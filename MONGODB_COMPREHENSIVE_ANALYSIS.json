@@ -1,0 +1,2426 @@
+{
+  "collections": {
+    "project_teams": {
+      "name": "project_teams",
+      "count": 0,
+      "size": 0,
+      "avgObjSize": 0,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_user_unique",
+          "key": {
+            "projectId": 1,
+            "userId": 1
+          },
+          "unique": true,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_status_idx",
+          "key": {
+            "projectId": 1,
+            "status": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "userId_idx",
+          "key": {
+            "userId": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {},
+      "sampleDocs": 0,
+      "issues": [
+        {
+          "type": "index",
+          "severity": "warning",
+          "message": "Unique index \"project_user_unique\" is not sparse - may cause issues with null values",
+          "index": "project_user_unique",
+          "fields": [
+            "projectId",
+            "userId"
+          ]
+        }
+      ]
+    },
+    "approvals": {
+      "name": "approvals",
+      "count": 2,
+      "size": 468,
+      "avgObjSize": 234,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "related_unique",
+          "key": {
+            "relatedId": 1,
+            "relatedModel": 1
+          },
+          "unique": true,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_status_idx",
+          "key": {
+            "projectId": 1,
+            "status": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "createdAt_desc",
+          "key": {
+            "createdAt": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "status_idx",
+          "key": {
+            "status": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "relatedId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "relatedModel": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "action": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "approvedBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "reason": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "timestamp": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "previousStatus": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "newStatus": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 2,
+      "issues": [
+        {
+          "type": "index",
+          "severity": "warning",
+          "message": "Unique index \"related_unique\" is not sparse - may cause issues with null values",
+          "index": "related_unique",
+          "fields": [
+            "relatedId",
+            "relatedModel"
+          ]
+        }
+      ]
+    },
+    "expenses": {
+      "name": "expenses",
+      "count": 4,
+      "size": 3396,
+      "avgObjSize": 849,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_expenseCode_unique",
+          "key": {
+            "projectId": 1,
+            "expenseCode": 1
+          },
+          "unique": true,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_status_idx",
+          "key": {
+            "projectId": 1,
+            "status": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "date_desc",
+          "key": {
+            "date": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "submittedBy_idx",
+          "key": {
+            "submittedBy": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "amount_idx",
+          "key": {
+            "amount": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "category_idx",
+          "key": {
+            "category": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "projectId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "expenseCode": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "amount": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "currency": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "category": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "description": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "vendor": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "date": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "status": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "paymentMethod": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "referenceNumber": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "receiptFileUrl": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "submittedBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": true,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "approvedBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "approvalNotes": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "approvalChain": {
+          "type": "object",
+          "isArray": true,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "notes": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "updatedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "deletedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": true,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 4,
+      "issues": [
+        {
+          "type": "index",
+          "severity": "warning",
+          "message": "Unique index \"project_expenseCode_unique\" is not sparse - may cause issues with null values",
+          "index": "project_expenseCode_unique",
+          "fields": [
+            "projectId",
+            "expenseCode"
+          ]
+        }
+      ]
+    },
+    "users": {
+      "name": "users",
+      "count": 3,
+      "size": 1320,
+      "avgObjSize": 440,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "supabaseId_unique",
+          "key": {
+            "supabaseId": 1
+          },
+          "unique": true,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "email_unique",
+          "key": {
+            "email": 1
+          },
+          "unique": true,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "createdAt_desc",
+          "key": {
+            "createdAt": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "status_idx",
+          "key": {
+            "status": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "role_idx",
+          "key": {
+            "role": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "supabaseId": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "email": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "firstName": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "lastName": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "role": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "status": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "updatedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "isVerified": {
+          "type": "boolean",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "notificationPreferences": {
+          "type": "object",
+          "isArray": false,
+          "isObject": true,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "metadata": {
+          "type": "object",
+          "isArray": false,
+          "isObject": true,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "lastLogin": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 3,
+      "issues": [
+        {
+          "type": "index",
+          "severity": "warning",
+          "message": "Unique index \"supabaseId_unique\" is not sparse - may cause issues with null values",
+          "index": "supabaseId_unique",
+          "fields": [
+            "supabaseId"
+          ]
+        },
+        {
+          "type": "index",
+          "severity": "warning",
+          "message": "Unique index \"email_unique\" is not sparse - may cause issues with null values",
+          "index": "email_unique",
+          "fields": [
+            "email"
+          ]
+        }
+      ]
+    },
+    "audit_logs": {
+      "name": "audit_logs",
+      "count": 24,
+      "size": 11933,
+      "avgObjSize": 497,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "userId_timestamp_desc",
+          "key": {
+            "userId": 1,
+            "timestamp": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "resource_idx",
+          "key": {
+            "resourceType": 1,
+            "resourceId": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_timestamp_desc",
+          "key": {
+            "projectId": 1,
+            "timestamp": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "action_idx",
+          "key": {
+            "action": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "timestamp_desc",
+          "key": {
+            "timestamp": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "userId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "action": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "entityType": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "entityId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "changes": {
+          "type": "object",
+          "isArray": false,
+          "isObject": true,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "timestamp": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "status": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 5,
+      "issues": []
+    },
+    "role_changes": {
+      "name": "role_changes",
+      "count": 1,
+      "size": 198,
+      "avgObjSize": 198,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "userId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "oldRole": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "newRole": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "changedBy": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "reason": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "timestamp": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 1,
+      "issues": []
+    },
+    "materials": {
+      "name": "materials",
+      "count": 1,
+      "size": 1689,
+      "avgObjSize": 1689,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_status_idx",
+          "key": {
+            "projectId": 1,
+            "status": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "purchaseDate_desc",
+          "key": {
+            "purchaseDate": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "category_idx",
+          "key": {
+            "category": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "quantity_received_idx",
+          "key": {
+            "quantity.received": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "status_idx",
+          "key": {
+            "status": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_materialCode_unique_sparse",
+          "key": {
+            "projectId": 1,
+            "materialCode": 1
+          },
+          "unique": true,
+          "sparse": true,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "projectId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "name": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "description": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "category": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "categoryId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "floor": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "quantityPurchased": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "quantityDelivered": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "quantityUsed": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "quantityRemaining": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "wastage": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "unit": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "unitCost": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "totalCost": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "supplierName": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "paymentMethod": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "invoiceNumber": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "invoiceDate": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "datePurchased": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "dateDelivered": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": true,
+          "sampleValues": {}
+        },
+        "dateUsed": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": true,
+          "sampleValues": {}
+        },
+        "receiptFileUrl": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "invoiceFileUrl": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "deliveryNoteFileUrl": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "receiptUploadedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "status": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "submittedBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": true,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "enteredBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "receivedBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": true,
+          "sampleValues": {}
+        },
+        "approvedBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": true,
+          "sampleValues": {}
+        },
+        "verifiedBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": true,
+          "sampleValues": {}
+        },
+        "approvalChain": {
+          "type": "object",
+          "isArray": true,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "notes": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "approvalNotes": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "finishingDetails": {
+          "type": "object",
+          "isArray": false,
+          "isObject": true,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "updatedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "deletedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": true,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 1,
+      "issues": []
+    },
+    "_connection_test": {
+      "name": "_connection_test",
+      "count": 0,
+      "size": 0,
+      "avgObjSize": 0,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {},
+      "sampleDocs": 0,
+      "issues": []
+    },
+    "initial_expenses": {
+      "name": "initial_expenses",
+      "count": 2,
+      "size": 1318,
+      "avgObjSize": 659,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "projectId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "expenseCode": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "category": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "itemName": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "amount": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "supplier": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "receiptNumber": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "receiptFileUrl": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "supportingDocuments": {
+          "type": "object",
+          "isArray": true,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "datePaid": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "enteredBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "approvedBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "approvalNotes": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "status": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "notes": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "updatedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 2,
+      "issues": []
+    },
+    "floors": {
+      "name": "floors",
+      "count": 1,
+      "size": 312,
+      "avgObjSize": 312,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "projectId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "floorNumber": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "name": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "description": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "status": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "totalBudget": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "actualCost": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "startDate": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "completionDate": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "updatedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 1,
+      "issues": []
+    },
+    "categories": {
+      "name": "categories",
+      "count": 1,
+      "size": 162,
+      "avgObjSize": 162,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "name": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "description": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "subcategories": {
+          "type": "object",
+          "isArray": true,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "icon": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "updatedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 1,
+      "issues": []
+    },
+    "investors": {
+      "name": "investors",
+      "count": 3,
+      "size": 2983,
+      "avgObjSize": 994,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "name": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "email": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "phone": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "investmentType": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "totalInvested": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "contributions": {
+          "type": "object",
+          "isArray": true,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "loanTerms": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "documents": {
+          "type": "object",
+          "isArray": true,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "status": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "updatedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "projectAllocations": {
+          "type": "object",
+          "isArray": true,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "userId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": true,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 3,
+      "issues": []
+    },
+    "project_finances": {
+      "name": "project_finances",
+      "count": 1,
+      "size": 254,
+      "avgObjSize": 254,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "projectId": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "totalInvested": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "totalLoans": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "totalEquity": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "totalUsed": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "capitalBalance": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "loanBalance": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "equityBalance": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "investorCount": {
+          "type": "number",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "lastUpdated": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "updatedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 1,
+      "issues": []
+    },
+    "notifications": {
+      "name": "notifications",
+      "count": 0,
+      "size": 0,
+      "avgObjSize": 0,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "user_read_created_idx",
+          "key": {
+            "userId": 1,
+            "isRead": 1,
+            "createdAt": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_created_idx",
+          "key": {
+            "projectId": 1,
+            "createdAt": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "isRead_idx",
+          "key": {
+            "isRead": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {},
+      "sampleDocs": 0,
+      "issues": []
+    },
+    "labour": {
+      "name": "labour",
+      "count": 0,
+      "size": 0,
+      "avgObjSize": 0,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_employee_date_idx",
+          "key": {
+            "projectId": 1,
+            "employeeId": 1,
+            "date": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "project_status_idx",
+          "key": {
+            "projectId": 1,
+            "status": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "date_desc",
+          "key": {
+            "date": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "supervisorId_idx",
+          "key": {
+            "supervisorId": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "status_idx",
+          "key": {
+            "status": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {},
+      "sampleDocs": 0,
+      "issues": []
+    },
+    "projects": {
+      "name": "projects",
+      "count": 1,
+      "size": 584,
+      "avgObjSize": 584,
+      "indexes": [
+        {
+          "name": "_id_",
+          "key": {
+            "_id": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "projectCode_unique",
+          "key": {
+            "projectCode": 1
+          },
+          "unique": true,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "projectName_idx",
+          "key": {
+            "projectName": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "location_idx",
+          "key": {
+            "location": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "status_idx",
+          "key": {
+            "status": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "createdAt_desc",
+          "key": {
+            "createdAt": -1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        },
+        {
+          "name": "budget_total_idx",
+          "key": {
+            "budget.total": 1
+          },
+          "unique": false,
+          "sparse": false,
+          "partialFilterExpression": null
+        }
+      ],
+      "schema": {
+        "_id": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "projectCode": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "projectName": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "description": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "location": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "client": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "status": {
+          "type": "string",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "startDate": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "plannedEndDate": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "actualEndDate": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": true,
+          "sampleValues": {}
+        },
+        "budget": {
+          "type": "object",
+          "isArray": false,
+          "isObject": true,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "siteManager": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": true,
+          "sampleValues": {}
+        },
+        "teamMembers": {
+          "type": "object",
+          "isArray": true,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdBy": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": true,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "createdAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "updatedAt": {
+          "type": "object",
+          "isArray": false,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": true,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "documents": {
+          "type": "object",
+          "isArray": true,
+          "isObject": false,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        },
+        "metadata": {
+          "type": "object",
+          "isArray": false,
+          "isObject": true,
+          "isObjectId": false,
+          "isDate": false,
+          "nullable": false,
+          "sampleValues": {}
+        }
+      },
+      "sampleDocs": 1,
+      "issues": [
+        {
+          "type": "index",
+          "severity": "warning",
+          "message": "Unique index \"projectCode_unique\" is not sparse - may cause issues with null values",
+          "index": "projectCode_unique",
+          "fields": [
+            "projectCode"
+          ]
+        }
+      ]
+    }
+  },
+  "indexes": {},
+  "issues": [],
+  "recommendations": [],
+  "statistics": {}
+}

@@ -1,0 +1,420 @@
+/**
+ * Materials API Route
+ * GET: List all materials with filters
+ * POST: Create new material
+ * 
+ * GET /api/materials
+ * POST /api/materials
+ */
+
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { getDatabase } from '@/lib/mongodb/connection';
+import { getUserProfile } from '@/lib/auth-helpers';
+import { hasPermission } from '@/lib/role-helpers';
+import { calculateTotalCost } from '@/lib/calculations';
+import { createAuditLog } from '@/lib/audit-log';
+import { ObjectId } from 'mongodb';
+import { successResponse, errorResponse } from '@/lib/api-response';
+
+/**
+ * GET /api/materials
+ * Returns materials with filtering, sorting, and pagination
+ * Auth: All authenticated users
+ * Query params: projectId, category, floor, status, supplier, search, page, limit, sortBy, sortOrder
+ */
+export async function GET(request) {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    const { searchParams } = new URL(request.url);
+    const projectId = searchParams.get('projectId');
+    const category = searchParams.get('category');
+    const floor = searchParams.get('floor');
+    const status = searchParams.get('status');
+    const supplier = searchParams.get('supplier');
+    const search = searchParams.get('search');
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+
+    const db = await getDatabase();
+
+    // Build query
+    const query = {};
+    const orConditions = [];
+
+    if (projectId && ObjectId.isValid(projectId)) {
+      query.projectId = new ObjectId(projectId);
+    }
+
+    if (category) {
+      if (ObjectId.isValid(category)) {
+        query.categoryId = new ObjectId(category);
+      } else {
+        query.category = category;
+      }
+    }
+
+    if (floor && ObjectId.isValid(floor)) {
+      query.floor = new ObjectId(floor);
+    }
+
+    if (status) {
+      query.status = status;
+    }
+
+    // Archive filter: if archived=true, show only archived; if archived=false or not set, exclude archived
+    const archived = searchParams.get('archived');
+    if (archived === 'true') {
+      query.deletedAt = { $ne: null };
+    } else if (archived === 'false' || !archived) {
+      // Default: exclude archived materials
+      query.deletedAt = null;
+    }
+
+    // Build supplier filter
+    if (supplier) {
+      orConditions.push(
+        { supplierName: { $regex: supplier, $options: 'i' } },
+        { supplier: { $regex: supplier, $options: 'i' } }
+      );
+    }
+
+    // Build search filter
+    if (search) {
+      const searchConditions = [
+        { name: { $regex: search, $options: 'i' } },
+        // Backward compatibility: also search materialName if it exists
+        { materialName: { $regex: search, $options: 'i' } },
+        { supplierName: { $regex: search, $options: 'i' } },
+        // Backward compatibility: also search supplier if it exists
+        { supplier: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ];
+      
+      // If supplier filter exists, combine with $and
+      if (orConditions.length > 0) {
+        query.$and = [
+          { $or: orConditions }, // Supplier filter
+          { $or: searchConditions } // Search filter
+        ];
+      } else {
+        query.$or = searchConditions;
+      }
+    } else if (orConditions.length > 0) {
+      // Only supplier filter, no search
+      query.$or = orConditions;
+    }
+
+    // Build sort
+    const sort = {};
+    sort[sortBy] = sortOrder === 'asc' ? 1 : -1;
+
+    // Execute query
+    const skip = (page - 1) * limit;
+    const materials = await db
+      .collection('materials')
+      .find(query)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit)
+      .toArray();
+
+    // Populate category names for materials that have categoryId
+    const categoryIds = materials
+      .map(m => m.categoryId)
+      .filter(id => id && ObjectId.isValid(id))
+      .map(id => new ObjectId(id));
+    
+    let categoriesMap = {};
+    if (categoryIds.length > 0) {
+      const categories = await db
+        .collection('categories')
+        .find({ _id: { $in: categoryIds } })
+        .toArray();
+      categoriesMap = categories.reduce((acc, cat) => {
+        acc[cat._id.toString()] = cat;
+        return acc;
+      }, {});
+    }
+
+    // Enrich materials with category details
+    const enrichedMaterials = materials.map(material => {
+      if (material.categoryId && categoriesMap[material.categoryId.toString()]) {
+        return {
+          ...material,
+          categoryDetails: categoriesMap[material.categoryId.toString()],
+          // Ensure category name is set (use from categoryDetails if category string is missing)
+          category: material.category || categoriesMap[material.categoryId.toString()].name,
+        };
+      }
+      return material;
+    });
+
+    const total = await db.collection('materials').countDocuments(query);
+
+    return successResponse(
+      {
+        materials: enrichedMaterials,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      },
+      'Materials retrieved successfully'
+    );
+  } catch (error) {
+    console.error('Get materials error:', error);
+    return errorResponse('Failed to retrieve materials', 500);
+  }
+}
+
+/**
+ * POST /api/materials
+ * Creates a new material entry
+ * Auth: CLERK, PM, OWNER
+ */
+export async function POST(request) {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    // Check permission
+    const hasCreatePermission = await hasPermission(user.id, 'create_material');
+    if (!hasCreatePermission) {
+      return errorResponse('Insufficient permissions. Only CLERK, PM, and OWNER can create materials.', 403);
+    }
+
+    const body = await request.json();
+    const {
+      projectId,
+      name,
+      materialName,
+      description,
+      category,
+      categoryId,
+      floor,
+      quantity,
+      quantityPurchased,
+      unit,
+      unitCost,
+      supplierName,
+      supplier,
+      paymentMethod,
+      invoiceNumber,
+      invoiceDate,
+      datePurchased,
+      notes,
+      // File uploads
+      receiptFileUrl,
+      receiptUrl,
+      invoiceFileUrl,
+      deliveryNoteFileUrl,
+      // Finishing details (Module 3)
+      finishingDetails,
+      // Dual Workflow fields
+      entryType,
+      materialRequestId,
+      purchaseOrderId,
+      orderFulfillmentDate,
+      retroactiveNotes,
+      originalPurchaseDate,
+      documentationStatus,
+      costStatus,
+      costVerified,
+    } = body;
+
+    // Validation
+    if (!projectId || !ObjectId.isValid(projectId)) {
+      return errorResponse('Valid projectId is required', 400);
+    }
+
+    // Determine entry type (default to retroactive for backward compatibility)
+    const materialEntryType = entryType || 'retroactive_entry';
+    
+    // Validate entry type specific requirements
+    if (materialEntryType === 'new_procurement') {
+      // For new procurement, must have purchaseOrderId
+      if (!purchaseOrderId || !ObjectId.isValid(purchaseOrderId)) {
+        return errorResponse('Purchase order ID required for new procurement entries', 400);
+      }
+    }
+
+    // Get user profile
+    const userProfile = await getUserProfile(user.id);
+    if (!userProfile) {
+      return errorResponse('User profile not found', 404);
+    }
+
+    const db = await getDatabase();
+
+    // For new procurement, validate purchase order exists and is fulfilled
+    if (materialEntryType === 'new_procurement') {
+      const purchaseOrder = await db.collection('purchase_orders').findOne({
+        _id: new ObjectId(purchaseOrderId),
+        status: 'ready_for_delivery',
+        deletedAt: null,
+      });
+      
+      if (!purchaseOrder) {
+        return errorResponse('Purchase order not found or not ready for delivery', 400);
+      }
+      
+      // Use data from purchase order if not provided
+      if (!name && !materialName) {
+        body.name = purchaseOrder.materialName;
+        body.materialName = purchaseOrder.materialName;
+      }
+      if (!quantity && !quantityPurchased) {
+        body.quantity = purchaseOrder.quantityOrdered;
+        body.quantityPurchased = purchaseOrder.quantityOrdered;
+      }
+      if (!unitCost && purchaseOrder.unitCost) {
+        body.unitCost = purchaseOrder.unitCost;
+      }
+      if (!supplierName && !supplier && purchaseOrder.supplierName) {
+        body.supplierName = purchaseOrder.supplierName;
+        body.supplier = purchaseOrder.supplierName;
+      }
+      if (!deliveryNoteFileUrl && purchaseOrder.deliveryNoteFileUrl) {
+        body.deliveryNoteFileUrl = purchaseOrder.deliveryNoteFileUrl;
+      }
+      // Set order fulfillment date
+      body.orderFulfillmentDate = new Date();
+    }
+
+    // Now get values after potential purchase order data merge
+    const itemName = name || materialName;
+    if (!itemName || itemName.trim().length === 0) {
+      return errorResponse('Material name is required', 400);
+    }
+
+    const qty = quantity || quantityPurchased;
+    if (!qty || qty <= 0) {
+      return errorResponse('Quantity must be greater than 0', 400);
+    }
+
+    // For retroactive entries, unitCost is optional
+    if (materialEntryType === 'new_procurement' && (!unitCost || unitCost < 0)) {
+      return errorResponse('Unit cost must be non-negative', 400);
+    }
+    // For retroactive, allow missing unitCost (will be 0)
+    const finalUnitCost = unitCost || 0;
+
+    // For retroactive entries, set defaults for optional fields
+    if (materialEntryType === 'retroactive_entry') {
+      if (!supplierName && !supplier) {
+        body.supplierName = 'Unknown';
+        body.supplier = 'Unknown';
+      }
+      if (!costStatus) {
+        const calculatedTotal = calculateTotalCost(qty, finalUnitCost);
+        body.costStatus = (calculatedTotal > 0) ? 'actual' : 'missing';
+      }
+      if (!documentationStatus) {
+        body.documentationStatus = (receiptFileUrl || receiptUrl || invoiceFileUrl) ? 'complete' : 'missing';
+      }
+    }
+
+    const supplierNameValue = supplierName || supplier || 'Unknown';
+    // Only require supplier for new procurement
+    if (materialEntryType === 'new_procurement' && (!supplierNameValue || supplierNameValue.trim().length === 0)) {
+      return errorResponse('Supplier name is required for new procurement entries', 400);
+    }
+
+    // Calculate total cost
+    const totalCost = calculateTotalCost(qty, finalUnitCost);
+
+    // Build material document (using standard field names only)
+    const material = {
+      projectId: new ObjectId(projectId),
+      name: itemName.trim(), // Standard field name
+      description: description?.trim() || '',
+      category: category || 'other', // Keep for queries, categoryId is primary
+      ...(categoryId && ObjectId.isValid(categoryId) && { categoryId: new ObjectId(categoryId) }),
+      ...(floor && ObjectId.isValid(floor) && { floor: new ObjectId(floor) }),
+      quantityPurchased: parseFloat(qty), // Standard field name
+      quantityDelivered: 0,
+      quantityUsed: 0,
+      quantityRemaining: parseFloat(qty), // Initially same as purchased
+      wastage: 0,
+      unit: unit || 'piece',
+      unitCost: parseFloat(finalUnitCost),
+      totalCost, // Standard field name
+      supplierName: supplierNameValue.trim(), // Standard field name
+      paymentMethod: paymentMethod || 'CASH',
+      invoiceNumber: invoiceNumber?.trim() || '',
+      invoiceDate: invoiceDate ? new Date(invoiceDate) : null,
+      datePurchased: datePurchased ? new Date(datePurchased) : new Date(),
+      dateDelivered: null,
+      dateUsed: null,
+      receiptFileUrl: receiptFileUrl || receiptUrl || null, // Standard field name (backward compatible for reading)
+      invoiceFileUrl: invoiceFileUrl || null,
+      deliveryNoteFileUrl: deliveryNoteFileUrl || null,
+      receiptUploadedAt: (receiptFileUrl || receiptUrl) ? new Date() : null,
+      status: 'draft',
+      submittedBy: {
+        userId: new ObjectId(userProfile._id),
+        name: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
+        email: userProfile.email,
+      },
+      enteredBy: new ObjectId(userProfile._id),
+      receivedBy: null,
+      approvedBy: null,
+      verifiedBy: null,
+      approvalChain: [],
+      notes: notes?.trim() || '',
+      approvalNotes: '',
+      // Finishing details (Module 3) - optional field for finishing stage materials
+      ...(finishingDetails && { finishingDetails }),
+      // Dual Workflow fields
+      entryType: materialEntryType,
+      isRetroactiveEntry: materialEntryType === 'retroactive_entry',
+      materialRequestId: materialRequestId && ObjectId.isValid(materialRequestId) ? new ObjectId(materialRequestId) : null,
+      purchaseOrderId: purchaseOrderId && ObjectId.isValid(purchaseOrderId) ? new ObjectId(purchaseOrderId) : null,
+      orderFulfillmentDate: orderFulfillmentDate ? new Date(orderFulfillmentDate) : null,
+      retroactiveNotes: retroactiveNotes?.trim() || null,
+      originalPurchaseDate: originalPurchaseDate ? new Date(originalPurchaseDate) : null,
+      documentationStatus: documentationStatus || null,
+      costStatus: costStatus || 'actual',
+      costVerified: costVerified || false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deletedAt: null,
+    };
+
+    // Insert material
+    const result = await db.collection('materials').insertOne(material);
+
+    const insertedMaterial = { ...material, _id: result.insertedId };
+
+    // Create audit log
+    await createAuditLog({
+      userId: userProfile._id.toString(),
+      action: 'CREATED',
+      entityType: 'MATERIAL',
+      entityId: result.insertedId.toString(),
+      projectId: projectId,
+      changes: { created: insertedMaterial },
+    });
+
+    return successResponse(insertedMaterial, 'Material created successfully', 201);
+  } catch (error) {
+    console.error('Create material error:', error);
+    return errorResponse('Failed to create material', 500);
+  }
+}
+

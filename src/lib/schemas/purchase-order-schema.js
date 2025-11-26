@@ -1,0 +1,227 @@
+/**
+ * Purchase Order Schema Definition
+ * Centralized schema definition for purchase orders
+ */
+
+/**
+ * Purchase Order Schema
+ * @typedef {Object} PurchaseOrderSchema
+ * @property {string} purchaseOrderNumber - Auto-generated: PO-YYYYMMDD-001 (unique)
+ * @property {ObjectId} materialRequestId - Links to material request (required)
+ * @property {ObjectId} supplierId - Supplier user ID (required)
+ * @property {string} supplierName - Denormalized supplier name
+ * @property {string} [supplierEmail] - Denormalized supplier email
+ * @property {ObjectId} projectId - Project ID (required)
+ * @property {ObjectId} [floorId] - Floor ID (optional)
+ * @property {ObjectId} [categoryId] - Category ID (optional)
+ * @property {string} [category] - Denormalized category name
+ * @property {string} materialName - Material name
+ * @property {string} [description] - Material description
+ * @property {number} quantityOrdered - Quantity ordered (required, > 0)
+ * @property {string} unit - Unit of measurement
+ * @property {number} unitCost - Per unit cost (required, >= 0)
+ * @property {number} totalCost - Total cost: quantityOrdered * unitCost (required)
+ * @property {Date} deliveryDate - Expected delivery date (required)
+ * @property {string} [terms] - Payment terms, delivery terms
+ * @property {string} [notes] - Additional notes
+ * @property {string} status - Status: 'order_sent', 'order_accepted', 'order_rejected', 'order_modified', 'ready_for_delivery', 'delivered', 'cancelled'
+ * @property {Date} [sentAt] - When order was sent
+ * @property {string} [supplierResponse] - 'accept', 'reject', 'modify'
+ * @property {Date} [supplierResponseDate] - When supplier responded
+ * @property {string} [supplierNotes] - Supplier's response notes
+ * @property {Object} [supplierModifications] - If supplier proposes changes
+ * @property {boolean} [modificationApproved] - If PM/OWNER approved supplier modifications
+ * @property {string} [deliveryNoteFileUrl] - Uploaded by supplier
+ * @property {number} [actualQuantityDelivered] - Actual quantity delivered (may differ from ordered)
+ * @property {ObjectId} [linkedMaterialId] - Material entry created from this order
+ * @property {ObjectId} createdBy - PM/OWNER who created the order
+ * @property {string} createdByName - Denormalized creator name
+ * @property {string} financialStatus - 'not_committed', 'committed', 'fulfilled'
+ * @property {Date} [committedAt] - When order was accepted (committed)
+ * @property {Date} [fulfilledAt] - When material entry created (fulfilled)
+ * @property {Date} createdAt - Creation timestamp
+ * @property {Date} updatedAt - Last update timestamp
+ * @property {Date} [deletedAt] - Soft delete timestamp
+ */
+
+export const PURCHASE_ORDER_SCHEMA = {
+  purchaseOrderNumber: String, // Auto-generated: PO-YYYYMMDD-001
+  materialRequestId: 'ObjectId', // Links to material request
+  supplierId: 'ObjectId', // Supplier user ID
+  supplierName: String, // Denormalized
+  supplierEmail: String, // Denormalized
+  projectId: 'ObjectId',
+  floorId: 'ObjectId', // Optional
+  categoryId: 'ObjectId', // Optional
+  category: String, // Denormalized
+  materialName: String,
+  description: String,
+  quantityOrdered: Number,
+  unit: String,
+  unitCost: Number, // From supplier quote or estimated
+  totalCost: Number, // quantityOrdered * unitCost
+  deliveryDate: Date, // Expected delivery date
+  terms: String, // Payment terms, delivery terms
+  notes: String, // Additional notes
+  status: String, // 'order_sent', 'order_accepted', 'order_rejected', 'order_modified', 'ready_for_delivery', 'delivered', 'cancelled'
+  sentAt: Date,
+  supplierResponse: String, // 'accept', 'reject', 'modify'
+  supplierResponseDate: Date,
+  supplierNotes: String, // Supplier's response notes
+  supplierModifications: Object, // If supplier proposes changes
+  modificationApproved: Boolean, // If PM/OWNER approved supplier modifications
+  deliveryNoteFileUrl: String, // Uploaded by supplier
+  actualQuantityDelivered: Number, // Actual quantity delivered (may differ from ordered)
+  linkedMaterialId: 'ObjectId', // Material entry created from this order
+  createdBy: 'ObjectId', // PM/OWNER who created the order
+  createdByName: String,
+  financialStatus: String, // 'not_committed', 'committed', 'fulfilled'
+  committedAt: Date, // When order was accepted (committed)
+  fulfilledAt: Date, // When material entry created (fulfilled)
+  createdAt: Date,
+  updatedAt: Date,
+  deletedAt: Date, // Soft delete
+};
+
+/**
+ * Valid purchase order statuses
+ */
+export const VALID_PURCHASE_ORDER_STATUSES = [
+  'order_sent',
+  'order_accepted',
+  'order_rejected',
+  'order_modified',
+  'ready_for_delivery',
+  'delivered',
+  'cancelled',
+];
+
+/**
+ * Valid supplier responses
+ */
+export const VALID_SUPPLIER_RESPONSES = ['accept', 'reject', 'modify'];
+
+/**
+ * Valid financial statuses
+ */
+export const VALID_FINANCIAL_STATUSES = ['not_committed', 'committed', 'fulfilled'];
+
+/**
+ * Validation rules for purchase orders
+ */
+export const PURCHASE_ORDER_VALIDATION = {
+  purchaseOrderNumber: {
+    required: false, // Auto-generated
+    type: 'string',
+    pattern: /^PO-\d{8}-\d{3}$/,
+  },
+  materialRequestId: {
+    required: true,
+    type: 'ObjectId',
+  },
+  supplierId: {
+    required: true,
+    type: 'ObjectId',
+  },
+  projectId: {
+    required: true,
+    type: 'ObjectId',
+  },
+  quantityOrdered: {
+    required: true,
+    type: 'number',
+    min: 0.01,
+  },
+  unitCost: {
+    required: true,
+    type: 'number',
+    min: 0,
+  },
+  totalCost: {
+    required: true,
+    type: 'number',
+    min: 0,
+  },
+  deliveryDate: {
+    required: true,
+    type: 'Date',
+  },
+  status: {
+    required: true,
+    type: 'string',
+    enum: VALID_PURCHASE_ORDER_STATUSES,
+    default: 'order_sent',
+  },
+  financialStatus: {
+    required: true,
+    type: 'string',
+    enum: VALID_FINANCIAL_STATUSES,
+    default: 'not_committed',
+  },
+};
+
+/**
+ * Validate purchase order data
+ * @param {Object} data - Purchase order data to validate
+ * @returns {Object} { isValid: boolean, errors: string[] }
+ */
+export function validatePurchaseOrder(data) {
+  const errors = [];
+
+  // Required fields
+  if (!data.materialRequestId) {
+    errors.push('materialRequestId is required');
+  }
+  if (!data.supplierId) {
+    errors.push('supplierId is required');
+  }
+  if (!data.projectId) {
+    errors.push('projectId is required');
+  }
+  if (!data.quantityOrdered || data.quantityOrdered <= 0) {
+    errors.push('quantityOrdered is required and must be greater than 0');
+  }
+  if (data.unitCost === undefined || data.unitCost < 0) {
+    errors.push('unitCost is required and must be >= 0');
+  }
+  if (data.totalCost === undefined || data.totalCost < 0) {
+    errors.push('totalCost is required and must be >= 0');
+  }
+  if (!data.deliveryDate) {
+    errors.push('deliveryDate is required');
+  }
+
+  // Validate totalCost calculation
+  if (data.quantityOrdered && data.unitCost !== undefined && data.totalCost !== undefined) {
+    const expectedTotal = data.quantityOrdered * data.unitCost;
+    if (Math.abs(data.totalCost - expectedTotal) > 0.01) {
+      errors.push(`totalCost (${data.totalCost}) must equal quantityOrdered (${data.quantityOrdered}) * unitCost (${data.unitCost}) = ${expectedTotal}`);
+    }
+  }
+
+  // Validate delivery date is in the future
+  if (data.deliveryDate) {
+    const deliveryDate = new Date(data.deliveryDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (deliveryDate < today) {
+      errors.push('deliveryDate must be a future date');
+    }
+  }
+
+  // Validate status
+  if (data.status && !VALID_PURCHASE_ORDER_STATUSES.includes(data.status)) {
+    errors.push(`status must be one of: ${VALID_PURCHASE_ORDER_STATUSES.join(', ')}`);
+  }
+
+  // Validate financial status
+  if (data.financialStatus && !VALID_FINANCIAL_STATUSES.includes(data.financialStatus)) {
+    errors.push(`financialStatus must be one of: ${VALID_FINANCIAL_STATUSES.join(', ')}`);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+

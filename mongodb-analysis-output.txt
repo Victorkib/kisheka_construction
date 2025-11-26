@@ -1,0 +1,469 @@
+🔍 Starting Comprehensive MongoDB Database Analysis...
+
+📡 Connecting to MongoDB...
+✅ Connected to MongoDB
+
+📋 Found 16 collections
+
+
+================================================================================
+📊 Analyzing Collection: project_teams
+================================================================================
+   Count: 0
+   Size: 0.00 MB
+   Indexes: 4
+   ⚠️  Issues found: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+     2. project_user_unique
+        Keys: {"projectId":1,"userId":1}
+        ⚠️  UNIQUE
+     3. project_status_idx
+        Keys: {"projectId":1,"status":1}
+     4. userId_idx
+        Keys: {"userId":1}
+
+================================================================================
+📊 Analyzing Collection: approvals
+================================================================================
+   Count: 2
+   Size: 0.00 MB
+   Indexes: 5
+   ⚠️  Issues found: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+     2. related_unique
+        Keys: {"relatedId":1,"relatedModel":1}
+        ⚠️  UNIQUE
+     3. project_status_idx
+        Keys: {"projectId":1,"status":1}
+     4. createdAt_desc
+        Keys: {"createdAt":-1}
+     5. status_idx
+        Keys: {"status":1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - relatedId: ObjectId
+     - relatedModel: string
+     - action: string
+     - approvedBy: ObjectId
+     - reason: string
+     - timestamp: Date
+     - previousStatus: string
+     - newStatus: string
+     - createdAt: Date
+
+================================================================================
+📊 Analyzing Collection: expenses
+================================================================================
+   Count: 4
+   Size: 0.00 MB
+   Indexes: 7
+   ⚠️  Issues found: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+     2. project_expenseCode_unique
+        Keys: {"projectId":1,"expenseCode":1}
+        ⚠️  UNIQUE
+     3. project_status_idx
+        Keys: {"projectId":1,"status":1}
+     4. date_desc
+        Keys: {"date":-1}
+     5. submittedBy_idx
+        Keys: {"submittedBy":1}
+     6. amount_idx
+        Keys: {"amount":1}
+     7. category_idx
+        Keys: {"category":1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - projectId: ObjectId
+     - expenseCode: string
+     - amount: number
+     - currency: string
+     - category: string
+     - description: string
+     - vendor: string
+     - date: Date
+     - status: string
+     ... and 11 more fields
+
+================================================================================
+📊 Analyzing Collection: users
+================================================================================
+   Count: 3
+   Size: 0.00 MB
+   Indexes: 6
+   ⚠️  Issues found: 2
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+     2. supabaseId_unique
+        Keys: {"supabaseId":1}
+        ⚠️  UNIQUE
+     3. email_unique
+        Keys: {"email":1}
+        ⚠️  UNIQUE
+     4. createdAt_desc
+        Keys: {"createdAt":-1}
+     5. status_idx
+        Keys: {"status":1}
+     6. role_idx
+        Keys: {"role":1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - supabaseId: string
+     - email: string
+     - firstName: string
+     - lastName: string
+     - role: string
+     - status: string
+     - updatedAt: Date
+     - isVerified: boolean
+     - createdAt: Date
+     ... and 3 more fields
+
+================================================================================
+📊 Analyzing Collection: audit_logs
+================================================================================
+   Count: 24
+   Size: 0.01 MB
+   Indexes: 6
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+     2. userId_timestamp_desc
+        Keys: {"userId":1,"timestamp":-1}
+     3. resource_idx
+        Keys: {"resourceType":1,"resourceId":1}
+     4. project_timestamp_desc
+        Keys: {"projectId":1,"timestamp":-1}
+     5. action_idx
+        Keys: {"action":1}
+     6. timestamp_desc
+        Keys: {"timestamp":-1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - userId: ObjectId
+     - action: string
+     - entityType: string
+     - entityId: ObjectId
+     - changes: Object
+     - timestamp: Date
+     - status: string
+
+================================================================================
+📊 Analyzing Collection: role_changes
+================================================================================
+   Count: 1
+   Size: 0.00 MB
+   Indexes: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - userId: ObjectId
+     - oldRole: string
+     - newRole: string
+     - changedBy: string
+     - reason: string
+     - timestamp: Date
+
+================================================================================
+📊 Analyzing Collection: materials
+================================================================================
+   Count: 1
+   Size: 0.00 MB
+   Indexes: 7
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+     2. project_status_idx
+        Keys: {"projectId":1,"status":1}
+     3. purchaseDate_desc
+        Keys: {"purchaseDate":-1}
+     4. category_idx
+        Keys: {"category":1}
+     5. quantity_received_idx
+        Keys: {"quantity.received":1}
+     6. status_idx
+        Keys: {"status":1}
+     7. project_materialCode_unique_sparse
+        Keys: {"projectId":1,"materialCode":1}
+        ⚠️  UNIQUE
+        ✅ SPARSE
+
+   Schema (from samples):
+     - _id: ObjectId
+     - projectId: ObjectId
+     - name: string
+     - description: string
+     - category: string
+     - categoryId: ObjectId
+     - floor: ObjectId
+     - quantityPurchased: number
+     - quantityDelivered: number
+     - quantityUsed: number
+     ... and 29 more fields
+
+================================================================================
+📊 Analyzing Collection: _connection_test
+================================================================================
+   Count: 0
+   Size: 0.00 MB
+   Indexes: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+
+================================================================================
+📊 Analyzing Collection: initial_expenses
+================================================================================
+   Count: 2
+   Size: 0.00 MB
+   Indexes: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - projectId: ObjectId
+     - expenseCode: string
+     - category: string
+     - itemName: string
+     - amount: number
+     - supplier: string
+     - receiptNumber: string
+     - receiptFileUrl: string
+     - supportingDocuments: Array
+     ... and 8 more fields
+
+================================================================================
+📊 Analyzing Collection: floors
+================================================================================
+   Count: 1
+   Size: 0.00 MB
+   Indexes: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - projectId: ObjectId
+     - floorNumber: number
+     - name: string
+     - description: string
+     - status: string
+     - totalBudget: number
+     - actualCost: number
+     - startDate: Date
+     - completionDate: Date
+     ... and 2 more fields
+
+================================================================================
+📊 Analyzing Collection: categories
+================================================================================
+   Count: 1
+   Size: 0.00 MB
+   Indexes: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - name: string
+     - description: string
+     - subcategories: Array
+     - icon: string
+     - createdAt: Date
+     - updatedAt: Date
+
+================================================================================
+📊 Analyzing Collection: investors
+================================================================================
+   Count: 3
+   Size: 0.00 MB
+   Indexes: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - name: string
+     - email: string
+     - phone: string
+     - investmentType: string
+     - totalInvested: number
+     - contributions: Array
+     - loanTerms: object
+     - documents: Array
+     - status: string
+     ... and 4 more fields
+
+================================================================================
+📊 Analyzing Collection: project_finances
+================================================================================
+   Count: 1
+   Size: 0.00 MB
+   Indexes: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - projectId: ObjectId
+     - totalInvested: number
+     - totalLoans: number
+     - totalEquity: number
+     - totalUsed: number
+     - capitalBalance: number
+     - loanBalance: number
+     - equityBalance: number
+     - investorCount: number
+     ... and 3 more fields
+
+================================================================================
+📊 Analyzing Collection: notifications
+================================================================================
+   Count: 0
+   Size: 0.00 MB
+   Indexes: 4
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+     2. user_read_created_idx
+        Keys: {"userId":1,"isRead":1,"createdAt":-1}
+     3. project_created_idx
+        Keys: {"projectId":1,"createdAt":-1}
+     4. isRead_idx
+        Keys: {"isRead":1}
+
+================================================================================
+📊 Analyzing Collection: labour
+================================================================================
+   Count: 0
+   Size: 0.00 MB
+   Indexes: 6
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+     2. project_employee_date_idx
+        Keys: {"projectId":1,"employeeId":1,"date":1}
+     3. project_status_idx
+        Keys: {"projectId":1,"status":1}
+     4. date_desc
+        Keys: {"date":-1}
+     5. supervisorId_idx
+        Keys: {"supervisorId":1}
+     6. status_idx
+        Keys: {"status":1}
+
+================================================================================
+📊 Analyzing Collection: projects
+================================================================================
+   Count: 1
+   Size: 0.00 MB
+   Indexes: 7
+   ⚠️  Issues found: 1
+
+   Indexes:
+     1. _id_
+        Keys: {"_id":1}
+     2. projectCode_unique
+        Keys: {"projectCode":1}
+        ⚠️  UNIQUE
+     3. projectName_idx
+        Keys: {"projectName":1}
+     4. location_idx
+        Keys: {"location":1}
+     5. status_idx
+        Keys: {"status":1}
+     6. createdAt_desc
+        Keys: {"createdAt":-1}
+     7. budget_total_idx
+        Keys: {"budget.total":1}
+
+   Schema (from samples):
+     - _id: ObjectId
+     - projectCode: string
+     - projectName: string
+     - description: string
+     - location: string
+     - client: string
+     - status: string
+     - startDate: Date
+     - plannedEndDate: Date
+     - actualEndDate: object (nullable)
+     ... and 8 more fields
+
+
+================================================================================
+🔍 Running Data Integrity Checks...
+================================================================================
+
+
+================================================================================
+🔍 Checking Schema Mismatches...
+================================================================================
+
+   Errors: 0
+   Warnings: 0
+
+
+================================================================================
+🔍 Detailed Materials Index Analysis...
+================================================================================
+
+   Found index: project_materialCode_unique_sparse
+   Keys: {"projectId":1,"materialCode":1}
+   Unique: true
+   Sparse: true
+   Partial Filter: None
+
+   Materials with null materialCode: 1
+   Projects with multiple null materialCode: 0
+
+
+================================================================================
+📊 ANALYSIS SUMMARY
+================================================================================
+
+   Collections Analyzed: 16
+   Total Issues Found: 0
+   Errors: 0
+   Warnings: 0
+
+✅ Analysis saved to: MONGODB_COMPREHENSIVE_ANALYSIS.json
+
+✅ Connection closed
+
+✅ Comprehensive analysis complete

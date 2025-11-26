@@ -1,0 +1,219 @@
+/**
+ * Expense Approval API Route
+ * POST: Approve an expense submission
+ * 
+ * POST /api/expenses/[id]/approve
+ * Auth: PM, OWNER, ACCOUNTANT
+ */
+
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { getDatabase } from '@/lib/mongodb/connection';
+import { getUserProfile } from '@/lib/auth-helpers';
+import { hasPermission } from '@/lib/role-helpers';
+import { createAuditLog } from '@/lib/audit-log';
+import { createNotification } from '@/lib/notifications';
+import { ObjectId } from 'mongodb';
+import { successResponse, errorResponse } from '@/lib/api-response';
+import { validateCapitalAvailability, recalculateProjectFinances } from '@/lib/financial-helpers';
+
+/**
+ * POST /api/expenses/[id]/approve
+ * Approves an expense submission
+ * Creates approval record and updates expense status
+ * Auth: PM, OWNER, ACCOUNTANT
+ */
+export async function POST(request, { params }) {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    // Check permission
+    const hasApprovePermission = await hasPermission(user.id, 'approve_expense');
+    if (!hasApprovePermission) {
+      return errorResponse('Insufficient permissions. Only PM, OWNER, and ACCOUNTANT can approve expenses.', 403);
+    }
+
+    const { id } = await params;
+
+    if (!ObjectId.isValid(id)) {
+      return errorResponse('Invalid expense ID', 400);
+    }
+
+    const body = await request.json();
+    const { notes, approvalNotes } = body;
+
+    const db = await getDatabase();
+    const userProfile = await getUserProfile(user.id);
+
+    if (!userProfile) {
+      return errorResponse('User profile not found', 404);
+    }
+
+    // Get existing expense
+    const existingExpense = await db.collection('expenses').findOne({
+      _id: new ObjectId(id),
+      deletedAt: null,
+    });
+
+    if (!existingExpense) {
+      return errorResponse('Expense not found', 404);
+    }
+
+    // Check if expense can be approved
+    const approvableStatuses = ['PENDING', 'REJECTED'];
+    if (!approvableStatuses.includes(existingExpense.status)) {
+      return errorResponse(
+        `Cannot approve expense with status "${existingExpense.status}". Expense must be PENDING or REJECTED.`,
+        400
+      );
+    }
+
+    // Validate capital availability before approval
+    if (existingExpense.projectId) {
+      const expenseAmount = existingExpense.amount || 0;
+      try {
+        const capitalValidation = await validateCapitalAvailability(
+          existingExpense.projectId.toString(),
+          expenseAmount
+        );
+
+        if (!capitalValidation.isValid) {
+          const availableFormatted = capitalValidation.available.toLocaleString('en-KE', {
+            style: 'currency',
+            currency: 'KES',
+            minimumFractionDigits: 0,
+          });
+          const requiredFormatted = capitalValidation.required.toLocaleString('en-KE', {
+            style: 'currency',
+            currency: 'KES',
+            minimumFractionDigits: 0,
+          });
+          
+          return errorResponse(
+            {
+              message: `Cannot approve expense: ${capitalValidation.message}`,
+              available: capitalValidation.available,
+              required: capitalValidation.required,
+              shortfall: capitalValidation.required - capitalValidation.available,
+            },
+            `Cannot approve expense: ${capitalValidation.message}. Available capital: ${availableFormatted}, Required: ${requiredFormatted}. Shortfall: ${(capitalValidation.required - capitalValidation.available).toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}`,
+            400
+          );
+        }
+      } catch (validationError) {
+        console.error('Capital validation error:', validationError);
+        return errorResponse(
+          'Unable to validate capital availability. Please try again or contact support if the issue persists.',
+          500
+        );
+      }
+    }
+
+    // Create approval entry
+    const approvalEntry = {
+      approverId: new ObjectId(userProfile._id),
+      approverName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
+      status: 'approved',
+      notes: notes || approvalNotes || '',
+      approvedAt: new Date(),
+    };
+
+    // Update expense
+    const previousStatus = existingExpense.status;
+    const result = await db.collection('expenses').findOneAndUpdate(
+      { _id: new ObjectId(id) },
+      {
+        $push: { approvalChain: approvalEntry },
+        $set: {
+          status: 'APPROVED',
+          approvedBy: new ObjectId(userProfile._id),
+          approvalNotes: notes || approvalNotes || '',
+          updatedAt: new Date(),
+        },
+      },
+      { returnDocument: 'after' }
+    );
+
+    // Create approval record in approvals collection
+    await db.collection('approvals').insertOne({
+      relatedId: new ObjectId(id),
+      relatedModel: 'EXPENSE',
+      action: 'APPROVED',
+      approvedBy: new ObjectId(userProfile._id),
+      reason: notes || approvalNotes || 'Expense approved',
+      timestamp: new Date(),
+      previousStatus,
+      newStatus: 'APPROVED',
+      createdAt: new Date(),
+    });
+
+    // Create audit log
+    await createAuditLog({
+      userId: userProfile._id.toString(),
+      action: 'APPROVED',
+      entityType: 'EXPENSE',
+      entityId: id,
+      projectId: existingExpense.projectId?.toString(),
+      changes: {
+        status: {
+          oldValue: previousStatus,
+          newValue: 'APPROVED',
+        },
+        approvedBy: {
+          oldValue: existingExpense.approvedBy,
+          newValue: userProfile._id.toString(),
+        },
+      },
+    });
+
+    // Create notification for submitter
+    if (existingExpense.submittedBy?._id) {
+      await createNotification({
+        userId: existingExpense.submittedBy._id.toString(),
+        type: 'approval_status',
+        title: 'Expense Approved',
+        message: `Your expense "${existingExpense.expenseCode || existingExpense.description}" has been approved by ${userProfile.firstName || userProfile.email}.`,
+        projectId: existingExpense.projectId?.toString(),
+        relatedModel: 'EXPENSE',
+        relatedId: id,
+        createdBy: userProfile._id.toString(),
+      });
+    }
+
+    // Auto-recalculate project finances after approval (async, non-blocking)
+    if (existingExpense.projectId) {
+      recalculateProjectFinances(existingExpense.projectId.toString())
+        .then(() => {
+          console.log(`✅ Project finances updated for project ${existingExpense.projectId}`);
+        })
+        .catch((error) => {
+          console.error(`❌ Error updating project finances for project ${existingExpense.projectId}:`, error);
+          // Log detailed error for debugging
+          console.error('Error details:', {
+            projectId: existingExpense.projectId.toString(),
+            expenseId: id,
+            errorMessage: error.message,
+            errorStack: error.stack,
+          });
+          // Don't fail the approval if finances update fails, but log it for manual review
+        });
+    }
+
+    return successResponse(
+      {
+        expense: result.value,
+        approval: approvalEntry,
+      },
+      'Expense approved successfully'
+    );
+  } catch (error) {
+    console.error('Approve expense error:', error);
+    return errorResponse('Failed to approve expense', 500);
+  }
+}
+

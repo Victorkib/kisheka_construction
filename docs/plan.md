@@ -407,20 +407,3 @@ are included and mapped correctly into:
 ✔ Reporting engine
 ✔ Dashboard views
 
----
-
-# If you want, I can now generate:
-
-### ✔ **MongoDB schemas for all models**
-
-### ✔ **API route templates**
-
-### ✔ **Component/file structure for the Next.js app**
-
-### ✔ **ERD (Entity Relationship Diagram)**
-
-### ✔ **UI wireframes**
-
-### ✔ **System architecture diagram**
-
-Just say **"Next: generate X"**.
