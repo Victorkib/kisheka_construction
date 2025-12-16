@@ -402,7 +402,7 @@ export default function UserDetailPage() {
                   ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
                   : 'User Details'}
               </h1>
-              <p className="text-gray-600 mt-2">{userData.email}</p>
+              <p className="text-gray-700 mt-2">{userData.email}</p>
             </div>
             <div className="flex gap-2">
               {userData.status === 'active' ? (
@@ -462,7 +462,7 @@ export default function UserDetailPage() {
                   value={formData.firstName || ''}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
@@ -475,7 +475,7 @@ export default function UserDetailPage() {
                   value={formData.lastName || ''}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
@@ -488,7 +488,7 @@ export default function UserDetailPage() {
                   onChange={handleInputChange}
                   required
                   disabled={userData.role?.toLowerCase() === 'owner'}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-700"
                 >
                   <option value="site_clerk">Clerk</option>
                   <option value="pm">Project Manager</option>
@@ -499,7 +499,7 @@ export default function UserDetailPage() {
                   {userData.role?.toLowerCase() === 'owner' && <option value="owner">Owner</option>}
                 </select>
                 {userData.role?.toLowerCase() === 'owner' && (
-                  <p className="text-xs text-gray-500 mt-1">Owner role cannot be changed</p>
+                  <p className="text-sm text-gray-700 mt-1">Owner role cannot be changed</p>
                 )}
               </div>
               <div>
@@ -512,7 +512,7 @@ export default function UserDetailPage() {
                   onChange={handleInputChange}
                   required
                   disabled={userData.role?.toLowerCase() === 'owner'}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-700"
                 >
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
@@ -529,7 +529,7 @@ export default function UserDetailPage() {
                   onChange={handleInputChange}
                   rows={3}
                   placeholder="Enter reason for role/status change..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
                 />
               </div>
             </div>
@@ -563,27 +563,27 @@ export default function UserDetailPage() {
           <h2 className="text-xl font-semibold text-gray-900 mb-4">User Information</h2>
           <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <dt className="text-sm font-medium text-gray-500">Email</dt>
+              <dt className="text-sm font-medium text-gray-700">Email</dt>
               <dd className="mt-1 text-sm text-gray-900">{userData.email}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">First Name</dt>
+              <dt className="text-sm font-medium text-gray-700">First Name</dt>
               <dd className="mt-1 text-sm text-gray-900">{userData.firstName || 'N/A'}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">Last Name</dt>
+              <dt className="text-sm font-medium text-gray-700">Last Name</dt>
               <dd className="mt-1 text-sm text-gray-900">{userData.lastName || 'N/A'}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">Created At</dt>
+              <dt className="text-sm font-medium text-gray-700">Created At</dt>
               <dd className="mt-1 text-sm text-gray-900">{formatDate(userData.createdAt)}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">Last Login</dt>
+              <dt className="text-sm font-medium text-gray-700">Last Login</dt>
               <dd className="mt-1 text-sm text-gray-900">{formatDate(userData.lastLogin)}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">Last Activity</dt>
+              <dt className="text-sm font-medium text-gray-700">Last Activity</dt>
               <dd className="mt-1 text-sm text-gray-900">
                 {formatDate(userData.metadata?.lastActivityAt)}
               </dd>
@@ -617,7 +617,7 @@ export default function UserDetailPage() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Role Change History</h2>
           {roleHistory.length === 0 ? (
-            <p className="text-gray-500">No role changes recorded</p>
+            <p className="text-gray-700">No role changes recorded</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -643,7 +643,7 @@ export default function UserDetailPage() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {roleHistory.map((change) => (
                     <tr key={change.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                         {formatDate(change.timestamp)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -652,10 +652,10 @@ export default function UserDetailPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getRoleBadge(change.newRole)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                         {change.changedBy?.name || change.changedBy?.email || 'System'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
+                      <td className="px-6 py-4 text-sm text-gray-700">
                         {change.reason || 'N/A'}
                       </td>
                     </tr>
@@ -672,10 +672,10 @@ export default function UserDetailPage() {
           {loadingActivity ? (
             <div className="text-center py-8">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-sm text-gray-600">Loading activity...</p>
+              <p className="mt-2 text-sm text-gray-700">Loading activity...</p>
             </div>
           ) : userActivity.length === 0 ? (
-            <p className="text-gray-500">No activity recorded</p>
+            <p className="text-gray-700">No activity recorded</p>
           ) : (
             <div className="space-y-4">
               {userActivity.map((activity, index) => {
@@ -708,9 +708,9 @@ export default function UserDetailPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900">{activity.description}</p>
-                      <p className="text-sm text-gray-600 mt-1 leading-normal">{formatDate(activity.timestamp)}</p>
+                      <p className="text-sm text-gray-700 mt-1 leading-normal">{formatDate(activity.timestamp)}</p>
                       {activity.metadata && Object.keys(activity.metadata).length > 0 && (
-                        <div className="mt-2 text-xs text-gray-600">
+                        <div className="mt-2 text-sm text-gray-700">
                           {activity.metadata.reason && (
                             <p className="italic">Reason: {activity.metadata.reason}</p>
                           )}

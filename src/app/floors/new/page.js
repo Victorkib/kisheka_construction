@@ -24,10 +24,12 @@ function NewFloorPageContent() {
   const [projects, setProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
 
+  const isBasement = searchParams.get('basement') === 'true';
+  
   const [formData, setFormData] = useState({
     projectId: searchParams.get('projectId') || '',
-    floorNumber: '',
-    name: '',
+    floorNumber: isBasement ? '-1' : '',
+    name: isBasement ? 'Basement 1' : '',
     description: '',
     status: 'NOT_STARTED',
     totalBudget: '',
@@ -106,9 +108,30 @@ function NewFloorPageContent() {
       return;
     }
 
-    const floorNumber = parseInt(formData.floorNumber);
-    if (isNaN(floorNumber) || floorNumber < 0) {
-      setError('Floor number must be a non-negative number');
+    // Auto-calculate basement floor number if creating basement and floor number not set
+    let floorNumber = parseInt(formData.floorNumber);
+    if (isBasement && (isNaN(floorNumber) || floorNumber >= 0)) {
+      // Find the lowest basement number for this project
+      try {
+        const floorsResponse = await fetch(`/api/floors?projectId=${formData.projectId}`);
+        const floorsData = await floorsResponse.json();
+        if (floorsData.success) {
+          const existingFloors = floorsData.data || [];
+          const basementFloors = existingFloors.filter(f => f.floorNumber < 0);
+          const lowestBasement = basementFloors.length > 0 
+            ? Math.min(...basementFloors.map(f => f.floorNumber))
+            : 0;
+          floorNumber = lowestBasement - 1; // Next basement number
+        } else {
+          floorNumber = -1; // Default to Basement 1
+        }
+      } catch (err) {
+        floorNumber = -1; // Default to Basement 1
+      }
+    }
+    
+    if (isNaN(floorNumber) || floorNumber < -10 || floorNumber > 100) {
+      setError('Floor number must be between -10 (Basement 10) and 100');
       setLoading(false);
       return;
     }
@@ -235,14 +258,25 @@ function NewFloorPageContent() {
               name="floorNumber"
               value={formData.floorNumber}
               onChange={handleChange}
-              min="0"
+              min="-10"
+              max="100"
               required
-              placeholder="e.g., 0 for Basement/Ground Floor, 1 for First Floor"
+              placeholder="e.g., -2 for Basement 2, -1 for Basement 1, 0 for Ground Floor, 1 for First Floor"
               className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
-            <p className="mt-1 text-sm text-gray-500">
-              Use 0 for Basement/Ground Floor, 1 for First Floor, 2 for Second Floor, etc. (up to 10 for superstructure)
-            </p>
+            <div className="mt-2 space-y-1">
+              <p className="text-sm text-gray-600">
+                <strong>Floor Numbering System:</strong>
+              </p>
+              <ul className="text-sm text-gray-600 list-disc list-inside space-y-1 ml-2">
+                <li><strong>Negative numbers (-1, -2, etc.):</strong> Basements (below ground level)</li>
+                <li><strong>Zero (0):</strong> Ground Floor (at ground level)</li>
+                <li><strong>Positive numbers (1, 2, 3, etc.):</strong> Above-ground floors</li>
+              </ul>
+              <p className="text-sm text-gray-500 mt-2">
+                <strong>Tip:</strong> If creating a basement and leaving floor number empty, the system will automatically assign the next available basement number.
+              </p>
+            </div>
           </div>
 
           {/* Floor Name */}

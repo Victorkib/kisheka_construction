@@ -184,18 +184,20 @@ export async function calculateCommittedCost(projectId) {
 }
 
 /**
- * Calculate total estimated cost from approved material requests
+ * Calculate total estimated cost from approved material requests (not yet converted)
  * @param {string} projectId - Project ID
  * @returns {Promise<number>} Total estimated cost
  */
 export async function calculateEstimatedCost(projectId) {
   const db = await getDatabase();
   
+  // Calculate estimated cost from approved material requests (not yet converted)
+  // Once converted to PO, it moves from estimatedCost to committedCost
   const result = await db.collection('material_requests').aggregate([
     {
       $match: {
         projectId: new ObjectId(projectId),
-        status: { $in: ['approved', 'converted_to_order'] },
+        status: 'approved', // Only 'approved', not 'converted_to_order'
         deletedAt: null,
         estimatedCost: { $exists: true, $ne: null, $gt: 0 },
       },
@@ -216,9 +218,10 @@ export async function calculateEstimatedCost(projectId) {
  * @param {string} projectId - Project ID
  * @param {number} amount - Amount to add/subtract
  * @param {string} operation - 'add' or 'subtract'
+ * @param {Object} [session] - MongoDB session for transactions (optional)
  * @returns {Promise<number>} New committed cost
  */
-export async function updateCommittedCost(projectId, amount, operation = 'add') {
+export async function updateCommittedCost(projectId, amount, operation = 'add', session = null) {
   const db = await getDatabase();
   
   const finances = await getProjectFinances(projectId);
@@ -232,6 +235,8 @@ export async function updateCommittedCost(projectId, amount, operation = 'add') 
   const totalUsed = finances?.totalUsed || 0;
   const availableCapital = totalInvested - totalUsed - newCommitted;
   
+  const updateOptions = session ? { session } : {};
+  
   await db.collection('project_finances').updateOne(
     { projectId: new ObjectId(projectId) },
     {
@@ -240,7 +245,8 @@ export async function updateCommittedCost(projectId, amount, operation = 'add') 
         availableCapital: availableCapital,
         updatedAt: new Date(),
       },
-    }
+    },
+    updateOptions
   );
   
   return newCommitted;
@@ -250,10 +256,11 @@ export async function updateCommittedCost(projectId, amount, operation = 'add') 
  * Decrease committed cost when order is fulfilled
  * @param {string} projectId - Project ID
  * @param {number} amount - Amount to decrease
+ * @param {Object} [session] - MongoDB session for transactions (optional)
  * @returns {Promise<number>} New committed cost
  */
-export async function decreaseCommittedCost(projectId, amount) {
-  return await updateCommittedCost(projectId, amount, 'subtract');
+export async function decreaseCommittedCost(projectId, amount, session = null) {
+  return await updateCommittedCost(projectId, amount, 'subtract', session);
 }
 
 /**
@@ -291,16 +298,97 @@ export async function calculateMaterialsBreakdown(projectId) {
   // Committed from accepted purchase orders
   const committed = await calculateCommittedCost(projectId);
   
-  // Estimated from approved requests
+  // Estimated from approved requests (including bulk requests)
   const estimated = await calculateEstimatedCost(projectId);
+  
+  // Include bulk order estimates from batches
+  const batchEstimates = await db.collection('material_request_batches').aggregate([
+    {
+      $match: {
+        projectId: new ObjectId(projectId),
+        status: { $in: ['approved', 'partially_ordered', 'fully_ordered'] },
+        deletedAt: null,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: '$totalEstimatedCost' },
+      },
+    },
+  ]).toArray();
+  
+  const batchEstimated = batchEstimates[0]?.total || 0;
+  const totalEstimated = estimated + batchEstimated;
   
   return {
     budget,
     actual,
     committed,
-    estimated,
+    estimated: totalEstimated,
+    batchEstimated,
     remaining: Math.max(0, budget - actual - committed),
     variance: actual - budget,
+  };
+}
+
+/**
+ * Validate capital removal before removing allocation
+ * Checks if removing capital would cause negative available capital
+ * @param {string} projectId - Project ID
+ * @param {number} amountToRemove - Amount to be removed
+ * @returns {Promise<Object>} Validation result
+ */
+export async function validateCapitalRemoval(projectId, amountToRemove) {
+  if (!projectId || !ObjectId.isValid(projectId)) {
+    return {
+      canRemove: false,
+      currentAvailable: 0,
+      availableAfterRemoval: 0,
+      shortfall: 0,
+      message: 'Invalid project ID',
+    };
+  }
+
+  if (!amountToRemove || amountToRemove <= 0) {
+    return {
+      canRemove: true,
+      currentAvailable: 0,
+      availableAfterRemoval: 0,
+      shortfall: 0,
+      message: 'No amount to remove',
+    };
+  }
+
+  // Get current project finances
+  const finances = await getProjectFinances(projectId);
+  const totalInvested = finances.totalInvested || 0;
+  const totalUsed = finances.totalUsed || 0;
+  const committedCost = finances.committedCost || 0;
+  
+  // Calculate current available capital
+  const currentAvailable = Math.max(0, totalInvested - totalUsed - committedCost);
+  
+  // Calculate available after removal
+  const newTotalInvested = totalInvested - amountToRemove;
+  const availableAfterRemoval = Math.max(0, newTotalInvested - totalUsed - committedCost);
+  
+  // Check if removal would cause negative available
+  const canRemove = availableAfterRemoval >= 0;
+  const shortfall = availableAfterRemoval < 0 ? Math.abs(availableAfterRemoval) : 0;
+
+  return {
+    canRemove,
+    currentAvailable,
+    availableAfterRemoval,
+    shortfall,
+    currentTotalInvested: totalInvested,
+    newTotalInvested,
+    totalUsed,
+    committedCost,
+    message: canRemove
+      ? `Capital removal allowed. Available after removal: ${availableAfterRemoval.toLocaleString()}`
+      : `Cannot remove capital. Would cause negative available capital. Current available: ${currentAvailable.toLocaleString()}, Removal amount: ${amountToRemove.toLocaleString()}, Shortfall: ${shortfall.toLocaleString()}`,
   };
 }
 
@@ -354,6 +442,76 @@ export async function validateCapitalAvailability(projectId, amount) {
     message: isValid
       ? `Sufficient capital. Available: ${available.toLocaleString()}`
       : `Insufficient capital. Available: ${available.toLocaleString()}, Required: ${amount.toLocaleString()}, Shortfall: ${(amount - available).toLocaleString()}`,
+  };
+}
+
+/**
+ * Calculate batch financials
+ * @param {string} batchId - Batch ID
+ * @returns {Promise<Object>} Batch financial breakdown
+ */
+export async function calculateBatchFinancials(batchId) {
+  const db = await getDatabase();
+  
+  const batch = await db.collection('material_request_batches').findOne({
+    _id: new ObjectId(batchId),
+    deletedAt: null,
+  });
+  
+  if (!batch) {
+    return {
+      totalEstimatedCost: 0,
+      totalCommittedCost: 0,
+      totalActualCost: 0,
+      materialCount: 0,
+    };
+  }
+  
+  // Get committed cost from purchase orders linked to this batch
+  const committedResult = await db.collection('purchase_orders').aggregate([
+    {
+      $match: {
+        batchId: new ObjectId(batchId),
+        status: { $in: ['order_accepted', 'ready_for_delivery', 'delivered'] },
+        financialStatus: { $in: ['committed', 'fulfilled'] },
+        deletedAt: null,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: '$totalCost' },
+      },
+    },
+  ]).toArray();
+  
+  const totalCommittedCost = committedResult[0]?.total || 0;
+  
+  // Get actual cost from materials created from this batch
+  const actualResult = await db.collection('materials').aggregate([
+    {
+      $match: {
+        materialRequestId: { $in: batch.materialRequestIds.map((id) => new ObjectId(id)) },
+        status: { $in: MATERIAL_APPROVED_STATUSES },
+        deletedAt: null,
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: '$totalCost' },
+      },
+    },
+  ]).toArray();
+  
+  const totalActualCost = actualResult[0]?.total || 0;
+  
+  return {
+    totalEstimatedCost: batch.totalEstimatedCost || 0,
+    totalCommittedCost,
+    totalActualCost,
+    materialCount: batch.totalMaterials || 0,
+    variance: totalActualCost - (batch.totalEstimatedCost || 0),
   };
 }
 

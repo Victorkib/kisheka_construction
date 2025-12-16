@@ -86,6 +86,18 @@ export const NAVIGATION_SECTIONS = {
         roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant', 'supervisor'],
       },
       {
+        label: 'Material Library',
+        href: '/material-library',
+        roles: ['owner', 'pm', 'project_manager'],
+        icon: 'book',
+      },
+      {
+        label: 'Bulk Material Request',
+        href: '/material-requests/bulk',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'supervisor'],
+        icon: 'shopping-cart',
+      },
+      {
         label: 'Material Requests',
         href: '/material-requests',
         roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant', 'supervisor'],
@@ -148,43 +160,12 @@ export const NAVIGATION_SECTIONS = {
       },
     ],
   },
-  supplier: {
-    label: 'Purchase Orders',
-    icon: 'briefcase',
-    roles: ['supplier'],
-    children: [
-      {
-        label: 'All Orders',
-        href: '/supplier/purchase-orders',
-        roles: ['supplier'],
-      },
-      {
-        label: 'Pending Response',
-        href: '/supplier/purchase-orders?status=order_sent',
-        roles: ['supplier'],
-        badge: 'pending_orders', // Will show count of pending orders
-      },
-      {
-        label: 'Accepted Orders',
-        href: '/supplier/purchase-orders?status=order_accepted',
-        roles: ['supplier'],
-      },
-      {
-        label: 'Ready to Deliver',
-        href: '/supplier/purchase-orders?status=ready_for_delivery',
-        roles: ['supplier'],
-      },
-      {
-        label: 'Delivery Notes',
-        href: '/supplier/delivery-notes',
-        roles: ['supplier'],
-      },
-    ],
-  },
+  // Supplier navigation removed - suppliers no longer have system access
+  // They receive purchase orders via email/SMS/push and respond via secure token links
   management: {
     label: 'Management',
     icon: 'settings',
-    roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant'],
+    roles: ['owner', 'pm', 'project_manager', 'accountant'],
     children: [
       {
         label: 'Users',
@@ -192,14 +173,19 @@ export const NAVIGATION_SECTIONS = {
         roles: ['owner'],
       },
       {
+        label: 'Suppliers',
+        href: '/suppliers',
+        roles: ['owner', 'pm', 'project_manager'],
+      },
+      {
         label: 'Categories',
         href: '/categories',
-        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant'],
+        roles: ['owner', 'pm', 'project_manager', 'accountant'],
       },
       {
         label: 'Floors',
         href: '/floors',
-        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant'],
+        roles: ['owner', 'pm', 'project_manager', 'accountant'],
       },
     ],
   },

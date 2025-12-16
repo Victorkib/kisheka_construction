@@ -10,6 +10,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getNavigationForRole } from '@/lib/navigation-helpers';
 import { usePermissions } from '@/hooks/use-permissions';
+import { SidebarDataProvider } from '@/components/layout/SidebarDataProvider';
+import { ContextualQuickActions } from '@/components/navigation/ContextualQuickActions';
+import { CurrentProjectContext } from '@/components/navigation/CurrentProjectContext';
+import { RecentlyViewed } from '@/components/navigation/RecentlyViewed';
+import { PendingActions } from '@/components/navigation/PendingActions';
+import { SuggestedActions } from '@/components/navigation/SuggestedActions';
 
 /**
  * Icon component placeholder
@@ -298,27 +304,51 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
   }, [navigation, pendingApprovalsCount, pendingOrdersCount, readyToOrderCount]);
 
   return (
+    <SidebarDataProvider>
+      <SidebarContent
+        isCollapsed={isCollapsed}
+        onToggleCollapse={onToggleCollapse}
+        user={user}
+        pathname={pathname}
+        navigationWithBadges={navigationWithBadges}
+      />
+    </SidebarDataProvider>
+  );
+});
+
+/**
+ * Sidebar Content Component
+ * Separated to use SidebarDataProvider context
+ */
+const SidebarContent = memo(function SidebarContent({
+  isCollapsed,
+  onToggleCollapse,
+  user,
+  pathname,
+  navigationWithBadges,
+}) {
+  return (
     <aside
       className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen ${
         isCollapsed ? 'w-16' : 'w-64'
       }`}
     >
-      {/* Logo/Brand */}
-      <div className="p-4 border-b border-gray-200 flex-shrink-0">
+      {/* Logo/Brand - Sticky Top */}
+      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white z-10">
         <div className="flex items-center justify-between">
           {!isCollapsed && (
-            <Link href="/dashboard" className="text-xl font-bold text-blue-600">
+            <Link href="/dashboard" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition">
               Kisheka
             </Link>
           )}
           {isCollapsed && (
-            <Link href="/dashboard" className="text-xl font-bold text-blue-600">
+            <Link href="/dashboard" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition" title="Kisheka">
               K
             </Link>
           )}
           <button
             onClick={onToggleCollapse}
-            className="p-1 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+            className="p-1 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition"
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -332,27 +362,54 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-1 min-h-0">
-        {navigationWithBadges.map((section) => (
-          <NavSection
-            key={section.label}
-            section={section}
-            pathname={pathname}
-            isCollapsed={isCollapsed}
-          />
-        ))}
-      </nav>
+      {/* Primary Sections - Sticky */}
+      <div className="flex-shrink-0">
+        {/* Current Project Context */}
+        <CurrentProjectContext isCollapsed={isCollapsed} />
+      </div>
 
-      {/* User Info (when not collapsed) */}
-      {!isCollapsed && user && (
-        <div className="p-4 border-t border-gray-200 flex-shrink-0">
-          <div className="text-sm">
-            <p className="font-medium text-gray-900">{user.firstName || user.email}</p>
-            <p className="text-gray-500 capitalize">{user.role || 'User'}</p>
-          </div>
+      {/* Scrollable Middle Section */}
+      <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+        {/* Secondary Sections */}
+        <div className="flex-shrink-0">
+          {/* Pending Actions */}
+          <PendingActions isCollapsed={isCollapsed} />
+
+          {/* Suggested Actions */}
+          <SuggestedActions isCollapsed={isCollapsed} />
+
+          {/* Recently Viewed */}
+          <RecentlyViewed isCollapsed={isCollapsed} />
         </div>
-      )}
+
+        {/* Main Navigation */}
+        <nav className="p-4 space-y-1">
+          {navigationWithBadges.map((section) => (
+            <NavSection
+              key={section.label}
+              section={section}
+              pathname={pathname}
+              isCollapsed={isCollapsed}
+            />
+          ))}
+        </nav>
+      </div>
+
+      {/* Bottom Sections - Sticky */}
+      <div className="flex-shrink-0 border-t border-gray-200 bg-white">
+        {/* Contextual Quick Actions */}
+        <ContextualQuickActions isCollapsed={isCollapsed} />
+
+        {/* User Info (when not collapsed) */}
+        {!isCollapsed && user && (
+          <div className="p-4 border-t border-gray-200">
+            <div className="text-sm">
+              <p className="font-medium text-gray-900 truncate">{user.firstName || user.email}</p>
+              <p className="text-gray-500 capitalize text-xs">{user.role || 'User'}</p>
+            </div>
+          </div>
+        )}
+      </div>
     </aside>
   );
 });

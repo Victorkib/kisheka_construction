@@ -125,6 +125,10 @@ async function setupDatabase() {
     await materialRequestsCollection.createIndex({ status: 1, createdAt: -1 }, { name: 'status_createdAt_desc' });
     await materialRequestsCollection.createIndex({ createdAt: -1 }, { name: 'createdAt_desc' });
     await materialRequestsCollection.createIndex({ linkedPurchaseOrderId: 1 }, { name: 'linkedPurchaseOrderId_idx', sparse: true });
+    // Bulk request indexes
+    await materialRequestsCollection.createIndex({ batchId: 1, status: 1 }, { name: 'batchId_status_idx', sparse: true });
+    await materialRequestsCollection.createIndex({ batchNumber: 1 }, { name: 'batchNumber_idx', sparse: true });
+    await materialRequestsCollection.createIndex({ libraryMaterialId: 1 }, { name: 'libraryMaterialId_idx', sparse: true });
     console.log('✅ Material requests collection ready\n');
     
     // ============================================
@@ -140,7 +144,52 @@ async function setupDatabase() {
     await purchaseOrdersCollection.createIndex({ status: 1, sentAt: -1 }, { name: 'status_sentAt_desc' });
     await purchaseOrdersCollection.createIndex({ createdAt: -1 }, { name: 'createdAt_desc' });
     await purchaseOrdersCollection.createIndex({ linkedMaterialId: 1 }, { name: 'linkedMaterialId_idx', sparse: true });
+    // New indexes for token-based responses and communication tracking
+    await purchaseOrdersCollection.createIndex({ responseToken: 1 }, { sparse: true, name: 'responseToken_idx' });
+    await purchaseOrdersCollection.createIndex({ 'communications.sentAt': -1 }, { name: 'communications_sentAt_desc' });
+    await purchaseOrdersCollection.createIndex({ autoConfirmed: 1 }, { name: 'autoConfirmed_idx' });
+    // Bulk order indexes
+    await purchaseOrdersCollection.createIndex({ isBulkOrder: 1, supplierId: 1, status: 1 }, { name: 'bulkOrder_supplier_status_idx', sparse: true });
+    await purchaseOrdersCollection.createIndex({ batchId: 1 }, { name: 'batchId_idx', sparse: true });
+    await purchaseOrdersCollection.createIndex({ materialRequestIds: 1 }, { name: 'materialRequestIds_idx', sparse: true });
     console.log('✅ Purchase orders collection ready\n');
+    
+    // ============================================
+    // 3c. SUPPLIERS COLLECTION (Supplier Restructuring)
+    // ============================================
+    console.log('📝 Setting up suppliers collection...');
+    const suppliersCollection = db.collection('suppliers');
+    
+    // Unique email index
+    await suppliersCollection.createIndex({ email: 1 }, { unique: true, name: 'email_unique' });
+    // Search and filtering indexes
+    await suppliersCollection.createIndex({ name: 1 }, { name: 'name_text' });
+    await suppliersCollection.createIndex({ status: 1 }, { name: 'status_idx' });
+    await suppliersCollection.createIndex({ specialties: 1 }, { name: 'specialties_idx' });
+    await suppliersCollection.createIndex({ createdAt: -1 }, { name: 'createdAt_desc' });
+    await suppliersCollection.createIndex({ deletedAt: 1 }, { sparse: true, name: 'deletedAt_idx' });
+    // Push notification subscription index
+    await suppliersCollection.createIndex({ 'pushSubscription.endpoint': 1 }, { sparse: true, name: 'pushEndpoint_idx' });
+    console.log('✅ Suppliers collection ready\n');
+    
+    // ============================================
+    // 3d. PUSH_SUBSCRIPTIONS COLLECTION (Push Notifications)
+    // ============================================
+    console.log('📝 Setting up push_subscriptions collection...');
+    const pushSubscriptionsCollection = db.collection('push_subscriptions');
+    
+    // Unique endpoint index
+    await pushSubscriptionsCollection.createIndex({ endpoint: 1 }, { unique: true, name: 'endpoint_unique' });
+    // User/Supplier lookups
+    await pushSubscriptionsCollection.createIndex({ userId: 1 }, { name: 'userId_idx' });
+    await pushSubscriptionsCollection.createIndex({ supplierId: 1 }, { sparse: true, name: 'supplierId_idx' });
+    await pushSubscriptionsCollection.createIndex({ userType: 1, userId: 1 }, { name: 'userType_userId_idx' });
+    await pushSubscriptionsCollection.createIndex({ userType: 1, supplierId: 1 }, { sparse: true, name: 'userType_supplierId_idx' });
+    // Status and expiration
+    await pushSubscriptionsCollection.createIndex({ status: 1 }, { name: 'status_idx' });
+    await pushSubscriptionsCollection.createIndex({ expiresAt: 1 }, { name: 'expiresAt_idx' });
+    await pushSubscriptionsCollection.createIndex({ lastActiveAt: -1 }, { name: 'lastActiveAt_desc' });
+    console.log('✅ Push subscriptions collection ready\n');
     
     // ============================================
     // 4. EXPENSES COLLECTION
@@ -253,6 +302,125 @@ async function setupDatabase() {
     await projectTeamsCollection.createIndex({ projectId: 1, status: 1 }, { name: 'project_status_idx' });
     await projectTeamsCollection.createIndex({ userId: 1 }, { name: 'userId_idx' });
     console.log('✅ Project teams collection ready\n');
+    
+    // ============================================
+    // 10. INVITATIONS COLLECTION
+    // ============================================
+    console.log('📝 Setting up invitations collection...');
+    const invitationsCollection = db.collection('invitations');
+    
+    await invitationsCollection.createIndex({ email: 1, status: 1 }, { name: 'email_status_idx' });
+    await invitationsCollection.createIndex({ token: 1 }, { unique: true, name: 'token_unique', sparse: true });
+    await invitationsCollection.createIndex({ status: 1, expiresAt: 1 }, { name: 'status_expiresAt_idx' });
+    await invitationsCollection.createIndex({ invitedBy: 1 }, { name: 'invitedBy_idx' });
+    await invitationsCollection.createIndex({ createdAt: -1 }, { name: 'createdAt_desc' });
+    await invitationsCollection.createIndex({ expiresAt: 1 }, { name: 'expiresAt_idx' });
+    console.log('✅ Invitations collection ready\n');
+    
+    // ============================================
+    // 11. ROLE_CHANGES COLLECTION
+    // ============================================
+    console.log('📝 Setting up role_changes collection...');
+    const roleChangesCollection = db.collection('role_changes');
+    
+    await roleChangesCollection.createIndex({ userId: 1, timestamp: -1 }, { name: 'userId_timestamp_desc' });
+    await roleChangesCollection.createIndex({ changedBy: 1 }, { name: 'changedBy_idx' });
+    await roleChangesCollection.createIndex({ timestamp: -1 }, { name: 'timestamp_desc' });
+    await roleChangesCollection.createIndex({ newRole: 1 }, { name: 'newRole_idx' });
+    console.log('✅ Role changes collection ready\n');
+    
+    // ============================================
+    // 12. MATERIAL_LIBRARY COLLECTION (Bulk Procurement)
+    // ============================================
+    console.log('📝 Setting up material_library collection...');
+    const materialLibraryCollection = db.collection('material_library');
+    
+    await materialLibraryCollection.createIndex(
+      { categoryId: 1, name: 1 },
+      { unique: false, name: 'category_name_idx' }
+    );
+    await materialLibraryCollection.createIndex(
+      { isCommon: 1, isActive: 1, usageCount: -1 },
+      { name: 'common_active_usage_idx' }
+    );
+    await materialLibraryCollection.createIndex(
+      { name: 'text', description: 'text' },
+      { name: 'text_search_idx' }
+    );
+    await materialLibraryCollection.createIndex(
+      { categoryId: 1, isActive: 1 },
+      { name: 'category_active_idx' }
+    );
+    await materialLibraryCollection.createIndex(
+      { createdAt: -1 },
+      { name: 'createdAt_desc_idx' }
+    );
+    await materialLibraryCollection.createIndex(
+      { deletedAt: 1 },
+      { sparse: true, name: 'deletedAt_idx' }
+    );
+    console.log('✅ Material library collection ready\n');
+    
+    // ============================================
+    // 13. MATERIAL_REQUEST_BATCHES COLLECTION (Bulk Procurement)
+    // ============================================
+    console.log('📝 Setting up material_request_batches collection...');
+    const batchesCollection = db.collection('material_request_batches');
+    
+    await batchesCollection.createIndex(
+      { batchNumber: 1 },
+      { unique: true, name: 'batchNumber_unique_idx' }
+    );
+    await batchesCollection.createIndex(
+      { projectId: 1, createdAt: -1 },
+      { name: 'project_createdAt_idx' }
+    );
+    await batchesCollection.createIndex(
+      { status: 1, createdAt: -1 },
+      { name: 'status_createdAt_idx' }
+    );
+    await batchesCollection.createIndex(
+      { createdBy: 1, createdAt: -1 },
+      { name: 'createdBy_createdAt_idx' }
+    );
+    await batchesCollection.createIndex(
+      { deletedAt: 1 },
+      { sparse: true, name: 'deletedAt_idx' }
+    );
+    // Performance indexes for batch operations
+    await batchesCollection.createIndex(
+      { materialRequestIds: 1 },
+      { name: 'materialRequestIds_idx' }
+    );
+    await batchesCollection.createIndex(
+      { approvedBy: 1, approvedAt: -1 },
+      { sparse: true, name: 'approvedBy_approvedAt_idx' }
+    );
+    console.log('✅ Material request batches collection ready\n');
+    
+    // ============================================
+    // 14. MATERIAL_TEMPLATES COLLECTION (Bulk Procurement)
+    // ============================================
+    console.log('📝 Setting up material_templates collection...');
+    const templatesCollection = db.collection('material_templates');
+    
+    await templatesCollection.createIndex(
+      { name: 1, createdBy: 1 },
+      { unique: false, name: 'name_createdBy_idx' }
+    );
+    await templatesCollection.createIndex(
+      { createdBy: 1, createdAt: -1 },
+      { name: 'createdBy_createdAt_idx' }
+    );
+    await templatesCollection.createIndex(
+      { isPublic: 1, usageCount: -1 },
+      { name: 'public_usage_idx' }
+    );
+    await templatesCollection.createIndex(
+      { deletedAt: 1 },
+      { sparse: true, name: 'deletedAt_idx' }
+    );
+    console.log('✅ Material templates collection ready\n');
     
     // ============================================
     // SUMMARY

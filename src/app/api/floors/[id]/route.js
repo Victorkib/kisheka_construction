@@ -133,3 +133,87 @@ export async function PATCH(request, { params }) {
   }
 }
 
+/**
+ * DELETE /api/floors/[id]
+ * Deletes a floor (if not in use)
+ * Auth: PM, OWNER only
+ */
+export async function DELETE(request, { params }) {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    // Check permission
+    const hasDeletePermission = await hasPermission(user.id, 'delete_floor');
+    if (!hasDeletePermission) {
+      return errorResponse('Insufficient permissions. Only PM and OWNER can delete floors.', 403);
+    }
+
+    const { id } = await params;
+    
+    if (!id || !ObjectId.isValid(id)) {
+      return errorResponse('Invalid floor ID', 400);
+    }
+
+    const db = await getDatabase();
+
+    // Check if floor exists
+    const floor = await db.collection('floors').findOne({
+      _id: new ObjectId(id),
+    });
+
+    if (!floor) {
+      return errorResponse('Floor not found', 404);
+    }
+
+    // Check dependencies: materials, material requests, purchase orders
+    const [materialCount, materialRequestCount, purchaseOrderCount] = await Promise.all([
+      db.collection('materials').countDocuments({
+        floor: new ObjectId(id),
+        deletedAt: null,
+      }),
+      db.collection('material_requests').countDocuments({
+        floorId: new ObjectId(id),
+        deletedAt: null,
+      }),
+      // Check if any purchase orders reference this floor through material requests
+      db.collection('purchase_orders').countDocuments({
+        'materialRequest.floorId': new ObjectId(id),
+        deletedAt: null,
+      }),
+    ]);
+
+    const dependencies = [];
+    if (materialCount > 0) {
+      dependencies.push(`${materialCount} material(s)`);
+    }
+    if (materialRequestCount > 0) {
+      dependencies.push(`${materialRequestCount} material request(s)`);
+    }
+    if (purchaseOrderCount > 0) {
+      dependencies.push(`${purchaseOrderCount} purchase order(s)`);
+    }
+
+    if (dependencies.length > 0) {
+      return errorResponse(
+        `Cannot delete floor. It is used by: ${dependencies.join(', ')}. Please reassign or remove these items first.`,
+        400
+      );
+    }
+
+    // Delete floor
+    await db.collection('floors').deleteOne({
+      _id: new ObjectId(id),
+    });
+
+    return successResponse(null, 'Floor deleted successfully', 200);
+  } catch (error) {
+    console.error('Delete floor error:', error);
+    return errorResponse('Failed to delete floor', 500);
+  }
+}
+

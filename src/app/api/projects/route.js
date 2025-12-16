@@ -16,6 +16,7 @@ import { createAuditLog } from '@/lib/audit-log';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { calculateProjectTotals } from '@/lib/investment-allocation';
+import { recalculateProjectFinances } from '@/lib/financial-helpers';
 
 /**
  * GET /api/projects
@@ -149,6 +150,10 @@ export async function POST(request) {
       startDate,
       plannedEndDate,
       budget,
+      floorCount,
+      autoCreateFloors = true, // Default: true for backward compatibility
+      includeBasements = false,
+      basementCount = 0,
     } = body;
 
     // Validation
@@ -171,6 +176,23 @@ export async function POST(request) {
       return errorResponse('Project with this code already exists', 400);
     }
 
+    // Check budget and generate warning if zero (don't block project creation)
+    // Optional: Require budget > 0 (configurable via environment variable)
+    let budgetWarning = null;
+    const budgetTotal = budget?.total || 0;
+    
+    // Optional: Require budget > 0 (configurable)
+    if (process.env.REQUIRE_PROJECT_BUDGET === 'true') {
+      if (!budgetTotal || budgetTotal <= 0) {
+        return errorResponse('Project budget is required and must be greater than 0', 400);
+      }
+    } else if (budgetTotal === 0) {
+      budgetWarning = {
+        message: 'Project created with zero budget. Please set budget before creating materials.',
+        type: 'zero_budget',
+      };
+    }
+
     // Create project
     const project = {
       projectCode: projectCode.trim(),
@@ -183,7 +205,7 @@ export async function POST(request) {
       plannedEndDate: plannedEndDate ? new Date(plannedEndDate) : null,
       actualEndDate: null,
       budget: {
-        total: budget?.total || 0,
+        total: budgetTotal,
         materials: budget?.materials || 0,
         labour: budget?.labour || 0,
         contingency: budget?.contingency || 0,
@@ -206,25 +228,65 @@ export async function POST(request) {
 
     const insertedProject = { ...project, _id: result.insertedId };
 
-    // Auto-create default floors for the project (Ground + Floors 1-9)
+    // Auto-create floors (configurable)
     const defaultFloors = [];
-    for (let i = 0; i <= 9; i++) {
-      const floorNumber = i;
-      const floorName = i === 0 ? 'Ground Floor' : `Floor ${i}`;
+    if (autoCreateFloors !== false) { // Default: true for backward compatibility
+      const requestedFloorCount = floorCount !== undefined ? parseInt(floorCount) : 10; // Default: 10
+      const maxFloors = Math.min(Math.max(0, requestedFloorCount), 50); // Cap at 50 floors, minimum 0
+      const requestedBasementCount = includeBasements ? Math.min(Math.max(0, parseInt(basementCount) || 0), 10) : 0; // Cap at 10 basements
       
-      defaultFloors.push({
-        projectId: result.insertedId,
-        floorNumber: floorNumber,
-        name: floorName,
-        description: `${floorName} of ${project.projectName || 'the building'}`,
-        status: 'NOT_STARTED',
-        startDate: null,
-        completionDate: null,
-        totalBudget: 0,
-        actualCost: 0,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      });
+      // Create basements first (if any) - negative floor numbers
+      if (requestedBasementCount > 0) {
+        for (let i = requestedBasementCount; i >= 1; i--) {
+          defaultFloors.push({
+            projectId: result.insertedId,
+            floorNumber: -i, // Negative numbers for basements
+            name: `Basement ${i}`,
+            description: `Basement ${i} of ${project.projectName || 'the building'}`,
+            status: 'NOT_STARTED',
+            startDate: null,
+            completionDate: null,
+            totalBudget: 0,
+            actualCost: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
+      }
+      
+      // Create ground floor (0) if any floors are requested
+      if (maxFloors > 0) {
+        defaultFloors.push({
+          projectId: result.insertedId,
+          floorNumber: 0,
+          name: 'Ground Floor',
+          description: `Ground Floor of ${project.projectName || 'the building'}`,
+          status: 'NOT_STARTED',
+          startDate: null,
+          completionDate: null,
+          totalBudget: 0,
+          actualCost: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+        
+        // Create above-ground floors (positive numbers)
+        for (let i = 1; i <= maxFloors - 1; i++) {
+          defaultFloors.push({
+            projectId: result.insertedId,
+            floorNumber: i,
+            name: `Floor ${i}`,
+            description: `Floor ${i} of ${project.projectName || 'the building'}`,
+            status: 'NOT_STARTED',
+            startDate: null,
+            completionDate: null,
+            totalBudget: 0,
+            actualCost: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
+      }
     }
 
     // Insert floors if any were created
@@ -239,6 +301,35 @@ export async function POST(request) {
       }
     }
 
+    // Initialize project_finances record immediately after project creation
+    // This ensures financial tracking is always available from the start
+    let capitalInfo = null;
+    try {
+      await recalculateProjectFinances(result.insertedId.toString());
+      console.log(`✅ Project finances initialized for project ${insertedProject.projectCode}`);
+      
+      // Check if capital is allocated to project
+      try {
+        const projectTotals = await calculateProjectTotals(result.insertedId.toString());
+        const totalInvested = projectTotals.totalInvested || 0;
+        
+        if (totalInvested === 0) {
+          capitalInfo = {
+            message: 'No capital allocated to this project. Please allocate capital before creating materials.',
+            totalInvested: 0,
+          };
+        }
+      } catch (capitalError) {
+        // Don't fail project creation if capital check fails
+        console.error('Capital check error during project creation:', capitalError);
+      }
+    } catch (financeError) {
+      // Log error but don't fail project creation
+      // Finances will be created on first access via getProjectFinances()
+      console.error(`Error initializing project finances for ${insertedProject.projectCode}:`, financeError);
+      // Continue - finances will be created on-demand if needed
+    }
+
     // Create audit log
     await createAuditLog({
       userId: userProfile._id.toString(),
@@ -248,7 +339,16 @@ export async function POST(request) {
       changes: { created: insertedProject },
     });
 
-    return successResponse(insertedProject, 'Project created successfully', 201);
+    // Include budget warning and capital info in response if present
+    const responseData = { ...insertedProject };
+    if (budgetWarning) {
+      responseData.budgetWarning = budgetWarning;
+    }
+    if (capitalInfo) {
+      responseData.capitalInfo = capitalInfo;
+    }
+
+    return successResponse(responseData, 'Project created successfully', 201);
   } catch (error) {
     console.error('Create project error:', error);
     return errorResponse('Failed to create project', 500);

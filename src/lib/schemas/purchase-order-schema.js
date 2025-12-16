@@ -42,6 +42,7 @@
  * @property {Date} createdAt - Creation timestamp
  * @property {Date} updatedAt - Last update timestamp
  * @property {Date} [deletedAt] - Soft delete timestamp
+ * @property {string} [idempotencyKey] - SHA256 hash of request parameters to prevent duplicates on retry
  */
 
 export const PURCHASE_ORDER_SCHEMA = {
@@ -81,6 +82,7 @@ export const PURCHASE_ORDER_SCHEMA = {
   createdAt: Date,
   updatedAt: Date,
   deletedAt: Date, // Soft delete
+  idempotencyKey: String, // SHA256 hash to prevent duplicate POs on retry (e.g., after 404)
 };
 
 /**

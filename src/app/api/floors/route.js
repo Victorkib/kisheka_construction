@@ -50,7 +50,18 @@ export async function GET(request) {
       .sort({ floorNumber: 1 })
       .toArray();
 
-    return successResponse(floors, 'Floors retrieved successfully');
+    // Add usage count for each floor
+    const floorsWithUsage = await Promise.all(
+      floors.map(async (floor) => {
+        const usageCount = await db.collection('materials').countDocuments({
+          floor: floor._id,
+          deletedAt: null,
+        });
+        return { ...floor, usageCount };
+      })
+    );
+
+    return successResponse(floorsWithUsage, 'Floors retrieved successfully');
   } catch (error) {
     console.error('Get floors error:', error);
     return errorResponse('Failed to retrieve floors', 500);
@@ -109,8 +120,8 @@ export async function POST(request) {
       return errorResponse('Floor number is required', 400);
     }
 
-    if (typeof floorNumber !== 'number' || floorNumber < 0) {
-      return errorResponse('Floor number must be a non-negative number', 400);
+    if (typeof floorNumber !== 'number' || floorNumber < -10 || floorNumber > 100) {
+      return errorResponse('Floor number must be between -10 (Basement 10) and 100', 400);
     }
 
     if (!name || name.trim().length === 0) {

@@ -12,6 +12,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { useToast } from '@/components/toast';
+import { ConfirmationModal } from '@/components/modals';
 
 export default function FloorDetailPage() {
   const router = useRouter();
@@ -25,8 +26,13 @@ export default function FloorDetailPage() {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
+  const [canDelete, setCanDelete] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteError, setDeleteError] = useState(null);
+  const [dependencies, setDependencies] = useState(null);
 
   const [formData, setFormData] = useState({
     status: 'NOT_STARTED',
@@ -49,7 +55,9 @@ export default function FloorDetailPage() {
       if (data.success) {
         setUser(data.data);
         const role = data.data.role?.toLowerCase();
-        setCanEdit(['owner', 'pm', 'project_manager'].includes(role));
+        const hasPermission = ['owner', 'pm', 'project_manager'].includes(role);
+        setCanEdit(hasPermission);
+        setCanDelete(hasPermission);
       }
     } catch (err) {
       console.error('Fetch user error:', err);
@@ -97,11 +105,41 @@ export default function FloorDetailPage() {
           : '',
         description: floorData.description || '',
       });
+      
+      // Check dependencies for deletion
+      if (floorData._id) {
+        checkDependencies(floorData._id);
+      }
     } catch (err) {
       setError(err.message);
       console.error('Fetch floor error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const checkDependencies = async (floorId) => {
+    try {
+      // Check if floor has dependencies
+      const [materialsRes, requestsRes] = await Promise.all([
+        fetch(`/api/materials?floorId=${floorId}&limit=1`).catch(() => ({ json: () => ({ data: [] }) })),
+        fetch(`/api/material-requests?floorId=${floorId}&limit=1`).catch(() => ({ json: () => ({ data: [] }) })),
+      ]);
+      
+      const materialsData = await materialsRes.json();
+      const requestsData = await requestsRes.json();
+      
+      const materialCount = materialsData.data?.length || 0;
+      const requestCount = requestsData.data?.length || 0;
+      
+      if (materialCount > 0 || requestCount > 0) {
+        setDependencies({
+          materials: materialCount,
+          requests: requestCount,
+        });
+      }
+    } catch (err) {
+      console.error('Error checking dependencies:', err);
     }
   };
 
@@ -141,13 +179,46 @@ export default function FloorDetailPage() {
 
       setFloor(data.data);
       setEditMode(false);
+      toast.showSuccess('Floor updated successfully');
       // Refresh to get updated data
       fetchFloor();
     } catch (err) {
       setError(err.message);
+      toast.showError(err.message);
       console.error('Update floor error:', err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setDeleteError(null);
+
+    try {
+      const response = await fetch(`/api/floors/${floorId}`, {
+        method: 'DELETE',
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to delete floor');
+      }
+
+      toast.showSuccess('Floor deleted successfully');
+      // Redirect to floors list or project page
+      if (floor?.projectId) {
+        router.push(`/floors?projectId=${floor.projectId}`);
+      } else {
+        router.push('/floors');
+      }
+    } catch (err) {
+      setDeleteError(err.message);
+      toast.showError(err.message);
+      console.error('Delete floor error:', err);
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -228,10 +299,19 @@ export default function FloorDetailPage() {
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
-                {floor.name || `Floor ${floor.floorNumber !== undefined ? floor.floorNumber : 'N/A'}`}
+                {floor.name || (() => {
+                  if (floor.floorNumber === undefined || floor.floorNumber === null) return 'N/A';
+                  if (floor.floorNumber < 0) return `Basement ${Math.abs(floor.floorNumber)}`;
+                  if (floor.floorNumber === 0) return 'Ground Floor';
+                  return `Floor ${floor.floorNumber}`;
+                })()}
               </h1>
               <p className="text-gray-600 mt-1">
-                Floor Number: {floor.floorNumber !== undefined ? floor.floorNumber : 'N/A'}
+                Floor Number: {floor.floorNumber !== undefined ? (
+                  floor.floorNumber < 0 ? `Basement ${Math.abs(floor.floorNumber)} (${floor.floorNumber})` :
+                  floor.floorNumber === 0 ? `Ground Floor (${floor.floorNumber})` :
+                  `Floor ${floor.floorNumber} (${floor.floorNumber})`
+                ) : 'N/A'}
                 {project && (
                   <span className="ml-4">
                     • Project: <Link href={`/projects/${floor.projectId}`} className="text-blue-600 hover:underline">
@@ -263,12 +343,22 @@ export default function FloorDetailPage() {
                     </button>
                   </>
                 ) : (
-                  <button
-                    onClick={() => setEditMode(true)}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    Edit Floor
-                  </button>
+                  <>
+                    <button
+                      onClick={() => setEditMode(true)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                      Edit Floor
+                    </button>
+                    {canDelete && (
+                      <button
+                        onClick={() => setShowDeleteModal(true)}
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                      >
+                        Delete Floor
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             )}
@@ -494,11 +584,50 @@ export default function FloorDetailPage() {
               </Link>
             </div>
           </div>
+          )}
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <ConfirmationModal
+            isOpen={showDeleteModal}
+            onClose={() => {
+              setShowDeleteModal(false);
+              setDeleteError(null);
+            }}
+            onConfirm={handleDelete}
+            title="Delete Floor"
+            message={
+              <div>
+                <p className="mb-2">
+                  Are you sure you want to delete <strong>{floor?.name || `Floor ${floor?.floorNumber}`}</strong>?
+                </p>
+                {dependencies && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mt-3">
+                    <p className="text-sm text-yellow-800 font-semibold mb-1">Warning:</p>
+                    <p className="text-sm text-yellow-700">
+                      This floor is currently used by {dependencies.materials} material(s) and {dependencies.requests} material request(s).
+                      You must reassign or remove these items before deleting the floor.
+                    </p>
+                  </div>
+                )}
+                {deleteError && (
+                  <div className="bg-red-50 border border-red-200 rounded p-3 mt-3">
+                    <p className="text-sm text-red-800">{deleteError}</p>
+                  </div>
+                )}
+                <p className="text-sm text-gray-600 mt-3">This action cannot be undone.</p>
+              </div>
+            }
+            confirmText="Delete Floor"
+            cancelText="Cancel"
+            confirmColor="red"
+            isLoading={deleting}
+          />
         )}
-      </div>
-    </AppLayout>
-  );
-}
+      </AppLayout>
+    );
+  }
 
 // Floor Progress Section Component
 function FloorProgressSection({ floorId, canEdit }) {

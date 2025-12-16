@@ -32,6 +32,11 @@ function MaterialRequestsPageContent() {
   const [approvalNotes, setApprovalNotes] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+  const [selectedRequests, setSelectedRequests] = useState(new Set());
+  const [bulkActionLoading, setBulkActionLoading] = useState(false);
+  const [showBulkApproveModal, setShowBulkApproveModal] = useState(false);
+  const [showBulkRejectModal, setShowBulkRejectModal] = useState(false);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   
   // Filters
   const [filters, setFilters] = useState({
@@ -180,6 +185,83 @@ function MaterialRequestsPageContent() {
     }
   };
 
+  // Bulk action handlers
+  const handleSelectAll = (e) => {
+    if (e.target.checked) {
+      setSelectedRequests(new Set(requests.map(r => r._id)));
+    } else {
+      setSelectedRequests(new Set());
+    }
+  };
+
+  const handleSelectRequest = (requestId) => {
+    setSelectedRequests((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(requestId)) {
+        newSet.delete(requestId);
+      } else {
+        newSet.add(requestId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleBulkAction = async (action) => {
+    if (selectedRequests.size === 0) {
+      toast.showError('Please select at least one request');
+      return;
+    }
+
+    const requestIds = Array.from(selectedRequests);
+    
+    if (action === 'approve') {
+      setShowBulkApproveModal(true);
+    } else if (action === 'reject') {
+      setShowBulkRejectModal(true);
+    } else if (action === 'delete') {
+      setShowBulkDeleteModal(true);
+    }
+  };
+
+  const executeBulkAction = async (action, notes = '') => {
+    if (selectedRequests.size === 0) return;
+
+    setBulkActionLoading(true);
+    const requestIds = Array.from(selectedRequests);
+
+    try {
+      const response = await fetch('/api/material-requests/bulk', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, requestIds, notes }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        const { success, failed } = data.data.results;
+        if (success.length > 0) {
+          toast.showSuccess(`${action}ed ${success.length} request(s) successfully`);
+        }
+        if (failed.length > 0) {
+          toast.showWarning(`${failed.length} request(s) failed: ${failed.map(f => f.reason).join(', ')}`);
+        }
+        setSelectedRequests(new Set());
+        fetchRequests();
+      } else {
+        toast.showError(`Error: ${data.error}`);
+      }
+    } catch (err) {
+      toast.showError(`Error: ${err.message}`);
+    } finally {
+      setBulkActionLoading(false);
+      setShowBulkApproveModal(false);
+      setShowBulkRejectModal(false);
+      setShowBulkDeleteModal(false);
+      setApprovalNotes('');
+      setRejectionReason('');
+    }
+  };
+
   const getStatusBadgeColor = (status) => {
     const colors = {
       requested: 'bg-gray-100 text-gray-800',
@@ -187,7 +269,7 @@ function MaterialRequestsPageContent() {
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
       converted_to_order: 'bg-blue-100 text-blue-800',
-      cancelled: 'bg-gray-100 text-gray-600',
+      cancelled: 'bg-gray-100 text-gray-800',
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
@@ -239,14 +321,32 @@ function MaterialRequestsPageContent() {
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Material Requests</h1>
             <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage material procurement requests</p>
           </div>
-          {canAccess('create_material_request') && (
-            <Link
-              href="/material-requests/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
-            >
-              + New Request
-            </Link>
-          )}
+          <div className="flex gap-2">
+            {canAccess('create_material_request') && (
+              <Link
+                href="/material-requests/new"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              >
+                + New Request
+              </Link>
+            )}
+            {canAccess('create_bulk_material_request') && (
+              <Link
+                href="/material-requests/bulk"
+                className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              >
+                📦 Bulk Request
+              </Link>
+            )}
+            {canAccess('view_bulk_material_requests') && (
+              <Link
+                href="/material-requests/batches"
+                className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              >
+                📋 View Batches
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Filters */}
@@ -257,11 +357,11 @@ function MaterialRequestsPageContent() {
               <select
                 value={filters.projectId}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">All Projects</option>
+                <option value="" className="text-gray-900">All Projects</option>
                 {projects.map((project) => (
-                  <option key={project._id} value={project._id}>
+                  <option key={project._id} value={project._id} className="text-gray-900">
                     {project.projectName}
                   </option>
                 ))}
@@ -272,16 +372,16 @@ function MaterialRequestsPageContent() {
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">All Statuses</option>
-                <option value="requested">Requested</option>
-                <option value="pending_approval">Pending Approval</option>
-                <option value="ready_to_order">Ready to Order</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
-                <option value="converted_to_order">Converted to Order</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="" className="text-gray-900">All Statuses</option>
+                <option value="requested" className="text-gray-900">Requested</option>
+                <option value="pending_approval" className="text-gray-900">Pending Approval</option>
+                <option value="ready_to_order" className="text-gray-900">Ready to Order</option>
+                <option value="approved" className="text-gray-900">Approved</option>
+                <option value="rejected" className="text-gray-900">Rejected</option>
+                <option value="converted_to_order" className="text-gray-900">Converted to Order</option>
+                <option value="cancelled" className="text-gray-900">Cancelled</option>
               </select>
             </div>
             <div>
@@ -289,13 +389,13 @@ function MaterialRequestsPageContent() {
               <select
                 value={filters.urgency}
                 onChange={(e) => handleFilterChange('urgency', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                <option value="">All Urgencies</option>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="critical">Critical</option>
+                <option value="" className="text-gray-900">All Urgencies</option>
+                <option value="low" className="text-gray-900">Low</option>
+                <option value="medium" className="text-gray-900">Medium</option>
+                <option value="high" className="text-gray-900">High</option>
+                <option value="critical" className="text-gray-900">Critical</option>
               </select>
             </div>
             <div>
@@ -305,7 +405,7 @@ function MaterialRequestsPageContent() {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search by material name..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
               />
             </div>
             <div className="flex items-end">
@@ -332,7 +432,7 @@ function MaterialRequestsPageContent() {
         {/* Requests Table */}
         {requests.length === 0 && !loading ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-lg text-gray-600 mb-4">No material requests found</p>
+            <p className="text-lg text-gray-700 mb-4">No material requests found</p>
             {canAccess('create_material_request') && (
               <Link
                 href="/material-requests/new"
@@ -344,12 +444,66 @@ function MaterialRequestsPageContent() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow overflow-hidden">
+            {/* Bulk Actions Toolbar */}
+            {selectedRequests.size > 0 && (
+              <div className="bg-blue-50 border-b border-blue-200 px-6 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium text-blue-900">
+                    {selectedRequests.size} request(s) selected
+                  </span>
+                  {canAccess('approve_material_request') && (
+                    <button
+                      onClick={() => handleBulkAction('approve')}
+                      disabled={bulkActionLoading}
+                      className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
+                    >
+                      Approve Selected
+                    </button>
+                  )}
+                  {canAccess('reject_material_request') && (
+                    <button
+                      onClick={() => handleBulkAction('reject')}
+                      disabled={bulkActionLoading}
+                      className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 disabled:opacity-50"
+                    >
+                      Reject Selected
+                    </button>
+                  )}
+                  {canAccess('delete_material_request') && (
+                    <button
+                      onClick={() => handleBulkAction('delete')}
+                      disabled={bulkActionLoading}
+                      className="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 disabled:opacity-50"
+                    >
+                      Delete Selected
+                    </button>
+                  )}
+                </div>
+                <button
+                  onClick={() => setSelectedRequests(new Set())}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
+                  Clear Selection
+                </button>
+              </div>
+            )}
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
+                    <th className="px-6 py-3 text-left">
+                      <input
+                        type="checkbox"
+                        checked={selectedRequests.size > 0 && selectedRequests.size === requests.length}
+                        onChange={handleSelectAll}
+                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                       Request Number
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                      Batch
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                       Material
@@ -388,6 +542,14 @@ function MaterialRequestsPageContent() {
                     return (
                       <tr key={request._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
+                          <input
+                            type="checkbox"
+                            checked={selectedRequests.has(request._id)}
+                            onChange={() => handleSelectRequest(request._id)}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <Link
                             href={`/material-requests/${request._id}`}
                             className="text-blue-600 hover:text-blue-800 font-medium"
@@ -395,10 +557,23 @@ function MaterialRequestsPageContent() {
                             {request.requestNumber}
                           </Link>
                         </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {request.batchNumber ? (
+                            <Link
+                              href={`/material-requests/bulk/${request.batchId}`}
+                              className="text-purple-600 hover:text-purple-800 font-medium text-sm"
+                              title={request.batchName || 'View batch'}
+                            >
+                              {request.batchNumber}
+                            </Link>
+                          ) : (
+                            <span className="text-sm text-gray-400">—</span>
+                          )}
+                        </td>
                         <td className="px-6 py-4">
                           <div className="text-sm font-medium text-gray-900">{request.materialName}</div>
                           {request.description && (
-                            <div className="text-sm text-gray-600 truncate max-w-xs">{request.description}</div>
+                            <div className="text-sm text-gray-700 truncate max-w-xs">{request.description}</div>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -420,7 +595,7 @@ function MaterialRequestsPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {request.requestedByName || 'Unknown'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                           {formatDate(request.createdAt)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -519,7 +694,7 @@ function MaterialRequestsPageContent() {
               value={approvalNotes}
               onChange={(e) => setApprovalNotes(e.target.value)}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:text-gray-400"
               placeholder="Add any notes about this approval..."
             />
           </div>
@@ -547,11 +722,85 @@ function MaterialRequestsPageContent() {
               onChange={(e) => setRejectionReason(e.target.value)}
               rows={3}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder:text-gray-400"
               placeholder="Explain why this request is being rejected..."
             />
           </div>
         </ConfirmationModal>
+
+        {/* Bulk Approve Modal */}
+        <ConfirmationModal
+          isOpen={showBulkApproveModal}
+          onClose={() => {
+            setShowBulkApproveModal(false);
+            setApprovalNotes('');
+          }}
+          onConfirm={() => executeBulkAction('approve', approvalNotes)}
+          title={`Approve ${selectedRequests.size} Material Request(s)`}
+          message={`Are you sure you want to approve ${selectedRequests.size} material request(s)?`}
+          confirmText="Approve All"
+          cancelText="Cancel"
+          confirmColor="green"
+          isLoading={bulkActionLoading}
+        >
+          <div className="mt-4">
+            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Approval Notes (Optional)</label>
+            <textarea
+              value={approvalNotes}
+              onChange={(e) => setApprovalNotes(e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:text-gray-400"
+              placeholder="Add notes for this approval..."
+            />
+          </div>
+        </ConfirmationModal>
+
+        {/* Bulk Reject Modal */}
+        <ConfirmationModal
+          isOpen={showBulkRejectModal}
+          onClose={() => {
+            setShowBulkRejectModal(false);
+            setRejectionReason('');
+          }}
+          onConfirm={() => {
+            if (!rejectionReason.trim()) {
+              toast.showError('Rejection reason is required');
+              return;
+            }
+            executeBulkAction('reject', rejectionReason);
+          }}
+          title={`Reject ${selectedRequests.size} Material Request(s)`}
+          message={`Are you sure you want to reject ${selectedRequests.size} material request(s)?`}
+          confirmText="Reject All"
+          cancelText="Cancel"
+          confirmColor="red"
+          isLoading={bulkActionLoading}
+        >
+          <div className="mt-4">
+            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Rejection Reason (Required)</label>
+            <textarea
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder:text-gray-400"
+              placeholder="Enter rejection reason..."
+              required
+            />
+          </div>
+        </ConfirmationModal>
+
+        {/* Bulk Delete Modal */}
+        <ConfirmationModal
+          isOpen={showBulkDeleteModal}
+          onClose={() => setShowBulkDeleteModal(false)}
+          onConfirm={() => executeBulkAction('delete')}
+          title={`Delete ${selectedRequests.size} Material Request(s)`}
+          message={`Are you sure you want to permanently delete ${selectedRequests.size} material request(s)? This action cannot be undone.`}
+          confirmText="Delete All"
+          cancelText="Cancel"
+          confirmColor="red"
+          isLoading={bulkActionLoading}
+        />
       </div>
     </AppLayout>
   );

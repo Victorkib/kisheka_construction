@@ -68,6 +68,10 @@ export async function getUnallocatedAmount(investorId) {
 export async function getProjectAllocations(projectId) {
   const db = await getDatabase();
   
+  // Normalize projectId to ObjectId for consistent comparison
+  const targetProjectId = projectId instanceof ObjectId ? projectId : new ObjectId(projectId);
+  const targetProjectIdString = targetProjectId.toString();
+  
   const investors = await db
     .collection('investors')
     .find({ status: 'ACTIVE' })
@@ -77,9 +81,24 @@ export async function getProjectAllocations(projectId) {
   
   for (const investor of investors) {
     const investorAllocations = investor.projectAllocations || [];
-    const projectAllocation = investorAllocations.find(
-      (alloc) => alloc.projectId && alloc.projectId.toString() === projectId.toString()
-    );
+    
+    // Find allocation matching this project with robust ObjectId comparison
+    const projectAllocation = investorAllocations.find((alloc) => {
+      if (!alloc.projectId) return false;
+      
+      // Handle both ObjectId instances and string formats
+      let allocProjectIdString;
+      if (alloc.projectId instanceof ObjectId) {
+        allocProjectIdString = alloc.projectId.toString();
+      } else if (ObjectId.isValid(alloc.projectId)) {
+        allocProjectIdString = new ObjectId(alloc.projectId).toString();
+      } else {
+        // If it's already a string, use it directly
+        allocProjectIdString = String(alloc.projectId);
+      }
+      
+      return allocProjectIdString === targetProjectIdString;
+    });
     
     if (projectAllocation) {
       allocations.push({
@@ -105,6 +124,10 @@ export async function getProjectAllocations(projectId) {
 export async function calculateProjectTotals(projectId) {
   const db = await getDatabase();
   
+  // Normalize projectId to ObjectId for consistent comparison
+  const targetProjectId = projectId instanceof ObjectId ? projectId : new ObjectId(projectId);
+  const targetProjectIdString = targetProjectId.toString();
+  
   const investors = await db
     .collection('investors')
     .find({ status: 'ACTIVE' })
@@ -116,9 +139,24 @@ export async function calculateProjectTotals(projectId) {
   
   for (const investor of investors) {
     const investorAllocations = investor.projectAllocations || [];
-    const projectAllocation = investorAllocations.find(
-      (alloc) => alloc.projectId && alloc.projectId.toString() === projectId.toString()
-    );
+    
+    // Find allocation matching this project with robust ObjectId comparison
+    const projectAllocation = investorAllocations.find((alloc) => {
+      if (!alloc.projectId) return false;
+      
+      // Handle both ObjectId instances and string formats
+      let allocProjectIdString;
+      if (alloc.projectId instanceof ObjectId) {
+        allocProjectIdString = alloc.projectId.toString();
+      } else if (ObjectId.isValid(alloc.projectId)) {
+        allocProjectIdString = new ObjectId(alloc.projectId).toString();
+      } else {
+        // If it's already a string, use it directly
+        allocProjectIdString = String(alloc.projectId);
+      }
+      
+      return allocProjectIdString === targetProjectIdString;
+    });
     
     if (projectAllocation) {
       const allocatedAmount = projectAllocation.amount || 0;

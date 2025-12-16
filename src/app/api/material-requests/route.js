@@ -123,8 +123,28 @@ export async function GET(request) {
       .limit(limit)
       .toArray();
 
+    // Enrich requests with batch information if they belong to a batch
+    const requestsWithBatchInfo = await Promise.all(
+      requests.map(async (request) => {
+        if (request.batchId) {
+          const batch = await db.collection('material_request_batches').findOne({
+            _id: request.batchId,
+            deletedAt: null,
+          });
+          if (batch) {
+            return {
+              ...request,
+              batchNumber: batch.batchNumber,
+              batchName: batch.batchName,
+            };
+          }
+        }
+        return request;
+      })
+    );
+
     return successResponse({
-      requests,
+      requests: requestsWithBatchInfo,
       pagination: {
         page,
         limit,
@@ -180,6 +200,17 @@ export async function POST(request) {
       return errorResponse('Valid projectId is required', 400);
     }
 
+    const db = await getDatabase();
+
+    // Verify project exists
+    const project = await db.collection('projects').findOne({
+      _id: new ObjectId(projectId),
+    });
+
+    if (!project) {
+      return errorResponse('Project not found', 404);
+    }
+
     if (!materialName || materialName.trim().length < 2) {
       return errorResponse('Material name is required and must be at least 2 characters', 400);
     }
@@ -211,8 +242,6 @@ export async function POST(request) {
       return errorResponse('User profile not found', 404);
     }
 
-    const db = await getDatabase();
-
     // DUPLICATE DETECTION: Check for existing active requests for the same material and project
     if (materialName && projectId && ObjectId.isValid(projectId)) {
       const existingRequest = await db.collection('material_requests').findOne({
@@ -229,15 +258,6 @@ export async function POST(request) {
           400
         );
       }
-    }
-
-    // Verify project exists
-    const project = await db.collection('projects').findOne({
-      _id: new ObjectId(projectId),
-    });
-
-    if (!project) {
-      return errorResponse('Project not found', 404);
     }
 
     // Verify floor exists if provided
@@ -258,6 +278,37 @@ export async function POST(request) {
       if (!categoryDoc) {
         return errorResponse('Category not found', 404);
       }
+    }
+
+    // Check capital availability (warning only, don't block request creation)
+    let capitalWarning = null;
+    try {
+      const requestAmount = estimatedCost || 0;
+      
+      if (requestAmount > 0) {
+        const capitalCheck = await validateCapitalAvailability(
+          projectId.toString(),
+          requestAmount
+        );
+        
+        if (!capitalCheck.isValid) {
+          capitalWarning = {
+            message: `Insufficient capital. Available: ${capitalCheck.available.toLocaleString()}, Required: ${requestAmount.toLocaleString()}, Shortfall: ${(requestAmount - capitalCheck.available).toLocaleString()}`,
+            available: capitalCheck.available,
+            required: requestAmount,
+            shortfall: requestAmount - capitalCheck.available,
+          };
+        }
+      } else if (estimatedCost === undefined || estimatedCost === null) {
+        // If no estimated cost provided, show info message
+        capitalWarning = {
+          message: 'No estimated cost provided. Capital validation will occur when converting to purchase order.',
+          type: 'info',
+        };
+      }
+    } catch (capitalError) {
+      // Don't fail request creation if capital check fails
+      console.error('Capital check error during material request creation:', capitalError);
     }
 
     // Generate request number
@@ -324,7 +375,13 @@ export async function POST(request) {
       await createNotifications(notifications);
     }
 
-    return successResponse(insertedRequest, 'Material request created successfully', 201);
+    // Include capital warning in response if present
+    const responseData = { ...insertedRequest };
+    if (capitalWarning) {
+      responseData.capitalWarning = capitalWarning;
+    }
+
+    return successResponse(responseData, 'Material request created successfully', 201);
   } catch (error) {
     console.error('Create material request error:', error);
     return errorResponse('Failed to create material request', 500);

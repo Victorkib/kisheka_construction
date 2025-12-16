@@ -18,7 +18,7 @@ import { useToast } from '@/components/toast';
 function PurchaseOrdersPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { canAccess } = usePermissions();
+  const { canAccess, user } = usePermissions();
   const toast = useToast();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,11 +35,30 @@ function PurchaseOrdersPageContent() {
     search: searchParams.get('search') || '',
   });
 
+  // Check if user has access to purchase orders
+  useEffect(() => {
+    if (user) {
+      const userRole = user.role?.toLowerCase();
+      if (userRole === 'clerk' || userRole === 'site_clerk') {
+        toast.showError('You do not have permission to view purchase orders');
+        router.push('/dashboard/clerk');
+        return;
+      }
+      if (!canAccess('view_purchase_orders')) {
+        toast.showError('You do not have permission to view purchase orders');
+        router.push('/dashboard');
+        return;
+      }
+    }
+  }, [user, canAccess, router, toast]);
+
   // Fetch projects and suppliers for filter dropdowns
   useEffect(() => {
-    fetchProjects();
-    fetchSuppliers();
-  }, []);
+    if (user && (user.role?.toLowerCase() !== 'clerk' && user.role?.toLowerCase() !== 'site_clerk')) {
+      fetchProjects();
+      fetchSuppliers();
+    }
+  }, [user]);
 
   // Fetch purchase orders
   useEffect(() => {
@@ -60,10 +79,11 @@ function PurchaseOrdersPageContent() {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await fetch('/api/users?role=supplier');
+      // Updated to use suppliers collection instead of users
+      const response = await fetch('/api/suppliers?status=active&limit=100');
       const data = await response.json();
       if (data.success) {
-        setSuppliers(data.data.users || []);
+        setSuppliers(data.data.suppliers || []);
       }
     } catch (err) {
       console.error('Error fetching suppliers:', err);
@@ -122,7 +142,7 @@ function PurchaseOrdersPageContent() {
       order_modified: 'bg-yellow-100 text-yellow-800',
       ready_for_delivery: 'bg-purple-100 text-purple-800',
       delivered: 'bg-indigo-100 text-indigo-800',
-      cancelled: 'bg-gray-100 text-gray-600',
+      cancelled: 'bg-gray-100 text-gray-800',
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
   };
@@ -192,11 +212,11 @@ function PurchaseOrdersPageContent() {
               <select
                 value={filters.projectId}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Projects</option>
-                {projects.map((project) => (
-                  <option key={project._id} value={project._id}>
+                {projects.map((project, index) => (
+                  <option key={project._id?.toString() || project.id?.toString() || `project-${index}`} value={project._id?.toString() || project.id?.toString() || ''}>
                     {project.projectName}
                   </option>
                 ))}
@@ -207,7 +227,7 @@ function PurchaseOrdersPageContent() {
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Statuses</option>
                 <option value="order_sent">Order Sent</option>
@@ -225,14 +245,18 @@ function PurchaseOrdersPageContent() {
                 <select
                   value={filters.supplierId}
                   onChange={(e) => handleFilterChange('supplierId', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Suppliers</option>
-                  {suppliers.map((supplier) => (
-                    <option key={supplier._id} value={supplier._id}>
-                      {supplier.firstName} {supplier.lastName}
-                    </option>
-                  ))}
+                  {suppliers.map((supplier, index) => {
+                    const supplierId = supplier._id?.toString() || supplier.id?.toString() || '';
+                    const displayName = supplier.name || supplier.contactPerson || supplier.email || 'Unknown Supplier';
+                    return (
+                      <option key={supplierId || `supplier-${index}`} value={supplierId}>
+                        {displayName}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
             )}
@@ -243,7 +267,7 @@ function PurchaseOrdersPageContent() {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search by order number, material..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
               />
             </div>
             <div className="flex items-end">
@@ -270,7 +294,7 @@ function PurchaseOrdersPageContent() {
         {/* Orders Table */}
         {orders.length === 0 && !loading ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-lg text-gray-600 mb-4">No purchase orders found</p>
+            <p className="text-lg text-gray-700 mb-4">No purchase orders found</p>
             {canAccess('create_purchase_order') && (
               <Link
                 href="/purchase-orders/new"
@@ -316,7 +340,7 @@ function PurchaseOrdersPageContent() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {orders.map((order) => {
+                  {orders.map((order, index) => {
                     const canView = canAccess('view_purchase_orders');
                     const canAccept = canAccess('accept_purchase_order') && order.status === 'order_sent' && order.supplierId;
                     const canReject = canAccess('reject_purchase_order') && order.status === 'order_sent' && order.supplierId;
@@ -325,7 +349,7 @@ function PurchaseOrdersPageContent() {
                     const canCreateMaterial = canAccess('create_material_from_order') && order.status === 'ready_for_delivery';
 
                     return (
-                      <tr key={order._id} className="hover:bg-gray-50">
+                      <tr key={order._id?.toString() || order.id?.toString() || `order-${index}`} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <Link
                             href={`/purchase-orders/${order._id}`}
@@ -337,7 +361,7 @@ function PurchaseOrdersPageContent() {
                         <td className="px-6 py-4">
                           <div className="text-sm font-medium text-gray-900">{order.materialName}</div>
                           {order.description && (
-                            <div className="text-sm text-gray-600 truncate max-w-xs">{order.description}</div>
+                            <div className="text-sm text-gray-700 truncate max-w-xs">{order.description}</div>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -359,7 +383,7 @@ function PurchaseOrdersPageContent() {
                             {order.financialStatus?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                           {formatDate(order.deliveryDate)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

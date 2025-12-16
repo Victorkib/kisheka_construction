@@ -5,10 +5,10 @@
 
 import { getUserProfile } from './auth-helpers';
 import { PERMISSIONS, roleHasPermission } from './permissions';
-import { ROLES } from './role-constants';
+import { ROLES, normalizeRole, normalizeUserRole, isRole } from './role-constants';
 
-// Re-export ROLES for backward compatibility
-export { ROLES };
+// Re-export ROLES and client-safe functions for backward compatibility
+export { ROLES, normalizeUserRole, isRole };
 
 /**
  * Checks if user has one of the required roles

@@ -14,9 +14,13 @@ import { LoadingTable, LoadingButton, LoadingOverlay } from '@/components/loadin
 import { CapitalBalanceWarning } from '@/components/financial/capital-balance-warning';
 import { ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
+import { usePermissions } from '@/hooks/use-permissions';
+import { useRouter } from 'next/navigation';
 
 export default function ApprovalsPage() {
   const toast = useToast();
+  const router = useRouter();
+  const { canAccess, user } = usePermissions();
   const [materials, setMaterials] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [initialExpenses, setInitialExpenses] = useState([]);
@@ -25,7 +29,6 @@ export default function ApprovalsPage() {
   const [selectedMaterials, setSelectedMaterials] = useState([]);
   const [selectedExpenses, setSelectedExpenses] = useState([]);
   const [selectedInitialExpenses, setSelectedInitialExpenses] = useState([]);
-  const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('materials'); // 'materials', 'expenses', or 'initial-expenses'
   const [processingItems, setProcessingItems] = useState(new Set()); // Track items being processed
   const [bulkProcessing, setBulkProcessing] = useState(false);
@@ -38,10 +41,28 @@ export default function ApprovalsPage() {
   const [rejectItemId, setRejectItemId] = useState(null);
   const [rejectItemType, setRejectItemType] = useState(null); // 'material', 'expense', 'initial-expense'
 
+  // Check if user has access to approvals page
   useEffect(() => {
-    fetchPendingApprovals();
-    fetchUser();
-  }, []);
+    if (user) {
+      const userRole = user.role?.toLowerCase();
+      if (userRole === 'clerk' || userRole === 'site_clerk') {
+        toast.showError('You do not have permission to view the approvals page');
+        router.push('/dashboard/clerk');
+        return;
+      }
+      if (!canAccess('view_approvals')) {
+        toast.showError('You do not have permission to view the approvals page');
+        router.push('/dashboard');
+        return;
+      }
+    }
+  }, [user, canAccess, router, toast]);
+
+  useEffect(() => {
+    if (user && (user.role?.toLowerCase() !== 'clerk' && user.role?.toLowerCase() !== 'site_clerk')) {
+      fetchPendingApprovals();
+    }
+  }, [user]);
 
   const fetchPendingApprovals = async () => {
     try {
@@ -83,17 +104,6 @@ export default function ApprovalsPage() {
     }
   };
 
-  const fetchUser = async () => {
-    try {
-      const response = await fetch('/api/auth/me');
-      const data = await response.json();
-      if (data.success) {
-        setUser(data.data);
-      }
-    } catch (err) {
-      console.error('Error fetching user:', err);
-    }
-  };
 
   const handleApproveMaterial = async (materialId, notes = '') => {
     setProcessingItems((prev) => new Set(prev).add(materialId));

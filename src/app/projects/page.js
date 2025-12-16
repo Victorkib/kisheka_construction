@@ -133,7 +133,7 @@ function ProjectsPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
+        <div className="mb-6 flex justify-between items-center">
           <div>
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Projects</h1>
             <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage construction projects</p>
@@ -147,6 +147,34 @@ function ProjectsPageContent() {
             </Link>
           )}
         </div>
+
+        {/* Summary Stats - Moved to top for quick reference */}
+        {!loading && projects.length > 0 && (
+          <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
+              <p className="text-sm font-medium text-gray-600">Total Projects</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">{projects.length}</p>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
+              <p className="text-sm font-medium text-gray-600">Active Projects</p>
+              <p className="text-2xl font-bold text-green-600 mt-1">
+                {projects.filter((p) => p.status === 'active').length}
+              </p>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-purple-500">
+              <p className="text-sm font-medium text-gray-600">Total Budget</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">
+                {formatCurrency(projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0))}
+              </p>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
+              <p className="text-sm font-medium text-gray-600">In Planning</p>
+              <p className="text-2xl font-bold text-blue-600 mt-1">
+                {projects.filter((p) => p.status === 'planning').length}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
@@ -223,137 +251,235 @@ function ProjectsPageContent() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Project Code
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Project Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Location
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Budget
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Client
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Created
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {projects.map((project) => (
-                  <tr key={project._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-gray-900">{project.projectCode}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Link
-                        href={`/projects/${project._id}`}
-                        className="text-sm font-medium text-blue-600 hover:text-blue-900"
-                      >
-                        {project.projectName}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">{project.location || 'N/A'}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Project
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Budget
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Financing
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Location
+                      </th>
+                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {projects.map((project) => {
+                      const totalInvested = project.statistics?.totalInvested || 0;
+                      const capitalBalance = project.statistics?.capitalBalance || 0;
+                      const availableCapital = capitalBalance;
+                      const totalUsed = totalInvested - capitalBalance;
+                      const usagePercentage = totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
+                      
+                      let capitalStatusColor = 'bg-green-100 text-green-800';
+                      let capitalStatusText = 'Capital OK';
+                      
+                      if (totalInvested === 0) {
+                        capitalStatusColor = 'bg-red-100 text-red-800';
+                        capitalStatusText = 'No Capital';
+                      } else if (availableCapital < 0) {
+                        capitalStatusColor = 'bg-red-100 text-red-800';
+                        capitalStatusText = 'Negative';
+                      } else if (usagePercentage > 80) {
+                        capitalStatusColor = 'bg-yellow-100 text-yellow-800';
+                        capitalStatusText = 'Low Capital';
+                      }
+
+                      return (
+                        <tr key={project._id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4">
+                            <div>
+                              <Link
+                                href={`/projects/${project._id}`}
+                                className="text-sm font-semibold text-gray-900 hover:text-blue-600"
+                              >
+                                {project.projectName}
+                              </Link>
+                              <p className="text-xs text-gray-500 mt-0.5">{project.projectCode}</p>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
+                                project.status
+                              )}`}
+                            >
+                              {project.status || 'planning'}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm font-medium text-gray-900">
+                              {formatCurrency(project.budget?.total || 0)}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            {project.statistics?.totalInvested !== undefined ? (
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-medium text-gray-900">
+                                    {formatCurrency(project.statistics.totalInvested)}
+                                  </span>
+                                  <span 
+                                    className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${capitalStatusColor}`}
+                                    title={`Capital: ${formatCurrency(totalInvested)}, Available: ${formatCurrency(availableCapital)}`}
+                                  >
+                                    {capitalStatusText}
+                                  </span>
+                                </div>
+                                <div className="text-xs text-gray-600">
+                                  Balance: {formatCurrency(project.statistics.capitalBalance || 0)}
+                                </div>
+                                {project.statistics.budgetVsCapitalWarning && (
+                                  <div className="text-xs text-yellow-600 flex items-center gap-1" title={project.statistics.budgetVsCapitalWarning}>
+                                    <span>⚠️</span>
+                                    <span>Budget exceeds capital</span>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-sm text-gray-400">No financing</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-sm text-gray-900">{project.location || 'N/A'}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <Link
+                              href={`/projects/${project._id}`}
+                              className="text-blue-600 hover:text-blue-900 font-medium"
+                            >
+                              View →
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {projects.map((project) => {
+                const totalInvested = project.statistics?.totalInvested || 0;
+                const capitalBalance = project.statistics?.capitalBalance || 0;
+                const availableCapital = capitalBalance;
+                const totalUsed = totalInvested - capitalBalance;
+                const usagePercentage = totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
+                
+                let capitalStatusColor = 'bg-green-100 text-green-800';
+                let capitalStatusText = 'Capital OK';
+                
+                if (totalInvested === 0) {
+                  capitalStatusColor = 'bg-red-100 text-red-800';
+                  capitalStatusText = 'No Capital';
+                } else if (availableCapital < 0) {
+                  capitalStatusColor = 'bg-red-100 text-red-800';
+                  capitalStatusText = 'Negative';
+                } else if (usagePercentage > 80) {
+                  capitalStatusColor = 'bg-yellow-100 text-yellow-800';
+                  capitalStatusText = 'Low Capital';
+                }
+
+                return (
+                  <div key={project._id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <Link
+                          href={`/projects/${project._id}`}
+                          className="text-base font-semibold text-gray-900 hover:text-blue-600 block"
+                        >
+                          {project.projectName}
+                        </Link>
+                        <p className="text-sm text-gray-500 mt-0.5">{project.projectCode}</p>
+                      </div>
                       <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
+                        className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
                           project.status
                         )}`}
                       >
                         {project.status || 'planning'}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">
-                        {formatCurrency(project.budget?.total || 0)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {project.statistics?.totalInvested !== undefined ? (
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <p className="text-xs text-gray-500">Budget</p>
+                        <p className="text-sm font-medium text-gray-900 mt-0.5">
+                          {formatCurrency(project.budget?.total || 0)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">Location</p>
+                        <p className="text-sm font-medium text-gray-900 mt-0.5">
+                          {project.location || 'N/A'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {project.statistics?.totalInvested !== undefined && (
+                      <div className="border-t border-gray-200 pt-3 mt-3">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-xs text-gray-500">Financing</p>
+                          <span 
+                            className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${capitalStatusColor}`}
+                            title={`Capital: ${formatCurrency(totalInvested)}, Available: ${formatCurrency(availableCapital)}`}
+                          >
+                            {capitalStatusText}
+                          </span>
+                        </div>
                         <div className="space-y-1">
-                          <div className="text-sm font-medium text-gray-900">
-                            {formatCurrency(project.statistics.totalInvested)}
+                          <div className="flex justify-between">
+                            <span className="text-xs text-gray-600">Capital Raised</span>
+                            <span className="text-sm font-medium text-gray-900">
+                              {formatCurrency(project.statistics.totalInvested)}
+                            </span>
                           </div>
-                          <div className="text-xs text-gray-600">
-                            Balance: {formatCurrency(project.statistics.capitalBalance || 0)}
+                          <div className="flex justify-between">
+                            <span className="text-xs text-gray-600">Balance</span>
+                            <span className="text-sm font-medium text-gray-900">
+                              {formatCurrency(project.statistics.capitalBalance || 0)}
+                            </span>
                           </div>
                           {project.statistics.budgetVsCapitalWarning && (
-                            <div className="text-xs text-yellow-600" title={project.statistics.budgetVsCapitalWarning}>
-                              ⚠️ Budget exceeds capital
+                            <div className="text-xs text-yellow-600 flex items-center gap-1 mt-1" title={project.statistics.budgetVsCapitalWarning}>
+                              <span>⚠️</span>
+                              <span>Budget exceeds capital</span>
                             </div>
                           )}
                         </div>
-                      ) : (
-                        <span className="text-sm text-gray-400">No financing</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">{project.client || 'N/A'}</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-500">
-                        {project.createdAt
-                          ? new Date(project.createdAt).toLocaleDateString()
-                          : 'N/A'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      </div>
+                    )}
+
+                    <div className="mt-3 pt-3 border-t border-gray-200">
                       <Link
                         href={`/projects/${project._id}`}
-                        className="text-blue-600 hover:text-blue-900 mr-4"
+                        className="block text-center text-sm font-medium text-blue-600 hover:text-blue-900 py-2"
                       >
-                        View
+                        View Details →
                       </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Summary Stats */}
-        {projects.length > 0 && (
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">Total Projects</p>
-              <p className="text-2xl font-bold text-gray-900">{projects.length}</p>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">Active Projects</p>
-              <p className="text-2xl font-bold text-green-600">
-                {projects.filter((p) => p.status === 'active').length}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">Total Budget</p>
-              <p className="text-2xl font-bold text-gray-900">
-                {formatCurrency(projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0))}
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">In Planning</p>
-              <p className="text-2xl font-bold text-blue-600">
-                {projects.filter((p) => p.status === 'planning').length}
-              </p>
-            </div>
-          </div>
+          </>
         )}
       </div>
     </AppLayout>

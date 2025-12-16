@@ -11,15 +11,18 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingSpinner, LoadingButton } from '@/components/loading';
+import { LoadingSpinner, LoadingButton, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { CloudinaryUploadWidget } from '@/components/uploads/cloudinary-upload-widget';
+import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
+import { WorkflowGuide } from '@/components/workflow/WorkflowGuide';
+import { HelpIcon, FieldHelp } from '@/components/help/HelpTooltip';
 
 function NewPurchaseOrderPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { canAccess } = usePermissions();
+  const { canAccess, user } = usePermissions();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -32,6 +35,9 @@ function NewPurchaseOrderPageContent() {
   const [availableCapital, setAvailableCapital] = useState(null);
   const [loadingCapital, setLoadingCapital] = useState(false);
   const [capitalValidation, setCapitalValidation] = useState(null);
+  const [validatingCapital, setValidatingCapital] = useState(false);
+  const [showSupplierModal, setShowSupplierModal] = useState(false);
+  const [creatingSupplier, setCreatingSupplier] = useState(false);
 
   const [formData, setFormData] = useState({
     materialRequestId: '',
@@ -44,6 +50,7 @@ function NewPurchaseOrderPageContent() {
     description: '',
     quantityOrdered: '',
     unit: 'piece',
+    customUnit: '',
     unitCost: '',
     totalCost: '',
     deliveryDate: '',
@@ -51,12 +58,53 @@ function NewPurchaseOrderPageContent() {
     notes: '',
   });
 
+  // Predefined unit options
+  const unitOptions = [
+    'piece',
+    'bag',
+    'kg',
+    'ton',
+    'liter',
+    'gallon',
+    'meter',
+    'square meter',
+    'cubic meter',
+    'roll',
+    'sheet',
+    'box',
+    'carton',
+    'pack',
+    'set',
+    'pair',
+    'dozen',
+    'others'
+  ];
+
+  // Check if user has access to create purchase orders
+  useEffect(() => {
+    if (user) {
+      const userRole = user.role?.toLowerCase();
+      if (userRole === 'clerk' || userRole === 'site_clerk') {
+        toast.showError('You do not have permission to create purchase orders');
+        router.push('/dashboard/clerk');
+        return;
+      }
+      if (!canAccess('create_purchase_order')) {
+        toast.showError('You do not have permission to create purchase orders');
+        router.push('/dashboard');
+        return;
+      }
+    }
+  }, [user, canAccess, router, toast]);
+
   // Fetch data on mount
   useEffect(() => {
-    fetchProjects();
-    fetchSuppliers();
-    fetchCategories();
-  }, []);
+    if (user && (user.role?.toLowerCase() !== 'clerk' && user.role?.toLowerCase() !== 'site_clerk')) {
+      fetchProjects();
+      fetchSuppliers();
+      fetchCategories();
+    }
+  }, [user]);
 
   // Handle URL parameters - fetch request details first to get projectId
   useEffect(() => {
@@ -111,13 +159,18 @@ function NewPurchaseOrderPageContent() {
 
   // Calculate total cost and validate capital when quantity or unit cost changes
   useEffect(() => {
-    if (formData.quantityOrdered && formData.unitCost) {
-      const total = parseFloat(formData.quantityOrdered) * parseFloat(formData.unitCost);
+    const quantity = parseFloat(formData.quantityOrdered);
+    const unitCost = parseFloat(formData.unitCost);
+    
+    if (!isNaN(quantity) && !isNaN(unitCost) && quantity > 0 && unitCost >= 0) {
+      const total = quantity * unitCost;
       setFormData((prev) => ({ ...prev, totalCost: total.toFixed(2) }));
       
       // Validate capital if project is selected
       if (formData.projectId && availableCapital !== null) {
-        validateCapital(total);
+        validateCapital(total).catch(err => {
+          console.error('Capital validation error:', err);
+        });
       }
     } else {
       setFormData((prev) => ({ ...prev, totalCost: '' }));
@@ -150,11 +203,12 @@ function NewPurchaseOrderPageContent() {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await fetch('/api/users?role=supplier&status=active');
+      // Updated to use suppliers collection instead of users
+      const response = await fetch('/api/suppliers?status=active&limit=100');
       const data = await response.json();
       if (data.success) {
-        // API returns { users: [...], pagination: {...}, ... }
-        setSuppliers(data.data?.users || []);
+        // API returns { suppliers: [...], pagination: {...}, ... }
+        setSuppliers(data.data?.suppliers || []);
       } else {
         setSuppliers([]);
         console.error('Failed to fetch suppliers:', data.error);
@@ -162,6 +216,40 @@ function NewPurchaseOrderPageContent() {
     } catch (err) {
       console.error('Error fetching suppliers:', err);
       setSuppliers([]);
+    }
+  };
+
+  const handleCreateSupplier = async (supplierData) => {
+    setCreatingSupplier(true);
+    try {
+      const response = await fetch('/api/suppliers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(supplierData),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to create supplier');
+      }
+
+      // Refresh suppliers list
+      await fetchSuppliers();
+      
+      // Auto-select new supplier
+      const newSupplierId = data.data._id?.toString() || data.data.id?.toString();
+      if (newSupplierId) {
+        setFormData((prev) => ({ ...prev, supplierId: newSupplierId }));
+      }
+
+      setShowSupplierModal(false);
+      toast.showSuccess('Supplier created and selected successfully!');
+    } catch (err) {
+      toast.showError(err.message || 'Failed to create supplier');
+      console.error('Create supplier error:', err);
+    } finally {
+      setCreatingSupplier(false);
     }
   };
 
@@ -272,7 +360,14 @@ function NewPurchaseOrderPageContent() {
       }
       
       // Pre-fill form with request details
-      setFormData((prev) => ({
+      setFormData((prev) => {
+        const requestUnit = request.unit || prev.unit || 'piece';
+        // Check if unit is in predefined list, if not, use "others" and set customUnit
+        const isUnitInList = unitOptions.includes(requestUnit?.toLowerCase());
+        const finalUnit = isUnitInList ? requestUnit?.toLowerCase() : 'others';
+        const customUnitValue = isUnitInList ? '' : requestUnit;
+        
+        return {
         ...prev,
         materialRequestId: requestId,
         projectId: request.projectId?.toString() || prev.projectId,
@@ -282,10 +377,12 @@ function NewPurchaseOrderPageContent() {
         materialName: request.materialName || prev.materialName,
         description: request.description || prev.description,
         quantityOrdered: request.quantityNeeded?.toString() || prev.quantityOrdered,
-        unit: request.unit || prev.unit,
+          unit: finalUnit,
+          customUnit: customUnitValue,
         unitCost: request.estimatedUnitCost?.toString() || prev.unitCost,
         totalCost: request.estimatedCost?.toString() || prev.totalCost,
-      }));
+        };
+      });
       
       return request;
     } catch (err) {
@@ -315,22 +412,38 @@ function NewPurchaseOrderPageContent() {
     }
   };
 
-  const validateCapital = (totalCost) => {
-    if (availableCapital === null) {
+  const validateCapital = async (totalCost) => {
+    if (!formData.projectId || availableCapital === null) {
       setCapitalValidation(null);
       return;
     }
 
-    if (totalCost > availableCapital) {
-      setCapitalValidation({
-        isValid: false,
-        message: `Insufficient capital. Required: ${formatCurrency(totalCost)}, Available: ${formatCurrency(availableCapital)}`,
-      });
-    } else {
-      setCapitalValidation({
-        isValid: true,
-        message: `Capital available. Required: ${formatCurrency(totalCost)}, Available: ${formatCurrency(availableCapital)}`,
-      });
+    setValidatingCapital(true);
+    try {
+      // Simulate validation delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      if (totalCost > availableCapital) {
+        setCapitalValidation({
+          isValid: false,
+          message: `Insufficient capital. Required: ${formatCurrency(totalCost)}, Available: ${formatCurrency(availableCapital)}, Shortfall: ${formatCurrency(totalCost - availableCapital)}`,
+          available: availableCapital,
+          required: totalCost,
+          shortfall: totalCost - availableCapital,
+        });
+      } else {
+        setCapitalValidation({
+          isValid: true,
+          message: `Capital validation passed. Available: ${formatCurrency(availableCapital)}, Required: ${formatCurrency(totalCost)}`,
+          available: availableCapital,
+          required: totalCost,
+        });
+      }
+    } catch (err) {
+      console.error('Capital validation error:', err);
+      setCapitalValidation(null);
+    } finally {
+      setValidatingCapital(false);
     }
   };
 
@@ -346,6 +459,12 @@ function NewPurchaseOrderPageContent() {
       if (name === 'categoryId') {
         const selectedCategory = categories.find((cat) => cat._id === value);
         updated.category = selectedCategory ? selectedCategory.name : '';
+      }
+      // Handle unit selection - clear custom unit if not "others"
+      if (name === 'unit') {
+        if (value !== 'others') {
+          updated.customUnit = '';
+        }
       }
       return updated;
     });
@@ -380,6 +499,15 @@ function NewPurchaseOrderPageContent() {
       setError('Unit cost must be a non-negative number');
       return;
     }
+    // Validate unit - if "others" is selected, customUnit must be provided
+    if (!formData.unit || formData.unit.trim().length === 0) {
+      setError('Unit is required');
+      return;
+    }
+    if (formData.unit === 'others' && (!formData.customUnit || formData.customUnit.trim().length === 0)) {
+      setError('Please enter a custom unit name');
+      return;
+    }
     if (!formData.deliveryDate) {
       setError('Delivery date is required');
       return;
@@ -409,7 +537,7 @@ function NewPurchaseOrderPageContent() {
         materialName: formData.materialName.trim(),
         description: formData.description?.trim() || '',
         quantityOrdered: parseFloat(formData.quantityOrdered),
-        unit: formData.unit.trim(),
+        unit: formData.unit === 'others' ? formData.customUnit.trim() : formData.unit.trim(),
         unitCost: parseFloat(formData.unitCost),
         deliveryDate: formData.deliveryDate,
         terms: formData.terms?.trim() || '',
@@ -425,17 +553,69 @@ function NewPurchaseOrderPageContent() {
         body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      // Handle HTTP errors before parsing JSON
+      if (!response.ok) {
+        let errorMessage = 'Failed to create purchase order';
+        
+        if (response.status === 404) {
+          errorMessage = 'Purchase order API route not found. The server may not be running correctly or the route may have been moved. Please refresh the page and try again.';
+          console.error('[Purchase Order Creation] 404 Error - Route not found');
+          console.error('[Purchase Order Creation] Request URL:', '/api/purchase-orders');
+          console.error('[Purchase Order Creation] Request Method:', 'POST');
+          console.error('[Purchase Order Creation] Request Payload:', payload);
+        } else if (response.status === 401) {
+          errorMessage = 'You are not authorized to create purchase orders. Please log in again.';
+        } else if (response.status === 403) {
+          errorMessage = 'You do not have permission to create purchase orders. Only Project Managers and Owners can create purchase orders.';
+        } else if (response.status === 400) {
+          // Try to get error message from response
+          try {
+            const errorData = await response.json();
+            errorMessage = errorData.error || 'Invalid request. Please check your input.';
+          } catch (e) {
+            errorMessage = 'Invalid request. Please check your input.';
+          }
+        } else if (response.status === 500) {
+          errorMessage = 'Server error occurred. Please try again later or contact support.';
+        } else {
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        }
+        
+        setError(errorMessage);
+        toast.showError(errorMessage);
+        return;
+      }
+
+      // Parse JSON response
+      let data;
+      try {
+        data = await response.json();
+      } catch (err) {
+        console.error('[Purchase Order Creation] Failed to parse response:', err);
+        setError('Invalid response from server. Please try again.');
+        toast.showError('Invalid response from server. Please try again.');
+        return;
+      }
+
       if (data.success) {
         toast.showSuccess('Purchase order created successfully!');
-        router.push(`/purchase-orders/${data.data._id}`);
+        // API returns { order: {...}, capitalInfo: {...} }
+        const orderId = data.data?.order?._id || data.data?._id;
+        if (orderId) {
+          router.push(`/purchase-orders/${orderId}`);
+        } else {
+          console.error('Purchase order created but ID not found in response:', data);
+          setError('Purchase order created but navigation failed. Please refresh the page.');
+          toast.showError('Purchase order created but navigation failed.');
+        }
       } else {
         setError(data.error || 'Failed to create purchase order');
         toast.showError(data.error || 'Failed to create purchase order');
       }
     } catch (err) {
-      setError(err.message || 'Failed to create purchase order');
-      toast.showError(err.message || 'Failed to create purchase order');
+      console.error('[Purchase Order Creation] Network or other error:', err);
+      setError(err.message || 'Failed to create purchase order. Please check your connection and try again.');
+      toast.showError(err.message || 'Failed to create purchase order. Please check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -452,21 +632,41 @@ function NewPurchaseOrderPageContent() {
 
   return (
     <AppLayout>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+        {/* Loading Overlay */}
+        <LoadingOverlay 
+          isLoading={loading || validatingCapital} 
+          message={
+            loading ? "Creating purchase order..." :
+            validatingCapital ? "Validating capital availability..." :
+            "Processing..."
+          } 
+          fullScreen={false} 
+        />
         {/* Header */}
         <div className="mb-8">
-          <Link
-            href="/purchase-orders"
-            className="text-blue-600 hover:text-blue-800 mb-4 inline-block"
-          >
-            ← Back to Purchase Orders
-          </Link>
+          <Breadcrumbs 
+            items={[
+              { label: 'Purchase Orders', href: '/purchase-orders' },
+              { label: 'Create Order', href: '/purchase-orders/new', current: true },
+            ]}
+          />
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create Purchase Order</h1>
           <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Create a purchase order from an approved material request</p>
         </div>
 
+        {/* Capital Validation Loading */}
+        {validatingCapital && (
+          <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-6">
+            <div className="flex items-center gap-2">
+              <LoadingSpinner size="sm" color="blue-600" />
+              <p className="text-sm">Validating capital availability...</p>
+            </div>
+          </div>
+        )}
+
         {/* Capital Warning */}
-        {capitalValidation && !capitalValidation.isValid && (
+        {capitalValidation && !capitalValidation.isValid && !validatingCapital && (
           <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
             <p className="font-semibold">⚠️ Insufficient Capital</p>
             <p className="text-sm mt-1">{capitalValidation.message}</p>
@@ -475,7 +675,7 @@ function NewPurchaseOrderPageContent() {
         )}
 
         {/* Capital Validation Success */}
-        {capitalValidation && capitalValidation.isValid && (
+        {capitalValidation && capitalValidation.isValid && !validatingCapital && (
           <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">
             <p className="text-sm">{capitalValidation.message}</p>
           </div>
@@ -496,6 +696,9 @@ function NewPurchaseOrderPageContent() {
             {error}
           </div>
         )}
+
+        {/* Workflow Guide */}
+        <WorkflowGuide projectId={formData.projectId} compact={true} />
 
         {/* Quick Actions - Approved Requests Ready to Order */}
         {!formData.projectId && (
@@ -578,7 +781,14 @@ function NewPurchaseOrderPageContent() {
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Material Request <span className="text-red-500">*</span>
+                <HelpIcon 
+                  content="Select an approved material request to create a purchase order from. Only approved requests are available."
+                  position="right"
+                />
               </label>
+              <FieldHelp>
+                Choose an approved material request. The form will auto-fill details from the selected request.
+              </FieldHelp>
               {loadingRequests ? (
                 <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
                   Loading available requests...
@@ -627,7 +837,14 @@ function NewPurchaseOrderPageContent() {
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Project <span className="text-red-500">*</span>
+                <HelpIcon 
+                  content="Select the project this purchase order is for. Capital availability will be checked for this project."
+                  position="right"
+                />
               </label>
+              <FieldHelp>
+                The project this purchase order belongs to. Capital will be validated against this project.
+              </FieldHelp>
               <select
                 name="projectId"
                 value={formData.projectId}
@@ -649,9 +866,27 @@ function NewPurchaseOrderPageContent() {
 
             {/* Supplier Selection */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                Supplier <span className="text-red-500">*</span>
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-base font-semibold text-gray-700 leading-normal">
+                  Supplier <span className="text-red-500">*</span>
+                  <HelpIcon 
+                    content="Select the supplier who will fulfill this purchase order. You can create a new supplier if needed."
+                    position="right"
+                  />
+                </label>
+                {canAccess('create_supplier') && (
+                  <button
+                    type="button"
+                    onClick={() => setShowSupplierModal(true)}
+                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    + Create New Supplier
+                  </button>
+                )}
+              </div>
+              <FieldHelp>
+                Choose the supplier for this order. Create a new supplier if they're not in the list.
+              </FieldHelp>
               <select
                 name="supplierId"
                 value={formData.supplierId}
@@ -662,9 +897,11 @@ function NewPurchaseOrderPageContent() {
                 <option value="">Select a supplier</option>
                 {suppliers.map((supplier) => {
                   const supplierId = supplier._id?.toString() || supplier.id?.toString() || '';
+                  const displayName = supplier.name || supplier.contactPerson || supplier.email || 'Unknown Supplier';
+                  const contactInfo = supplier.contactPerson ? ` - ${supplier.contactPerson}` : '';
                   return (
                     <option key={supplierId || `supplier-${supplier.email}`} value={supplierId}>
-                      {supplier.firstName} {supplier.lastName} ({supplier.email})
+                      {displayName}{contactInfo} ({supplier.email})
                     </option>
                   );
                 })}
@@ -706,7 +943,14 @@ function NewPurchaseOrderPageContent() {
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Quantity Ordered <span className="text-red-500">*</span>
+                  <HelpIcon 
+                    content="Enter the quantity you're ordering. This may differ from the requested quantity."
+                    position="right"
+                  />
                 </label>
+                <FieldHelp>
+                  Quantity to order. May differ from the requested quantity.
+                </FieldHelp>
                 <input
                   type="number"
                   name="quantityOrdered"
@@ -722,14 +966,30 @@ function NewPurchaseOrderPageContent() {
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Unit <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
+                <select
                   name="unit"
                   value={formData.unit}
                   onChange={handleChange}
                   required
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
+                >
+                  {unitOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option.charAt(0).toUpperCase() + option.slice(1)}
+                    </option>
+                  ))}
+                </select>
+                {formData.unit === 'others' && (
+                  <input
+                    type="text"
+                    name="customUnit"
+                    value={formData.customUnit}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter custom unit name"
+                    className="w-full mt-2 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                  />
+                )}
               </div>
             </div>
 
@@ -738,7 +998,14 @@ function NewPurchaseOrderPageContent() {
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Unit Cost <span className="text-red-500">*</span>
+                  <HelpIcon 
+                    content="Enter the cost per unit. The total cost will be calculated automatically (Quantity × Unit Cost)."
+                    position="right"
+                  />
                 </label>
+                <FieldHelp>
+                  Cost per unit. Total cost is calculated automatically.
+                </FieldHelp>
                 <input
                   type="number"
                   name="unitCost"
@@ -753,7 +1020,14 @@ function NewPurchaseOrderPageContent() {
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Total Cost
+                  <HelpIcon 
+                    content="Total cost is calculated automatically from Quantity × Unit Cost. This amount will be committed from project capital."
+                    position="right"
+                  />
                 </label>
+                <FieldHelp>
+                  Calculated automatically. This amount will be committed from project capital.
+                </FieldHelp>
                 <input
                   type="text"
                   value={formatCurrency(formData.totalCost || 0)}
@@ -767,7 +1041,14 @@ function NewPurchaseOrderPageContent() {
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Delivery Date <span className="text-red-500">*</span>
+                <HelpIcon 
+                  content="Select the expected delivery date for this order. This helps with planning and tracking."
+                  position="right"
+                />
               </label>
+              <FieldHelp>
+                Expected delivery date. Helps with planning and tracking.
+              </FieldHelp>
               <input
                 type="date"
                 name="deliveryDate"
@@ -818,7 +1099,8 @@ function NewPurchaseOrderPageContent() {
               </Link>
               <LoadingButton
                 type="submit"
-                isLoading={loading}
+                isLoading={loading || validatingCapital}
+                loadingText={loading ? "Creating Purchase Order..." : "Validating..."}
                 disabled={capitalValidation && !capitalValidation.isValid}
                 className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -826,11 +1108,180 @@ function NewPurchaseOrderPageContent() {
               </LoadingButton>
             </div>
           </div>
-        </form>
-      </div>
-    </AppLayout>
-  );
-}
+          </form>
+
+          {/* Supplier Creation Modal */}
+          {showSupplierModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-gray-900">Create New Supplier</h2>
+                  <button
+                    type="button"
+                    onClick={() => setShowSupplierModal(false)}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <SupplierCreationForm
+                  onSubmit={handleCreateSupplier}
+                  onCancel={() => setShowSupplierModal(false)}
+                  loading={creatingSupplier}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Supplier Creation Form Component (Modal)
+  function SupplierCreationForm({ onSubmit, onCancel, loading }) {
+    const [formData, setFormData] = useState({
+      name: '',
+      contactPerson: '',
+      email: '',
+      phone: '',
+      alternatePhone: '',
+      alternateEmail: '',
+      businessType: '',
+      taxId: '',
+      address: '',
+      preferredContactMethod: 'all',
+      emailEnabled: true,
+      smsEnabled: true,
+      pushNotificationsEnabled: true,
+      status: 'active',
+    });
+    const [error, setError] = useState(null);
+
+    const handleChange = (e) => {
+      const { name, value, type, checked } = e.target;
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+      }));
+    };
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setError(null);
+
+      // Validation
+      if (!formData.name || formData.name.trim().length === 0) {
+        setError('Supplier name is required');
+        return;
+      }
+
+      if (!formData.email || formData.email.trim().length === 0) {
+        setError('Email is required');
+        return;
+      }
+
+      if (!formData.phone || formData.phone.trim().length === 0) {
+        setError('Phone number is required');
+        return;
+      }
+
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email.trim())) {
+        setError('Invalid email format');
+        return;
+      }
+
+      await onSubmit(formData);
+    };
+
+    return (
+      <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+            <p className="font-semibold">Error</p>
+            <p className="text-sm">{error}</p>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Supplier Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+            <input
+              type="text"
+              name="contactPerson"
+              value={formData.contactPerson}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Email <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-4 border-t">
+          <button
+            type="button"
+            onClick={onCancel}
+            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+            disabled={loading}
+          >
+            Cancel
+          </button>
+          <LoadingButton
+            type="submit"
+            isLoading={loading}
+            loadingText="Creating..."
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          >
+            Create Supplier
+          </LoadingButton>
+        </div>
+      </form>
+    );
+  }
 
 export default function NewPurchaseOrderPage() {
   return (

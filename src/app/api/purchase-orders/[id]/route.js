@@ -82,47 +82,122 @@ export async function GET(request, { params }) {
       _id: purchaseOrder.createdBy,
     });
 
-    let materialRequest = null;
-    if (purchaseOrder.materialRequestId) {
-      materialRequest = await db.collection('material_requests').findOne({
+    // Handle bulk orders - get multiple material requests
+    let materialRequests = [];
+    let batch = null;
+
+    if (purchaseOrder.isBulkOrder && purchaseOrder.materialRequestIds && Array.isArray(purchaseOrder.materialRequestIds)) {
+      // Bulk order - get all material requests
+      materialRequests = await db
+        .collection('material_requests')
+        .find({
+          _id: { $in: purchaseOrder.materialRequestIds.map((id) => new ObjectId(id)) },
+        })
+        .toArray();
+
+      // Get batch information if available
+      if (purchaseOrder.batchId) {
+        batch = await db.collection('material_request_batches').findOne({
+          _id: purchaseOrder.batchId,
+        });
+      }
+    } else if (purchaseOrder.materialRequestId) {
+      // Single material order
+      const materialRequest = await db.collection('material_requests').findOne({
         _id: purchaseOrder.materialRequestId,
       });
+      if (materialRequest) {
+        materialRequests = [materialRequest];
+      }
     }
 
-    let linkedMaterial = null;
-    if (purchaseOrder.linkedMaterialId) {
-      linkedMaterial = await db.collection('materials').findOne({
+    // Get linked materials (if any materials were created from this PO)
+    let linkedMaterials = [];
+    if (purchaseOrder.isBulkOrder && purchaseOrder.materialRequestIds) {
+      // For bulk orders, check if materials were created from any of the requests
+      const linkedMaterialIds = await db
+        .collection('materials')
+        .find({
+          linkedPurchaseOrderId: new ObjectId(id),
+          deletedAt: null,
+        })
+        .toArray();
+      linkedMaterials = linkedMaterialIds;
+    } else if (purchaseOrder.linkedMaterialId) {
+      // Single material
+      const linkedMaterial = await db.collection('materials').findOne({
         _id: purchaseOrder.linkedMaterialId,
       });
+      if (linkedMaterial) {
+        linkedMaterials = [linkedMaterial];
+      }
     }
+
+    // Get supplier from suppliers collection (not users)
+    const supplierContact = await db.collection('suppliers').findOne({
+      _id: purchaseOrder.supplierId,
+    });
 
     return successResponse({
       ...purchaseOrder,
+      // Ensure communications array is included
+      communications: purchaseOrder.communications || [],
       project: project ? {
         _id: project._id.toString(),
         projectCode: project.projectCode,
         projectName: project.projectName,
       } : null,
-      supplier: supplier ? {
+      supplier: supplierContact ? {
+        _id: supplierContact._id.toString(),
+        name: supplierContact.name || supplierContact.contactPerson || 'Unknown Supplier',
+        email: supplierContact.email,
+        phone: supplierContact.phone,
+        emailEnabled: supplierContact.emailEnabled !== false,
+        smsEnabled: supplierContact.smsEnabled !== false,
+        pushNotificationsEnabled: supplierContact.pushNotificationsEnabled !== false,
+      } : supplier ? {
         _id: supplier._id.toString(),
         name: `${supplier.firstName || ''} ${supplier.lastName || ''}`.trim() || supplier.email,
         email: supplier.email,
+        emailEnabled: true,
+        smsEnabled: false,
+        pushNotificationsEnabled: false,
       } : null,
       creator: creator ? {
         _id: creator._id.toString(),
         name: `${creator.firstName || ''} ${creator.lastName || ''}`.trim() || creator.email,
         email: creator.email,
       } : null,
-      materialRequest: materialRequest ? {
-        _id: materialRequest._id.toString(),
-        requestNumber: materialRequest.requestNumber,
-        materialName: materialRequest.materialName,
-        status: materialRequest.status,
+      materialRequests: materialRequests.map((req) => ({
+        _id: req._id.toString(),
+        requestNumber: req.requestNumber,
+        materialName: req.materialName,
+        quantityNeeded: req.quantityNeeded,
+        unit: req.unit,
+        status: req.status,
+        category: req.category,
+      })),
+      materialRequest: materialRequests.length > 0 ? {
+        _id: materialRequests[0]._id.toString(),
+        requestNumber: materialRequests[0].requestNumber,
+        materialName: materialRequests[0].materialName,
+        status: materialRequests[0].status,
       } : null,
-      linkedMaterial: linkedMaterial ? {
-        _id: linkedMaterial._id.toString(),
-        name: linkedMaterial.name,
-        status: linkedMaterial.status,
+      batch: batch ? {
+        _id: batch._id.toString(),
+        batchNumber: batch.batchNumber,
+        batchName: batch.batchName,
+        status: batch.status,
+      } : null,
+      linkedMaterials: linkedMaterials.map((mat) => ({
+        _id: mat._id.toString(),
+        name: mat.materialName || mat.itemName || mat.name,
+        status: mat.status,
+      })),
+      linkedMaterial: linkedMaterials.length > 0 ? {
+        _id: linkedMaterials[0]._id.toString(),
+        name: linkedMaterials[0].materialName || linkedMaterials[0].itemName || linkedMaterials[0].name,
+        status: linkedMaterials[0].status,
       } : null,
     });
   } catch (error) {

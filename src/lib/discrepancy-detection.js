@@ -48,10 +48,24 @@ export const DEFAULT_THRESHOLDS = {
 export function checkMaterialDiscrepancies(material, thresholds = {}) {
   const thresh = { ...DEFAULT_THRESHOLDS, ...thresholds };
   
-  const quantityPurchased = parseFloat(material.quantityPurchased || material.quantity || 0);
-  const quantityDelivered = parseFloat(material.quantityDelivered || 0);
-  const quantityUsed = parseFloat(material.quantityUsed || 0);
-  const unitCost = parseFloat(material.unitCost || 0);
+  // Enhanced field name handling: support both quantity and quantityPurchased
+  // Also validate and clamp negative values
+  const quantityPurchased = Math.max(0, parseFloat(material.quantityPurchased || material.quantity || 0) || 0);
+  const quantityDelivered = Math.max(0, parseFloat(material.quantityDelivered || 0) || 0);
+  const quantityUsed = Math.max(0, parseFloat(material.quantityUsed || 0) || 0);
+  const unitCost = Math.max(0, parseFloat(material.unitCost || 0) || 0);
+  
+  // Log warning for negative values (data integrity check)
+  if (material.quantityPurchased < 0 || material.quantity < 0 || 
+      material.quantityDelivered < 0 || material.quantityUsed < 0 || 
+      material.unitCost < 0) {
+    console.warn(`Material ${material._id} has negative quantity/cost values. Clamped to 0.`, {
+      quantityPurchased: material.quantityPurchased || material.quantity,
+      quantityDelivered: material.quantityDelivered,
+      quantityUsed: material.quantityUsed,
+      unitCost: material.unitCost,
+    });
+  }
   
   // Calculate metrics
   const variance = calculateVariance(quantityPurchased, quantityDelivered);
@@ -178,7 +192,13 @@ export async function checkProjectDiscrepancies(projectId, options = {}) {
     const query = {
       projectId: new ObjectId(projectId),
       deletedAt: null,
-      quantityDelivered: { $gt: 0 }, // Only check materials that have been delivered
+      // Include ALL materials: delivered, undelivered, and partially delivered
+      // This allows detection of variance for materials purchased but not delivered
+      // Filter: must have quantityPurchased OR quantity field (backward compatibility)
+      $or: [
+        { quantityPurchased: { $exists: true, $gt: 0 } },
+        { quantity: { $exists: true, $gt: 0 } },
+      ],
     };
 
     // Add category filter if provided
@@ -186,7 +206,7 @@ export async function checkProjectDiscrepancies(projectId, options = {}) {
       query.category = options.category;
     }
 
-    // Add date filters if provided
+    // Add date filters if provided - use primary date field for accurate filtering
     if (options.startDate || options.endDate) {
       const dateFilter = {};
       if (options.startDate) {
@@ -199,11 +219,32 @@ export async function checkProjectDiscrepancies(projectId, options = {}) {
       }
       
       if (Object.keys(dateFilter).length > 0) {
+        // Use primary date field: prefer dateDelivered, fallback to dateUsed, then createdAt
+        // This prevents duplicate counting across time periods
         query.$or = [
-          { dateDelivered: dateFilter },
-          { dateUsed: dateFilter },
-          { createdAt: dateFilter },
-          { updatedAt: dateFilter },
+          { dateDelivered: dateFilter }, // Primary: when material was delivered
+          { 
+            // For undelivered materials, use datePurchased or createdAt
+            $and: [
+              { quantityDelivered: { $lte: 0 } },
+              { datePurchased: dateFilter }
+            ]
+          },
+          {
+            // Fallback for materials without delivery date
+            $and: [
+              { dateDelivered: { $exists: false } },
+              { dateUsed: dateFilter }
+            ]
+          },
+          {
+            // Last resort: use createdAt for materials without other dates
+            $and: [
+              { dateDelivered: { $exists: false } },
+              { dateUsed: { $exists: false } },
+              { createdAt: dateFilter }
+            ]
+          },
         ];
       }
     }
@@ -399,7 +440,8 @@ export async function getSupplierPerformance(projectId = null, options = {}) {
     
     const matchQuery = {
       deletedAt: null,
-      quantityDelivered: { $gt: 0 },
+      // Include all materials for supplier performance tracking
+      // This allows tracking suppliers with delivery issues
     };
     
     if (projectId) {
@@ -411,7 +453,7 @@ export async function getSupplierPerformance(projectId = null, options = {}) {
       matchQuery.category = options.category;
     }
 
-    // Add date filters if provided
+    // Add date filters if provided - use primary date field
     if (options.startDate || options.endDate) {
       const dateFilter = {};
       if (options.startDate) {
@@ -424,11 +466,28 @@ export async function getSupplierPerformance(projectId = null, options = {}) {
       }
       
       if (Object.keys(dateFilter).length > 0) {
+        // Use primary date field: prefer dateDelivered, fallback to datePurchased/createdAt
         matchQuery.$or = [
           { dateDelivered: dateFilter },
-          { dateUsed: dateFilter },
-          { createdAt: dateFilter },
-          { updatedAt: dateFilter },
+          { 
+            $and: [
+              { quantityDelivered: { $lte: 0 } },
+              { datePurchased: dateFilter }
+            ]
+          },
+          {
+            $and: [
+              { dateDelivered: { $exists: false } },
+              { dateUsed: dateFilter }
+            ]
+          },
+          {
+            $and: [
+              { dateDelivered: { $exists: false } },
+              { dateUsed: { $exists: false } },
+              { createdAt: dateFilter }
+            ]
+          },
         ];
       }
     }
@@ -438,34 +497,71 @@ export async function getSupplierPerformance(projectId = null, options = {}) {
       .aggregate([
         { $match: matchQuery },
         {
+          // Normalize supplier names and handle null/undefined
+          $addFields: {
+            normalizedSupplier: {
+              $cond: {
+                if: { $or: [{ $eq: ['$supplierName', null] }, { $eq: ['$supplierName', ''] }] },
+                then: 'Unknown Supplier',
+                else: {
+                  $trim: {
+                    input: {
+                      $toLower: {
+                        $ifNull: ['$supplierName', 'Unknown Supplier']
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            // Handle both quantity and quantityPurchased fields
+            qtyPurchased: {
+              $ifNull: ['$quantityPurchased', { $ifNull: ['$quantity', 0] }]
+            },
+            qtyDelivered: {
+              $ifNull: ['$quantityDelivered', 0]
+            }
+          }
+        },
+        {
           $group: {
-            _id: '$supplierName',
+            _id: '$normalizedSupplier',
             totalMaterials: { $sum: 1 },
-            totalPurchased: { $sum: '$quantityPurchased' },
-            totalDelivered: { $sum: '$quantityDelivered' },
+            totalPurchased: { $sum: '$qtyPurchased' },
+            totalDelivered: { $sum: '$qtyDelivered' },
             totalVariance: {
               $sum: {
-                $subtract: ['$quantityPurchased', '$quantityDelivered'],
+                $subtract: ['$qtyPurchased', '$qtyDelivered'],
               },
             },
             totalVarianceCost: {
               $sum: {
                 $multiply: [
-                  { $subtract: ['$quantityPurchased', '$quantityDelivered'] },
-                  '$unitCost',
+                  { 
+                    $max: [
+                      { $subtract: ['$qtyPurchased', '$qtyDelivered'] },
+                      0
+                    ]
+                  },
+                  { $ifNull: ['$unitCost', 0] },
                 ],
               },
             },
             averageVariancePercentage: {
               $avg: {
                 $cond: [
-                  { $gt: ['$quantityPurchased', 0] },
+                  { $gt: ['$qtyPurchased', 0] },
                   {
                     $multiply: [
                       {
                         $divide: [
-                          { $subtract: ['$quantityPurchased', '$quantityDelivered'] },
-                          '$quantityPurchased',
+                          { 
+                            $max: [
+                              { $subtract: ['$qtyPurchased', '$qtyDelivered'] },
+                              0
+                            ]
+                          },
+                          '$qtyPurchased',
                         ],
                       },
                       100,
@@ -479,13 +575,23 @@ export async function getSupplierPerformance(projectId = null, options = {}) {
         },
         {
           $project: {
-            supplierName: '$_id',
+            supplierName: '$_id', // Keep normalized name (will capitalize in JavaScript if needed)
             totalMaterials: 1,
-            totalPurchased: 1,
-            totalDelivered: 1,
-            totalVariance: 1,
+            totalPurchased: { $round: ['$totalPurchased', 2] },
+            totalDelivered: { $round: ['$totalDelivered', 2] },
+            totalVariance: { 
+              $round: [
+                { $max: ['$totalVariance', 0] },
+                2
+              ]
+            },
             totalVarianceCost: { $round: ['$totalVarianceCost', 2] },
-            averageVariancePercentage: { $round: ['$averageVariancePercentage', 2] },
+            averageVariancePercentage: { 
+              $round: [
+                { $max: ['$averageVariancePercentage', 0] },
+                2
+              ]
+            },
             deliveryAccuracy: {
               $round: [
                 {
@@ -531,7 +637,12 @@ export async function getProjectDiscrepancySummary(projectId, options = {}) {
     const query = {
       projectId: new ObjectId(projectId),
       deletedAt: null,
-      quantityDelivered: { $gt: 0 },
+      // Include ALL materials for comprehensive analysis
+      // Filter: must have quantityPurchased OR quantity field
+      $or: [
+        { quantityPurchased: { $exists: true, $gt: 0 } },
+        { quantity: { $exists: true, $gt: 0 } },
+      ],
     };
 
     // Add category filter if provided
@@ -539,7 +650,7 @@ export async function getProjectDiscrepancySummary(projectId, options = {}) {
       query.category = options.category;
     }
 
-    // Add date filters if provided
+    // Add date filters if provided - use primary date field for accurate filtering
     if (options.startDate || options.endDate) {
       const dateFilter = {};
       if (options.startDate) {
@@ -551,14 +662,38 @@ export async function getProjectDiscrepancySummary(projectId, options = {}) {
         dateFilter.$lte = endDate;
       }
       
-      // Check any of these date fields (materials matching any date field)
+      // Use primary date field: prefer dateDelivered, fallback to datePurchased/createdAt
       if (Object.keys(dateFilter).length > 0) {
-        query.$or = [
-          { dateDelivered: dateFilter },
-          { dateUsed: dateFilter },
-          { createdAt: dateFilter },
-          { updatedAt: dateFilter },
+        // Combine with existing $or for quantity fields
+        const existingOr = query.$or || [];
+        query.$and = [
+          { $or: existingOr },
+          {
+            $or: [
+              { dateDelivered: dateFilter },
+              { 
+                $and: [
+                  { quantityDelivered: { $lte: 0 } },
+                  { datePurchased: dateFilter }
+                ]
+              },
+              {
+                $and: [
+                  { dateDelivered: { $exists: false } },
+                  { dateUsed: dateFilter }
+                ]
+              },
+              {
+                $and: [
+                  { dateDelivered: { $exists: false } },
+                  { dateUsed: { $exists: false } },
+                  { createdAt: dateFilter }
+                ]
+              },
+            ],
+          },
         ];
+        delete query.$or; // Remove $or, now handled in $and
       }
     }
     
@@ -569,24 +704,33 @@ export async function getProjectDiscrepancySummary(projectId, options = {}) {
     
     let totalVariance = 0;
     let totalLoss = 0;
-    let totalWastage = 0;
+    let totalWastageSum = 0; // Sum of wastage percentages for averaging
     let totalVarianceCost = 0;
     let totalLossCost = 0;
     let totalDiscrepancyCost = 0;
     let materialsWithIssues = 0;
+    let materialsWithWastage = 0; // Count materials that have wastage calculated
     let criticalCount = 0;
     let highCount = 0;
     let mediumCount = 0;
     let lowCount = 0;
     
+    // Calculate metrics for ALL materials, not just those with alerts
     for (const material of materials) {
       const discrepancy = checkMaterialDiscrepancies(material);
       
+      // Always accumulate wastage for average calculation (if material has quantities)
+      const quantityPurchased = parseFloat(material.quantityPurchased || material.quantity || 0);
+      if (quantityPurchased > 0) {
+        totalWastageSum += discrepancy.metrics.wastage;
+        materialsWithWastage++;
+      }
+      
+      // Only count materials with alerts for issue tracking
       if (discrepancy.alerts.hasAnyAlert) {
         materialsWithIssues++;
         totalVariance += discrepancy.metrics.variance;
         totalLoss += discrepancy.metrics.loss;
-        totalWastage += discrepancy.metrics.wastage;
         totalVarianceCost += discrepancy.metrics.varianceCost;
         totalLossCost += discrepancy.metrics.lossCost;
         totalDiscrepancyCost += discrepancy.metrics.totalDiscrepancyCost;
@@ -608,14 +752,20 @@ export async function getProjectDiscrepancySummary(projectId, options = {}) {
       }
     }
     
+    // Calculate average wastage correctly: sum of percentages / count of materials
+    const averageWastage = materialsWithWastage > 0 
+      ? parseFloat((totalWastageSum / materialsWithWastage).toFixed(2))
+      : 0;
+    
     return {
       projectId,
       totalMaterials: materials.length,
       materialsWithIssues,
+      materialsWithWastage,
       metrics: {
         totalVariance: parseFloat(totalVariance.toFixed(2)),
         totalLoss: parseFloat(totalLoss.toFixed(2)),
-        totalWastage: parseFloat((totalWastage / materials.length).toFixed(2)),
+        averageWastage, // Correctly calculated average
         totalVarianceCost: parseFloat(totalVarianceCost.toFixed(2)),
         totalLossCost: parseFloat(totalLossCost.toFixed(2)),
         totalDiscrepancyCost: parseFloat(totalDiscrepancyCost.toFixed(2)),
@@ -648,10 +798,15 @@ export async function getHistoricalTrends(projectId, options = {}) {
     const query = {
       projectId: new ObjectId(projectId),
       deletedAt: null,
-      quantityDelivered: { $gt: 0 },
+      // Include ALL materials for historical trend analysis
+      // Filter: must have quantityPurchased OR quantity field
+      $or: [
+        { quantityPurchased: { $exists: true, $gt: 0 } },
+        { quantity: { $exists: true, $gt: 0 } },
+      ],
     };
 
-    // Add date filters if provided
+    // Add date filters if provided - use primary date field
     if (options.startDate || options.endDate) {
       const dateFilter = {};
       if (options.startDate) {
@@ -664,12 +819,35 @@ export async function getHistoricalTrends(projectId, options = {}) {
       }
       
       if (Object.keys(dateFilter).length > 0) {
-        query.$or = [
-          { dateDelivered: dateFilter },
-          { dateUsed: dateFilter },
-          { createdAt: dateFilter },
-          { updatedAt: dateFilter },
+        const existingOr = query.$or || [];
+        query.$and = [
+          { $or: existingOr },
+          {
+            $or: [
+              { dateDelivered: dateFilter },
+              { 
+                $and: [
+                  { quantityDelivered: { $lte: 0 } },
+                  { datePurchased: dateFilter }
+                ]
+              },
+              {
+                $and: [
+                  { dateDelivered: { $exists: false } },
+                  { dateUsed: dateFilter }
+                ]
+              },
+              {
+                $and: [
+                  { dateDelivered: { $exists: false } },
+                  { dateUsed: { $exists: false } },
+                  { createdAt: dateFilter }
+                ]
+              },
+            ],
+          },
         ];
+        delete query.$or;
       }
     }
 
@@ -694,7 +872,8 @@ export async function getHistoricalTrends(projectId, options = {}) {
           month: monthKey,
           variance: 0,
           loss: 0,
-          wastage: 0,
+          wastageSum: 0, // Sum of wastage percentages for averaging
+          materialsWithWastage: 0, // Count materials with wastage calculated
           varianceCost: 0,
           lossCost: 0,
           totalDiscrepancyCost: 0,
@@ -708,11 +887,17 @@ export async function getHistoricalTrends(projectId, options = {}) {
       
       monthData.materialCount++;
       
+      // Always accumulate wastage for average calculation (if material has quantities)
+      const quantityPurchased = parseFloat(material.quantityPurchased || material.quantity || 0);
+      if (quantityPurchased > 0) {
+        monthData.wastageSum += discrepancy.metrics.wastage;
+        monthData.materialsWithWastage++;
+      }
+      
       if (discrepancy.alerts.hasAnyAlert) {
         monthData.materialsWithIssues++;
         monthData.variance += discrepancy.metrics.variance;
         monthData.loss += discrepancy.metrics.loss;
-        monthData.wastage += discrepancy.metrics.wastage;
         monthData.varianceCost += discrepancy.metrics.varianceCost;
         monthData.lossCost += discrepancy.metrics.lossCost;
         monthData.totalDiscrepancyCost += discrepancy.metrics.totalDiscrepancyCost;
@@ -721,18 +906,25 @@ export async function getHistoricalTrends(projectId, options = {}) {
 
     // Convert to array and format
     const trends = Array.from(monthlyData.values())
-      .map((data) => ({
-        month: data.month,
-        monthLabel: new Date(data.month + '-01').toLocaleDateString('en-KE', { year: 'numeric', month: 'short' }),
-        variance: parseFloat(data.variance.toFixed(2)),
-        loss: parseFloat(data.loss.toFixed(2)),
-        wastage: parseFloat((data.wastage / data.materialCount).toFixed(2)),
-        varianceCost: parseFloat(data.varianceCost.toFixed(2)),
-        lossCost: parseFloat(data.lossCost.toFixed(2)),
-        totalDiscrepancyCost: parseFloat(data.totalDiscrepancyCost.toFixed(2)),
-        materialCount: data.materialCount,
-        materialsWithIssues: data.materialsWithIssues,
-      }))
+      .map((data) => {
+        // Calculate average wastage correctly: sum of percentages / count of materials with wastage
+        const averageWastage = data.materialsWithWastage > 0
+          ? parseFloat((data.wastageSum / data.materialsWithWastage).toFixed(2))
+          : 0;
+        
+        return {
+          month: data.month,
+          monthLabel: new Date(data.month + '-01').toLocaleDateString('en-KE', { year: 'numeric', month: 'short' }),
+          variance: parseFloat(data.variance.toFixed(2)),
+          loss: parseFloat(data.loss.toFixed(2)),
+          wastage: averageWastage, // Correctly calculated average
+          varianceCost: parseFloat(data.varianceCost.toFixed(2)),
+          lossCost: parseFloat(data.lossCost.toFixed(2)),
+          totalDiscrepancyCost: parseFloat(data.totalDiscrepancyCost.toFixed(2)),
+          materialCount: data.materialCount,
+          materialsWithIssues: data.materialsWithIssues,
+        };
+      })
       .sort((a, b) => a.month.localeCompare(b.month));
 
     return trends;
@@ -757,10 +949,15 @@ export async function getCategoryAnalysis(projectId, options = {}) {
     const query = {
       projectId: new ObjectId(projectId),
       deletedAt: null,
-      quantityDelivered: { $gt: 0 },
+      // Include ALL materials for category analysis
+      // Filter: must have quantityPurchased OR quantity field
+      $or: [
+        { quantityPurchased: { $exists: true, $gt: 0 } },
+        { quantity: { $exists: true, $gt: 0 } },
+      ],
     };
 
-    // Add date filters if provided
+    // Add date filters if provided - use primary date field
     if (options.startDate || options.endDate) {
       const dateFilter = {};
       if (options.startDate) {
@@ -773,12 +970,35 @@ export async function getCategoryAnalysis(projectId, options = {}) {
       }
       
       if (Object.keys(dateFilter).length > 0) {
-        query.$or = [
-          { dateDelivered: dateFilter },
-          { dateUsed: dateFilter },
-          { createdAt: dateFilter },
-          { updatedAt: dateFilter },
+        const existingOr = query.$or || [];
+        query.$and = [
+          { $or: existingOr },
+          {
+            $or: [
+              { dateDelivered: dateFilter },
+              { 
+                $and: [
+                  { quantityDelivered: { $lte: 0 } },
+                  { datePurchased: dateFilter }
+                ]
+              },
+              {
+                $and: [
+                  { dateDelivered: { $exists: false } },
+                  { dateUsed: dateFilter }
+                ]
+              },
+              {
+                $and: [
+                  { dateDelivered: { $exists: false } },
+                  { dateUsed: { $exists: false } },
+                  { createdAt: dateFilter }
+                ]
+              },
+            ],
+          },
         ];
+        delete query.$or;
       }
     }
 
@@ -798,9 +1018,10 @@ export async function getCategoryAnalysis(projectId, options = {}) {
           category,
           totalMaterials: 0,
           materialsWithIssues: 0,
+          materialsWithWastage: 0, // Count materials with wastage calculated
           totalVariance: 0,
           totalLoss: 0,
-          totalWastage: 0,
+          totalWastageSum: 0, // Sum of wastage percentages for averaging
           totalVarianceCost: 0,
           totalLossCost: 0,
           totalDiscrepancyCost: 0,
@@ -812,11 +1033,17 @@ export async function getCategoryAnalysis(projectId, options = {}) {
       
       catData.totalMaterials++;
       
+      // Always accumulate wastage for average calculation (if material has quantities)
+      const quantityPurchased = parseFloat(material.quantityPurchased || material.quantity || 0);
+      if (quantityPurchased > 0) {
+        catData.totalWastageSum += discrepancy.metrics.wastage;
+        catData.materialsWithWastage++;
+      }
+      
       if (discrepancy.alerts.hasAnyAlert) {
         catData.materialsWithIssues++;
         catData.totalVariance += discrepancy.metrics.variance;
         catData.totalLoss += discrepancy.metrics.loss;
-        catData.totalWastage += discrepancy.metrics.wastage;
         catData.totalVarianceCost += discrepancy.metrics.varianceCost;
         catData.totalLossCost += discrepancy.metrics.lossCost;
         catData.totalDiscrepancyCost += discrepancy.metrics.totalDiscrepancyCost;
@@ -825,20 +1052,27 @@ export async function getCategoryAnalysis(projectId, options = {}) {
 
     // Convert to array and format
     const analysis = Array.from(categoryData.values())
-      .map((data) => ({
-        category: data.category,
-        totalMaterials: data.totalMaterials,
-        materialsWithIssues: data.materialsWithIssues,
-        variance: parseFloat(data.totalVariance.toFixed(2)),
-        loss: parseFloat(data.totalLoss.toFixed(2)),
-        wastage: parseFloat((data.totalWastage / data.totalMaterials).toFixed(2)),
-        varianceCost: parseFloat(data.totalVarianceCost.toFixed(2)),
-        lossCost: parseFloat(data.totalLossCost.toFixed(2)),
-        totalDiscrepancyCost: parseFloat(data.totalDiscrepancyCost.toFixed(2)),
-        issueRate: data.totalMaterials > 0 
-          ? parseFloat(((data.materialsWithIssues / data.totalMaterials) * 100).toFixed(2))
-          : 0,
-      }))
+      .map((data) => {
+        // Calculate average wastage correctly: sum of percentages / count of materials with wastage
+        const averageWastage = data.materialsWithWastage > 0
+          ? parseFloat((data.totalWastageSum / data.materialsWithWastage).toFixed(2))
+          : 0;
+        
+        return {
+          category: data.category,
+          totalMaterials: data.totalMaterials,
+          materialsWithIssues: data.materialsWithIssues,
+          variance: parseFloat(data.totalVariance.toFixed(2)),
+          loss: parseFloat(data.totalLoss.toFixed(2)),
+          wastage: averageWastage, // Correctly calculated average
+          varianceCost: parseFloat(data.totalVarianceCost.toFixed(2)),
+          lossCost: parseFloat(data.totalLossCost.toFixed(2)),
+          totalDiscrepancyCost: parseFloat(data.totalDiscrepancyCost.toFixed(2)),
+          issueRate: data.totalMaterials > 0 
+            ? parseFloat(((data.materialsWithIssues / data.totalMaterials) * 100).toFixed(2))
+            : 0,
+        };
+      })
       .sort((a, b) => b.totalDiscrepancyCost - a.totalDiscrepancyCost);
 
     return analysis;

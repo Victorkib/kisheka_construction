@@ -12,9 +12,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
+import { useToast } from '@/components/toast';
 
 export default function NewProjectPage() {
   const router = useRouter();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
@@ -35,6 +37,10 @@ export default function NewProjectPage() {
       labour: '',
       contingency: '',
     },
+    autoCreateFloors: true,
+    floorCount: 10,
+    includeBasements: false,
+    basementCount: 0,
   });
 
   useEffect(() => {
@@ -61,7 +67,7 @@ export default function NewProjectPage() {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     if (name.startsWith('budget.')) {
       const budgetField = name.split('.')[1];
       setFormData((prev) => ({
@@ -70,6 +76,11 @@ export default function NewProjectPage() {
           ...prev.budget,
           [budgetField]: value,
         },
+      }));
+    } else if (type === 'checkbox') {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: checked,
       }));
     } else {
       setFormData((prev) => ({
@@ -105,28 +116,54 @@ export default function NewProjectPage() {
         contingency: parseFloat(formData.budget.contingency) || 0,
       };
 
+      // Build request body
+      const requestBody = {
+        projectCode: formData.projectCode.trim(),
+        projectName: formData.projectName.trim(),
+        description: formData.description.trim(),
+        location: formData.location.trim(),
+        client: formData.client.trim(),
+        status: formData.status,
+        startDate: formData.startDate || null,
+        plannedEndDate: formData.plannedEndDate || null,
+        budget,
+        autoCreateFloors: formData.autoCreateFloors,
+      };
+
+      // Add floor configuration if auto-create is enabled
+      if (formData.autoCreateFloors) {
+        requestBody.floorCount = parseInt(formData.floorCount) || 10;
+        requestBody.includeBasements = formData.includeBasements;
+        requestBody.basementCount = formData.includeBasements ? parseInt(formData.basementCount) || 0 : 0;
+      }
+
       const response = await fetch('/api/projects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          projectCode: formData.projectCode.trim(),
-          projectName: formData.projectName.trim(),
-          description: formData.description.trim(),
-          location: formData.location.trim(),
-          client: formData.client.trim(),
-          status: formData.status,
-          startDate: formData.startDate || null,
-          plannedEndDate: formData.plannedEndDate || null,
-          budget,
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to create project');
+      }
+
+      // Show budget warning if present
+      if (data.data.budgetWarning) {
+        toast.showWarning(data.data.budgetWarning.message, { duration: 10000 });
+      }
+      
+      // Show capital info if present
+      if (data.data.capitalInfo) {
+        toast.showInfo(data.data.capitalInfo.message, { duration: 10000 });
+      }
+      
+      // Show success message if no warnings
+      if (!data.data.budgetWarning && !data.data.capitalInfo) {
+        toast.showSuccess('Project created successfully!');
       }
 
       // Redirect to project detail page
@@ -370,6 +407,52 @@ export default function NewProjectPage() {
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
                 />
               </div>
+            </div>
+          </div>
+
+          {/* Floor Configuration */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Floor Configuration</h2>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="autoCreateFloors"
+                  name="autoCreateFloors"
+                  checked={formData.autoCreateFloors}
+                  onChange={handleChange}
+                  className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <div className="flex-1">
+                  <label htmlFor="autoCreateFloors" className="block text-base font-semibold text-gray-700 mb-1 cursor-pointer">
+                    Auto-create Floors
+                  </label>
+                  <p className="text-sm text-gray-600">
+                    Automatically create floors for this project. You can create floors manually later if disabled.
+                  </p>
+                </div>
+              </div>
+
+              {formData.autoCreateFloors && (
+                <div className="ml-7">
+                  <label className="block text-base font-semibold text-gray-700 mb-1">
+                    Number of Floors
+                  </label>
+                  <input
+                    type="number"
+                    name="floorCount"
+                    value={formData.floorCount}
+                    onChange={handleChange}
+                    placeholder="10"
+                    min="0"
+                    max="50"
+                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  />
+                  <p className="text-sm text-gray-600 mt-1">
+                    Number of floors to create (0-50). Ground floor is included. Default: 10 floors (Ground + 9 floors).
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 

@@ -17,6 +17,7 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { getProjectSpendingLimit, recalculateProjectFinances, getCurrentTotalUsed } from '@/lib/financial-helpers';
 import { returnCapitalToInvestors } from '@/lib/financial-rollback';
+import { calculateProjectTotals } from '@/lib/investment-allocation';
 
 /**
  * GET /api/projects/[id]
@@ -79,6 +80,50 @@ export async function GET(request, { params }) {
 
     const totalMaterialsSpent = materialsSpent[0]?.total || 0;
 
+    // Calculate financial statistics from allocations
+    let financialStats = {
+      totalInvested: 0,
+      capitalBalance: 0,
+      totalUsed: 0,
+      budgetVsCapitalWarning: null,
+    };
+
+    try {
+      const projectTotals = await calculateProjectTotals(id);
+      const totalInvested = projectTotals.totalInvested || 0;
+      
+      // Get project finances for accurate capital balance and total used
+      const projectFinances = await db
+        .collection('project_finances')
+        .findOne({ projectId: new ObjectId(id) });
+      
+      // If project_finances exists, use it; otherwise calculate on the fly
+      if (projectFinances) {
+        financialStats = {
+          totalInvested: projectFinances.totalInvested || totalInvested,
+          capitalBalance: projectFinances.capitalBalance || (totalInvested - (projectFinances.totalUsed || 0)),
+          totalUsed: projectFinances.totalUsed || 0,
+          budgetVsCapitalWarning: project.budget?.total > (projectFinances.totalInvested || totalInvested) && (projectFinances.totalInvested || totalInvested) > 0
+            ? `Budget (${project.budget.total.toLocaleString()}) exceeds capital (${(projectFinances.totalInvested || totalInvested).toLocaleString()})`
+            : null,
+        };
+      } else {
+        // Calculate on the fly if project_finances doesn't exist
+        const totalUsed = await getCurrentTotalUsed(id);
+        financialStats = {
+          totalInvested,
+          capitalBalance: totalInvested - totalUsed,
+          totalUsed,
+          budgetVsCapitalWarning: project.budget?.total > totalInvested && totalInvested > 0
+            ? `Budget (${project.budget.total.toLocaleString()}) exceeds capital (${totalInvested.toLocaleString()})`
+            : null,
+        };
+      }
+    } catch (err) {
+      console.error(`Error calculating financial statistics for project ${id}:`, err);
+      // Use defaults if calculation fails
+    }
+
     return successResponse({
       ...project,
       statistics: {
@@ -86,6 +131,8 @@ export async function GET(request, { params }) {
         expensesCount,
         totalMaterialsSpent,
         budgetRemaining: (project.budget?.total || 0) - totalMaterialsSpent,
+        // Add financial statistics
+        ...financialStats,
       },
     });
   } catch (error) {

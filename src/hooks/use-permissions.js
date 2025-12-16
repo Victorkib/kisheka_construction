@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { roleHasPermission } from '@/lib/permissions';
 import { normalizeRole } from '@/lib/role-normalizer';
 
@@ -115,14 +115,14 @@ export function usePermissions() {
    * @param {string|string[]} requiredRoles - Role(s) to check
    * @returns {boolean} True if user has required role
    */
-  const hasRole = (requiredRoles) => {
+  const hasRole = useCallback((requiredRoles) => {
     if (!user || !user.role) return false;
 
     const roles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
     const userRole = user.role.toLowerCase();
 
     return roles.some((role) => role.toLowerCase() === userRole);
-  };
+  }, [user]);
 
   /**
    * Check if user has permission to perform an action
@@ -130,7 +130,7 @@ export function usePermissions() {
    * @param {string} action - Action to check (e.g., 'create_material')
    * @returns {boolean} True if user has permission
    */
-  const canAccess = (action) => {
+  const canAccess = useCallback((action) => {
     if (!user || !user.role) return false;
 
     // Normalize role using utility function
@@ -138,14 +138,14 @@ export function usePermissions() {
     
     // Use centralized permissions
     return roleHasPermission(normalizedRole, action);
-  };
+  }, [user]);
 
   /**
    * Check if user can access a specific route
    * @param {string} route - Route path
    * @returns {boolean} True if user can access route
    */
-  const canAccessRoute = (route) => {
+  const canAccessRoute = useCallback((route) => {
     if (!user || !user.role) return false;
 
     const role = user.role.toLowerCase();
@@ -188,7 +188,7 @@ export function usePermissions() {
 
     // Default: allow access if user is authenticated
     return true;
-  };
+  }, [user]);
 
   return {
     user,

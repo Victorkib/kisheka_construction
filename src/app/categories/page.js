@@ -127,6 +127,11 @@ function CategoriesPageContent() {
                       {category.description && (
                         <p className="text-sm text-gray-600 mt-1">{category.description}</p>
                       )}
+                      {category.usageCount !== undefined && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Used by {category.usageCount} material{category.usageCount !== 1 ? 's' : ''}
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

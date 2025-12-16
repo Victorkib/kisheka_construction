@@ -16,7 +16,7 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '..', '.env.local') });
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_DB = process.env.MONGODB_DB || 'kisheka_prod';
+const MONGODB_DB = process.env.MONGODB_DB_NAME || 'kisheka_prod';
 
 async function cleanupMaterialCodes() {
   let client;

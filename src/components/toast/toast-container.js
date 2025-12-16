@@ -15,7 +15,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { createContext, useContext } from 'react';
 
 // Toast context
@@ -33,7 +33,11 @@ export function useToast() {
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
 
-  const addToast = (toast) => {
+  const removeToast = useCallback((id) => {
+    setToasts((prev) => prev.filter((toast) => toast.id !== id));
+  }, []);
+
+  const addToast = useCallback((toast) => {
     const id = Date.now() + Math.random();
     const newToast = {
       id,
@@ -51,40 +55,37 @@ export function ToastProvider({ children }) {
     }
 
     return id;
-  };
+  }, [removeToast]);
 
-  const removeToast = (id) => {
-    setToasts((prev) => prev.filter((toast) => toast.id !== id));
-  };
-
-  const showSuccess = (message, options = {}) => {
+  const showSuccess = useCallback((message, options = {}) => {
     return addToast({ ...options, message, variant: 'success' });
-  };
+  }, [addToast]);
 
-  const showError = (message, options = {}) => {
+  const showError = useCallback((message, options = {}) => {
     return addToast({ ...options, message, variant: 'error' });
-  };
+  }, [addToast]);
 
-  const showWarning = (message, options = {}) => {
+  const showWarning = useCallback((message, options = {}) => {
     return addToast({ ...options, message, variant: 'warning' });
-  };
+  }, [addToast]);
 
-  const showInfo = (message, options = {}) => {
+  const showInfo = useCallback((message, options = {}) => {
     return addToast({ ...options, message, variant: 'info' });
-  };
+  }, [addToast]);
+
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    toasts,
+    addToast,
+    removeToast,
+    showSuccess,
+    showError,
+    showWarning,
+    showInfo,
+  }), [toasts, addToast, removeToast, showSuccess, showError, showWarning, showInfo]);
 
   return (
-    <ToastContext.Provider
-      value={{
-        toasts,
-        addToast,
-        removeToast,
-        showSuccess,
-        showError,
-        showWarning,
-        showInfo,
-      }}
-    >
+    <ToastContext.Provider value={contextValue}>
       {children}
       <ToastContainer toasts={toasts} removeToast={removeToast} />
     </ToastContext.Provider>

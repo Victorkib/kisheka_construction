@@ -82,3 +82,28 @@ export function normalizeRole(role) {
   return normalized;
 }
 
+/**
+ * Normalize user role to lowercase standard format (CLIENT-SAFE)
+ * This ensures consistent role comparison throughout the application
+ * Can be used in both client and server components
+ * @param {string} role - Role to normalize
+ * @returns {string} Normalized role (lowercase)
+ */
+export function normalizeUserRole(role) {
+  return normalizeRole(role) || (role?.toLowerCase() || '');
+}
+
+/**
+ * Check if user role matches a specific role (case-insensitive) (CLIENT-SAFE)
+ * Can be used in both client and server components
+ * @param {string} userRole - User's role
+ * @param {string|string[]} targetRoles - Role(s) to check against
+ * @returns {boolean} True if user role matches
+ */
+export function isRole(userRole, targetRoles) {
+  if (!userRole) return false;
+  const normalized = normalizeUserRole(userRole);
+  const roles = Array.isArray(targetRoles) ? targetRoles : [targetRoles];
+  return roles.some(role => normalizeUserRole(role) === normalized);
+}
+

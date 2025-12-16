@@ -13,6 +13,7 @@ import { getDatabase } from '@/lib/mongodb/connection';
 import { getUserProfile } from '@/lib/auth-helpers';
 import { hasPermission } from '@/lib/role-helpers';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { ObjectId } from 'mongodb';
 
 /**
  * GET /api/categories
@@ -35,7 +36,18 @@ export async function GET(request) {
       .sort({ name: 1 })
       .toArray();
 
-    return successResponse(categories, 'Categories retrieved successfully');
+    // Add usage count for each category
+    const categoriesWithUsage = await Promise.all(
+      categories.map(async (category) => {
+        const usageCount = await db.collection('materials').countDocuments({
+          categoryId: category._id,
+          deletedAt: null,
+        });
+        return { ...category, usageCount };
+      })
+    );
+
+    return successResponse(categoriesWithUsage, 'Categories retrieved successfully');
   } catch (error) {
     console.error('Get categories error:', error);
     return errorResponse('Failed to retrieve categories', 500);

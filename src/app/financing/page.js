@@ -34,6 +34,7 @@ function FinancingPageContent() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [projectsLoading, setProjectsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const projectId = searchParams.get('projectId');
 
@@ -45,13 +46,20 @@ function FinancingPageContent() {
     }
   }, [projectId]);
 
-  const fetchFinances = async () => {
+  const fetchFinances = async (forceRecalculate = false) => {
     try {
-      setLoading(true);
+      if (forceRecalculate) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
       setError(null);
 
-      const queryParams = projectId ? `?projectId=${projectId}` : '';
-      const response = await fetch(`/api/project-finances${queryParams}`);
+      const queryParams = new URLSearchParams();
+      if (projectId) queryParams.append('projectId', projectId);
+      if (forceRecalculate) queryParams.append('forceRecalculate', 'true');
+      
+      const response = await fetch(`/api/project-finances?${queryParams.toString()}`);
       const data = await response.json();
 
       if (!data.success) {
@@ -64,6 +72,7 @@ function FinancingPageContent() {
       console.error('Fetch finances error:', err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -158,11 +167,31 @@ function FinancingPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Financing Dashboard</h1>
-          <p className="mt-2 text-base md:text-lg text-gray-700 leading-relaxed">
-            Overview of capital raised, used, and remaining balance
-          </p>
+        <div className="mb-6 flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Financing Dashboard</h1>
+            <p className="mt-2 text-base md:text-lg text-gray-700 leading-relaxed">
+              Overview of capital raised, used, and remaining balance
+            </p>
+          </div>
+          <button
+            onClick={() => fetchFinances(true)}
+            disabled={refreshing || loading}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            title="Refresh financial data"
+          >
+            {refreshing ? (
+              <>
+                <span className="animate-spin">⟳</span>
+                <span>Refreshing...</span>
+              </>
+            ) : (
+              <>
+                <span>⟳</span>
+                <span>Refresh</span>
+              </>
+            )}
+          </button>
         </div>
 
         {/* Summary Cards */}

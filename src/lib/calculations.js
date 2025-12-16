@@ -84,15 +84,19 @@ export function calculateQuantityStatus(quantityPurchased, quantityDelivered, qu
  * @returns {number} Wastage percentage (0-100)
  */
 export function calculateWastage(quantityPurchased, quantityDelivered, quantityUsed) {
-  const purchased = parseFloat(quantityPurchased) || 0;
-  const delivered = parseFloat(quantityDelivered) || 0;
-  const used = parseFloat(quantityUsed) || 0;
+  const purchased = Math.max(0, parseFloat(quantityPurchased) || 0);
+  const delivered = Math.max(0, parseFloat(quantityDelivered) || 0);
+  const used = Math.max(0, parseFloat(quantityUsed) || 0);
   
-  if (purchased === 0 || delivered === 0) {
+  // Wastage should be calculated based on purchased vs used, not delivered vs used
+  // This allows detection of wastage even for undelivered materials
+  // If purchased = 0, wastage is undefined (return 0)
+  if (purchased === 0) {
     return 0;
   }
   
   // Wastage = (Purchased - Used) / Purchased * 100
+  // This represents overall material efficiency: what percentage of purchased materials are not used
   const wastage = ((purchased - used) / purchased) * 100;
   return Math.max(0, Math.min(100, parseFloat(wastage.toFixed(2))));
 }
@@ -168,9 +172,10 @@ export function isNonNegativeNumber(value) {
  * @returns {number} Variance amount (purchased - delivered)
  */
 export function calculateVariance(quantityPurchased, quantityDelivered) {
-  const purchased = parseFloat(quantityPurchased) || 0;
-  const delivered = parseFloat(quantityDelivered) || 0;
+  const purchased = Math.max(0, parseFloat(quantityPurchased) || 0);
+  const delivered = Math.max(0, parseFloat(quantityDelivered) || 0);
   
+  // Variance: materials purchased but not delivered (potential fraud/theft)
   return Math.max(0, purchased - delivered);
 }
 
@@ -181,8 +186,8 @@ export function calculateVariance(quantityPurchased, quantityDelivered) {
  * @returns {number} Variance percentage (0-100)
  */
 export function calculateVariancePercentage(quantityPurchased, quantityDelivered) {
-  const purchased = parseFloat(quantityPurchased) || 0;
-  const delivered = parseFloat(quantityDelivered) || 0;
+  const purchased = Math.max(0, parseFloat(quantityPurchased) || 0);
+  const delivered = Math.max(0, parseFloat(quantityDelivered) || 0);
   
   if (purchased === 0) {
     return 0;
@@ -200,9 +205,10 @@ export function calculateVariancePercentage(quantityPurchased, quantityDelivered
  * @returns {number} Loss amount (delivered - used)
  */
 export function calculateLoss(quantityDelivered, quantityUsed) {
-  const delivered = parseFloat(quantityDelivered) || 0;
-  const used = parseFloat(quantityUsed) || 0;
+  const delivered = Math.max(0, parseFloat(quantityDelivered) || 0);
+  const used = Math.max(0, parseFloat(quantityUsed) || 0);
   
+  // Loss: materials delivered but not used (wastage, theft, damage)
   return Math.max(0, delivered - used);
 }
 
@@ -213,8 +219,8 @@ export function calculateLoss(quantityDelivered, quantityUsed) {
  * @returns {number} Loss percentage (0-100)
  */
 export function calculateLossPercentage(quantityDelivered, quantityUsed) {
-  const delivered = parseFloat(quantityDelivered) || 0;
-  const used = parseFloat(quantityUsed) || 0;
+  const delivered = Math.max(0, parseFloat(quantityDelivered) || 0);
+  const used = Math.max(0, parseFloat(quantityUsed) || 0);
   
   if (delivered === 0) {
     return 0;
@@ -268,7 +274,7 @@ export function calculateTotalDiscrepancyPercentage(quantityPurchased, quantityD
  */
 export function calculateVarianceCost(quantityPurchased, quantityDelivered, unitCost) {
   const variance = calculateVariance(quantityPurchased, quantityDelivered);
-  const cost = parseFloat(unitCost) || 0;
+  const cost = Math.max(0, parseFloat(unitCost) || 0);
   
   return parseFloat((variance * cost).toFixed(2));
 }

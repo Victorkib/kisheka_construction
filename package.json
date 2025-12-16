@@ -8,14 +8,18 @@
     "start": "next start",
     "lint": "eslint",
     "setup:db": "node scripts/setup-database.mjs",
+    "cleanup:db": "node scripts/cleanup-database.mjs",
     "seed:categories": "node scripts/seed-categories.mjs",
     "seed:floors": "node scripts/seed-floors.mjs",
     "seed:project": "node scripts/seed-default-project.mjs",
+    "seed:material-library": "node scripts/seed-material-library.mjs",
+    "setup:bulk-procurement": "node scripts/setup-database.mjs && node scripts/seed-material-library.mjs",
     "test:db": "node scripts/test-connection.mjs",
     "test:connections": "node scripts/test-connections.mjs",
     "update:user-role": "node scripts/update-user-role.mjs",
     "migrate:investor-links": "node scripts/migrate-investor-user-links.mjs",
     "migrate:role-naming": "node scripts/migrate-role-naming.mjs",
+    "migrate:atomicity": "node scripts/migrate-atomicity-fixes.mjs",
     "diagnose:roles": "node scripts/diagnose-and-fix-roles.mjs",
     "fix:roles": "node scripts/diagnose-and-fix-roles.mjs --fix"
   },
@@ -37,6 +41,7 @@
     "react-hook-form": "^7.48.0",
     "recharts": "^2.10.0",
     "swr": "^2.2.0",
+    "web-push": "^3.6.7",
     "zod": "^3.22.0"
   },
   "devDependencies": {

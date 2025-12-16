@@ -16,7 +16,7 @@ import { ObjectId } from 'mongodb';
  * Creates a notification for a user
  * @param {Object} params - Notification parameters
  * @param {string} params.userId - MongoDB user ID (ObjectId string)
- * @param {string} params.type - Notification type (approval_needed, approval_status, budget_alert, discrepancy_alert, item_received, task_assigned, comment, role_changed, invitation_sent)
+ * @param {string} params.type - Notification type (approval_needed, approval_status, budget_alert, discrepancy_alert, item_received, task_assigned, comment, role_changed, invitation_sent, bulk_request_created, bulk_request_approved, bulk_po_created, template_used, bulk_materials_created)
  * @param {string} params.title - Notification title
  * @param {string} params.message - Notification message
  * @param {string} [params.projectId] - MongoDB project ID (ObjectId string)
@@ -199,6 +199,121 @@ export async function getUnreadNotifications(userId, options = {}) {
     console.error('Error getting unread notifications:', error);
     return [];
   }
+}
+
+/**
+ * Creates a bulk request creation notification
+ * @param {Object} params - Notification parameters
+ * @param {string} params.batchId - Batch ID
+ * @param {string} params.batchNumber - Batch number
+ * @param {string} params.projectId - Project ID
+ * @param {string} params.createdBy - User ID who created the batch
+ * @param {number} params.materialCount - Number of materials in the batch
+ * @returns {Promise<Array>} Created notifications
+ */
+export async function createBulkRequestNotifications({ batchId, batchNumber, projectId, createdBy, materialCount }) {
+  const db = await getDatabase();
+  
+  // Get approvers (PM, OWNER)
+  const approvers = await db.collection('users').find({
+    role: { $in: ['pm', 'project_manager', 'owner'] },
+    status: 'active',
+  }).toArray();
+
+  const notifications = approvers.map((approver) => ({
+    userId: approver._id.toString(),
+    type: 'bulk_request_created',
+    title: 'New Bulk Material Request',
+    message: `A bulk material request (${batchNumber}) with ${materialCount} material(s) requires your approval.`,
+    projectId,
+    relatedModel: 'MATERIAL_REQUEST_BATCH',
+    relatedId: batchId,
+    createdBy,
+  }));
+
+  return await createNotifications(notifications);
+}
+
+/**
+ * Creates bulk request approval notifications
+ * @param {Object} params - Notification parameters
+ * @param {string} params.batchId - Batch ID
+ * @param {string} params.batchNumber - Batch number
+ * @param {string} params.projectId - Project ID
+ * @param {string} params.approvedBy - User ID who approved
+ * @param {string} params.requesterId - User ID who created the request
+ * @param {number} params.approvedCount - Number of approved requests
+ * @returns {Promise<Array>} Created notifications
+ */
+export async function createBulkApprovalNotifications({ batchId, batchNumber, projectId, approvedBy, requesterId, approvedCount }) {
+  const notifications = [
+    {
+      userId: requesterId,
+      type: 'bulk_request_approved',
+      title: 'Bulk Material Request Approved',
+      message: `Your bulk material request (${batchNumber}) with ${approvedCount} material(s) has been approved.`,
+      projectId,
+      relatedModel: 'MATERIAL_REQUEST_BATCH',
+      relatedId: batchId,
+      createdBy: approvedBy,
+    },
+  ];
+
+  return await createNotifications(notifications);
+}
+
+/**
+ * Creates bulk PO creation notifications
+ * @param {Object} params - Notification parameters
+ * @param {Array<string>} params.poIds - Array of purchase order IDs
+ * @param {string} params.batchId - Batch ID
+ * @param {string} params.batchNumber - Batch number
+ * @param {string} params.projectId - Project ID
+ * @param {string} params.createdBy - User ID who created the POs
+ * @param {Array<string>} params.supplierIds - Array of supplier IDs
+ * @returns {Promise<Array>} Created notifications
+ */
+export async function createBulkPONotifications({ poIds, batchId, batchNumber, projectId, createdBy, supplierIds }) {
+  const db = await getDatabase();
+  
+  // Get unique suppliers
+  const uniqueSupplierIds = [...new Set(supplierIds)];
+  
+  const notifications = uniqueSupplierIds.map((supplierId) => ({
+    userId: supplierId,
+    type: 'bulk_po_created',
+    title: 'New Bulk Purchase Order',
+    message: `A bulk purchase order from batch ${batchNumber} has been created. Please review and respond.`,
+    projectId,
+    relatedModel: 'PURCHASE_ORDER',
+    relatedId: poIds[0] || batchId, // Use first PO ID or batch ID
+    createdBy,
+  }));
+
+  return await createNotifications(notifications);
+}
+
+/**
+ * Creates template usage notification
+ * @param {Object} params - Notification parameters
+ * @param {string} params.templateId - Template ID
+ * @param {string} params.templateName - Template name
+ * @param {string} params.batchId - Batch ID created from template
+ * @param {string} params.projectId - Project ID
+ * @param {string} params.createdBy - User ID who used the template
+ * @returns {Promise<Object>} Created notification
+ */
+export async function createTemplateUsageNotification({ templateId, templateName, batchId, projectId, createdBy }) {
+  return await createNotification({
+    userId: createdBy,
+    type: 'template_used',
+    title: 'Template Used Successfully',
+    message: `Material template "${templateName}" was used to create a new bulk request.`,
+    projectId,
+    relatedModel: 'MATERIAL_TEMPLATE',
+    relatedId: templateId,
+    createdBy,
+  });
 }
 
 /**

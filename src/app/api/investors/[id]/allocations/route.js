@@ -16,7 +16,7 @@ import { createAuditLog } from '@/lib/audit-log';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateAllocations } from '@/lib/investment-allocation';
-import { recalculateProjectFinances } from '@/lib/financial-helpers';
+import { recalculateProjectFinances, validateCapitalRemoval } from '@/lib/financial-helpers';
 
 /**
  * GET /api/investors/[id]/allocations
@@ -151,10 +151,64 @@ export async function POST(request, { params }) {
       return errorResponse('Allocations must be an array', 400);
     }
 
+    // Get current allocations to compare
+    const currentAllocations = investor.projectAllocations || [];
+    
     // Validate allocations
     const validation = await validateAllocations(id, allocations);
     if (!validation.isValid) {
       return errorResponse(`Validation failed: ${validation.errors.join(', ')}`, 400);
+    }
+
+    // Check for removed allocations and validate capital removal
+    const currentAllocationsMap = new Map();
+    currentAllocations.forEach(alloc => {
+      if (alloc.projectId) {
+        const projectIdStr = alloc.projectId.toString();
+        currentAllocationsMap.set(projectIdStr, alloc.amount || 0);
+      }
+    });
+
+    const newAllocationsMap = new Map();
+    allocations.forEach(alloc => {
+      if (alloc.projectId) {
+        const projectIdStr = alloc.projectId.toString();
+        newAllocationsMap.set(projectIdStr, parseFloat(alloc.amount) || 0);
+      }
+    });
+
+    // Find removed or reduced allocations
+    const capitalRemovalWarnings = [];
+    for (const [projectIdStr, currentAmount] of currentAllocationsMap.entries()) {
+      const newAmount = newAllocationsMap.get(projectIdStr) || 0;
+      const amountRemoved = currentAmount - newAmount;
+      
+      if (amountRemoved > 0) {
+        // Capital is being removed from this project
+        const removalValidation = await validateCapitalRemoval(projectIdStr, amountRemoved);
+        
+        if (!removalValidation.canRemove) {
+          // Get project name for better error message
+          const project = await db.collection('projects').findOne({
+            _id: new ObjectId(projectIdStr),
+          });
+          const projectName = project?.projectName || projectIdStr;
+          
+          return errorResponse(
+            `Cannot remove ${amountRemoved.toLocaleString()} from project "${projectName}". ${removalValidation.message}`,
+            400
+          );
+        }
+        
+        // Warn if removal reduces available capital significantly
+        if (removalValidation.availableAfterRemoval < removalValidation.currentAvailable * 0.2) {
+          capitalRemovalWarnings.push({
+            projectId: projectIdStr,
+            amountRemoved,
+            availableAfterRemoval: removalValidation.availableAfterRemoval,
+          });
+        }
+      }
     }
 
     // Process allocations - convert projectId strings to ObjectIds and add metadata
@@ -195,30 +249,54 @@ export async function POST(request, { params }) {
       },
     });
 
-    // Auto-recalculate project finances for affected projects (async, non-blocking)
+    // Auto-recalculate project finances for affected projects (synchronous to ensure data consistency)
     const projectIds = processedAllocations.map((alloc) => alloc.projectId.toString());
     const uniqueProjectIds = [...new Set(projectIds)]; // Remove duplicates
     
-    // Recalculate finances for each affected project
-    uniqueProjectIds.forEach((projectId) => {
-      recalculateProjectFinances(projectId)
-        .then(() => {
-          console.log(`✅ Project finances updated for project ${projectId} after allocation change`);
-        })
-        .catch((error) => {
-          console.error(`❌ Error updating project finances for project ${projectId}:`, error);
-          // Don't fail the allocation update if finances update fails
+    // Recalculate finances for each affected project (await to ensure completion before response)
+    const recalculationResults = await Promise.allSettled(
+      uniqueProjectIds.map((projectId) => 
+        recalculateProjectFinances(projectId)
+      )
+    );
+
+    // Log results and collect any errors
+    const recalculationErrors = [];
+    recalculationResults.forEach((result, index) => {
+      const projectId = uniqueProjectIds[index];
+      if (result.status === 'fulfilled') {
+        console.log(`✅ Project finances updated for project ${projectId} after allocation change`);
+      } else {
+        const error = result.reason;
+        console.error(`❌ Error updating project finances for project ${projectId}:`, error);
+        recalculationErrors.push({
+          projectId,
+          error: error.message || String(error),
         });
+      }
     });
 
+    // If recalculation failed for any project, include warning in response
+    // But still return success since allocations were saved
+    const responseData = {
+      allocations: processedAllocations,
+      totalInvested: validation.totalInvested,
+      totalAllocated: validation.totalAllocated,
+      unallocated: validation.unallocated,
+    };
+
+    if (recalculationErrors.length > 0) {
+      responseData.warnings = recalculationErrors.map(
+        (err) => `Failed to update finances for project ${err.projectId}: ${err.error}`
+      );
+      console.warn('⚠️ Allocations saved but some finance recalculations failed:', recalculationErrors);
+    }
+
     return successResponse(
-      {
-        allocations: processedAllocations,
-        totalInvested: validation.totalInvested,
-        totalAllocated: validation.totalAllocated,
-        unallocated: validation.unallocated,
-      },
-      'Allocations updated successfully'
+      responseData,
+      recalculationErrors.length > 0
+        ? 'Allocations updated successfully, but some finance updates failed. Please refresh the project finances page.'
+        : 'Allocations updated successfully'
     );
   } catch (error) {
     console.error('Update allocations error:', error);

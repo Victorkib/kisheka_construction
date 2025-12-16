@@ -100,6 +100,19 @@ export default function ClerkDashboard() {
           </div>
         </div>
 
+        {/* Materials Pending Receipt */}
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Materials Pending Receipt Verification</h2>
+          <p className="text-sm text-gray-600 mb-4">Materials that need receipt verification on site</p>
+          <Link
+            href="/items?status=approved&status=pending_receipt"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
+          >
+            <span>View Pending Receipt Materials</span>
+            <span>→</span>
+          </Link>
+        </div>
+
         {/* View & Manage Section */}
         <div className="bg-white rounded-lg shadow p-6 mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">View & Manage</h2>

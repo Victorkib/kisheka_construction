@@ -30,7 +30,8 @@ export default function InvestorDetailPage() {
   const [contributions, setContributions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [addingContribution, setAddingContribution] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [fetchingContributions, setFetchingContributions] = useState(false);
   const [showStatementGenerator, setShowStatementGenerator] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -109,7 +110,7 @@ export default function InvestorDetailPage() {
       return;
     }
 
-    setAddingContribution(true);
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(`/api/investors/${investorId}/contributions`, {
@@ -133,12 +134,13 @@ export default function InvestorDetailPage() {
         notes: '',
         receiptUrl: '',
       });
-      setAddingContribution(false);
+      setShowAddForm(false);
       toast.showSuccess('Contribution added successfully!');
     } catch (err) {
       toast.showError(err.message || 'Failed to add contribution');
       console.error('Add contribution error:', err);
-      setAddingContribution(false);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -433,22 +435,22 @@ export default function InvestorDetailPage() {
         {/* Contributions */}
         <div className="bg-white rounded-lg shadow p-6 mb-6 relative">
           <LoadingOverlay 
-            isLoading={addingContribution || fetchingContributions} 
-            message={addingContribution ? "Adding contribution..." : "Loading contributions..."} 
+            isLoading={isSubmitting || fetchingContributions} 
+            message={isSubmitting ? "Adding contribution..." : "Loading contributions..."} 
             fullScreen={false} 
           />
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Contributions</h2>
             <button
-              onClick={() => setAddingContribution(!addingContribution)}
-              disabled={addingContribution || fetchingContributions}
+              onClick={() => setShowAddForm(!showAddForm)}
+              disabled={isSubmitting || fetchingContributions}
               className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {addingContribution ? 'Cancel' : '+ Add Contribution'}
+              {showAddForm ? 'Cancel' : '+ Add Contribution'}
             </button>
           </div>
 
-          {addingContribution && (
+          {showAddForm && (
             <form onSubmit={handleAddContribution} className="mb-6 p-4 bg-gray-50 rounded-lg">
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div>
@@ -506,7 +508,7 @@ export default function InvestorDetailPage() {
               </div>
               <LoadingButton
                 type="submit"
-                isLoading={addingContribution}
+                isLoading={isSubmitting}
                 loadingText="Adding..."
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >

@@ -38,6 +38,37 @@ export const PERMISSIONS = {
   delete_material_request: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
 
   // ============================================
+  // Material Library Permissions (Bulk Procurement)
+  // ============================================
+  manage_material_library: [ROLES.OWNER],
+  view_material_library: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK, ROLES.SUPERVISOR, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Bulk Request Permissions (Bulk Procurement)
+  // ============================================
+  create_bulk_material_request: [ROLES.CLERK, ROLES.SUPERVISOR, ROLES.PROJECT_MANAGER, ROLES.OWNER],
+  view_bulk_material_requests: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK, ROLES.ACCOUNTANT, ROLES.SUPERVISOR],
+  bulk_approve_material_requests: [ROLES.PROJECT_MANAGER, ROLES.OWNER, ROLES.ACCOUNTANT],
+  create_bulk_purchase_orders: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
+
+  // ============================================
+  // Template Permissions (Bulk Procurement)
+  // ============================================
+  create_material_template: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  manage_material_templates: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  use_material_template: [ROLES.CLERK, ROLES.SUPERVISOR, ROLES.PROJECT_MANAGER, ROLES.OWNER],
+  validate_material_template: [ROLES.OWNER],
+  mark_template_official: [ROLES.OWNER],
+  create_template_variant: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  view_template_analytics: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Analytics Permissions (Bulk Procurement)
+  // ============================================
+  view_bulk_analytics: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  view_supplier_performance: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+
+  // ============================================
   // Purchase Order Permissions
   // ============================================
   create_purchase_order: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
@@ -109,10 +140,19 @@ export const PERMISSIONS = {
   update_project_finances: [ROLES.OWNER],
 
   // ============================================
-  // Supplier Permissions
+  // Supplier Permissions (Legacy - for old supplier role)
   // ============================================
   upload_delivery_note: [ROLES.SUPPLIER],
   view_supplier_materials: [ROLES.SUPPLIER],
+
+  // ============================================
+  // Supplier Management Permissions (New - for contact-based suppliers)
+  // ============================================
+  manage_suppliers: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  create_supplier: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  edit_supplier: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  delete_supplier: [ROLES.OWNER],
+  view_suppliers: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
 
   // ============================================
   // Approval Permissions
@@ -194,6 +234,29 @@ export const PERMISSION_CATEGORIES = {
     'edit_material_request',
     'delete_material_request',
   ],
+  MATERIAL_LIBRARY: [
+    'manage_material_library',
+    'view_material_library',
+  ],
+  BULK_REQUESTS: [
+    'create_bulk_material_request',
+    'view_bulk_material_requests',
+    'bulk_approve_material_requests',
+    'create_bulk_purchase_orders',
+  ],
+  TEMPLATES: [
+    'create_material_template',
+    'manage_material_templates',
+    'use_material_template',
+    'validate_material_template',
+    'mark_template_official',
+    'create_template_variant',
+    'view_template_analytics',
+  ],
+  ANALYTICS: [
+    'view_bulk_analytics',
+    'view_supplier_performance',
+  ],
   PURCHASE_ORDERS: [
     'create_purchase_order',
     'view_purchase_orders',
@@ -252,6 +315,13 @@ export const PERMISSION_CATEGORIES = {
   SUPPLIER: [
     'upload_delivery_note',
     'view_supplier_materials',
+  ],
+  SUPPLIER_MANAGEMENT: [
+    'manage_suppliers',
+    'create_supplier',
+    'edit_supplier',
+    'delete_supplier',
+    'view_suppliers',
   ],
   APPROVALS: [
     'view_approvals',

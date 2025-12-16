@@ -7,10 +7,12 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useMemo } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
+import { FloorVisualization } from '@/components/floors/FloorVisualization';
+import { groupFloorsByType, getFloorDisplayName, getFloorColorClass } from '@/lib/floor-helpers';
 import { LoadingTable } from '@/components/loading';
 
 function FloorsPageContent() {
@@ -100,6 +102,11 @@ function FloorsPageContent() {
     }
   };
 
+  // Group floors by type
+  const groupedFloors = useMemo(() => {
+    return groupFloorsByType(floors);
+  }, [floors]);
+
   const handleProjectChange = (e) => {
     const projectId = e.target.value;
     setSelectedProjectId(projectId);
@@ -148,12 +155,23 @@ function FloorsPageContent() {
             </p>
           </div>
           {canCreate && (
-            <Link
-              href="/floors/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
-            >
-              + Create Floor
-            </Link>
+            <div className="flex gap-2">
+              {selectedProjectId && (
+                <Link
+                  href={`/floors/new?projectId=${selectedProjectId}&basement=true`}
+                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition flex items-center gap-2"
+                  title="Add a basement floor"
+                >
+                  <span>🏢</span> Add Basement
+                </Link>
+              )}
+              <Link
+                href={selectedProjectId ? `/floors/new?projectId=${selectedProjectId}` : '/floors/new'}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              >
+                + Create Floor
+              </Link>
+            </div>
           )}
         </div>
 
@@ -239,94 +257,321 @@ function FloorsPageContent() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Floor Number
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Floor Name
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Budget
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Actual Cost
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Project
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {floors.map((floor) => (
-                  <tr key={floor._id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-gray-900">
-                        {floor.floorNumber !== undefined ? `Floor ${floor.floorNumber}` : 'N/A'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <Link
-                        href={`/floors/${floor._id}`}
-                        className="text-sm font-medium text-blue-600 hover:text-blue-900"
-                      >
-                        {floor.name || `Floor ${floor.floorNumber || 'N/A'}`}
-                      </Link>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span
-                        className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                          floor.status
-                        )}`}
-                      >
-                        {floor.status || 'NOT_STARTED'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">
-                        {formatCurrency(floor.totalBudget || 0)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">
-                        {formatCurrency(floor.actualCost || 0)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm text-gray-900">
-                        {floor.projectId ? (
+          <div className="space-y-6">
+            {/* Basements Section */}
+            {groupedFloors.basements.length > 0 && (
+              <div className="bg-white rounded-lg shadow overflow-hidden">
+                <div className="bg-purple-50 px-6 py-3 border-b border-purple-200">
+                  <h3 className="text-sm font-semibold text-purple-900">
+                    Basements ({groupedFloors.basements.length})
+                  </h3>
+                </div>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Floor Number
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Floor Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Budget
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Actual Cost
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Project
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {groupedFloors.basements.map((floor) => (
+                      <tr key={floor._id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm font-medium text-purple-900">
+                            {getFloorDisplayName(floor.floorNumber, null)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
                           <Link
-                            href={`/projects/${floor.projectId}`}
+                            href={`/floors/${floor._id}`}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                          >
+                            <div>
+                              <div>{getFloorDisplayName(floor.floorNumber, floor.name)}</div>
+                              {floor.usageCount !== undefined && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Used by {floor.usageCount} material{floor.usageCount !== 1 ? 's' : ''}
+                                </div>
+                              )}
+                            </div>
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
+                              floor.status
+                            )}`}
+                          >
+                            {floor.status || 'NOT_STARTED'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">
+                            {formatCurrency(floor.totalBudget || 0)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">
+                            {formatCurrency(floor.actualCost || 0)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">
+                            {floor.projectId ? (
+                              <Link
+                                href={`/projects/${floor.projectId}`}
+                                className="text-blue-600 hover:text-blue-900"
+                              >
+                                {getProjectName(floor.projectId)}
+                              </Link>
+                            ) : (
+                              'N/A'
+                            )}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <Link
+                            href={`/floors/${floor._id}`}
                             className="text-blue-600 hover:text-blue-900"
                           >
-                            {getProjectName(floor.projectId)}
+                            {canEdit ? 'Edit' : 'View'}
                           </Link>
-                        ) : (
-                          'N/A'
-                        )}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <Link
-                        href={`/floors/${floor._id}`}
-                        className="text-blue-600 hover:text-blue-900"
-                      >
-                        {canEdit ? 'Edit' : 'View'}
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Ground Floor Section */}
+            {groupedFloors.ground.length > 0 && (
+              <div className="bg-white rounded-lg shadow overflow-hidden">
+                <div className="bg-blue-50 px-6 py-3 border-b border-blue-200">
+                  <h3 className="text-sm font-semibold text-blue-900">
+                    Ground Floor ({groupedFloors.ground.length})
+                  </h3>
+                </div>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Floor Number
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Floor Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Budget
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Actual Cost
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Project
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {groupedFloors.ground.map((floor) => (
+                      <tr key={floor._id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm font-medium text-blue-900">
+                            {getFloorDisplayName(floor.floorNumber, null)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Link
+                            href={`/floors/${floor._id}`}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                          >
+                            <div>
+                              <div>{getFloorDisplayName(floor.floorNumber, floor.name)}</div>
+                              {floor.usageCount !== undefined && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Used by {floor.usageCount} material{floor.usageCount !== 1 ? 's' : ''}
+                                </div>
+                              )}
+                            </div>
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
+                              floor.status
+                            )}`}
+                          >
+                            {floor.status || 'NOT_STARTED'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">
+                            {formatCurrency(floor.totalBudget || 0)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">
+                            {formatCurrency(floor.actualCost || 0)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">
+                            {floor.projectId ? (
+                              <Link
+                                href={`/projects/${floor.projectId}`}
+                                className="text-blue-600 hover:text-blue-900"
+                              >
+                                {getProjectName(floor.projectId)}
+                              </Link>
+                            ) : (
+                              'N/A'
+                            )}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <Link
+                            href={`/floors/${floor._id}`}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            {canEdit ? 'Edit' : 'View'}
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Above-Ground Floors Section */}
+            {groupedFloors.aboveGround.length > 0 && (
+              <div className="bg-white rounded-lg shadow overflow-hidden">
+                <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+                  <h3 className="text-sm font-semibold text-gray-900">
+                    Above-Ground Floors ({groupedFloors.aboveGround.length})
+                  </h3>
+                </div>
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Floor Number
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Floor Name
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Budget
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Actual Cost
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Project
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {groupedFloors.aboveGround.map((floor) => (
+                      <tr key={floor._id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm font-medium text-gray-900">
+                            {getFloorDisplayName(floor.floorNumber, null)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Link
+                            href={`/floors/${floor._id}`}
+                            className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                          >
+                            <div>
+                              <div>{getFloorDisplayName(floor.floorNumber, floor.name)}</div>
+                              {floor.usageCount !== undefined && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Used by {floor.usageCount} material{floor.usageCount !== 1 ? 's' : ''}
+                                </div>
+                              )}
+                            </div>
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
+                              floor.status
+                            )}`}
+                          >
+                            {floor.status || 'NOT_STARTED'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">
+                            {formatCurrency(floor.totalBudget || 0)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">
+                            {formatCurrency(floor.actualCost || 0)}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm text-gray-900">
+                            {floor.projectId ? (
+                              <Link
+                                href={`/projects/${floor.projectId}`}
+                                className="text-blue-600 hover:text-blue-900"
+                              >
+                                {getProjectName(floor.projectId)}
+                              </Link>
+                            ) : (
+                              'N/A'
+                            )}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <Link
+                            href={`/floors/${floor._id}`}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            {canEdit ? 'Edit' : 'View'}
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 

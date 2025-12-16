@@ -21,7 +21,7 @@
  * @property {number} [estimatedCost] - Estimated total cost (optional, >= 0)
  * @property {number} [estimatedUnitCost] - Estimated cost per unit (optional, >= 0)
  * @property {string} [reason] - Why this material is needed
- * @property {string} status - Status: 'requested', 'pending_approval', 'approved', 'rejected', 'converted_to_order', 'cancelled' (required, defaults to 'requested')
+ * @property {string} status - Status: 'requested', 'pending_approval', 'approved', 'rejected', 'converted_to_order', 'converted_to_material', 'cancelled' (required, defaults to 'requested')
  * @property {Date} [submittedAt] - When request was submitted
  * @property {ObjectId} [approvedBy] - PM/OWNER who approved
  * @property {string} [approvedByName] - Denormalized approver name
@@ -50,7 +50,7 @@ export const MATERIAL_REQUEST_SCHEMA = {
   estimatedCost: Number, // Optional
   estimatedUnitCost: Number, // Optional
   reason: String, // Why this material is needed
-  status: String, // 'requested', 'pending_approval', 'approved', 'rejected', 'converted_to_order', 'cancelled'
+  status: String, // 'requested', 'pending_approval', 'approved', 'rejected', 'converted_to_order', 'converted_to_material', 'cancelled'
   submittedAt: Date,
   approvedBy: 'ObjectId', // PM/OWNER
   approvedByName: String,
@@ -77,6 +77,7 @@ export const VALID_REQUEST_STATUSES = [
   'approved',
   'rejected',
   'converted_to_order',
+  'converted_to_material', // When material entry is created from PO
   'cancelled',
 ];
 

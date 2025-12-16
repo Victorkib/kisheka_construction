@@ -94,6 +94,12 @@ export function NotificationItem({ notification, onMarkRead, onMarkUnread, onDel
         router.push(`/initial-expenses/${relatedId}`);
       } else if (notification.relatedModel === 'PROJECT') {
         router.push(`/projects/${relatedId}`);
+      } else if (notification.relatedModel === 'MATERIAL_REQUEST') {
+        // Navigate to material request detail page
+        router.push(`/material-requests/${relatedId}`);
+      } else if (notification.relatedModel === 'PURCHASE_ORDER') {
+        // Navigate to purchase order detail page
+        router.push(`/purchase-orders/${relatedId}`);
       } else if (notification.relatedModel === 'USER') {
         // User notifications might not have a detail page
         // Could navigate to profile or do nothing

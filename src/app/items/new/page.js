@@ -14,11 +14,13 @@ import { AppLayout } from '@/components/layout/app-layout';
 import { CloudinaryUploadWidget } from '@/components/uploads/cloudinary-upload-widget';
 import { LoadingSpinner, LoadingOverlay, LoadingButton } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
+import { useToast } from '@/components/toast/toast-container';
 
 function NewItemPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
+  const toast = useToast();
   const [user, setUser] = useState(null);
   const [entryType, setEntryType] = useState(null); // null = not selected, 'new_purchase' or 'retroactive_entry'
   const [showContinueAnyway, setShowContinueAnyway] = useState(false);
@@ -29,6 +31,31 @@ function NewItemPageContent() {
   const [categories, setCategories] = useState([]);
   const [floors, setFloors] = useState([]);
   const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [loadingFloors, setLoadingFloors] = useState(false);
+
+  // Predefined unit options
+  const unitOptions = [
+    'piece',
+    'bag',
+    'kg',
+    'ton',
+    'liter',
+    'gallon',
+    'meter',
+    'square meter',
+    'cubic meter',
+    'roll',
+    'sheet',
+    'box',
+    'carton',
+    'pack',
+    'set',
+    'pair',
+    'dozen',
+    'others'
+  ];
 
   const [formData, setFormData] = useState({
     projectId: '',
@@ -39,6 +66,7 @@ function NewItemPageContent() {
     floor: '',
     quantity: '',
     unit: 'piece',
+    customUnit: '',
     unitCost: '',
     supplierName: '',
     paymentMethod: 'CASH',
@@ -131,23 +159,30 @@ function NewItemPageContent() {
   }, [formData.projectId]);
 
   const fetchCategories = async () => {
+    setLoadingCategories(true);
     try {
       const response = await fetch('/api/categories');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
+      } else {
+        setCategories([]);
       }
     } catch (err) {
       console.error('Error fetching categories:', err);
+      setCategories([]);
+    } finally {
+      setLoadingCategories(false);
     }
   };
 
   const fetchFloors = async (projectId) => {
+    if (!projectId) {
+      setFloors([]);
+      return;
+    }
+    setLoadingFloors(true);
     try {
-      if (!projectId) {
-        setFloors([]);
-        return;
-      }
       const response = await fetch(`/api/floors?projectId=${projectId}`);
       const data = await response.json();
       if (data.success) {
@@ -161,14 +196,19 @@ function NewItemPageContent() {
             floor: floorExists ? currentFloorId : ''
           };
         });
+      } else {
+        setFloors([]);
       }
     } catch (err) {
       console.error('Error fetching floors:', err);
       setFloors([]);
+    } finally {
+      setLoadingFloors(false);
     }
   };
 
   const fetchProjects = async () => {
+    setLoadingProjects(true);
     try {
       const response = await fetch('/api/projects');
       const data = await response.json();
@@ -178,9 +218,14 @@ function NewItemPageContent() {
         if (data.data && data.data.length === 1 && !formData.projectId) {
           setFormData(prev => ({ ...prev, projectId: data.data[0]._id }));
         }
+      } else {
+        setProjects([]);
       }
     } catch (err) {
       console.error('Error fetching projects:', err);
+      setProjects([]);
+    } finally {
+      setLoadingProjects(false);
     }
   };
 
@@ -191,6 +236,12 @@ function NewItemPageContent() {
       // Clear floor selection when project changes
       if (name === 'projectId') {
         updated.floor = '';
+      }
+      // Handle unit selection - clear custom unit if not "others"
+      if (name === 'unit') {
+        if (value !== 'others') {
+          updated.customUnit = '';
+        }
       }
       return updated;
     });
@@ -317,6 +368,7 @@ function NewItemPageContent() {
       const payload = {
         ...formData,
         quantityPurchased: formData.quantity,
+        unit: formData.unit === 'others' ? formData.customUnit.trim() : formData.unit.trim(),
         category: categoryName,
         categoryId: formData.categoryId || null,
         entryType: entryType === 'retroactive_entry' ? 'retroactive_entry' : 'retroactive_entry', // Default to retroactive for direct creation
@@ -341,6 +393,16 @@ function NewItemPageContent() {
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to create material');
+      }
+
+      // Show capital warning if present
+      if (data.data.capitalWarning) {
+        toast.showWarning(
+          `Material created but capital insufficient: ${data.data.capitalWarning.message}`,
+          { duration: 10000 }
+        );
+      } else {
+        toast.showSuccess('Material created successfully!');
       }
 
       // Redirect to material detail page
@@ -372,6 +434,11 @@ function NewItemPageContent() {
         }
         if (!formData.unit) {
           setError('Please select a unit');
+          return false;
+        }
+        // Validate unit - if "others" is selected, customUnit must be provided
+        if (formData.unit === 'others' && (!formData.customUnit || formData.customUnit.trim().length === 0)) {
+          setError('Please enter a custom unit name');
           return false;
         }
         return true;
@@ -425,7 +492,7 @@ function NewItemPageContent() {
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
-        <LoadingOverlay isLoading={loading} message="Creating material..." fullScreen={false} />
+        <LoadingOverlay isLoading={loading} message="Creating material entry..." fullScreen={false} />
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -631,14 +698,21 @@ function NewItemPageContent() {
                     value={formData.projectId}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    disabled={loadingProjects || loading}
+                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    <option value="">Select a project</option>
-                    {projects.map((project) => (
-                      <option key={project._id} value={project._id}>
-                        {project.projectName || project.projectCode} {project.location ? `- ${project.location}` : ''}
-                      </option>
-                    ))}
+                    {loadingProjects ? (
+                      <option>Loading projects...</option>
+                    ) : (
+                      <>
+                        <option value="">Select a project</option>
+                        {projects.map((project) => (
+                          <option key={project._id} value={project._id}>
+                            {project.projectName || project.projectCode} {project.location ? `- ${project.location}` : ''}
+                          </option>
+                        ))}
+                      </>
+                    )}
                   </select>
                 ) : (
                   <div className="space-y-2">
@@ -749,17 +823,24 @@ function NewItemPageContent() {
                         }));
                       }
                     }}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={loadingCategories || loading}
                   >
-                    <option value="">Select category</option>
-                    {categories.length > 0 ? (
-                      categories.map((cat) => (
-                        <option key={cat._id} value={cat._id}>
-                          {cat.name}
-                        </option>
-                      ))
+                    {loadingCategories ? (
+                      <option>Loading categories...</option>
                     ) : (
-                      <option value="" disabled>Loading categories...</option>
+                      <>
+                        <option value="">Select category</option>
+                        {categories.length > 0 ? (
+                          categories.map((cat) => (
+                            <option key={cat._id} value={cat._id}>
+                              {cat.name}
+                            </option>
+                          ))
+                        ) : (
+                          <option value="" disabled>No categories available</option>
+                        )}
+                      </>
                     )}
                   </select>
                   {formData.categoryId && formData.category && (
@@ -795,14 +876,30 @@ function NewItemPageContent() {
                       name="floor"
                       value={formData.floor}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                      disabled={loadingFloors || loading || !formData.projectId}
+                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      <option value="">Select floor (optional)</option>
-                      {floors.map((floor) => (
-                        <option key={floor._id} value={floor._id}>
-                          {floor.name || `Floor ${floor.floorNumber}`} {floor.status ? `(${floor.status.replace('_', ' ')})` : ''}
-                        </option>
-                      ))}
+                      {loadingFloors ? (
+                        <option>Loading floors...</option>
+                      ) : (
+                        <>
+                          <option value="">Select floor (optional)</option>
+                          {floors.map((floor) => {
+                            const getFloorDisplay = (floorNumber, name) => {
+                              if (name) return name;
+                              if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                              if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                              if (floorNumber === 0) return 'Ground Floor';
+                              return `Floor ${floorNumber}`;
+                            };
+                            return (
+                              <option key={floor._id} value={floor._id}>
+                                {getFloorDisplay(floor.floorNumber, floor.name)} {floor.status ? `(${floor.status.replace('_', ' ')})` : ''}
+                              </option>
+                            );
+                          })}
+                        </>
+                      )}
                     </select>
                   )}
                 </div>
@@ -855,14 +952,23 @@ function NewItemPageContent() {
                     required
                     className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
                   >
-                    <option value="piece">Piece</option>
-                    <option value="kg">Kilogram (kg)</option>
-                    <option value="litre">Litre</option>
-                    <option value="meter">Meter</option>
-                    <option value="bag">Bag</option>
-                    <option value="box">Box</option>
-                    <option value="cubic_meter">Cubic Meter</option>
+                    {unitOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option.charAt(0).toUpperCase() + option.slice(1)}
+                      </option>
+                    ))}
                   </select>
+                  {formData.unit === 'others' && (
+                    <input
+                      type="text"
+                      name="customUnit"
+                      value={formData.customUnit}
+                      onChange={handleChange}
+                      required
+                      placeholder="Enter custom unit name"
+                      className="w-full mt-2 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                    />
+                  )}
                 </div>
               </div>
             </div>
@@ -1427,7 +1533,7 @@ function NewItemPageContent() {
                 </div>
                 <div className="flex justify-between">
                   <span className="font-medium">Quantity:</span>
-                  <span>{formData.quantity} {formData.unit}</span>
+                  <span>{formData.quantity} {formData.unit === 'others' ? formData.customUnit : formData.unit}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="font-medium">Unit Cost:</span>

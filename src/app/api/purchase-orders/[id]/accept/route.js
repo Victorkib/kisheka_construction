@@ -15,6 +15,7 @@ import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotification, createNotifications } from '@/lib/notifications';
 import { validateCapitalAvailability, updateCommittedCost, recalculateProjectFinances } from '@/lib/financial-helpers';
+import { withTransaction } from '@/lib/mongodb/transaction-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
@@ -96,7 +97,10 @@ export async function POST(request, { params }) {
       );
     }
 
-    // Update order status
+    // CRITICAL: Wrap critical operations in transaction for atomicity
+    // This ensures PO status update and financial update happen together or not at all
+    console.log('[POST /api/purchase-orders/[id]/accept] Starting transaction for atomic operations');
+
     const updateData = {
       status: 'order_accepted',
       supplierResponse: 'accept',
@@ -109,65 +113,85 @@ export async function POST(request, { params }) {
       updatedAt: new Date(),
     };
 
-    await db.collection('purchase_orders').updateOne(
-      { _id: new ObjectId(id) },
-      { $set: updateData }
-    );
+    const transactionResult = await withTransaction(async ({ db, session }) => {
+      // 1. Update purchase order status (atomic)
+      await db.collection('purchase_orders').updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updateData },
+        { session }
+      );
 
-    // Get updated order
+      // 2. Update committed cost in project_finances (atomic with PO update)
+      await updateCommittedCost(
+        purchaseOrder.projectId.toString(),
+        finalTotalCost,
+        'add',
+        session
+      );
+
+      // 3. Create audit log (atomic with above)
+      await createAuditLog({
+        userId: userProfile._id.toString(),
+        action: 'ACCEPTED',
+        entityType: 'PURCHASE_ORDER',
+        entityId: id,
+        projectId: purchaseOrder.projectId.toString(),
+        changes: {
+          before: purchaseOrder,
+          after: { ...purchaseOrder, ...updateData },
+          committedCost: finalTotalCost,
+          capitalValidation: {
+            available: capitalValidation.available,
+            required: finalTotalCost,
+            isValid: true,
+          },
+        },
+      }, { session });
+
+      return { success: true };
+    });
+
+    console.log('[POST /api/purchase-orders/[id]/accept] Transaction completed successfully');
+
+    // Get updated order (after transaction)
     const updatedOrder = await db.collection('purchase_orders').findOne({
       _id: new ObjectId(id),
     });
 
-    // CRITICAL: Increase committedCost in project_finances
-    await updateCommittedCost(
-      purchaseOrder.projectId.toString(),
-      finalTotalCost,
-      'add'
-    );
-
-    // Trigger financial recalculation
-    await recalculateProjectFinances(purchaseOrder.projectId.toString());
-
-    // Create notifications for PM/OWNER
-    const managers = await db.collection('users').find({
-      role: { $in: ['pm', 'project_manager', 'owner'] },
-      status: 'active',
-    }).toArray();
-
-    if (managers.length > 0) {
-      const notifications = managers.map(manager => ({
-        userId: manager._id.toString(),
-        type: 'approval_status',
-        title: 'Purchase Order Accepted',
-        message: `${purchaseOrder.supplierName} accepted purchase order ${purchaseOrder.purchaseOrderNumber} for ${purchaseOrder.quantityOrdered} ${purchaseOrder.unit} of ${purchaseOrder.materialName}`,
-        projectId: purchaseOrder.projectId.toString(),
-        relatedModel: 'PURCHASE_ORDER',
-        relatedId: id,
-        createdBy: userProfile._id.toString(),
-      }));
-
-      await createNotifications(notifications);
+    // Non-critical operations (can fail without affecting core data)
+    // Trigger financial recalculation (read-heavy, can happen outside transaction)
+    try {
+      await recalculateProjectFinances(purchaseOrder.projectId.toString());
+    } catch (recalcError) {
+      console.error('[POST /api/purchase-orders/[id]/accept] Financial recalculation failed (non-critical):', recalcError);
+      // Don't fail the request - recalculation can be done later
     }
 
-    // Create audit log
-    await createAuditLog({
-      userId: userProfile._id.toString(),
-      action: 'ACCEPTED',
-      entityType: 'PURCHASE_ORDER',
-      entityId: id,
-      projectId: purchaseOrder.projectId.toString(),
-      changes: {
-        before: purchaseOrder,
-        after: updatedOrder,
-        committedCost: finalTotalCost,
-        capitalValidation: {
-          available: capitalValidation.available,
-          required: finalTotalCost,
-          isValid: true,
-        },
-      },
-    });
+    // Create notifications for PM/OWNER (non-critical)
+    try {
+      const managers = await db.collection('users').find({
+        role: { $in: ['pm', 'project_manager', 'owner'] },
+        status: 'active',
+      }).toArray();
+
+      if (managers.length > 0) {
+        const notifications = managers.map(manager => ({
+          userId: manager._id.toString(),
+          type: 'approval_status',
+          title: 'Purchase Order Accepted',
+          message: `${purchaseOrder.supplierName} accepted purchase order ${purchaseOrder.purchaseOrderNumber} for ${purchaseOrder.quantityOrdered} ${purchaseOrder.unit} of ${purchaseOrder.materialName}`,
+          projectId: purchaseOrder.projectId.toString(),
+          relatedModel: 'PURCHASE_ORDER',
+          relatedId: id,
+          createdBy: userProfile._id.toString(),
+        }));
+
+        await createNotifications(notifications);
+      }
+    } catch (notifError) {
+      console.error('[POST /api/purchase-orders/[id]/accept] Notification creation failed (non-critical):', notifError);
+      // Don't fail the request - notifications are non-critical
+    }
 
     return successResponse({
       order: updatedOrder,

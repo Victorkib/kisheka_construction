@@ -120,36 +120,72 @@ function WastageAnalyticsPageContent() {
 
       setSummary(summaryData.data);
 
-      const suppliersResponse = await fetch(`/api/discrepancies/suppliers?${params.toString()}`);
-      const suppliersData = await suppliersResponse.json();
+      // Fetch suppliers with error handling
+      try {
+        const suppliersResponse = await fetch(`/api/discrepancies/suppliers?${params.toString()}`);
+        const suppliersData = await suppliersResponse.json();
 
-      if (suppliersData.success) {
-        setSuppliers(suppliersData.data.suppliers || []);
+        if (suppliersData.success) {
+          setSuppliers(suppliersData.data?.suppliers || suppliersData.data || []);
+        } else {
+          console.warn('Failed to fetch suppliers:', suppliersData.error);
+          setSuppliers([]);
+        }
+      } catch (suppliersErr) {
+        console.error('Error fetching suppliers:', suppliersErr);
+        setSuppliers([]);
       }
 
-      const discrepanciesResponse = await fetch(`/api/discrepancies/check?${params.toString()}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      });
-      const discrepanciesData = await discrepanciesResponse.json();
+      // Fetch discrepancies with error handling
+      try {
+        const discrepanciesResponse = await fetch(`/api/discrepancies/check?${params.toString()}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({}),
+        });
+        const discrepanciesData = await discrepanciesResponse.json();
 
-      if (discrepanciesData.success) {
-        setDiscrepancies(discrepanciesData.data.discrepancies || []);
+        if (discrepanciesData.success) {
+          setDiscrepancies(discrepanciesData.data?.discrepancies || discrepanciesData.data || []);
+        } else {
+          console.warn('Failed to fetch discrepancies:', discrepanciesData.error);
+          setDiscrepancies([]);
+        }
+      } catch (discrepanciesErr) {
+        console.error('Error fetching discrepancies:', discrepanciesErr);
+        setDiscrepancies([]);
       }
 
-      const trendsResponse = await fetch(`/api/discrepancies/trends?${params.toString()}`);
-      const trendsData = await trendsResponse.json();
+      // Fetch trends with error handling
+      try {
+        const trendsResponse = await fetch(`/api/discrepancies/trends?${params.toString()}`);
+        const trendsData = await trendsResponse.json();
 
-      if (trendsData.success) {
-        setTrends(trendsData.data.trends || []);
+        if (trendsData.success) {
+          setTrends(trendsData.data?.trends || trendsData.data || []);
+        } else {
+          console.warn('Failed to fetch trends:', trendsData.error);
+          setTrends([]);
+        }
+      } catch (trendsErr) {
+        console.error('Error fetching trends:', trendsErr);
+        setTrends([]);
       }
 
-      const categoriesResponse = await fetch(`/api/discrepancies/categories?${params.toString()}`);
-      const categoriesData = await categoriesResponse.json();
+      // Fetch category analysis with error handling
+      try {
+        const categoriesResponse = await fetch(`/api/discrepancies/categories?${params.toString()}`);
+        const categoriesData = await categoriesResponse.json();
 
-      if (categoriesData.success) {
-        setCategoryAnalysis(categoriesData.data.categories || []);
+        if (categoriesData.success) {
+          setCategoryAnalysis(categoriesData.data?.categories || categoriesData.data || []);
+        } else {
+          console.warn('Failed to fetch category analysis:', categoriesData.error);
+          setCategoryAnalysis([]);
+        }
+      } catch (categoriesErr) {
+        console.error('Error fetching category analysis:', categoriesErr);
+        setCategoryAnalysis([]);
       }
     } catch (err) {
       setError(err.message);
@@ -198,36 +234,82 @@ function WastageAnalyticsPageContent() {
 
     setLoadingComparison(true);
     try {
-      const comparisonPromises = selectedProjects.map(async (projId) => {
-        const params = new URLSearchParams({ projectId: projId });
-        if (!showAllTime) {
-          if (dateRange.startDate) params.append('startDate', dateRange.startDate);
-          if (dateRange.endDate) params.append('endDate', dateRange.endDate);
-        }
+      // Validate project IDs before fetching
+      const validProjectIds = selectedProjects.filter((id) => {
+        const project = projects.find((p) => p._id === id);
+        return project !== undefined;
+      });
 
-        const summaryResponse = await fetch(`/api/discrepancies/summary?${params.toString()}`);
-        const summaryData = await summaryResponse.json();
+      if (validProjectIds.length < 2) {
+        toast.showError('Please select at least 2 valid projects for comparison');
+        setComparisonData([]);
+        setLoadingComparison(false);
+        return;
+      }
 
-        if (summaryData.success && summaryData.data) {
+      // Fetch data for each project with individual error handling
+      const comparisonPromises = validProjectIds.map(async (projId) => {
+        try {
+          const params = new URLSearchParams({ projectId: projId });
+          if (!showAllTime) {
+            if (dateRange.startDate) params.append('startDate', dateRange.startDate);
+            if (dateRange.endDate) params.append('endDate', dateRange.endDate);
+          }
+
+          const summaryResponse = await fetch(`/api/discrepancies/summary?${params.toString()}`);
+          
+          if (!summaryResponse.ok) {
+            throw new Error(`HTTP ${summaryResponse.status}`);
+          }
+
+          const summaryData = await summaryResponse.json();
+
+          if (summaryData.success && summaryData.data) {
+            const project = projects.find((p) => p._id === projId);
+            return {
+              projectId: projId,
+              projectName: project?.projectName || project?.projectCode || 'Unknown',
+              ...summaryData.data,
+            };
+          }
+          return null;
+        } catch (err) {
+          // Log error but continue with other projects
           const project = projects.find((p) => p._id === projId);
+          const projectName = project?.projectName || project?.projectCode || projId;
+          console.error(`Error fetching data for project ${projectName}:`, err);
+          // Return error object so user knows which project failed
           return {
             projectId: projId,
-            projectName: project?.projectName || project?.projectCode || 'Unknown',
-            ...summaryData.data,
+            projectName,
+            error: true,
+            errorMessage: err.message || 'Failed to fetch data',
           };
         }
-        return null;
       });
 
       const results = await Promise.all(comparisonPromises);
-      setComparisonData(results.filter((r) => r !== null));
+      const validResults = results.filter((r) => r !== null && !r.error);
+      const errorResults = results.filter((r) => r && r.error);
+
+      // Show warning if some projects failed
+      if (errorResults.length > 0 && validResults.length > 0) {
+        toast.showWarning(
+          `Failed to load data for ${errorResults.length} project(s). Showing available data.`
+        );
+      } else if (errorResults.length > 0 && validResults.length === 0) {
+        toast.showError('Failed to load comparison data for all selected projects');
+      }
+
+      setComparisonData(validResults);
     } catch (err) {
       console.error('Error fetching comparison data:', err);
+      toast.showError('Failed to load comparison data');
       setComparisonData([]);
     } finally {
       setLoadingComparison(false);
     }
-  }, [selectedProjects, showAllTime, dateRange.startDate, dateRange.endDate, projects]);
+  }, [selectedProjects, showAllTime, dateRange.startDate, dateRange.endDate, projects, toast]);
 
   useEffect(() => {
     if (comparisonMode && selectedProjects.length >= 2 && projects.length > 0) {
@@ -471,30 +553,66 @@ function WastageAnalyticsPageContent() {
     }
   };
 
-  const severityData = summary
+  // Prepare chart data with validation
+  // Prepare chart data with comprehensive validation
+  const severityData = summary && summary.severityBreakdown
     ? [
-        { name: 'Critical', value: summary.severityBreakdown.critical, color: '#ef4444' },
-        { name: 'High', value: summary.severityBreakdown.high, color: '#f59e0b' },
-        { name: 'Medium', value: summary.severityBreakdown.medium, color: '#eab308' },
-        { name: 'Low', value: summary.severityBreakdown.low, color: '#3b82f6' },
-      ].filter((item) => item.value > 0)
+        { 
+          name: 'Critical', 
+          value: Math.max(0, parseFloat(summary.severityBreakdown.critical) || 0), 
+          color: '#ef4444' 
+        },
+        { 
+          name: 'High', 
+          value: Math.max(0, parseFloat(summary.severityBreakdown.high) || 0), 
+          color: '#f59e0b' 
+        },
+        { 
+          name: 'Medium', 
+          value: Math.max(0, parseFloat(summary.severityBreakdown.medium) || 0), 
+          color: '#eab308' 
+        },
+        { 
+          name: 'Low', 
+          value: Math.max(0, parseFloat(summary.severityBreakdown.low) || 0), 
+          color: '#3b82f6' 
+        },
+      ].filter((item) => !isNaN(item.value) && item.value > 0)
     : [];
 
-  const supplierVarianceData = suppliers
+  // Validate and prepare supplier data
+  const supplierVarianceData = (Array.isArray(suppliers) ? suppliers : [])
     .slice(0, 10)
-    .map((supplier) => ({
-      name: supplier.supplierName || 'Unknown',
-      variance: supplier.totalVariance || 0,
-      varianceCost: supplier.totalVarianceCost || 0,
-      deliveryAccuracy: supplier.deliveryAccuracy || 0,
-    }));
+    .map((supplier) => {
+      const variance = Math.max(0, parseFloat(supplier?.totalVariance) || 0);
+      const varianceCost = Math.max(0, parseFloat(supplier?.totalVarianceCost) || 0);
+      const deliveryAccuracy = Math.max(0, Math.min(100, parseFloat(supplier?.deliveryAccuracy) || 0));
+      
+      return {
+        name: (supplier?.supplierName || 'Unknown').substring(0, 30), // Limit name length
+        variance: isNaN(variance) ? 0 : variance,
+        varianceCost: isNaN(varianceCost) ? 0 : varianceCost,
+        deliveryAccuracy: isNaN(deliveryAccuracy) ? 0 : deliveryAccuracy,
+      };
+    })
+    .filter((item) => !isNaN(item.variance) && !isNaN(item.varianceCost));
 
-  const discrepancyBreakdown = discrepancies.slice(0, 10).map((d) => ({
-    name: d.materialName,
-    variance: d.metrics.variance,
-    loss: d.metrics.loss,
-    totalCost: d.metrics.totalDiscrepancyCost,
-  }));
+  // Validate and prepare discrepancy breakdown data
+  const discrepancyBreakdown = (Array.isArray(discrepancies) ? discrepancies : [])
+    .slice(0, 10)
+    .map((d) => {
+      const variance = Math.max(0, parseFloat(d?.metrics?.variance) || 0);
+      const loss = Math.max(0, parseFloat(d?.metrics?.loss) || 0);
+      const totalCost = Math.max(0, parseFloat(d?.metrics?.totalDiscrepancyCost) || 0);
+      
+      return {
+        name: (d?.materialName || 'Unknown Material').substring(0, 40), // Limit name length
+        variance: isNaN(variance) ? 0 : variance,
+        loss: isNaN(loss) ? 0 : loss,
+        totalCost: isNaN(totalCost) ? 0 : totalCost,
+      };
+    })
+    .filter((item) => !isNaN(item.variance) && !isNaN(item.loss) && !isNaN(item.totalCost));
 
   if (loading) {
     return (
@@ -917,11 +1035,11 @@ function WastageAnalyticsPageContent() {
         ) : (
           <>
             {summary && (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
                 <div className="bg-white rounded-lg shadow p-6">
                   <h3 className="text-base font-semibold text-gray-700 leading-normal">Materials with Issues</h3>
                   <p className="text-3xl font-bold text-gray-900 mt-2">
-                    {summary.materialsWithIssues} / {summary.totalMaterials}
+                    {summary.materialsWithIssues || 0} / {summary.totalMaterials || 0}
                   </p>
                   <p className="text-sm text-gray-700 mt-1 leading-normal">
                     {summary.totalMaterials > 0
@@ -932,61 +1050,77 @@ function WastageAnalyticsPageContent() {
                 </div>
 
                 <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-base font-semibold text-gray-700 leading-normal">Total Variance Cost</h3>
-                  <p className="text-3xl font-bold text-orange-600 mt-2">
-                    {formatCurrency(summary.metrics.totalVarianceCost)}
+                  <h3 className="text-base font-semibold text-gray-700 leading-normal">Average Wastage</h3>
+                  <p className="text-3xl font-bold text-yellow-600 mt-2">
+                    {summary.metrics?.averageWastage?.toFixed(1) || summary.metrics?.totalWastage?.toFixed(1) || '0.0'}%
                   </p>
                   <p className="text-sm text-gray-700 mt-1 leading-normal">
-                    {summary.metrics.totalVariance.toFixed(2)} units
+                    {summary.materialsWithWastage || summary.totalMaterials || 0} materials analyzed
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-lg shadow p-6">
+                  <h3 className="text-base font-semibold text-gray-700 leading-normal">Total Variance Cost</h3>
+                  <p className="text-3xl font-bold text-orange-600 mt-2">
+                    {formatCurrency(summary.metrics?.totalVarianceCost || 0)}
+                  </p>
+                  <p className="text-sm text-gray-700 mt-1 leading-normal">
+                    {(summary.metrics?.totalVariance || 0).toFixed(2)} units
                   </p>
                 </div>
 
                 <div className="bg-white rounded-lg shadow p-6">
                   <h3 className="text-base font-semibold text-gray-700 leading-normal">Total Loss Cost</h3>
                   <p className="text-3xl font-bold text-red-600 mt-2">
-                    {formatCurrency(summary.metrics.totalLossCost)}
+                    {formatCurrency(summary.metrics?.totalLossCost || 0)}
                   </p>
                   <p className="text-sm text-gray-700 mt-1 leading-normal">
-                    {summary.metrics.totalLoss.toFixed(2)} units
+                    {(summary.metrics?.totalLoss || 0).toFixed(2)} units
                   </p>
                 </div>
 
                 <div className="bg-white rounded-lg shadow p-6">
                   <h3 className="text-base font-semibold text-gray-700 leading-normal">Total Discrepancy Cost</h3>
                   <p className="text-3xl font-bold text-purple-600 mt-2">
-                    {formatCurrency(summary.metrics.totalDiscrepancyCost)}
+                    {formatCurrency(summary.metrics?.totalDiscrepancyCost || 0)}
                   </p>
                   <p className="text-sm text-gray-700 mt-1 leading-normal">Combined impact</p>
                 </div>
               </div>
             )}
 
-            {summary && summary.severityBreakdown && (
+            {summary && summary.severityBreakdown && severityData.length > 0 && (
               <div className="bg-white rounded-lg shadow p-6 mb-6">
                 <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Severity Breakdown</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <PieChart>
-                        <Pie
-                          data={severityData}
-                          cx="50%"
-                          cy="50%"
-                          labelLine={false}
-                          label={({ name, value, percent }) =>
-                            `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
-                          }
-                          outerRadius={100}
-                          fill="#8884d8"
-                          dataKey="value"
-                        >
-                          {severityData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
+                    {severityData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <PieChart>
+                          <Pie
+                            data={severityData}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, value, percent }) =>
+                              `${name}: ${value} (${(percent * 100).toFixed(0)}%)`
+                            }
+                            outerRadius={100}
+                            fill="#8884d8"
+                            dataKey="value"
+                          >
+                            {severityData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-[300px] text-gray-500">
+                        No severity data available
+                      </div>
+                    )}
                   </div>
                   <div className="flex flex-col justify-center space-y-3">
                     <div className="flex items-center justify-between">
@@ -1018,32 +1152,45 @@ function WastageAnalyticsPageContent() {
               </div>
             )}
 
-            {suppliers.length > 0 && (
+            {supplierVarianceData.length > 0 && (
               <div className="bg-white rounded-lg shadow p-6 mb-6">
                 <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Supplier Performance</h2>
-                <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={supplierVarianceData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={100} />
-                    <YAxis yAxisId="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip
-                      formatter={(value, name) => {
-                        if (name === 'varianceCost') return formatCurrency(value);
-                        if (name === 'deliveryAccuracy') return `${value.toFixed(2)}%`;
-                        return value.toFixed(2);
-                      }}
-                    />
-                    <Legend />
-                    <Bar yAxisId="left" dataKey="variance" fill="#ef4444" name="Variance (units)" />
-                    <Bar
-                      yAxisId="right"
-                      dataKey="varianceCost"
-                      fill="#f59e0b"
-                      name="Variance Cost"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                {supplierVarianceData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={400}>
+                    <BarChart data={supplierVarianceData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="name" 
+                        angle={-45} 
+                        textAnchor="end" 
+                        height={100}
+                        tick={{ fontSize: 12 }}
+                      />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip
+                        formatter={(value, name) => {
+                          if (isNaN(value)) return 'N/A';
+                          if (name === 'varianceCost') return formatCurrency(value);
+                          if (name === 'deliveryAccuracy') return `${value.toFixed(2)}%`;
+                          return value.toFixed(2);
+                        }}
+                      />
+                      <Legend />
+                      <Bar yAxisId="left" dataKey="variance" fill="#ef4444" name="Variance (units)" />
+                      <Bar
+                        yAxisId="right"
+                        dataKey="varianceCost"
+                        fill="#f59e0b"
+                        name="Variance Cost"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-[400px] text-gray-500">
+                    No supplier data available
+                  </div>
+                )}
               </div>
             )}
 
@@ -1114,23 +1261,23 @@ function WastageAnalyticsPageContent() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
-                              {discrepancy.metrics.variance.toFixed(2)} units
+                              {(discrepancy.metrics?.variance || 0).toFixed(2)} units
                             </div>
                             <div className="text-sm text-gray-700 leading-normal">
-                              {discrepancy.metrics.variancePercentage.toFixed(2)}%
+                              {(discrepancy.metrics?.variancePercentage || 0).toFixed(2)}%
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
-                              {discrepancy.metrics.loss.toFixed(2)} units
+                              {(discrepancy.metrics?.loss || 0).toFixed(2)} units
                             </div>
                             <div className="text-sm text-gray-700 leading-normal">
-                              {discrepancy.metrics.lossPercentage.toFixed(2)}%
+                              {(discrepancy.metrics?.lossPercentage || 0).toFixed(2)}%
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-red-600">
-                              {formatCurrency(discrepancy.metrics.totalDiscrepancyCost)}
+                              {formatCurrency(discrepancy.metrics?.totalDiscrepancyCost || 0)}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -1179,48 +1326,68 @@ function WastageAnalyticsPageContent() {
                 <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Category Analysis</h2>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={categoryAnalysis.slice(0, 10)}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="category" angle={-45} textAnchor="end" height={100} />
-                        <YAxis yAxisId="left" />
-                        <YAxis yAxisId="right" orientation="right" />
-                        <Tooltip
-                          formatter={(value, name) => {
-                            if (name === 'totalDiscrepancyCost' || name === 'varianceCost' || name === 'lossCost') {
-                              return formatCurrency(value);
-                            }
-                            return value.toFixed(2);
-                          }}
-                        />
-                        <Legend />
-                        <Bar yAxisId="left" dataKey="materialsWithIssues" fill="#ef4444" name="Materials with Issues" />
-                        <Bar
-                          yAxisId="right"
-                          dataKey="totalDiscrepancyCost"
-                          fill="#8b5cf6"
-                          name="Total Cost Impact"
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
+                    {categoryAnalysis.length > 0 ? (
+                      <ResponsiveContainer width="100%" height={300}>
+                        <BarChart data={categoryAnalysis.slice(0, 10).map((cat) => ({
+                          category: (cat.category || 'Other').substring(0, 20),
+                          materialsWithIssues: Math.max(0, parseFloat(cat.materialsWithIssues) || 0),
+                          totalDiscrepancyCost: Math.max(0, parseFloat(cat.totalDiscrepancyCost) || 0),
+                        }))}>
+                          <CartesianGrid strokeDasharray="3 3" />
+                          <XAxis dataKey="category" angle={-45} textAnchor="end" height={100} tick={{ fontSize: 12 }} />
+                          <YAxis yAxisId="left" />
+                          <YAxis yAxisId="right" orientation="right" />
+                          <Tooltip
+                            formatter={(value, name) => {
+                              if (isNaN(value)) return 'N/A';
+                              if (name === 'totalDiscrepancyCost' || name === 'varianceCost' || name === 'lossCost') {
+                                return formatCurrency(value);
+                              }
+                              return value.toFixed(2);
+                            }}
+                          />
+                          <Legend />
+                          <Bar yAxisId="left" dataKey="materialsWithIssues" fill="#ef4444" name="Materials with Issues" />
+                          <Bar
+                            yAxisId="right"
+                            dataKey="totalDiscrepancyCost"
+                            fill="#8b5cf6"
+                            name="Total Cost Impact"
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-[300px] text-gray-500">
+                        No category data available
+                      </div>
+                    )}
                   </div>
                   <div>
                     <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4 leading-tight">Top Categories by Wastage</h3>
                     <div className="space-y-3 max-h-64 overflow-y-auto">
-                      {categoryAnalysis.slice(0, 10).map((cat, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                          <div className="flex-1">
-                            <p className="font-medium text-gray-900">{cat.category || 'Other'}</p>
-                            <p className="text-sm text-gray-700">
-                              {cat.materialsWithIssues} / {cat.totalMaterials} materials with issues
-                            </p>
+                      {categoryAnalysis.slice(0, 10).map((cat, index) => {
+                        const materialsWithIssues = Math.max(0, parseFloat(cat.materialsWithIssues) || 0);
+                        const totalMaterials = Math.max(0, parseFloat(cat.totalMaterials) || 0);
+                        const totalDiscrepancyCost = Math.max(0, parseFloat(cat.totalDiscrepancyCost) || 0);
+                        const issueRate = totalMaterials > 0 
+                          ? ((materialsWithIssues / totalMaterials) * 100)
+                          : 0;
+                        
+                        return (
+                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div className="flex-1">
+                              <p className="font-medium text-gray-900">{cat.category || 'Other'}</p>
+                              <p className="text-sm text-gray-700">
+                                {materialsWithIssues} / {totalMaterials} materials with issues
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-semibold text-red-600">{formatCurrency(totalDiscrepancyCost)}</p>
+                              <p className="text-sm text-gray-700 leading-normal">{issueRate.toFixed(1)}% issue rate</p>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <p className="font-semibold text-red-600">{formatCurrency(cat.totalDiscrepancyCost)}</p>
-                            <p className="text-sm text-gray-700 leading-normal">{cat.issueRate.toFixed(1)}% issue rate</p>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
@@ -1230,76 +1397,107 @@ function WastageAnalyticsPageContent() {
             {trends.length > 0 && (
               <div className="bg-white rounded-lg shadow p-6 mb-6">
                 <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Historical Trends</h2>
-                <ResponsiveContainer width="100%" height={400}>
-                  <LineChart data={trends}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="monthLabel" angle={-45} textAnchor="end" height={100} />
-                    <YAxis yAxisId="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip
-                      formatter={(value, name) => {
-                        if (name === 'varianceCost' || name === 'lossCost' || name === 'totalDiscrepancyCost') {
-                          return formatCurrency(value);
-                        }
-                        return value.toFixed(2);
-                      }}
-                    />
-                    <Legend />
-                    <Line
-                      yAxisId="left"
-                      type="monotone"
-                      dataKey="variance"
-                      stroke="#ef4444"
-                      strokeWidth={2}
-                      name="Variance (units)"
-                    />
-                    <Line
-                      yAxisId="left"
-                      type="monotone"
-                      dataKey="loss"
-                      stroke="#f59e0b"
-                      strokeWidth={2}
-                      name="Loss (units)"
-                    />
-                    <Line
-                      yAxisId="right"
-                      type="monotone"
-                      dataKey="totalDiscrepancyCost"
-                      stroke="#8b5cf6"
-                      strokeWidth={2}
-                      name="Total Cost Impact"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                {trends.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={400}>
+                    <LineChart data={trends.map((t) => ({
+                      ...t,
+                      variance: Math.max(0, parseFloat(t.variance) || 0),
+                      loss: Math.max(0, parseFloat(t.loss) || 0),
+                      wastage: Math.max(0, Math.min(100, parseFloat(t.wastage) || 0)),
+                      varianceCost: Math.max(0, parseFloat(t.varianceCost) || 0),
+                      lossCost: Math.max(0, parseFloat(t.lossCost) || 0),
+                      totalDiscrepancyCost: Math.max(0, parseFloat(t.totalDiscrepancyCost) || 0),
+                    })).filter((t) => !isNaN(t.variance) && !isNaN(t.loss))}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="monthLabel" angle={-45} textAnchor="end" height={100} tick={{ fontSize: 12 }} />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip
+                        formatter={(value, name) => {
+                          if (isNaN(value)) return 'N/A';
+                          if (name === 'varianceCost' || name === 'lossCost' || name === 'totalDiscrepancyCost') {
+                            return formatCurrency(value);
+                          }
+                          if (name === 'wastage') {
+                            return `${value.toFixed(2)}%`;
+                          }
+                          return value.toFixed(2);
+                        }}
+                      />
+                      <Legend />
+                      <Line
+                        yAxisId="left"
+                        type="monotone"
+                        dataKey="variance"
+                        stroke="#ef4444"
+                        strokeWidth={2}
+                        name="Variance (units)"
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                      <Line
+                        yAxisId="left"
+                        type="monotone"
+                        dataKey="loss"
+                        stroke="#f59e0b"
+                        strokeWidth={2}
+                        name="Loss (units)"
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                      <Line
+                        yAxisId="right"
+                        type="monotone"
+                        dataKey="totalDiscrepancyCost"
+                        stroke="#8b5cf6"
+                        strokeWidth={2}
+                        name="Total Cost Impact"
+                        dot={{ r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-[400px] text-gray-500">
+                    No trend data available
+                  </div>
+                )}
               </div>
             )}
 
             {discrepancyBreakdown.length > 0 && (
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Discrepancy Breakdown by Material</h2>
-                <ResponsiveContainer width="100%" height={400}>
-                  <BarChart data={discrepancyBreakdown}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" angle={-45} textAnchor="end" height={120} />
-                    <YAxis yAxisId="left" />
-                    <YAxis yAxisId="right" orientation="right" />
-                    <Tooltip
-                      formatter={(value, name) => {
-                        if (name === 'totalCost') return formatCurrency(value);
-                        return value.toFixed(2);
-                      }}
-                    />
-                    <Legend />
-                    <Bar yAxisId="left" dataKey="variance" fill="#ef4444" name="Variance (units)" />
-                    <Bar yAxisId="left" dataKey="loss" fill="#f59e0b" name="Loss (units)" />
-                    <Bar
-                      yAxisId="right"
-                      dataKey="totalCost"
-                      fill="#8b5cf6"
-                      name="Cost Impact"
-                    />
-                  </BarChart>
-                </ResponsiveContainer>
+                {discrepancyBreakdown.length > 0 ? (
+                  <ResponsiveContainer width="100%" height={400}>
+                    <BarChart data={discrepancyBreakdown}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" angle={-45} textAnchor="end" height={120} tick={{ fontSize: 12 }} />
+                      <YAxis yAxisId="left" />
+                      <YAxis yAxisId="right" orientation="right" />
+                      <Tooltip
+                        formatter={(value, name) => {
+                          if (isNaN(value)) return 'N/A';
+                          if (name === 'totalCost') return formatCurrency(value);
+                          return value.toFixed(2);
+                        }}
+                      />
+                      <Legend />
+                      <Bar yAxisId="left" dataKey="variance" fill="#ef4444" name="Variance (units)" />
+                      <Bar yAxisId="left" dataKey="loss" fill="#f59e0b" name="Loss (units)" />
+                      <Bar
+                        yAxisId="right"
+                        dataKey="totalCost"
+                        fill="#8b5cf6"
+                        name="Cost Impact"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-[400px] text-gray-500">
+                    No discrepancy breakdown data available
+                  </div>
+                )}
               </div>
             )}
 

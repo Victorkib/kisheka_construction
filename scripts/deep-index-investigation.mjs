@@ -16,7 +16,7 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '..', '.env.local') });
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_DB = process.env.MONGODB_DB || 'kisheka_prod';
+const MONGODB_DB = process.env.MONGODB_DB_NAME || 'kisheka_prod';
 
 async function deepInvestigation() {
   let client;
@@ -94,7 +94,7 @@ async function deepInvestigation() {
       const collection = db.collection(collInfo.name);
       const indexes = await collection.indexes();
       
-      indexes.forEach(index => {
+      for (const index of indexes) {
         if (index.unique && !index.sparse && !index.partialFilterExpression) {
           const indexFields = Object.keys(index.key);
           
@@ -129,7 +129,7 @@ async function deepInvestigation() {
             });
           }
         }
-      });
+      }
     }
     
     if (uniqueIndexIssues.length > 0) {

@@ -1,0 +1,322 @@
+/**
+ * Bulk Material Request API Route
+ * POST: Create bulk material request batch
+ * GET: List bulk material request batches
+ * 
+ * POST /api/material-requests/bulk
+ * GET /api/material-requests/bulk
+ * Auth: CLERK, PM, OWNER, SUPERVISOR
+ */
+
+import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
+import { getDatabase } from '@/lib/mongodb/connection';
+import { getUserProfile } from '@/lib/auth-helpers';
+import { hasPermission } from '@/lib/role-helpers';
+import { createAuditLog } from '@/lib/audit-log';
+import { createNotifications } from '@/lib/notifications';
+import { recalculateProjectFinances } from '@/lib/financial-helpers';
+import { ObjectId } from 'mongodb';
+import { successResponse, errorResponse } from '@/lib/api-response';
+import { validateMaterialRequestBatch } from '@/lib/schemas/material-request-batch-schema';
+import {
+  createBatch,
+  getBatches,
+  updateBatchStatus,
+} from '@/lib/helpers/batch-helpers';
+import { withTransaction } from '@/lib/mongodb/transaction-helpers';
+import { normalizeUserRole, isRole } from '@/lib/role-constants';
+
+/**
+ * POST /api/material-requests/bulk
+ * Creates a new bulk material request batch
+ * Auth: CLERK, PM, OWNER, SUPERVISOR
+ */
+export async function POST(request) {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    // Check permission
+    const canCreate = await hasPermission(user.id, 'create_bulk_material_request');
+    if (!canCreate) {
+      return errorResponse(
+        'Insufficient permissions. Only CLERK, PM, OWNER, and SUPERVISOR can create bulk material requests.',
+        403
+      );
+    }
+
+    const userProfile = await getUserProfile(user.id);
+    if (!userProfile) {
+      return errorResponse('User profile not found', 404);
+    }
+
+    const body = await request.json();
+    const {
+      projectId,
+      batchName,
+      defaultFloorId,
+      defaultCategoryId,
+      defaultUrgency = 'medium',
+      defaultReason,
+      materials,
+      autoApprove = false,
+    } = body;
+
+    // Validate required fields
+    if (!projectId || !ObjectId.isValid(projectId)) {
+      return errorResponse('Valid projectId is required', 400);
+    }
+
+    if (!materials || !Array.isArray(materials) || materials.length === 0) {
+      return errorResponse('At least one material is required', 400);
+    }
+
+    // Validate batch data
+    const validation = validateMaterialRequestBatch({
+      projectId,
+      createdBy: userProfile._id.toString(),
+      materials,
+      defaultUrgency,
+    });
+
+    if (!validation.isValid) {
+      return errorResponse(validation.errors.join(', '), 400);
+    }
+
+    const db = await getDatabase();
+
+    // Verify project exists
+    const project = await db.collection('projects').findOne({
+      _id: new ObjectId(projectId),
+    });
+
+    if (!project) {
+      return errorResponse('Project not found', 404);
+    }
+
+    // Verify floor exists if provided
+    if (defaultFloorId && ObjectId.isValid(defaultFloorId)) {
+      const floor = await db.collection('floors').findOne({
+        _id: new ObjectId(defaultFloorId),
+      });
+      if (!floor) {
+        return errorResponse('Floor not found', 404);
+      }
+    }
+
+    // Verify category exists if provided
+    if (defaultCategoryId && ObjectId.isValid(defaultCategoryId)) {
+      const category = await db.collection('categories').findOne({
+        _id: new ObjectId(defaultCategoryId),
+      });
+      if (!category) {
+        return errorResponse('Category not found', 404);
+      }
+      // Set default category name
+      body.defaultCategory = category.name;
+    }
+
+    // Determine initial status
+    const userRole = normalizeUserRole(userProfile.role);
+    let initialStatus = 'draft';
+    let requiresApproval = true;
+
+    // If OWNER and autoApprove, set status to approved
+    if (autoApprove && isRole(userRole, 'owner')) {
+      initialStatus = 'approved';
+      requiresApproval = false;
+    } else if (body.status === 'submitted' || autoApprove === false) {
+      initialStatus = 'pending_approval';
+      requiresApproval = true;
+    }
+
+    // Create batch using helper - wrap in transaction for atomicity
+    const batchSettings = {
+      projectId,
+      batchName,
+      defaultFloorId,
+      defaultCategoryId,
+      defaultCategory: body.defaultCategory,
+      defaultUrgency,
+      defaultReason,
+    };
+
+    console.log('[POST /api/material-requests/bulk] Starting transaction for atomic batch creation');
+
+    // Wrap batch creation and auto-approval in transaction
+    const createdBatch = await withTransaction(async ({ db: transactionDb, session }) => {
+      // Create batch with transaction support
+      const batch = await createBatch(materials, batchSettings, userProfile, initialStatus, {
+        session,
+        db: transactionDb,
+      });
+
+      // If auto-approve and OWNER, approve all requests within transaction
+      if (autoApprove && isRole(userRole, 'owner')) {
+        // Approve all material requests in the batch (atomic)
+        await transactionDb.collection('material_requests').updateMany(
+          { _id: { $in: batch.materialRequestIds } },
+          {
+            $set: {
+              status: 'approved',
+              approvedBy: new ObjectId(userProfile._id),
+              approvedByName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
+              approvalDate: new Date(),
+              updatedAt: new Date(),
+            },
+          },
+          { session }
+        );
+
+        // Update batch with approval info (atomic)
+        await transactionDb.collection('material_request_batches').updateOne(
+          { _id: batch._id },
+          {
+            $set: {
+              status: 'approved',
+              approvedBy: new ObjectId(userProfile._id),
+              approvedAt: new Date(),
+              approvalNotes: 'Auto-approved by OWNER',
+              updatedAt: new Date(),
+            },
+          },
+          { session }
+        );
+      }
+
+      return batch;
+    });
+
+    console.log('[POST /api/material-requests/bulk] Transaction completed successfully');
+
+    // Trigger financial recalculation (idempotent, can happen outside transaction)
+    if (autoApprove && isRole(userRole, 'owner') && createdBatch.totalEstimatedCost > 0) {
+      await recalculateProjectFinances(projectId.toString());
+    }
+
+    // Create audit log
+    await createAuditLog({
+      userId: userProfile._id.toString(),
+      action: 'CREATED',
+      entityType: 'MATERIAL_REQUEST_BATCH',
+      entityId: createdBatch._id.toString(),
+      projectId: projectId,
+      changes: { created: createdBatch },
+    });
+
+    // Create notifications
+    if (requiresApproval) {
+      // Notify approvers (PM/OWNER)
+      const approvers = await db.collection('users').find({
+        role: { $in: ['pm', 'project_manager', 'owner'] },
+        status: 'active',
+      }).toArray();
+
+      if (approvers.length > 0) {
+        const notifications = approvers.map((approver) => ({
+          userId: approver._id.toString(),
+          type: 'approval_needed',
+          title: 'New Bulk Material Request',
+          message: `${userProfile.firstName || userProfile.email} created a bulk request with ${materials.length} material(s) (${createdBatch.batchNumber})`,
+          projectId: projectId,
+          relatedModel: 'MATERIAL_REQUEST_BATCH',
+          relatedId: createdBatch._id.toString(),
+          createdBy: userProfile._id.toString(),
+        }));
+
+        await createNotifications(notifications);
+      }
+    } else {
+      // Notify creator that batch was auto-approved
+      await createNotifications([
+        {
+          userId: userProfile._id.toString(),
+          type: 'approval_status',
+          title: 'Bulk Request Auto-Approved',
+          message: `Your bulk request ${createdBatch.batchNumber} with ${materials.length} material(s) has been auto-approved and is ready for supplier assignment`,
+          projectId: projectId,
+          relatedModel: 'MATERIAL_REQUEST_BATCH',
+          relatedId: createdBatch._id.toString(),
+          createdBy: userProfile._id.toString(),
+        },
+      ]);
+    }
+
+    return successResponse(
+      {
+        batchId: createdBatch._id,
+        batchNumber: createdBatch.batchNumber,
+        materialRequestIds: createdBatch.materialRequestIds,
+        status: createdBatch.status,
+        requiresApproval,
+        totalMaterials: createdBatch.totalMaterials,
+        totalEstimatedCost: createdBatch.totalEstimatedCost,
+      },
+      'Bulk material request created successfully',
+      201
+    );
+  } catch (error) {
+    console.error('Create bulk material request error:', error);
+    console.error('Error stack:', error.stack);
+    console.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      ...(error.cause && { cause: error.cause }),
+    });
+    return errorResponse(
+      error.message || 'Failed to create bulk material request',
+      500
+    );
+  }
+}
+
+/**
+ * GET /api/material-requests/bulk
+ * Lists bulk material request batches with filtering and pagination
+ * Auth: CLERK, PM, OWNER, SUPERVISOR, ACCOUNTANT
+ */
+export async function GET(request) {
+  try {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
+      return errorResponse('Unauthorized', 401);
+    }
+
+    // Check permission
+    const canView = await hasPermission(user.id, 'view_bulk_material_requests');
+    if (!canView) {
+      return errorResponse(
+        'Insufficient permissions to view bulk material requests',
+        403
+      );
+    }
+
+    const { searchParams } = new URL(request.url);
+    const projectId = searchParams.get('projectId');
+    const status = searchParams.get('status');
+    const createdBy = searchParams.get('createdBy');
+    const search = searchParams.get('search');
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
+
+    const filters = {};
+    if (projectId) filters.projectId = projectId;
+    if (status) filters.status = status;
+    if (createdBy) filters.createdBy = createdBy;
+    if (search) filters.search = search;
+
+    const result = await getBatches(filters, { page, limit });
+
+    return successResponse(result);
+  } catch (error) {
+    console.error('Get bulk material requests error:', error);
+    return errorResponse('Failed to retrieve bulk material requests', 500);
+  }
+}

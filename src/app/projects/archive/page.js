@@ -219,81 +219,138 @@ function ArchivedProjectsPageContent() {
             </p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Project
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Archived Date
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Budget
-                    </th>
-                    {canManage && (
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Actions
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Project
                       </th>
-                    )}
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {projects.map((project) => (
-                    <tr key={project._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Status
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Archived Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Budget
+                      </th>
+                      {canManage && (
+                        <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                          Actions
+                        </th>
+                      )}
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {projects.map((project) => (
+                      <tr key={project._id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4">
                           <div>
                             <Link
                               href={`/projects/${project._id}`}
-                              className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                              className="text-sm font-semibold text-gray-900 hover:text-blue-600"
                             >
                               {project.projectName}
                             </Link>
-                            <p className="text-sm text-gray-500">{project.projectCode}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <ArchiveBadge />
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {formatDate(project.deletedAt)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatCurrency(project.budget?.total || 0)}
-                      </td>
-                      {canManage && (
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end gap-2">
-                            <button
-                              onClick={() => handleRestoreClick(project)}
-                              disabled={restoring}
-                              className="text-green-600 hover:text-green-900 disabled:opacity-50"
-                            >
-                              Restore
-                            </button>
-                            <button
-                              onClick={() => handleDeleteClick(project)}
-                              disabled={deleting}
-                              className="text-red-600 hover:text-red-900 disabled:opacity-50"
-                            >
-                              Delete
-                            </button>
+                            <p className="text-xs text-gray-500 mt-0.5">{project.projectCode}</p>
                           </div>
                         </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <ArchiveBadge />
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {formatDate(project.deletedAt)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span className="text-sm font-medium text-gray-900">
+                            {formatCurrency(project.budget?.total || 0)}
+                          </span>
+                        </td>
+                        {canManage && (
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <div className="flex justify-end gap-3">
+                              <button
+                                onClick={() => handleRestoreClick(project)}
+                                disabled={restoring}
+                                className="text-green-600 hover:text-green-900 disabled:opacity-50 font-medium"
+                              >
+                                Restore
+                              </button>
+                              <button
+                                onClick={() => handleDeleteClick(project)}
+                                disabled={deleting}
+                                className="text-red-600 hover:text-red-900 disabled:opacity-50 font-medium"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {projects.map((project) => (
+                <div key={project._id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex-1">
+                      <Link
+                        href={`/projects/${project._id}`}
+                        className="text-base font-semibold text-gray-900 hover:text-blue-600 block"
+                      >
+                        {project.projectName}
+                      </Link>
+                      <p className="text-sm text-gray-500 mt-0.5">{project.projectCode}</p>
+                    </div>
+                    <ArchiveBadge />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <p className="text-xs text-gray-500">Budget</p>
+                      <p className="text-sm font-medium text-gray-900 mt-0.5">
+                        {formatCurrency(project.budget?.total || 0)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Archived</p>
+                      <p className="text-sm font-medium text-gray-900 mt-0.5">
+                        {formatDate(project.deletedAt)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {canManage && (
+                    <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2">
+                      <button
+                        onClick={() => handleRestoreClick(project)}
+                        disabled={restoring}
+                        className="flex-1 text-center text-sm font-medium text-green-600 hover:text-green-900 disabled:opacity-50 py-2"
+                      >
+                        Restore
+                      </button>
+                      <button
+                        onClick={() => handleDeleteClick(project)}
+                        disabled={deleting}
+                        className="flex-1 text-center text-sm font-medium text-red-600 hover:text-red-900 disabled:opacity-50 py-2"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
         )}
 
         {/* Restore Modal */}

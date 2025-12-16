@@ -127,14 +127,20 @@ export async function POST(request, { params }) {
     });
 
     // Create notification for requester
+    // If purchase order exists, point to it; otherwise point to material request
+    const notificationRelatedModel = purchaseOrder ? 'PURCHASE_ORDER' : 'MATERIAL_REQUEST';
+    const notificationRelatedId = purchaseOrder ? purchaseOrderId : id;
+    
     await createNotification({
       userId: materialRequest.requestedBy.toString(),
       type: 'approval_status',
       title: 'Material Request Converted to Order',
-      message: `Your request for ${materialRequest.quantityNeeded} ${materialRequest.unit} of ${materialRequest.materialName} has been converted to purchase order.`,
+      message: purchaseOrder 
+        ? `Your request for ${materialRequest.quantityNeeded} ${materialRequest.unit} of ${materialRequest.materialName} has been converted to purchase order ${purchaseOrder.purchaseOrderNumber}.`
+        : `Your request for ${materialRequest.quantityNeeded} ${materialRequest.unit} of ${materialRequest.materialName} has been converted to purchase order.`,
       projectId: materialRequest.projectId.toString(),
-      relatedModel: 'MATERIAL_REQUEST',
-      relatedId: id,
+      relatedModel: notificationRelatedModel,
+      relatedId: notificationRelatedId,
       createdBy: userProfile._id.toString(),
     });
 

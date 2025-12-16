@@ -103,14 +103,25 @@ export function NotificationBell() {
     
     // Navigate to related item if available
     if (notification.relatedModel && notification.relatedId) {
+      // Convert ObjectId to string if needed
+      const relatedId = typeof notification.relatedId === 'object' 
+        ? notification.relatedId.toString() 
+        : notification.relatedId;
+        
       if (notification.relatedModel === 'MATERIAL') {
-        router.push(`/items/${notification.relatedId}`);
+        router.push(`/items/${relatedId}`);
       } else if (notification.relatedModel === 'EXPENSE') {
-        router.push(`/expenses/${notification.relatedId}`);
+        router.push(`/expenses/${relatedId}`);
       } else if (notification.relatedModel === 'INITIAL_EXPENSE') {
-        router.push(`/initial-expenses/${notification.relatedId}`);
+        router.push(`/initial-expenses/${relatedId}`);
       } else if (notification.relatedModel === 'PROJECT') {
-        router.push(`/projects/${notification.relatedId}`);
+        router.push(`/projects/${relatedId}`);
+      } else if (notification.relatedModel === 'MATERIAL_REQUEST') {
+        // Navigate to material request detail page
+        router.push(`/material-requests/${relatedId}`);
+      } else if (notification.relatedModel === 'PURCHASE_ORDER') {
+        // Navigate to purchase order detail page
+        router.push(`/purchase-orders/${relatedId}`);
       }
     }
     

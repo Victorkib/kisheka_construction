@@ -22,7 +22,7 @@ const __dirname = dirname(__filename);
 dotenv.config({ path: join(__dirname, '..', '.env.local') });
 
 const MONGODB_URI = process.env.MONGODB_URI;
-const MONGODB_DB = process.env.MONGODB_DB || 'kisheka_prod';
+const MONGODB_DB = process.env.MONGODB_DB_NAME || 'kisheka_prod';
 
 if (!MONGODB_URI) {
   console.error('❌ MONGODB_URI not found in environment variables');

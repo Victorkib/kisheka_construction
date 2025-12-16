@@ -16,6 +16,7 @@ import { calculateTotalCost } from '@/lib/calculations';
 import { createAuditLog } from '@/lib/audit-log';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { validateCapitalAvailability } from '@/lib/financial-helpers';
 
 /**
  * GET /api/materials
@@ -242,6 +243,44 @@ export async function POST(request) {
       return errorResponse('Valid projectId is required', 400);
     }
 
+    const db = await getDatabase();
+
+    // Verify project exists and is not deleted
+    const project = await db.collection('projects').findOne({
+      _id: new ObjectId(projectId),
+    });
+
+    if (!project) {
+      return errorResponse('Project not found', 404);
+    }
+
+    // Validate category if provided
+    if (categoryId && ObjectId.isValid(categoryId)) {
+      const category = await db.collection('categories').findOne({
+        _id: new ObjectId(categoryId),
+      });
+
+      if (!category) {
+        return errorResponse(`Category not found: ${categoryId}`, 404);
+      }
+    }
+
+    // Validate floor if provided
+    if (floor && ObjectId.isValid(floor)) {
+      const floorDoc = await db.collection('floors').findOne({
+        _id: new ObjectId(floor),
+      });
+
+      if (!floorDoc) {
+        return errorResponse(`Floor not found: ${floor}`, 404);
+      }
+
+      // Verify floor belongs to the same project
+      if (floorDoc.projectId.toString() !== projectId) {
+        return errorResponse('Floor does not belong to the selected project', 400);
+      }
+    }
+
     // Determine entry type (default to retroactive for backward compatibility)
     const materialEntryType = entryType || 'retroactive_entry';
     
@@ -258,8 +297,6 @@ export async function POST(request) {
     if (!userProfile) {
       return errorResponse('User profile not found', 404);
     }
-
-    const db = await getDatabase();
 
     // For new procurement, validate purchase order exists and is fulfilled
     if (materialEntryType === 'new_procurement') {
@@ -314,12 +351,34 @@ export async function POST(request) {
     // For retroactive, allow missing unitCost (will be 0)
     const finalUnitCost = unitCost || 0;
 
-    // For retroactive entries, set defaults for optional fields
+    // For retroactive entries, validate supplier if supplierId provided
+    let supplierNameValue = supplierName || supplier || 'Unknown';
+    
     if (materialEntryType === 'retroactive_entry') {
-      if (!supplierName && !supplier) {
+      // Check if supplierId is provided and validate it
+      const supplierIdFromBody = body.supplierId;
+      if (supplierIdFromBody && ObjectId.isValid(supplierIdFromBody)) {
+        const supplierDoc = await db.collection('suppliers').findOne({
+          _id: new ObjectId(supplierIdFromBody),
+          status: 'active',
+          deletedAt: null,
+        });
+
+        if (!supplierDoc) {
+          return errorResponse('Supplier not found or inactive', 404);
+        }
+
+        // Use supplier name from suppliers collection
+        supplierNameValue = supplierDoc.name;
+        body.supplierName = supplierDoc.name;
+        body.supplier = supplierDoc.name;
+      } else if (!supplierName && !supplier) {
+        // No supplier provided, set default
         body.supplierName = 'Unknown';
         body.supplier = 'Unknown';
+        supplierNameValue = 'Unknown';
       }
+      
       if (!costStatus) {
         const calculatedTotal = calculateTotalCost(qty, finalUnitCost);
         body.costStatus = (calculatedTotal > 0) ? 'actual' : 'missing';
@@ -328,8 +387,6 @@ export async function POST(request) {
         body.documentationStatus = (receiptFileUrl || receiptUrl || invoiceFileUrl) ? 'complete' : 'missing';
       }
     }
-
-    const supplierNameValue = supplierName || supplier || 'Unknown';
     // Only require supplier for new procurement
     if (materialEntryType === 'new_procurement' && (!supplierNameValue || supplierNameValue.trim().length === 0)) {
       return errorResponse('Supplier name is required for new procurement entries', 400);
@@ -337,6 +394,42 @@ export async function POST(request) {
 
     // Calculate total cost
     const totalCost = calculateTotalCost(qty, finalUnitCost);
+
+    // Check capital availability (warning only, don't block material creation)
+    // Optional: Block material creation if no capital (configurable)
+    let capitalWarning = null;
+    try {
+      const materialAmount = totalCost || 0;
+      
+      if (materialAmount > 0) {
+        const capitalCheck = await validateCapitalAvailability(
+          projectId.toString(),
+          materialAmount
+        );
+        
+        if (!capitalCheck.isValid) {
+          capitalWarning = {
+            message: `Insufficient capital. Available: ${capitalCheck.available.toLocaleString()}, Required: ${materialAmount.toLocaleString()}, Shortfall: ${(materialAmount - capitalCheck.available).toLocaleString()}`,
+            available: capitalCheck.available,
+            required: materialAmount,
+            shortfall: materialAmount - capitalCheck.available,
+          };
+          
+          // Optional: Block material creation if no capital (configurable)
+          if (process.env.BLOCK_MATERIAL_CREATION_NO_CAPITAL === 'true') {
+            if (capitalWarning.available === 0) {
+              return errorResponse(
+                'Cannot create material: Project has no capital allocated. Please allocate capital first.',
+                400
+              );
+            }
+          }
+        }
+      }
+    } catch (capitalError) {
+      // Don't fail material creation if capital check fails
+      console.error('Capital check error during material creation:', capitalError);
+    }
 
     // Build material document (using standard field names only)
     const material = {
@@ -411,7 +504,13 @@ export async function POST(request) {
       changes: { created: insertedMaterial },
     });
 
-    return successResponse(insertedMaterial, 'Material created successfully', 201);
+    // Include capital warning in response if present
+    const responseData = { ...insertedMaterial };
+    if (capitalWarning) {
+      responseData.capitalWarning = capitalWarning;
+    }
+
+    return successResponse(responseData, 'Material created successfully', 201);
   } catch (error) {
     console.error('Create material error:', error);
     return errorResponse('Failed to create material', 500);

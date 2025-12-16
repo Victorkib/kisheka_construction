@@ -38,6 +38,7 @@ export default function ItemDetailPage() {
   const [isArchiving, setIsArchiving] = useState(false);
   const [isRestoring, setIsRestoring] = useState(false);
   const [isVerifyingReceipt, setIsVerifyingReceipt] = useState(false);
+  const [validatingCapital, setValidatingCapital] = useState(false);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -45,6 +46,7 @@ export default function ItemDetailPage() {
   const [showRestoreModal, setShowRestoreModal] = useState(false);
   const [showVerifyReceiptModal, setShowVerifyReceiptModal] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
+  const [approvalNotes, setApprovalNotes] = useState('');
   const [verifyReceiptData, setVerifyReceiptData] = useState({
     actualQuantityReceived: '',
     notes: '',
@@ -155,11 +157,13 @@ export default function ItemDetailPage() {
 
   const handleApproveConfirm = async () => {
     setIsApproving(true);
+    setValidatingCapital(true);
+    
     try {
       const response = await fetch(`/api/materials/${materialId}/approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notes: 'Approved via UI' }),
+        body: JSON.stringify({ approvalNotes: approvalNotes || 'Approved via UI' }),
       });
 
       const data = await response.json();
@@ -167,6 +171,9 @@ export default function ItemDetailPage() {
       if (!data.success) {
         throw new Error(data.error || 'Failed to approve material');
       }
+
+      // Capital validation complete
+      setValidatingCapital(false);
 
       // Refresh material data
       fetchMaterial();
@@ -177,6 +184,7 @@ export default function ItemDetailPage() {
       console.error('Approve error:', err);
     } finally {
       setIsApproving(false);
+      setValidatingCapital(false);
     }
   };
 
@@ -556,7 +564,22 @@ export default function ItemDetailPage() {
 
   return (
     <AppLayout>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+        {/* Loading Overlay for Actions */}
+        <LoadingOverlay 
+          isLoading={isDeleting || isArchiving || isRestoring || updatingQuantity || isVerifyingReceipt || isSubmitting || isApproving} 
+          message={
+            isDeleting ? "Deleting material..." :
+            isArchiving ? "Archiving material..." :
+            isRestoring ? "Restoring material..." :
+            updatingQuantity ? "Updating quantities..." :
+            isVerifyingReceipt ? "Verifying receipt and updating finances..." :
+            isSubmitting ? "Submitting material for approval..." :
+            isApproving ? (validatingCapital ? "Validating capital availability..." : "Approving material and updating finances...") :
+            "Processing..."
+          } 
+          fullScreen={false} 
+        />
         {/* Header */}
         <div className="mb-6">
           <Link href="/items" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
@@ -796,8 +819,9 @@ export default function ItemDetailPage() {
           )}
         </div>
 
-        {/* Discrepancy Summary Card */}
-        {material && material.quantityDelivered > 0 && discrepancy && (
+        {/* Discrepancy Summary Card - Hidden for Clerk */}
+        {material && material.quantityDelivered > 0 && discrepancy && 
+          userRole !== 'clerk' && userRole !== 'site_clerk' && (
           <div className={`bg-white rounded-lg shadow mb-6 border-2 ${hasDiscrepancyIssues ? getSeverityColor(discrepancy.severity) : 'border-gray-200'}`}>
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
@@ -943,7 +967,15 @@ export default function ItemDetailPage() {
         <div className="bg-white rounded-lg shadow mb-6">
           <div className="border-b border-gray-200">
             <nav className="flex -mb-px">
-              {['overview', 'discrepancy', 'approval', 'activity'].map((tab) => (
+              {['overview', 'discrepancy', 'approval', 'activity']
+              .filter(tab => {
+                // Hide discrepancy tab for clerk
+                if (tab === 'discrepancy' && (userRole === 'clerk' || userRole === 'site_clerk')) {
+                  return false;
+                }
+                return true;
+              })
+              .map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -1248,7 +1280,16 @@ export default function ItemDetailPage() {
                               href={`/floors/${material.floor}`}
                               className="text-blue-600 hover:text-blue-800"
                             >
-                              {material.floorDetails.name || `Floor ${material.floorDetails.floorNumber}`}
+                              {(() => {
+                                const floor = material.floorDetails;
+                                if (!floor) return 'N/A';
+                                if (floor.name) return floor.name;
+                                const floorNumber = floor.floorNumber;
+                                if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                                if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                                if (floorNumber === 0) return 'Ground Floor';
+                                return `Floor ${floorNumber}`;
+                              })()}
                             </Link>
                           </dd>
                         </div>
@@ -1686,15 +1727,46 @@ export default function ItemDetailPage() {
       {/* Approval Confirmation Modal */}
       <ConfirmationModal
         isOpen={showApproveModal}
-        onClose={() => !isApproving && setShowApproveModal(false)}
+        onClose={() => {
+          if (!isApproving) {
+            setShowApproveModal(false);
+            setApprovalNotes('');
+          }
+        }}
         onConfirm={handleApproveConfirm}
         title="Approve Material"
-        message="Are you sure you want to approve this material?"
+        message="Approving this material will update project finances. Make sure sufficient capital is available."
         confirmText="Approve"
         cancelText="Cancel"
         variant="info"
         isLoading={isApproving}
-      />
+      >
+        <div className="mt-4 space-y-4">
+          {/* Capital Validation Indicator */}
+          {validatingCapital && (
+            <div className="bg-blue-50 border border-blue-200 text-blue-800 px-3 py-2 rounded-lg text-sm">
+              <div className="flex items-center gap-2">
+                <LoadingSpinner size="sm" color="blue-600" />
+                <span>Validating capital availability...</span>
+              </div>
+            </div>
+          )}
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Approval Notes (Optional)
+            </label>
+            <textarea
+              value={approvalNotes}
+              onChange={(e) => setApprovalNotes(e.target.value)}
+              placeholder="Add approval notes..."
+              rows={3}
+              disabled={isApproving}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            />
+          </div>
+        </div>
+      </ConfirmationModal>
 
       {/* Rejection Modal with Reason Input */}
       {showRejectModal && (

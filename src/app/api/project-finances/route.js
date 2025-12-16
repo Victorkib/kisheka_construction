@@ -49,6 +49,7 @@ export async function GET(request) {
     const userRole = userProfile.role?.toLowerCase();
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get('projectId');
+    const forceRecalculate = searchParams.get('forceRecalculate') === 'true';
 
     const db = await getDatabase();
 
@@ -381,6 +382,16 @@ export async function GET(request) {
     // Get or create project_finances record
     let projectFinances;
     if (projectId && ObjectId.isValid(projectId)) {
+      // If forceRecalculate is true, recalculate finances before fetching
+      if (forceRecalculate) {
+        try {
+          await recalculateProjectFinances(projectId);
+        } catch (err) {
+          console.error(`Error force recalculating project finances for ${projectId}:`, err);
+          // Continue even if recalculation fails
+        }
+      }
+
       projectFinances = await db
         .collection('project_finances')
         .findOne({ projectId: new ObjectId(projectId) });
@@ -405,7 +416,7 @@ export async function GET(request) {
         await db.collection('project_finances').insertOne(newRecord);
         projectFinances = newRecord;
       } else {
-        // Update existing record
+        // Update existing record (always update to ensure latest data)
         await db
           .collection('project_finances')
           .updateOne(

@@ -15,6 +15,13 @@ import { ConfirmationModal, EditModal, RestoreModal } from '@/components/modals'
 import { ArchiveBadge } from '@/components/badges';
 import { useToast } from '@/components/toast';
 import { LoadingOverlay } from '@/components/loading';
+import { usePermissions } from '@/hooks/use-permissions';
+import { ProjectSetupChecklist } from '@/components/project-setup/ProjectSetupChecklist';
+import { PostCreationWizard } from '@/components/project-setup/PostCreationWizard';
+import { FloorVisualization } from '@/components/floors/FloorVisualization';
+import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
+import { ProjectHealthDashboard } from '@/components/project-health/ProjectHealthDashboard';
+import { useTrackPageView } from '@/hooks/use-track-page-view';
 
 // Budget vs Actual Section Component
 function BudgetVsActualSection({ projectId }) {
@@ -423,14 +430,26 @@ function InitialExpensesSection({ projectId }) {
 function ProjectFinancesSection({ projectId }) {
   const [finances, setFinances] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchFinances();
   }, [projectId]);
 
-  const fetchFinances = async () => {
+  const fetchFinances = async (forceRecalculate = false) => {
     try {
-      const response = await fetch(`/api/project-finances?projectId=${projectId}`);
+      if (forceRecalculate) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
+      
+      // Add forceRecalculate query param to trigger recalculation on server
+      const url = forceRecalculate 
+        ? `/api/project-finances?projectId=${projectId}&forceRecalculate=true`
+        : `/api/project-finances?projectId=${projectId}`;
+      
+      const response = await fetch(url);
       const data = await response.json();
       if (data.success) {
         setFinances(data.data);
@@ -439,6 +458,7 @@ function ProjectFinancesSection({ projectId }) {
       console.error('Fetch project finances error:', err);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -455,7 +475,24 @@ function ProjectFinancesSection({ projectId }) {
     <div className="bg-white rounded-lg shadow p-6 mb-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-900">Project Finances</h2>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={() => fetchFinances(true)}
+            disabled={refreshing}
+            className="text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Refresh financial data"
+          >
+            {refreshing ? (
+              <span className="flex items-center gap-1">
+                <span className="animate-spin">⟳</span> Refreshing...
+              </span>
+            ) : (
+              <span className="flex items-center gap-1">
+                ⟳ Refresh
+              </span>
+            )}
+          </button>
+          <span className="text-gray-300">|</span>
           <Link
             href={`/projects/${projectId}/finances`}
             className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -570,6 +607,7 @@ export default function ProjectDetailPage() {
   const params = useParams();
   const projectId = params?.id;
   const toast = useToast();
+  const { canAccess } = usePermissions();
 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -588,6 +626,7 @@ export default function ProjectDetailPage() {
   const [financialData, setFinancialData] = useState(null);
   const [fetchingFinancialData, setFetchingFinancialData] = useState(false);
   const [dependencies, setDependencies] = useState(null);
+  const [floors, setFloors] = useState([]);
 
   const [formData, setFormData] = useState({
     projectName: '',
@@ -603,6 +642,20 @@ export default function ProjectDetailPage() {
       labour: 0,
       contingency: 0,
     },
+  });
+
+  // Track page view
+  useTrackPageView('project', async (id) => {
+    try {
+      const response = await fetch(`/api/projects/${id}`);
+      const data = await response.json();
+      if (data.success) {
+        return data.data;
+      }
+    } catch (err) {
+      console.error('Error fetching project for tracking:', err);
+    }
+    return {};
   });
 
   useEffect(() => {
@@ -854,6 +907,11 @@ export default function ProjectDetailPage() {
         // Get allocations count from project data if available
         const allocationsCount = project?.statistics?.investorAllocations || 0;
         
+        // Store floors for visualization
+        if (floorsData.success && floorsData.data) {
+          setFloors(floorsData.data);
+        }
+        
         setDependencies({
           materials: materialsData.data?.length || 0,
           expenses: expensesData.data?.length || 0,
@@ -1038,17 +1096,44 @@ export default function ProjectDetailPage() {
         />
         {/* Header */}
         <div className="mb-8">
-          <Link
-            href="/projects"
-            className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block"
-          >
-            ← Back to Projects
-          </Link>
+          <Breadcrumbs 
+            items={[
+              { label: 'Projects', href: '/projects' },
+              { label: project.projectName || 'Project', href: `/projects/${projectId}`, current: true },
+            ]}
+          />
           <div className="flex justify-between items-start">
             <div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 flex-wrap">
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">{project.projectName}</h1>
                 {project.status === 'archived' && <ArchiveBadge />}
+                {statistics && (() => {
+                  const totalInvested = statistics.totalInvested || 0;
+                  const capitalBalance = statistics.capitalBalance || 0;
+                  const availableCapital = capitalBalance;
+                  const totalUsed = totalInvested - capitalBalance;
+                  const usagePercentage = totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
+                  
+                  let statusColor = 'bg-green-100 text-green-800';
+                  let statusText = 'Capital OK';
+                  
+                  if (totalInvested === 0) {
+                    statusColor = 'bg-red-100 text-red-800';
+                    statusText = 'No Capital';
+                  } else if (availableCapital < 0) {
+                    statusColor = 'bg-red-100 text-red-800';
+                    statusText = 'Negative';
+                  } else if (usagePercentage > 80) {
+                    statusColor = 'bg-yellow-100 text-yellow-800';
+                    statusText = 'Low Capital';
+                  }
+                  
+                  return (
+                    <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${statusColor}`} title={`Capital: ${formatCurrency(totalInvested)}, Available: ${formatCurrency(availableCapital)}`}>
+                      💰 {statusText}
+                    </span>
+                  );
+                })()}
               </div>
               <p className="text-gray-600 mt-1">
                 {project.projectCode} {project.location && `• ${project.location}`}
@@ -1258,6 +1343,36 @@ export default function ProjectDetailPage() {
           )}
         </div>
 
+        {/* Project Health Dashboard */}
+        <ProjectHealthDashboard projectId={projectId} />
+
+        {/* Post-Creation Setup Wizard */}
+        {project && (
+          <PostCreationWizard
+            projectId={projectId}
+            projectData={project}
+            onComplete={() => {
+              // Refresh project data
+              fetchProject();
+            }}
+            onDismiss={() => {
+              // Wizard dismissed, continue normally
+            }}
+          />
+        )}
+
+        {/* Project Setup Checklist */}
+        <ProjectSetupChecklist projectId={projectId} />
+
+        {/* Floor Visualization */}
+        {floors.length > 0 && (
+          <FloorVisualization
+            floors={floors}
+            projectId={projectId}
+            compact={false}
+          />
+        )}
+
         {/* Budget vs Actual Section */}
         <BudgetVsActualSection projectId={projectId} />
 
@@ -1274,6 +1389,33 @@ export default function ProjectDetailPage() {
         <ProgressSection projectId={projectId} />
 
         {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          {canAccess && canAccess('create_bulk_material_request') && (
+            <Link
+              href={`/material-requests/bulk?projectId=${projectId}`}
+              className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-3 rounded-lg transition text-center"
+            >
+              📦 Bulk Material Request
+            </Link>
+          )}
+          {canEdit && (
+            <Link
+              href={`/floors/new?projectId=${projectId}&basement=true`}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded-lg transition text-center flex items-center justify-center gap-2"
+              title="Add a basement floor to this project"
+            >
+              <span>🏢</span> Add Basement
+            </Link>
+          )}
+          {canEdit && (
+            <Link
+              href={`/floors/new?projectId=${projectId}`}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition text-center"
+            >
+              + Add Floor
+            </Link>
+          )}
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Link
             href={`/projects/${projectId}/finances`}
@@ -1296,6 +1438,18 @@ export default function ProjectDetailPage() {
               <div>
                 <h3 className="font-semibold text-gray-900">View Materials</h3>
                 <p className="text-sm text-gray-600">{statistics.materialsCount || 0} items</p>
+              </div>
+            </div>
+          </Link>
+          <Link
+            href={`/floors?projectId=${projectId}`}
+            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
+          >
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">🏢</div>
+              <div>
+                <h3 className="font-semibold text-gray-900">Manage Floors</h3>
+                <p className="text-sm text-gray-600">View and edit project floors</p>
               </div>
             </div>
           </Link>
@@ -1341,11 +1495,11 @@ export default function ProjectDetailPage() {
         maxWidth="max-w-4xl"
       >
         <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Project Name <span className="text-red-500">*</span>
+                <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">
+                  Project Name <span className="text-red-600 font-bold">*</span>
                 </label>
                 <input
                   type="text"
@@ -1353,19 +1507,20 @@ export default function ProjectDetailPage() {
                   value={formData.projectName || ''}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter project name"
+                  className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Status <span className="text-red-500">*</span>
+                <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">
+                  Status <span className="text-red-600 font-bold">*</span>
                 </label>
                 <select
                   name="status"
                   value={formData.status || 'planning'}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all cursor-pointer"
                 >
                   <option value="planning">Planning</option>
                   <option value="active">Active</option>
@@ -1375,63 +1530,66 @@ export default function ProjectDetailPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Location</label>
                 <input
                   type="text"
                   name="location"
                   value={formData.location || ''}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter project location"
+                  className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Client</label>
+                <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Client</label>
                 <input
                   type="text"
                   name="client"
                   value={formData.client || ''}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter client name"
+                  className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Start Date</label>
                 <input
                   type="date"
                   name="startDate"
                   value={formData.startDate || ''}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all cursor-pointer"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Planned End Date</label>
+                <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Planned End Date</label>
                 <input
                   type="date"
                   name="plannedEndDate"
                   value={formData.plannedEndDate || ''}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all cursor-pointer"
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Description</label>
                 <textarea
                   name="description"
                   value={formData.description || ''}
                   onChange={handleChange}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  rows={4}
+                  placeholder="Enter project description"
+                  className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all resize-y placeholder:text-gray-500 placeholder:font-normal"
                 />
               </div>
             </div>
 
-            <div className="pt-4 border-t">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">Budget</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="pt-6 border-t-2 border-gray-300">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">Budget Information</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Total <span className="text-red-500">*</span>
+                  <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">
+                    Total <span className="text-red-600 font-bold">*</span>
                   </label>
                   <input
                     type="number"
@@ -1441,11 +1599,12 @@ export default function ProjectDetailPage() {
                     min="0"
                     step="0.01"
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0.00"
+                    className="w-full px-4 py-3 text-base font-semibold text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Materials</label>
+                  <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Materials</label>
                   <input
                     type="number"
                     name="budget.materials"
@@ -1453,11 +1612,12 @@ export default function ProjectDetailPage() {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0.00"
+                    className="w-full px-4 py-3 text-base font-semibold text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Labour</label>
+                  <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Labour</label>
                   <input
                     type="number"
                     name="budget.labour"
@@ -1465,11 +1625,12 @@ export default function ProjectDetailPage() {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0.00"
+                    className="w-full px-4 py-3 text-base font-semibold text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Contingency</label>
+                  <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Contingency</label>
                   <input
                     type="number"
                     name="budget.contingency"
@@ -1477,7 +1638,8 @@ export default function ProjectDetailPage() {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0.00"
+                    className="w-full px-4 py-3 text-base font-semibold text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
                   />
                 </div>
               </div>

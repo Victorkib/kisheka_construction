@@ -21,6 +21,8 @@ import { ObjectId } from 'mongodb';
  * @param {string} [params.userAgent] - User agent string
  * @param {string} [params.status] - Status (SUCCESS, FAILED) - defaults to SUCCESS
  * @param {string} [params.errorMessage] - Error message if status is FAILED
+ * @param {Object} [options] - Additional options
+ * @param {Object} [options.session] - MongoDB session for transactions
  * @returns {Promise<Object>} Created audit log entry
  */
 export async function createAuditLog({
@@ -34,8 +36,9 @@ export async function createAuditLog({
   userAgent = null,
   status = 'SUCCESS',
   errorMessage = null,
-}) {
+}, options = {}) {
   try {
+    const { session } = options;
     const db = await getDatabase();
     
     const auditLog = {
@@ -52,7 +55,8 @@ export async function createAuditLog({
       ...(errorMessage && { errorMessage }),
     };
     
-    const result = await db.collection('audit_logs').insertOne(auditLog);
+    const insertOptions = session ? { session } : {};
+    const result = await db.collection('audit_logs').insertOne(auditLog, insertOptions);
     
     return { ...auditLog, _id: result.insertedId };
   } catch (error) {
