@@ -18,6 +18,8 @@ import { calculateTotalCost, calculateRemainingQuantity, calculateWastage } from
 import { createAuditLog } from '@/lib/audit-log';
 import { checkMaterialDiscrepancies, createDiscrepancyAlerts } from '@/lib/discrepancy-detection';
 import { recalculateProjectFinances } from '@/lib/financial-helpers';
+import { recalculatePhaseSpending } from '@/lib/phase-helpers';
+import { recalculateFloorSpending } from '@/lib/material-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
@@ -160,6 +162,7 @@ export async function PATCH(request, { params }) {
       receiptFileUrl,
       invoiceFileUrl,
       deliveryNoteFileUrl,
+      phaseId,
       // Finishing details (Module 3)
       finishingDetails,
     } = body;
@@ -328,6 +331,40 @@ export async function PATCH(request, { params }) {
       };
     }
 
+    // Handle phaseId update
+    const oldPhaseId = existingMaterial.phaseId;
+    if (phaseId !== undefined) {
+      if (phaseId === null || phaseId === '') {
+        updateData.phaseId = null;
+        changes.phaseId = {
+          oldValue: oldPhaseId,
+          newValue: null,
+        };
+      } else if (ObjectId.isValid(phaseId)) {
+        // Validate phase exists and belongs to same project
+        const phase = await db.collection('phases').findOne({
+          _id: new ObjectId(phaseId),
+          deletedAt: null,
+        });
+
+        if (!phase) {
+          return errorResponse(`Phase not found: ${phaseId}`, 404);
+        }
+
+        if (phase.projectId.toString() !== existingMaterial.projectId.toString()) {
+          return errorResponse('Phase does not belong to the same project as the material', 400);
+        }
+
+        updateData.phaseId = new ObjectId(phaseId);
+        changes.phaseId = {
+          oldValue: oldPhaseId,
+          newValue: phaseId,
+        };
+      } else {
+        return errorResponse('Invalid phaseId format', 400);
+      }
+    }
+
     // Update material
     const result = await db.collection('materials').findOneAndUpdate(
       { _id: new ObjectId(id) },
@@ -368,6 +405,70 @@ export async function PATCH(request, { params }) {
           console.error('Error checking discrepancies after material update:', error);
           // Don't throw - this is a background check
         });
+    }
+
+    // Recalculate project finances if cost changed
+    if (updateData.totalCost !== undefined || updateData.status) {
+      try {
+        const projectIdStr = existingMaterial.projectId?.toString();
+        if (projectIdStr) {
+          await recalculateProjectFinances(projectIdStr);
+        }
+      } catch (error) {
+        // Log error but don't fail the update
+        console.error('Error recalculating project finances:', error);
+      }
+    }
+
+    // Recalculate phase spending if phaseId changed
+    if (phaseId !== undefined && oldPhaseId?.toString() !== updateData.phaseId?.toString()) {
+      try {
+        // Recalculate old phase if it exists
+        if (oldPhaseId && ObjectId.isValid(oldPhaseId)) {
+          await recalculatePhaseSpending(oldPhaseId.toString());
+        }
+        // Recalculate new phase if it exists
+        if (updateData.phaseId && ObjectId.isValid(updateData.phaseId)) {
+          await recalculatePhaseSpending(updateData.phaseId.toString());
+        }
+      } catch (error) {
+        // Log error but don't fail the update
+        console.error('Error recalculating phase spending:', error);
+      }
+    }
+
+    // Recalculate phase spending if status changed and material is linked to a phase
+    if (updateData.status !== undefined && updateData.status !== existingMaterial.status) {
+      const currentPhaseId = updateData.phaseId || existingMaterial.phaseId;
+      if (currentPhaseId && ObjectId.isValid(currentPhaseId)) {
+        try {
+          await recalculatePhaseSpending(currentPhaseId.toString());
+        } catch (error) {
+          // Log error but don't fail the update
+          console.error('Error recalculating phase spending after status change:', error);
+        }
+      }
+    }
+
+    // Recalculate floor spending if floorId changed or cost/status changed
+    const oldFloorId = existingMaterial.floor;
+    const newFloorId = updateData.floor !== undefined ? updateData.floor : existingMaterial.floor;
+    
+    if (updateData.totalCost !== undefined || updateData.status !== undefined || 
+        (oldFloorId?.toString() !== newFloorId?.toString())) {
+      try {
+        // Recalculate old floor if it exists and changed
+        if (oldFloorId && ObjectId.isValid(oldFloorId) && oldFloorId.toString() !== newFloorId?.toString()) {
+          await recalculateFloorSpending(oldFloorId.toString());
+        }
+        // Recalculate new floor if it exists
+        if (newFloorId && ObjectId.isValid(newFloorId)) {
+          await recalculateFloorSpending(newFloorId.toString());
+        }
+      } catch (error) {
+        // Log error but don't fail the update
+        console.error('Error recalculating floor spending:', error);
+      }
     }
 
     return successResponse(result.value, 'Material updated successfully');
@@ -484,6 +585,28 @@ export async function DELETE(request, { params }) {
       } catch (error) {
         // Log error but don't fail the delete operation
         console.error(`❌ Error recalculating project finances after material deletion:`, error);
+      }
+    }
+
+    // Recalculate phase spending if material had a phase
+    if (existingMaterial.phaseId && ObjectId.isValid(existingMaterial.phaseId) && isApproved && hasCost) {
+      try {
+        await recalculatePhaseSpending(existingMaterial.phaseId.toString());
+        console.log(`✅ Phase spending recalculated after material deletion for phase ${existingMaterial.phaseId}`);
+      } catch (error) {
+        // Log error but don't fail the delete operation
+        console.error(`❌ Error recalculating phase spending after material deletion:`, error);
+      }
+    }
+
+    // Recalculate floor spending if material had a floor
+    if (existingMaterial.floor && ObjectId.isValid(existingMaterial.floor) && isApproved && hasCost) {
+      try {
+        await recalculateFloorSpending(existingMaterial.floor.toString());
+        console.log(`✅ Floor spending recalculated after material deletion for floor ${existingMaterial.floor}`);
+      } catch (error) {
+        // Log error but don't fail the delete operation
+        console.error(`❌ Error recalculating floor spending after material deletion:`, error);
       }
     }
 

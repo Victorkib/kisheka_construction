@@ -97,6 +97,7 @@ export async function POST(request, { params }) {
     });
 
     // AUTOMATIC MATERIAL CREATION: Create material entry automatically when supplier fulfills
+    // Materials created from POs are automatically approved for immediate financial state accuracy
     // Get the PM/OWNER who created the purchase order to use as material creator
     let materialCreationResult = null;
     let materialCreationError = null;
@@ -108,7 +109,7 @@ export async function POST(request, { params }) {
       });
 
       if (poCreator) {
-        // Create material automatically
+        // Create material automatically (will be auto-approved)
         materialCreationResult = await createMaterialFromPurchaseOrder({
           purchaseOrderId: id,
           creatorUserProfile: poCreator,
@@ -151,7 +152,7 @@ export async function POST(request, { params }) {
             : 'Purchase Order Ready for Delivery',
           message: materialCreationError
             ? `${purchaseOrder.supplierName} has fulfilled purchase order ${purchaseOrder.purchaseOrderNumber}, but material creation failed: ${materialCreationError}. Please create material manually.`
-            : `${purchaseOrder.supplierName} has fulfilled purchase order ${purchaseOrder.purchaseOrderNumber}. Material entry automatically created.`,
+            : `${purchaseOrder.supplierName} has fulfilled purchase order ${purchaseOrder.purchaseOrderNumber}. Material entry automatically created and approved.`,
           projectId: purchaseOrder.projectId.toString(),
           relatedModel: materialCreationError ? 'PURCHASE_ORDER' : 'MATERIAL',
           relatedId: materialCreationError ? id : (materialCreationResult?.material?._id?.toString() || id),
@@ -184,7 +185,7 @@ export async function POST(request, { params }) {
       materialCreated: !!materialCreationResult,
       materialCreationError: materialCreationError || null,
     }, materialCreationResult 
-      ? 'Purchase order fulfilled and material entry automatically created' 
+      ? 'Purchase order fulfilled and material entry automatically created and approved' 
       : (materialCreationError 
           ? `Purchase order fulfilled, but material creation failed: ${materialCreationError}. Please create material manually.`
           : 'Purchase order marked as ready for delivery'));

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usePermissions } from '@/hooks/use-permissions';
 import { NotificationBell } from '@/components/notifications/notification-bell';
+import { ProjectSwitcher } from '@/components/project-switcher/ProjectSwitcher';
 
 export function Header({ onMenuClick }) {
   const router = useRouter();
@@ -122,18 +123,18 @@ export function Header({ onMenuClick }) {
         </svg>
       </button>
 
-      {/* Center: Logo / Home Link */}
-      <Link href="/" className="flex items-center gap-2 hover:opacity-90">
-        <img
-          src="/logo.png"
-          alt="Kisheka Construction Logo"
-          className="h-9 w-9 object-contain rounded-full"
-          loading="eager"
-        />
-        {/* <span className="text-xl font-semibold tracking-wider text-gray-900">
-          Kisheka Construction
-        </span> */}
-      </Link>
+      {/* Center: Logo / Home Link and Project Switcher */}
+      <div className="flex items-center gap-4">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+          <img
+            src="/logo.png"
+            alt="Doshaki Construction Logo"
+            className="h-9 w-9 object-contain rounded-full"
+            loading="eager"
+          />
+        </Link>
+        <ProjectSwitcher />
+      </div>
 
       {/* Right: User info & actions */}
       <div className="flex items-center gap-4">

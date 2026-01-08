@@ -8,9 +8,11 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import {
   BarChart,
   Bar,
@@ -26,43 +28,32 @@ import {
   Pie,
   Cell,
 } from 'recharts';
+import { HierarchicalBudgetDisplay } from '@/components/budget/HierarchicalBudgetDisplay';
+import { BudgetVisualization } from '@/components/budget/BudgetVisualization';
 
 function BudgetDashboardContent() {
+  const { currentProject, accessibleProjects, switchProject, isEmpty } = useProjectContext();
   const searchParams = useSearchParams();
-  const projectId = searchParams.get('projectId');
-
+  const router = useRouter();
+  
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [projects, setProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState(projectId || '');
+  const [projectBudget, setProjectBudget] = useState(null);
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+  const selectedProjectId = normalizeProjectId(currentProject?._id) || null;
 
   useEffect(() => {
     if (selectedProjectId) {
       fetchBudgetVariance();
+    } else if (!isEmpty) {
+      // If no project selected but projects exist, wait for context to load
+      setLoading(true);
     } else {
       setData(null);
       setLoading(false);
     }
-  }, [selectedProjectId]);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const result = await response.json();
-      if (result.success) {
-        setProjects(result.data || []);
-        if (!selectedProjectId && result.data.length > 0) {
-          setSelectedProjectId(result.data[0]._id);
-        }
-      }
-    } catch (err) {
-      console.error('Fetch projects error:', err);
-    }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedProjectId, isEmpty]);
 
   const fetchBudgetVariance = async () => {
     if (!selectedProjectId) return;
@@ -75,6 +66,13 @@ function BudgetDashboardContent() {
         setData(result.data);
       } else {
         // Error handled by state
+      }
+      
+      // Also fetch project budget for enhanced display
+      const projectResponse = await fetch(`/api/projects/${selectedProjectId}`);
+      const projectResult = await projectResponse.json();
+      if (projectResult.success) {
+        setProjectBudget(projectResult.data.budget);
       }
     } catch (err) {
       console.error('Fetch budget variance error:', err);
@@ -229,18 +227,33 @@ function BudgetDashboardContent() {
                     Financial Overview
                   </Link>
                 )}
-                <select
-                  value={selectedProjectId}
-                  onChange={(e) => setSelectedProjectId(e.target.value)}
-                  className="px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                >
-                  <option value="">Select Project</option>
-                  {projects.map((project) => (
-                    <option key={project._id} value={project._id}>
-                      {project.projectCode} - {project.projectName}
-                    </option>
-                  ))}
-                </select>
+                {accessibleProjects.length > 0 ? (
+                  <select
+                    value={selectedProjectId || ''}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        switchProject(e.target.value);
+                        // Update URL
+                        router.push(`/dashboard/budget?projectId=${e.target.value}`);
+                      }
+                    }}
+                    className="px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  >
+                    <option value="">Select Project</option>
+                    {accessibleProjects.map((project) => (
+                      <option key={project._id} value={project._id}>
+                        {project.projectCode} - {project.projectName}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <Link
+                    href="/projects/new"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                  >
+                    Create Project
+                  </Link>
+                )}
                 {selectedProjectId && (
                   <Link
                     href={`/projects/${selectedProjectId}`}
@@ -529,6 +542,20 @@ function BudgetDashboardContent() {
             </div>
           </div>
 
+          {/* Enhanced Budget Display */}
+          {projectBudget && (
+            <div className="mb-6">
+              <HierarchicalBudgetDisplay budget={projectBudget} showActuals={true} actualSpending={data?.actual} />
+            </div>
+          )}
+
+          {/* Budget Visualization */}
+          {projectBudget && (
+            <div className="mb-6">
+              <BudgetVisualization budget={projectBudget} actualSpending={data?.actual} />
+            </div>
+          )}
+
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Budget vs Actual Bar Chart */}
@@ -689,6 +716,78 @@ function BudgetDashboardContent() {
                           )}`}>
                             {getStatusLabel(
                               floor.variance >= 0 ? 'on_budget' : floor.variancePercentage < -10 ? 'over_budget' : 'at_risk'
+                            )}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Phase Breakdown Table */}
+          {data.phaseBreakdown && data.phaseBreakdown.length > 0 && (
+            <div className="bg-white rounded-lg shadow p-6 mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Phase Breakdown</h2>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Phase
+                      </th>
+                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Budget
+                      </th>
+                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Actual
+                      </th>
+                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Committed
+                      </th>
+                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Variance
+                      </th>
+                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        Status
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {data.phaseBreakdown.map((phase, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          <div>
+                            <div className="font-semibold">{phase.phaseName}</div>
+                            <div className="text-xs text-gray-500">{phase.phaseType} • {phase.completionPercentage}% Complete</div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                          {formatCurrency(phase.budget)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                          {formatCurrency(phase.actual)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                          {formatCurrency(phase.committed)}
+                        </td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${getVarianceColor(phase.variancePercentage)}`}>
+                          {phase.variance >= 0 ? '+' : ''}
+                          {formatCurrency(phase.variance)} ({phase.variancePercentage >= 0 ? '+' : ''}
+                          {phase.variancePercentage}%)
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
+                          <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(
+                            phase.statusIndicator === 'over_budget' ? 'over_budget' : 
+                            phase.statusIndicator === 'committed_over_budget' ? 'at_risk' :
+                            phase.statusIndicator === 'approaching_budget' ? 'at_risk' : 'on_budget'
+                          )}`}>
+                            {getStatusLabel(
+                              phase.statusIndicator === 'over_budget' ? 'over_budget' : 
+                              phase.statusIndicator === 'committed_over_budget' ? 'at_risk' :
+                              phase.statusIndicator === 'approaching_budget' ? 'at_risk' : 'on_budget'
                             )}
                           </span>
                         </td>

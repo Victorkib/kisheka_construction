@@ -155,7 +155,39 @@ export function validateMaterialRequestBatch(data) {
       if (material.estimatedUnitCost !== undefined && material.estimatedUnitCost < 0) {
         errors.push(`Material ${index + 1}: estimatedUnitCost must be >= 0`);
       }
+      // Phase Enforcement: Validate phaseId format if provided (actual validation happens in API)
+      if (material.phaseId !== undefined && material.phaseId !== null && material.phaseId !== '') {
+        const isValidObjectId = (id) => {
+          if (typeof id === 'string') {
+            return /^[0-9a-fA-F]{24}$/.test(id);
+          }
+          return id && typeof id === 'object' && id.toString && /^[0-9a-fA-F]{24}$/.test(id.toString());
+        };
+        if (!isValidObjectId(material.phaseId)) {
+          errors.push(`Material ${index + 1}: Invalid phaseId format. phaseId must be a valid ObjectId`);
+        }
+      }
     });
+    
+    // Phase Enforcement: Require either defaultPhaseId or all materials have phaseId
+    const hasDefaultPhase = data.defaultPhaseId && (
+      (typeof data.defaultPhaseId === 'string' && /^[0-9a-fA-F]{24}$/.test(data.defaultPhaseId)) ||
+      (typeof data.defaultPhaseId === 'object')
+    );
+    const materialsWithPhase = data.materials ? data.materials.filter(m => 
+      m.phaseId && (
+        (typeof m.phaseId === 'string' && /^[0-9a-fA-F]{24}$/.test(m.phaseId)) ||
+        (typeof m.phaseId === 'object')
+      )
+    ) : [];
+    const allMaterialsHavePhase = data.materials && data.materials.length === materialsWithPhase.length;
+    
+    if (!hasDefaultPhase && !allMaterialsHavePhase) {
+      errors.push(
+        'Phase selection is required. Either provide defaultPhaseId for all materials, or specify phaseId for each material. ' +
+        `Currently: ${materialsWithPhase.length} of ${data.materials?.length || 0} materials have phaseId, and no defaultPhaseId provided.`
+      );
+    }
   }
 
   return {

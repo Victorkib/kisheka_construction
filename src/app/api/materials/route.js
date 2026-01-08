@@ -17,12 +17,15 @@ import { createAuditLog } from '@/lib/audit-log';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateCapitalAvailability } from '@/lib/financial-helpers';
+import { recalculatePhaseSpending } from '@/lib/phase-helpers';
+import { recalculateFloorSpending } from '@/lib/material-helpers';
+import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
 
 /**
  * GET /api/materials
  * Returns materials with filtering, sorting, and pagination
  * Auth: All authenticated users
- * Query params: projectId, category, floor, status, supplier, search, page, limit, sortBy, sortOrder
+ * Query params: projectId, category, floor, phaseId, status, supplier, search, page, limit, sortBy, sortOrder
  */
 export async function GET(request) {
   try {
@@ -34,9 +37,9 @@ export async function GET(request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const projectId = searchParams.get('projectId');
     const category = searchParams.get('category');
     const floor = searchParams.get('floor');
+    const phaseId = searchParams.get('phaseId');
     const status = searchParams.get('status');
     const supplier = searchParams.get('supplier');
     const search = searchParams.get('search');
@@ -45,15 +48,19 @@ export async function GET(request) {
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
+    // Get and validate project context
+    const projectContext = await getProjectContext(request, user.id);
+    
+    // If projectId is provided, validate access
+    if (projectContext.projectId && !projectContext.hasAccess) {
+      return errorResponse(projectContext.error || 'Access denied to this project', 403);
+    }
+
     const db = await getDatabase();
 
-    // Build query
-    const query = {};
+    // Build query with project filter
+    const query = createProjectFilter(projectContext.projectId, {});
     const orConditions = [];
-
-    if (projectId && ObjectId.isValid(projectId)) {
-      query.projectId = new ObjectId(projectId);
-    }
 
     if (category) {
       if (ObjectId.isValid(category)) {
@@ -65,6 +72,10 @@ export async function GET(request) {
 
     if (floor && ObjectId.isValid(floor)) {
       query.floor = new ObjectId(floor);
+    }
+
+    if (phaseId && ObjectId.isValid(phaseId)) {
+      query.phaseId = new ObjectId(phaseId);
     }
 
     if (status) {
@@ -146,17 +157,75 @@ export async function GET(request) {
       }, {});
     }
 
-    // Enrich materials with category details
+    // Populate material request details for materials that have materialRequestId
+    const materialRequestIds = materials
+      .map(m => m.materialRequestId)
+      .filter(id => id && ObjectId.isValid(id))
+      .map(id => new ObjectId(id));
+    
+    let materialRequestsMap = {};
+    if (materialRequestIds.length > 0) {
+      const materialRequests = await db
+        .collection('material_requests')
+        .find({ _id: { $in: materialRequestIds } })
+        .toArray();
+      materialRequestsMap = materialRequests.reduce((acc, req) => {
+        acc[req._id.toString()] = req;
+        return acc;
+      }, {});
+    }
+
+    // Populate purchase order details for materials that have purchaseOrderId or linkedPurchaseOrderId
+    const purchaseOrderIds = materials
+      .map(m => m.purchaseOrderId || m.linkedPurchaseOrderId)
+      .filter(id => id && ObjectId.isValid(id))
+      .map(id => new ObjectId(id));
+    
+    let purchaseOrdersMap = {};
+    if (purchaseOrderIds.length > 0) {
+      const purchaseOrders = await db
+        .collection('purchase_orders')
+        .find({ _id: { $in: purchaseOrderIds } })
+        .toArray();
+      purchaseOrdersMap = purchaseOrders.reduce((acc, po) => {
+        acc[po._id.toString()] = po;
+        return acc;
+      }, {});
+    }
+
+    // Enrich materials with category, material request, and purchase order details
     const enrichedMaterials = materials.map(material => {
+      let enriched = { ...material };
+      
+      // Add category details
       if (material.categoryId && categoriesMap[material.categoryId.toString()]) {
-        return {
-          ...material,
-          categoryDetails: categoriesMap[material.categoryId.toString()],
-          // Ensure category name is set (use from categoryDetails if category string is missing)
-          category: material.category || categoriesMap[material.categoryId.toString()].name,
-        };
+        enriched.categoryDetails = categoriesMap[material.categoryId.toString()];
+        enriched.category = material.category || categoriesMap[material.categoryId.toString()].name;
       }
-      return material;
+      
+      // Add material request details
+      if (material.materialRequestId) {
+        const requestId = material.materialRequestId.toString();
+        if (materialRequestsMap[requestId]) {
+          enriched.materialRequest = materialRequestsMap[requestId];
+          enriched.materialRequestNumber = materialRequestsMap[requestId].requestNumber;
+          enriched.materialRequestStatus = materialRequestsMap[requestId].status;
+        }
+      }
+      
+      // Add purchase order details
+      const poId = (material.purchaseOrderId || material.linkedPurchaseOrderId);
+      if (poId) {
+        const poIdStr = poId.toString();
+        if (purchaseOrdersMap[poIdStr]) {
+          enriched.purchaseOrder = purchaseOrdersMap[poIdStr];
+          enriched.purchaseOrderNumber = purchaseOrdersMap[poIdStr].purchaseOrderNumber;
+          enriched.purchaseOrderStatus = purchaseOrdersMap[poIdStr].status;
+          enriched.isBulkOrder = purchaseOrdersMap[poIdStr].isBulkOrder || false;
+        }
+      }
+      
+      return enriched;
     });
 
     const total = await db.collection('materials').countDocuments(query);
@@ -208,6 +277,7 @@ export async function POST(request) {
       category,
       categoryId,
       floor,
+      phaseId,
       quantity,
       quantityPurchased,
       unit,
@@ -278,6 +348,22 @@ export async function POST(request) {
       // Verify floor belongs to the same project
       if (floorDoc.projectId.toString() !== projectId) {
         return errorResponse('Floor does not belong to the selected project', 400);
+      }
+    }
+
+    // Validate phase if provided
+    if (phaseId && ObjectId.isValid(phaseId)) {
+      const phase = await db.collection('phases').findOne({
+        _id: new ObjectId(phaseId),
+      });
+
+      if (!phase) {
+        return errorResponse(`Phase not found: ${phaseId}`, 404);
+      }
+
+      // Verify phase belongs to the same project
+      if (phase.projectId.toString() !== projectId) {
+        return errorResponse('Phase does not belong to the selected project', 400);
       }
     }
 
@@ -439,6 +525,7 @@ export async function POST(request) {
       category: category || 'other', // Keep for queries, categoryId is primary
       ...(categoryId && ObjectId.isValid(categoryId) && { categoryId: new ObjectId(categoryId) }),
       ...(floor && ObjectId.isValid(floor) && { floor: new ObjectId(floor) }),
+      ...(phaseId && ObjectId.isValid(phaseId) && { phaseId: new ObjectId(phaseId) }),
       quantityPurchased: parseFloat(qty), // Standard field name
       quantityDelivered: 0,
       quantityUsed: 0,
@@ -503,6 +590,27 @@ export async function POST(request) {
       projectId: projectId,
       changes: { created: insertedMaterial },
     });
+
+    // Recalculate phase spending if phaseId is provided
+    if (phaseId && ObjectId.isValid(phaseId)) {
+      try {
+        await recalculatePhaseSpending(phaseId);
+      } catch (phaseError) {
+        console.error('Error recalculating phase spending after material creation:', phaseError);
+        // Don't fail the request, just log the error
+      }
+    }
+
+    // Recalculate floor spending if floorId is provided
+    const floorId = insertedMaterial.floor;
+    if (floorId && ObjectId.isValid(floorId)) {
+      try {
+        await recalculateFloorSpending(floorId.toString());
+      } catch (floorError) {
+        console.error('Error recalculating floor spending after material creation:', floorError);
+        // Don't fail the request, just log the error
+      }
+    }
 
     // Include capital warning in response if present
     const responseData = { ...insertedMaterial };

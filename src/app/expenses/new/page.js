@@ -21,11 +21,14 @@ function NewExpensePageContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [phases, setPhases] = useState([]);
+  const [loadingPhases, setLoadingPhases] = useState(false);
 
   const [formData, setFormData] = useState({
     projectId: '',
     amount: '',
     category: '',
+    phaseId: '',
     description: '',
     vendor: '',
     date: new Date().toISOString().split('T')[0],
@@ -34,6 +37,8 @@ function NewExpensePageContent() {
     receiptFileUrl: null,
     notes: '',
     currency: 'KES',
+    isIndirectCost: false, // NEW: Flag for indirect costs
+    indirectCostCategory: '', // NEW: Indirect cost category
   });
 
   // Fetch projects on mount
@@ -47,6 +52,16 @@ function NewExpensePageContent() {
       setFormData((prev) => ({ ...prev, projectId: projectIdFromUrl }));
     }
   }, [projectIdFromUrl]);
+
+  // Fetch phases when projectId changes
+  useEffect(() => {
+    if (formData.projectId) {
+      fetchPhases(formData.projectId);
+    } else {
+      setPhases([]);
+      setFormData((prev) => ({ ...prev, phaseId: '' }));
+    }
+  }, [formData.projectId]);
 
   const fetchProjects = async () => {
     try {
@@ -64,9 +79,68 @@ function NewExpensePageContent() {
     }
   };
 
+  const fetchPhases = async (projectId) => {
+    if (!projectId) {
+      setPhases([]);
+      return;
+    }
+    setLoadingPhases(true);
+    try {
+      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const data = await response.json();
+      if (data.success) {
+        setPhases(data.data || []);
+        // Clear phase selection if current phase is not in the new list
+        setFormData((prev) => {
+          const currentPhaseId = prev.phaseId;
+          const phaseExists = data.data.some(p => p._id === currentPhaseId);
+          return {
+            ...prev,
+            phaseId: phaseExists ? currentPhaseId : ''
+          };
+        });
+      } else {
+        setPhases([]);
+      }
+    } catch (err) {
+      console.error('Error fetching phases:', err);
+      setPhases([]);
+    } finally {
+      setLoadingPhases(false);
+    }
+  };
+
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    const newValue = type === 'checkbox' ? checked : value;
+    
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: newValue };
+      
+      // Auto-suggest isIndirectCost based on category
+      if (name === 'category') {
+        const indirectCategories = ['utilities', 'transport', 'safety'];
+        const suggestedIsIndirect = indirectCategories.includes(value);
+        
+        // Auto-map category to indirectCostCategory
+        const categoryMap = {
+          'utilities': 'utilities',
+          'transport': 'transportation',
+          'safety': 'safetyCompliance',
+          'accommodation': 'siteOverhead',
+        };
+        
+        updated.isIndirectCost = suggestedIsIndirect;
+        updated.indirectCostCategory = categoryMap[value] || '';
+      }
+      
+      // Clear indirectCostCategory if isIndirectCost is unchecked
+      if (name === 'isIndirectCost' && !checked) {
+        updated.indirectCostCategory = '';
+      }
+      
+      return updated;
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -245,6 +319,52 @@ function NewExpensePageContent() {
             </div>
           </div>
 
+          {/* Construction Phase */}
+          <div>
+            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              Construction Phase
+            </label>
+            {!formData.projectId ? (
+              <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
+                Please select a project first to see available phases
+              </div>
+            ) : phases.length === 0 ? (
+              <div className="space-y-2">
+                <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
+                  No phases available for this project. Phases can be created in the project phases section.
+                </div>
+                <Link
+                  href={`/phases?projectId=${formData.projectId}`}
+                  className="text-sm text-blue-600 hover:underline"
+                  target="_blank"
+                >
+                  Manage phases for this project →
+                </Link>
+              </div>
+            ) : (
+              <select
+                name="phaseId"
+                value={formData.phaseId}
+                onChange={handleChange}
+                disabled={loadingPhases || loading || !formData.projectId}
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loadingPhases ? (
+                  <option>Loading phases...</option>
+                ) : (
+                  <>
+                    <option value="">Select phase (optional)</option>
+                    {phases.map((phase) => (
+                      <option key={phase._id} value={phase._id}>
+                        {phase.name} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
+                      </option>
+                    ))}
+                  </>
+                )}
+              </select>
+            )}
+          </div>
+
           {/* Description */}
           <div>
             <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
@@ -326,6 +446,49 @@ function NewExpensePageContent() {
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
               />
             </div>
+          </div>
+
+          {/* Indirect Cost Options */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start gap-3 mb-3">
+              <input
+                type="checkbox"
+                id="isIndirectCost"
+                name="isIndirectCost"
+                checked={formData.isIndirectCost}
+                onChange={handleChange}
+                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <div className="flex-1">
+                <label htmlFor="isIndirectCost" className="block text-base font-semibold text-gray-700 mb-1">
+                  This is an Indirect Cost
+                </label>
+                <p className="text-sm text-gray-600">
+                  Indirect costs (utilities, transport, site overhead, safety) are charged to the project-level indirect costs budget, not the phase budget. They are still linked to a phase for timeline tracking.
+                </p>
+              </div>
+            </div>
+            
+            {formData.isIndirectCost && (
+              <div className="mt-3">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Indirect Cost Category <span className="text-red-500">*</span>
+                </label>
+                <select
+                  name="indirectCostCategory"
+                  value={formData.indirectCostCategory}
+                  onChange={handleChange}
+                  required={formData.isIndirectCost}
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">Select category</option>
+                  <option value="utilities">Utilities</option>
+                  <option value="siteOverhead">Site Overhead</option>
+                  <option value="transportation">Transportation</option>
+                  <option value="safetyCompliance">Safety & Compliance</option>
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Receipt Upload */}

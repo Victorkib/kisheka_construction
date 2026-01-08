@@ -119,12 +119,14 @@ export async function POST(request) {
         }
 
         // Confirm delivery and create materials
+        // Materials created from POs are automatically approved for immediate financial state accuracy
         const materialResult = await createMaterialFromPurchaseOrder({
           purchaseOrderId: purchaseOrder._id.toString(),
           creatorUserProfile: userProfile,
           notes: 'Bulk delivery confirmation by Owner/PM',
           isAutomatic: false,
-          allowFromAccepted: true,
+          // Note: allowFromAccepted parameter is deprecated but kept for backward compatibility
+          // Materials from POs are now always auto-approved
         });
 
         results.confirmed.push({
@@ -176,5 +178,6 @@ export async function POST(request) {
     return errorResponse('Failed to confirm deliveries', 500);
   }
 }
+
 
 

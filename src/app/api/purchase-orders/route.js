@@ -25,6 +25,7 @@ import { sendSMS, generatePurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-
 import { sendPushToSupplier, sendPushToUser } from '@/lib/push-service';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
 import crypto from 'crypto';
 
 /**
@@ -57,31 +58,70 @@ export async function GET(request) {
     const projectId = searchParams.get('projectId');
     const status = searchParams.get('status');
     const supplierId = searchParams.get('supplierId');
+    const phaseId = searchParams.get('phaseId');
     const search = searchParams.get('search');
+    const rejectionReason = searchParams.get('rejectionReason');
+    const isRetryable = searchParams.get('isRetryable');
+    const needsReassignment = searchParams.get('needsReassignment');
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '20', 10);
     const sortBy = searchParams.get('sortBy') || 'sentAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
+    // Get and validate project context
+    const projectContext = await getProjectContext(request, user.id);
+    
+    // If projectId is provided, validate access
+    if (projectContext.projectId && !projectContext.hasAccess) {
+      return errorResponse(projectContext.error || 'Access denied to this project', 403);
+    }
+
     const db = await getDatabase();
 
-    // Build query
-    const query = { deletedAt: null };
+    // Build query with project filter (use context projectId if not in query params)
+    const activeProjectId = projectId || projectContext.projectId;
+    const query = createProjectFilter(activeProjectId, { deletedAt: null });
     const andConditions = [];
 
     // Note: Supplier role filtering removed - suppliers are now contacts, not users
     // PM, OWNER, ACCOUNTANT can see all orders
 
-    if (projectId && ObjectId.isValid(projectId)) {
-      query.projectId = new ObjectId(projectId);
-    }
-
     if (status) {
-      query.status = status;
+      // Handle comma-separated status values (e.g., "order_rejected,order_partially_responded")
+      if (status.includes(',')) {
+        const statusArray = status.split(',').map(s => s.trim()).filter(s => s);
+        if (statusArray.length > 0) {
+          query.status = { $in: statusArray };
+        }
+      } else {
+        query.status = status;
+      }
     }
 
     if (supplierId && ObjectId.isValid(supplierId)) {
       query.supplierId = new ObjectId(supplierId);
+    }
+
+    // Phase Management: Add phaseId filter
+    if (phaseId && ObjectId.isValid(phaseId)) {
+      query.phaseId = new ObjectId(phaseId);
+    }
+
+    // Rejection-specific filters
+    if (rejectionReason) {
+      query.rejectionReason = rejectionReason;
+    }
+
+    if (isRetryable !== null && isRetryable !== undefined && isRetryable !== '') {
+      // Convert string 'true'/'false' to boolean
+      const retryableValue = isRetryable === 'true' || isRetryable === true;
+      query.isRetryable = retryableValue;
+    }
+
+    if (needsReassignment !== null && needsReassignment !== undefined && needsReassignment !== '') {
+      // Convert string 'true'/'false' to boolean
+      const reassignmentValue = needsReassignment === 'true' || needsReassignment === true;
+      query.needsReassignment = reassignmentValue;
     }
 
     // Search filter
@@ -116,8 +156,40 @@ export async function GET(request) {
       .limit(limit)
       .toArray();
 
+    // Populate phase information for each order
+    const phaseIds = [...new Set(orders.filter(o => o.phaseId).map(o => o.phaseId.toString()))];
+    const phasesMap = new Map();
+    if (phaseIds.length > 0) {
+      const phases = await db.collection('phases').find({
+        _id: { $in: phaseIds.map(id => new ObjectId(id)) },
+        deletedAt: null
+      }).toArray();
+      phases.forEach(phase => {
+        phasesMap.set(phase._id.toString(), {
+          phaseId: phase._id,
+          phaseName: phase.phaseName || phase.name,
+          phaseCode: phase.phaseCode || phase.code,
+        });
+      });
+    }
+
+    // Enrich orders with phase information
+    const enrichedOrders = orders.map(order => {
+      if (order.phaseId) {
+        const phaseInfo = phasesMap.get(order.phaseId.toString());
+        if (phaseInfo) {
+          return {
+            ...order,
+            phaseName: phaseInfo.phaseName,
+            phaseCode: phaseInfo.phaseCode,
+          };
+        }
+      }
+      return order;
+    });
+
     return successResponse({
-      orders,
+      orders: enrichedOrders,
       pagination: {
         page,
         limit,
@@ -222,17 +294,68 @@ export async function POST(request) {
 
     const db = await getDatabase();
 
-    // Verify material request exists and is approved (not already converted)
-    const materialRequest = await db.collection('material_requests').findOne({
+    // First, check if material request exists (without status filter) for better diagnostics
+    const materialRequestExists = await db.collection('material_requests').findOne({
       _id: new ObjectId(materialRequestId),
-      status: 'approved', // Only allow 'approved', not 'converted_to_order'
       deletedAt: null,
     });
 
-    if (!materialRequest) {
-      console.log('[POST /api/purchase-orders] Material request not found or not in valid status');
-      return errorResponse('Material request not found or not in valid status for PO creation. Request must be approved and not already converted to a purchase order.', 404);
+    if (!materialRequestExists) {
+      console.log('[POST /api/purchase-orders] Material request not found:', materialRequestId);
+      return errorResponse('Material request not found', 404);
     }
+
+    // Log actual status for debugging
+    console.log('[POST /api/purchase-orders] Material request found with status:', materialRequestExists.status, 'ID:', materialRequestId);
+
+    // Check if status is valid for PO creation (must be 'approved')
+    if (materialRequestExists.status !== 'approved') {
+      console.log('[POST /api/purchase-orders] Material request has invalid status:', materialRequestExists.status);
+      
+      // Provide specific error messages based on status
+      if (materialRequestExists.status === 'pending_approval') {
+        return errorResponse('Material request is pending approval. Please approve the request before creating a purchase order.', 400);
+      }
+      
+      if (materialRequestExists.status === 'converted_to_order') {
+        return errorResponse('Material request has already been converted to a purchase order.', 400);
+      }
+      
+      if (materialRequestExists.status === 'rejected') {
+        return errorResponse('Material request has been rejected. Cannot create purchase order from a rejected request.', 400);
+      }
+      
+      if (materialRequestExists.status === 'cancelled') {
+        return errorResponse('Material request has been cancelled. Cannot create purchase order from a cancelled request.', 400);
+      }
+      
+      if (materialRequestExists.status === 'converted_to_material') {
+        return errorResponse('Material request has already been converted to a material entry. Cannot create purchase order.', 400);
+      }
+      
+      // Generic error for other statuses
+      return errorResponse(
+        `Material request status '${materialRequestExists.status}' is not valid for purchase order creation. Request must be approved.`,
+        400
+      );
+    }
+
+    // Material request is approved, use it
+    const materialRequest = materialRequestExists;
+
+    // Phase Management: Inherit phaseId from material request (required)
+    // Priority: body.phaseId (manual override) > materialRequest.phaseId (inherited)
+    let phaseId = body.phaseId || materialRequest.phaseId;
+    
+    // PhaseId is now required - validate using centralized helper
+    const { validatePhaseForPurchaseOrder } = await import('@/lib/phase-validation-helpers');
+    const phaseValidation = await validatePhaseForPurchaseOrder(phaseId, materialRequest.projectId.toString());
+    
+    if (!phaseValidation.isValid) {
+      return errorResponse(phaseValidation.error, phaseValidation.phase ? 400 : 404);
+    }
+    
+    const phase = phaseValidation.phase;
 
     // Check if request already has a purchase order
     if (materialRequest.linkedPurchaseOrderId && ObjectId.isValid(materialRequest.linkedPurchaseOrderId)) {
@@ -337,24 +460,22 @@ export async function POST(request) {
       }
     }
 
-    // Generate purchase order number
-    const purchaseOrderNumber = await generatePurchaseOrderNumber();
-
     // Generate response token for supplier response
     const responseToken = generateResponseToken(supplierId);
     const tokenExpirationDate = getTokenExpirationDate(
       parseInt(process.env.PO_RESPONSE_TOKEN_EXPIRY_DAYS || '7', 10)
     );
 
-    // Build purchase order document
+    // Build purchase order document (purchaseOrderNumber will be generated in transaction)
     const purchaseOrder = {
-      purchaseOrderNumber,
+      purchaseOrderNumber: '', // Will be set in transaction
       materialRequestId: new ObjectId(materialRequestId),
       supplierId: new ObjectId(supplierId),
       supplierName: supplier.name,
       supplierEmail: supplier.email,
       supplierPhone: supplier.phone, // NEW: Store supplier phone
       projectId: materialRequest.projectId,
+      phaseId: new ObjectId(phaseId), // Required - validated above
       ...(materialRequest.floorId && { floorId: materialRequest.floorId }),
       ...(materialRequest.categoryId && { categoryId: materialRequest.categoryId }),
       ...(materialRequest.category && { category: materialRequest.category }),
@@ -400,6 +521,10 @@ export async function POST(request) {
 
     // Wrap critical operations in transaction for atomicity
     const transactionResult = await withTransaction(async ({ db, session }) => {
+      // 0. Generate purchase order number atomically within transaction
+      const purchaseOrderNumber = await generatePurchaseOrderNumber({ session, db });
+      purchaseOrder.purchaseOrderNumber = purchaseOrderNumber;
+      
       // 1. Insert purchase order (atomic)
       const poResult = await db.collection('purchase_orders').insertOne(
         purchaseOrder,

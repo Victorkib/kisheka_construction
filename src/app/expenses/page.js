@@ -7,38 +7,47 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingTable, LoadingSpinner } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
+import { NoProjectsEmptyState } from '@/components/empty-states';
 
 function ExpensesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
+  const { currentProject, isEmpty } = useProjectContext();
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
   
+  // Get projectId from context (prioritize current project over URL param)
+  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromUrl = searchParams.get('projectId');
+  const activeProjectId = projectIdFromContext || projectIdFromUrl || '';
+  
   // Filters
   const [filters, setFilters] = useState({
+    projectId: activeProjectId,
     category: searchParams.get('category') || '',
+    phaseId: searchParams.get('phaseId') || '',
     status: searchParams.get('status') || '',
     vendor: searchParams.get('vendor') || '',
     search: searchParams.get('search') || '',
     startDate: searchParams.get('startDate') || '',
     endDate: searchParams.get('endDate') || '',
+    isIndirectCost: searchParams.get('isIndirectCost') || '', // NEW: Filter by indirect costs
   });
+  const [phases, setPhases] = useState([]);
+  const [loadingPhases, setLoadingPhases] = useState(false);
 
-  // Fetch expenses
-  useEffect(() => {
-    fetchExpenses();
-  }, [filters, pagination.page]);
-
-  const fetchExpenses = async () => {
+  const fetchExpenses = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -47,12 +56,15 @@ function ExpensesPageContent() {
       const queryParams = new URLSearchParams({
         page: pagination.page.toString(),
         limit: pagination.limit.toString(),
+        ...(filters.projectId && { projectId: filters.projectId }),
         ...(filters.category && { category: filters.category }),
+        ...(filters.phaseId && { phaseId: filters.phaseId }),
         ...(filters.status && { status: filters.status }),
         ...(filters.vendor && { vendor: filters.vendor }),
         ...(filters.search && { search: filters.search }),
         ...(filters.startDate && { startDate: filters.startDate }),
         ...(filters.endDate && { endDate: filters.endDate }),
+        ...(filters.isIndirectCost && { isIndirectCost: filters.isIndirectCost }), // NEW: Filter by indirect costs
       });
 
       const response = await fetch(`/api/expenses?${queryParams}`);
@@ -69,6 +81,40 @@ function ExpensesPageContent() {
       console.error('Fetch expenses error:', err);
     } finally {
       setLoading(false);
+    }
+  }, [filters, pagination]);
+
+  // Update filters when project changes
+  useEffect(() => {
+    if (projectIdFromContext && filters.projectId !== projectIdFromContext) {
+      setFilters(prev => ({ ...prev, projectId: projectIdFromContext }));
+    }
+  }, [projectIdFromContext, filters.projectId]);
+
+  // Fetch expenses
+  useEffect(() => {
+    // Don't fetch if empty state
+    if (isEmpty) {
+      setLoading(false);
+      setExpenses([]);
+      return;
+    }
+    
+    fetchExpenses();
+  }, [fetchExpenses, isEmpty]);
+
+  const fetchAllPhases = async () => {
+    setLoadingPhases(true);
+    try {
+      const response = await fetch('/api/phases');
+      const data = await response.json();
+      if (data.success) {
+        setPhases(data.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching phases:', err);
+    } finally {
+      setLoadingPhases(false);
     }
   };
 
@@ -119,6 +165,24 @@ function ExpensesPageContent() {
     'construction_services',
     'other',
   ];
+
+  // Check empty state - no projects
+  if (isEmpty && !loading) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expenses</h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage project expenses</p>
+          </div>
+          <NoProjectsEmptyState
+            canCreate={canAccess('create_project')}
+            role={canAccess('create_project') ? 'owner' : 'site_clerk'}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -178,6 +242,27 @@ function ExpensesPageContent() {
             </div>
 
             <div>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Phase</label>
+              <select
+                value={filters.phaseId}
+                onChange={(e) => handleFilterChange('phaseId', e.target.value)}
+                disabled={loadingPhases}
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50"
+              >
+                <option value="">All Phases</option>
+                {loadingPhases ? (
+                  <option>Loading phases...</option>
+                ) : (
+                  phases.map((phase) => (
+                    <option key={phase._id} value={phase._id}>
+                      {phase.name}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+
+            <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Status</label>
               <select
                 value={filters.status}
@@ -189,6 +274,19 @@ function ExpensesPageContent() {
                 <option value="APPROVED">Approved</option>
                 <option value="REJECTED">Rejected</option>
                 <option value="PAID">Paid</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Cost Type</label>
+              <select
+                value={filters.isIndirectCost}
+                onChange={(e) => handleFilterChange('isIndirectCost', e.target.value)}
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+              >
+                <option value="">All Costs</option>
+                <option value="true">Indirect Costs</option>
+                <option value="false">Direct Costs</option>
               </select>
             </div>
 
@@ -283,7 +381,14 @@ function ExpensesPageContent() {
                           {expense.description}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-base leading-normal text-gray-500">
-                          {expense.category?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
+                          <div className="flex items-center gap-2">
+                            {expense.category?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
+                            {expense.isIndirectCost && (
+                              <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-100 text-purple-800" title="Indirect Cost">
+                                Indirect
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-base leading-normal text-gray-500">
                           {expense.vendor || 'N/A'}

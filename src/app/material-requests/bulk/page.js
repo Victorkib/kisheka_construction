@@ -37,6 +37,7 @@ function BulkRequestPageContent() {
     // Step 1: Project & Settings
     projectId: '',
     defaultFloorId: '',
+    defaultPhaseId: '',
     defaultCategoryId: '',
     defaultUrgency: 'medium',
     defaultReason: '',
@@ -63,6 +64,12 @@ function BulkRequestPageContent() {
       case 1:
         if (!wizardData.projectId) {
           setError('Please select a project');
+          return false;
+        }
+        // Phase Enforcement: Require defaultPhaseId OR all materials have phaseId
+        // For Step 1, we require defaultPhaseId (users can override in Step 3)
+        if (!wizardData.defaultPhaseId) {
+          setError('Please select a default construction phase. This is required for phase tracking and budget management.');
           return false;
         }
         break;
@@ -104,7 +111,9 @@ function BulkRequestPageContent() {
           const quantity = parseFloat(m.quantityNeeded || m.quantity || 0);
           const hasQuantity = !isNaN(quantity) && quantity > 0;
           const hasUnit = m.unit && m.unit.trim().length > 0;
-          return !hasName || !hasQuantity || !hasUnit;
+          // Phase Enforcement: Material must have phaseId (from default or per-material)
+          const hasPhaseId = !!(m.phaseId || wizardData.defaultPhaseId);
+          return !hasName || !hasQuantity || !hasUnit || !hasPhaseId;
         });
         if (invalidMaterialsFinal.length > 0) {
           setError(`Please fill in all required fields for all materials. ${invalidMaterialsFinal.length} material(s) are incomplete.`);
@@ -175,6 +184,7 @@ function BulkRequestPageContent() {
           projectId: wizardData.projectId,
           batchName: wizardData.batchName || null,
           defaultFloorId: wizardData.defaultFloorId || null,
+          defaultPhaseId: wizardData.defaultPhaseId || null,
           defaultCategoryId: wizardData.defaultCategoryId || null,
           defaultUrgency: wizardData.defaultUrgency,
           defaultReason: wizardData.defaultReason || null,

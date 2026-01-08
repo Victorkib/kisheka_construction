@@ -46,6 +46,18 @@ export const NAVIGATION_SECTIONS = {
         href: '/projects/new',
         roles: ['owner', 'pm', 'project_manager'],
       },
+      {
+        label: 'Phases',
+        href: '/phases',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant', 'supervisor'],
+        icon: 'layers',
+      },
+      {
+        label: 'Phase Templates',
+        href: '/phase-templates',
+        roles: ['owner', 'pm', 'project_manager'],
+        icon: 'file-text',
+      },
     ],
   },
   financial: {
@@ -62,6 +74,12 @@ export const NAVIGATION_SECTIONS = {
         label: 'Investors',
         href: '/investors',
         roles: ['owner'],
+      },
+      {
+        label: 'Budget Reallocations',
+        href: '/budget-reallocations',
+        roles: ['owner', 'pm', 'project_manager', 'accountant'],
+        icon: 'arrow-left-right',
       },
       {
         label: 'Initial Expenses',
@@ -141,6 +159,11 @@ export const NAVIGATION_SECTIONS = {
             roles: ['owner', 'pm', 'project_manager'],
           },
           {
+            label: 'Rejections',
+            href: '/purchase-orders/rejections',
+            roles: ['owner', 'pm', 'project_manager'],
+          },
+          {
             label: 'Ready to Deliver',
             href: '/purchase-orders?status=ready_for_delivery',
             roles: ['owner', 'pm', 'project_manager'],
@@ -157,6 +180,70 @@ export const NAVIGATION_SECTIONS = {
         href: '/dashboard/approvals',
         roles: ['owner', 'pm', 'project_manager', 'accountant'],
         badge: 'pending', // Will show count of pending approvals
+      },
+      {
+        label: 'Work Items',
+        href: '/work-items',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'supervisor'],
+        icon: 'check-square',
+      },
+      {
+        label: 'Equipment',
+        href: '/equipment',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant', 'supervisor'],
+        icon: 'tool',
+      },
+      {
+        label: 'Subcontractors',
+        href: '/subcontractors',
+        roles: ['owner', 'pm', 'project_manager', 'accountant'],
+        icon: 'users',
+      },
+    ],
+  },
+  professionalServices: {
+    label: 'Professional Services',
+    icon: 'users',
+    roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant'],
+    children: [
+      {
+        label: 'All Services',
+        href: '/professional-services',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant'],
+      },
+      {
+        label: 'Services Library',
+        href: '/professional-services-library',
+        roles: ['owner', 'pm', 'project_manager'],
+        icon: 'book',
+      },
+      {
+        label: 'Activities',
+        href: '/professional-activities',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant'],
+      },
+      {
+        label: 'Bulk Activity Entry',
+        href: '/professional-activities/bulk',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk'],
+        icon: 'shopping-cart',
+      },
+      {
+        label: 'Activity Templates',
+        href: '/activity-templates',
+        roles: ['owner', 'pm', 'project_manager'],
+        icon: 'file-text',
+      },
+      {
+        label: 'Professional Fees',
+        href: '/professional-fees',
+        roles: ['owner', 'pm', 'project_manager', 'accountant'],
+      },
+      {
+        label: 'Reports',
+        href: '/reports/professional-services',
+        roles: ['owner', 'pm', 'project_manager', 'accountant'],
+        icon: 'bar-chart',
       },
     ],
   },
@@ -204,6 +291,12 @@ export const NAVIGATION_SECTIONS = {
         href: '/dashboard/budget',
         roles: ['owner', 'investor', 'accountant', 'pm', 'project_manager'],
       },
+      {
+        label: 'Phase Reports',
+        href: '/reports/phases',
+        roles: ['owner', 'pm', 'project_manager', 'accountant'],
+        icon: 'bar-chart',
+      },
     ],
   },
   archive: {
@@ -243,13 +336,48 @@ export const NAVIGATION_SECTIONS = {
 /**
  * Get navigation items filtered by user role
  * @param {string} userRole - User's role (lowercase)
+ * @param {string|null} projectId - Optional project ID for project-scoped navigation
  * @returns {Array} Filtered navigation items
  */
-export function getNavigationForRole(userRole) {
+export function getNavigationForRole(userRole, projectId = null) {
   if (!userRole) return [];
 
   const role = userRole.toLowerCase();
   const filteredSections = [];
+
+  // Define project-scoped routes (routes that should include projectId)
+  const projectScopedRoutes = [
+    '/items',
+    '/phases',
+    '/expenses',
+    '/initial-expenses',
+    '/material-requests',
+    '/purchase-orders',
+    '/professional-services',
+    '/professional-activities',
+    '/professional-fees',
+    '/dashboard/budget',
+    '/dashboard/analytics',
+  ];
+
+  // Helper to add project context to href
+  const addProjectContext = (href) => {
+    if (!projectId || !href) return href;
+    
+    // Check if route should be project-scoped
+    const shouldScope = projectScopedRoutes.some((route) => href.startsWith(route));
+    
+    if (shouldScope) {
+      // If it's a query string, add projectId to it
+      if (href.includes('?')) {
+        return `${href}&projectId=${projectId}`;
+      }
+      // Otherwise, add as query param
+      return `${href}?projectId=${projectId}`;
+    }
+    
+    return href;
+  };
 
   // Check each section
   Object.values(NAVIGATION_SECTIONS).forEach((section) => {
@@ -259,20 +387,27 @@ export function getNavigationForRole(userRole) {
     if (hasSectionAccess) {
       // If section has children, filter them too
       if (section.children && section.children.length > 0) {
-        const filteredChildren = section.children.filter((child) =>
-          child.roles.some((r) => r.toLowerCase() === role)
-        );
+        const filteredChildren = section.children
+          .filter((child) => child.roles.some((r) => r.toLowerCase() === role))
+          .map((child) => ({
+            ...child,
+            href: addProjectContext(child.href),
+          }));
 
         // Only include section if it has accessible children or no children
         if (filteredChildren.length > 0 || !section.children) {
           filteredSections.push({
             ...section,
+            href: addProjectContext(section.href),
             children: filteredChildren.length > 0 ? filteredChildren : undefined,
           });
         }
       } else {
         // Section has no children, include it if user has access
-        filteredSections.push(section);
+        filteredSections.push({
+          ...section,
+          href: addProjectContext(section.href),
+        });
       }
     }
   });
@@ -295,28 +430,64 @@ export function isNavItemVisible(item, userRole) {
 /**
  * Get flat list of all navigation links for a role (for mobile menu)
  * @param {string} userRole - User's role
+ * @param {string|null} projectId - Optional project ID for project-scoped navigation
  * @returns {Array} Flat list of navigation links (deduplicated by href)
  */
-export function getFlatNavigationForRole(userRole) {
+export function getFlatNavigationForRole(userRole, projectId = null) {
   if (!userRole) return [];
 
   const role = userRole.toLowerCase();
   const flatNav = [];
   const seenHrefs = new Set(); // Track seen hrefs to prevent duplicates
 
+  // Define project-scoped routes
+  const projectScopedRoutes = [
+    '/items',
+    '/phases',
+    '/expenses',
+    '/initial-expenses',
+    '/material-requests',
+    '/purchase-orders',
+    '/professional-services',
+    '/professional-activities',
+    '/professional-fees',
+    '/dashboard/budget',
+    '/dashboard/analytics',
+    '/work-items',
+    '/equipment',
+    '/subcontractors',
+  ];
+
+  // Helper to add project context to href
+  const addProjectContext = (href) => {
+    if (!projectId || !href) return href;
+    
+    const shouldScope = projectScopedRoutes.some((route) => href.startsWith(route));
+    
+    if (shouldScope) {
+      if (href.includes('?')) {
+        return `${href}&projectId=${projectId}`;
+      }
+      return `${href}?projectId=${projectId}`;
+    }
+    
+    return href;
+  };
+
   Object.values(NAVIGATION_SECTIONS).forEach((section) => {
     // Check section access
     if (section.roles.some((r) => r.toLowerCase() === role)) {
       // Add section itself if it has a direct href
       if (section.href && !section.children) {
-        if (!seenHrefs.has(section.href)) {
+        const href = addProjectContext(section.href);
+        if (!seenHrefs.has(href)) {
           flatNav.push({
             label: section.label,
-            href: section.href,
+            href: href,
             icon: section.icon,
             badge: section.badge,
           });
-          seenHrefs.add(section.href);
+          seenHrefs.add(href);
         }
       }
 
@@ -324,15 +495,16 @@ export function getFlatNavigationForRole(userRole) {
       if (section.children) {
         section.children.forEach((child) => {
           if (child.roles.some((r) => r.toLowerCase() === role)) {
+            const href = addProjectContext(child.href);
             // Only add if we haven't seen this href before
-            if (!seenHrefs.has(child.href)) {
+            if (!seenHrefs.has(href)) {
               flatNav.push({
                 label: child.label,
-                href: child.href,
+                href: href,
                 icon: child.icon,
                 badge: child.badge,
               });
-              seenHrefs.add(child.href);
+              seenHrefs.add(href);
             }
           }
         });

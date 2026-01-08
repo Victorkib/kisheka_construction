@@ -7,18 +7,23 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingTable } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
+import { NoProjectsEmptyState } from '@/components/empty-states';
+import { PhaseFilter } from '@/components/filters/PhaseFilter';
 
 function PurchaseOrdersPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess, user } = usePermissions();
+  const { currentProject, isEmpty } = useProjectContext();
   const toast = useToast();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -27,11 +32,17 @@ function PurchaseOrdersPageContent() {
   const [projects, setProjects] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   
+  // Get projectId from context (prioritize current project over URL param)
+  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromUrl = searchParams.get('projectId');
+  const activeProjectId = projectIdFromContext || projectIdFromUrl || '';
+  
   // Filters
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: activeProjectId,
     status: searchParams.get('status') || '',
     supplierId: searchParams.get('supplierId') || '',
+    phaseId: searchParams.get('phaseId') || '',
     search: searchParams.get('search') || '',
   });
 
@@ -51,19 +62,6 @@ function PurchaseOrdersPageContent() {
       }
     }
   }, [user, canAccess, router, toast]);
-
-  // Fetch projects and suppliers for filter dropdowns
-  useEffect(() => {
-    if (user && (user.role?.toLowerCase() !== 'clerk' && user.role?.toLowerCase() !== 'site_clerk')) {
-      fetchProjects();
-      fetchSuppliers();
-    }
-  }, [user]);
-
-  // Fetch purchase orders
-  useEffect(() => {
-    fetchOrders();
-  }, [filters, pagination.page]);
 
   const fetchProjects = async () => {
     try {
@@ -90,7 +88,7 @@ function PurchaseOrdersPageContent() {
     }
   };
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -102,6 +100,7 @@ function PurchaseOrdersPageContent() {
         ...(filters.projectId && { projectId: filters.projectId }),
         ...(filters.status && { status: filters.status }),
         ...(filters.supplierId && { supplierId: filters.supplierId }),
+        ...(filters.phaseId && { phaseId: filters.phaseId }),
         ...(filters.search && { search: filters.search }),
       });
 
@@ -113,14 +112,26 @@ function PurchaseOrdersPageContent() {
       }
 
       setOrders(data.data.orders || []);
-      setPagination(data.data.pagination || pagination);
+      setPagination(prev => data.data.pagination || prev);
     } catch (err) {
       setError(err.message);
       console.error('Fetch purchase orders error:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, pagination.page, pagination.limit]);
+
+  // Fetch purchase orders
+  useEffect(() => {
+    // Don't fetch if empty state
+    if (isEmpty) {
+      setLoading(false);
+      setOrders([]);
+      return;
+    }
+    
+    fetchOrders();
+  }, [fetchOrders, isEmpty]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -185,6 +196,24 @@ function PurchaseOrdersPageContent() {
     );
   }
 
+  // Check empty state - no projects
+  if (isEmpty && !loading) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Purchase Orders</h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage purchase orders and supplier interactions</p>
+          </div>
+          <NoProjectsEmptyState
+            canCreate={canAccess('create_project')}
+            role={canAccess('create_project') ? 'owner' : 'pm'}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -206,7 +235,7 @@ function PurchaseOrdersPageContent() {
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Project</label>
               <select
@@ -260,6 +289,11 @@ function PurchaseOrdersPageContent() {
                 </select>
               </div>
             )}
+            <PhaseFilter
+              projectId={filters.projectId}
+              value={filters.phaseId}
+              onChange={(phaseId) => handleFilterChange('phaseId', phaseId)}
+            />
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Search</label>
               <input
@@ -273,7 +307,7 @@ function PurchaseOrdersPageContent() {
             <div className="flex items-end">
               <button
                 onClick={() => {
-                  setFilters({ projectId: '', status: '', supplierId: '', search: '' });
+                  setFilters({ projectId: '', status: '', supplierId: '', phaseId: '', search: '' });
                   router.push('/purchase-orders', { scroll: false });
                 }}
                 className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition"
@@ -315,6 +349,9 @@ function PurchaseOrdersPageContent() {
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                       Material
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                      Phase
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wider">
                       Supplier
@@ -362,6 +399,20 @@ function PurchaseOrdersPageContent() {
                           <div className="text-sm font-medium text-gray-900">{order.materialName}</div>
                           {order.description && (
                             <div className="text-sm text-gray-700 truncate max-w-xs">{order.description}</div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {order.phaseName ? (
+                            <Link
+                              href={`/phases/${order.phaseId}`}
+                              className="text-blue-600 hover:text-blue-800 font-medium"
+                            >
+                              {order.phaseName}
+                            </Link>
+                          ) : order.phaseId ? (
+                            <span className="text-gray-500 italic">Phase ID: {order.phaseId.toString().substring(0, 8)}...</span>
+                          ) : (
+                            <span className="text-red-500 italic">No Phase</span>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

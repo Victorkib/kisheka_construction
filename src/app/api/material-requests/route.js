@@ -19,6 +19,7 @@ import { validateMaterialRequest, VALID_URGENCY_LEVELS } from '@/lib/schemas/mat
 import { validateCapitalAvailability } from '@/lib/financial-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
 
 /**
  * GET /api/material-requests
@@ -47,19 +48,27 @@ export async function GET(request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const projectId = searchParams.get('projectId');
     const status = searchParams.get('status');
     const urgency = searchParams.get('urgency');
+    const phaseId = searchParams.get('phaseId');
     const search = searchParams.get('search');
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '20', 10);
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
+    // Get and validate project context
+    const projectContext = await getProjectContext(request, user.id);
+    
+    // If projectId is provided, validate access
+    if (projectContext.projectId && !projectContext.hasAccess) {
+      return errorResponse(projectContext.error || 'Access denied to this project', 403);
+    }
+
     const db = await getDatabase();
 
-    // Build query
-    const query = { deletedAt: null };
+    // Build query with project filter
+    const query = createProjectFilter(projectContext.projectId, { deletedAt: null });
     const andConditions = [];
 
     // Role-based filtering
@@ -69,10 +78,6 @@ export async function GET(request) {
       query.requestedBy = new ObjectId(userProfile._id);
     }
     // PM, OWNER, ACCOUNTANT can see all requests
-
-    if (projectId && ObjectId.isValid(projectId)) {
-      query.projectId = new ObjectId(projectId);
-    }
 
     if (status) {
       // Special handling for "ready_to_order" filter
@@ -90,6 +95,11 @@ export async function GET(request) {
 
     if (urgency && VALID_URGENCY_LEVELS.includes(urgency)) {
       query.urgency = urgency;
+    }
+
+    // Phase Management: Add phaseId filter
+    if (phaseId && ObjectId.isValid(phaseId)) {
+      query.phaseId = new ObjectId(phaseId);
     }
 
     // Search filter
@@ -184,6 +194,7 @@ export async function POST(request) {
       floorId,
       categoryId,
       category,
+      phaseId,
       materialName,
       description,
       quantityNeeded,
@@ -280,6 +291,54 @@ export async function POST(request) {
       }
     }
 
+    // Build material request data for validation
+    const materialRequestData = {
+      requestedBy: userProfile._id.toString(),
+      projectId,
+      materialName,
+      quantityNeeded,
+      unit,
+      urgency,
+      estimatedCost,
+      estimatedUnitCost,
+      phaseId,
+      floorId,
+      categoryId,
+      status: 'requested',
+    };
+
+    // PhaseId is now required - validate using centralized helper
+    const { validatePhaseForMaterialRequest } = await import('@/lib/phase-validation-helpers');
+    const phaseValidation = await validatePhaseForMaterialRequest(phaseId, projectId);
+    
+    if (!phaseValidation.isValid) {
+      return errorResponse(phaseValidation.error, phaseValidation.phase ? 400 : 404);
+    }
+    
+    const phase = phaseValidation.phase;
+
+    // Validate using schema validation (includes phaseId validation)
+    const validation = validateMaterialRequest(materialRequestData);
+    if (!validation.isValid) {
+      return errorResponse(`Validation failed: ${validation.errors.join(', ')}`, 400);
+    }
+
+    // Phase Budget Validation: Check if estimated cost fits within phase material budget
+    if (estimatedCost && estimatedCost > 0) {
+      const { validatePhaseMaterialBudget } = await import('@/lib/phase-helpers');
+      const budgetValidation = await validatePhaseMaterialBudget(phaseId, estimatedCost);
+      
+      if (!budgetValidation.isValid) {
+        return errorResponse(
+          `Phase material budget exceeded. ${budgetValidation.message}. ` +
+          `Phase material budget: ${budgetValidation.materialBudget.toLocaleString()}, ` +
+          `Available: ${budgetValidation.available.toLocaleString()}, ` +
+          `Required: ${budgetValidation.required.toLocaleString()}`,
+          400
+        );
+      }
+    }
+
     // Check capital availability (warning only, don't block request creation)
     let capitalWarning = null;
     try {
@@ -323,6 +382,7 @@ export async function POST(request) {
       ...(floorId && ObjectId.isValid(floorId) && { floorId: new ObjectId(floorId) }),
       ...(categoryId && ObjectId.isValid(categoryId) && { categoryId: new ObjectId(categoryId) }),
       ...(category && { category: category.trim() }),
+      phaseId: new ObjectId(phaseId), // Required - validated above
       materialName: materialName.trim(),
       description: description?.trim() || '',
       quantityNeeded: parseFloat(quantityNeeded),
@@ -343,6 +403,15 @@ export async function POST(request) {
     const result = await db.collection('material_requests').insertOne(materialRequest);
 
     const insertedRequest = { ...materialRequest, _id: result.insertedId };
+
+    // Collect warnings (from validation and capital check)
+    const warnings = [];
+    if (validation.warnings && validation.warnings.length > 0) {
+      warnings.push(...validation.warnings);
+    }
+    if (capitalWarning) {
+      warnings.push(capitalWarning.message);
+    }
 
     // Create audit log
     await createAuditLog({
@@ -375,8 +444,11 @@ export async function POST(request) {
       await createNotifications(notifications);
     }
 
-    // Include capital warning in response if present
+    // Include warnings in response if present
     const responseData = { ...insertedRequest };
+    if (warnings.length > 0) {
+      responseData.warnings = warnings;
+    }
     if (capitalWarning) {
       responseData.capitalWarning = capitalWarning;
     }

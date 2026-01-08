@@ -16,7 +16,7 @@ import { validateBulkPOCreation, createPOFromSupplierGroup } from '@/lib/helpers
 import { recalculateProjectFinances } from '@/lib/financial-helpers';
 import { withTransaction } from '@/lib/mongodb/transaction-helpers';
 import { sendPurchaseOrderEmail } from '@/lib/email-templates/purchase-order-templates';
-import { sendSMS, generatePurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
+import { sendSMS, generatePurchaseOrderSMS, generateBulkPurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { sendPushToSupplier } from '@/lib/push-service';
 import { generateShortUrl } from '@/lib/generators/url-shortener';
 import { ObjectId } from 'mongodb';
@@ -258,19 +258,34 @@ export async function POST(request) {
         if (supplier.smsEnabled && supplier.phone) {
           try {
             const formattedPhone = formatPhoneNumber(supplier.phone);
-            const materialSummary = po.materials?.length > 0
-              ? `${po.materials.length} material(s)`
-              : po.materialName || 'Materials';
-            const smsMessage = generatePurchaseOrderSMS({
-              purchaseOrderNumber: po.purchaseOrderNumber,
-              materialName: materialSummary,
-              quantity: po.quantityOrdered,
-              unit: po.unit,
-              totalCost: po.totalCost,
-              shortLink,
-              deliveryDate: po.deliveryDate,
-              unitCost: po.unitCost || null
-            });
+            
+            // Use detailed bulk order SMS for bulk orders, regular SMS for single orders
+            let smsMessage;
+            if (po.isBulkOrder && po.materials && Array.isArray(po.materials) && po.materials.length > 0) {
+              // Bulk order - use detailed message with material breakdown
+              smsMessage = generateBulkPurchaseOrderSMS({
+                purchaseOrderNumber: po.purchaseOrderNumber,
+                materials: po.materials,
+                totalCost: po.totalCost,
+                shortLink,
+                deliveryDate: po.deliveryDate
+              });
+            } else {
+              // Single order or fallback - use regular SMS
+              const materialSummary = po.materials?.length > 0
+                ? `${po.materials.length} item${po.materials.length > 1 ? 's' : ''}`
+                : po.materialName || 'Materials';
+              smsMessage = generatePurchaseOrderSMS({
+                purchaseOrderNumber: po.purchaseOrderNumber,
+                materialName: materialSummary,
+                quantity: po.quantityOrdered,
+                unit: po.unit,
+                totalCost: po.totalCost,
+                shortLink,
+                deliveryDate: po.deliveryDate,
+                unitCost: po.unitCost || null
+              });
+            }
 
             const smsResult = await sendSMS({
               to: formattedPhone,

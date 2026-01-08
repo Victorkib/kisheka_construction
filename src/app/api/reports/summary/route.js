@@ -133,7 +133,31 @@ export async function GET(request) {
     const totalInitialExpensesCost = totalInitialExpensesResult[0]?.total || 0;
     const totalInitialExpensesItems = totalInitialExpensesResult[0]?.count || 0;
 
+    // Get professional services fees (from expenses where category is construction_services)
+    const professionalServicesFeesResult = await db
+      .collection('expenses')
+      .aggregate([
+        {
+          $match: {
+            ...expensesBaseQuery,
+            category: 'construction_services', // Professional fees are converted to expenses with this category
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$amount' },
+            count: { $sum: 1 },
+          },
+        },
+      ])
+      .toArray();
+
+    const totalProfessionalServicesFees = professionalServicesFeesResult[0]?.total || 0;
+    const totalProfessionalServicesItems = professionalServicesFeesResult[0]?.count || 0;
+
     // Combined totals (materials + expenses + initial expenses)
+    // Note: Professional services fees are already included in expenses, so we don't double-count
     const totalExpenses = totalMaterialsCost + totalExpensesCost + totalInitialExpensesCost;
     const totalItems = totalMaterialsItems + totalExpensesItems + totalInitialExpensesItems;
 
@@ -323,6 +347,17 @@ export async function GET(request) {
       dailyBurnRate = totalExpenses / days;
     }
 
+    // Get professional services statistics
+    let professionalServicesStats = null;
+    if (projectId && ObjectId.isValid(projectId)) {
+      try {
+        const { calculateProjectProfessionalServicesStats } = await import('@/lib/professional-services-helpers');
+        professionalServicesStats = await calculateProjectProfessionalServicesStats(projectId);
+      } catch (err) {
+        console.error('Error calculating professional services stats:', err);
+      }
+    }
+
     return successResponse({
       // Combined totals
       totalExpenses,
@@ -333,6 +368,11 @@ export async function GET(request) {
       expensesTotal: totalExpensesCost,
       expensesCount: totalExpensesItems,
       initialExpensesTotal: totalInitialExpensesCost,
+      professionalServices: {
+        total: totalProfessionalServicesFees,
+        count: totalProfessionalServicesItems,
+        statistics: professionalServicesStats, // Detailed stats if projectId provided
+      },
       initialExpensesCount: totalInitialExpensesItems,
       // Category breakdown (combined from materials and expenses)
       categoryBreakdown: categoryBreakdown.map((item) => ({

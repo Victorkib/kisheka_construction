@@ -132,7 +132,7 @@ export function RecentlyViewed({ isCollapsed = false }) {
       badge={items.length}
       badgeColor="blue"
     >
-      <div className="space-y-1">
+      <div className="space-y-1 max-h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
         {items.map((item, index) => {
           const typeInfo = ITEM_TYPES[item.type];
           if (!typeInfo) return null;
@@ -141,23 +141,24 @@ export function RecentlyViewed({ isCollapsed = false }) {
             <Link
               key={`${item.type}-${item.id}-${index}`}
               href={typeInfo.getHref(item.id)}
-              className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg hover:bg-gray-100 transition group"
+              className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg hover:bg-gray-100 transition-colors group"
             >
               <span className="text-base flex-shrink-0">{typeInfo.icon}</span>
-              <span className="flex-1 truncate text-gray-700 group-hover:text-blue-600 transition">
+              <span className="flex-1 truncate text-gray-700 group-hover:text-blue-600 transition-colors">
                 {item.label}
               </span>
             </Link>
           );
         })}
       </div>
-      {items.length >= MAX_ITEMS && (
+      {items.length > 0 && (
         <button
           onClick={() => {
             localStorage.removeItem(STORAGE_KEY);
             setItems([]);
           }}
-          className="mt-2 text-xs text-gray-500 hover:text-gray-700 transition"
+          className="mt-3 w-full text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-2 py-1.5 rounded-md transition-colors font-medium"
+          aria-label="Clear recently viewed history"
         >
           Clear history
         </button>

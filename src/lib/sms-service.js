@@ -43,7 +43,9 @@ export async function sendSMS({ to, message }) {
     // Format phone number (ensure it starts with +)
     const formattedPhone = to.startsWith('+') ? to : `+${to}`;
 
-    const response = await fetch('https://api.africastalking.com/version1/messaging', {
+    // const africasTalkingUrl = 'https://api.africastalking.com/version1/messaging';
+    const africasTalkingUrl = 'https://api.sandbox.africastalking.com/version1/messaging';
+    const response = await fetch(africasTalkingUrl, {
       method: 'POST',
       headers: {
         'ApiKey': AFRICASTALKING_API_KEY,
@@ -61,7 +63,21 @@ export async function sendSMS({ to, message }) {
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Africa\'s Talking API error:', errorText);
-      throw new Error(`SMS send failed: ${response.status} ${response.statusText}`);
+      console.error('API Key (first 10 chars):', AFRICASTALKING_API_KEY?.substring(0, 10) + '...');
+      console.error('Username:', AFRICASTALKING_USERNAME);
+      console.error('Sender ID:', AFRICASTALKING_SENDER_ID);
+      console.error('Response Status:', response.status, response.statusText);
+      
+      // Try to parse error response as JSON
+      let errorDetails = errorText;
+      try {
+        const errorJson = JSON.parse(errorText);
+        errorDetails = JSON.stringify(errorJson, null, 2);
+      } catch (e) {
+        // Not JSON, use as-is
+      }
+      
+      throw new Error(`SMS send failed: ${response.status} ${response.statusText}. Details: ${errorDetails}`);
     }
 
     const data = await response.json();
@@ -87,39 +103,257 @@ export async function sendSMS({ to, message }) {
 
 /**
  * Parse SMS reply for purchase order confirmation
- * Extracts action (accept/reject/modify) and purchase order number from SMS text
+ * Extracts action (accept/reject/modify), purchase order number, rejection reasons, and modification details from SMS text
  * @param {string} smsText - SMS message text
- * @returns {Object} Parsed result with action and optional PO number
+ * @returns {Object} Parsed result with action, PO number, rejection reason, and modification details
  */
 export function parseSMSReply(smsText) {
   if (!smsText || typeof smsText !== 'string') {
-    return { action: null, purchaseOrderNumber: null };
+    return { 
+      action: null, 
+      purchaseOrderNumber: null,
+      rejectionReason: null,
+      rejectionSubcategory: null,
+      modificationDetails: null,
+      confidence: 0
+    };
   }
 
-  const text = smsText.toUpperCase().trim();
+  // Remove emojis and special characters that might interfere
+  const cleanedText = smsText.replace(/[\u{1F300}-\u{1F9FF}]/gu, '').trim();
+  const text = cleanedText.toUpperCase().trim();
   
-  // Keywords for actions
-  const acceptKeywords = ['ACCEPT', 'YES', 'OK', 'CONFIRM', 'APPROVE'];
-  const rejectKeywords = ['REJECT', 'NO', 'DECLINE', 'CANCEL', 'REFUSE'];
-  const modifyKeywords = ['MODIFY', 'CHANGE', 'UPDATE', 'EDIT'];
+  // Keywords for actions (with common typos)
+  const acceptKeywords = ['ACCEPT', 'ACEPT', 'ACEPPT', 'ACCEPTED', 'YES', 'OK', 'OKAY', 'CONFIRM', 'CONFIRMED', 'APPROVE', 'APPROVED'];
+  const rejectKeywords = ['REJECT', 'REJCT', 'REJECTED', 'NO', 'DECLINE', 'DECLINED', 'CANCEL', 'CANCELLED', 'REFUSE', 'REFUSED'];
+  const modifyKeywords = ['MODIFY', 'MODFY', 'CHANGE', 'CHANGED', 'UPDATE', 'UPDATED', 'EDIT', 'EDITED', 'ADJUST', 'ADJUSTED'];
 
   // Extract purchase order number (format: PO-YYYYMMDD-001 or PO-001)
   const poMatch = text.match(/PO[-\s]?(\d{8}-\d{3}|\d{3})/i);
   const purchaseOrderNumber = poMatch ? poMatch[0].replace(/[-\s]/g, '-') : null;
 
-  // Determine action
+  // Determine action with priority (accept > reject > modify)
   let action = null;
+  let confidence = 0.5; // Default confidence
+  
+  // Check for negation words that might reverse the action
+  const negationWords = ['NOT', "DON'T", "WON'T", 'NEVER', 'CANT', "CAN'T"];
+  const hasNegation = negationWords.some(word => text.includes(word));
+  
   if (acceptKeywords.some(keyword => text.includes(keyword))) {
-    action = 'accept';
+    if (hasNegation && text.indexOf('NOT') < text.indexOf('ACCEPT')) {
+      action = 'reject'; // "NOT ACCEPT" = reject
+      confidence = 0.8;
+    } else {
+      action = 'accept';
+      confidence = 0.9;
+    }
   } else if (rejectKeywords.some(keyword => text.includes(keyword))) {
-    action = 'reject';
+    if (hasNegation && text.indexOf('NOT') < text.indexOf('REJECT')) {
+      action = 'accept'; // "NOT REJECT" = accept
+      confidence = 0.8;
+    } else {
+      action = 'reject';
+      confidence = 0.9;
+    }
   } else if (modifyKeywords.some(keyword => text.includes(keyword))) {
     action = 'modify';
+    confidence = 0.85;
+  }
+
+  // Extract rejection reason from text
+  let rejectionReason = null;
+  let rejectionSubcategory = null;
+  let rejectionConfidence = 0;
+  
+  if (action === 'reject') {
+    const rejectionPatterns = {
+      // Price-related
+      price_too_high: {
+        keywords: ['PRICE', 'COST', 'EXPENSIVE', 'TOO HIGH', 'TOO MUCH', 'CHEAPER', 'LOWER PRICE', 'BUDGET'],
+        subcategories: {
+          market_rates_higher: ['MARKET', 'RATES'],
+          material_costs_increased: ['MATERIAL COST', 'RAW MATERIAL'],
+          labor_costs_high: ['LABOR', 'WORKER', 'MANPOWER'],
+          overhead_costs: ['OVERHEAD', 'OPERATIONAL'],
+          insufficient_profit_margin: ['PROFIT', 'MARGIN'],
+          currency_fluctuation: ['CURRENCY', 'EXCHANGE', 'RATE']
+        }
+      },
+      // Availability
+      unavailable: {
+        keywords: ['UNAVAILABLE', 'OUT OF STOCK', 'NO STOCK', 'NOT AVAILABLE', 'DONT HAVE', "DON'T HAVE", 'CANT GET', "CAN'T GET", 'DISCONTINUED'],
+        subcategories: {
+          out_of_stock: ['OUT OF STOCK', 'NO STOCK', 'STOCK'],
+          material_discontinued: ['DISCONTINUED', 'NO LONGER'],
+          seasonal_unavailable: ['SEASONAL', 'SEASON'],
+          supplier_shortage: ['SHORTAGE', 'SHORT'],
+          manufacturing_delay: ['MANUFACTURING', 'PRODUCTION', 'DELAY'],
+          shipping_constraints: ['SHIPPING', 'TRANSPORT', 'LOGISTICS']
+        }
+      },
+      // Timeline
+      timeline: {
+        keywords: ['TIME', 'DELIVERY', 'DEADLINE', 'TOO SOON', 'TOO FAST', 'LATE', 'DELAY', 'SCHEDULE', 'RUSH'],
+        subcategories: {
+          delivery_date_too_soon: ['TOO SOON', 'TOO FAST', 'RUSH', 'URGENT'],
+          insufficient_production_time: ['PRODUCTION TIME', 'MAKE TIME'],
+          logistics_delay: ['LOGISTICS', 'TRANSPORT', 'SHIPPING'],
+          weather_related_delays: ['WEATHER', 'RAIN', 'STORM'],
+          current_workload_too_high: ['WORKLOAD', 'BUSY', 'FULL'],
+          staff_shortage: ['STAFF', 'WORKER', 'MANPOWER']
+        }
+      },
+      // Specifications
+      specifications: {
+        keywords: ['SPECIFICATION', 'SPEC', 'QUALITY', 'STANDARD', 'GRADE', 'CERTIFICATION', 'TESTING', 'REQUIREMENT'],
+        subcategories: {
+          cannot_meet_quality_standards: ['QUALITY', 'STANDARD'],
+          technical_specifications_unmet: ['TECHNICAL', 'SPEC'],
+          material_grade_unavailable: ['GRADE', 'TYPE'],
+          custom_requirements_impossible: ['CUSTOM', 'SPECIAL'],
+          certification_requirements: ['CERTIFICATION', 'CERTIFIED'],
+          testing_requirements: ['TESTING', 'TEST']
+        }
+      },
+      // Quantity
+      quantity: {
+        keywords: ['QUANTITY', 'QTY', 'AMOUNT', 'TOO MUCH', 'TOO MANY', 'MINIMUM', 'MAXIMUM', 'CAPACITY'],
+        subcategories: {
+          below_minimum_order_quantity: ['MINIMUM', 'MIN'],
+          exceeds_production_capacity: ['CAPACITY', 'MAXIMUM', 'MAX'],
+          batch_size_constraints: ['BATCH', 'BULK'],
+          storage_limitations: ['STORAGE', 'SPACE'],
+          can_only_partial_fulfill: ['PARTIAL', 'SOME', 'ONLY']
+        }
+      },
+      // Business policy
+      business_policy: {
+        keywords: ['POLICY', 'TERM', 'CONTRACT', 'PAYMENT', 'INSURANCE', 'LICENSE', 'GEOGRAPHIC'],
+        subcategories: {
+          unacceptable_payment_terms: ['PAYMENT', 'TERM'],
+          contract_terms_unacceptable: ['CONTRACT', 'AGREEMENT'],
+          insurance_requirements: ['INSURANCE'],
+          licensing_restrictions: ['LICENSE', 'PERMIT'],
+          geographic_service_limits: ['GEOGRAPHIC', 'AREA', 'LOCATION'],
+          client_specific_restrictions: ['CLIENT', 'CUSTOMER']
+        }
+      },
+      // External factors
+      external_factors: {
+        keywords: ['REGULATORY', 'MARKET', 'FORCE MAJEURE', 'TRANSPORTATION', 'SUPPLY CHAIN', 'ECONOMIC'],
+        subcategories: {
+          regulatory_changes: ['REGULATORY', 'REGULATION'],
+          market_volatility: ['MARKET', 'VOLATILITY'],
+          force_majeure: ['FORCE MAJEURE', 'DISASTER'],
+          transportation_issues: ['TRANSPORTATION', 'TRANSPORT'],
+          supply_chain_disruption: ['SUPPLY CHAIN', 'CHAIN'],
+          economic_conditions: ['ECONOMIC', 'ECONOMY']
+        }
+      }
+    };
+
+    // Find matching rejection reason
+    for (const [reasonId, pattern] of Object.entries(rejectionPatterns)) {
+      const mainMatch = pattern.keywords.some(keyword => text.includes(keyword));
+      if (mainMatch) {
+        rejectionReason = reasonId;
+        rejectionConfidence = 0.7;
+        
+        // Try to find subcategory
+        for (const [subcatKey, subcatKeywords] of Object.entries(pattern.subcategories)) {
+          if (subcatKeywords.some(keyword => text.includes(keyword))) {
+            rejectionSubcategory = pattern.subcategories[subcatKey];
+            rejectionConfidence = 0.85;
+            break;
+          }
+        }
+        break;
+      }
+    }
+
+    // If no specific reason found, default to 'other'
+    if (!rejectionReason) {
+      rejectionReason = 'other';
+      rejectionSubcategory = 'not_specified';
+      rejectionConfidence = 0.3;
+    }
+  }
+
+  // Extract modification details
+  let modificationDetails = null;
+  if (action === 'modify') {
+    modificationDetails = {
+      unitCost: null,
+      quantityOrdered: null,
+      deliveryDate: null,
+      notes: null
+    };
+
+    // Extract price/cost modifications
+    const priceMatch = text.match(/(?:PRICE|COST|UNIT)[\s:]*KES?[\s:]*(\d+(?:[.,]\d+)?)/i);
+    if (priceMatch) {
+      modificationDetails.unitCost = parseFloat(priceMatch[1].replace(/,/g, ''));
+    }
+
+    // Extract quantity modifications
+    const qtyMatch = text.match(/(?:QTY|QUANTITY|QTY)[\s:]*(\d+(?:[.,]\d+)?)/i);
+    if (qtyMatch) {
+      modificationDetails.quantityOrdered = parseFloat(qtyMatch[1].replace(/,/g, ''));
+    }
+
+    // Extract date modifications (various formats)
+    const dateFormats = [
+      /(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})/, // DD-MM-YYYY or DD/MM/YYYY
+      /(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/, // YYYY-MM-DD or YYYY/MM/DD
+      /(?:DATE|DELIVERY)[\s:]*(\d{1,2})[-\/](\d{1,2})[-\/](\d{2,4})/i
+    ];
+    
+    for (const dateFormat of dateFormats) {
+      const dateMatch = text.match(dateFormat);
+      if (dateMatch) {
+        try {
+          let year, month, day;
+          if (dateMatch[0].length > 8) {
+            // YYYY-MM-DD format
+            year = parseInt(dateMatch[1]);
+            month = parseInt(dateMatch[2]) - 1;
+            day = parseInt(dateMatch[3]);
+          } else {
+            // DD-MM-YYYY format
+            day = parseInt(dateMatch[1]);
+            month = parseInt(dateMatch[2]) - 1;
+            year = parseInt(dateMatch[3]);
+            if (year < 100) year += 2000; // Assume 2000s for 2-digit years
+          }
+          const date = new Date(year, month, day);
+          if (!isNaN(date.getTime())) {
+            modificationDetails.deliveryDate = date.toISOString().split('T')[0];
+          }
+        } catch (e) {
+          // Invalid date, skip
+        }
+        break;
+      }
+    }
+
+    // Extract notes (everything after MODIFY keyword)
+    const modifyIndex = text.indexOf('MODIFY');
+    if (modifyIndex !== -1) {
+      const notesText = cleanedText.substring(smsText.toUpperCase().indexOf('MODIFY') + 6).trim();
+      if (notesText && notesText.length > 0) {
+        modificationDetails.notes = notesText.substring(0, 500); // Limit to 500 chars
+      }
+    }
   }
 
   return {
     action,
     purchaseOrderNumber,
+    rejectionReason,
+    rejectionSubcategory,
+    modificationDetails,
+    confidence: action === 'reject' ? rejectionConfidence : confidence,
     originalText: smsText
   };
 }
@@ -185,6 +419,138 @@ export function generatePurchaseOrderSMS({ purchaseOrderNumber, materialName, qu
 }
 
 /**
+ * Generate SMS message for bulk purchase order with detailed material information
+ * @param {Object} options - Purchase order details
+ * @param {string} options.purchaseOrderNumber - PO number
+ * @param {Array<Object>} options.materials - Array of material objects with materialName, quantity, unit, unitCost, totalCost
+ * @param {number} options.totalCost - Total cost for all materials
+ * @param {string} options.shortLink - Short URL for full details
+ * @param {Date} options.deliveryDate - Delivery date (optional)
+ * @returns {string} Formatted SMS message optimized for bulk orders
+ */
+export function generateBulkPurchaseOrderSMS({ purchaseOrderNumber, materials, totalCost, shortLink, deliveryDate = null }) {
+  if (!materials || !Array.isArray(materials) || materials.length === 0) {
+    // Fallback to generic message if no materials
+    return generatePurchaseOrderSMS({
+      purchaseOrderNumber,
+      materialName: 'Multiple materials',
+      quantity: 0,
+      unit: 'items',
+      totalCost,
+      shortLink,
+      deliveryDate
+    });
+  }
+
+  // Format delivery date if provided
+  const deliveryDateStr = deliveryDate 
+    ? new Date(deliveryDate).toLocaleDateString('en-KE', { month: 'short', day: 'numeric' })
+    : null;
+
+  // Helper function to truncate material name if too long
+  const truncateName = (name, maxLength = 20) => {
+    if (name.length <= maxLength) return name;
+    return name.substring(0, maxLength - 3) + '...';
+  };
+
+  // Helper function to format material line
+  const formatMaterialLine = (material, index, showCost = false) => {
+    const name = truncateName(material.materialName || material.name || `Material ${index + 1}`, 18);
+    const qty = material.quantity || material.quantityNeeded || 0;
+    const unit = material.unit || '';
+    const cost = showCost && material.unitCost ? ` @ KES ${material.unitCost.toLocaleString()}` : '';
+    return `${index + 1}. ${name}: ${qty} ${unit}${cost}`;
+  };
+
+  let message = '';
+  const materialCount = materials.length;
+
+  // Strategy 1: 1-2 materials - Show full details with costs
+  if (materialCount <= 2) {
+    message = `New PO: ${purchaseOrderNumber}\n`;
+    
+    materials.forEach((material, index) => {
+      message += formatMaterialLine(material, index, true) + '\n';
+    });
+    
+    message += `Total: KES ${totalCost.toLocaleString()}`;
+    
+    if (deliveryDateStr) {
+      message += `\nDelivery: ${deliveryDateStr}`;
+    }
+    
+    message += `\nReply ACCEPT/REJECT\nDetails: ${shortLink || 'Contact us'}`;
+  }
+  // Strategy 2: 3-4 materials - Show abbreviated list without costs
+  else if (materialCount <= 4) {
+    message = `New PO: ${purchaseOrderNumber}\nMaterials:\n`;
+    
+    materials.forEach((material, index) => {
+      message += `• ${formatMaterialLine(material, index, false).substring(3)}\n`; // Remove "1. " prefix, use bullet
+    });
+    
+    message += `Total: KES ${totalCost.toLocaleString()}`;
+    
+    if (deliveryDateStr) {
+      message += `\nDelivery: ${deliveryDateStr}`;
+    }
+    
+    message += `\nReply ACCEPT/REJECT\nDetails: ${shortLink || 'Contact us'}`;
+  }
+  // Strategy 3: 5+ materials - Show summary with key materials
+  else {
+    // Show first 3-4 material names, then "and X more"
+    const materialsToShow = Math.min(3, materialCount);
+    const materialNames = materials.slice(0, materialsToShow).map(m => 
+      truncateName(m.materialName || m.name || 'Material', 15)
+    ).join(', ');
+    
+    const remainingCount = materialCount - materialsToShow;
+    const moreText = remainingCount > 0 ? ` +${remainingCount} more` : '';
+    
+    message = `New PO: ${purchaseOrderNumber}\n${materialCount} materials:\n${materialNames}${moreText}\nTotal: KES ${totalCost.toLocaleString()}`;
+    
+    if (deliveryDateStr) {
+      message += `\nDelivery: ${deliveryDateStr}`;
+    }
+    
+    message += `\nReply ACCEPT/REJECT\nFull list: ${shortLink || 'Contact us'}`;
+  }
+
+  // If message is still too long, apply intelligent truncation
+  if (message.length > 160) {
+    // Try removing unit costs if present (Strategy 1)
+    if (materialCount <= 2) {
+      message = `New PO: ${purchaseOrderNumber}\n`;
+      materials.forEach((material, index) => {
+        message += formatMaterialLine(material, index, false) + '\n';
+      });
+      message += `Total: KES ${totalCost.toLocaleString()}`;
+      if (deliveryDateStr) {
+        message += `\nDelivery: ${deliveryDateStr}`;
+      }
+      message += `\nReply ACCEPT/REJECT\nDetails: ${shortLink || 'Contact us'}`;
+    }
+    
+    // If still too long, truncate material names more aggressively
+    if (message.length > 160) {
+      const maxNameLength = materialCount <= 2 ? 12 : 10;
+      message = message.replace(/\d+\.\s+([^:]+):/g, (match, name) => {
+        const truncated = truncateName(name, maxNameLength);
+        return match.replace(name, truncated);
+      });
+    }
+    
+    // Last resort: Remove delivery date if still too long
+    if (message.length > 160 && deliveryDateStr) {
+      message = message.replace(`\nDelivery: ${deliveryDateStr}`, '');
+    }
+  }
+
+  return message;
+}
+
+/**
  * Generate SMS reminder message
  * @param {Object} options - Reminder details
  * @param {string} options.purchaseOrderNumber - PO number
@@ -198,14 +564,17 @@ export function generateReminderSMS({ purchaseOrderNumber, contactPhone }) {
 /**
  * Generate SMS confirmation message
  * @param {Object} options - Confirmation details
- * @param {string} options.purchaseOrderNumber - PO number
+ * @param {string} options.purchaseOrderNumber - PO number (already includes "PO-" prefix, e.g., "PO-20260104-003")
  * @param {string} options.action - Action taken (accept/reject)
  * @param {Date} options.deliveryDate - Expected delivery date (optional)
  * @returns {string} Formatted confirmation SMS
  */
 export function generateConfirmationSMS({ purchaseOrderNumber, action, deliveryDate }) {
   const actionText = action === 'accept' ? 'ACCEPTED' : action === 'reject' ? 'REJECTED' : 'UPDATED';
-  let message = `Thank you! PO-${purchaseOrderNumber} ${actionText}.`;
+  
+  // purchaseOrderNumber already includes "PO-" prefix, so don't add it again
+  // Format: "PO-20260104-003" (not "20260104-003")
+  let message = `Thank you! ${purchaseOrderNumber} ${actionText}.`;
   
   if (action === 'accept' && deliveryDate) {
     const dateStr = new Date(deliveryDate).toLocaleDateString('en-KE', {

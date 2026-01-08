@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { Sidebar } from './sidebar';
 import { MobileNav } from './mobile-nav';
 import { Header } from './header';
+import { LoadingSpinner } from '@/components/loading';
 
 export function AppLayout({ children }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -35,7 +36,11 @@ export function AppLayout({ children }) {
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto">
-          {children}
+          {children || (
+            <div className="flex items-center justify-center min-h-[400px]">
+              <LoadingSpinner size="lg" text="Loading..." />
+            </div>
+          )}
         </main>
       </div>
     </div>

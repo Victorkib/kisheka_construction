@@ -57,7 +57,11 @@ export async function POST(request, { params }) {
     }
 
     const body = await request.json();
-    const { deliveryNoteFileUrl, actualQuantityDelivered, actualUnitCost, notes } = body || {};
+    const { deliveryNoteFileUrl, actualQuantityDelivered, actualUnitCost, notes, materialQuantities } = body || {};
+    
+    // materialQuantities: Array of { materialRequestId: string, quantity: number } for bulk orders
+    // If materialQuantities is provided, it overrides actualQuantityDelivered for bulk orders
+    // For single orders, actualQuantityDelivered is used
 
     // Validate delivery note is provided
     if (!deliveryNoteFileUrl || deliveryNoteFileUrl.trim().length === 0) {
@@ -145,11 +149,26 @@ export async function POST(request, { params }) {
       _id: new ObjectId(id),
     });
 
-    // Create materials using the helper function with allowFromAccepted flag
+    // Create materials using the helper function
+    // Materials created from POs are automatically approved for immediate financial state accuracy
     let materialCreationResult = null;
     let materialCreationError = null;
 
     try {
+      // Prepare per-material quantities if provided (for bulk orders)
+      let materialQuantitiesMap = null;
+      if (materialQuantities && Array.isArray(materialQuantities) && materialQuantities.length > 0) {
+        materialQuantitiesMap = {};
+        materialQuantities.forEach((mq) => {
+          if (mq.materialRequestId && mq.quantity !== undefined && mq.quantity !== null) {
+            const quantity = parseFloat(mq.quantity);
+            if (!isNaN(quantity) && quantity > 0) {
+              materialQuantitiesMap[mq.materialRequestId] = quantity;
+            }
+          }
+        });
+      }
+
       materialCreationResult = await createMaterialFromPurchaseOrder({
         purchaseOrderId: id,
         creatorUserProfile: userProfile,
@@ -159,11 +178,13 @@ export async function POST(request, { params }) {
         actualUnitCost: actualUnitCost !== undefined && actualUnitCost !== null 
           ? parseFloat(actualUnitCost) 
           : undefined,
+        materialQuantities: materialQuantitiesMap, // Per-material quantities for bulk orders
         notes: notes && notes.trim() 
           ? notes.trim() 
           : 'Delivery confirmed by Owner/PM',
         isAutomatic: false, // Manual confirmation by Owner/PM
-        allowFromAccepted: true, // Allow creation from 'order_accepted' status
+        // Note: allowFromAccepted parameter is deprecated but kept for backward compatibility
+        // Materials from POs are now always auto-approved
       });
     } catch (error) {
       console.error('Error creating material from purchase order:', error);

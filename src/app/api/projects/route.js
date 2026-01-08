@@ -17,6 +17,12 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { calculateProjectTotals } from '@/lib/investment-allocation';
 import { recalculateProjectFinances } from '@/lib/financial-helpers';
+import { 
+  isEnhancedBudget, 
+  createEnhancedBudget, 
+  convertLegacyToEnhanced,
+  validateBudget 
+} from '@/lib/schemas/budget-schema';
 
 /**
  * GET /api/projects
@@ -82,6 +88,15 @@ export async function GET(request) {
           
           const capitalBalance = projectFinances?.capitalBalance || totalInvested;
           
+          // Get professional services statistics
+          let professionalServicesStats = null;
+          try {
+            const { calculateProjectProfessionalServicesStats } = await import('@/lib/professional-services-helpers');
+            professionalServicesStats = await calculateProjectProfessionalServicesStats(project._id.toString());
+          } catch (err) {
+            console.error(`Error calculating professional services stats for project ${project._id}:`, err);
+          }
+          
           return {
             ...project,
             statistics: {
@@ -90,6 +105,7 @@ export async function GET(request) {
               budgetVsCapitalWarning: project.budget?.total > totalInvested && totalInvested > 0
                 ? `Budget (${project.budget.total.toLocaleString()}) exceeds capital (${totalInvested.toLocaleString()})`
                 : null,
+              professionalServices: professionalServicesStats,
             },
           };
         } catch (err) {
@@ -100,6 +116,7 @@ export async function GET(request) {
               totalInvested: 0,
               capitalBalance: 0,
               budgetVsCapitalWarning: null,
+              professionalServices: null,
             },
           };
         }
@@ -154,6 +171,9 @@ export async function POST(request) {
       autoCreateFloors = true, // Default: true for backward compatibility
       includeBasements = false,
       basementCount = 0,
+      autoInitializePhases = true, // Default: true for better UX
+      siteManager, // Site manager user ID
+      teamMembers, // Array of team member user IDs
     } = body;
 
     // Validation
@@ -179,18 +199,120 @@ export async function POST(request) {
     // Check budget and generate warning if zero (don't block project creation)
     // Optional: Require budget > 0 (configurable via environment variable)
     let budgetWarning = null;
-    const budgetTotal = budget?.total || 0;
+    let finalBudget;
     
-    // Optional: Require budget > 0 (configurable)
-    if (process.env.REQUIRE_PROJECT_BUDGET === 'true') {
-      if (!budgetTotal || budgetTotal <= 0) {
-        return errorResponse('Project budget is required and must be greater than 0', 400);
+    // All budgets must be in enhanced structure
+    // If legacy structure is provided, convert it immediately
+    if (budget) {
+      // Check if it's already enhanced
+      if (isEnhancedBudget(budget)) {
+        // Validate enhanced budget
+        const validation = validateBudget(budget);
+        if (!validation.isValid) {
+          return errorResponse(`Invalid budget: ${validation.errors.join(', ')}`, 400);
+        }
+        
+        // Log warnings if any (but don't block project creation)
+        if (validation.warnings && validation.warnings.length > 0) {
+          console.warn('Budget validation warnings:', validation.warnings);
+        }
+        
+        // Use provided enhanced budget
+        finalBudget = createEnhancedBudget(budget);
+      } else if (budget.materials !== undefined || budget.labour !== undefined || budget.contingency !== undefined) {
+        // Legacy structure detected - convert to enhanced
+        // This should not happen in normal flow, but handle gracefully
+        console.warn('Legacy budget structure detected during project creation. Converting to enhanced structure.');
+        finalBudget = convertLegacyToEnhanced({
+          total: budget.total || 0,
+          materials: budget.materials || 0,
+          labour: budget.labour || 0,
+          contingency: budget.contingency || 0,
+          spent: 0
+        });
+      } else {
+        // Budget object provided but not in expected format - treat as empty
+        finalBudget = createEnhancedBudget({
+          total: budget.total || 0,
+          directConstructionCosts: 0,
+          preConstructionCosts: 0,
+          indirectCosts: 0,
+          contingencyReserve: 0
+        });
       }
-    } else if (budgetTotal === 0) {
+      
+      // Check budget total for warnings
+      const budgetTotal = finalBudget.total || 0;
+      if (process.env.REQUIRE_PROJECT_BUDGET === 'true') {
+        if (!budgetTotal || budgetTotal <= 0) {
+          return errorResponse('Project budget is required and must be greater than 0', 400);
+        }
+      } else if (budgetTotal === 0) {
+        budgetWarning = {
+          message: 'Project created with zero budget. Please set budget before creating materials.',
+          type: 'zero_budget',
+        };
+      }
+    } else {
+      // No budget provided - create empty enhanced structure
+      if (process.env.REQUIRE_PROJECT_BUDGET === 'true') {
+        return errorResponse('Project budget is required', 400);
+      }
+      
       budgetWarning = {
         message: 'Project created with zero budget. Please set budget before creating materials.',
         type: 'zero_budget',
       };
+      
+      finalBudget = createEnhancedBudget({
+        total: 0,
+        directConstructionCosts: 0,
+        preConstructionCosts: 0,
+        indirectCosts: 0,
+        contingencyReserve: 0
+      });
+    }
+
+    // Validate site manager if provided
+    let siteManagerId = null;
+    if (siteManager && ObjectId.isValid(siteManager)) {
+      const siteManagerUser = await db.collection('users').findOne({
+        _id: new ObjectId(siteManager),
+        status: { $in: ['active', null] }, // Allow active or no status
+      });
+      
+      if (!siteManagerUser) {
+        return errorResponse('Site manager not found or inactive', 400);
+      }
+      
+      // Verify user has appropriate role (PM, Supervisor, or Owner)
+      const userRole = siteManagerUser.role?.toLowerCase();
+      const validSiteManagerRoles = ['pm', 'project_manager', 'supervisor', 'owner'];
+      if (!validSiteManagerRoles.includes(userRole)) {
+        return errorResponse(
+          `User "${siteManagerUser.firstName || ''} ${siteManagerUser.lastName || ''}" does not have a role suitable for site manager. ` +
+          `Required roles: Project Manager, Supervisor, or Owner.`,
+          400
+        );
+      }
+      
+      siteManagerId = new ObjectId(siteManager);
+    }
+
+    // Validate team members if provided
+    const validatedTeamMembers = [];
+    if (Array.isArray(teamMembers) && teamMembers.length > 0) {
+      for (const memberId of teamMembers) {
+        if (ObjectId.isValid(memberId)) {
+          const member = await db.collection('users').findOne({
+            _id: new ObjectId(memberId),
+            status: { $in: ['active', null] },
+          });
+          if (member) {
+            validatedTeamMembers.push(new ObjectId(memberId));
+          }
+        }
+      }
     }
 
     // Create project
@@ -204,21 +326,15 @@ export async function POST(request) {
       startDate: startDate ? new Date(startDate) : null,
       plannedEndDate: plannedEndDate ? new Date(plannedEndDate) : null,
       actualEndDate: null,
-      budget: {
-        total: budgetTotal,
-        materials: budget?.materials || 0,
-        labour: budget?.labour || 0,
-        contingency: budget?.contingency || 0,
-        spent: 0, // Computed field
-      },
-      siteManager: null,
-      teamMembers: [],
+      budget: finalBudget,
+      siteManager: siteManagerId,
+      teamMembers: validatedTeamMembers,
       createdBy: new ObjectId(userProfile._id),
       createdAt: new Date(),
       updatedAt: new Date(),
       documents: [],
       metadata: {
-        contractValue: budget?.total || 0,
+        contractValue: finalBudget.total || 0,
         estimatedDuration: null,
         completionPercentage: 0,
       },
@@ -301,6 +417,49 @@ export async function POST(request) {
       }
     }
 
+    // Auto-initialize phases if requested
+    let phaseInitializationWarning = null;
+    let phasesCreated = false;
+    if (autoInitializePhases !== false) {
+      try {
+        const { initializeDefaultPhases } = await import('@/lib/phase-helpers');
+        const createdPhases = await initializeDefaultPhases(result.insertedId.toString(), insertedProject);
+        phasesCreated = createdPhases && createdPhases.length > 0;
+        console.log(`✅ Auto-initialized ${createdPhases.length} default phases for project ${insertedProject.projectCode}`);
+      } catch (phaseError) {
+        // Log error with full details
+        console.error('Error auto-initializing phases:', phaseError);
+        console.error('Phase initialization error stack:', phaseError.stack);
+        
+        // Create detailed warning for user
+        phaseInitializationWarning = {
+          type: 'phase_initialization_failed',
+          message: phaseError.message || 'Failed to initialize default phases',
+          details: `Phase initialization failed: ${phaseError.message || 'Unknown error'}. ` +
+                   `The project was created successfully, but phases were not initialized. ` +
+                   `You can initialize phases manually from the project detail page.`,
+          actionUrl: `/projects/${result.insertedId.toString()}`,
+          actionLabel: 'Go to Project',
+          canRetry: true,
+          retryUrl: `/api/projects/${result.insertedId.toString()}/phases/initialize`,
+        };
+        
+        // Continue with project creation even if phase initialization fails
+        // User can initialize phases manually later
+      }
+    } else {
+      // Phases not auto-initialized - provide info
+      phaseInitializationWarning = {
+        type: 'phases_not_initialized',
+        message: 'Phases were not auto-initialized',
+        details: 'Phases were not automatically initialized. You can initialize them manually from the project detail page.',
+        actionUrl: `/projects/${result.insertedId.toString()}`,
+        actionLabel: 'Go to Project',
+        canRetry: true,
+        retryUrl: `/api/projects/${result.insertedId.toString()}/phases/initialize`,
+      };
+    }
+
     // Initialize project_finances record immediately after project creation
     // This ensures financial tracking is always available from the start
     let capitalInfo = null;
@@ -339,16 +498,46 @@ export async function POST(request) {
       changes: { created: insertedProject },
     });
 
-    // Include budget warning and capital info in response if present
+    // Include warnings and info in response
     const responseData = { ...insertedProject };
+    const warnings = [];
+    
     if (budgetWarning) {
       responseData.budgetWarning = budgetWarning;
+      warnings.push(budgetWarning.message);
     }
     if (capitalInfo) {
       responseData.capitalInfo = capitalInfo;
+      warnings.push(capitalInfo.message);
+    }
+    if (phaseInitializationWarning) {
+      responseData.phaseInitializationWarning = phaseInitializationWarning;
+      warnings.push(phaseInitializationWarning.message);
+    }
+    
+    // Add summary of what was created
+    responseData.creationSummary = {
+      projectCreated: true,
+      floorsCreated: defaultFloors.length,
+      phasesCreated: phasesCreated,
+      financesInitialized: true,
+      warnings: warnings.length > 0 ? warnings : null,
+      hasWarnings: warnings.length > 0,
+    };
+
+    // Build success message with details
+    let successMessage = 'Project created successfully';
+    if (defaultFloors.length > 0) {
+      successMessage += `. ${defaultFloors.length} floor${defaultFloors.length !== 1 ? 's' : ''} created.`;
+    }
+    if (phasesCreated) {
+      successMessage += ' Default phases initialized.';
+    }
+    if (warnings.length > 0) {
+      successMessage += ` ${warnings.length} warning${warnings.length !== 1 ? 's' : ''} - see details below.`;
     }
 
-    return successResponse(responseData, 'Project created successfully', 201);
+    return successResponse(responseData, successMessage, 201);
   } catch (error) {
     console.error('Create project error:', error);
     return errorResponse('Failed to create project', 500);

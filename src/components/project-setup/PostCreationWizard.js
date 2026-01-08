@@ -64,8 +64,26 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
     return null;
   }
 
+  // Check if phases exist
+  const phasesExist = prerequisites.prerequisites.phases?.completed || false;
+  
   // Determine which steps need attention
   const steps = [];
+  
+  // Phase initialization check (if not completed)
+  if (!phasesExist) {
+    steps.push({
+      id: 'phases',
+      title: 'Initialize Phases',
+      description: 'Initialize default construction phases for phase-based budget tracking and financial management',
+      href: `/api/projects/${projectId}/phases/initialize`,
+      actionType: 'api_call', // Special handling for API call
+      icon: '🏗️',
+      color: 'indigo',
+      completed: false,
+      priority: 'high',
+    });
+  }
   
   if (!prerequisites.prerequisites.budget.completed) {
     steps.push({
@@ -76,6 +94,7 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
       icon: '💰',
       color: 'blue',
       completed: false,
+      priority: phasesExist ? 'high' : 'medium', // Lower priority if phases not initialized
     });
   }
 
@@ -88,6 +107,7 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
       icon: '💵',
       color: 'green',
       completed: false,
+      priority: 'high',
     });
   }
 
@@ -100,6 +120,7 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
       icon: '🏢',
       color: 'purple',
       completed: false,
+      priority: 'medium',
     });
   }
 
@@ -191,16 +212,47 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
               <p className="text-sm text-gray-600 mb-4">{currentStepData.description}</p>
               
               <div className="flex gap-2">
-                <Link
-                  href={currentStepData.href}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
-                >
-                  {currentStepData.id === 'budget' && 'Set Budget'}
-                  {currentStepData.id === 'capital' && 'Allocate Capital'}
-                  {currentStepData.id === 'floors' && 'Review Floors'}
-                  {currentStepData.id === 'suppliers' && 'Add Supplier'}
-                  {currentStepData.id === 'categories' && 'Manage Categories'}
-                </Link>
+                {currentStepData.actionType === 'api_call' ? (
+                  <button
+                    onClick={async () => {
+                      try {
+                        const response = await fetch(currentStepData.href, { method: 'POST' });
+                        const data = await response.json();
+                        if (data.success) {
+                          toast.showSuccess('Phases initialized successfully!');
+                          // Refresh prerequisites to update status
+                          await fetchPrerequisites();
+                          // Move to next step or complete
+                          if (currentStep < steps.length - 1) {
+                            setCurrentStep(currentStep + 1);
+                          } else {
+                            handleComplete();
+                          }
+                        } else {
+                          toast.showError(data.error || 'Failed to initialize phases');
+                        }
+                      } catch (err) {
+                        toast.showError('Failed to initialize phases. Please try again.');
+                        console.error('Phase initialization error:', err);
+                      }
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                  >
+                    Initialize Phases
+                  </button>
+                ) : (
+                  <Link
+                    href={currentStepData.href}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                  >
+                    {currentStepData.id === 'phases' && 'Initialize Phases'}
+                    {currentStepData.id === 'budget' && 'Set Budget'}
+                    {currentStepData.id === 'capital' && 'Allocate Capital'}
+                    {currentStepData.id === 'floors' && 'Review Floors'}
+                    {currentStepData.id === 'suppliers' && 'Add Supplier'}
+                    {currentStepData.id === 'categories' && 'Manage Categories'}
+                  </Link>
+                )}
                 <button
                   onClick={() => {
                     fetchPrerequisites();
@@ -274,6 +326,7 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
     </div>
   );
 }
+
 
 
 

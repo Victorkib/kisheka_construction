@@ -35,12 +35,21 @@ export async function GET(request) {
     const db = await getDatabase();
     const userRole = userProfile.role?.toLowerCase();
 
+    // Get projectId from query params (optional - for project-specific summary)
+    const { searchParams } = new URL(request.url);
+    const projectId = searchParams.get('projectId');
+    const projectObjectId = projectId && ObjectId.isValid(projectId) ? new ObjectId(projectId) : null;
+
+    // Build project filter for aggregations
+    const projectFilter = projectObjectId ? { projectId: projectObjectId } : {};
+
     // Get total projects count
     const totalProjects = await db.collection('projects').countDocuments({
       deletedAt: null,
+      ...projectFilter,
     });
 
-    // Get total costs (materials, expenses, initial expenses)
+    // Get total costs (materials, expenses, initial expenses) - filtered by project if provided
     const materialsTotal = await db
       .collection('materials')
       .aggregate([
@@ -48,6 +57,7 @@ export async function GET(request) {
           $match: {
             deletedAt: null,
             status: { $in: ['approved', 'received'] },
+            ...projectFilter,
           },
         },
         {
@@ -67,6 +77,7 @@ export async function GET(request) {
           $match: {
             deletedAt: null,
             status: { $in: ['APPROVED', 'PAID'] },
+            ...projectFilter,
           },
         },
         {
@@ -85,6 +96,7 @@ export async function GET(request) {
         {
           $match: {
             status: 'approved',
+            ...projectFilter,
           },
         },
         {
@@ -102,19 +114,22 @@ export async function GET(request) {
     const totalInitialExpensesCost = initialExpensesTotal[0]?.total || 0;
     const totalOverallCost = totalMaterialsCost + totalExpensesCost + totalInitialExpensesCost;
 
-    // Get pending approvals count
+    // Get pending approvals count - filtered by project if provided
     const pendingMaterials = await db.collection('materials').countDocuments({
       deletedAt: null,
       status: { $in: ['pending_approval', 'submitted'] },
+      ...projectFilter,
     });
 
     const pendingExpenses = await db.collection('expenses').countDocuments({
       deletedAt: null,
       status: { $in: ['pending_approval', 'submitted'] },
+      ...projectFilter,
     });
 
     const pendingInitialExpenses = await db.collection('initial_expenses').countDocuments({
       status: 'pending_approval',
+      ...projectFilter,
     });
 
     const totalPendingApprovals = pendingMaterials + pendingExpenses + pendingInitialExpenses;
@@ -128,19 +143,19 @@ export async function GET(request) {
     if (['owner', 'investor', 'accountant', 'pm', 'project_manager'].includes(userRole)) {
       // Calculate total used from actual spending (real-time)
       // This matches the logic in /api/project-finances
-      capitalUsed = totalOverallCost; // Already calculated from actual spending above
+      capitalUsed = totalOverallCost; // Already calculated from actual spending above (filtered by project if provided)
 
-      // Calculate total invested from all projects (real-time from allocations)
-      const allProjects = await db
-        .collection('projects')
-        .find({ deletedAt: null })
-        .toArray();
+      // Calculate total invested from projects (real-time from allocations)
+      // If projectId provided, only calculate for that project; otherwise all projects
+      const projectsToCalculate = projectObjectId
+        ? await db.collection('projects').find({ _id: projectObjectId, deletedAt: null }).toArray()
+        : await db.collection('projects').find({ deletedAt: null }).toArray();
 
       let totalInvestedAllProjects = 0;
       let totalLoansAllProjects = 0;
       let totalEquityAllProjects = 0;
 
-      for (const project of allProjects) {
+      for (const project of projectsToCalculate) {
         try {
           const projectTotals = await calculateProjectTotals(project._id.toString());
           totalInvestedAllProjects += projectTotals.totalInvested || 0;

@@ -61,6 +61,7 @@ export async function POST(request) {
       batchName,
       defaultFloorId,
       defaultCategoryId,
+      defaultPhaseId,
       defaultUrgency = 'medium',
       defaultReason,
       materials,
@@ -121,6 +122,74 @@ export async function POST(request) {
       body.defaultCategory = category.name;
     }
 
+    // Phase Enforcement: Phase is now REQUIRED for bulk requests
+    // Either defaultPhaseId OR each material must have phaseId
+    const materialsWithPhase = materials.filter(m => m.phaseId && ObjectId.isValid(m.phaseId));
+    const hasDefaultPhase = defaultPhaseId && ObjectId.isValid(defaultPhaseId);
+    const allMaterialsHavePhase = materials.length === materialsWithPhase.length;
+
+    if (!hasDefaultPhase && !allMaterialsHavePhase) {
+      return errorResponse(
+        'Phase selection is required. Either provide defaultPhaseId for all materials, or specify phaseId for each material. ' +
+        `Currently: ${materialsWithPhase.length} of ${materials.length} materials have phaseId, and no defaultPhaseId provided.`,
+        400
+      );
+    }
+
+    // Validate defaultPhaseId if provided using centralized helper
+    if (hasDefaultPhase) {
+      const { validatePhaseForMaterialRequest } = await import('@/lib/phase-validation-helpers');
+      const phaseValidation = await validatePhaseForMaterialRequest(defaultPhaseId, projectId);
+      
+      if (!phaseValidation.isValid) {
+        return errorResponse(`Default phase validation failed: ${phaseValidation.error}`, phaseValidation.phase ? 400 : 404);
+      }
+    }
+
+    // Validate all material phaseIds using centralized helper
+    const { validatePhaseForMaterialRequest } = await import('@/lib/phase-validation-helpers');
+    const uniquePhaseIds = new Set();
+    
+    // Collect all phaseIds (default + per-material)
+    if (hasDefaultPhase) {
+      uniquePhaseIds.add(defaultPhaseId);
+    }
+    materialsWithPhase.forEach(m => {
+      if (m.phaseId && ObjectId.isValid(m.phaseId)) {
+        uniquePhaseIds.add(m.phaseId);
+      }
+    });
+
+    // Validate each unique phaseId
+    for (const phaseId of uniquePhaseIds) {
+      const phaseValidation = await validatePhaseForMaterialRequest(phaseId, projectId);
+      
+      if (!phaseValidation.isValid) {
+        return errorResponse(
+          `Phase validation failed for phase ${phaseId}: ${phaseValidation.error}`,
+          phaseValidation.phase ? 400 : 404
+        );
+      }
+    }
+
+    // Budget Validation: Validate bulk request budget across all phases
+    const materialsWithCosts = materials.filter(m => {
+      const cost = m.estimatedCost || (m.estimatedUnitCost && m.quantityNeeded ? m.estimatedUnitCost * m.quantityNeeded : 0);
+      return cost > 0;
+    });
+
+    if (materialsWithCosts.length > 0) {
+      const { validateBulkMaterialRequestBudget } = await import('@/lib/phase-helpers');
+      const budgetValidation = await validateBulkMaterialRequestBudget(materialsWithCosts, defaultPhaseId);
+      
+      if (!budgetValidation.isValid) {
+        return errorResponse(
+          `Budget validation failed: ${budgetValidation.errors.join('; ')}`,
+          400
+        );
+      }
+    }
+
     // Determine initial status
     const userRole = normalizeUserRole(userProfile.role);
     let initialStatus = 'draft';
@@ -142,6 +211,7 @@ export async function POST(request) {
       defaultFloorId,
       defaultCategoryId,
       defaultCategory: body.defaultCategory,
+      defaultPhaseId,
       defaultUrgency,
       defaultReason,
     };

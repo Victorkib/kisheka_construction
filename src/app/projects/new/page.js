@@ -13,10 +13,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { useToast } from '@/components/toast';
+import { EnhancedBudgetInput } from '@/components/budget/EnhancedBudgetInput';
+import { useProjectContext } from '@/contexts/ProjectContext';
 
 export default function NewProjectPage() {
   const router = useRouter();
   const toast = useToast();
+  const { handleProjectCreated, currentProject, accessibleProjects } = useProjectContext();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
@@ -32,20 +35,74 @@ export default function NewProjectPage() {
     startDate: '',
     plannedEndDate: '',
     budget: {
-      total: '',
-      materials: '',
-      labour: '',
-      contingency: '',
+      total: 0,
+      directConstructionCosts: 0,
+      preConstructionCosts: 0,
+      indirectCosts: 0,
+      contingencyReserve: 0,
+      directCosts: {
+        materials: { total: 0, structural: 0, finishing: 0, mep: 0, specialty: 0 },
+        labour: { total: 0, skilled: 0, unskilled: 0, supervisory: 0, specialized: 0 },
+        equipment: { total: 0, rental: 0, purchase: 0, maintenance: 0 },
+        subcontractors: { total: 0, specializedTrades: 0, professionalServices: 0 }
+      },
+      preConstruction: {
+        total: 0,
+        landAcquisition: 0,
+        legalRegulatory: 0,
+        permitsApprovals: 0,
+        sitePreparation: 0
+      },
+      indirect: {
+        total: 0,
+        siteOverhead: 0,
+        transportation: 0,
+        utilities: 0,
+        safetyCompliance: 0
+      },
+      contingency: {
+        total: 0,
+        designContingency: 0,
+        constructionContingency: 0,
+        ownersReserve: 0
+      }
     },
+    siteManager: '',
+    teamMembers: [],
     autoCreateFloors: true,
     floorCount: 10,
     includeBasements: false,
     basementCount: 0,
+    autoInitializePhases: true, // Default to true for better UX
   });
+
+  const [availableUsers, setAvailableUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   useEffect(() => {
     fetchUser();
+    fetchAvailableUsers();
   }, []);
+
+  const fetchAvailableUsers = async () => {
+    try {
+      setLoadingUsers(true);
+      // Fetch users with PM role (site managers)
+      const response = await fetch('/api/users?role=pm&status=active&limit=100');
+      const data = await response.json();
+      if (data.success) {
+        // API returns { users: [...], pagination: {...}, ... }
+        setAvailableUsers(Array.isArray(data.data?.users) ? data.data.users : []);
+      } else {
+        setAvailableUsers([]);
+      }
+    } catch (err) {
+      console.error('Error fetching users:', err);
+      setAvailableUsers([]); // Ensure it's always an array
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
 
   const fetchUser = async () => {
     try {
@@ -90,6 +147,13 @@ export default function NewProjectPage() {
     }
   };
 
+  const handleBudgetChange = (budgetData) => {
+    setFormData((prev) => ({
+      ...prev,
+      budget: budgetData,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -108,13 +172,33 @@ export default function NewProjectPage() {
       return;
     }
 
+    // Budget validation
+    const budgetTotal = parseFloat(formData.budget?.total || 0);
+    if (isNaN(budgetTotal) || budgetTotal < 0) {
+      setError('Project budget must be a valid positive number');
+      setLoading(false);
+      return;
+    }
+
+    // Phase initialization validation - warn if budget is zero
+    if (formData.autoInitializePhases && (budgetTotal === 0 || isNaN(budgetTotal))) {
+      const proceed = window.confirm(
+        'You have selected to auto-initialize phases, but the project budget is zero. ' +
+        'Phases cannot be initialized without a budget. Would you like to:\n\n' +
+        '• Click OK to proceed without auto-initializing phases (you can initialize them later)\n' +
+        '• Click Cancel to go back and set a budget'
+      );
+      if (!proceed) {
+        setLoading(false);
+        return;
+      }
+      // User chose to proceed - disable phase initialization
+      formData.autoInitializePhases = false;
+    }
+
     try {
-      const budget = {
-        total: parseFloat(formData.budget.total) || 0,
-        materials: parseFloat(formData.budget.materials) || 0,
-        labour: parseFloat(formData.budget.labour) || 0,
-        contingency: parseFloat(formData.budget.contingency) || 0,
-      };
+      // Budget is always in enhanced structure
+      const budget = formData.budget;
 
       // Build request body
       const requestBody = {
@@ -127,6 +211,8 @@ export default function NewProjectPage() {
         startDate: formData.startDate || null,
         plannedEndDate: formData.plannedEndDate || null,
         budget,
+        siteManager: formData.siteManager || null,
+        teamMembers: formData.teamMembers || [],
         autoCreateFloors: formData.autoCreateFloors,
       };
 
@@ -136,6 +222,9 @@ export default function NewProjectPage() {
         requestBody.includeBasements = formData.includeBasements;
         requestBody.basementCount = formData.includeBasements ? parseInt(formData.basementCount) || 0 : 0;
       }
+
+      // Add phase initialization option
+      requestBody.autoInitializePhases = formData.autoInitializePhases !== false; // Default to true
 
       const response = await fetch('/api/projects', {
         method: 'POST',
@@ -151,6 +240,20 @@ export default function NewProjectPage() {
         throw new Error(data.error || 'Failed to create project');
       }
 
+      const newProjectId = data.data._id;
+      const newProjectName = data.data.projectName;
+      
+      // Capture current project info BEFORE handling creation (since it might change)
+      const hadCurrentProject = !!currentProject;
+      const previousProjectName = currentProject?.projectName;
+      const previousProjectCount = accessibleProjects.length;
+
+      // Handle project creation with ProjectContext
+      const selectionResult = await handleProjectCreated(newProjectId, {
+        autoSelectIfOnly: true,
+        preserveCurrent: true,
+      });
+
       // Show budget warning if present
       if (data.data.budgetWarning) {
         toast.showWarning(data.data.budgetWarning.message, { duration: 10000 });
@@ -161,13 +264,82 @@ export default function NewProjectPage() {
         toast.showInfo(data.data.capitalInfo.message, { duration: 10000 });
       }
       
-      // Show success message if no warnings
-      if (!data.data.budgetWarning && !data.data.capitalInfo) {
-        toast.showSuccess('Project created successfully!');
+      // Show phase initialization warning if present
+      if (data.data.phaseInitializationWarning) {
+        const warning = data.data.phaseInitializationWarning;
+        toast.showWarning(
+          warning.details || warning.message,
+          {
+            duration: 15000,
+            title: 'Phase Initialization Notice',
+            action: warning.canRetry ? {
+              label: 'Initialize Phases',
+              onClick: () => {
+                // Navigate to project detail page where user can initialize phases
+                router.push(warning.actionUrl);
+              }
+            } : undefined
+          }
+        );
+      }
+      
+      // Show creation summary if available
+      if (data.data.creationSummary) {
+        const summary = data.data.creationSummary;
+        const summaryParts = [];
+        if (summary.floorsCreated > 0) {
+          summaryParts.push(`${summary.floorsCreated} floor${summary.floorsCreated !== 1 ? 's' : ''}`);
+        }
+        if (summary.phasesCreated) {
+          summaryParts.push('phases initialized');
+        }
+        if (summaryParts.length > 0) {
+          toast.showInfo(
+            `Project created with: ${summaryParts.join(', ')}.`,
+            { duration: 8000, title: 'Setup Complete' }
+          );
+        }
+      }
+
+      // Show project selection notification
+      if (selectionResult.success) {
+        const { selectionReason, isOnlyProject, totalProjects } = selectionResult;
+        
+        if (isOnlyProject) {
+          // First project created
+          toast.showInfo(
+            `Project "${newProjectName}" created and automatically selected! This is your active project.`,
+            { 
+              duration: 7000,
+              title: 'First Project Created'
+            }
+          );
+        } else if (selectionReason === 'preserved_current') {
+          // Current project preserved
+          toast.showSuccess(
+            `Project "${newProjectName}" created successfully! You're still working with "${previousProjectName || 'your current project'}".`,
+            { 
+              duration: 7000,
+              title: 'Project Created'
+            }
+          );
+        } else {
+          // New project selected
+          toast.showInfo(
+            `Project "${newProjectName}" created and selected! This is now your active project.`,
+            { 
+              duration: 7000,
+              title: 'Project Created & Selected'
+            }
+          );
+        }
+      } else {
+        // Fallback success message
+        toast.showSuccess(`Project "${newProjectName}" created successfully!`);
       }
 
       // Redirect to project detail page
-      router.push(`/projects/${data.data._id}`);
+      router.push(`/projects/${newProjectId}`);
     } catch (err) {
       setError(err.message);
       console.error('Create project error:', err);
@@ -195,284 +367,754 @@ export default function NewProjectPage() {
     );
   }
 
+  // Calculate form completion progress
+  const calculateProgress = () => {
+    let completed = 0;
+    const total = 6;
+    if (formData.projectCode) completed++;
+    if (formData.projectName) completed++;
+    if (formData.location) completed++;
+    if (formData.client) completed++;
+    const budgetTotal = parseFloat(formData.budget?.total || 0);
+    if (budgetTotal > 0) completed++;
+    if (formData.startDate && formData.plannedEndDate) completed++;
+    return Math.round((completed / total) * 100);
+  };
+
+  const progress = calculateProgress();
+
   return (
     <AppLayout>
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            href="/projects"
-            className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block"
-          >
-            ← Back to Projects
-          </Link>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create New Project</h1>
-          <p className="text-gray-600 mt-2">Set up a new construction project</p>
-        </div>
-
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 flex items-start gap-2">
-            <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <div>
-              <p className="font-semibold">Error</p>
-              <p>{error}</p>
-            </div>
-            <button
-              onClick={() => setError(null)}
-              className="ml-auto text-red-500 hover:text-red-700"
-            >
-              ×
-            </button>
-          </div>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
-          {/* Basic Information */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                  Project Code <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="projectCode"
-                  value={formData.projectCode}
-                  onChange={handleChange}
-                  placeholder="e.g., KISHEKA-001"
-                  required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-                <p className="text-sm text-gray-600 mt-1 leading-normal">Unique identifier for this project</p>
-              </div>
-
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                  Project Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  name="projectName"
-                  value={formData.projectName}
-                  onChange={handleChange}
-                  placeholder="e.g., 10-Storey Residential Building"
-                  required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Description</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Project description and details..."
-                  rows={3}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Location</label>
-                <input
-                  type="text"
-                  name="location"
-                  value={formData.location}
-                  onChange={handleChange}
-                  placeholder="e.g., Nairobi, Kenya"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Client</label>
-                <input
-                  type="text"
-                  name="client"
-                  value={formData.client}
-                  onChange={handleChange}
-                  placeholder="Client name"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Status & Dates */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Status & Timeline</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Status</label>
-                <select
-                  name="status"
-                  value={formData.status}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                >
-                  <option value="planning">Planning</option>
-                  <option value="active">Active</option>
-                  <option value="paused">Paused</option>
-                  <option value="completed">Completed</option>
-                  <option value="archived">Archived</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Start Date</label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Planned End Date</label>
-                <input
-                  type="date"
-                  name="plannedEndDate"
-                  value={formData.plannedEndDate}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Budget */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Total Budget (KES)</label>
-                <input
-                  type="number"
-                  name="budget.total"
-                  value={formData.budget.total}
-                  onChange={handleChange}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Materials Budget (KES)</label>
-                <input
-                  type="number"
-                  name="budget.materials"
-                  value={formData.budget.materials}
-                  onChange={handleChange}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Labour Budget (KES)</label>
-                <input
-                  type="number"
-                  name="budget.labour"
-                  value={formData.budget.labour}
-                  onChange={handleChange}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Contingency (KES)</label>
-                <input
-                  type="number"
-                  name="budget.contingency"
-                  value={formData.budget.contingency}
-                  onChange={handleChange}
-                  placeholder="0.00"
-                  min="0"
-                  step="0.01"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Floor Configuration */}
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Floor Configuration</h2>
-            <div className="space-y-4">
-              <div className="flex items-start gap-3">
-                <input
-                  type="checkbox"
-                  id="autoCreateFloors"
-                  name="autoCreateFloors"
-                  checked={formData.autoCreateFloors}
-                  onChange={handleChange}
-                  className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                />
-                <div className="flex-1">
-                  <label htmlFor="autoCreateFloors" className="block text-base font-semibold text-gray-700 mb-1 cursor-pointer">
-                    Auto-create Floors
-                  </label>
-                  <p className="text-sm text-gray-600">
-                    Automatically create floors for this project. You can create floors manually later if disabled.
-                  </p>
-                </div>
-              </div>
-
-              {formData.autoCreateFloors && (
-                <div className="ml-7">
-                  <label className="block text-base font-semibold text-gray-700 mb-1">
-                    Number of Floors
-                  </label>
-                  <input
-                    type="number"
-                    name="floorCount"
-                    value={formData.floorCount}
-                    onChange={handleChange}
-                    placeholder="10"
-                    min="0"
-                    max="50"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                  />
-                  <p className="text-sm text-gray-600 mt-1">
-                    Number of floors to create (0-50). Ground floor is included. Default: 10 floors (Ground + 9 floors).
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Submit Buttons */}
-          <div className="flex justify-end gap-4 pt-4 border-t">
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+        {/* Header with Gradient */}
+        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+            {/* Breadcrumb */}
             <Link
               href="/projects"
-              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="inline-flex items-center text-blue-100 hover:text-white text-sm font-medium mb-4 transition-colors group"
             >
-              Cancel
+              <svg className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Back to Projects
             </Link>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Creating...' : 'Create Project'}
-            </button>
+            
+            {/* Title Section */}
+            <div className="flex items-center gap-4 mb-6">
+              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 md:p-4">
+                <svg className="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div>
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight">Create New Project</h1>
+                <p className="text-blue-100 mt-2 text-base md:text-lg">Set up a new construction project with all the essentials</p>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="mt-6">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-blue-100">Form Completion</span>
+                <span className="text-sm font-bold text-white">{progress}%</span>
+              </div>
+              <div className="w-full bg-white/20 rounded-full h-2.5 overflow-hidden">
+                <div 
+                  className="bg-white h-full rounded-full transition-all duration-500 ease-out"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
           </div>
-        </form>
+        </div>
+
+        {/* Main Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+          {/* Error Message */}
+          {error && (
+            <div className="mb-6 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md p-4 flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="font-semibold text-red-800 text-base">Error</p>
+                <p className="text-red-700 mt-1">{error}</p>
+              </div>
+              <button
+                onClick={() => setError(null)}
+                className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors"
+                aria-label="Dismiss error"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Section 1: Basic Information */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="bg-blue-600 rounded-lg p-2">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Basic Information</h2>
+                    <p className="text-sm text-gray-600">Essential project details</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Project Code */}
+                  <div className="md:col-span-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Project Code <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        name="projectCode"
+                        value={formData.projectCode}
+                        onChange={handleChange}
+                        placeholder="e.g., DOSHAKI-001"
+                        required
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-2">Unique identifier for this project</p>
+                  </div>
+
+                  {/* Project Name */}
+                  <div className="md:col-span-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Project Name <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        name="projectName"
+                        value={formData.projectName}
+                        onChange={handleChange}
+                        placeholder="e.g., 10-Storey Residential Building"
+                        required
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Description */}
+<div className="md:col-span-2">
+  <div className="flex justify-between items-center mb-2">
+    <label className="block text-sm font-semibold text-gray-700">Description</label>
+    <span className={`text-xs font-medium ${formData.description.length > 450 ? 'text-orange-500' : 'text-gray-400'}`}>
+      {formData.description.length} / 500 characters
+    </span>
+  </div>
+  <textarea
+    name="description"
+    value={formData.description}
+    onChange={handleChange}
+    placeholder="Provide a detailed description of the project..."
+    rows={4}
+    maxLength={500}
+    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-400 transition-all resize-none"
+  />
+</div>
+
+                  {/* Location */}
+                  <div className="md:col-span-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        name="location"
+                        value={formData.location}
+                        onChange={handleChange}
+                        placeholder="e.g., Nairobi, Kenya"
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-gray-900"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Client */}
+                  <div className="md:col-span-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Client</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        name="client"
+                        value={formData.client}
+                        onChange={handleChange}
+                        placeholder="Client name"
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2: Status & Timeline */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="bg-purple-600 rounded-lg p-2">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Status & Timeline</h2>
+                    <p className="text-sm text-gray-600">Project status and important dates</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Status */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <select
+                        name="status"
+                        value={formData.status}
+                        onChange={handleChange}
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 appearance-none cursor-pointer transition-all text-gray-900"
+                      >
+                        <option value="planning">Planning</option>
+                        <option value="active">Active</option>
+                        <option value="paused">Paused</option>
+                        <option value="completed">Completed</option>
+                        <option value="archived">Archived</option>
+                      </select>
+                      <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Start Date */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="date"
+                        name="startDate"
+                        value={formData.startDate}
+                        onChange={handleChange}
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-gray-900"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Planned End Date */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Planned End Date</label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <input
+                        type="date"
+                        name="plannedEndDate"
+                        value={formData.plannedEndDate}
+                        onChange={handleChange}
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-gray-900"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Budget */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="bg-green-600 rounded-lg p-2">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Budget & Financials</h2>
+                    <p className="text-sm text-gray-600">Set project budget and allocations</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <EnhancedBudgetInput
+                  value={formData.budget}
+                  onChange={handleBudgetChange}
+                  showAdvanced={true}
+                />
+            {/* Budget validation warning and phase preview */}
+            {(() => {
+              const budgetTotal = parseFloat(formData.budget?.total || 0);
+              if (budgetTotal === 0 || isNaN(budgetTotal)) {
+                return (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
+                    <div className="flex items-start gap-2">
+                      <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                      </svg>
+                      <div>
+                        <p className="text-sm font-medium text-yellow-800">
+                          Zero Budget Warning
+                        </p>
+                        <p className="text-sm text-yellow-700 mt-1">
+                          Project budget is zero. You won't be able to create material requests or purchase orders until a budget is set.
+                          {formData.autoInitializePhases && ' Phase initialization will also be skipped.'}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+              // Show phase budget preview if budget is set and phases will be initialized
+              // CRITICAL: Only allocate DCC to phases (not total budget)
+              if (budgetTotal > 0 && formData.autoInitializePhases) {
+                // Get DCC from budget (enhanced structure) or estimate from legacy
+                const budget = formData.budget || {};
+                const isEnhanced = budget.directCosts !== undefined;
+                let dccBudget = 0;
+                
+                if (isEnhanced) {
+                  dccBudget = budget.directConstructionCosts || 0;
+                } else {
+                  // Legacy: Estimate DCC (total - estimated pre-construction - indirect - contingency)
+                  const estimatedPreConstruction = budgetTotal * 0.05;
+                  const estimatedIndirect = budgetTotal * 0.05;
+                  const estimatedContingency = budget.contingency || (budgetTotal * 0.05);
+                  dccBudget = Math.max(0, budgetTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+                }
+                
+                // Phase allocations based on DCC only (pre-construction tracked separately via initial_expenses)
+                const phaseAllocations = {
+                  basement: dccBudget * 0.15,            // 15% of DCC
+                  superstructure: dccBudget * 0.65,      // 65% of DCC
+                  finishing: dccBudget * 0.15,           // 15% of DCC
+                  finalSystems: dccBudget * 0.05         // 5% of DCC
+                  // Total: 100% of DCC (not total budget)
+                };
+                const totalPhaseBudgets = Object.values(phaseAllocations).reduce((sum, val) => sum + val, 0);
+               return (
+  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-blue-500/30 rounded-xl p-6 mt-4 shadow-xl">
+    {/* Header */}
+    <div className="flex items-start justify-between mb-4">
+      <div className="flex items-center gap-3">
+        <div className="bg-blue-600 rounded-lg p-2">
+          <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <div>
+          <h3 className="text-base font-bold text-blue-400">Phase Budget Preview (Auto-Initialized)</h3>
+          <p className="text-xs text-slate-400 mt-1">Standard construction phases with industry-based allocations</p>
+        </div>
+      </div>
+    </div>
+
+    {/* Information Box */}
+    <div className="bg-blue-900/30 border-l-4 border-blue-500 rounded-lg p-4 mb-5">
+      <div className="flex items-start gap-3">
+        <svg className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div className="flex-1">
+          <p className="text-sm text-blue-200 font-medium mb-2">Why These Phases?</p>
+          <p className="text-xs text-slate-300 leading-relaxed mb-3">
+            These 4 construction phases represent the standard workflow. Budget allocations are automatically calculated from <strong className="text-blue-300">Direct Construction Costs (DCC)</strong> only. Pre-construction costs are tracked separately via initial expenses.
+          </p>
+          <ul className="text-xs text-slate-300 space-y-1 mb-3 ml-4 list-disc">
+            <li><strong className="text-blue-300">Basement (15% of DCC):</strong> Foundation, basement, and substructure work</li>
+            <li><strong className="text-blue-300">Superstructure (65% of DCC):</strong> Main building structure - typically the largest cost component</li>
+            <li><strong className="text-blue-300">Finishing (15% of DCC):</strong> Electrical, plumbing, joinery, paintwork, and tiling</li>
+            <li><strong className="text-blue-300">Final Systems (5% of DCC):</strong> Lift installation, testing, commissioning, and handover</li>
+            <li className="text-slate-400 italic mt-2"><strong className="text-blue-300">Note:</strong> Pre-construction costs (land, permits, approvals) are tracked separately via initial expenses, not as a phase.</li>
+          </ul>
+          <div className="bg-slate-800/50 rounded-lg p-3 mt-3 border border-slate-700">
+            <p className="text-xs text-slate-300">
+              <strong className="text-blue-300">💡 Note:</strong> These are <strong>estimates</strong> based on industry standards. You can adjust individual phase budgets after project creation by navigating to each phase's budget management page from the project details or phases list.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Budget Breakdown */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
+      <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-blue-500/50 transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-slate-400 text-xs font-medium uppercase tracking-wide">Basement</span>
+          <span className="text-blue-400 text-xs font-bold">15% of DCC</span>
+        </div>
+        <div className="font-bold text-white text-lg">{phaseAllocations.basement.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}</div>
+        <p className="text-xs text-slate-500 mt-2">Foundation & substructure</p>
+      </div>
+      <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-blue-500/50 transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-slate-400 text-xs font-medium uppercase tracking-wide">Superstructure</span>
+          <span className="text-blue-400 text-xs font-bold">65% of DCC</span>
+        </div>
+        <div className="font-bold text-white text-lg">{phaseAllocations.superstructure.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}</div>
+        <p className="text-xs text-slate-500 mt-2">Main building structure</p>
+      </div>
+      <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-blue-500/50 transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-slate-400 text-xs font-medium uppercase tracking-wide">Finishing</span>
+          <span className="text-blue-400 text-xs font-bold">15% of DCC</span>
+        </div>
+        <div className="font-bold text-white text-lg">{phaseAllocations.finishing.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}</div>
+        <p className="text-xs text-slate-500 mt-2">Electrical, plumbing & finishes</p>
+      </div>
+      <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700 hover:border-blue-500/50 transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-slate-400 text-xs font-medium uppercase tracking-wide">Final Systems</span>
+          <span className="text-blue-400 text-xs font-bold">5% of DCC</span>
+        </div>
+        <div className="font-bold text-white text-lg">{phaseAllocations.finalSystems.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}</div>
+        <p className="text-xs text-slate-500 mt-2">Lift, testing & handover</p>
+      </div>
+      <div className="bg-gradient-to-br from-blue-900/50 to-indigo-900/50 rounded-lg p-4 border-2 border-blue-500/50 hover:border-blue-400 transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-blue-300 text-xs font-bold uppercase tracking-wide">Total Allocation</span>
+          <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+        </div>
+        <div className="font-bold text-blue-300 text-xl">{totalPhaseBudgets.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}</div>
+        <p className="text-xs text-blue-200/70 mt-2">100% of DCC allocated to phases</p>
+        <p className="text-xs text-blue-200/50 mt-1">(Pre-construction, indirect, contingency tracked separately)</p>
+      </div>
+    </div>
+
+    {/* Update Information */}
+    <div className="bg-slate-800/30 border border-slate-600 rounded-lg p-4 mt-4">
+      <div className="flex items-start gap-3">
+        <svg className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+        </svg>
+        <div className="flex-1">
+          <p className="text-sm text-green-300 font-semibold mb-2">How to Update Phase Budgets Later</p>
+          <p className="text-xs text-slate-300 leading-relaxed mb-2">
+            After project creation, you can adjust individual phase budgets to match your specific project requirements:
+          </p>
+          <ul className="text-xs text-slate-300 space-y-1.5 ml-4 list-disc mb-3">
+            <li>Navigate to <strong className="text-green-300">Project Details</strong> page and click on any phase</li>
+            <li>Go to the <strong className="text-green-300">Budget</strong> tab within the phase detail page</li>
+            <li>Or visit <strong className="text-green-300">Phases List</strong> and select a phase to manage its budget</li>
+            <li>Adjust allocations as needed - the system will validate against total project budget</li>
+          </ul>
+          <div className="bg-slate-700/50 rounded p-2 mt-2 border border-slate-600">
+            <p className="text-xs text-slate-400 italic">
+              <strong className="text-green-300">Tip:</strong> Phase budgets can be updated at any time. Changes are tracked in the audit log for transparency and accountability.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+              }
+              return null;
+            })()}
+              </div>
+            </div>
+
+            {/* Section 4: Team Assignment */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-orange-50 to-amber-50 px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="bg-orange-600 rounded-lg p-2">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Team Assignment</h2>
+                    <p className="text-sm text-gray-600">Assign project team members</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Site Manager */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Site Manager <span className="text-gray-500 font-normal">(Optional)</span>
+                    </label>
+                    {loadingUsers ? (
+                      <div className="px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg flex items-center gap-3">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-600"></div>
+                        <span className="text-gray-600">Loading users...</span>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                        </div>
+                        <select
+                          name="siteManager"
+                          value={formData.siteManager}
+                          onChange={handleChange}
+                          className="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 appearance-none cursor-pointer transition-all text-gray-900"
+                        >
+                          <option value="">No site manager assigned</option>
+                          {Array.isArray(availableUsers) && availableUsers.length > 0 ? (
+                            availableUsers.map((user) => (
+                              <option key={user.id || user._id} value={user.id || user._id}>
+                                {user.firstName || ''} {user.lastName || ''} {user.email ? `(${user.email})` : ''}
+                              </option>
+                            ))
+                          ) : (
+                            <option value="" disabled>No site managers available</option>
+                          )}
+                        </select>
+                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
+                      </div>
+                    )}
+                    <p className="text-xs text-gray-500 mt-2">
+                      Assign a site manager to oversee this project. Can be assigned later.
+                    </p>
+                  </div>
+
+                  {/* Team Members - Info */}
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Team Members
+                    </label>
+                    <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg">
+                      <div className="flex items-start gap-3">
+                        <svg className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                          <p className="text-sm font-medium text-gray-700">Add After Creation</p>
+                          <p className="text-xs text-gray-600 mt-1">
+                            Team members can be added after project creation from the project team page for better control.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 5: Configuration */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <div className="bg-indigo-600 rounded-lg p-2">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">Project Configuration</h2>
+                    <p className="text-sm text-gray-600">Auto-setup options and preferences</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6 space-y-6">
+                {/* Floor Configuration */}
+                <div>
+                  <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    Floor Configuration
+                  </h3>
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center h-5">
+                        <input
+                          type="checkbox"
+                          id="autoCreateFloors"
+                          name="autoCreateFloors"
+                          checked={formData.autoCreateFloors}
+                          onChange={handleChange}
+                          className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label htmlFor="autoCreateFloors" className="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">
+                          Auto-create Floors
+                        </label>
+                        <p className="text-xs text-gray-600">
+                          Automatically create floors for this project. You can create floors manually later if disabled.
+                        </p>
+                      </div>
+                    </div>
+
+                    {formData.autoCreateFloors && (
+                      <div className="mt-4 ml-9">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Number of Floors
+                        </label>
+                        <input
+                          type="number"
+                          name="floorCount"
+                          value={formData.floorCount}
+                          onChange={handleChange}
+                          placeholder="10"
+                          min="0"
+                          max="50"
+                          className="w-full px-4 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder:text-gray-400 transition-all"
+                        />
+                        <p className="text-xs text-gray-500 mt-2">
+                          Number of floors to create (0-50). Ground floor is included. Default: 10 floors (Ground + 9 floors).
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Phase Configuration */}
+                <div>
+                  <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Phase Configuration
+                  </h3>
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div className="flex items-start gap-4">
+                      <div className="flex items-center h-5">
+                        <input
+                          type="checkbox"
+                          id="autoInitializePhases"
+                          name="autoInitializePhases"
+                          checked={formData.autoInitializePhases}
+                          onChange={handleChange}
+                          className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label htmlFor="autoInitializePhases" className="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">
+                          Auto-initialize Default Phases <span className="text-indigo-600">(Recommended)</span>
+                        </label>
+                        <p className="text-xs text-gray-600 mb-3">
+                          Automatically create 4 default construction phases (Basement, Superstructure, Finishing, Final Systems) with automatic budget allocation from Direct Construction Costs (DCC). Pre-construction costs are tracked separately via initial expenses. This enables phase-based budget tracking and financial management.
+                        </p>
+                  {formData.autoInitializePhases && (() => {
+                    const budgetTotal = parseFloat(formData.budget?.total || 0);
+                    if (budgetTotal === 0 || isNaN(budgetTotal)) {
+                      return (
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2">
+                          <div className="flex items-start gap-2">
+                            <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <div>
+                              <p className="text-sm font-medium text-yellow-800">
+                                Budget Required for Phase Initialization
+                              </p>
+                              <p className="text-sm text-yellow-700 mt-1">
+                                Phases cannot be initialized with a zero budget. Please set a project budget above, or phases will need to be initialized manually after setting the budget.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    }
+                        return null;
+                      })()}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Buttons */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+              <div className="flex flex-col sm:flex-row justify-end gap-4">
+                <Link
+                  href="/projects"
+                  className="px-6 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 font-medium text-gray-700 transition-all text-center"
+                >
+                  Cancel
+                </Link>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-8 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md hover:shadow-lg transition-all transform hover:scale-105 disabled:transform-none flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Creating Project...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Create Project
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </AppLayout>
   );

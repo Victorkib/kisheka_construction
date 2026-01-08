@@ -48,14 +48,15 @@ export function EditModal({
 
   // Prevent body scroll when modal is open
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen]);
 
   const handleCloseAttempt = () => {

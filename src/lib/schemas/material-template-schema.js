@@ -24,9 +24,10 @@ export const TEMPLATE_CATEGORY_TYPES = {
 
 /**
  * Project Phases (from OrgDoc.md)
+ * NOTE: 'pre_construction' removed - pre-construction costs tracked via initial_expenses collection
  */
 export const PROJECT_PHASES = [
-  'pre_construction',
+  // 'pre_construction', // REMOVED - pre-construction tracked via initial_expenses
   'basement_substructure',
   'superstructure',
   'doors_windows',

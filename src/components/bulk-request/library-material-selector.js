@@ -5,12 +5,13 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { MaterialLibrarySearch } from '@/components/material-library/material-library-search';
 
 export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [] }) {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [selectedIds, setSelectedIds] = useState(new Set(selectedLibraryIds));
   const [categories, setCategories] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
@@ -21,41 +22,43 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
     search: '',
   });
 
+  // Memoize filter values to prevent unnecessary re-renders
+  const filterValues = useMemo(() => ({
+    categoryId: filters.categoryId,
+    isCommon: filters.isCommon,
+    isActive: filters.isActive,
+    search: filters.search,
+  }), [filters.categoryId, filters.isCommon, filters.isActive, filters.search]);
+
+  // Fetch categories on mount
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories');
+        const data = await response.json();
+        if (data.success) {
+          setCategories(data.data || []);
+        }
+      } catch (err) {
+        console.error('Error fetching categories:', err);
+      }
+    };
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    // Reset to page 1 when filters change
-    setPagination(prev => ({ ...prev, page: 1 }));
-  }, [filters]);
-
-  useEffect(() => {
-    fetchMaterials();
-  }, [filters, pagination.page]);
-
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch('/api/categories');
-      const data = await response.json();
-      if (data.success) {
-        setCategories(data.data || []);
-      }
-    } catch (err) {
-      console.error('Error fetching categories:', err);
-    }
-  };
-
-  const fetchMaterials = async () => {
+  // Memoized fetchMaterials function to prevent unnecessary recreations
+  const fetchMaterials = useCallback(async (page, filterVals) => {
     try {
       setLoading(true);
+      setError(null);
+      
       const queryParams = new URLSearchParams({
-        page: pagination.page.toString(),
+        page: page.toString(),
         limit: pagination.limit.toString(),
-        ...(filters.categoryId && { categoryId: filters.categoryId }),
-        ...(filters.isCommon && { isCommon: filters.isCommon }),
-        ...(filters.isActive && { isActive: filters.isActive }),
-        ...(filters.search && { search: filters.search }),
+        ...(filterVals.categoryId && { categoryId: filterVals.categoryId }),
+        ...(filterVals.isCommon && { isCommon: filterVals.isCommon }),
+        ...(filterVals.isActive && { isActive: filterVals.isActive }),
+        ...(filterVals.search && { search: filterVals.search }),
         sortBy: 'usageCount',
         sortOrder: 'desc',
       });
@@ -65,16 +68,51 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
 
       if (data.success) {
         setMaterials(data.data.materials || []);
+        // Only update pagination if it actually changed
         if (data.data.pagination) {
-          setPagination(data.data.pagination);
+          setPagination((prev) => {
+            const newPagination = data.data.pagination;
+            // Preserve limit if not provided
+            const updatedPagination = {
+              ...newPagination,
+              limit: newPagination.limit || prev.limit,
+            };
+            // Only update if values actually changed
+            if (
+              prev.page === updatedPagination.page &&
+              prev.limit === updatedPagination.limit &&
+              prev.total === updatedPagination.total &&
+              prev.pages === updatedPagination.pages
+            ) {
+              return prev; // Return same reference if values are the same
+            }
+            return updatedPagination;
+          });
         }
+      } else {
+        throw new Error(data.error || 'Failed to fetch materials');
       }
     } catch (err) {
       console.error('Error fetching materials:', err);
+      setError(err.message || 'Failed to load materials. Please try again.');
+      setMaterials([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [pagination.limit]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setPagination((prev) => {
+      if (prev.page === 1) return prev; // Avoid unnecessary update
+      return { ...prev, page: 1 };
+    });
+  }, [filterValues]);
+
+  // Fetch materials when page or filters change
+  useEffect(() => {
+    fetchMaterials(pagination.page, filterValues);
+  }, [pagination.page, filterValues, fetchMaterials]);
 
   const handleToggleSelect = (materialId) => {
     setSelectedIds((prev) => {
@@ -173,12 +211,27 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
         </div>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+          <p className="text-sm font-medium">{error}</p>
+          <button
+            onClick={() => fetchMaterials(pagination.page, filterValues)}
+            className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
       {/* Materials List */}
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-2 text-sm text-gray-600">Loading materials...</p>
         </div>
+      ) : error ? (
+        null // Error message already shown above
       ) : materials.length === 0 ? (
         <div className="text-center py-8 bg-gray-50 rounded-lg">
           <p className="text-gray-600">No materials found</p>

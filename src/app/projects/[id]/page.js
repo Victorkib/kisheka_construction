@@ -22,6 +22,310 @@ import { FloorVisualization } from '@/components/floors/FloorVisualization';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { ProjectHealthDashboard } from '@/components/project-health/ProjectHealthDashboard';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
+import { HierarchicalBudgetDisplay } from '@/components/budget/HierarchicalBudgetDisplay';
+import { EnhancedBudgetInput } from '@/components/budget/EnhancedBudgetInput';
+import { BudgetVisualization } from '@/components/budget/BudgetVisualization';
+
+// Phases Section Component
+function PhasesSection({ projectId, canEdit }) {
+  const toast = useToast();
+  const [phases, setPhases] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [initializing, setInitializing] = useState(false);
+  const [projectBudget, setProjectBudget] = useState(null);
+
+  useEffect(() => {
+    if (projectId) {
+      fetchPhases();
+      fetchProjectBudget();
+    }
+  }, [projectId]);
+
+  const fetchPhases = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/phases?projectId=${projectId}&includeFinancials=true`);
+      const data = await response.json();
+      if (data.success) {
+        setPhases(data.data || []);
+      } else {
+        setError(data.error || 'Failed to fetch phases');
+      }
+    } catch (err) {
+      console.error('Fetch phases error:', err);
+      setError('Failed to load phases');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProjectBudget = async () => {
+    try {
+      const response = await fetch(`/api/projects/${projectId}`);
+      const data = await response.json();
+      if (data.success && data.data) {
+        setProjectBudget(data.data.budget);
+      }
+    } catch (err) {
+      console.error('Fetch project budget error:', err);
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-KE', {
+      style: 'currency',
+      currency: 'KES',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount || 0);
+  };
+
+  const getStatusColor = (status) => {
+    const colors = {
+      'not_started': 'bg-gray-100 text-gray-800',
+      'in_progress': 'bg-blue-100 text-blue-800',
+      'completed': 'bg-green-100 text-green-800',
+      'on_hold': 'bg-yellow-100 text-yellow-800',
+      'cancelled': 'bg-red-100 text-red-800'
+    };
+    return colors[status] || 'bg-gray-100 text-gray-800';
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Construction Phases</h2>
+        <p className="text-sm text-gray-500">Loading phases...</p>
+      </div>
+    );
+  }
+
+  if (error && phases.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Construction Phases</h2>
+        <p className="text-sm text-red-600">{error}</p>
+        {canEdit && (
+          <button
+            onClick={async () => {
+              setInitializing(true);
+              try {
+                const response = await fetch(`/api/projects/${projectId}/phases/initialize`, { method: 'POST' });
+                const data = await response.json();
+                if (data.success) {
+                  toast.showSuccess(`Successfully initialized ${data.data.count} default phases`);
+                  fetchPhases();
+                } else {
+                  toast.showError(data.error || 'Failed to initialize phases');
+                }
+              } catch (err) {
+                toast.showError('Failed to initialize phases');
+                console.error('Initialize phases error:', err);
+              } finally {
+                setInitializing(false);
+              }
+            }}
+            disabled={initializing}
+            className="mt-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition-colors"
+          >
+            {initializing ? 'Initializing...' : 'Initialize Default Phases'}
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow p-6 mb-6">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold text-gray-900">Construction Phases</h2>
+        <div className="flex gap-2">
+          <Link
+            href={`/phases?projectId=${projectId}`}
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          >
+            View All
+          </Link>
+          {canEdit && (
+            <>
+              <span className="text-gray-300">|</span>
+              <Link
+                href={`/phases/new?projectId=${projectId}`}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              >
+                + New Phase
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+
+      {phases.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500 mb-2">No phases defined for this project</p>
+          <p className="text-sm text-gray-400 mb-4">
+            Initialize default phases to enable phase-based budget tracking and financial management
+          </p>
+          {canEdit && (
+            <button
+              onClick={async () => {
+                setInitializing(true);
+                try {
+                  const response = await fetch(`/api/projects/${projectId}/phases/initialize`, { method: 'POST' });
+                  const data = await response.json();
+                  if (data.success) {
+                    toast.showSuccess(`Successfully initialized ${data.data.count} default phases`);
+                    fetchPhases();
+                  } else {
+                    toast.showError(data.error || 'Failed to initialize phases');
+                  }
+                } catch (err) {
+                  toast.showError('Failed to initialize phases');
+                  console.error('Initialize phases error:', err);
+                } finally {
+                  setInitializing(false);
+                }
+              }}
+              disabled={initializing}
+              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            >
+              {initializing ? 'Initializing...' : 'Initialize Default Phases'}
+            </button>
+          )}
+          {canEdit && (
+            <p className="text-xs text-gray-500 mt-3">
+              This will create 5 default phases with automatic budget allocation
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {/* Phase Budget Summary */}
+          {projectBudget && phases.length > 0 && (() => {
+            const totalPhaseBudgets = phases.reduce((sum, phase) => {
+              return sum + (phase.budgetAllocation?.total || 0);
+            }, 0);
+            const projectTotal = projectBudget.total || 0;
+            const unallocatedBudget = projectTotal - totalPhaseBudgets;
+            const allocationPercentage = projectTotal > 0 ? (totalPhaseBudgets / projectTotal) * 100 : 0;
+            
+            return (
+              <div className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
+                <h3 className="text-sm font-semibold text-gray-700 mb-3">Phase Budget Summary</h3>
+                <div className="grid grid-cols-4 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Project Budget</p>
+                    <p className="text-sm font-semibold text-gray-900">{formatCurrency(projectTotal)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Allocated to Phases</p>
+                    <p className="text-sm font-semibold text-blue-600">{formatCurrency(totalPhaseBudgets)}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Unallocated</p>
+                    <p className={`text-sm font-semibold ${
+                      unallocatedBudget < 0 ? 'text-red-600' : unallocatedBudget > 0 ? 'text-yellow-600' : 'text-gray-600'
+                    }`}>
+                      {formatCurrency(unallocatedBudget)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-600 mb-1">Allocation</p>
+                    <p className="text-sm font-semibold text-gray-900">{allocationPercentage.toFixed(1)}%</p>
+                    <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                      <div
+                        className={`h-1.5 rounded-full ${
+                          allocationPercentage > 100 ? 'bg-red-600' : 
+                          allocationPercentage > 90 ? 'bg-yellow-600' : 'bg-green-600'
+                        }`}
+                        style={{ width: `${Math.min(100, allocationPercentage)}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+          
+          {phases.slice(0, 5).map((phase) => {
+            const financialSummary = phase.financialSummary || {
+              budgetTotal: phase.budgetAllocation?.total || 0,
+              actualTotal: phase.actualSpending?.total || 0,
+              remaining: phase.financialStates?.remaining || 0,
+              utilizationPercentage: 0
+            };
+            
+            return (
+              <Link
+                key={phase._id}
+                href={`/phases/${phase._id}`}
+                className="block border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex justify-between items-start">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="font-semibold text-gray-900">{phase.phaseName}</h3>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(phase.status)}`}>
+                        {phase.status.replace('_', ' ').toUpperCase()}
+                      </span>
+                      <span className="text-xs text-gray-500">{phase.phaseCode}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <p className="text-gray-600">Budget</p>
+                        <p className="font-semibold text-gray-900">{formatCurrency(financialSummary.budgetTotal)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Spent</p>
+                        <p className="font-semibold text-blue-600">{formatCurrency(financialSummary.actualTotal)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-600">Remaining</p>
+                        <p className={`font-semibold ${
+                          financialSummary.remaining < 0 ? 'text-red-600' : 'text-green-600'
+                        }`}>
+                          {formatCurrency(financialSummary.remaining)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-2">
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full ${
+                            financialSummary.utilizationPercentage > 100 
+                              ? 'bg-red-600' 
+                              : financialSummary.utilizationPercentage > 80 
+                              ? 'bg-yellow-600' 
+                              : 'bg-green-600'
+                          }`}
+                          style={{
+                            width: `${Math.min(100, financialSummary.utilizationPercentage)}%`
+                          }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {financialSummary.utilizationPercentage.toFixed(1)}% utilized • {phase.completionPercentage || 0}% complete
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+          {phases.length > 5 && (
+            <Link
+              href={`/phases?projectId=${projectId}`}
+              className="block text-center text-blue-600 hover:text-blue-800 text-sm font-medium py-2"
+            >
+              View all {phases.length} phases →
+            </Link>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // Budget vs Actual Section Component
 function BudgetVsActualSection({ projectId }) {
@@ -758,6 +1062,13 @@ export default function ProjectDetailPage() {
     }
   };
 
+  const handleBudgetChange = (budgetData) => {
+    setFormData((prev) => ({
+      ...prev,
+      budget: budgetData,
+    }));
+  };
+
   const handleEditClick = () => {
     if (project) {
       const initialFormData = {
@@ -768,11 +1079,11 @@ export default function ProjectDetailPage() {
         status: project.status || 'planning',
         startDate: project.startDate ? new Date(project.startDate).toISOString().split('T')[0] : '',
         plannedEndDate: project.plannedEndDate ? new Date(project.plannedEndDate).toISOString().split('T')[0] : '',
-        budget: {
-          total: project.budget?.total || 0,
-          materials: project.budget?.materials || 0,
-          labour: project.budget?.labour || 0,
-          contingency: project.budget?.contingency || 0,
+        budget: project.budget || {
+          total: 0,
+          materials: 0,
+          labour: 0,
+          contingency: 0,
         },
       };
       setFormData(initialFormData);
@@ -784,6 +1095,8 @@ export default function ProjectDetailPage() {
 
   const hasUnsavedChanges = () => {
     if (!originalFormData) return false;
+    // Deep compare budget objects
+    const budgetChanged = JSON.stringify(formData.budget) !== JSON.stringify(originalFormData.budget);
     return (
       formData.projectName !== originalFormData.projectName ||
       formData.description !== originalFormData.description ||
@@ -792,20 +1105,14 @@ export default function ProjectDetailPage() {
       formData.status !== originalFormData.status ||
       formData.startDate !== originalFormData.startDate ||
       formData.plannedEndDate !== originalFormData.plannedEndDate ||
-      formData.budget.total !== originalFormData.budget.total ||
-      formData.budget.materials !== originalFormData.budget.materials ||
-      formData.budget.labour !== originalFormData.budget.labour ||
-      formData.budget.contingency !== originalFormData.budget.contingency
+      budgetChanged
     );
   };
 
   const hasBudgetChange = () => {
-    return originalFormData && (
-      formData.budget.total !== originalFormData.budget.total ||
-      formData.budget.materials !== originalFormData.budget.materials ||
-      formData.budget.labour !== originalFormData.budget.labour ||
-      formData.budget.contingency !== originalFormData.budget.contingency
-    );
+    if (!originalFormData) return false;
+    // Deep compare budget objects
+    return JSON.stringify(formData.budget) !== JSON.stringify(originalFormData.budget);
   };
 
   const validateForm = () => {
@@ -813,14 +1120,46 @@ export default function ProjectDetailPage() {
       toast.showError('Project name is required');
       return false;
     }
-    if (formData.budget.total < 0) {
+    
+    // Validate budget - support both legacy and enhanced structures
+    const budget = formData.budget;
+    if (budget.total !== undefined && budget.total < 0) {
       toast.showError('Total budget cannot be negative');
       return false;
     }
-    if (formData.budget.materials < 0 || formData.budget.labour < 0 || formData.budget.contingency < 0) {
-      toast.showError('Budget values cannot be negative');
+    
+    // Check legacy structure
+    if (budget.materials !== undefined && budget.materials < 0) {
+      toast.showError('Materials budget cannot be negative');
       return false;
     }
+    if (budget.labour !== undefined && budget.labour < 0) {
+      toast.showError('Labour budget cannot be negative');
+      return false;
+    }
+    if (budget.contingency !== undefined && budget.contingency < 0) {
+      toast.showError('Contingency budget cannot be negative');
+      return false;
+    }
+    
+    // Check enhanced structure
+    if (budget.directConstructionCosts !== undefined && budget.directConstructionCosts < 0) {
+      toast.showError('Direct construction costs cannot be negative');
+      return false;
+    }
+    if (budget.preConstructionCosts !== undefined && budget.preConstructionCosts < 0) {
+      toast.showError('Pre-construction costs cannot be negative');
+      return false;
+    }
+    if (budget.indirectCosts !== undefined && budget.indirectCosts < 0) {
+      toast.showError('Indirect costs cannot be negative');
+      return false;
+    }
+    if (budget.contingencyReserve !== undefined && budget.contingencyReserve < 0) {
+      toast.showError('Contingency reserve cannot be negative');
+      return false;
+    }
+    
     if (formData.startDate && formData.plannedEndDate && formData.startDate > formData.plannedEndDate) {
       toast.showError('Planned end date must be after start date');
       return false;
@@ -1284,64 +1623,48 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* Budget Breakdown */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget Breakdown</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-sm text-gray-600">Total Budget</p>
-              <p className="text-xl font-bold text-gray-900 mt-1">
-                {formatCurrency(project.budget?.total || 0)}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Materials</p>
-              <p className="text-xl font-bold text-blue-600 mt-1">
-                {formatCurrency(project.budget?.materials || 0)}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Labour</p>
-              <p className="text-xl font-bold text-green-600 mt-1">
-                {formatCurrency(project.budget?.labour || 0)}
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Contingency</p>
-              <p className="text-xl font-bold text-purple-600 mt-1">
-                {formatCurrency(project.budget?.contingency || 0)}
-              </p>
-            </div>
-          </div>
-          {statistics.totalMaterialsSpent !== undefined && (
-            <div className="mt-4 pt-4 border-t">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-600">Total Spent (Materials)</span>
-                <span className="text-lg font-bold text-orange-600">
-                  {formatCurrency(statistics.totalMaterialsSpent)}
-                </span>
-              </div>
-              <div className="mt-2">
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-600 h-2 rounded-full"
-                    style={{
-                      width: `${
-                        project.budget?.total > 0
-                          ? Math.min(100, (statistics.totalMaterialsSpent / project.budget.total) * 100)
-                          : 0
-                      }%`,
-                    }}
-                  ></div>
-                </div>
-                <p className="text-sm text-gray-600 mt-1 leading-normal">
-                  {project.budget?.total > 0
-                    ? `${((statistics.totalMaterialsSpent / project.budget.total) * 100).toFixed(1)}% of budget used`
-                    : 'No budget set'}
-                </p>
-              </div>
-            </div>
-          )}
+        <div className="mb-6">
+          <HierarchicalBudgetDisplay budget={project.budget} />
         </div>
+
+        {/* Budget Visualization */}
+        {project.budget && (
+          <div className="mb-6">
+            <BudgetVisualization budget={project.budget} />
+            {statistics.totalMaterialsSpent !== undefined && (
+              <div className="mt-4 pt-4 border-t">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-600">Total Spent (Materials)</span>
+                  <span className="text-lg font-bold text-orange-600">
+                    {formatCurrency(statistics.totalMaterialsSpent)}
+                  </span>
+                </div>
+                <div className="mt-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-600 h-2 rounded-full"
+                      style={{
+                        width: `${
+                          project.budget?.total > 0
+                            ? Math.min(100, (statistics.totalMaterialsSpent / project.budget.total) * 100)
+                            : 0
+                        }%`,
+                      }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1 leading-normal">
+                    {project.budget?.total > 0
+                      ? `${((statistics.totalMaterialsSpent / project.budget.total) * 100).toFixed(1)}% of budget used`
+                      : 'No budget set'}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Construction Phases Section */}
+        <PhasesSection projectId={projectId} canEdit={canEdit} />
 
         {/* Project Health Dashboard */}
         <ProjectHealthDashboard projectId={projectId} />
@@ -1450,6 +1773,32 @@ export default function ProjectDetailPage() {
               <div>
                 <h3 className="font-semibold text-gray-900">Manage Floors</h3>
                 <p className="text-sm text-gray-600">View and edit project floors</p>
+              </div>
+            </div>
+          </Link>
+          {canAccess && canAccess('manage_project_team') && (
+            <Link
+              href={`/projects/${projectId}/team`}
+              className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
+            >
+              <div className="flex items-center gap-3">
+                <div className="text-3xl">👥</div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Team Management</h3>
+                  <p className="text-sm text-gray-600">Manage project team</p>
+                </div>
+              </div>
+            </Link>
+          )}
+          <Link
+            href={`/phases?projectId=${projectId}`}
+            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
+          >
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">🏗️</div>
+              <div>
+                <h3 className="font-semibold text-gray-900">Manage Phases</h3>
+                <p className="text-sm text-gray-600">View and edit construction phases</p>
               </div>
             </div>
           </Link>
@@ -1586,63 +1935,11 @@ export default function ProjectDetailPage() {
 
             <div className="pt-6 border-t-2 border-gray-300">
               <h3 className="text-lg font-bold text-gray-900 mb-4">Budget Information</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div>
-                  <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">
-                    Total <span className="text-red-600 font-bold">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    name="budget.total"
-                    value={formData.budget?.total || 0}
-                    onChange={handleChange}
-                    min="0"
-                    step="0.01"
-                    required
-                    placeholder="0.00"
-                    className="w-full px-4 py-3 text-base font-semibold text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
-                  />
-                </div>
-                <div>
-                  <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Materials</label>
-                  <input
-                    type="number"
-                    name="budget.materials"
-                    value={formData.budget?.materials || 0}
-                    onChange={handleChange}
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    className="w-full px-4 py-3 text-base font-semibold text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
-                  />
-                </div>
-                <div>
-                  <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Labour</label>
-                  <input
-                    type="number"
-                    name="budget.labour"
-                    value={formData.budget?.labour || 0}
-                    onChange={handleChange}
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    className="w-full px-4 py-3 text-base font-semibold text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
-                  />
-                </div>
-                <div>
-                  <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Contingency</label>
-                  <input
-                    type="number"
-                    name="budget.contingency"
-                    value={formData.budget?.contingency || 0}
-                    onChange={handleChange}
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    className="w-full px-4 py-3 text-base font-semibold text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all placeholder:text-gray-500 placeholder:font-normal"
-                  />
-                </div>
-              </div>
+              <EnhancedBudgetInput
+                value={formData.budget}
+                onChange={handleBudgetChange}
+                showAdvanced={true}
+              />
             </div>
           </div>
         </form>

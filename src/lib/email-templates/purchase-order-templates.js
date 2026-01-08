@@ -15,9 +15,21 @@ const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
  * @param {string} options.responseToken - Token for response links
  * @param {Object} [options.project] - Project object (optional)
  * @param {Object} [options.batch] - Batch object (optional, for bulk orders)
+ * @param {boolean} [options.isRetry] - Whether this is a retry order
+ * @param {number} [options.retryCount] - Current retry attempt number
+ * @param {Object} [options.adjustments] - Adjustments made for retry
  * @returns {Promise<Object>} Send result
  */
-export async function sendPurchaseOrderEmail({ supplier, purchaseOrder, responseToken, project = null, batch = null }) {
+export async function sendPurchaseOrderEmail({ 
+  supplier, 
+  purchaseOrder, 
+  responseToken, 
+  project = null, 
+  batch = null,
+  isRetry = false,
+  retryCount = 0,
+  adjustments = {}
+}) {
   const {
     purchaseOrderNumber,
     materialName,
@@ -56,7 +68,9 @@ export async function sendPurchaseOrderEmail({ supplier, purchaseOrder, response
   const poId = purchaseOrder._id?.toString ? purchaseOrder._id.toString() : (purchaseOrder._id || '');
   const downloadUrl = poId ? `${APP_URL}/api/purchase-orders/${poId}/download?token=${responseToken}` : responseUrl;
 
-  const subject = `New Purchase Order: ${purchaseOrderNumber}`;
+  const subject = isRetry 
+    ? `Retry Request: ${purchaseOrderNumber} (Attempt #${retryCount})`
+    : `New Purchase Order: ${purchaseOrderNumber}`;
 
   // Build materials breakdown for bulk orders
   let materialsBreakdownHtml = '';
@@ -67,7 +81,34 @@ export async function sendPurchaseOrderEmail({ supplier, purchaseOrder, response
         <h3 style="color: #1f2937; margin-bottom: 10px; font-size: 14px;">Materials Breakdown:</h3>
         <table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">
           <thead>
-            <tr style="background-color: #f3f4f6;">
+            <tr style="background-color: #f9fafb;">
+              <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; color: #374151;">Purchase Order Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${isRetry ? `
+            <tr style="background-color: #fef3c7;">
+              <td style="padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                  <span style="background-color: #f59e0b; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-right: 8px;">RETRY #${retryCount}</span>
+                  <strong>This is a retry request with adjustments</strong>
+                </div>
+                ${adjustments && Object.keys(adjustments).length > 0 ? `
+                <div style="background-color: #fff; padding: 8px; border-radius: 4px; border-left: 3px solid #f59e0b; margin-top: 8px;">
+                  <strong style="color: #92400e;">Adjustments made:</strong>
+                  <ul style="margin: 4px 0; padding-left: 16px; font-size: 14px;">
+                    ${adjustments.originalUnitCost !== adjustments.newUnitCost ? `<li>Unit Cost: ${formatCurrency(adjustments.originalUnitCost)} → ${formatCurrency(adjustments.newUnitCost)}</li>` : ''}
+                    ${adjustments.originalQuantityOrdered !== adjustments.newQuantityOrdered ? `<li>Quantity: ${adjustments.originalQuantityOrdered} → ${adjustments.newQuantityOrdered} ${unit}</li>` : ''}
+                    ${adjustments.originalDeliveryDate !== adjustments.newDeliveryDate ? `<li>Delivery Date: ${formatDate(adjustments.originalDeliveryDate)} → ${formatDate(adjustments.newDeliveryDate)}</li>` : ''}
+                    ${adjustments.terms ? `<li>Terms updated: ${adjustments.terms}</li>` : ''}
+                    ${adjustments.notes ? `<li>Additional notes: ${adjustments.notes}</li>` : ''}
+                  </ul>
+                </div>
+                ` : ''}
+              </td>
+            </tr>
+            ` : ''}
+            <tr>
               <th style="padding: 8px; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Material</th>
               <th style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Quantity</th>
               <th style="padding: 8px; text-align: right; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Unit Cost</th>
@@ -105,7 +146,7 @@ export async function sendPurchaseOrderEmail({ supplier, purchaseOrder, response
       <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
         <h1 style="color: #2563eb; margin-top: 0;">New Purchase Order</h1>
         <p>Hello ${supplier.contactPerson || supplier.name},</p>
-        <p>You have received a new purchase order from <strong>Kisheka Construction</strong>.</p>
+        <p>You have received a new purchase order from <strong>Doshaki Construction</strong>.</p>
         ${project ? `<p><strong>Project:</strong> ${project.projectName || 'N/A'}${project.location ? ` - ${project.location}` : ''}</p>` : ''}
         ${batch ? `<p><strong>Batch:</strong> ${batch.batchNumber || 'N/A'}${batch.batchName ? ` - ${batch.batchName}` : ''}</p>` : ''}
       </div>
@@ -184,7 +225,7 @@ export async function sendPurchaseOrderEmail({ supplier, purchaseOrder, response
 
       <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; font-size: 12px; color: #6b7280; margin-bottom: 20px;">
         <p style="margin: 0; font-weight: bold; margin-bottom: 5px;">Contact Information:</p>
-        <p style="margin: 2px 0;">Kisheka Construction</p>
+        <p style="margin: 2px 0;">Doshaki Construction</p>
         <p style="margin: 2px 0;">Email: ${process.env.COMPANY_EMAIL || 'info@kisheka.com'}</p>
         ${process.env.COMPANY_PHONE ? `<p style="margin: 2px 0;">Phone: ${process.env.COMPANY_PHONE}</p>` : ''}
         ${process.env.COMPANY_ADDRESS ? `<p style="margin: 2px 0;">Address: ${process.env.COMPANY_ADDRESS}</p>` : ''}
@@ -192,7 +233,7 @@ export async function sendPurchaseOrderEmail({ supplier, purchaseOrder, response
 
       <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; font-size: 12px; color: #6b7280;">
         <p style="margin: 0;">
-          This is an automated message from Kisheka Construction System.
+          This is an automated message from Doshaki Construction System.
         </p>
       </div>
     </body>
@@ -204,7 +245,7 @@ New Purchase Order: ${purchaseOrderNumber}
 
 Hello ${supplier.contactPerson || supplier.name},
 
-You have received a new purchase order from Kisheka Construction.
+You have received a new purchase order from Doshaki Construction.
 
 ${project ? `Project: ${project.projectName || 'N/A'}${project.location ? ` - ${project.location}` : ''}\n` : ''}${batch ? `Batch: ${batch.batchNumber || 'N/A'}${batch.batchName ? ` - ${batch.batchName}` : ''}\n` : ''}
 Order Details:
@@ -233,7 +274,7 @@ Download PDF: ${downloadUrl}
 Important: Please respond to this order as soon as possible.
 
 Contact Information:
-Kisheka Construction
+Doshaki Construction
 Email: ${process.env.COMPANY_EMAIL || 'info@kisheka.com'}
 ${process.env.COMPANY_PHONE ? `Phone: ${process.env.COMPANY_PHONE}` : ''}
 ${process.env.COMPANY_ADDRESS ? `Address: ${process.env.COMPANY_ADDRESS}` : ''}
@@ -308,7 +349,7 @@ export async function sendPurchaseOrderReminderEmail({ supplier, purchaseOrder, 
 
       <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; font-size: 12px; color: #6b7280;">
         <p style="margin: 0;">
-          This is an automated reminder from Kisheka Construction System.
+          This is an automated reminder from Doshaki Construction System.
         </p>
       </div>
     </body>

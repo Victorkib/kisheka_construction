@@ -81,14 +81,15 @@ export function BaseModal({
 
   // Prevent body scroll when modal is open
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen]);
 
   // Variant color mappings
@@ -151,7 +152,7 @@ export function BaseModal({
       />
 
       {/* Modal Container */}
-      <div className="flex min-h-full items-center justify-center p-4">
+      <div className="flex min-h-full items-center justify-center p-2 sm:p-4">
         <div
           ref={modalRef}
           className={`relative w-full ${maxWidth} transform transition-all duration-300 ${

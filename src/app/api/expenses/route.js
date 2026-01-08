@@ -15,12 +15,14 @@ import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
+import { recalculatePhaseSpending } from '@/lib/phase-helpers';
 
 /**
  * GET /api/expenses
  * Returns expenses with filtering, sorting, and pagination
  * Auth: All authenticated users
- * Query params: projectId, category, status, vendor, search, page, limit, sortBy, sortOrder, startDate, endDate
+ * Query params: projectId, category, phaseId, status, vendor, search, page, limit, sortBy, sortOrder, startDate, endDate
  */
 export async function GET(request) {
   try {
@@ -32,33 +34,47 @@ export async function GET(request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const projectId = searchParams.get('projectId');
     const category = searchParams.get('category');
+    const phaseId = searchParams.get('phaseId');
     const status = searchParams.get('status');
     const vendor = searchParams.get('vendor');
     const search = searchParams.get('search');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
+    const isIndirectCost = searchParams.get('isIndirectCost'); // NEW: Filter by indirect costs
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const sortBy = searchParams.get('sortBy') || 'date';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
+    // Get and validate project context
+    const projectContext = await getProjectContext(request, user.id);
+    
+    // If projectId is provided, validate access
+    if (projectContext.projectId && !projectContext.hasAccess) {
+      return errorResponse(projectContext.error || 'Access denied to this project', 403);
+    }
+
     const db = await getDatabase();
 
-    // Build query
-    const query = {};
-
-    if (projectId && ObjectId.isValid(projectId)) {
-      query.projectId = new ObjectId(projectId);
-    }
+    // Build query with project filter
+    const query = createProjectFilter(projectContext.projectId, {});
 
     if (category) {
       query.category = category;
     }
 
+    if (phaseId && ObjectId.isValid(phaseId)) {
+      query.phaseId = new ObjectId(phaseId);
+    }
+
     if (status) {
       query.status = status;
+    }
+    
+    // Filter by indirect costs
+    if (isIndirectCost !== null && isIndirectCost !== undefined) {
+      query.isIndirectCost = isIndirectCost === 'true';
     }
 
     // Archive filter: if archived=true, show only archived; if archived=false or not set, exclude archived
@@ -158,6 +174,7 @@ export async function POST(request) {
       projectId,
       amount,
       category,
+      phaseId,
       description,
       vendor,
       date,
@@ -166,6 +183,8 @@ export async function POST(request) {
       receiptFileUrl,
       notes,
       currency = 'KES',
+      isIndirectCost, // NEW: Flag to mark expense as indirect cost
+      indirectCostCategory, // NEW: Category for indirect costs (utilities, siteOverhead, transportation, safetyCompliance)
     } = body;
 
     // Validation
@@ -189,6 +208,16 @@ export async function POST(request) {
       return errorResponse('Vendor is required', 400);
     }
 
+    // PhaseId is now required - validate using centralized helper
+    const { validatePhaseForExpense } = await import('@/lib/phase-validation-helpers');
+    const phaseValidation = await validatePhaseForExpense(phaseId, projectId);
+    
+    if (!phaseValidation.isValid) {
+      return errorResponse(phaseValidation.error, phaseValidation.phase ? 400 : 404);
+    }
+    
+    const phase = phaseValidation.phase;
+
     // Valid expense categories
     const validCategories = [
       'equipment_rental',
@@ -207,14 +236,76 @@ export async function POST(request) {
     if (!validCategories.includes(category)) {
       return errorResponse(`Invalid category. Must be one of: ${validCategories.join(', ')}`, 400);
     }
+    
+    // Auto-suggest isIndirectCost based on category
+    // Categories that are typically indirect costs
+    const indirectCostCategories = ['utilities', 'transport', 'safety'];
+    const suggestedIsIndirectCost = indirectCostCategories.includes(category);
+    
+    // Map category to indirectCostCategory if not provided
+    const categoryToIndirectCategory = {
+      'utilities': 'utilities',
+      'transport': 'transportation',
+      'safety': 'safetyCompliance',
+      'accommodation': 'siteOverhead', // Could be site office accommodation
+    };
+    
+    // Determine if this is an indirect cost
+    const finalIsIndirectCost = isIndirectCost !== undefined ? isIndirectCost : suggestedIsIndirectCost;
+    const finalIndirectCostCategory = indirectCostCategory || categoryToIndirectCategory[category] || null;
+    
+    // Validate indirectCostCategory if isIndirectCost is true
+    if (finalIsIndirectCost) {
+      const validIndirectCategories = ['utilities', 'siteOverhead', 'transportation', 'safetyCompliance'];
+      if (!finalIndirectCostCategory || !validIndirectCategories.includes(finalIndirectCostCategory)) {
+        return errorResponse(
+          `Invalid indirectCostCategory. Must be one of: ${validIndirectCategories.join(', ')} when isIndirectCost is true`,
+          400
+        );
+      }
+    }
+
+    const db = await getDatabase();
+
+    // Verify project exists
+    const project = await db.collection('projects').findOne({
+      _id: new ObjectId(projectId),
+    });
+
+    if (!project) {
+      return errorResponse('Project not found', 404);
+    }
+
+    // Phase Management: Strongly recommend phaseId for phase-centric tracking
+    const warnings = [];
+    
+    // Validate phase if provided
+    if (phaseId && ObjectId.isValid(phaseId)) {
+      const phase = await db.collection('phases').findOne({
+        _id: new ObjectId(phaseId),
+        deletedAt: null,
+      });
+
+      if (!phase) {
+        return errorResponse(`Phase not found: ${phaseId}`, 404);
+      }
+
+      // Verify phase belongs to the same project
+      if (phase.projectId.toString() !== projectId) {
+        return errorResponse('Phase does not belong to the selected project', 400);
+      }
+    } else if (!phaseId || phaseId === null || phaseId === '') {
+      // Phase Management: Add warning if phaseId is not provided
+      warnings.push('phaseId is strongly recommended for phase-centric construction management. Expenses without a phase may be harder to track and manage.');
+    } else if (phaseId && !ObjectId.isValid(phaseId)) {
+      return errorResponse('Invalid phaseId format. phaseId must be a valid ObjectId', 400);
+    }
 
     // Get user profile
     const userProfile = await getUserProfile(user.id);
     if (!userProfile) {
       return errorResponse('User profile not found', 404);
     }
-
-    const db = await getDatabase();
 
     // Generate expense code
     const expenseCount = await db.collection('expenses').countDocuments({ projectId: new ObjectId(projectId) });
@@ -234,6 +325,9 @@ export async function POST(request) {
       paymentMethod: paymentMethod || 'CASH',
       referenceNumber: referenceNumber?.trim() || null,
       receiptFileUrl: receiptFileUrl || null,
+      phaseId: new ObjectId(phaseId), // Required - validated above (for timeline tracking)
+      isIndirectCost: finalIsIndirectCost || false, // NEW: Mark as indirect cost
+      indirectCostCategory: finalIsIndirectCost ? finalIndirectCostCategory : null, // NEW: Indirect cost category
       submittedBy: {
         userId: new ObjectId(userProfile._id),
         name: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
@@ -253,6 +347,11 @@ export async function POST(request) {
 
     const insertedExpense = { ...expense, _id: result.insertedId };
 
+    // Include warnings in response if present
+    if (warnings.length > 0) {
+      insertedExpense.warnings = warnings;
+    }
+
     // Create audit log
     await createAuditLog({
       userId: userProfile._id.toString(),
@@ -262,6 +361,20 @@ export async function POST(request) {
       projectId: projectId,
       changes: { created: insertedExpense },
     });
+
+    // Recalculate phase spending if phaseId is provided (only for direct costs)
+    // Indirect costs are NOT included in phase spending
+    if (phaseId && ObjectId.isValid(phaseId) && !finalIsIndirectCost) {
+      try {
+        await recalculatePhaseSpending(phaseId);
+      } catch (phaseError) {
+        console.error('Error recalculating phase spending after expense creation:', phaseError);
+        // Don't fail the request, just log the error
+      }
+    }
+    
+    // If indirect cost and auto-approved, charge to indirect costs budget
+    // Note: Most expenses require approval, so indirect costs will be charged on approval
 
     return successResponse(insertedExpense, 'Expense created successfully', 201);
   } catch (error) {

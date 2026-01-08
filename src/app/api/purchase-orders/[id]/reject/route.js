@@ -12,6 +12,7 @@ import { getUserProfile } from '@/lib/auth-helpers';
 import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotifications } from '@/lib/notifications';
+import { assessRetryability, formatRejectionReason } from '@/lib/rejection-reasons';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
@@ -46,10 +47,21 @@ export async function POST(request, { params }) {
     }
 
     const body = await request.json();
-    const { supplierNotes } = body || {};
+    const { supplierNotes, rejectionReason, rejectionSubcategory } = body || {};
 
     if (!supplierNotes || supplierNotes.trim().length === 0) {
       return errorResponse('Rejection reason (supplierNotes) is required', 400);
+    }
+
+    // Validate rejection reason if provided
+    if (rejectionReason) {
+      const validReasons = [
+        'price_too_high', 'unavailable', 'timeline', 'specifications',
+        'quantity', 'business_policy', 'external_factors', 'other'
+      ];
+      if (!validReasons.includes(rejectionReason)) {
+        return errorResponse('Invalid rejection reason', 400);
+      }
     }
 
     const db = await getDatabase();
@@ -75,12 +87,31 @@ export async function POST(request, { params }) {
       return errorResponse(`Cannot reject order with status: ${purchaseOrder.status}`, 400);
     }
 
+    // Assess retryability and generate recommendations
+    let retryabilityAssessment = { retryable: false, recommendation: 'Manual review required' };
+    if (rejectionReason) {
+      retryabilityAssessment = assessRetryability(rejectionReason, rejectionSubcategory);
+    }
+
     // Update order status
     const updateData = {
       status: 'order_rejected',
       supplierResponse: 'reject',
       supplierResponseDate: new Date(),
       supplierNotes: supplierNotes.trim(),
+      rejectionReason: rejectionReason || null,
+      rejectionSubcategory: rejectionSubcategory || null,
+      isRetryable: retryabilityAssessment.retryable,
+      retryRecommendation: retryabilityAssessment.recommendation,
+      rejectionMetadata: {
+        assessedAt: new Date(),
+        reasonCategory: rejectionReason,
+        subcategory: rejectionSubcategory,
+        priority: retryabilityAssessment.priority,
+        confidence: retryabilityAssessment.confidence,
+        formattedReason: rejectionReason ? formatRejectionReason(rejectionReason, rejectionSubcategory) : null,
+        userAgent: request.headers.get('user-agent') || null,
+      },
       updatedAt: new Date(),
     };
 
@@ -101,15 +132,27 @@ export async function POST(request, { params }) {
     }).toArray();
 
     if (managers.length > 0) {
+      const formattedReason = rejectionReason ? formatRejectionReason(rejectionReason, rejectionSubcategory) : 'No category specified';
+      const retryInfo = retryabilityAssessment.retryable ? 
+        ` (Retryable: ${retryabilityAssessment.recommendation})` : 
+        ' (Not retryable)';
+      
       const notifications = managers.map(manager => ({
         userId: manager._id.toString(),
         type: 'approval_status',
         title: 'Purchase Order Rejected',
-        message: `${purchaseOrder.supplierName} rejected purchase order ${purchaseOrder.purchaseOrderNumber}. Reason: ${supplierNotes.trim()}`,
+        message: `${purchaseOrder.supplierName} rejected purchase order ${purchaseOrder.purchaseOrderNumber}. Reason: ${formattedReason}${retryInfo}`,
         projectId: purchaseOrder.projectId.toString(),
         relatedModel: 'PURCHASE_ORDER',
         relatedId: id,
         createdBy: userProfile._id.toString(),
+        metadata: {
+          rejectionReason,
+          rejectionSubcategory,
+          isRetryable: retryabilityAssessment.retryable,
+          retryRecommendation: retryabilityAssessment.recommendation,
+          priority: retryabilityAssessment.priority,
+        }
       }));
 
       await createNotifications(notifications);

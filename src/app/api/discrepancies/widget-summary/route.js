@@ -36,10 +36,18 @@ export async function GET(request) {
 
     const db = await getDatabase();
 
-    // Get all active projects
-    const projects = await db.collection('projects').find({
-      status: { $in: ['planning', 'active'] },
-    }).toArray();
+    // Get projectId from query params (optional - for project-specific summary)
+    const { searchParams } = new URL(request.url);
+    const projectId = searchParams.get('projectId');
+    const projectObjectId = projectId && ObjectId.isValid(projectId) ? new ObjectId(projectId) : null;
+
+    // Build project filter
+    const projectQuery = projectObjectId
+      ? { _id: projectObjectId, status: { $in: ['planning', 'active'] } }
+      : { status: { $in: ['planning', 'active'] } };
+
+    // Get projects to check (single project if projectId provided, otherwise all active projects)
+    const projects = await db.collection('projects').find(projectQuery).toArray();
 
     let totalCritical = 0;
     let totalHigh = 0;

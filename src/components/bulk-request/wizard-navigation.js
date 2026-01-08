@@ -12,6 +12,7 @@ export function WizardNavigation({
   totalSteps,
   onBack,
   onNext,
+  onSubmit,
   onSaveDraft,
   canGoBack = true,
   canGoNext = true,
@@ -19,6 +20,7 @@ export function WizardNavigation({
   backText = 'Back',
   nextText = 'Next',
   showSaveDraft = true,
+  isLastStep = false,
 }) {
   return (
     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-200">
@@ -45,7 +47,7 @@ export function WizardNavigation({
         )}
       </div>
       <div className="flex gap-3 w-full sm:w-auto">
-        {currentStep < totalSteps ? (
+        {currentStep < totalSteps && !isLastStep ? (
           <LoadingButton
             type="button"
             onClick={onNext}
@@ -62,13 +64,13 @@ export function WizardNavigation({
         ) : (
           <LoadingButton
             type="button"
-            onClick={onNext}
+            onClick={onSubmit || onNext}
             disabled={!canGoNext || isLoading}
             isLoading={isLoading}
             loadingText="Submitting..."
             className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
           >
-            {nextText || 'Submit Request'}
+            {nextText || 'Submit'}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>

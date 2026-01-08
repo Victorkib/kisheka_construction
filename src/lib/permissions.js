@@ -108,6 +108,7 @@ export const PERMISSIONS = {
   delete_project: [ROLES.OWNER],
   view_projects: [ROLES.SUPERVISOR, ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK, ROLES.ACCOUNTANT],
   manage_project_finances: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  manage_project_team: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
 
   // ============================================
   // Category Permissions
@@ -122,6 +123,19 @@ export const PERMISSIONS = {
   create_floor: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
   edit_floor: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
   delete_floor: [ROLES.OWNER],
+
+  // ============================================
+  // Phase Permissions
+  // ============================================
+  create_phase: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  edit_phase: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
+  delete_phase: [ROLES.OWNER],
+  view_phases: [ROLES.SUPERVISOR, ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK, ROLES.ACCOUNTANT, ROLES.INVESTOR],
+  manage_phase_budget: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  create_budget_reallocation: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  approve_budget_reallocation: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  reject_budget_reallocation: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  view_budget_reallocations: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
 
   // ============================================
   // View & Reporting Permissions
@@ -168,6 +182,54 @@ export const PERMISSIONS = {
   revoke_access: [ROLES.OWNER],
   view_users: [ROLES.OWNER],
   invite_users: [ROLES.OWNER],
+
+  // ============================================
+  // Professional Services Library Permissions
+  // ============================================
+  manage_professional_services_library: [ROLES.OWNER],
+  view_professional_services_library: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK, ROLES.ACCOUNTANT],
+  create_professional_service: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  edit_professional_service: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  delete_professional_service: [ROLES.OWNER],
+
+  // ============================================
+  // Professional Services (Project Assignments) Permissions
+  // ============================================
+  assign_professional_service: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  view_professional_services: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT, ROLES.CLERK],
+  edit_professional_service_assignment: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  terminate_professional_service: [ROLES.OWNER],
+
+  // ============================================
+  // Professional Activities Permissions
+  // ============================================
+  create_professional_activity: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK],
+  view_professional_activities: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT, ROLES.CLERK],
+  edit_professional_activity: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK],
+  delete_professional_activity: [ROLES.OWNER],
+  approve_professional_activity: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  reject_professional_activity: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+
+  // ============================================
+  // Professional Fees Permissions
+  // ============================================
+  create_professional_fee: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  view_professional_fees: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT, ROLES.CLERK],
+  edit_professional_fee: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  delete_professional_fee: [ROLES.OWNER],
+  approve_professional_fee: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  reject_professional_fee: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  record_professional_fee_payment: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Activity Templates Permissions
+  // ============================================
+  create_activity_template: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  view_activity_templates: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK, ROLES.ACCOUNTANT],
+  manage_activity_templates: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  delete_activity_template: [ROLES.OWNER],
+  use_activity_template: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK],
+  validate_activity_template: [ROLES.OWNER],
 };
 
 /**
@@ -289,6 +351,7 @@ export const PERMISSION_CATEGORIES = {
     'delete_project',
     'view_projects',
     'manage_project_finances',
+    'manage_project_team',
   ],
   CATEGORIES: [
     'create_category',
@@ -333,6 +396,44 @@ export const PERMISSION_CATEGORIES = {
     'revoke_access',
     'view_users',
     'invite_users',
+  ],
+  PROFESSIONAL_SERVICES_LIBRARY: [
+    'manage_professional_services_library',
+    'view_professional_services_library',
+    'create_professional_service',
+    'edit_professional_service',
+    'delete_professional_service',
+  ],
+  PROFESSIONAL_SERVICES: [
+    'assign_professional_service',
+    'view_professional_services',
+    'edit_professional_service_assignment',
+    'terminate_professional_service',
+  ],
+  PROFESSIONAL_ACTIVITIES: [
+    'create_professional_activity',
+    'view_professional_activities',
+    'edit_professional_activity',
+    'delete_professional_activity',
+    'approve_professional_activity',
+    'reject_professional_activity',
+  ],
+  PROFESSIONAL_FEES: [
+    'create_professional_fee',
+    'view_professional_fees',
+    'edit_professional_fee',
+    'delete_professional_fee',
+    'approve_professional_fee',
+    'reject_professional_fee',
+    'record_professional_fee_payment',
+  ],
+  ACTIVITY_TEMPLATES: [
+    'create_activity_template',
+    'view_activity_templates',
+    'manage_activity_templates',
+    'delete_activity_template',
+    'use_activity_template',
+    'validate_activity_template',
   ],
 };
 

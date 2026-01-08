@@ -86,6 +86,167 @@ async function setupDatabase() {
     console.log('✅ Floors collection ready\n');
     
     // ============================================
+    // 2c. PHASES COLLECTION (Enhanced Budget/Phase System)
+    // ============================================
+    console.log('📝 Setting up phases collection...');
+    const phasesCollection = db.collection('phases');
+    
+    await phasesCollection.createIndex({ projectId: 1 }, { name: 'projectId_idx' });
+    await phasesCollection.createIndex({ projectId: 1, sequence: 1 }, { name: 'projectId_sequence_idx' });
+    await phasesCollection.createIndex({ projectId: 1, status: 1 }, { name: 'projectId_status_idx' });
+    await phasesCollection.createIndex({ phaseCode: 1 }, { name: 'phaseCode_idx' });
+    await phasesCollection.createIndex({ createdAt: -1 }, { name: 'createdAt_desc' });
+    await phasesCollection.createIndex({ deletedAt: 1 }, { name: 'deletedAt_idx' });
+    // Phase 2: Dependencies indexes
+    await phasesCollection.createIndex({ dependsOn: 1 }, { name: 'dependsOn_idx', sparse: true });
+    await phasesCollection.createIndex({ canStartAfter: 1 }, { name: 'canStartAfter_idx', sparse: true });
+    console.log('✅ Phases collection ready\n');
+    
+    // ============================================
+    // EQUIPMENT COLLECTION (Phase 4)
+    // ============================================
+    console.log('📝 Setting up equipment collection...');
+    const equipmentCollection = db.collection('equipment');
+    
+    await equipmentCollection.createIndex(
+      { projectId: 1, phaseId: 1 },
+      { name: 'projectId_phaseId_idx' }
+    );
+    await equipmentCollection.createIndex(
+      { phaseId: 1, status: 1 },
+      { name: 'phaseId_status_idx' }
+    );
+    await equipmentCollection.createIndex(
+      { projectId: 1, status: 1 },
+      { name: 'projectId_status_idx' }
+    );
+    await equipmentCollection.createIndex(
+      { supplierId: 1 },
+      { name: 'supplierId_idx', sparse: true }
+    );
+    await equipmentCollection.createIndex(
+      { equipmentType: 1 },
+      { name: 'equipmentType_idx' }
+    );
+    await equipmentCollection.createIndex(
+      { createdAt: -1 },
+      { name: 'createdAt_desc' }
+    );
+    await equipmentCollection.createIndex(
+      { deletedAt: 1 },
+      { name: 'deletedAt_idx' }
+    );
+    console.log('✅ Equipment collection ready\n');
+    
+    // ============================================
+    // SUBCONTRACTORS COLLECTION (Phase 5)
+    // ============================================
+    console.log('📝 Setting up subcontractors collection...');
+    const subcontractorsCollection = db.collection('subcontractors');
+    
+    await subcontractorsCollection.createIndex(
+      { projectId: 1, phaseId: 1 },
+      { name: 'projectId_phaseId_idx' }
+    );
+    await subcontractorsCollection.createIndex(
+      { phaseId: 1, status: 1 },
+      { name: 'phaseId_status_idx' }
+    );
+    await subcontractorsCollection.createIndex(
+      { projectId: 1, status: 1 },
+      { name: 'projectId_status_idx' }
+    );
+    await subcontractorsCollection.createIndex(
+      { subcontractorType: 1 },
+      { name: 'subcontractorType_idx' }
+    );
+    await subcontractorsCollection.createIndex(
+      { createdAt: -1 },
+      { name: 'createdAt_desc' }
+    );
+    await subcontractorsCollection.createIndex(
+      { deletedAt: 1 },
+      { name: 'deletedAt_idx' }
+    );
+    console.log('✅ Subcontractors collection ready\n');
+    
+    // ============================================
+    // WORK ITEMS COLLECTION (Phase 6)
+    // ============================================
+    console.log('📝 Setting up work_items collection...');
+    const workItemsCollection = db.collection('work_items');
+    
+    await workItemsCollection.createIndex(
+      { phaseId: 1, status: 1 },
+      { name: 'phaseId_status_idx' }
+    );
+    await workItemsCollection.createIndex(
+      { projectId: 1, phaseId: 1 },
+      { name: 'projectId_phaseId_idx' }
+    );
+    await workItemsCollection.createIndex(
+      { assignedTo: 1 },
+      { name: 'assignedTo_idx', sparse: true }
+    );
+    await workItemsCollection.createIndex(
+      { dependencies: 1 },
+      { name: 'dependencies_idx' }
+    );
+    await workItemsCollection.createIndex(
+      { category: 1 },
+      { name: 'category_idx' }
+    );
+    await workItemsCollection.createIndex(
+      { priority: 1 },
+      { name: 'priority_idx' }
+    );
+    await workItemsCollection.createIndex(
+      { createdAt: -1 },
+      { name: 'createdAt_desc' }
+    );
+    await workItemsCollection.createIndex(
+      { deletedAt: 1 },
+      { name: 'deletedAt_idx' }
+    );
+    console.log('✅ Work items collection ready\n');
+    
+    // ============================================
+    // PHASE TEMPLATES COLLECTION
+    // ============================================
+    console.log('📝 Setting up phase_templates collection...');
+    const phaseTemplatesCollection = db.collection('phase_templates');
+    
+    await phaseTemplatesCollection.createIndex(
+      { templateName: 1 },
+      { name: 'templateName_idx' }
+    );
+    await phaseTemplatesCollection.createIndex(
+      { templateType: 1 },
+      { name: 'templateType_idx' }
+    );
+    await phaseTemplatesCollection.createIndex(
+      { createdBy: 1 },
+      { name: 'createdBy_idx' }
+    );
+    await phaseTemplatesCollection.createIndex(
+      { usageCount: -1 },
+      { name: 'usageCount_desc' }
+    );
+    await phaseTemplatesCollection.createIndex(
+      { lastUsedAt: -1 },
+      { name: 'lastUsedAt_desc' }
+    );
+    await phaseTemplatesCollection.createIndex(
+      { createdAt: -1 },
+      { name: 'createdAt_desc' }
+    );
+    await phaseTemplatesCollection.createIndex(
+      { deletedAt: 1 },
+      { name: 'deletedAt_idx' }
+    );
+    console.log('✅ Phase templates collection ready\n');
+    
+    // ============================================
     // 3. MATERIALS COLLECTION
     // ============================================
     console.log('📝 Setting up materials collection...');
@@ -152,6 +313,15 @@ async function setupDatabase() {
     await purchaseOrdersCollection.createIndex({ isBulkOrder: 1, supplierId: 1, status: 1 }, { name: 'bulkOrder_supplier_status_idx', sparse: true });
     await purchaseOrdersCollection.createIndex({ batchId: 1 }, { name: 'batchId_idx', sparse: true });
     await purchaseOrdersCollection.createIndex({ materialRequestIds: 1 }, { name: 'materialRequestIds_idx', sparse: true });
+    // Phase Management: Add phaseId indexes
+    await purchaseOrdersCollection.createIndex(
+      { phaseId: 1, projectId: 1 },
+      { name: 'phaseId_projectId_idx', sparse: true }
+    );
+    await purchaseOrdersCollection.createIndex(
+      { phaseId: 1, status: 1 },
+      { name: 'phaseId_status_idx', sparse: true }
+    );
     console.log('✅ Purchase orders collection ready\n');
     
     // ============================================
@@ -421,6 +591,38 @@ async function setupDatabase() {
       { sparse: true, name: 'deletedAt_idx' }
     );
     console.log('✅ Material templates collection ready\n');
+    
+    // ============================================
+    // 15. BUDGET_REALLOCATIONS COLLECTION (Phase 5)
+    // ============================================
+    console.log('📝 Setting up budget_reallocations collection...');
+    const budgetReallocationsCollection = db.collection('budget_reallocations');
+    
+    await budgetReallocationsCollection.createIndex(
+      { projectId: 1, requestedAt: -1 },
+      { name: 'projectId_requestedAt_idx' }
+    );
+    await budgetReallocationsCollection.createIndex(
+      { fromPhaseId: 1 },
+      { sparse: true, name: 'fromPhaseId_idx' }
+    );
+    await budgetReallocationsCollection.createIndex(
+      { toPhaseId: 1 },
+      { sparse: true, name: 'toPhaseId_idx' }
+    );
+    await budgetReallocationsCollection.createIndex(
+      { status: 1, requestedAt: -1 },
+      { name: 'status_requestedAt_idx' }
+    );
+    await budgetReallocationsCollection.createIndex(
+      { requestedBy: 1, requestedAt: -1 },
+      { name: 'requestedBy_requestedAt_idx' }
+    );
+    await budgetReallocationsCollection.createIndex(
+      { deletedAt: 1 },
+      { sparse: true, name: 'deletedAt_idx' }
+    );
+    console.log('✅ Budget reallocations collection ready\n');
     
     // ============================================
     // SUMMARY

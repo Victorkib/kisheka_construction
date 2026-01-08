@@ -54,7 +54,7 @@ async function sendViaMailjet(options) {
       {
         From: {
           Email: options.from || process.env.EMAIL_FROM || process.env.GMAIL_USER,
-          Name: options.fromName || process.env.EMAIL_FROM_NAME || 'Kisheka Construction',
+          Name: options.fromName || process.env.EMAIL_FROM_NAME || 'Doshaki Construction',
         },
         To: [
           {
@@ -93,7 +93,7 @@ export async function sendEmail(options) {
 
   const emailOptions = {
     from: from || process.env.EMAIL_FROM || process.env.GMAIL_USER || 'noreply@kisheka.com',
-    fromName: fromName || process.env.EMAIL_FROM_NAME || 'Kisheka Construction',
+    fromName: fromName || process.env.EMAIL_FROM_NAME || 'Doshaki Construction',
     to,
     toName,
     subject,
@@ -179,13 +179,13 @@ export async function sendInvitationEmail(options) {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Invitation to Kisheka Construction</title>
+      <title>Invitation to Doshaki Construction</title>
     </head>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
         <h1 style="color: #2563eb; margin-top: 0;">You've been invited!</h1>
         <p>Hello,</p>
-        <p><strong>${inviterName}</strong> has invited you to join the <strong>Kisheka Construction</strong> system as a <strong>${roleDisplay}</strong>.</p>
+        <p><strong>${inviterName}</strong> has invited you to join the <strong>Doshaki Construction</strong> system as a <strong>${roleDisplay}</strong>.</p>
       </div>
 
       <div style="background-color: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
@@ -211,7 +211,7 @@ export async function sendInvitationEmail(options) {
           If you didn't expect this invitation, you can safely ignore this email.
         </p>
         <p style="margin: 10px 0 0 0;">
-          This is an automated message from Kisheka Construction System.
+          This is an automated message from Doshaki Construction System.
         </p>
       </div>
     </body>
@@ -219,9 +219,9 @@ export async function sendInvitationEmail(options) {
   `;
 
   const text = `
-You've been invited to Kisheka Construction!
+You've been invited to Doshaki Construction!
 
-${inviterName} has invited you to join the Kisheka Construction system as a ${roleDisplay}.
+${inviterName} has invited you to join the Doshaki Construction system as a ${roleDisplay}.
 
 To accept this invitation, click the link below or copy it into your browser:
 ${invitationUrl}
@@ -235,7 +235,7 @@ This is an automated message from Kisheka Construction System.
 
   return sendEmail({
     to: email,
-    subject: `Invitation to join Kisheka Construction as ${roleDisplay}`,
+    subject: `Invitation to join Doshaki Construction as ${roleDisplay}`,
     text,
     html,
   });
@@ -275,13 +275,13 @@ export async function sendRoleChangeEmail(options) {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Role Updated - Kisheka Construction</title>
+      <title>Role Updated - Doshaki Construction</title>
     </head>
     <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
       <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
         <h1 style="color: #2563eb; margin-top: 0;">Your Role Has Been Updated</h1>
         <p>Hello ${userName || 'there'},</p>
-        <p>Your role in the Kisheka Construction system has been updated.</p>
+        <p>Your role in the Doshaki Construction system has been updated.</p>
       </div>
 
       <div style="background-color: #ffffff; border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
@@ -316,7 +316,7 @@ export async function sendRoleChangeEmail(options) {
 
       <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; font-size: 12px; color: #6b7280;">
         <p style="margin: 0;">
-          This is an automated notification from Kisheka Construction System.
+          This is an automated notification from Doshaki Construction System.
         </p>
       </div>
     </body>
@@ -328,7 +328,7 @@ Your Role Has Been Updated
 
 Hello ${userName || 'there'},
 
-Your role in the Kisheka Construction system has been updated.
+Your role in the Doshaki Construction system has been updated.
 
 Role Change Details:
 - Previous Role: ${roleDisplay(oldRole)}
@@ -343,7 +343,7 @@ This is an automated notification from Kisheka Construction System.
 
   return sendEmail({
     to: email,
-    subject: 'Your Role Has Been Updated - Kisheka Construction',
+    subject: 'Your Role Has Been Updated - Doshaki Construction',
     text,
     html,
   });

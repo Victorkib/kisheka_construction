@@ -31,6 +31,8 @@ function NewPurchaseOrderPageContent() {
   const [materialRequests, setMaterialRequests] = useState([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
   const [floors, setFloors] = useState([]);
+  const [phases, setPhases] = useState([]);
+  const [loadingPhases, setLoadingPhases] = useState(false);
   const [categories, setCategories] = useState([]);
   const [availableCapital, setAvailableCapital] = useState(null);
   const [loadingCapital, setLoadingCapital] = useState(false);
@@ -43,6 +45,7 @@ function NewPurchaseOrderPageContent() {
     materialRequestId: '',
     supplierId: '',
     projectId: '',
+    phaseId: '', // Required for phase tracking
     floorId: '',
     categoryId: '',
     category: '',
@@ -288,6 +291,41 @@ function NewPurchaseOrderPageContent() {
     }
   };
 
+  const fetchPhases = async (projectId) => {
+    try {
+      if (!projectId) {
+        setPhases([]);
+        setFormData((prev) => ({ ...prev, phaseId: '' }));
+        return;
+      }
+      setLoadingPhases(true);
+      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const data = await response.json();
+      if (data.success) {
+        setPhases(data.data || []);
+        // Clear phase selection if current phase is not in the new list
+        setFormData((prev) => {
+          if (prev.phaseId) {
+            const phaseExists = (data.data || []).some(p => 
+              (p._id?.toString() || p.id?.toString()) === prev.phaseId
+            );
+            if (!phaseExists) {
+              return { ...prev, phaseId: '' };
+            }
+          }
+          return prev;
+        });
+      } else {
+        setPhases([]);
+      }
+    } catch (err) {
+      console.error('Error fetching phases:', err);
+      setPhases([]);
+    } finally {
+      setLoadingPhases(false);
+    }
+  };
+
   const fetchApprovedMaterialRequests = async (projectId, specificRequestId = null) => {
     try {
       setLoadingRequests(true);
@@ -371,6 +409,7 @@ function NewPurchaseOrderPageContent() {
         ...prev,
         materialRequestId: requestId,
         projectId: request.projectId?.toString() || prev.projectId,
+        phaseId: request.phaseId?.toString() || prev.phaseId, // Inherit phaseId from material request
         floorId: request.floorId?.toString() || prev.floorId,
         categoryId: request.categoryId?.toString() || prev.categoryId,
         category: request.category || prev.category,
@@ -451,9 +490,16 @@ function NewPurchaseOrderPageContent() {
     const { name, value } = e.target;
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
-      // Clear floor selection when project changes
+      // Clear floor and phase selection when project changes
       if (name === 'projectId') {
         updated.floorId = '';
+        updated.phaseId = '';
+        // Fetch phases for new project
+        if (value) {
+          fetchPhases(value);
+        } else {
+          setPhases([]);
+        }
       }
       // Handle category selection
       if (name === 'categoryId') {
@@ -485,6 +531,10 @@ function NewPurchaseOrderPageContent() {
     }
     if (!formData.projectId) {
       setError('Project is required');
+      return;
+    }
+    if (!formData.phaseId) {
+      setError('Phase selection is required for phase tracking and financial management');
       return;
     }
     if (!formData.materialName || formData.materialName.trim().length < 2) {
@@ -542,6 +592,7 @@ function NewPurchaseOrderPageContent() {
         deliveryDate: formData.deliveryDate,
         terms: formData.terms?.trim() || '',
         notes: formData.notes?.trim() || '',
+        phaseId: formData.phaseId, // Required - inherited from material request or manually selected
         ...(formData.floorId && { floorId: formData.floorId }),
         ...(formData.categoryId && { categoryId: formData.categoryId }),
         ...(formData.category && { category: formData.category }),
@@ -749,7 +800,13 @@ function NewPurchaseOrderPageContent() {
                     <button
                       onClick={() => {
                         setFormData((prev) => ({ ...prev, materialRequestId: request._id }));
-                        fetchMaterialRequestDetails(request._id);
+                        fetchMaterialRequestDetails(request._id).then((requestData) => {
+                          // Phase will be inherited in fetchMaterialRequestDetails
+                          // Also ensure we have phases loaded
+                          if (requestData?.projectId && !phases.length) {
+                            fetchPhases(requestData.projectId.toString());
+                          }
+                        });
                         // Scroll to form
                         setTimeout(() => {
                           document.getElementById('purchase-order-form')?.scrollIntoView({ behavior: 'smooth' });
@@ -862,6 +919,66 @@ function NewPurchaseOrderPageContent() {
                   );
                 })}
               </select>
+            </div>
+
+            {/* Phase Selection (Required) */}
+            <div>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Construction Phase <span className="text-red-500">*</span>
+                <HelpIcon 
+                  content="Select the construction phase this purchase order is for. This is required for phase-based budget tracking and financial management."
+                  position="right"
+                />
+              </label>
+              <FieldHelp>
+                Required: Select which construction phase this purchase order belongs to. This helps track phase-based spending and budget allocation. The phase will be inherited from the material request if available.
+              </FieldHelp>
+              {!formData.projectId ? (
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+                  Please select a project first to see available phases
+                </div>
+              ) : loadingPhases ? (
+                <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+                  Loading phases...
+                </div>
+              ) : phases.length === 0 ? (
+                <div className="w-full px-3 py-2 border border-yellow-300 rounded-lg bg-yellow-50 text-yellow-800 text-sm">
+                  No phases available for this project. Phases can be created in the project phases section.
+                  <Link
+                    href={`/phases?projectId=${formData.projectId}`}
+                    className="block mt-2 text-yellow-900 hover:text-yellow-950 font-medium underline"
+                  >
+                    Manage phases for this project →
+                  </Link>
+                </div>
+              ) : (
+                <select
+                  name="phaseId"
+                  value={formData.phaseId}
+                  onChange={handleChange}
+                  required
+                  disabled={loadingPhases || !formData.projectId}
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                >
+                  <option value="" className="text-gray-900">Select phase (required)</option>
+                  {phases.map((phase) => {
+                    const phaseId = phase._id?.toString() || phase.id?.toString() || '';
+                    const phaseName = phase.phaseName || phase.name || 'Unknown Phase';
+                    const phaseCode = phase.phaseCode || phase.code || '';
+                    const phaseStatus = phase.status ? `(${phase.status.replace('_', ' ')})` : '';
+                    return (
+                      <option key={phaseId} value={phaseId} className="text-gray-900">
+                        {phaseName} {phaseCode && `(${phaseCode})`} {phaseStatus}
+                      </option>
+                    );
+                  })}
+                </select>
+              )}
+              {formData.phaseId && !phases.find(p => (p._id?.toString() || p.id?.toString()) === formData.phaseId) && (
+                <p className="text-sm text-amber-600 mt-1">
+                  ⚠️ The selected phase is not in the available phases list. Please verify the phase belongs to this project.
+                </p>
+              )}
             </div>
 
             {/* Supplier Selection */}

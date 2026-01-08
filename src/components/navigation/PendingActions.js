@@ -44,12 +44,12 @@ export function PendingActions({ isCollapsed = false }) {
       badge={totalCount}
       badgeColor={badgeColor}
     >
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {pendingActions.map((action, index) => (
           <Link
             key={index}
             href={action.href}
-            className={`block p-2 rounded-lg border transition ${
+            className={`block p-2 rounded-lg border transition-colors ${
               action.priority === 'high'
                 ? 'bg-red-50 border-red-200 hover:bg-red-100'
                 : 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100'

@@ -12,6 +12,7 @@
  * @property {string} supplierName - Denormalized supplier name
  * @property {string} [supplierEmail] - Denormalized supplier email
  * @property {ObjectId} projectId - Project ID (required)
+ * @property {ObjectId} phaseId - Phase ID (required for phase tracking and financial management)
  * @property {ObjectId} [floorId] - Floor ID (optional)
  * @property {ObjectId} [categoryId] - Category ID (optional)
  * @property {string} [category] - Denormalized category name
@@ -24,13 +25,31 @@
  * @property {Date} deliveryDate - Expected delivery date (required)
  * @property {string} [terms] - Payment terms, delivery terms
  * @property {string} [notes] - Additional notes
- * @property {string} status - Status: 'order_sent', 'order_accepted', 'order_rejected', 'order_modified', 'ready_for_delivery', 'delivered', 'cancelled'
+ * @property {string} status - Status: 'order_sent', 'order_accepted', 'order_rejected', 'order_modified', 'retry_requested', 'retry_sent', 'alternatives_sent', 'ready_for_delivery', 'delivered', 'cancelled'
  * @property {Date} [sentAt] - When order was sent
  * @property {string} [supplierResponse] - 'accept', 'reject', 'modify'
  * @property {Date} [supplierResponseDate] - When supplier responded
  * @property {string} [supplierNotes] - Supplier's response notes
+ * @property {string} [rejectionReason] - Main rejection reason category (from rejection-reasons.js)
+ * @property {string} [rejectionSubcategory] - Specific rejection subcategory
+ * @property {Object} [rejectionMetadata] - Additional rejection context and analytics
+ * @property {boolean} [isRetryable] - Whether rejection is assessed as retryable
+ * @property {string} [retryRecommendation] - Recommended action for retry
+ * @property {Date} [retryRequestedAt] - When retry was requested
+ * @property {ObjectId} [retryRequestedBy] - User who requested retry
+ * @property {Object} [retryAdjustments] - Adjustments made for retry (price, quantity, etc.)
+ * @property {number} [retryCount] - Number of retry attempts
+ * @property {Date} [alternativesSentAt] - When alternatives were sent
+ * @property {ObjectId} [alternativesSentBy] - User who sent alternatives
+ * @property {Array} [alternativeOrderIds] - IDs of alternative orders created
+ * @property {ObjectId} [originalOrderId] - Original rejected order ID (for alternative orders)
+ * @property {string} [originalOrderNumber] - Original rejected order number
+ * @property {string} [originalRejectionReason] - Original rejection reason (for alternative orders)
+ * @property {boolean} [isAlternativeOrder] - Whether this is an alternative order
  * @property {Object} [supplierModifications] - If supplier proposes changes
  * @property {boolean} [modificationApproved] - If PM/OWNER approved supplier modifications
+ * @property {Array} [materialResponses] - Material-level responses for bulk orders (array of { materialRequestId, action, status, notes, rejectionReason, rejectionSubcategory, modifications })
+ * @property {boolean} [supportsPartialResponse] - Whether this order supports partial responses (bulk orders)
  * @property {string} [deliveryNoteFileUrl] - Uploaded by supplier
  * @property {number} [actualQuantityDelivered] - Actual quantity delivered (may differ from ordered)
  * @property {ObjectId} [linkedMaterialId] - Material entry created from this order
@@ -52,6 +71,7 @@ export const PURCHASE_ORDER_SCHEMA = {
   supplierName: String, // Denormalized
   supplierEmail: String, // Denormalized
   projectId: 'ObjectId',
+  phaseId: 'ObjectId', // Required for phase tracking and financial management
   floorId: 'ObjectId', // Optional
   categoryId: 'ObjectId', // Optional
   category: String, // Denormalized
@@ -69,8 +89,26 @@ export const PURCHASE_ORDER_SCHEMA = {
   supplierResponse: String, // 'accept', 'reject', 'modify'
   supplierResponseDate: Date,
   supplierNotes: String, // Supplier's response notes
+  rejectionReason: String, // Main rejection reason category (from rejection-reasons.js)
+  rejectionSubcategory: String, // Specific rejection subcategory
+  rejectionMetadata: Object, // Additional rejection context and analytics
+  isRetryable: Boolean, // Whether rejection is assessed as retryable
+  retryRecommendation: String, // Recommended action for retry
+  retryRequestedAt: Date, // When retry was requested
+  retryRequestedBy: 'ObjectId', // User who requested retry
+  retryAdjustments: Object, // Adjustments made for retry (price, quantity, etc.)
+  retryCount: Number, // Number of retry attempts
+  alternativesSentAt: Date, // When alternatives were sent
+  alternativesSentBy: 'ObjectId', // User who sent alternatives
+  alternativeOrderIds: ['ObjectId'], // IDs of alternative orders created
+  originalOrderId: 'ObjectId', // Original rejected order ID (for alternative orders)
+  originalOrderNumber: String, // Original rejected order number
+  originalRejectionReason: String, // Original rejection reason (for alternative orders)
+  isAlternativeOrder: Boolean, // Whether this is an alternative order
   supplierModifications: Object, // If supplier proposes changes
   modificationApproved: Boolean, // If PM/OWNER approved supplier modifications
+  materialResponses: Array, // Material-level responses for bulk orders: [{ materialRequestId, action: 'accept'|'reject'|'modify', status: 'pending'|'accepted'|'rejected'|'modified', notes, rejectionReason, rejectionSubcategory, modifications: { unitCost, quantityOrdered, deliveryDate }, respondedAt }]
+  supportsPartialResponse: Boolean, // Whether this order supports partial responses (true for bulk orders)
   deliveryNoteFileUrl: String, // Uploaded by supplier
   actualQuantityDelivered: Number, // Actual quantity delivered (may differ from ordered)
   linkedMaterialId: 'ObjectId', // Material entry created from this order
@@ -93,9 +131,21 @@ export const VALID_PURCHASE_ORDER_STATUSES = [
   'order_accepted',
   'order_rejected',
   'order_modified',
+  'order_partially_responded', // For bulk orders with mixed responses
+  'retry_requested',
+  'retry_sent',
+  'alternatives_sent',
   'ready_for_delivery',
   'delivered',
   'cancelled',
+];
+
+/**
+ * Retry workflow statuses (subset of main statuses)
+ */
+export const RETRY_STATUSES = [
+  'retry_requested',
+  'retry_sent',
 ];
 
 /**
@@ -160,6 +210,32 @@ export const PURCHASE_ORDER_VALIDATION = {
     enum: VALID_FINANCIAL_STATUSES,
     default: 'not_committed',
   },
+  rejectionReason: {
+    required: false,
+    type: 'string',
+    validate: (value) => {
+      // Import would cause circular dependency, so basic validation
+      const validReasons = [
+        'price_too_high', 'unavailable', 'timeline', 'specifications',
+        'quantity', 'business_policy', 'external_factors', 'other'
+      ];
+      return !value || validReasons.includes(value);
+    },
+  },
+  rejectionSubcategory: {
+    required: false,
+    type: 'string',
+  },
+  isRetryable: {
+    required: false,
+    type: 'boolean',
+    default: null,
+  },
+  retryRecommendation: {
+    required: false,
+    type: 'string',
+    maxLength: 500,
+  },
 };
 
 /**
@@ -219,6 +295,36 @@ export function validatePurchaseOrder(data) {
   // Validate financial status
   if (data.financialStatus && !VALID_FINANCIAL_STATUSES.includes(data.financialStatus)) {
     errors.push(`financialStatus must be one of: ${VALID_FINANCIAL_STATUSES.join(', ')}`);
+  }
+
+  // Validate phaseId (required)
+  if (!data.phaseId) {
+    errors.push('phaseId is required for phase tracking and financial management');
+  } else if (typeof data.phaseId === 'string' && !data.phaseId.match(/^[0-9a-fA-F]{24}$/)) {
+    errors.push('Invalid phaseId format');
+  } else if (data.phaseId && typeof data.phaseId !== 'object' && typeof data.phaseId !== 'string') {
+    errors.push('Invalid phaseId format');
+  }
+
+  // Validate rejection reason
+  if (data.rejectionReason) {
+    const validReasons = [
+      'price_too_high', 'unavailable', 'timeline', 'specifications',
+      'quantity', 'business_policy', 'external_factors', 'other'
+    ];
+    if (!validReasons.includes(data.rejectionReason)) {
+      errors.push(`rejectionReason must be one of: ${validReasons.join(', ')}`);
+    }
+  }
+
+  // Validate rejection subcategory (only present if rejectionReason exists)
+  if (data.rejectionSubcategory && !data.rejectionReason) {
+    errors.push('rejectionSubcategory requires rejectionReason to be present');
+  }
+
+  // Validate retry recommendation (only present if isRetryable is true)
+  if (data.isRetryable === false && !data.retryRecommendation) {
+    errors.push('retryRecommendation is required when isRetryable is false');
   }
 
   return {

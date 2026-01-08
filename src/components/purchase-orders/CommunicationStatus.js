@@ -12,9 +12,13 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
   const toast = useToast();
   const [retrying, setRetrying] = useState({ email: false, sms: false, push: false });
 
-  if (!order || !order.communications || !Array.isArray(order.communications) || order.communications.length === 0) {
+  // Don't return early - we want to show enabled channels even if no communications exist
+  if (!order) {
     return null;
   }
+
+  // Initialize communications array if missing
+  const communications = order.communications || [];
 
   // Group communications by channel and get the latest status for each
   const communicationStatus = {
@@ -23,11 +27,11 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
     push: null,
   };
 
-  order.communications.forEach((comm) => {
-    if (comm.channel && communicationStatus[comm.channel] !== null) {
+  communications.forEach((comm) => {
+    if (comm.channel && communicationStatus.hasOwnProperty(comm.channel)) {
       // Keep the most recent communication for each channel
       const existing = communicationStatus[comm.channel];
-      if (!existing || new Date(comm.sentAt) > new Date(existing.sentAt)) {
+      if (!existing || (comm.sentAt && new Date(comm.sentAt) > new Date(existing.sentAt))) {
         communicationStatus[comm.channel] = comm;
       }
     }
@@ -272,6 +276,7 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
     </div>
   );
 }
+
 
 
 

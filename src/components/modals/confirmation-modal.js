@@ -39,6 +39,7 @@ export function ConfirmationModal({
   showRecommendation = false, // New: Show recommendation banner
   financialImpact = null, // New: { totalUsed, totalInvested, capitalBalance }
   dependencies = null, // New: { materials, expenses, initialExpenses, floors, allocations }
+  size = 'md', // New: 'sm', 'md', 'lg', 'xl', 'full' - controls modal max width
   children, // Custom content (form fields, etc.) to render between message and buttons
 }) {
   const modalRef = useRef(null);
@@ -70,14 +71,15 @@ export function ConfirmationModal({
 
   // Prevent body scroll when modal is open
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     if (isOpen) {
+      const originalOverflow = document.body.style.overflow;
       document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
   }, [isOpen]);
 
   if (!isOpen) return null;
@@ -130,6 +132,17 @@ export function ConfirmationModal({
   };
 
   const loadingMessage = overallLoading ? getLoadingMessage() : '';
+
+  // Map size prop to maxWidth classes
+  const sizeMap = {
+    sm: 'max-w-sm',
+    md: 'max-w-md',
+    lg: 'max-w-2xl',
+    xl: 'max-w-4xl',
+    '2xl': 'max-w-6xl',
+    full: 'max-w-[95vw]',
+  };
+  const maxWidth = sizeMap[size] || sizeMap.md;
 
   // Icon component with modern gradient styling
   const Icon = () => {
@@ -185,7 +198,7 @@ export function ConfirmationModal({
     <BaseModal
       isOpen={isOpen}
       onClose={onClose}
-      maxWidth="max-w-md"
+      maxWidth={maxWidth}
       closeOnBackdrop={!overallLoading}
       closeOnEscape={!overallLoading}
       variant={modalVariant}
@@ -193,8 +206,11 @@ export function ConfirmationModal({
       loadingMessage={loadingMessage}
       preventCloseDuringLoading={true}
     >
-      {/* Modal content */}
-      <div className="p-8">
+      {/* Modal content - scrollable for large content */}
+      <div className={`flex flex-col ${size === 'full' || size === '2xl' || size === 'xl' ? 'max-h-[90vh]' : ''}`}>
+        {/* Header Section - Sticky on large modals */}
+        <div className={`${size === 'full' || size === '2xl' || size === 'xl' ? 'sticky top-0 z-10 bg-white/90 backdrop-blur-sm border-b border-gray-200/50' : ''}`}>
+          <div className={`${size === 'full' || size === '2xl' || size === 'xl' ? 'p-6' : 'p-8'}`}>
         {/* Icon and Title */}
         <div className="flex flex-col items-center text-center mb-6">
           {showIcon && (
@@ -209,19 +225,13 @@ export function ConfirmationModal({
           >
             {title}
           </h3>
-              <h3
-                className="text-lg font-semibold leading-6 text-gray-900 mb-2"
-                id="modal-title"
-              >
-                {title}
-              </h3>
           <div className="mt-2">
             {typeof message === 'string' ? (
-              <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">
+              <p className="text-sm font-medium text-gray-700 whitespace-pre-line leading-relaxed">
                 {message}
               </p>
             ) : (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm font-medium text-gray-700">
                 {message}
               </div>
             )}
@@ -310,16 +320,19 @@ export function ConfirmationModal({
             )}
           </div>
         </div>
+          </div>
+        </div>
+        {/* End of Header Section */}
         
-        {/* Custom Content (children) - Form fields, additional inputs, etc. */}
+        {/* Custom Content (children) - Form fields, additional inputs, etc. - Scrollable */}
         {children && (
-          <div className="mt-6">
+          <div className={`flex-1 overflow-y-auto ${size === 'full' || size === '2xl' || size === 'xl' ? 'px-6' : 'px-8'} ${size === 'full' || size === '2xl' || size === 'xl' ? 'pb-4' : 'mt-6'}`}>
             {children}
           </div>
         )}
 
-        {/* Actions */}
-        <div className="mt-8 pt-6 border-t border-gray-200/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+        {/* Actions - Sticky footer on large modals */}
+        <div className={`${size === 'full' || size === '2xl' || size === 'xl' ? 'sticky bottom-0 bg-white/90 backdrop-blur-sm border-t border-gray-200/50' : ''} ${size === 'full' || size === '2xl' || size === 'xl' ? 'p-6' : 'p-8'} ${size === 'full' || size === '2xl' || size === 'xl' ? 'mt-0' : 'mt-8'} pt-6 border-t border-gray-200/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3`}>
           <button
             type="button"
             onClick={onClose}

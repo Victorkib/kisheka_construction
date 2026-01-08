@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense, useRef } from 'react';
+import { useState, useEffect, Suspense, useRef, useCallback } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -167,13 +167,15 @@ function SupplierAssignmentPageContent() {
     }
   };
 
-  const handleSingleAssignmentChange = (assignment) => {
+  // Memoize callbacks to prevent infinite re-render loops
+  // These callbacks are passed to child components, so they need stable references
+  const handleSingleAssignmentChange = useCallback((assignment) => {
     setSingleAssignment(assignment);
-  };
+  }, []); // ✅ Stable reference - no dependencies needed
 
-  const handleMultipleAssignmentChange = (assignments) => {
+  const handleMultipleAssignmentChange = useCallback((assignments) => {
     setMultipleAssignments(assignments);
-  };
+  }, []); // ✅ Stable reference - no dependencies needed
 
   const handleSubmit = async () => {
     try {

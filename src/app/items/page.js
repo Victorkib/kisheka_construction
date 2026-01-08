@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -15,11 +15,15 @@ import { LoadingTable } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
+import { NoProjectsEmptyState, NoDataEmptyState } from '@/components/empty-states';
 
 function ItemsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
+  const { currentProject, isEmpty } = useProjectContext();
   const toast = useToast();
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,21 +49,35 @@ function ItemsPageContent() {
     projectId: searchParams.get('projectId') || '',
     category: searchParams.get('category') || '',
     floor: searchParams.get('floor') || '',
+    phaseId: searchParams.get('phaseId') || '',
     status: searchParams.get('status') || '',
     supplier: searchParams.get('supplier') || '',
     entryType: searchParams.get('entryType') || '',
     search: searchParams.get('search') || '',
   });
+  const [phases, setPhases] = useState([]);
+  const [loadingPhases, setLoadingPhases] = useState(false);
 
   // Fetch projects for filter dropdown
   useEffect(() => {
     fetchProjects();
+    fetchAllPhases();
   }, []);
 
-  // Fetch materials
-  useEffect(() => {
-    fetchMaterials();
-  }, [filters, pagination.page, pagination.limit, sortConfig]);
+  const fetchAllPhases = async () => {
+    setLoadingPhases(true);
+    try {
+      const response = await fetch('/api/phases');
+      const data = await response.json();
+      if (data.success) {
+        setPhases(data.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching phases:', err);
+    } finally {
+      setLoadingPhases(false);
+    }
+  };
 
   const fetchProjects = async () => {
     try {
@@ -73,7 +91,7 @@ function ItemsPageContent() {
     }
   };
 
-  const fetchMaterials = async () => {
+  const fetchMaterials = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -85,6 +103,7 @@ function ItemsPageContent() {
         ...(filters.projectId && { projectId: filters.projectId }),
         ...(filters.category && { category: filters.category }),
         ...(filters.floor && { floor: filters.floor }),
+        ...(filters.phaseId && { phaseId: filters.phaseId }),
         ...(filters.status && { status: filters.status }),
         ...(filters.supplier && { supplier: filters.supplier }),
         ...(filters.entryType && { entryType: filters.entryType }),
@@ -141,14 +160,35 @@ function ItemsPageContent() {
       }
 
       setMaterials(materialsData);
-      setPagination(data.data.pagination || pagination);
+      setPagination(prev => data.data.pagination || prev);
     } catch (err) {
       setError(err.message);
       console.error('Fetch materials error:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, pagination.page, pagination.limit, sortConfig]);
+
+  // Update filters when project changes
+  useEffect(() => {
+    const newProjectId = normalizeProjectId(currentProject?._id);
+    if (newProjectId && filters.projectId !== newProjectId) {
+      setFilters(prev => ({ ...prev, projectId: newProjectId }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentProject?._id]);
+
+  // Fetch materials
+  useEffect(() => {
+    // Don't fetch if empty state
+    if (isEmpty) {
+      setLoading(false);
+      setMaterials([]);
+      return;
+    }
+    
+    fetchMaterials();
+  }, [fetchMaterials, isEmpty]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -394,6 +434,24 @@ function ItemsPageContent() {
     setPagination((prev) => ({ ...prev, limit: parseInt(newLimit), page: 1 }));
   };
 
+  // Check empty state - no projects
+  if (isEmpty && !loading) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Materials & Items</h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage construction materials</p>
+          </div>
+          <NoProjectsEmptyState
+            canCreate={canAccess('create_project')}
+            role={canAccess('create_project') ? 'owner' : 'site_clerk'}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
   const SortIcon = ({ columnKey }) => {
     if (sortConfig.key !== columnKey) {
       return (
@@ -580,6 +638,26 @@ function ItemsPageContent() {
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
                 />
               </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">Phase</label>
+                <select
+                  value={filters.phaseId}
+                  onChange={(e) => handleFilterChange('phaseId', e.target.value)}
+                  disabled={loadingPhases}
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                >
+                  <option value="" className="text-gray-900">All Phases</option>
+                  {loadingPhases ? (
+                    <option>Loading phases...</option>
+                  ) : (
+                    phases.map((phase) => (
+                      <option key={phase._id} value={phase._id} className="text-gray-900">
+                        {phase.name}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
               <div className="flex items-end">
                 <button
                   onClick={() => {
@@ -587,6 +665,7 @@ function ItemsPageContent() {
                       projectId: '',
                       category: '',
                       floor: '',
+                      phaseId: '',
                       status: '',
                       supplier: '',
                       entryType: '',

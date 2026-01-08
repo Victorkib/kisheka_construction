@@ -27,11 +27,13 @@ function NewMaterialRequestPageContent() {
   const [error, setError] = useState(null);
   const [projects, setProjects] = useState([]);
   const [floors, setFloors] = useState([]);
+  const [phases, setPhases] = useState([]);
   const [categories, setCategories] = useState([]);
   const [availableCapital, setAvailableCapital] = useState(null);
   const [loadingCapital, setLoadingCapital] = useState(false);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingFloors, setLoadingFloors] = useState(false);
+  const [loadingPhases, setLoadingPhases] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [prerequisites, setPrerequisites] = useState(null);
   const [loadingPrerequisites, setLoadingPrerequisites] = useState(false);
@@ -39,6 +41,7 @@ function NewMaterialRequestPageContent() {
   const [formData, setFormData] = useState({
     projectId: '',
     floorId: '',
+    phaseId: '',
     categoryId: '',
     category: '',
     materialName: '',
@@ -85,6 +88,7 @@ function NewMaterialRequestPageContent() {
   useEffect(() => {
     const projectIdFromUrl = searchParams.get('projectId');
     const floorIdFromUrl = searchParams.get('floorId');
+    const phaseIdFromUrl = searchParams.get('phaseId');
     const materialIdFromUrl = searchParams.get('materialId');
     const quantityFromUrl = searchParams.get('quantity');
     const quantityNeededFromUrl = searchParams.get('quantityNeeded');
@@ -99,6 +103,9 @@ function NewMaterialRequestPageContent() {
     }
     if (floorIdFromUrl) {
       setFormData((prev) => ({ ...prev, floorId: floorIdFromUrl }));
+    }
+    if (phaseIdFromUrl) {
+      setFormData((prev) => ({ ...prev, phaseId: phaseIdFromUrl }));
     }
     if (quantityFromUrl || quantityNeededFromUrl) {
       setFormData((prev) => ({ ...prev, quantityNeeded: quantityNeededFromUrl || quantityFromUrl }));
@@ -123,14 +130,16 @@ function NewMaterialRequestPageContent() {
     }
   }, [searchParams]);
 
-  // Fetch floors when projectId changes
+  // Fetch floors and phases when projectId changes
   useEffect(() => {
     if (formData.projectId) {
       fetchFloors(formData.projectId);
+      fetchPhases(formData.projectId);
       fetchAvailableCapital(formData.projectId);
       fetchPrerequisites(formData.projectId);
     } else {
       setFloors([]);
+      setPhases([]);
       setAvailableCapital(null);
       setPrerequisites(null);
     }
@@ -185,6 +194,37 @@ function NewMaterialRequestPageContent() {
       setFloors([]);
     } finally {
       setLoadingFloors(false);
+    }
+  };
+
+  const fetchPhases = async (projectId) => {
+    if (!projectId) {
+      setPhases([]);
+      return;
+    }
+    setLoadingPhases(true);
+    try {
+      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const data = await response.json();
+      if (data.success) {
+        setPhases(data.data || []);
+        // Clear phase selection if current phase is not in the new list
+        setFormData((prev) => {
+          const currentPhaseId = prev.phaseId;
+          const phaseExists = data.data.some(p => p._id === currentPhaseId);
+          return {
+            ...prev,
+            phaseId: phaseExists ? currentPhaseId : ''
+          };
+        });
+      } else {
+        setPhases([]);
+      }
+    } catch (err) {
+      console.error('Error fetching phases:', err);
+      setPhases([]);
+    } finally {
+      setLoadingPhases(false);
     }
   };
 
@@ -272,9 +312,10 @@ function NewMaterialRequestPageContent() {
     const { name, value } = e.target;
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
-      // Clear floor selection when project changes
+      // Clear floor and phase selection when project changes
       if (name === 'projectId') {
         updated.floorId = '';
+        updated.phaseId = '';
       }
       // Handle category selection
       if (name === 'categoryId') {
@@ -380,6 +421,7 @@ function NewMaterialRequestPageContent() {
         reason: formData.reason?.trim() || '',
         notes: formData.notes?.trim() || '',
         ...(formData.floorId && { floorId: formData.floorId }),
+        ...(formData.phaseId && { phaseId: formData.phaseId }),
         ...(formData.categoryId && { categoryId: formData.categoryId }),
         ...(formData.category && { category: formData.category }),
         ...(formData.estimatedCost && { estimatedCost: parseFloat(formData.estimatedCost) }),
@@ -603,6 +645,61 @@ function NewMaterialRequestPageContent() {
                     </>
                   )}
                 </select>
+              </div>
+            )}
+
+            {/* Phase Selection (Optional) */}
+            {formData.projectId && (
+              <div>
+                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  Construction Phase (Optional)
+                  <HelpIcon 
+                    content="Select the construction phase if this material is for a specific phase. This helps with phase-based budget tracking and financial management."
+                    position="right"
+                  />
+                </label>
+                <FieldHelp>
+                  Optional: Specify which construction phase these materials are for. Helps track phase-based spending and budget allocation.
+                </FieldHelp>
+                {!formData.projectId ? (
+                  <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
+                    Please select a project first to see available phases
+                  </div>
+                ) : phases.length === 0 ? (
+                  <div className="space-y-2">
+                    <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
+                      No phases available for this project. Phases can be created in the project phases section.
+                    </div>
+                    <Link
+                      href={`/phases?projectId=${formData.projectId}`}
+                      className="text-sm text-blue-600 hover:underline"
+                      target="_blank"
+                    >
+                      Manage phases for this project →
+                    </Link>
+                  </div>
+                ) : (
+                  <select
+                    name="phaseId"
+                    value={formData.phaseId}
+                    onChange={handleChange}
+                    disabled={loadingPhases || loading || !formData.projectId}
+                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loadingPhases ? (
+                      <option>Loading phases...</option>
+                    ) : (
+                      <>
+                        <option value="" className="text-gray-900">Select phase (optional)</option>
+                        {phases.map((phase) => (
+                          <option key={phase._id} value={phase._id} className="text-gray-900">
+                            {phase.phaseName || phase.name} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
+                          </option>
+                        ))}
+                      </>
+                    )}
+                  </select>
+                )}
               </div>
             )}
 

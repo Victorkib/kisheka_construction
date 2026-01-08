@@ -15,6 +15,8 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { calculateProjectTotals } from '@/lib/investment-allocation';
 import { calculateMaterialsBreakdown } from '@/lib/financial-helpers';
 import { MATERIAL_APPROVED_STATUSES, EXPENSE_APPROVED_STATUSES, INITIAL_EXPENSE_APPROVED_STATUSES } from '@/lib/status-constants';
+import { calculatePhaseFinancialSummary } from '@/lib/schemas/phase-schema';
+import { getBudgetTotal, getMaterialsBudget, getLabourBudget, getContingencyBudget } from '@/lib/schemas/budget-schema';
 
 /**
  * GET /api/reports/budget-variance
@@ -54,11 +56,19 @@ export async function GET(request) {
       return errorResponse('Project not found', 404);
     }
 
-    const budget = project.budget || {
+    // Use enhanced budget helpers to support both legacy and enhanced budget structures
+    const projectBudget = project.budget || {
       total: 0,
       materials: 0,
       labour: 0,
       contingency: 0,
+    };
+    
+    const budget = {
+      total: getBudgetTotal(projectBudget),
+      materials: getMaterialsBudget(projectBudget),
+      labour: getLabourBudget(projectBudget),
+      contingency: getContingencyBudget(projectBudget),
     };
 
     // Build queries for actual costs
@@ -284,6 +294,65 @@ export async function GET(request) {
       count: month.count || 0,
     }));
 
+    // Phase-wise breakdown
+    const phases = await db.collection('phases').find({
+      projectId: new ObjectId(projectId),
+      deletedAt: null,
+    }).sort({ sequence: 1 }).toArray();
+
+    const phaseBreakdown = await Promise.all(
+      phases.map(async (phase) => {
+        const phaseFinancialSummary = await calculatePhaseFinancialSummary(phase._id.toString());
+        
+        const phaseBudget = phase.budgetAllocation?.total || 0;
+        const phaseActual = phaseFinancialSummary.actualSpending?.total || 0;
+        const phaseCommitted = phaseFinancialSummary.committedCost || 0;
+        const phaseEstimated = phaseFinancialSummary.estimatedCost || 0;
+        
+        const phaseVariance = phaseBudget - phaseActual;
+        const phaseVariancePercentage = phaseBudget > 0
+          ? ((phaseVariance / phaseBudget) * 100).toFixed(2)
+          : 0;
+
+        const phaseCommittedVariance = phaseBudget - phaseCommitted;
+        const phaseCommittedVariancePercentage = phaseBudget > 0
+          ? ((phaseCommittedVariance / phaseBudget) * 100).toFixed(2)
+          : 0;
+
+        const phaseEstimatedVariance = phaseBudget - phaseEstimated;
+        const phaseEstimatedVariancePercentage = phaseBudget > 0
+          ? ((phaseEstimatedVariance / phaseBudget) * 100).toFixed(2)
+          : 0;
+
+        return {
+          phaseId: phase._id.toString(),
+          phaseName: phase.phaseName,
+          phaseType: phase.phaseType,
+          sequence: phase.sequence || 0,
+          status: phase.status,
+          completionPercentage: phase.completionPercentage || 0,
+          budget: phaseBudget,
+          actual: phaseActual,
+          committed: phaseCommitted,
+          estimated: phaseEstimated,
+          variance: phaseVariance,
+          variancePercentage: parseFloat(phaseVariancePercentage),
+          committedVariance: phaseCommittedVariance,
+          committedVariancePercentage: parseFloat(phaseCommittedVariancePercentage),
+          estimatedVariance: phaseEstimatedVariance,
+          estimatedVariancePercentage: parseFloat(phaseEstimatedVariancePercentage),
+          remaining: Math.max(0, phaseBudget - phaseActual - phaseCommitted),
+          statusIndicator: (() => {
+            if (phaseActual > phaseBudget) return 'over_budget';
+            if (phaseCommitted > phaseBudget) return 'committed_over_budget';
+            if (phaseEstimated > phaseBudget) return 'estimated_over_budget';
+            if (phaseActual > phaseBudget * 0.9) return 'approaching_budget';
+            return 'within_budget';
+          })(),
+        };
+      })
+    );
+
     // Get financing data
     const projectTotals = await calculateProjectTotals(projectId);
     const totalInvested = projectTotals.totalInvested || 0;
@@ -394,6 +463,7 @@ export async function GET(request) {
       },
       categoryBreakdown: categoryBreakdownWithVariance,
       floorBreakdown: floorBreakdownWithVariance,
+      phaseBreakdown: phaseBreakdown,
       monthlyTrend: monthlyTrendFormatted,
       status: {
         // Determine overall status based on variance

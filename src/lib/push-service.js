@@ -59,7 +59,7 @@ export async function sendPushNotification({ subscription, title, message, actio
     }
 
     const payload = JSON.stringify({
-      title: title || 'Kisheka Construction',
+      title: title || 'Doshaki Construction',
       message: message || '',
       actions: actions || [],
       data: data || {},

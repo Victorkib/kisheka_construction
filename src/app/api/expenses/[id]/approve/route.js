@@ -16,6 +16,8 @@ import { createNotification } from '@/lib/notifications';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateCapitalAvailability, recalculateProjectFinances } from '@/lib/financial-helpers';
+import { recalculatePhaseSpending } from '@/lib/phase-helpers';
+import { updateIndirectCostsSpending } from '@/lib/indirect-costs-helpers';
 
 /**
  * POST /api/expenses/[id]/approve
@@ -114,6 +116,58 @@ export async function POST(request, { params }) {
       }
     }
 
+    // Validate phase budget if expense is linked to a phase AND is a direct cost
+    // CRITICAL: Indirect costs are NOT charged to phase budget, so skip validation for them
+    if (existingExpense.phaseId && ObjectId.isValid(existingExpense.phaseId) && !existingExpense.isIndirectCost) {
+      const db = await getDatabase();
+      const phase = await db.collection('phases').findOne({
+        _id: new ObjectId(existingExpense.phaseId),
+        deletedAt: null
+      });
+
+      if (phase) {
+        const expenseAmount = existingExpense.amount || 0;
+        const phaseBudget = phase.budgetAllocation?.total || 0;
+        const phaseActual = phase.actualSpending?.total || 0;
+        const phaseCommitted = phase.financialStates?.committed || 0;
+        const phaseAvailable = Math.max(0, phaseBudget - phaseActual - phaseCommitted);
+
+        if (expenseAmount > phaseAvailable) {
+          // Allow PM/OWNER to override with warning
+          const userRole = userProfile?.role?.toLowerCase();
+          const isOwnerOrPM = ['owner', 'pm', 'project_manager'].includes(userRole);
+
+          if (!isOwnerOrPM) {
+            return errorResponse(
+              `Cannot approve expense: Exceeds phase budget. Phase budget: ${phaseBudget.toLocaleString()}, Available: ${phaseAvailable.toLocaleString()}, Required: ${expenseAmount.toLocaleString()}`,
+              400
+            );
+          }
+          // For PM/OWNER, continue but this will be logged in audit
+        }
+      }
+    }
+    
+    // Validate indirect costs budget if expense is an indirect cost
+    if (existingExpense.isIndirectCost && existingExpense.indirectCostCategory) {
+      const { getIndirectCostsRemaining } = await import('@/lib/indirect-costs-helpers');
+      const indirectRemaining = await getIndirectCostsRemaining(existingExpense.projectId.toString());
+      const expenseAmount = existingExpense.amount || 0;
+      
+      if (expenseAmount > indirectRemaining) {
+        const userRole = userProfile?.role?.toLowerCase();
+        const isOwnerOrPM = ['owner', 'pm', 'project_manager'].includes(userRole);
+        
+        if (!isOwnerOrPM) {
+          return errorResponse(
+            `Cannot approve expense: Exceeds indirect costs budget. Available: ${indirectRemaining.toLocaleString()} KES, Required: ${expenseAmount.toLocaleString()} KES`,
+            400
+          );
+        }
+        // For PM/OWNER, continue but this will be logged in audit
+      }
+    }
+
     // Create approval entry
     const approvalEntry = {
       approverId: new ObjectId(userProfile._id),
@@ -185,6 +239,21 @@ export async function POST(request, { params }) {
       });
     }
 
+    // Charge to indirect costs budget if expense is an indirect cost
+    if (existingExpense.isIndirectCost && existingExpense.indirectCostCategory) {
+      try {
+        await updateIndirectCostsSpending(
+          existingExpense.projectId.toString(),
+          existingExpense.indirectCostCategory,
+          existingExpense.amount || 0
+        );
+        console.log(`✅ Indirect costs updated for project ${existingExpense.projectId}`);
+      } catch (indirectError) {
+        console.error(`❌ Error updating indirect costs:`, indirectError);
+        // Don't fail the approval if indirect costs update fails
+      }
+    }
+    
     // Auto-recalculate project finances after approval (async, non-blocking)
     if (existingExpense.projectId) {
       recalculateProjectFinances(existingExpense.projectId.toString())
@@ -202,6 +271,17 @@ export async function POST(request, { params }) {
           });
           // Don't fail the approval if finances update fails, but log it for manual review
         });
+    }
+
+    // Recalculate phase spending if expense is linked to a phase AND is a direct cost
+    // CRITICAL: Indirect costs are NOT included in phase spending
+    if (existingExpense.phaseId && ObjectId.isValid(existingExpense.phaseId) && !existingExpense.isIndirectCost) {
+      try {
+        await recalculatePhaseSpending(existingExpense.phaseId.toString());
+      } catch (phaseError) {
+        console.error('Error recalculating phase spending after expense approval:', phaseError);
+        // Don't fail the request, just log the error
+      }
     }
 
     return successResponse(

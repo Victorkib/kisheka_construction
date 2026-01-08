@@ -6,13 +6,16 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 
 export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
   const [projects, setProjects] = useState([]);
   const [floors, setFloors] = useState([]);
+  const [phases, setPhases] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingFloors, setLoadingFloors] = useState(false);
+  const [loadingPhases, setLoadingPhases] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(true);
 
   // Fetch projects on mount
@@ -21,22 +24,25 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
     fetchCategories();
   }, []);
 
-  // Fetch floors when project changes
+  // Fetch floors and phases when project changes
   useEffect(() => {
     if (wizardData.projectId) {
       fetchFloors(wizardData.projectId);
+      fetchPhases(wizardData.projectId);
     } else {
       setFloors([]);
+      setPhases([]);
     }
   }, [wizardData.projectId]);
 
   // Validate and notify parent
-  // Only depend on the actual value, not the callback function
+  // Phase is now required: either defaultPhaseId must be set, or validation will check per-material in Step 3
+  // For Step 1, we require defaultPhaseId for simplicity (users can override per-material in Step 3)
   useEffect(() => {
-    const isValid = !!wizardData.projectId;
+    const isValid = !!wizardData.projectId && !!wizardData.defaultPhaseId;
     onValidationChange(isValid);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wizardData.projectId]); // onValidationChange is stable (memoized in parent)
+  }, [wizardData.projectId, wizardData.defaultPhaseId]); // onValidationChange is stable (memoized in parent)
 
   const fetchProjects = async () => {
     setLoadingProjects(true);
@@ -81,6 +87,33 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
       setFloors([]);
     } finally {
       setLoadingFloors(false);
+    }
+  };
+
+  const fetchPhases = async (projectId) => {
+    if (!projectId) {
+      setPhases([]);
+      return;
+    }
+    setLoadingPhases(true);
+    try {
+      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const data = await response.json();
+      if (data.success) {
+        setPhases(data.data || []);
+        // Clear phase selection if current phase is not in the new list
+        if (wizardData.defaultPhaseId) {
+          const phaseExists = data.data.some((p) => p._id === wizardData.defaultPhaseId);
+          if (!phaseExists) {
+            onUpdate({ defaultPhaseId: '' });
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Error fetching phases:', err);
+      setPhases([]);
+    } finally {
+      setLoadingPhases(false);
     }
   };
 
@@ -194,6 +227,50 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
             </select>
           )}
           <p className="mt-1 text-sm text-gray-600">Default floor for all materials (can be overridden per material)</p>
+        </div>
+
+        {/* Default Phase - REQUIRED */}
+        <div>
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Default Construction Phase <span className="text-red-500">*</span>
+          </label>
+          {loadingPhases ? (
+            <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-500">
+              Loading phases...
+            </div>
+          ) : phases.length === 0 && wizardData.projectId ? (
+            <div className="space-y-2">
+              <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700">
+                No phases found for this project
+              </div>
+              <Link
+                href={`/phases?projectId=${wizardData.projectId}`}
+                className="text-sm text-blue-600 hover:underline"
+                target="_blank"
+              >
+                Manage phases for this project →
+              </Link>
+            </div>
+          ) : (
+            <select
+              value={wizardData.defaultPhaseId || ''}
+              onChange={(e) => handleChange('defaultPhaseId', e.target.value)}
+              required
+              disabled={!wizardData.projectId || phases.length === 0}
+              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+            >
+              <option value="" className="text-gray-900">Select phase (required)</option>
+              {phases.map((phase) => (
+                <option key={phase._id} value={phase._id} className="text-gray-900">
+                  {phase.phaseName || phase.name} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
+                </option>
+              ))}
+            </select>
+          )}
+          <p className="mt-1 text-sm text-gray-600">
+            <span className="font-medium text-red-600">Required:</span> Default construction phase for all materials. 
+            You can override this for individual materials in Step 3 if needed.
+          </p>
         </div>
 
         {/* Default Category */}

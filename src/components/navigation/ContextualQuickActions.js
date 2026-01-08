@@ -180,7 +180,7 @@ export function ContextualQuickActions({ isCollapsed = false }) {
       showBorder={true}
       className="flex-shrink-0"
     >
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         {actions.map((action, index) => (
           <Link
             key={index}
@@ -188,7 +188,7 @@ export function ContextualQuickActions({ isCollapsed = false }) {
             className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg border transition-colors ${getColorClasses(action.color)}`}
           >
             <span className="text-base flex-shrink-0">{action.icon}</span>
-            <span className="flex-1 font-medium">{action.label}</span>
+            <span className="flex-1 font-medium truncate">{action.label}</span>
           </Link>
         ))}
       </div>

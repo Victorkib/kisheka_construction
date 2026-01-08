@@ -25,6 +25,7 @@ import {
   calculateEstimatedCost,
   calculateMaterialsBreakdown,
 } from '@/lib/financial-helpers';
+import { calculateTotalPhaseBudgets } from '@/lib/phase-helpers';
 
 /**
  * GET /api/project-finances
@@ -469,6 +470,80 @@ export async function GET(request) {
       };
     }
 
+    // Calculate unallocated project budget and pre-construction budget (if projectId provided)
+    let unallocatedBudget = null;
+    let allocatedToPhases = null;
+    let preConstructionBudget = null;
+    if (projectId && ObjectId.isValid(projectId)) {
+      const project = await db.collection('projects').findOne({
+        _id: new ObjectId(projectId),
+        deletedAt: null
+      });
+      
+      if (project) {
+        const { getBudgetTotal, isEnhancedBudget } = await import('@/lib/schemas/budget-schema');
+        const projectBudget = project.budget || {};
+        
+        // Get pre-construction budget
+        if (isEnhancedBudget(projectBudget)) {
+          preConstructionBudget = {
+            budgeted: projectBudget.preConstructionCosts || 0,
+            spent: 0, // Will be calculated from project_finances
+            remaining: 0,
+            byCategory: {
+              landAcquisition: 0,
+              legalRegulatory: 0,
+              permitsApprovals: 0,
+              sitePreparation: 0
+            }
+          };
+        } else {
+          // Legacy: Estimate 5% of total
+          const projectBudgetTotal = getBudgetTotal(projectBudget);
+          preConstructionBudget = {
+            budgeted: projectBudgetTotal * 0.05,
+            spent: 0,
+            remaining: 0,
+            byCategory: {
+              landAcquisition: 0,
+              legalRegulatory: 0,
+              permitsApprovals: 0,
+              sitePreparation: 0
+            }
+          };
+        }
+        
+        // Get pre-construction spending from project_finances
+        const { getPreConstructionSpending } = await import('@/lib/financial-helpers');
+        const preConstructionSpending = await getPreConstructionSpending(projectId);
+        preConstructionBudget.spent = preConstructionSpending.total || 0;
+        preConstructionBudget.remaining = Math.max(0, preConstructionBudget.budgeted - preConstructionBudget.spent);
+        preConstructionBudget.byCategory = preConstructionSpending.byCategory || preConstructionBudget.byCategory;
+        
+        // Calculate unallocated DCC (not total budget)
+        let dccBudget = 0;
+        if (isEnhancedBudget(projectBudget)) {
+          dccBudget = projectBudget.directConstructionCosts || 0;
+        } else {
+          const projectBudgetTotal = getBudgetTotal(projectBudget);
+          const estimatedPreConstruction = projectBudgetTotal * 0.05;
+          const estimatedIndirect = projectBudgetTotal * 0.05;
+          const estimatedContingency = projectBudget.contingency || (projectBudgetTotal * 0.05);
+          dccBudget = Math.max(0, projectBudgetTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+        }
+        
+        allocatedToPhases = await calculateTotalPhaseBudgets(projectId);
+        unallocatedBudget = Math.max(0, dccBudget - allocatedToPhases);
+      }
+    }
+
+    // Get indirect costs summary if projectId provided
+    let indirectCostsSummary = null;
+    if (projectId && ObjectId.isValid(projectId)) {
+      const { getIndirectCostsSummary } = await import('@/lib/indirect-costs-helpers');
+      indirectCostsSummary = await getIndirectCostsSummary(projectId);
+    }
+
     return successResponse({
       ...projectFinances,
       // NEW: Add committed and estimated costs
@@ -477,6 +552,10 @@ export async function GET(request) {
         estimatedCost,
         availableCapital,
         materialsBreakdown,
+        allocatedToPhases,
+        unallocatedBudget,
+        preConstructionBudget, // NEW: Pre-construction budget tracking
+        indirectCostsSummary, // NEW: Indirect costs budget tracking
       }),
       breakdown: {
         expenses: totalExpenses,

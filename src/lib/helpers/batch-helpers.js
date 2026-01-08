@@ -88,6 +88,24 @@ export async function createMaterialRequestsFromBatch(materials, settings, userP
 
     const category = material.category || settings.defaultCategory || '';
 
+    // Phase Enforcement: PhaseId is now required
+    // Use material-specific phaseId or fall back to defaultPhaseId
+    let phaseId = null;
+    
+    if (material.phaseId && ObjectId.isValid(material.phaseId)) {
+      phaseId = new ObjectId(material.phaseId);
+    } else if (settings.defaultPhaseId && ObjectId.isValid(settings.defaultPhaseId)) {
+      phaseId = new ObjectId(settings.defaultPhaseId);
+    }
+    
+    // Validate phaseId exists (should have been validated in API, but double-check for safety)
+    if (!phaseId) {
+      throw new Error(
+        `Material "${material.name || material.materialName || 'Unknown'}" (index ${i}) does not have a phaseId. ` +
+        `Either provide defaultPhaseId in batch settings or specify phaseId for each material.`
+      );
+    }
+
     const urgency = material.urgency || settings.defaultUrgency || 'medium';
     const reason = material.reason || settings.defaultReason || '';
 
@@ -123,6 +141,7 @@ export async function createMaterialRequestsFromBatch(materials, settings, userP
       ...(floorId && { floorId }),
       ...(categoryId && { categoryId }),
       ...(category && { category: category.trim() }),
+      phaseId: phaseId, // Required - validated above
       materialName,
       description: material.description?.trim() || '',
       quantityNeeded,

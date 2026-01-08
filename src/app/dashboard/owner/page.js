@@ -10,36 +10,60 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner, LoadingCard } from '@/components/loading';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
+import { NoProjectsEmptyState, ErrorState } from '@/components/empty-states';
 
 export default function OwnerDashboard() {
+  const { currentProject, accessibleProjects, switchProject, isEmpty } = useProjectContext();
   const [user, setUser] = useState(null);
   const [summary, setSummary] = useState(null);
   const [wastageSummary, setWastageSummary] = useState(null);
   const [readyToOrderCount, setReadyToOrderCount] = useState(0);
+  const [phaseOverview, setPhaseOverview] = useState(null);
+  const [loadingPhaseOverview, setLoadingPhaseOverview] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [userError, setUserError] = useState(null);
   const router = useRouter();
+  
+  const selectedProjectId = normalizeProjectId(currentProject?._id) || null;
 
   useEffect(() => {
     async function fetchData() {
+      // Always fetch user data, even if empty state
+      // This ensures user is available for empty state display
       try {
-        const [userResponse, summaryResponse, wastageResponse, readyToOrderResponse] = await Promise.all([
-          fetch('/api/auth/me'),
-          fetch('/api/dashboard/summary'),
-          fetch('/api/discrepancies/widget-summary'),
-          fetch('/api/material-requests?status=ready_to_order&limit=0'),
-        ]);
-
+        setUserError(null);
+        const userResponse = await fetch('/api/auth/me');
         const userData = await userResponse.json();
-        const summaryData = await summaryResponse.json();
-        const wastageData = await wastageResponse.json();
-        const readyToOrderData = await readyToOrderResponse.json();
 
         if (!userData.success) {
-          router.push('/auth/login');
+          setUserError('Failed to load user data. Please try again.');
+          setLoading(false);
           return;
         }
 
         setUser(userData.data);
+
+        // Don't fetch other data if no project selected or if empty state
+        if (!currentProject || isEmpty) {
+          setLoading(false);
+          return;
+        }
+        
+        const projectId = normalizeProjectId(currentProject._id);
+        const projectIdParam = projectId ? `?projectId=${projectId}` : '';
+        
+        const [summaryResponse, wastageResponse, readyToOrderResponse] = await Promise.all([
+          fetch(`/api/dashboard/summary${projectIdParam}`),
+          fetch(`/api/discrepancies/widget-summary${projectIdParam}`),
+          fetch(`/api/material-requests?status=ready_to_order&limit=0${projectId ? `&projectId=${projectId}` : ''}`),
+        ]);
+
+        const summaryData = await summaryResponse.json();
+        const wastageData = await wastageResponse.json();
+        const readyToOrderData = await readyToOrderResponse.json();
+
         if (summaryData.success) {
           setSummary(summaryData.data.summary);
         }
@@ -52,14 +76,39 @@ export default function OwnerDashboard() {
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-        router.push('/auth/login');
+        setUserError('Network error. Please check your connection and try again.');
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
-  }, [router]);
+  }, [router, currentProject, isEmpty]);
+
+  // Fetch phase overview when project is selected or changes
+  useEffect(() => {
+    if (selectedProjectId) {
+      fetchPhaseOverview(selectedProjectId);
+    } else {
+      setPhaseOverview(null);
+    }
+     
+  }, [selectedProjectId]);
+
+  const fetchPhaseOverview = async (projectId) => {
+    setLoadingPhaseOverview(true);
+    try {
+      const response = await fetch(`/api/projects/${projectId}/phase-financial-overview`);
+      const data = await response.json();
+      if (data.success) {
+        setPhaseOverview(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching phase overview:', error);
+    } finally {
+      setLoadingPhaseOverview(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -77,8 +126,66 @@ export default function OwnerDashboard() {
     );
   }
 
+  // Check empty state FIRST - this is critical to prevent dark screen
+  if (isEmpty) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Owner Dashboard</h1>
+            {user && (
+              <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+                Welcome, {user.firstName || user.email}!
+              </p>
+            )}
+          </div>
+
+          {/* Empty State - No Projects */}
+          <NoProjectsEmptyState
+            canCreate={true}
+            userName={user?.firstName || user?.email}
+            role="owner"
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Check for user error state
+  if (userError) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <ErrorState
+            title="Error Loading Dashboard"
+            message={userError}
+            onRetry={() => {
+              setUserError(null);
+              setLoading(true);
+              window.location.reload();
+            }}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Check if user is null (shouldn't happen if fetch succeeded, but safety check)
   if (!user) {
-    return null;
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-8 text-center">
+            <div className="max-w-2xl mx-auto">
+              <div className="text-5xl mb-4">⏳</div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading User Data</h2>
+              <p className="text-lg text-gray-700 mb-6">Please wait while we load your information...</p>
+              <LoadingSpinner />
+            </div>
+          </div>
+        </div>
+      </AppLayout>
+    );
   }
 
   return (
@@ -151,6 +258,197 @@ export default function OwnerDashboard() {
                 )}
               </p>
             </Link>
+          </div>
+        )}
+
+
+        {/* Phase-Based Financial Overview */}
+        {currentProject && (
+          <div className="bg-white rounded-lg shadow p-6 mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 leading-tight">Phase Financial Overview</h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {currentProject.projectName} ({currentProject.projectCode})
+                </p>
+              </div>
+              {accessibleProjects.length > 1 && (
+                <select
+                  value={selectedProjectId || ''}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      switchProject(e.target.value);
+                    }
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {accessibleProjects.map((project) => (
+                    <option key={project._id} value={project._id}>
+                      {project.projectName || project.projectCode}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {loadingPhaseOverview ? (
+              <div className="text-center py-8">
+                <LoadingSpinner />
+                <p className="text-gray-600 mt-2">Loading phase financial data...</p>
+              </div>
+            ) : phaseOverview ? (
+              <div className="space-y-6">
+                {/* Summary Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-1">Total Budget</h3>
+                    <p className="text-2xl font-bold text-blue-600">
+                      {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(phaseOverview.summary?.totalBudget || 0)}
+                    </p>
+                  </div>
+                  <div className="bg-green-50 rounded-lg p-4">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-1">Total Spent</h3>
+                    <p className="text-2xl font-bold text-green-600">
+                      {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(phaseOverview.summary?.totalSpent || 0)}
+                    </p>
+                  </div>
+                  <div className="bg-yellow-50 rounded-lg p-4">
+                    <h3 className="text-sm font-semibold text-gray-700 mb-1">Committed</h3>
+                    <p className="text-2xl font-bold text-yellow-600">
+                      {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(phaseOverview.summary?.totalCommitted || 0)}
+                    </p>
+                  </div>
+                  <div className={`rounded-lg p-4 ${(phaseOverview.summary?.overallVariancePercentage || 0) > 0 ? 'bg-red-50' : 'bg-gray-50'}`}>
+                    <h3 className="text-sm font-semibold text-gray-700 mb-1">Variance</h3>
+                    <p className={`text-2xl font-bold ${(phaseOverview.summary?.overallVariancePercentage || 0) > 0 ? 'text-red-600' : 'text-gray-600'}`}>
+                      {phaseOverview.summary?.overallVariancePercentage > 0 ? '+' : ''}{phaseOverview.summary?.overallVariancePercentage || 0}%
+                    </p>
+                  </div>
+                </div>
+
+                {/* Risk Indicators */}
+                {phaseOverview.riskIndicators && phaseOverview.riskIndicators.length > 0 && (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-yellow-900 mb-2">⚠️ Risk Indicators</h3>
+                    <ul className="space-y-2">
+                      {phaseOverview.riskIndicators.slice(0, 3).map((risk, idx) => (
+                        <li key={idx} className="text-sm text-yellow-800">
+                          • {risk.message}
+                        </li>
+                      ))}
+                    </ul>
+                    {phaseOverview.riskIndicators.length > 3 && (
+                      <p className="text-xs text-yellow-700 mt-2">
+                        +{phaseOverview.riskIndicators.length - 3} more risk indicator(s)
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Phase List */}
+                {phaseOverview.phases && phaseOverview.phases.length > 0 && (
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Phases</h3>
+                    <div className="space-y-3">
+                      {phaseOverview.phases.map((phase) => {
+                        const variance = phase.financialSummary?.variancePercentage || 0;
+                        const utilization = phase.financialSummary?.utilizationPercentage || 0;
+                        return (
+                          <Link
+                            key={phase.id}
+                            href={`/phases/${phase.id}`}
+                            className="block p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                  <h4 className="font-semibold text-gray-900">{phase.name}</h4>
+                                  <span className={`px-2 py-1 text-xs rounded-full ${
+                                    phase.status === 'completed' ? 'bg-green-100 text-green-800' :
+                                    phase.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                                    'bg-gray-100 text-gray-800'
+                                  }`}>
+                                    {phase.status.replace('_', ' ')}
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-4 text-sm">
+                                  <div>
+                                    <span className="text-gray-600">Budget: </span>
+                                    <span className="font-medium">
+                                      {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(phase.budget?.total || 0)}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-600">Spent: </span>
+                                    <span className="font-medium">
+                                      {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(phase.actual?.total || 0)}
+                                    </span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-600">Progress: </span>
+                                    <span className="font-medium">{phase.completionPercentage || 0}%</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="ml-4 text-right">
+                                <div className={`text-lg font-bold ${variance > 0 ? 'text-red-600' : variance < 0 ? 'text-green-600' : 'text-gray-600'}`}>
+                                  {variance > 0 ? '+' : ''}{variance.toFixed(1)}%
+                                </div>
+                                <div className="text-xs text-gray-600">variance</div>
+                              </div>
+                            </div>
+                            {utilization > 80 && phase.status !== 'completed' && (
+                              <div className="mt-2 text-xs text-yellow-700 bg-yellow-50 px-2 py-1 rounded">
+                                ⚠️ {utilization.toFixed(1)}% of budget utilized
+                              </div>
+                            )}
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Forecast Section */}
+                {phaseOverview.forecast && (
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-purple-900 mb-2">📊 Cost Forecast</h3>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-purple-700">Projected Total: </span>
+                        <span className="font-bold text-purple-900">
+                          {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(phaseOverview.forecast.totalForecast || 0)}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-purple-700">Forecast Variance: </span>
+                        <span className={`font-bold ${phaseOverview.forecast.overallVariancePercentage > 0 ? 'text-red-600' : 'text-green-600'}`}>
+                          {phaseOverview.forecast.overallVariancePercentage > 0 ? '+' : ''}{phaseOverview.forecast.overallVariancePercentage.toFixed(1)}%
+                        </span>
+                      </div>
+                    </div>
+                    {phaseOverview.forecast.overallRiskLevel === 'high' && (
+                      <p className="text-sm text-red-700 mt-2 font-semibold">
+                        ⚠️ High risk: {phaseOverview.forecast.highRiskPhases} phase(s) at high risk
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                <div className="text-center">
+                  <Link
+                    href={`/phases?projectId=${selectedProjectId}`}
+                    className="text-blue-600 hover:text-blue-800 font-medium"
+                  >
+                    View All Phases →
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-600">
+                No phase data available for this project
+              </div>
+            )}
           </div>
         )}
 
@@ -424,6 +722,19 @@ export default function OwnerDashboard() {
                 <div>
                   <h3 className="font-semibold text-gray-900">Stock Tracking</h3>
                   <p className="text-sm text-gray-700">Monitor inventory levels</p>
+                </div>
+              </div>
+            </Link>
+
+            <Link
+              href="/reports/phases"
+              className="p-4 border-2 border-indigo-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition"
+            >
+              <div className="flex items-center gap-3">
+                <div className="text-2xl">📈</div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Phase Reports</h3>
+                  <p className="text-sm text-gray-700">Comprehensive phase analytics</p>
                 </div>
               </div>
             </Link>

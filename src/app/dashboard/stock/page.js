@@ -15,6 +15,8 @@ import { LoadingButton } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 
 export default function StockPage() {
   const router = useRouter();
@@ -49,30 +51,17 @@ export default function StockPage() {
   const [showAutoReorderModal, setShowAutoReorderModal] = useState(false);
   const [autoReorderPreview, setAutoReorderPreview] = useState(null);
   const [autoReorderLoading, setAutoReorderLoading] = useState(false);
-  const [projects, setProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const { currentProject, accessibleProjects, switchProject } = useProjectContext();
+  
+  const selectedProjectId = normalizeProjectId(currentProject?._id) || '';
 
   useEffect(() => {
-    fetchStockData();
-    fetchMaterialRequests();
-    fetchProjects();
-  }, [filters, pagination.page, pagination.limit]);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data.projects || []);
-        // Set first project as default if available
-        if (data.data.projects && data.data.projects.length > 0 && !selectedProjectId) {
-          setSelectedProjectId(data.data.projects[0]._id);
-        }
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
+    if (selectedProjectId) {
+      fetchStockData();
+      fetchMaterialRequests();
     }
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, pagination.page, pagination.limit, selectedProjectId]);
 
   const handlePreviewAutoReorder = async () => {
     if (!selectedProjectId) {
@@ -164,6 +153,7 @@ export default function StockPage() {
         ...(filters.category && { category: filters.category }),
         ...(filters.floor && { floor: filters.floor }),
         ...(filters.search && { search: filters.search }),
+        ...(selectedProjectId && { projectId: selectedProjectId }),
       });
 
       const response = await fetch(`/api/materials?${queryParams}`);
@@ -300,6 +290,17 @@ export default function StockPage() {
 
   // Check if material has an existing request
   const getExistingRequest = (material) => {
+    // First, check if material has direct link to request
+    if (material.materialRequestId) {
+      const directRequest = materialRequests.find(
+        req => req._id?.toString() === material.materialRequestId.toString()
+      );
+      if (directRequest) {
+        return directRequest;
+      }
+    }
+    
+    // Fallback: name-based matching (only if no direct link)
     return materialRequests.find(
       (req) =>
         req.materialName?.toLowerCase() === (material.name || material.materialName)?.toLowerCase() &&
@@ -653,6 +654,12 @@ export default function StockPage() {
                         </div>
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                        Request
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                        Purchase Order
+                      </th>
+                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
                         Quantity
                       </th>
                       <th
@@ -713,6 +720,48 @@ export default function StockPage() {
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             <span className="text-sm text-gray-900">{material.category || 'N/A'}</span>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            {material.materialRequestNumber ? (
+                              <div className="flex flex-col">
+                                <Link
+                                  href={`/material-requests/${material.materialRequestId}`}
+                                  className="text-sm text-green-600 hover:text-green-800 font-medium"
+                                >
+                                  {material.materialRequestNumber}
+                                </Link>
+                                {material.materialRequestStatus && (
+                                  <span className={`text-xs px-2 py-0.5 rounded-full inline-block mt-1 ${
+                                    material.materialRequestStatus === 'approved'
+                                      ? 'bg-green-100 text-green-800'
+                                      : material.materialRequestStatus === 'converted_to_order'
+                                      ? 'bg-blue-100 text-blue-800'
+                                      : 'bg-yellow-100 text-yellow-800'
+                                  }`}>
+                                    {material.materialRequestStatus.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-sm text-gray-400">N/A</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap">
+                            {material.purchaseOrderNumber ? (
+                              <div className="flex flex-col">
+                                <Link
+                                  href={`/purchase-orders/${material.purchaseOrderId || material.linkedPurchaseOrderId}`}
+                                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                >
+                                  {material.purchaseOrderNumber}
+                                </Link>
+                                {material.isBulkOrder && (
+                                  <span className="text-xs text-purple-600 mt-1">Bulk Order</span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-sm text-gray-400">N/A</span>
+                            )}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">
@@ -856,6 +905,33 @@ export default function StockPage() {
                         <span className="ml-1 text-gray-900 font-medium">
                           {material.supplierName || material.supplier || 'N/A'}
                         </span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Request:</span>
+                        {material.materialRequestNumber ? (
+                          <Link
+                            href={`/material-requests/${material.materialRequestId}`}
+                            className="ml-1 text-green-600 hover:text-green-800 font-medium text-sm"
+                          >
+                            {material.materialRequestNumber}
+                          </Link>
+                        ) : (
+                          <span className="ml-1 text-gray-400 text-sm">N/A</span>
+                        )}
+                      </div>
+                      <div>
+                        <span className="text-gray-500">PO:</span>
+                        {material.purchaseOrderNumber ? (
+                          <Link
+                            href={`/purchase-orders/${material.purchaseOrderId || material.linkedPurchaseOrderId}`}
+                            className="ml-1 text-blue-600 hover:text-blue-800 font-medium text-sm"
+                          >
+                            {material.purchaseOrderNumber}
+                            {material.isBulkOrder && <span className="text-xs text-purple-600 ml-1">(Bulk)</span>}
+                          </Link>
+                        ) : (
+                          <span className="ml-1 text-gray-400 text-sm">N/A</span>
+                        )}
                       </div>
                       <div>
                         <span className="text-gray-500">Quantity:</span>

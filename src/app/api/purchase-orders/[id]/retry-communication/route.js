@@ -13,7 +13,7 @@ import { hasPermission } from '@/lib/role-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { sendPurchaseOrderEmail } from '@/lib/email-templates/purchase-order-templates';
-import { sendSMS, generatePurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
+import { sendSMS, generatePurchaseOrderSMS, generateBulkPurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { sendPushToSupplier } from '@/lib/push-service';
 import { generateShortUrl } from '@/lib/generators/url-shortener';
 
@@ -74,13 +74,16 @@ export async function POST(request, { params }) {
       return errorResponse('Supplier not found', 404);
     }
 
-    // Get material request for details
-    const materialRequest = await db.collection('material_requests').findOne({
-      _id: purchaseOrder.materialRequestId,
-    });
+    // Get material request for details (for single orders)
+    let materialRequest = null;
+    if (purchaseOrder.materialRequestId && !purchaseOrder.isBulkOrder) {
+      materialRequest = await db.collection('material_requests').findOne({
+        _id: purchaseOrder.materialRequestId,
+      });
 
-    if (!materialRequest) {
-      return errorResponse('Material request not found', 404);
+      if (!materialRequest) {
+        return errorResponse('Material request not found', 404);
+      }
     }
 
     const responseToken = purchaseOrder.responseToken;
@@ -137,14 +140,34 @@ export async function POST(request, { params }) {
         }
 
         const formattedPhone = formatPhoneNumber(supplier.phone);
-        const smsMessage = generatePurchaseOrderSMS({
-          purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
-          materialName: materialRequest.materialName,
-          quantity: purchaseOrder.quantityOrdered,
-          unit: materialRequest.unit,
-          totalCost: purchaseOrder.totalCost,
-          shortLink,
-        });
+        
+        // Use detailed bulk order SMS for bulk orders, regular SMS for single orders
+        let smsMessage;
+        if (purchaseOrder.isBulkOrder && purchaseOrder.materials && Array.isArray(purchaseOrder.materials) && purchaseOrder.materials.length > 0) {
+          // Bulk order - use detailed message with material breakdown
+          smsMessage = generateBulkPurchaseOrderSMS({
+            purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
+            materials: purchaseOrder.materials,
+            totalCost: purchaseOrder.totalCost,
+            shortLink,
+            deliveryDate: purchaseOrder.deliveryDate
+          });
+        } else if (materialRequest) {
+          // Single order - use regular SMS
+          smsMessage = generatePurchaseOrderSMS({
+            purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
+            materialName: materialRequest.materialName,
+            quantity: purchaseOrder.quantityOrdered,
+            unit: materialRequest.unit,
+            totalCost: purchaseOrder.totalCost,
+            shortLink,
+            deliveryDate: purchaseOrder.deliveryDate,
+            unitCost: purchaseOrder.unitCost || null
+          });
+        } else {
+          // Fallback if no material request found
+          return errorResponse('Cannot generate SMS: Material details not found', 400);
+        }
 
         const smsResult = await sendSMS({
           to: formattedPhone,

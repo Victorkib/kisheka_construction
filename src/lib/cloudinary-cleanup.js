@@ -278,3 +278,68 @@ export async function deleteProjectCloudinaryAssets(project) {
   return await deleteMultipleCloudinaryAssets(uniqueUrls);
 }
 
+/**
+ * Extract and delete Cloudinary assets from a professional service assignment
+ * @param {object} professionalService - Professional service assignment document
+ * @returns {Promise<{success: number, failed: number}>}
+ */
+export async function deleteProfessionalServiceCloudinaryAssets(professionalService) {
+  if (!professionalService) return { success: 0, failed: 0 };
+
+  const urls = [];
+
+  // Collect all Cloudinary URLs from professional service
+  if (professionalService.contractDocumentUrl) {
+    urls.push(professionalService.contractDocumentUrl);
+  }
+
+  // Remove duplicates
+  const uniqueUrls = [...new Set(urls.filter(Boolean))];
+
+  return await deleteMultipleCloudinaryAssets(uniqueUrls);
+}
+
+/**
+ * Extract and delete Cloudinary assets from a professional activity
+ * @param {object} activity - Professional activity document
+ * @returns {Promise<{success: number, failed: number}>}
+ */
+export async function deleteProfessionalActivityCloudinaryAssets(activity) {
+  if (!activity) return { success: 0, failed: 0 };
+
+  const urls = [];
+
+  // Collect all Cloudinary URLs from activity documents array
+  if (activity.documents && Array.isArray(activity.documents)) {
+    activity.documents.forEach((doc) => {
+      if (doc.documentUrl) urls.push(doc.documentUrl);
+      if (doc.url) urls.push(doc.url); // Fallback field name
+    });
+  }
+
+  // Remove duplicates
+  const uniqueUrls = [...new Set(urls.filter(Boolean))];
+
+  return await deleteMultipleCloudinaryAssets(uniqueUrls);
+}
+
+/**
+ * Extract and delete Cloudinary assets from a professional fee
+ * @param {object} fee - Professional fee document
+ * @returns {Promise<{success: number, failed: number}>}
+ */
+export async function deleteProfessionalFeeCloudinaryAssets(fee) {
+  if (!fee) return { success: 0, failed: 0 };
+
+  const urls = [];
+
+  // Collect all Cloudinary URLs from professional fee
+  if (fee.receiptUrl) urls.push(fee.receiptUrl);
+  if (fee.invoiceUrl) urls.push(fee.invoiceUrl);
+
+  // Remove duplicates
+  const uniqueUrls = [...new Set(urls.filter(Boolean))];
+
+  return await deleteMultipleCloudinaryAssets(uniqueUrls);
+}
+

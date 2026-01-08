@@ -14,7 +14,7 @@ function RegisterPageContent() {
     <div className="space-y-6">
       <div className="text-center">
         <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create Account</h1>
-        <p className="text-gray-600 mt-2">Join the Kisheka system</p>
+        <p className="text-gray-600 mt-2">Join the Doshaki system</p>
       </div>
 
       <RegisterForm />

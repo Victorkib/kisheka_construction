@@ -38,12 +38,12 @@ export function SuggestedActions({ isCollapsed = false }) {
       collapsible={true}
       defaultCollapsed={false}
     >
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {suggestions.map((suggestion, index) => (
           <Link
             key={index}
             href={suggestion.href}
-            className={`block p-2 rounded-lg border transition ${
+            className={`block p-2 rounded-lg border transition-colors ${
               suggestion.priority === 'high'
                 ? 'bg-blue-50 border-blue-200 hover:bg-blue-100'
                 : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
@@ -51,7 +51,7 @@ export function SuggestedActions({ isCollapsed = false }) {
           >
             <div className="flex items-center gap-2">
               <span className="text-base flex-shrink-0">{suggestion.icon}</span>
-              <p className={`text-sm font-medium ${
+              <p className={`text-sm font-medium truncate ${
                 suggestion.priority === 'high' ? 'text-blue-900' : 'text-gray-900'
               }`}>
                 {suggestion.label}

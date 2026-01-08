@@ -19,7 +19,7 @@ function LoginContent() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Kisheka</h1>
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Doshaki</h1>
         <p className="text-base md:text-lg text-gray-700 mt-1 leading-relaxed">Construction Accountability</p>
         <p className="text-sm text-gray-600 mt-3 leading-normal">Sign in to continue</p>
       </div>
@@ -70,7 +70,7 @@ export default function LoginPage() {
     <Suspense fallback={
       <div className="space-y-6">
         <div className="text-center">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Kisheka</h1>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Doshaki</h1>
           <p className="text-gray-600 mt-1">Construction Accountability</p>
           <p className="text-sm text-gray-500 mt-3">Loading...</p>
         </div>

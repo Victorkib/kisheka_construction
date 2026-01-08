@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingTable, LoadingButton, LoadingOverlay } from '@/components/loading';
@@ -16,11 +16,14 @@ import { ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useRouter } from 'next/navigation';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 
 export default function ApprovalsPage() {
   const toast = useToast();
   const router = useRouter();
   const { canAccess, user } = usePermissions();
+  const { currentProject } = useProjectContext();
   const [materials, setMaterials] = useState([]);
   const [expenses, setExpenses] = useState([]);
   const [initialExpenses, setInitialExpenses] = useState([]);
@@ -58,19 +61,18 @@ export default function ApprovalsPage() {
     }
   }, [user, canAccess, router, toast]);
 
-  useEffect(() => {
-    if (user && (user.role?.toLowerCase() !== 'clerk' && user.role?.toLowerCase() !== 'site_clerk')) {
-      fetchPendingApprovals();
-    }
-  }, [user]);
-
-  const fetchPendingApprovals = async () => {
+  const fetchPendingApprovals = useCallback(async () => {
+    if (!currentProject) return; // Don't fetch if no project selected
+    
     try {
       setLoading(true);
       setError(null);
 
+      const projectId = normalizeProjectId(currentProject._id);
+      const projectIdParam = projectId ? `&projectId=${projectId}` : '';
+
       // Fetch materials with pending_approval status
-      const materialsResponse = await fetch('/api/materials?status=pending_approval&limit=100');
+      const materialsResponse = await fetch(`/api/materials?status=pending_approval&limit=100${projectIdParam}`);
       const materialsData = await materialsResponse.json();
 
       if (!materialsData.success) {
@@ -80,7 +82,7 @@ export default function ApprovalsPage() {
       setMaterials(materialsData.data.materials || []);
 
       // Fetch expenses with PENDING status
-      const expensesResponse = await fetch('/api/expenses?status=PENDING&limit=100');
+      const expensesResponse = await fetch(`/api/expenses?status=PENDING&limit=100${projectIdParam}`);
       const expensesData = await expensesResponse.json();
 
       if (!expensesData.success) {
@@ -90,7 +92,7 @@ export default function ApprovalsPage() {
       setExpenses(expensesData.data.expenses || []);
 
       // Fetch initial expenses with pending_approval status
-      const initialExpensesResponse = await fetch('/api/initial-expenses?status=pending_approval&limit=100');
+      const initialExpensesResponse = await fetch(`/api/initial-expenses?status=pending_approval&limit=100${projectIdParam}`);
       const initialExpensesData = await initialExpensesResponse.json();
 
       if (initialExpensesData.success) {
@@ -102,7 +104,13 @@ export default function ApprovalsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentProject]);
+
+  useEffect(() => {
+    if (user && (user.role?.toLowerCase() !== 'clerk' && user.role?.toLowerCase() !== 'site_clerk')) {
+      fetchPendingApprovals();
+    }
+  }, [user, fetchPendingApprovals]);
 
 
   const handleApproveMaterial = async (materialId, notes = '') => {

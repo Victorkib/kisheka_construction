@@ -18,6 +18,8 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { getProjectSpendingLimit, recalculateProjectFinances, getCurrentTotalUsed } from '@/lib/financial-helpers';
 import { returnCapitalToInvestors } from '@/lib/financial-rollback';
 import { calculateProjectTotals } from '@/lib/investment-allocation';
+import { isEnhancedBudget, createEnhancedBudget, validateBudget, getBudgetTotal, convertLegacyToEnhanced } from '@/lib/schemas/budget-schema';
+import { calculateTotalPhaseBudgets } from '@/lib/phase-helpers';
 
 /**
  * GET /api/projects/[id]
@@ -80,6 +82,15 @@ export async function GET(request, { params }) {
 
     const totalMaterialsSpent = materialsSpent[0]?.total || 0;
 
+    // Get professional services statistics
+    let professionalServicesStats = null;
+    try {
+      const { calculateProjectProfessionalServicesStats } = await import('@/lib/professional-services-helpers');
+      professionalServicesStats = await calculateProjectProfessionalServicesStats(id);
+    } catch (err) {
+      console.error(`Error calculating professional services statistics for project ${id}:`, err);
+    }
+
     // Calculate financial statistics from allocations
     let financialStats = {
       totalInvested: 0,
@@ -133,6 +144,8 @@ export async function GET(request, { params }) {
         budgetRemaining: (project.budget?.total || 0) - totalMaterialsSpent,
         // Add financial statistics
         ...financialStats,
+        // Add professional services statistics
+        professionalServices: professionalServicesStats,
       },
     });
   } catch (error) {
@@ -246,10 +259,71 @@ export async function PATCH(request, { params }) {
     }
 
     if (budget) {
+      // All budgets must be in enhanced structure
+      // If legacy structure is provided, convert it immediately
+      let enhancedBudget;
+      
+      if (isEnhancedBudget(budget)) {
+        // Validate enhanced budget
+        const validation = validateBudget(budget);
+        if (!validation.isValid) {
+          return errorResponse(`Invalid budget: ${validation.errors.join(', ')}`, 400);
+        }
+        
+        // Use provided enhanced budget
+        enhancedBudget = createEnhancedBudget(budget);
+      } else if (budget.materials !== undefined || budget.labour !== undefined || budget.contingency !== undefined) {
+        // Legacy structure detected - convert to enhanced
+        // This should not happen in normal flow, but handle gracefully
+        console.warn('Legacy budget structure detected during project update. Converting to enhanced structure.');
+        enhancedBudget = convertLegacyToEnhanced({
+          total: budget.total || 0,
+          materials: budget.materials || 0,
+          labour: budget.labour || 0,
+          contingency: budget.contingency || 0,
+          spent: 0
+        });
+      } else {
+        // Budget object provided but not in expected format - merge with existing
+        enhancedBudget = createEnhancedBudget({
+          total: budget.total !== undefined ? budget.total : (existingProject.budget?.total || 0),
+          directConstructionCosts: budget.directConstructionCosts !== undefined ? budget.directConstructionCosts : (existingProject.budget?.directConstructionCosts || 0),
+          preConstructionCosts: budget.preConstructionCosts !== undefined ? budget.preConstructionCosts : (existingProject.budget?.preConstructionCosts || 0),
+          indirectCosts: budget.indirectCosts !== undefined ? budget.indirectCosts : (existingProject.budget?.indirectCosts || 0),
+          contingencyReserve: budget.contingencyReserve !== undefined ? budget.contingencyReserve : (existingProject.budget?.contingencyReserve || 0)
+        });
+      }
+      
+      // Merge with existing budget, preserving enhanced structure
       updateData.budget = {
         ...existingProject.budget,
-        ...budget,
+        ...enhancedBudget,
+        // Ensure all enhanced structure fields are present
+        directCosts: enhancedBudget.directCosts || existingProject.budget?.directCosts,
+        preConstruction: enhancedBudget.preConstruction || existingProject.budget?.preConstruction,
+        indirect: enhancedBudget.indirect || existingProject.budget?.indirect,
+        contingency: enhancedBudget.contingency || existingProject.budget?.contingency,
+        // Maintain legacy compatibility fields for backward compatibility with existing code
+        materials: enhancedBudget.directCosts?.materials?.total || enhancedBudget.materials || existingProject.budget?.materials || 0,
+        labour: enhancedBudget.directCosts?.labour?.total || enhancedBudget.labour || existingProject.budget?.labour || 0,
+        contingency: enhancedBudget.contingency?.total || enhancedBudget.contingencyReserve || existingProject.budget?.contingency || 0,
       };
+
+      // Validate that total phase budgets don't exceed the new project budget
+      try {
+        const newProjectBudget = getBudgetTotal(updateData.budget);
+        const totalPhaseBudgets = await calculateTotalPhaseBudgets(id);
+        
+        if (totalPhaseBudgets > newProjectBudget) {
+          return errorResponse(
+            `Cannot update project budget: Total phase budgets (${totalPhaseBudgets.toLocaleString()}) exceed the new project budget (${newProjectBudget.toLocaleString()}). Please reduce phase budgets first or increase the project budget.`,
+            400
+          );
+        }
+      } catch (phaseBudgetError) {
+        console.error('Error validating phase budgets against project budget:', phaseBudgetError);
+        // Don't fail the update if validation check fails, but log it
+      }
     }
 
     if (siteManager && ObjectId.isValid(siteManager)) {

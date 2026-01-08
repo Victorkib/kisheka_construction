@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -15,11 +15,16 @@ import { LoadingTable } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
+import { NoProjectsEmptyState } from '@/components/empty-states';
+import { PhaseFilter } from '@/components/filters/PhaseFilter';
 
 function MaterialRequestsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
+  const { currentProject, isEmpty } = useProjectContext();
   const toast = useToast();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,11 +43,17 @@ function MaterialRequestsPageContent() {
   const [showBulkRejectModal, setShowBulkRejectModal] = useState(false);
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   
+  // Get projectId from context (prioritize current project over URL param)
+  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromUrl = searchParams.get('projectId');
+  const activeProjectId = projectIdFromContext || projectIdFromUrl || '';
+  
   // Filters
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: activeProjectId,
     status: searchParams.get('status') || '',
     urgency: searchParams.get('urgency') || '',
+    phaseId: searchParams.get('phaseId') || '',
     search: searchParams.get('search') || '',
   });
 
@@ -50,11 +61,6 @@ function MaterialRequestsPageContent() {
   useEffect(() => {
     fetchProjects();
   }, []);
-
-  // Fetch material requests
-  useEffect(() => {
-    fetchRequests();
-  }, [filters, pagination.page]);
 
   const fetchProjects = async () => {
     try {
@@ -68,7 +74,7 @@ function MaterialRequestsPageContent() {
     }
   };
 
-  const fetchRequests = async () => {
+  const fetchRequests = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -80,6 +86,7 @@ function MaterialRequestsPageContent() {
         ...(filters.projectId && { projectId: filters.projectId }),
         ...(filters.status && { status: filters.status }),
         ...(filters.urgency && { urgency: filters.urgency }),
+        ...(filters.phaseId && { phaseId: filters.phaseId }),
         ...(filters.search && { search: filters.search }),
       });
 
@@ -91,14 +98,26 @@ function MaterialRequestsPageContent() {
       }
 
       setRequests(data.data.requests || []);
-      setPagination(data.data.pagination || pagination);
+      setPagination(prev => data.data.pagination || prev);
     } catch (err) {
       setError(err.message);
       console.error('Fetch material requests error:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, pagination.page, pagination.limit]);
+
+  // Fetch material requests
+  useEffect(() => {
+    // Don't fetch if empty state
+    if (isEmpty) {
+      setLoading(false);
+      setRequests([]);
+      return;
+    }
+    
+    fetchRequests();
+  }, [fetchRequests, isEmpty]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -312,6 +331,24 @@ function MaterialRequestsPageContent() {
     );
   }
 
+  // Check empty state - no projects
+  if (isEmpty && !loading) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Material Requests</h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Create and manage material requests</p>
+          </div>
+          <NoProjectsEmptyState
+            canCreate={canAccess('create_project')}
+            role={canAccess('create_project') ? 'owner' : 'site_clerk'}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -351,7 +388,7 @@ function MaterialRequestsPageContent() {
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Project</label>
               <select
@@ -398,6 +435,11 @@ function MaterialRequestsPageContent() {
                 <option value="critical" className="text-gray-900">Critical</option>
               </select>
             </div>
+            <PhaseFilter
+              projectId={filters.projectId}
+              value={filters.phaseId}
+              onChange={(phaseId) => handleFilterChange('phaseId', phaseId)}
+            />
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Search</label>
               <input
@@ -411,7 +453,7 @@ function MaterialRequestsPageContent() {
             <div className="flex items-end">
               <button
                 onClick={() => {
-                  setFilters({ projectId: '', status: '', urgency: '', search: '' });
+                  setFilters({ projectId: '', status: '', urgency: '', phaseId: '', search: '' });
                   router.push('/material-requests', { scroll: false });
                 }}
                 className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition"

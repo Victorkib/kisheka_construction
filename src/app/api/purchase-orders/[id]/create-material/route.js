@@ -72,6 +72,7 @@ export async function POST(request, { params }) {
     }
 
     // Use the helper function to create material
+    // Materials created from POs are automatically approved for immediate financial state accuracy
     try {
       const result = await createMaterialFromPurchaseOrder({
         purchaseOrderId: id,

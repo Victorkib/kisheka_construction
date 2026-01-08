@@ -13,6 +13,9 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingCard, LoadingSpinner } from '@/components/loading';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
+import { NoProjectsEmptyState } from '@/components/empty-states';
 import {
   BarChart,
   Bar,
@@ -29,6 +32,7 @@ import {
 
 function FinancingPageContent() {
   const searchParams = useSearchParams();
+  const { currentProject, isEmpty } = useProjectContext();
   const [finances, setFinances] = useState(null);
   const [investors, setInvestors] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -36,15 +40,11 @@ function FinancingPageContent() {
   const [projectsLoading, setProjectsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-  const projectId = searchParams.get('projectId');
-
-  useEffect(() => {
-    fetchFinances();
-    fetchInvestors();
-    if (!projectId) {
-      fetchProjects();
-    }
-  }, [projectId]);
+  
+  // Get projectId from context (prioritize current project over URL param)
+  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromUrl = searchParams.get('projectId');
+  const projectId = projectIdFromContext || projectIdFromUrl;
 
   const fetchFinances = async (forceRecalculate = false) => {
     try {
@@ -78,7 +78,7 @@ function FinancingPageContent() {
 
   const fetchInvestors = async () => {
     try {
-      const response = await fetch('/api/investors?status=ACTIVE');
+      const response = await fetch(`/api/investors?projectId=${projectIdFromContext}&status=ACTIVE`);
       const data = await response.json();
 
       if (data.success) {
@@ -88,6 +88,23 @@ function FinancingPageContent() {
       console.error('Fetch investors error:', err);
     }
   };
+
+  useEffect(() => {
+    // Don't fetch if empty state
+    if (isEmpty) {
+      setLoading(false);
+      setFinances(null);
+      setInvestors([]);
+      return;
+    }
+    
+    if (projectIdFromContext) {
+      fetchFinances();
+      fetchInvestors();
+    } else if (!projectId) {
+      fetchProjects();
+    }
+  }, [projectIdFromContext, projectId, isEmpty]);
 
   const fetchProjects = async () => {
     try {
@@ -127,6 +144,24 @@ function FinancingPageContent() {
       setProjectsLoading(false);
     }
   };
+
+  // Check empty state - no projects
+  if (isEmpty && !loading && !projectsLoading) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-6">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Financing Dashboard</h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">View and manage project finances</p>
+          </div>
+          <NoProjectsEmptyState
+            canCreate={false}
+            role="accountant"
+          />
+        </div>
+      </AppLayout>
+    );
+  }
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-KE', {

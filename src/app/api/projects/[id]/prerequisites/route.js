@@ -73,6 +73,14 @@ export async function GET(request, { params }) {
           ? 'low'
           : 'sufficient';
 
+    // Check phases
+    const phases = await db.collection('phases').countDocuments({
+      projectId: projectId,
+      deletedAt: null,
+    });
+    const hasPhases = phases > 0;
+    const phasesCount = phases;
+
     // Check floors
     const floors = await db.collection('floors').countDocuments({
       projectId: projectId,
@@ -97,7 +105,7 @@ export async function GET(request, { params }) {
     const categoriesCount = categories;
 
     // Determine readiness
-    const readyForMaterials = hasBudget && hasCapital && hasFloors;
+    const readyForMaterials = hasBudget && hasCapital && hasFloors && hasPhases; // Phases now required
     const readyForPurchaseOrders = readyForMaterials && hasSuppliers;
     const overallReadiness = {
       readyForMaterials,
@@ -106,6 +114,7 @@ export async function GET(request, { params }) {
         hasBudget,
         hasCapital,
         hasFloors,
+        hasPhases,
         hasSuppliers,
         hasCategories,
       }),
@@ -113,6 +122,21 @@ export async function GET(request, { params }) {
 
     // Build prerequisites checklist
     const prerequisites = {
+      phases: {
+        completed: hasPhases,
+        required: true, // Phases are now required for material requests
+        status: hasPhases ? 'complete' : 'missing',
+        message: hasPhases 
+          ? `${phasesCount} phase${phasesCount !== 1 ? 's' : ''} initialized`
+          : 'No phases initialized',
+        warning: !hasPhases ? 'Phases are required for material requests and phase-based tracking' : null,
+        details: {
+          count: phasesCount,
+        },
+        actionUrl: `/api/projects/${id}/phases/initialize`,
+        actionLabel: 'Initialize Phases',
+        actionType: 'api_call', // Special handling for API endpoint
+      },
       budget: {
         completed: hasBudget,
         required: true,
@@ -199,7 +223,7 @@ export async function GET(request, { params }) {
       prerequisites,
       readiness: overallReadiness,
       summary: {
-        totalItems: 5,
+        totalItems: 6, // Updated to include phases
         completedItems: Object.values(prerequisites).filter(p => p.completed).length,
         requiredItems: Object.values(prerequisites).filter(p => p.required).length,
         completedRequiredItems: Object.values(prerequisites).filter(p => p.required && p.completed).length,
@@ -214,16 +238,16 @@ export async function GET(request, { params }) {
 /**
  * Calculate completion percentage
  */
-function calculateCompletionPercentage({ hasBudget, hasCapital, hasFloors, hasSuppliers, hasCategories }) {
-  const required = [hasBudget, hasCapital, hasFloors];
+function calculateCompletionPercentage({ hasBudget, hasCapital, hasFloors, hasPhases, hasSuppliers, hasCategories }) {
+  const required = [hasBudget, hasCapital, hasFloors, hasPhases]; // Phases now required
   const optional = [hasSuppliers, hasCategories];
   
   const requiredCompleted = required.filter(Boolean).length;
   const optionalCompleted = optional.filter(Boolean).length;
   
-  // Required items are 60% weight, optional are 40%
-  const requiredPercentage = (requiredCompleted / required.length) * 60;
-  const optionalPercentage = (optionalCompleted / optional.length) * 40;
+  // Required items are 70% weight, optional are 30%
+  const requiredPercentage = (requiredCompleted / required.length) * 70;
+  const optionalPercentage = (optionalCompleted / optional.length) * 30;
   
   return Math.round(requiredPercentage + optionalPercentage);
 }

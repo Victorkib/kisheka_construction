@@ -16,6 +16,8 @@ import { createNotification } from '@/lib/notifications';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateCapitalAvailability, recalculateProjectFinances } from '@/lib/financial-helpers';
+import { recalculatePhaseSpending } from '@/lib/phase-helpers';
+import { recalculateFloorSpending } from '@/lib/material-helpers';
 
 /**
  * POST /api/materials/[id]/approve
@@ -64,6 +66,19 @@ export async function POST(request, { params }) {
       return errorResponse('Material not found', 404);
     }
 
+    // Check if material is already approved
+    // Materials created from purchase orders are automatically approved, so this is a no-op
+    if (existingMaterial.status === 'approved' || existingMaterial.status === 'received') {
+      return successResponse(
+        {
+          material: existingMaterial,
+          alreadyApproved: true,
+        },
+        'Material is already approved',
+        200
+      );
+    }
+
     // Check if material can be approved
     const approvableStatuses = ['submitted', 'pending_approval', 'rejected'];
     if (!approvableStatuses.includes(existingMaterial.status)) {
@@ -86,6 +101,37 @@ export async function POST(request, { params }) {
           `Cannot approve material: ${capitalValidation.message}. Available capital: ${capitalValidation.available.toLocaleString()}, Required: ${capitalValidation.required.toLocaleString()}`,
           400
         );
+      }
+    }
+
+    // Validate phase budget if material is linked to a phase
+    if (existingMaterial.phaseId && ObjectId.isValid(existingMaterial.phaseId)) {
+      const db = await getDatabase();
+      const phase = await db.collection('phases').findOne({
+        _id: new ObjectId(existingMaterial.phaseId),
+        deletedAt: null
+      });
+
+      if (phase) {
+        const materialAmount = existingMaterial.totalCost || 0;
+        const phaseBudget = phase.budgetAllocation?.total || 0;
+        const phaseActual = phase.actualSpending?.total || 0;
+        const phaseCommitted = phase.financialStates?.committed || 0;
+        const phaseAvailable = Math.max(0, phaseBudget - phaseActual - phaseCommitted);
+
+        if (materialAmount > phaseAvailable) {
+          // Allow PM/OWNER to override with warning
+          const userRole = userProfile?.role?.toLowerCase();
+          const isOwnerOrPM = ['owner', 'pm', 'project_manager'].includes(userRole);
+
+          if (!isOwnerOrPM) {
+            return errorResponse(
+              `Cannot approve material: Exceeds phase budget. Phase budget: ${phaseBudget.toLocaleString()}, Available: ${phaseAvailable.toLocaleString()}, Required: ${materialAmount.toLocaleString()}`,
+              400
+            );
+          }
+          // For PM/OWNER, continue but this will be logged in audit
+        }
       }
     }
 
@@ -167,6 +213,26 @@ export async function POST(request, { params }) {
     // Auto-recalculate project finances after approval (includes committed cost update)
     if (existingMaterial.projectId) {
       await recalculateProjectFinances(existingMaterial.projectId.toString());
+    }
+
+    // Recalculate phase spending if material is linked to a phase
+    if (existingMaterial.phaseId && ObjectId.isValid(existingMaterial.phaseId)) {
+      try {
+        await recalculatePhaseSpending(existingMaterial.phaseId.toString());
+      } catch (phaseError) {
+        console.error('Error recalculating phase spending after material approval:', phaseError);
+        // Don't fail the request, just log the error
+      }
+    }
+
+    // Recalculate floor spending if material is linked to a floor
+    if (existingMaterial.floor && ObjectId.isValid(existingMaterial.floor)) {
+      try {
+        await recalculateFloorSpending(existingMaterial.floor.toString());
+      } catch (floorError) {
+        console.error('Error recalculating floor spending after material approval:', floorError);
+        // Don't fail the request, just log the error
+      }
     }
 
     return successResponse(

@@ -7,23 +7,31 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingTable } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 
 function InitialExpensesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
+  const { currentProject } = useProjectContext();
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
   const [totals, setTotals] = useState({ totalAmount: 0, approvedAmount: 0 });
-  const [projectId, setProjectId] = useState(searchParams.get('projectId') || '');
+  
+  // Get projectId from context (prioritize current project over URL param)
+  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromUrl = searchParams.get('projectId');
+  const projectId = projectIdFromContext || projectIdFromUrl || '';
+  
   const [projects, setProjects] = useState([]);
   
   // Filters
@@ -40,11 +48,6 @@ function InitialExpensesPageContent() {
     fetchProjects();
   }, []);
 
-  // Fetch expenses
-  useEffect(() => {
-    fetchExpenses();
-  }, [filters, pagination.page, projectId]);
-
   const fetchProjects = async () => {
     try {
       const response = await fetch('/api/projects');
@@ -57,7 +60,7 @@ function InitialExpensesPageContent() {
     }
   };
 
-  const fetchExpenses = async () => {
+  const fetchExpenses = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -82,15 +85,20 @@ function InitialExpensesPageContent() {
       }
 
       setExpenses(data.data.expenses || []);
-      setPagination(data.data.pagination || pagination);
-      setTotals(data.data.totals || totals);
+      setPagination(prev => data.data.pagination || prev);
+      setTotals(prev => data.data.totals || prev);
     } catch (err) {
       setError(err.message);
       console.error('Fetch initial expenses error:', err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters, pagination.page, pagination.limit, projectId]);
+
+  // Fetch expenses
+  useEffect(() => {
+    fetchExpenses();
+  }, [fetchExpenses]);
 
   const handleFilterChange = (key, value) => {
     setFilters((prev) => ({ ...prev, [key]: value }));

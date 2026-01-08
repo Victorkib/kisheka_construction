@@ -117,6 +117,7 @@ export async function POST(request, { params }) {
       });
 
       // Automatically create material entry if configured
+      // Materials created from POs are automatically approved for immediate financial state accuracy
       let materialCreated = false;
       if (process.env.AUTO_CREATE_MATERIAL_ON_CONFIRM === 'true' && poCreator) {
         try {

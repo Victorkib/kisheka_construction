@@ -9,44 +9,56 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingCard } from '@/components/loading';
+import { LoadingCard, LoadingSpinner } from '@/components/loading';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { NoProjectsEmptyState, ErrorState } from '@/components/empty-states';
 
 export default function AccountantDashboard() {
+  const { isEmpty } = useProjectContext();
   const [user, setUser] = useState(null);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userError, setUserError] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
+      // Always fetch user data first, even if empty state
       try {
-        const [userResponse, summaryResponse] = await Promise.all([
-          fetch('/api/auth/me'),
-          fetch('/api/dashboard/summary'),
-        ]);
-
+        setUserError(null);
+        const userResponse = await fetch('/api/auth/me');
         const userData = await userResponse.json();
-        const summaryData = await summaryResponse.json();
 
         if (!userData.success) {
-          router.push('/auth/login');
+          setUserError('Failed to load user data. Please try again.');
+          setLoading(false);
           return;
         }
 
         setUser(userData.data);
+
+        // Don't fetch other data if empty state
+        if (isEmpty) {
+          setLoading(false);
+          return;
+        }
+
+        const summaryResponse = await fetch('/api/dashboard/summary');
+        const summaryData = await summaryResponse.json();
+
         if (summaryData.success) {
           setSummary(summaryData.data.summary);
         }
       } catch (error) {
         console.error('Error fetching data:', error);
-        router.push('/auth/login');
+        setUserError('Network error. Please check your connection and try again.');
       } finally {
         setLoading(false);
       }
     }
 
     fetchData();
-  }, [router]);
+  }, [router, isEmpty]);
 
   if (loading) {
     return (
@@ -64,8 +76,64 @@ export default function AccountantDashboard() {
     );
   }
 
+  // Check empty state FIRST - this is critical to prevent dark screen
+  if (isEmpty) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Accountant Dashboard</h1>
+            {user && (
+              <p className="text-gray-700 mt-2">Welcome, {user.firstName || user.email}!</p>
+            )}
+          </div>
+
+          {/* Empty State - No Projects */}
+          <NoProjectsEmptyState
+            canCreate={false}
+            userName={user?.firstName || user?.email}
+            role="accountant"
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Check for user error state
+  if (userError) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <ErrorState
+            title="Error Loading Dashboard"
+            message={userError}
+            onRetry={() => {
+              setUserError(null);
+              setLoading(true);
+              window.location.reload();
+            }}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Check if user is null (shouldn't happen if fetch succeeded, but safety check)
   if (!user) {
-    return null;
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-8 text-center">
+            <div className="max-w-2xl mx-auto">
+              <div className="text-5xl mb-4">⏳</div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading User Data</h2>
+              <p className="text-lg text-gray-700 mb-6">Please wait while we load your information...</p>
+              <LoadingSpinner />
+            </div>
+          </div>
+        </div>
+      </AppLayout>
+    );
   }
 
   return (

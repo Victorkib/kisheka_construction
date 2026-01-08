@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 export function SingleSupplierAssignment({
   materialRequests = [],
@@ -20,11 +20,27 @@ export function SingleSupplierAssignment({
     notes: initialData?.notes || '',
   });
 
+  // Use ref to store callback to avoid infinite loops
+  const onAssignmentChangeRef = useRef(onAssignmentChange);
+  
+  // Update ref when callback changes (but don't trigger effect)
   useEffect(() => {
-    if (assignment.supplierId || assignment.deliveryDate || assignment.terms || assignment.notes) {
-      onAssignmentChange(assignment);
+    onAssignmentChangeRef.current = onAssignmentChange;
+  }, [onAssignmentChange]);
+
+  // Use ref to track previous assignment to prevent unnecessary updates
+  const prevAssignmentRef = useRef(null);
+
+  useEffect(() => {
+    // Only notify if assignment actually changed meaningfully
+    const assignmentChanged = 
+      JSON.stringify(assignment) !== JSON.stringify(prevAssignmentRef.current);
+    
+    if ((assignment.supplierId || assignment.deliveryDate || assignment.terms || assignment.notes) && assignmentChanged) {
+      onAssignmentChangeRef.current(assignment);
+      prevAssignmentRef.current = assignment;
     }
-  }, [assignment, onAssignmentChange]);
+  }, [assignment]); // ✅ Only depend on assignment, not the callback
 
   const handleChange = (field, value) => {
     setAssignment((prev) => ({ ...prev, [field]: value }));

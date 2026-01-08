@@ -13,6 +13,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
   const [selectedRows, setSelectedRows] = useState(new Set());
   const [categories, setCategories] = useState([]);
   const [floors, setFloors] = useState([]);
+  const [phases, setPhases] = useState([]);
   const [editingRow, setEditingRow] = useState(null);
 
   useEffect(() => {
@@ -22,6 +23,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
       ...material,
       // Only set defaults if not already present
       floorId: material.floorId || wizardData.defaultFloorId || '',
+      phaseId: material.phaseId || wizardData.defaultPhaseId || '',
       categoryId: material.categoryId || wizardData.defaultCategoryId || '',
       category: material.category || '',
       urgency: material.urgency || wizardData.defaultUrgency || 'medium',
@@ -32,52 +34,60 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
     if (materialsWithDefaults.some((m, idx) => {
       const original = materialsFromWizard[idx];
       return m.floorId !== original?.floorId || 
+             m.phaseId !== original?.phaseId ||
              m.categoryId !== original?.categoryId ||
              m.urgency !== original?.urgency ||
              m.reason !== original?.reason;
     })) {
       onUpdate({ materials: materialsWithDefaults });
     }
-  }, [wizardData.materials, wizardData.defaultFloorId, wizardData.defaultCategoryId, wizardData.defaultUrgency, wizardData.defaultReason, onUpdate]);
+  }, [wizardData.materials, wizardData.defaultFloorId, wizardData.defaultPhaseId, wizardData.defaultCategoryId, wizardData.defaultUrgency, wizardData.defaultReason, onUpdate]);
 
   useEffect(() => {
     fetchCategories();
     if (wizardData.projectId) {
       fetchFloors(wizardData.projectId);
+      fetchPhases(wizardData.projectId);
     }
   }, [wizardData.projectId]);
 
   useEffect(() => {
     // Validate all materials
-    // Check that each material has: name (min 2 chars), quantity (> 0), and unit
+    // Check that each material has: name (min 2 chars), quantity (> 0), unit, and phaseId
     // Support both 'name' and 'materialName' fields for backward compatibility
+    // Phase Enforcement: Each material must have phaseId (either from default or per-material)
     const isValid = materials.length > 0 && materials.every((m) => {
       const materialName = m.name || m.materialName || '';
       const hasName = materialName && typeof materialName === 'string' && materialName.trim().length >= 2;
       const quantity = parseFloat(m.quantityNeeded || m.quantity || 0);
       const hasQuantity = !isNaN(quantity) && quantity > 0;
       const hasUnit = (m.unit && m.unit.trim().length > 0);
+      // Phase Enforcement: Material must have phaseId (from default or per-material)
+      const hasPhaseId = !!(m.phaseId || wizardData.defaultPhaseId);
       
       // Debug logging for first invalid material
-      if (!hasName || !hasQuantity || !hasUnit) {
+      if (!hasName || !hasQuantity || !hasUnit || !hasPhaseId) {
         console.log('[Step3 Validation] Invalid material:', {
           material: m,
           hasName,
           hasQuantity,
           hasUnit,
+          hasPhaseId,
+          phaseId: m.phaseId,
+          defaultPhaseId: wizardData.defaultPhaseId,
           name: materialName,
           quantity: quantity,
           unit: m.unit
         });
       }
       
-      return hasName && hasQuantity && hasUnit;
+      return hasName && hasQuantity && hasUnit && hasPhaseId;
     });
     
     console.log('[Step3 Validation] Overall validation result:', isValid, 'for', materials.length, 'materials');
     onValidationChange(isValid);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [materials]); // onValidationChange is stable (memoized in parent)
+  }, [materials, wizardData.defaultPhaseId]); // onValidationChange is stable (memoized in parent)
 
   const fetchCategories = async () => {
     try {
@@ -100,6 +110,18 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
       }
     } catch (err) {
       console.error('Error fetching floors:', err);
+    }
+  };
+
+  const fetchPhases = async (projectId) => {
+    try {
+      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const data = await response.json();
+      if (data.success) {
+        setPhases(data.data || []);
+      }
+    } catch (err) {
+      console.error('Error fetching phases:', err);
     }
   };
 
@@ -272,6 +294,9 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Unit</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Category</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Floor</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                  Phase <span className="text-red-500">*</span>
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Urgency</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Unit Cost</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Total Cost</th>
@@ -370,6 +395,27 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                           </option>
                         );
                       })}
+                    </select>
+                  </td>
+                  <td className="px-4 py-3">
+                    <select
+                      value={material.phaseId || wizardData.defaultPhaseId || ''}
+                      onChange={(e) => handleMaterialUpdate(index, 'phaseId', e.target.value)}
+                      required
+                      className={`w-40 px-2 py-1 bg-white text-gray-900 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 ${
+                        !material.phaseId && !wizardData.defaultPhaseId
+                          ? 'border-red-300 bg-red-50'
+                          : 'border-gray-300'
+                      }`}
+                    >
+                      <option value="" className="text-gray-900">
+                        {wizardData.defaultPhaseId ? 'Use default' : 'Select phase (required)'}
+                      </option>
+                      {phases.map((phase) => (
+                        <option key={phase._id} value={phase._id} className="text-gray-900">
+                          {phase.phaseName || phase.name} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
+                        </option>
+                      ))}
                     </select>
                   </td>
                   <td className="px-4 py-3">

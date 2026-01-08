@@ -142,8 +142,8 @@ export function SidebarSection({
     >
       {/* Section Header */}
       {(title || collapsible) && (
-        <div className="p-4 pb-2">
-          <div className="flex items-center justify-between">
+        <div className="px-4 py-3 pb-2">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 flex-1 min-w-0">
               {icon && <div className="text-lg flex-shrink-0">{icon}</div>}
               {title && (
@@ -162,12 +162,12 @@ export function SidebarSection({
             {collapsible && (
               <button
                 onClick={handleToggle}
-                className="ml-2 p-1 rounded hover:bg-gray-200 transition flex-shrink-0"
+                className="ml-2 p-1 rounded-md hover:bg-gray-200 transition-colors flex-shrink-0"
                 aria-label={isSectionCollapsed ? `Expand ${title}` : `Collapse ${title}`}
                 aria-expanded={!isSectionCollapsed}
               >
                 <svg
-                  className={`w-4 h-4 text-gray-500 transition-transform ${isSectionCollapsed ? '' : 'rotate-180'}`}
+                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isSectionCollapsed ? '' : 'rotate-180'}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -207,5 +207,6 @@ export function SidebarSection({
     </div>
   );
 }
+
 
 

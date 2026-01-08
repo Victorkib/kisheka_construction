@@ -14,7 +14,7 @@ import { createAuditLog } from '@/lib/audit-log';
 import { createNotification } from '@/lib/notifications';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
-import { validateCapitalAvailability, recalculateProjectFinances } from '@/lib/financial-helpers';
+import { validateCapitalAvailability, recalculateProjectFinances, updatePreConstructionSpending } from '@/lib/financial-helpers';
 
 /**
  * POST /api/initial-expenses/[id]/approve
@@ -140,6 +140,18 @@ export async function POST(request, { params }) {
     // Auto-recalculate project finances after approval (async, non-blocking)
     // Only if approved (rejections don't affect finances)
     if (approved && existingExpense.projectId) {
+      // Charge to pre-construction budget if budgetSource exists
+      if (existingExpense.budgetSource && existingExpense.budgetSource.subCategory) {
+        updatePreConstructionSpending(
+          existingExpense.projectId.toString(),
+          existingExpense.budgetSource.subCategory,
+          existingExpense.amount || 0
+        ).catch((error) => {
+          console.error(`❌ Error updating pre-construction spending:`, error);
+          // Don't fail the approval if budget update fails
+        });
+      }
+      
       recalculateProjectFinances(existingExpense.projectId.toString())
         .then(() => {
           console.log(`✅ Project finances updated for project ${existingExpense.projectId}`);

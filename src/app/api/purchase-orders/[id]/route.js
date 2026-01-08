@@ -262,6 +262,7 @@ export async function PATCH(request, { params }) {
       'deliveryDate',
       'terms',
       'notes',
+      'phaseId', // Phase Management: Allow phaseId updates
     ];
 
     const updateData = {
@@ -284,6 +285,26 @@ export async function PATCH(request, { params }) {
         } else if (field === 'quantityOrdered' || field === 'unitCost') {
           updateData[field] = parseFloat(body[field]);
           totalCostChanged = true;
+        } else if (field === 'phaseId') {
+          // Phase Management: Validate phaseId
+          if (body.phaseId === null || body.phaseId === '') {
+            updateData.phaseId = null;
+          } else if (ObjectId.isValid(body.phaseId)) {
+            // Validate phase exists and belongs to same project
+            const phase = await db.collection('phases').findOne({
+              _id: new ObjectId(body.phaseId),
+              projectId: existingOrder.projectId,
+              deletedAt: null
+            });
+            
+            if (!phase) {
+              return errorResponse('Phase not found or does not belong to this project', 400);
+            }
+            
+            updateData.phaseId = new ObjectId(body.phaseId);
+          } else {
+            return errorResponse('Invalid phaseId format', 400);
+          }
         } else {
           updateData[field] = body[field]?.trim() || '';
         }

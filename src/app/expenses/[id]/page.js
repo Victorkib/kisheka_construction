@@ -353,9 +353,30 @@ export default function ExpenseDetailPage() {
                 <div>
                   <dt className="text-sm font-medium text-gray-500">Category</dt>
                   <dd className="mt-1 text-sm text-gray-900">
-                    {expense.category?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
+                    <div className="flex items-center gap-2">
+                      {expense.category?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
+                      {expense.isIndirectCost && (
+                        <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-100 text-purple-800" title="Indirect Cost">
+                          Indirect
+                        </span>
+                      )}
+                    </div>
                   </dd>
                 </div>
+                
+                {expense.isIndirectCost && expense.indirectCostCategory && (
+                  <div>
+                    <dt className="text-sm font-medium text-gray-500">Indirect Cost Category</dt>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      <span className="px-2 py-1 text-xs font-semibold rounded bg-purple-100 text-purple-800">
+                        {expense.indirectCostCategory.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                      </span>
+                      <p className="text-xs text-gray-500 mt-1">
+                        This expense is charged to the project-level indirect costs budget, not the phase budget.
+                      </p>
+                    </dd>
+                  </div>
+                )}
 
                 <div>
                   <dt className="text-sm font-medium text-gray-500">Description</dt>

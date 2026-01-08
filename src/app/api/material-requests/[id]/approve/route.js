@@ -69,6 +69,9 @@ export async function POST(request, { params }) {
     }
 
     // Financial validation (warning only, don't block)
+    // NOTE: Material requests are ESTIMATES and don't directly spend capital.
+    // They only move to committed cost when converted to purchase orders.
+    // Therefore, we warn but don't block approval - this allows planning ahead.
     let financialWarning = null;
     if (materialRequest.estimatedCost && materialRequest.estimatedCost > 0) {
       const capitalCheck = await validateCapitalAvailability(
@@ -78,10 +81,11 @@ export async function POST(request, { params }) {
 
       if (!capitalCheck.isValid) {
         financialWarning = {
-          message: `Estimated cost (${materialRequest.estimatedCost.toLocaleString()}) exceeds available capital (${capitalCheck.available.toLocaleString()})`,
+          message: `Estimated cost (${materialRequest.estimatedCost.toLocaleString()}) exceeds available capital (${capitalCheck.available.toLocaleString()}). Note: This is an estimate and won't spend capital until converted to a purchase order.`,
           available: capitalCheck.available,
           required: materialRequest.estimatedCost,
           shortfall: materialRequest.estimatedCost - capitalCheck.available,
+          type: 'estimate_warning' // Indicates this is informational, not blocking
         };
         // Don't block approval - it's just an estimate
       }

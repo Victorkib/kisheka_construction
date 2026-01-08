@@ -30,10 +30,12 @@ function NewItemPageContent() {
   const [error, setError] = useState(null);
   const [categories, setCategories] = useState([]);
   const [floors, setFloors] = useState([]);
+  const [phases, setPhases] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [loadingFloors, setLoadingFloors] = useState(false);
+  const [loadingPhases, setLoadingPhases] = useState(false);
 
   // Predefined unit options
   const unitOptions = [
@@ -64,6 +66,7 @@ function NewItemPageContent() {
     category: '',
     categoryId: '',
     floor: '',
+    phaseId: '',
     quantity: '',
     unit: 'piece',
     customUnit: '',
@@ -147,14 +150,16 @@ function NewItemPageContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
 
-  // Fetch floors when projectId changes
+  // Fetch floors and phases when projectId changes
   useEffect(() => {
     if (formData.projectId) {
       fetchFloors(formData.projectId);
+      fetchPhases(formData.projectId);
     } else {
       setFloors([]);
-      // Clear floor selection when project is cleared
-      setFormData(prev => ({ ...prev, floor: '' }));
+      setPhases([]);
+      // Clear floor and phase selection when project is cleared
+      setFormData(prev => ({ ...prev, floor: '', phaseId: '' }));
     }
   }, [formData.projectId]);
 
@@ -204,6 +209,37 @@ function NewItemPageContent() {
       setFloors([]);
     } finally {
       setLoadingFloors(false);
+    }
+  };
+
+  const fetchPhases = async (projectId) => {
+    if (!projectId) {
+      setPhases([]);
+      return;
+    }
+    setLoadingPhases(true);
+    try {
+      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const data = await response.json();
+      if (data.success) {
+        setPhases(data.data || []);
+        // Clear phase selection if current phase is not in the new list
+        setFormData(prev => {
+          const currentPhaseId = prev.phaseId;
+          const phaseExists = data.data.some(p => p._id === currentPhaseId);
+          return {
+            ...prev,
+            phaseId: phaseExists ? currentPhaseId : ''
+          };
+        });
+      } else {
+        setPhases([]);
+      }
+    } catch (err) {
+      console.error('Error fetching phases:', err);
+      setPhases([]);
+    } finally {
+      setLoadingPhases(false);
     }
   };
 
@@ -903,6 +939,51 @@ function NewItemPageContent() {
                     </select>
                   )}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  Construction Phase
+                </label>
+                {!formData.projectId ? (
+                  <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
+                    Please select a project first to see available phases
+                  </div>
+                ) : phases.length === 0 ? (
+                  <div className="space-y-2">
+                    <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
+                      No phases available for this project. Phases can be created in the project phases section.
+                    </div>
+                    <Link
+                      href={`/phases?projectId=${formData.projectId}`}
+                      className="text-sm text-blue-600 hover:underline"
+                      target="_blank"
+                    >
+                      Manage phases for this project →
+                    </Link>
+                  </div>
+                ) : (
+                  <select
+                    name="phaseId"
+                    value={formData.phaseId}
+                    onChange={handleChange}
+                    disabled={loadingPhases || loading || !formData.projectId}
+                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loadingPhases ? (
+                      <option>Loading phases...</option>
+                    ) : (
+                      <>
+                        <option value="">Select phase (optional)</option>
+                        {phases.map((phase) => (
+                          <option key={phase._id} value={phase._id}>
+                            {phase.name} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
+                          </option>
+                        ))}
+                      </>
+                    )}
+                  </select>
+                )}
               </div>
             </div>
           )}

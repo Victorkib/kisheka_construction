@@ -15,6 +15,7 @@ import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
 
 /**
  * GET /api/initial-expenses
@@ -43,14 +44,19 @@ export async function GET(request) {
     const sortBy = searchParams.get('sortBy') || 'datePaid';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
+    // Get and validate project context
+    const projectContext = await getProjectContext(request, user.id);
+    
+    // If projectId is provided, validate access
+    if (projectContext.projectId && !projectContext.hasAccess) {
+      return errorResponse(projectContext.error || 'Access denied to this project', 403);
+    }
+
     const db = await getDatabase();
 
-    // Build query
-    const query = {};
-
-    if (projectId && ObjectId.isValid(projectId)) {
-      query.projectId = new ObjectId(projectId);
-    }
+    // Build query with project filter (use context projectId if not in query params)
+    const activeProjectId = projectId || projectContext.projectId;
+    const query = createProjectFilter(activeProjectId, {});
 
     if (category) {
       query.category = category;
@@ -211,6 +217,23 @@ export async function POST(request) {
     if (!validCategories.includes(category)) {
       return errorResponse('Invalid category', 400);
     }
+    
+    // Map category to pre-construction sub-category for budget tracking
+    const categoryToBudgetSource = {
+      'land': 'landAcquisition',
+      'transfer_fees': 'legalRegulatory',
+      'county_fees': 'legalRegulatory',
+      'permits': 'permitsApprovals',
+      'approvals': 'permitsApprovals',
+      'boreholes': 'sitePreparation',
+      'electricity': 'sitePreparation',
+      'other': 'sitePreparation' // Default to sitePreparation for other
+    };
+    
+    const budgetSource = {
+      category: 'preConstruction',
+      subCategory: categoryToBudgetSource[category] || 'sitePreparation'
+    };
 
     if (!itemName || itemName.trim().length === 0) {
       return errorResponse('Item name is required', 400);
@@ -262,6 +285,7 @@ export async function POST(request) {
       approvalNotes: status === 'approved' ? 'Auto-approved (amount < 100k)' : '',
       status,
       notes: notes?.trim() || '',
+      budgetSource, // NEW: Link to pre-construction budget
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -271,12 +295,23 @@ export async function POST(request) {
       .insertOne(initialExpense);
     const insertedExpense = { ...initialExpense, _id: result.insertedId };
 
+    // If auto-approved, charge to pre-construction budget immediately
+    if (status === 'approved') {
+      const { updatePreConstructionSpending } = await import('@/lib/financial-helpers');
+      await updatePreConstructionSpending(
+        projectId,
+        budgetSource.subCategory,
+        parseFloat(amount)
+      );
+    }
+
     // Create audit log
     await createAuditLog({
       userId: userProfile._id.toString(),
       action: 'CREATED',
       entityType: 'INITIAL_EXPENSE',
       entityId: result.insertedId.toString(),
+      projectId: projectId,
       changes: { created: insertedExpense },
     });
 

@@ -13,6 +13,137 @@ import {
   MATERIAL_APPROVED_STATUSES,
   INITIAL_EXPENSE_APPROVED_STATUSES,
 } from '@/lib/status-constants';
+import {
+  getBudgetTotal,
+  getMaterialsBudget,
+  getLabourBudget,
+  getContingencyBudget,
+  isEnhancedBudget,
+  isLegacyBudget
+} from '@/lib/schemas/budget-schema';
+
+/**
+ * Update pre-construction spending when initial expense is created/approved
+ * @param {string} projectId - Project ID
+ * @param {string} category - Pre-construction sub-category (landAcquisition, legalRegulatory, permitsApprovals, sitePreparation)
+ * @param {number} amount - Expense amount
+ * @returns {Promise<void>}
+ */
+export async function updatePreConstructionSpending(projectId, category, amount) {
+  const db = await getDatabase();
+  
+  // Get or create project_finances record
+  let projectFinances = await db.collection('project_finances').findOne({
+    projectId: new ObjectId(projectId)
+  });
+  
+  if (!projectFinances) {
+    // Create new project_finances record
+    projectFinances = {
+      projectId: new ObjectId(projectId),
+      preConstructionSpending: {
+        total: 0,
+        byCategory: {
+          landAcquisition: 0,
+          legalRegulatory: 0,
+          permitsApprovals: 0,
+          sitePreparation: 0
+        }
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    await db.collection('project_finances').insertOne(projectFinances);
+  }
+  
+  // Initialize preConstructionSpending if it doesn't exist
+  if (!projectFinances.preConstructionSpending) {
+    projectFinances.preConstructionSpending = {
+      total: 0,
+      byCategory: {
+        landAcquisition: 0,
+        legalRegulatory: 0,
+        permitsApprovals: 0,
+        sitePreparation: 0
+      }
+    };
+  }
+  
+  // Update spending
+  const currentTotal = projectFinances.preConstructionSpending.total || 0;
+  const currentCategory = projectFinances.preConstructionSpending.byCategory[category] || 0;
+  
+  await db.collection('project_finances').updateOne(
+    { projectId: new ObjectId(projectId) },
+    {
+      $set: {
+        'preConstructionSpending.total': currentTotal + amount,
+        [`preConstructionSpending.byCategory.${category}`]: currentCategory + amount,
+        updatedAt: new Date()
+      }
+    }
+  );
+}
+
+/**
+ * Get pre-construction spending for a project
+ * @param {string} projectId - Project ID
+ * @returns {Promise<Object>} Pre-construction spending breakdown
+ */
+export async function getPreConstructionSpending(projectId) {
+  const db = await getDatabase();
+  
+  const projectFinances = await db.collection('project_finances').findOne({
+    projectId: new ObjectId(projectId)
+  });
+  
+  if (!projectFinances || !projectFinances.preConstructionSpending) {
+    return {
+      total: 0,
+      byCategory: {
+        landAcquisition: 0,
+        legalRegulatory: 0,
+        permitsApprovals: 0,
+        sitePreparation: 0
+      }
+    };
+  }
+  
+  return projectFinances.preConstructionSpending;
+}
+
+/**
+ * Get pre-construction budget remaining
+ * @param {string} projectId - Project ID
+ * @returns {Promise<number>} Remaining pre-construction budget
+ */
+export async function getPreConstructionRemaining(projectId) {
+  const db = await getDatabase();
+  
+  const project = await db.collection('projects').findOne({
+    _id: new ObjectId(projectId)
+  });
+  
+  if (!project || !project.budget) {
+    return 0;
+  }
+  
+  const budget = project.budget;
+  let preConstructionBudget = 0;
+  
+  if (isEnhancedBudget(budget)) {
+    preConstructionBudget = budget.preConstructionCosts || 0;
+  } else {
+    // Legacy: Estimate 5% of total
+    const totalBudget = getBudgetTotal(budget);
+    preConstructionBudget = totalBudget * 0.05;
+  }
+  
+  const spending = await getPreConstructionSpending(projectId);
+  const remaining = Math.max(0, preConstructionBudget - spending.total);
+  
+  return remaining;
+}
 
 /**
  * Get actual spending limit for a project
@@ -38,7 +169,7 @@ export async function getProjectSpendingLimit(projectId) {
     };
   }
 
-  const budget = project.budget?.total || 0;
+  const budget = getBudgetTotal(project.budget);
 
   // Get capital from allocations
   const projectTotals = await calculateProjectTotals(projectId);
@@ -157,14 +288,15 @@ export async function getProjectFinances(projectId) {
 }
 
 /**
- * Calculate total committed cost from accepted purchase orders
+ * Calculate total committed cost from accepted purchase orders and professional service contracts
  * @param {string} projectId - Project ID
  * @returns {Promise<number>} Total committed cost
  */
 export async function calculateCommittedCost(projectId) {
   const db = await getDatabase();
   
-  const result = await db.collection('purchase_orders').aggregate([
+  // Get committed cost from purchase orders
+  const poResult = await db.collection('purchase_orders').aggregate([
     {
       $match: {
         projectId: new ObjectId(projectId),
@@ -180,7 +312,13 @@ export async function calculateCommittedCost(projectId) {
     },
   ]).toArray();
   
-  return result[0]?.total || 0;
+  const poCommitted = poResult[0]?.total || 0;
+  
+  // Get committed cost from professional services (remaining contract commitments)
+  const { calculateProfessionalServicesCommittedCost } = await import('@/lib/professional-services-helpers');
+  const professionalServicesCommitted = await calculateProfessionalServicesCommittedCost(projectId);
+  
+  return poCommitted + professionalServicesCommitted;
 }
 
 /**
@@ -646,6 +784,8 @@ export async function recalculateProjectFinances(projectId) {
  * @returns {Promise<Object>} Complete financial overview
  */
 export async function getFinancialOverview(projectId) {
+  // Import indirect costs helpers
+  const { getIndirectCostsSummary } = await import('@/lib/indirect-costs-helpers');
   if (!projectId || !ObjectId.isValid(projectId)) {
     throw new Error('Invalid project ID');
   }
@@ -661,11 +801,21 @@ export async function getFinancialOverview(projectId) {
     throw new Error('Project not found');
   }
 
+  // Get budget (works with both legacy and enhanced structures)
   const budget = project.budget || {
     total: 0,
     materials: 0,
     labour: 0,
     contingency: 0,
+  };
+  
+  // Ensure we have legacy fields for backward compatibility
+  const budgetWithLegacy = {
+    ...budget,
+    total: getBudgetTotal(budget),
+    materials: getMaterialsBudget(budget),
+    labour: getLabourBudget(budget),
+    contingency: getContingencyBudget(budget)
   };
 
   // Get financing data
@@ -686,7 +836,26 @@ export async function getFinancialOverview(projectId) {
 
   // Calculate balances
   const capitalBalance = totalInvested - totalUsed;
-  const budgetRemaining = budget.total - totalUsed;
+  const budgetRemaining = budgetWithLegacy.total - totalUsed;
+
+  // Calculate unallocated DCC budget (DCC not allocated to phases)
+  const { calculateTotalPhaseBudgets } = await import('@/lib/phase-helpers');
+  const totalPhaseBudgets = await calculateTotalPhaseBudgets(projectId);
+  let dccBudget = 0;
+  if (isEnhancedBudget(budget)) {
+    dccBudget = budget.directConstructionCosts || 0;
+  } else {
+    const projectBudgetTotal = getBudgetTotal(budget);
+    const estimatedPreConstruction = projectBudgetTotal * 0.05;
+    const estimatedIndirect = projectBudgetTotal * 0.05;
+    const estimatedContingency = budget.contingency || (projectBudgetTotal * 0.05);
+    dccBudget = Math.max(0, projectBudgetTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+  }
+  const unallocatedDCC = Math.max(0, dccBudget - totalPhaseBudgets);
+  
+  // Get pre-construction and indirect costs summaries
+  const preConstructionSpending = await getPreConstructionSpending(projectId);
+  const indirectCostsSummary = await getIndirectCostsSummary(projectId);
 
   // Get breakdown
   const expensesTotal = await db
@@ -740,11 +909,11 @@ export async function getFinancialOverview(projectId) {
 
   // Determine warnings
   const warnings = [];
-  if (budget.total > totalInvested) {
+  if (budgetWithLegacy.total > totalInvested) {
     warnings.push({
       type: 'budget_exceeds_capital',
       severity: 'warning',
-      message: `Budget (${budget.total.toLocaleString()}) exceeds available capital (${totalInvested.toLocaleString()}) by ${(budget.total - totalInvested).toLocaleString()}`,
+      message: `Budget (${budgetWithLegacy.total.toLocaleString()}) exceeds available capital (${totalInvested.toLocaleString()}) by ${(budgetWithLegacy.total - totalInvested).toLocaleString()}`,
     });
   }
   if (availableCapital < totalInvested * 0.1 && availableCapital > 0) {
@@ -776,11 +945,32 @@ export async function getFinancialOverview(projectId) {
       projectName: project.projectName,
     },
     budget: {
-      total: budget.total,
-      materials: budget.materials,
-      labour: budget.labour,
-      contingency: budget.contingency,
+      total: budgetWithLegacy.total,
+      materials: budgetWithLegacy.materials,
+      labour: budgetWithLegacy.labour,
+      contingency: budgetWithLegacy.contingency,
       remaining: budgetRemaining,
+      allocatedToPhases: totalPhaseBudgets,
+      unallocatedDCC, // NEW: Unallocated DCC (not total budget)
+      preConstruction: {
+        budgeted: isEnhancedBudget(budget) ? (budget.preConstructionCosts || 0) : (budgetWithLegacy.total * 0.05),
+        spent: preConstructionSpending.total || 0,
+        remaining: Math.max(0, (isEnhancedBudget(budget) ? (budget.preConstructionCosts || 0) : (budgetWithLegacy.total * 0.05)) - (preConstructionSpending.total || 0)),
+        byCategory: preConstructionSpending.byCategory || {}
+      },
+      indirectCosts: indirectCostsSummary, // NEW: Indirect costs summary
+      // Include enhanced structure if available
+      ...(isEnhancedBudget(budget) ? {
+        enhanced: {
+          directConstructionCosts: budget.directConstructionCosts,
+          preConstructionCosts: budget.preConstructionCosts,
+          indirectCosts: budget.indirectCosts,
+          contingencyReserve: budget.contingencyReserve,
+          directCosts: budget.directCosts,
+          phaseAllocations: budget.phaseAllocations,
+          financialStates: budget.financialStates
+        }
+      } : {})
     },
     financing: {
       totalInvested,

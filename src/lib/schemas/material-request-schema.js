@@ -12,6 +12,7 @@
  * @property {ObjectId} projectId - Project ID (required)
  * @property {ObjectId} [floorId] - Floor ID (optional)
  * @property {ObjectId} [categoryId] - Category ID (optional)
+ * @property {ObjectId} phaseId - Phase ID (required for phase tracking and financial management)
  * @property {string} [category] - Denormalized category name
  * @property {string} materialName - Material name (required, min 2 characters)
  * @property {string} [description] - Material description
@@ -41,6 +42,7 @@ export const MATERIAL_REQUEST_SCHEMA = {
   projectId: 'ObjectId',
   floorId: 'ObjectId', // Optional
   categoryId: 'ObjectId', // Optional
+  phaseId: 'ObjectId', // Required for phase tracking and financial management
   category: String, // Denormalized
   materialName: String, // Required
   description: String,
@@ -141,10 +143,11 @@ export const MATERIAL_REQUEST_VALIDATION = {
 /**
  * Validate material request data
  * @param {Object} data - Material request data to validate
- * @returns {Object} { isValid: boolean, errors: string[] }
+ * @returns {Object} { isValid: boolean, errors: string[], warnings: string[] }
  */
 export function validateMaterialRequest(data) {
   const errors = [];
+  const warnings = [];
 
   // Required fields
   if (!data.requestedBy) {
@@ -166,6 +169,24 @@ export function validateMaterialRequest(data) {
     errors.push(`urgency is required and must be one of: ${VALID_URGENCY_LEVELS.join(', ')}`);
   }
 
+  // Phase Management: phaseId is now required
+  if (!data.phaseId || data.phaseId === null || data.phaseId === '') {
+    errors.push('phaseId is required for phase tracking and financial management. Please select a phase for this material request.');
+  } else {
+    // Validate phaseId format
+    const isValidObjectId = (id) => {
+      if (typeof id === 'string') {
+        return /^[0-9a-fA-F]{24}$/.test(id);
+      }
+      return id && typeof id === 'object' && id.toString && /^[0-9a-fA-F]{24}$/.test(id.toString());
+    };
+
+    if (!isValidObjectId(data.phaseId)) {
+      errors.push('Invalid phaseId format. phaseId must be a valid ObjectId');
+    }
+    // Note: Project validation should be done at the API level where we can query the database
+  }
+
   // Optional field validation
   if (data.estimatedCost !== undefined && data.estimatedCost < 0) {
     errors.push('estimatedCost must be >= 0');
@@ -177,6 +198,7 @@ export function validateMaterialRequest(data) {
   return {
     isValid: errors.length === 0,
     errors,
+    warnings: warnings.length > 0 ? warnings : undefined,
   };
 }
 

@@ -15,7 +15,7 @@ export default function LandingPageContent() {
       <section className="container mx-auto px-4 py-16 md:py-24 text-center">
         <div className="max-w-4xl mx-auto space-y-6">
           <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">
-            Kisheka Construction
+            Doshaki Construction
             <span className="block text-blue-600 mt-2">Accountability System</span>
           </h1>
           
@@ -113,7 +113,7 @@ export default function LandingPageContent() {
             Ready to Transform Your Construction Management?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Join the Kisheka system today and experience seamless project accountability.
+            Join the Doshaki system today and experience seamless project accountability.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -136,7 +136,7 @@ export default function LandingPageContent() {
       <footer className="container mx-auto px-4 py-8 border-t border-gray-200">
         <div className="max-w-6xl mx-auto text-center text-gray-600">
           <p className="text-sm">
-            © {new Date().getFullYear()} Kisheka Construction Accountability System. All rights reserved.
+            © {new Date().getFullYear()} Doshaki Construction Accountability System. All rights reserved.
           </p>
         </div>
       </footer>

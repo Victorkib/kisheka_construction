@@ -180,8 +180,11 @@ export async function createPOFromSupplierGroup(supplierGroup, batchId, userProf
     );
   }
 
-  // Generate PO number
-  const purchaseOrderNumber = await generatePurchaseOrderNumber();
+  // Generate PO number (with session support for transaction)
+  const purchaseOrderNumber = await generatePurchaseOrderNumber({
+    session,
+    db: providedDb || db,
+  });
 
   // Generate response token
   const responseToken = generateResponseToken();
@@ -204,6 +207,12 @@ export async function createPOFromSupplierGroup(supplierGroup, batchId, userProf
     supplierEmail: supplier.email,
     supplierPhone: supplier.phone,
     projectId: batch.projectId,
+    // Phase Management: Inherit phaseId from first material request (bulk orders typically have same phase)
+    ...(materialRequests[0].phaseId && ObjectId.isValid(materialRequests[0].phaseId) && { 
+      phaseId: typeof materialRequests[0].phaseId === 'string' 
+        ? new ObjectId(materialRequests[0].phaseId) 
+        : materialRequests[0].phaseId 
+    }),
     // Use first material request's common fields (they should be similar for batch)
     ...(materialRequests[0].floorId && { floorId: materialRequests[0].floorId }),
     ...(materialRequests[0].categoryId && { categoryId: materialRequests[0].categoryId }),
@@ -231,6 +240,9 @@ export async function createPOFromSupplierGroup(supplierGroup, batchId, userProf
     autoConfirmed: false,
     autoConfirmedAt: null,
     autoConfirmationMethod: null,
+    // Material-level response tracking for bulk orders
+    supportsPartialResponse: true, // Bulk orders support partial responses
+    materialResponses: [], // Initialize empty - will be populated when supplier responds
     createdBy: new ObjectId(userProfile._id),
     createdByName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
     createdAt: new Date(),

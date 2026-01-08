@@ -120,7 +120,7 @@ export async function sendDiscrepancyEmail({ discrepancy, recipient, projectName
         </div>
         
         <p style="font-size: 14px; color: #666; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
-          This is an automated alert from the Kisheka Construction Accountability System.
+          This is an automated alert from the Doshaki Construction Accountability System.
           <br>
           Please do not reply to this email.
         </p>

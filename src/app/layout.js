@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/toast";
 import { ServiceWorkerRegister } from "@/components/push-notifications/service-worker-register";
+import { ProjectContextProvider } from "@/contexts/ProjectContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Kisheka Construction Accountability System",
+  title: "Doshaki Construction Accountability System",
   description: "Streamline your construction project management with real-time tracking of materials, expenses, and labour. Ensure transparency, optimize costs, and drive project success.",
 };
 
@@ -25,8 +26,10 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ToastProvider>
-          <ServiceWorkerRegister />
-          {children}
+          <ProjectContextProvider>
+            <ServiceWorkerRegister />
+            {children}
+          </ProjectContextProvider>
         </ToastProvider>
       </body>
     </html>

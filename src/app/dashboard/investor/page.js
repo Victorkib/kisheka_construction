@@ -14,9 +14,12 @@ import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner, LoadingCard, LoadingButton } from '@/components/loading';
 import { StatementGenerator } from '@/components/investors/statement-generator';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { NoProjectsEmptyState, NoDataEmptyState } from '@/components/empty-states';
 
 export default function InvestorDashboardPage() {
   const router = useRouter();
+  const { isEmpty } = useProjectContext();
   const [investor, setInvestor] = useState(null);
   const [finances, setFinances] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -162,6 +165,27 @@ export default function InvestorDashboardPage() {
             </div>
             <LoadingCard count={3} showHeader={true} lines={4} />
           </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // Check empty state - no projects
+  if (isEmpty && !error && investor) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-6">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">My Investment Dashboard</h1>
+            <p className="mt-2 text-sm text-gray-700">
+              Welcome, {investor.name}. View your investment details and project progress.
+            </p>
+          </div>
+          <NoProjectsEmptyState
+            canCreate={false}
+            userName={investor.name}
+            role="investor"
+          />
         </div>
       </AppLayout>
     );

@@ -5,8 +5,24 @@
 
 'use client';
 
-export function WizardProgress({ currentStep, totalSteps = 4 }) {
+export function WizardProgress({ currentStep, totalSteps = 4, stepLabels = null }) {
   const steps = Array.from({ length: totalSteps }, (_, i) => i + 1);
+
+  const getStepLabel = (step) => {
+    if (stepLabels && typeof stepLabels === 'function') {
+      return stepLabels(step);
+    }
+    if (stepLabels && typeof stepLabels === 'object' && stepLabels[step]) {
+      return stepLabels[step];
+    }
+    const defaultLabels = {
+      1: 'Project & Settings',
+      2: 'Select Materials',
+      3: 'Edit Details',
+      4: 'Review & Submit',
+    };
+    return defaultLabels[step] || `Step ${step}`;
+  };
 
   return (
     <div className="mb-8">
@@ -56,15 +72,5 @@ export function WizardProgress({ currentStep, totalSteps = 4 }) {
       </div>
     </div>
   );
-}
-
-function getStepLabel(step) {
-  const labels = {
-    1: 'Project & Settings',
-    2: 'Select Materials',
-    3: 'Edit Details',
-    4: 'Review & Submit',
-  };
-  return labels[step] || `Step ${step}`;
 }
 

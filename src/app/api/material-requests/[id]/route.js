@@ -220,6 +220,25 @@ export async function PATCH(request, { params }) {
       return errorResponse('Invalid urgency level', 400);
     }
 
+    // Phase Budget Validation: Check if updated estimated cost fits within phase material budget
+    const phaseId = existingRequest.phaseId;
+    const newEstimatedCost = updateData.estimatedCost !== undefined ? updateData.estimatedCost : existingRequest.estimatedCost;
+    
+    if (phaseId && newEstimatedCost && newEstimatedCost > 0) {
+      const { validatePhaseMaterialBudget } = await import('@/lib/phase-helpers');
+      const budgetValidation = await validatePhaseMaterialBudget(phaseId.toString(), newEstimatedCost, id);
+      
+      if (!budgetValidation.isValid) {
+        return errorResponse(
+          `Phase material budget exceeded. ${budgetValidation.message}. ` +
+          `Phase material budget: ${budgetValidation.materialBudget.toLocaleString()}, ` +
+          `Available: ${budgetValidation.available.toLocaleString()}, ` +
+          `Required: ${budgetValidation.required.toLocaleString()}`,
+          400
+        );
+      }
+    }
+
     // Update request
     await db.collection('material_requests').updateOne(
       { _id: new ObjectId(id) },

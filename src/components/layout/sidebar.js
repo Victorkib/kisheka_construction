@@ -10,12 +10,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getNavigationForRole } from '@/lib/navigation-helpers';
 import { usePermissions } from '@/hooks/use-permissions';
+import { useProjectContext } from '@/contexts/ProjectContext';
 import { SidebarDataProvider } from '@/components/layout/SidebarDataProvider';
 import { ContextualQuickActions } from '@/components/navigation/ContextualQuickActions';
 import { CurrentProjectContext } from '@/components/navigation/CurrentProjectContext';
 import { RecentlyViewed } from '@/components/navigation/RecentlyViewed';
 import { PendingActions } from '@/components/navigation/PendingActions';
 import { SuggestedActions } from '@/components/navigation/SuggestedActions';
+import { isRouteActive, getActiveState, getActiveRoute } from '@/lib/utils/route-matching';
+import { getNavItemColors } from '@/lib/utils/navigation-colors';
 
 /**
  * Icon component placeholder
@@ -64,6 +67,31 @@ function Icon({ name, className = 'w-5 h-5' }) {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
       </svg>
     ),
+    users: (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+    ),
+    book: (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+    ),
+    'shopping-cart': (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+      </svg>
+    ),
+    'file-text': (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+    ),
+    layers: (
+      <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+      </svg>
+    ),
   };
 
   return icons[name] || null;
@@ -85,18 +113,47 @@ function Badge({ count, className = '' }) {
 }
 
 /**
+ * Active Indicator Component
+ * Visual indicator for active navigation items with dynamic colors
+ */
+function ActiveIndicator({ isActive, isParentActive, accentColor = 'bg-blue-600', className = '' }) {
+  if (!isActive && !isParentActive) return null;
+  
+  return (
+    <div
+      className={`absolute left-0 top-0 bottom-0 w-0.5 ${accentColor} rounded-r transition-all duration-200 ${className}`}
+      aria-hidden="true"
+    />
+  );
+}
+
+/**
  * Navigation Section Component
  * Memoized to prevent unnecessary re-renders on navigation
+ * Enhanced with sophisticated active state detection
  */
-const NavSection = memo(function NavSection({ section, pathname, isCollapsed, onToggle }) {
+const NavSection = memo(function NavSection({ section, pathname, isCollapsed, onToggle, activeRouteInfo = null }) {
   const [isExpanded, setIsExpanded] = useState(!isCollapsed);
   const hasChildren = section.children && section.children.length > 0;
-  const isActive = pathname === section.href || (section.href && pathname.startsWith(section.href + '/'));
+  
+  // Use enhanced active state detection
+  const activeState = getActiveState(pathname, section, activeRouteInfo);
+  const { isActive, isParentActive, isChildActive } = activeState;
+  
+  // Get vibrant color theme for this section
+  const colors = getNavItemColors(section.label, isActive, isParentActive || isChildActive);
 
   // Auto-expand if any child is active
   useEffect(() => {
     if (hasChildren && !isCollapsed) {
-      const hasActiveChild = section.children.some((child) => pathname === child.href || pathname.startsWith(child.href + '/'));
+      const hasActiveChild = section.children.some((child) => {
+        if (!child.href) return false;
+        return isRouteActive(pathname, child.href, {
+          exact: false,
+          includeChildren: true,
+          ignoreQuery: true,
+        });
+      });
       if (hasActiveChild) {
         setIsExpanded(true);
       }
@@ -111,31 +168,37 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
   };
 
   return (
-    <div className="mb-1">
+    <div className="mb-0.5">
       {hasChildren ? (
         <>
           <button
             onClick={handleToggle}
-            className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-              isActive || isExpanded
-                ? 'bg-blue-50 text-blue-700'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
+            className={`group relative w-full flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${colors.container} ${isActive ? 'shadow-sm' : 'hover:shadow-sm'}`}
           >
-            {section.icon && <Icon name={section.icon} className="w-5 h-5 mr-3" />}
-            {!isCollapsed && <span className="flex-1 text-left">{section.label}</span>}
+            <ActiveIndicator isActive={isActive} isParentActive={isParentActive} accentColor={colors.accent} />
+            {section.icon && (
+              <Icon
+                name={section.icon}
+                className={`w-5 h-5 mr-3 flex-shrink-0 transition-all duration-200 ${colors.icon} ${
+                  isActive ? 'scale-110' : isParentActive || isChildActive ? 'scale-105' : 'group-hover:scale-105'
+                }`}
+              />
+            )}
+            {!isCollapsed && <span className="flex-1 text-left truncate">{section.label}</span>}
             {!isCollapsed && hasChildren && (
               <Icon
                 name="chevron"
-                className={`w-4 h-4 transition-transform ${isExpanded ? 'transform rotate-90' : ''}`}
+                className={`w-4 h-4 transition-transform duration-200 flex-shrink-0 ${
+                  isExpanded ? 'transform rotate-90' : ''
+                } ${isActive || isParentActive ? colors.icon.split(' ')[0] : 'text-gray-400'}`}
               />
             )}
             {!isCollapsed && section.badge && <Badge count={section.badge} />}
           </button>
           {isExpanded && !isCollapsed && (
-            <div className="ml-8 mt-1 space-y-1">
+            <div className="ml-8 mt-0.5 space-y-0.5">
               {section.children.map((child) => {
-                const isChildActive = pathname === child.href || pathname.startsWith(child.href + '/');
+                const childActiveState = getActiveState(pathname, child, activeRouteInfo);
                 const hasGrandChildren = child.children && child.children.length > 0;
                 
                 // If child has nested children, render as expandable section
@@ -146,22 +209,21 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
                       section={child}
                       pathname={pathname}
                       isCollapsed={isCollapsed}
+                      activeRouteInfo={activeRouteInfo}
                     />
                   );
                 }
                 
-                // Regular child link
+                // Regular child link with enhanced styling - inherit parent section colors
+                const childColors = getNavItemColors(section.label, childActiveState.isActive, false);
                 return (
                   <Link
                     key={child.href}
                     href={child.href}
-                    className={`flex items-center px-3 py-2 text-sm rounded-lg transition-colors ${
-                      isChildActive
-                        ? 'bg-blue-50 text-blue-700 font-medium'
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
+                    className={`group relative flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${childColors.container} ${childActiveState.isActive ? 'shadow-sm font-semibold' : 'font-normal hover:shadow-sm hover:font-medium'}`}
                   >
-                    <span className="flex-1">{child.label}</span>
+                    <ActiveIndicator isActive={childActiveState.isActive} accentColor={childColors.accent} />
+                    <span className="flex-1 truncate">{child.label}</span>
                     {child.badge && <Badge count={child.badge} />}
                   </Link>
                 );
@@ -172,14 +234,18 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
       ) : (
         <Link
           href={section.href}
-          className={`flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-            isActive
-              ? 'bg-blue-50 text-blue-700'
-              : 'text-gray-700 hover:bg-gray-100'
-          }`}
+          className={`group relative flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${colors.container} ${isActive ? 'shadow-sm' : 'hover:shadow-sm'}`}
         >
-          {section.icon && <Icon name={section.icon} className="w-5 h-5 mr-3" />}
-          {!isCollapsed && <span className="flex-1">{section.label}</span>}
+          <ActiveIndicator isActive={isActive} accentColor={colors.accent} />
+          {section.icon && (
+            <Icon
+              name={section.icon}
+              className={`w-5 h-5 mr-3 flex-shrink-0 transition-all duration-200 ${colors.icon} ${
+                isActive ? 'scale-110' : 'group-hover:scale-105'
+              }`}
+            />
+          )}
+          {!isCollapsed && <span className="flex-1 truncate">{section.label}</span>}
           {!isCollapsed && section.badge && <Badge count={section.badge} />}
         </Link>
       )}
@@ -194,6 +260,7 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
 export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleCollapse }) {
   const pathname = usePathname();
   const { user, loading } = usePermissions();
+  const { currentProject } = useProjectContext();
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
   const [readyToOrderCount, setReadyToOrderCount] = useState(0);
@@ -248,7 +315,7 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
   if (loading || !user) {
     return (
       <aside
-        className={`bg-white border-r border-gray-200 transition-all duration-300 ${
+        className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen ${
           isCollapsed ? 'w-16' : 'w-64'
         }`}
       >
@@ -263,7 +330,12 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
   }
 
   // Memoize navigation to prevent recalculation on every render
-  const navigation = useMemo(() => getNavigationForRole(user.role), [user.role]);
+  // Include project context for project-scoped navigation
+  const projectId = currentProject?._id?.toString() || currentProject?._id || null;
+  const navigation = useMemo(
+    () => getNavigationForRole(user.role, projectId),
+    [user.role, projectId]
+  );
   
   // Memoize navigation with badges to prevent recalculation on every render
   const navigationWithBadges = useMemo(() => {
@@ -335,20 +407,20 @@ const SidebarContent = memo(function SidebarContent({
     >
       {/* Logo/Brand - Sticky Top */}
       <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white z-10">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           {!isCollapsed && (
-            <Link href="/dashboard" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition">
-              Kisheka
+            <Link href="/dashboard" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors truncate">
+              Doshaki
             </Link>
           )}
           {isCollapsed && (
-            <Link href="/dashboard" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition" title="Kisheka">
+            <Link href="/dashboard" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors" title="Doshaki">
               K
             </Link>
           )}
           <button
             onClick={onToggleCollapse}
-            className="p-1 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition"
+            className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0"
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -369,7 +441,7 @@ const SidebarContent = memo(function SidebarContent({
       </div>
 
       {/* Scrollable Middle Section */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0">
+      <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
         {/* Secondary Sections */}
         <div className="flex-shrink-0">
           {/* Pending Actions */}
@@ -383,15 +455,21 @@ const SidebarContent = memo(function SidebarContent({
         </div>
 
         {/* Main Navigation */}
-        <nav className="p-4 space-y-1">
-          {navigationWithBadges.map((section) => (
-            <NavSection
-              key={section.label}
-              section={section}
-              pathname={pathname}
-              isCollapsed={isCollapsed}
-            />
-          ))}
+        <nav className="px-3 py-2 space-y-1">
+          {(() => {
+            // Get active route info once for all sections
+            const activeRouteInfo = getActiveRoute(pathname, navigationWithBadges);
+            
+            return navigationWithBadges.map((section) => (
+              <NavSection
+                key={section.label}
+                section={section}
+                pathname={pathname}
+                isCollapsed={isCollapsed}
+                activeRouteInfo={activeRouteInfo}
+              />
+            ));
+          })()}
         </nav>
       </div>
 
@@ -405,7 +483,7 @@ const SidebarContent = memo(function SidebarContent({
           <div className="p-4 border-t border-gray-200">
             <div className="text-sm">
               <p className="font-medium text-gray-900 truncate">{user.firstName || user.email}</p>
-              <p className="text-gray-500 capitalize text-xs">{user.role || 'User'}</p>
+              <p className="text-gray-500 capitalize text-xs truncate">{user.role || 'User'}</p>
             </div>
           </div>
         )}

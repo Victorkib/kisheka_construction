@@ -138,7 +138,7 @@ export function MobileNav({ isOpen, onClose }) {
           {/* Header */}
           <div className="p-4 border-b border-gray-200 flex items-center justify-between">
             <Link href="/dashboard" className="text-xl font-bold text-blue-600" onClick={onClose}>
-              Kisheka
+              Doshaki
             </Link>
             <button
               onClick={onClose}

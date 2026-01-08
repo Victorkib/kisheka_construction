@@ -59,7 +59,7 @@ export function generatePurchaseOrderPDF({ purchaseOrder, supplier, project = nu
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(24);
   doc.setFont('helvetica', 'bold');
-  doc.text('Kisheka Construction', margin, 25);
+  doc.text('Doshaki Construction', margin, 25);
   
   doc.setFontSize(14);
   doc.setFont('helvetica', 'normal');
@@ -304,6 +304,7 @@ export function generatePurchaseOrderPDF({ purchaseOrder, supplier, project = nu
   // Return PDF as buffer
   return doc.output('arraybuffer');
 }
+
 
 
 

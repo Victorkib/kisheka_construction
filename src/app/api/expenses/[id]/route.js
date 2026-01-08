@@ -16,6 +16,8 @@ import { getUserProfile } from '@/lib/auth-helpers';
 import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { recalculateProjectFinances } from '@/lib/financial-helpers';
+import { recalculatePhaseSpending } from '@/lib/phase-helpers';
+import { updateIndirectCostsSpending } from '@/lib/indirect-costs-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
@@ -123,6 +125,9 @@ export async function PATCH(request, { params }) {
       receiptFileUrl,
       notes,
       status,
+      phaseId,
+      isIndirectCost, // NEW: Update indirect cost flag
+      indirectCostCategory, // NEW: Update indirect cost category
     } = body;
 
     const db = await getDatabase();
@@ -210,6 +215,89 @@ export async function PATCH(request, { params }) {
       changes.status = { oldValue: existingExpense.status, newValue: status };
     }
 
+    // Handle phaseId update
+    const oldPhaseId = existingExpense.phaseId;
+    if (phaseId !== undefined) {
+      if (phaseId === null || phaseId === '') {
+        updateData.phaseId = null;
+        changes.phaseId = {
+          oldValue: oldPhaseId,
+          newValue: null,
+        };
+      } else if (ObjectId.isValid(phaseId)) {
+        // Validate phase exists and belongs to same project
+        const phase = await db.collection('phases').findOne({
+          _id: new ObjectId(phaseId),
+          deletedAt: null,
+        });
+
+        if (!phase) {
+          return errorResponse(`Phase not found: ${phaseId}`, 404);
+        }
+
+        if (phase.projectId.toString() !== existingExpense.projectId.toString()) {
+          return errorResponse('Phase does not belong to the same project as the expense', 400);
+        }
+
+        updateData.phaseId = new ObjectId(phaseId);
+        changes.phaseId = {
+          oldValue: oldPhaseId,
+          newValue: phaseId,
+        };
+      } else {
+        return errorResponse('Invalid phaseId format', 400);
+      }
+    }
+    
+    // Handle isIndirectCost and indirectCostCategory updates
+    if (isIndirectCost !== undefined) {
+      updateData.isIndirectCost = isIndirectCost === true;
+      changes.isIndirectCost = {
+        oldValue: existingExpense.isIndirectCost || false,
+        newValue: isIndirectCost === true,
+      };
+      
+      // If setting to indirect cost, validate category
+      if (isIndirectCost === true) {
+        const validIndirectCategories = ['utilities', 'siteOverhead', 'transportation', 'safetyCompliance'];
+        const finalCategory = indirectCostCategory || existingExpense.indirectCostCategory;
+        
+        if (!finalCategory || !validIndirectCategories.includes(finalCategory)) {
+          return errorResponse(
+            `Invalid indirectCostCategory. Must be one of: ${validIndirectCategories.join(', ')} when isIndirectCost is true`,
+            400
+          );
+        }
+        
+        updateData.indirectCostCategory = finalCategory;
+        changes.indirectCostCategory = {
+          oldValue: existingExpense.indirectCostCategory || null,
+          newValue: finalCategory,
+        };
+      } else {
+        // If setting to direct cost, clear indirectCostCategory
+        updateData.indirectCostCategory = null;
+        changes.indirectCostCategory = {
+          oldValue: existingExpense.indirectCostCategory || null,
+          newValue: null,
+        };
+      }
+    } else if (indirectCostCategory !== undefined && existingExpense.isIndirectCost) {
+      // Only allow updating category if already an indirect cost
+      const validIndirectCategories = ['utilities', 'siteOverhead', 'transportation', 'safetyCompliance'];
+      if (!validIndirectCategories.includes(indirectCostCategory)) {
+        return errorResponse(
+          `Invalid indirectCostCategory. Must be one of: ${validIndirectCategories.join(', ')}`,
+          400
+        );
+      }
+      updateData.indirectCostCategory = indirectCostCategory;
+      changes.indirectCostCategory = {
+        oldValue: existingExpense.indirectCostCategory || null,
+        newValue: indirectCostCategory,
+      };
+    }
+
     // Only update if there are changes
     if (Object.keys(updateData).length === 1) {
       return errorResponse('No valid fields provided for update', 400);
@@ -235,6 +323,71 @@ export async function PATCH(request, { params }) {
       projectId: existingExpense.projectId ? existingExpense.projectId.toString() : null,
       changes,
     });
+
+    // Recalculate project finances if amount changed
+    if (updateData.amount !== undefined) {
+      try {
+        const projectIdStr = existingExpense.projectId?.toString();
+        if (projectIdStr) {
+          await recalculateProjectFinances(projectIdStr);
+        }
+      } catch (error) {
+        console.error('Error recalculating project finances:', error);
+      }
+    }
+
+    // Update indirect costs if isIndirectCost or indirectCostCategory changed
+    const finalIsIndirectCost = updateData.isIndirectCost !== undefined 
+      ? updateData.isIndirectCost 
+      : existingExpense.isIndirectCost || false;
+    const finalIndirectCategory = updateData.indirectCostCategory !== undefined
+      ? updateData.indirectCostCategory
+      : existingExpense.indirectCostCategory;
+    
+    if ((updateData.isIndirectCost !== undefined || updateData.indirectCostCategory !== undefined) && 
+        finalIsIndirectCost && finalIndirectCategory && existingExpense.status === 'APPROVED') {
+      try {
+        // If changing to indirect cost or updating category, update indirect costs spending
+        await updateIndirectCostsSpending(
+          existingExpense.projectId.toString(),
+          finalIndirectCategory,
+          existingExpense.amount || 0
+        );
+      } catch (error) {
+        console.error('Error updating indirect costs:', error);
+      }
+    }
+    
+    // Recalculate phase spending if phaseId changed (ONLY for direct costs)
+    // CRITICAL: Indirect costs are NOT included in phase spending
+    if (phaseId !== undefined && oldPhaseId?.toString() !== updateData.phaseId?.toString() && !finalIsIndirectCost) {
+      try {
+        // Recalculate old phase if it exists
+        if (oldPhaseId && ObjectId.isValid(oldPhaseId)) {
+          await recalculatePhaseSpending(oldPhaseId.toString());
+        }
+        // Recalculate new phase if it exists
+        if (updateData.phaseId && ObjectId.isValid(updateData.phaseId)) {
+          await recalculatePhaseSpending(updateData.phaseId.toString());
+        }
+      } catch (error) {
+        // Log error but don't fail the update
+        console.error('Error recalculating phase spending:', error);
+      }
+    }
+
+    // Recalculate phase spending if status changed and expense is linked to a phase (ONLY for direct costs)
+    if (updateData.status !== undefined && updateData.status !== existingExpense.status && !finalIsIndirectCost) {
+      const currentPhaseId = updateData.phaseId || existingExpense.phaseId;
+      if (currentPhaseId && ObjectId.isValid(currentPhaseId)) {
+        try {
+          await recalculatePhaseSpending(currentPhaseId.toString());
+        } catch (error) {
+          // Log error but don't fail the update
+          console.error('Error recalculating phase spending after status change:', error);
+        }
+      }
+    }
 
     return successResponse(result.value, 'Expense updated successfully');
   } catch (error) {
@@ -359,6 +512,19 @@ export async function DELETE(request, { params }) {
         // Log error but don't fail the delete operation
         // The expense is already deleted, so we can't rollback
         // This should be investigated manually
+      }
+    }
+
+    // Recalculate phase spending if expense had a phase (ONLY for direct costs)
+    // CRITICAL: Indirect costs are NOT included in phase spending
+    if (existingExpense.phaseId && ObjectId.isValid(existingExpense.phaseId) && 
+        isApproved && hasAmount && !existingExpense.isIndirectCost) {
+      try {
+        await recalculatePhaseSpending(existingExpense.phaseId.toString());
+        console.log(`✅ Phase spending recalculated after expense deletion for phase ${existingExpense.phaseId}`);
+      } catch (error) {
+        // Log error but don't fail the delete operation
+        console.error(`❌ Error recalculating phase spending after expense deletion:`, error);
       }
     }
 
