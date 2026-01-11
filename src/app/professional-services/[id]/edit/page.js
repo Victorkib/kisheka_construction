@@ -120,7 +120,7 @@ function EditProfessionalServicePageContent() {
             <p>You do not have permission to edit professional service assignments. Only OWNER and PM can edit assignments.</p>
           </div>
           <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 underline">
-            ← Back to Professional Services
+            ← Back to Assignments
           </Link>
         </div>
       </AppLayout>
@@ -148,7 +148,7 @@ function EditProfessionalServicePageContent() {
             <p>{error}</p>
           </div>
           <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 underline">
-            ← Back to Professional Services
+            ← Back to Assignments
           </Link>
         </div>
       </AppLayout>
@@ -161,7 +161,7 @@ function EditProfessionalServicePageContent() {
         {/* Header */}
         <div className="mb-8">
           <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
-            ← Back to Professional Services
+            ← Back to Assignments
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
             Edit Professional Service Assignment

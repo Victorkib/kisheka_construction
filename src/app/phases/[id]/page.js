@@ -48,6 +48,7 @@ export default function PhaseDetailPage() {
   const [purchaseOrders, setPurchaseOrders] = useState([]);
   const [loadingMaterials, setLoadingMaterials] = useState(false);
   const [loadingExpenses, setLoadingExpenses] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [formData, setFormData] = useState({
     phaseName: '',
@@ -96,9 +97,13 @@ export default function PhaseDetailPage() {
     }
   };
 
-  const fetchPhase = async () => {
+  const fetchPhase = async (isRefresh = false) => {
     try {
-      setLoading(true);
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
       setError(null);
 
       const response = await fetch(`/api/phases/${params.id}?includeFinancials=true`);
@@ -130,11 +135,32 @@ export default function PhaseDetailPage() {
           setProject(projectData.data);
         }
       }
+
+      // Show success toast on refresh
+      if (isRefresh) {
+        toast.success('Phase data refreshed successfully');
+      }
     } catch (err) {
       setError(err.message);
       console.error('Fetch phase error:', err);
+      if (isRefresh) {
+        toast.error('Failed to refresh phase data');
+      }
     } finally {
-      setLoading(false);
+      if (isRefresh) {
+        setRefreshing(false);
+      } else {
+        setLoading(false);
+      }
+    }
+  };
+
+  const handleRefresh = async () => {
+    await fetchPhase(true);
+    // Also refresh materials and expenses if on overview tab
+    if (activeTab === 'overview') {
+      fetchMaterials();
+      fetchExpenses();
     }
   };
 
@@ -432,32 +458,55 @@ export default function PhaseDetailPage() {
                 </Link>
               )}
             </div>
-            {canEdit && (
-              <div className="flex gap-2">
-                <Link
-                  href={`/phases/${params.id}/dashboard`}
-                  className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-                >
-                  Dashboard
-                </Link>
-                {autoAdvanceStatus?.canAdvance && phase?.status !== 'completed' && (
-                  <button
-                    onClick={handleAutoAdvance}
-                    disabled={autoAdvancing}
-                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-                    title={autoAdvanceStatus.reason}
-                  >
-                    {autoAdvancing ? 'Auto-Advancing...' : 'Auto-Advance'}
-                  </button>
+            <div className="flex gap-2">
+              {/* Refresh button - available to all users */}
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing || loading}
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+                title="Refresh phase data and financial information"
+              >
+                {refreshing ? (
+                  <>
+                    <LoadingSpinner size="sm" />
+                    Refreshing...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    Refresh
+                  </>
                 )}
-                <button
-                  onClick={() => setShowEditModal(true)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Edit Phase
-                </button>
-              </div>
-            )}
+              </button>
+              {canEdit && (
+                <>
+                  <Link
+                    href={`/phases/${params.id}/dashboard`}
+                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  {autoAdvanceStatus?.canAdvance && phase?.status !== 'completed' && (
+                    <button
+                      onClick={handleAutoAdvance}
+                      disabled={autoAdvancing}
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                      title={autoAdvanceStatus.reason}
+                    >
+                      {autoAdvancing ? 'Auto-Advancing...' : 'Auto-Advance'}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => setShowEditModal(true)}
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    Edit Phase
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
 

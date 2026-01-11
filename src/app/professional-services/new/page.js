@@ -107,7 +107,7 @@ export default function NewProfessionalServicePage() {
             <p>You do not have permission to assign professionals to projects. Only OWNER and PM can assign professionals.</p>
           </div>
           <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 underline">
-            ← Back to Professional Services
+            ← Back to Assignments
           </Link>
         </div>
       </AppLayout>
@@ -132,7 +132,7 @@ export default function NewProfessionalServicePage() {
         {/* Header */}
         <div className="mb-8">
           <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
-            ← Back to Professional Services
+            ← Back to Assignments
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
             Assign Professional to Project

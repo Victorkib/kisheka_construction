@@ -431,16 +431,49 @@ export async function DELETE(request, { params }) {
       );
     }
 
+    // Get supplier information for cancellation SMS
+    const supplier = await db.collection('suppliers').findOne({
+      _id: existingOrder.supplierId,
+      status: 'active',
+      deletedAt: null
+    });
+
     // Soft delete
     await db.collection('purchase_orders').updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
+          status: 'cancelled',
+          cancelledAt: new Date(),
+          cancelledBy: userProfile._id,
+          cancelReason: 'Order cancelled by Owner/PM',
           deletedAt: new Date(),
           updatedAt: new Date(),
         },
       }
     );
+
+    // Send cancellation SMS to supplier
+    if (supplier && supplier.smsEnabled && supplier.phone) {
+      try {
+        const formattedPhone = formatPhoneNumber(supplier.phone);
+        const cancellationSMS = generateOrderCancellationSMS({
+          purchaseOrderNumber: existingOrder.purchaseOrderNumber,
+          reason: 'Order cancelled',
+          supplier: supplier
+        });
+
+        await sendSMS({
+          to: formattedPhone,
+          message: cancellationSMS
+        });
+
+        console.log(`[Delete PO] Cancellation SMS sent to ${formattedPhone} for ${existingOrder.purchaseOrderNumber}`);
+      } catch (smsError) {
+        console.error('[Delete PO] Failed to send cancellation SMS:', smsError);
+        // Don't fail the deletion if SMS fails
+      }
+    }
 
     // Create audit log
     await createAuditLog({

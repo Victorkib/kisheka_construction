@@ -295,7 +295,7 @@ function ProfessionalFeeDetailPageContent() {
             href="/professional-fees"
             className="mt-4 inline-block text-blue-600 hover:text-blue-800"
           >
-            ← Back to Professional Fees
+            ← Back to Fees
           </Link>
         </div>
       </AppLayout>
@@ -317,7 +317,7 @@ function ProfessionalFeeDetailPageContent() {
             href="/professional-fees"
             className="text-blue-600 hover:text-blue-800 mb-4 inline-block"
           >
-            ← Back to Professional Fees
+            ← Back to Fees
           </Link>
           <div className="flex justify-between items-start">
             <div>

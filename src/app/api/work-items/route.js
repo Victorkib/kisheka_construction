@@ -144,7 +144,12 @@ export async function POST(request) {
 
     const hasCreatePermission = await hasPermission(user.id, 'create_work_item');
     if (!hasCreatePermission) {
-      return errorResponse('Insufficient permissions. Only PM and OWNER can create work items.', 403);
+      // Fallback to role check for backward compatibility and safety
+      const userRole = userProfile.role?.toLowerCase();
+      const allowedRoles = ['owner', 'pm', 'project_manager'];
+      if (!allowedRoles.includes(userRole)) {
+        return errorResponse('Insufficient permissions. Only PM and OWNER can create work items.', 403);
+      }
     }
 
     const body = await request.json();

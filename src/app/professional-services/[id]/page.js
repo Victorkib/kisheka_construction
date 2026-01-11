@@ -183,7 +183,7 @@ function ProfessionalServiceDetailPageContent() {
             href="/professional-services"
             className="mt-4 inline-block text-blue-600 hover:text-blue-800"
           >
-            ← Back to Professional Services
+            ← Back to Assignments
           </Link>
         </div>
       </AppLayout>
@@ -199,7 +199,7 @@ function ProfessionalServiceDetailPageContent() {
             href="/professional-services"
             className="text-blue-600 hover:text-blue-800 mb-4 inline-block"
           >
-            ← Back to Professional Services
+            ← Back to Assignments
           </Link>
           <div className="flex justify-between items-start">
             <div>

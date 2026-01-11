@@ -202,17 +202,17 @@ export const NAVIGATION_SECTIONS = {
     ],
   },
   professionalServices: {
-    label: 'Professional Services',
+    label: 'Professionals',
     icon: 'users',
     roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant'],
     children: [
       {
-        label: 'All Services',
+        label: 'Assignments',
         href: '/professional-services',
         roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant'],
       },
       {
-        label: 'Services Library',
+        label: 'Library',
         href: '/professional-services-library',
         roles: ['owner', 'pm', 'project_manager'],
         icon: 'book',
@@ -235,7 +235,7 @@ export const NAVIGATION_SECTIONS = {
         icon: 'file-text',
       },
       {
-        label: 'Professional Fees',
+        label: 'Fees',
         href: '/professional-fees',
         roles: ['owner', 'pm', 'project_manager', 'accountant'],
       },

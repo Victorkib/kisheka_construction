@@ -13,7 +13,7 @@ import { hasPermission } from '@/lib/role-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { sendPurchaseOrderEmail } from '@/lib/email-templates/purchase-order-templates';
-import { sendSMS, generatePurchaseOrderSMS, generateBulkPurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
+import { sendSMS, sendMultipleSMS, generatePurchaseOrderSMS, generateBulkPurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { sendPushToSupplier } from '@/lib/push-service';
 import { generateShortUrl } from '@/lib/generators/url-shortener';
 
@@ -143,18 +143,25 @@ export async function POST(request, { params }) {
         
         // Use detailed bulk order SMS for bulk orders, regular SMS for single orders
         let smsMessage;
+        let isMultiPart = false;
+        
         if (purchaseOrder.isBulkOrder && purchaseOrder.materials && Array.isArray(purchaseOrder.materials) && purchaseOrder.materials.length > 0) {
-          // Bulk order - use detailed message with material breakdown
-          smsMessage = generateBulkPurchaseOrderSMS({
+          // Bulk order - use detailed message with material breakdown (may return array for multi-part)
+          smsMessage = await generateBulkPurchaseOrderSMS({
             purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
             materials: purchaseOrder.materials,
             totalCost: purchaseOrder.totalCost,
             shortLink,
-            deliveryDate: purchaseOrder.deliveryDate
+            deliveryDate: purchaseOrder.deliveryDate,
+            enableMultiPart: true,
+            supplier: supplier, // Pass supplier for language detection
+            projectId: purchaseOrder.projectId?.toString() || null,
+            enablePersonalization: true
           });
+          isMultiPart = Array.isArray(smsMessage);
         } else if (materialRequest) {
           // Single order - use regular SMS
-          smsMessage = generatePurchaseOrderSMS({
+          smsMessage = await generatePurchaseOrderSMS({
             purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
             materialName: materialRequest.materialName,
             quantity: purchaseOrder.quantityOrdered,
@@ -162,38 +169,84 @@ export async function POST(request, { params }) {
             totalCost: purchaseOrder.totalCost,
             shortLink,
             deliveryDate: purchaseOrder.deliveryDate,
-            unitCost: purchaseOrder.unitCost || null
+            unitCost: purchaseOrder.unitCost || null,
+            supplier: supplier, // Pass supplier for language detection
+            projectId: purchaseOrder.projectId?.toString() || null,
+            enablePersonalization: true
           });
         } else {
           // Fallback if no material request found
           return errorResponse('Cannot generate SMS: Material details not found', 400);
         }
 
-        const smsResult = await sendSMS({
-          to: formattedPhone,
-          message: smsMessage,
-        });
+        let smsResult;
+        if (isMultiPart) {
+          // Send multiple messages for bulk orders with 5+ materials
+          smsResult = await sendMultipleSMS({
+            to: formattedPhone,
+            messages: smsMessage,
+            delayBetweenMessages: 1000
+          });
+          
+          if (smsResult.success) {
+            result = { 
+              success: true, 
+              messageId: smsResult.messageIds?.[0] || null,
+              isMultiPart: true,
+              totalParts: smsMessage.length,
+              totalSent: smsResult.totalSent
+            };
 
-        if (smsResult.success) {
-          result = { success: true, messageId: smsResult.messageId };
-
-          // Track communication
-          await db.collection('purchase_orders').updateOne(
-            { _id: new ObjectId(id) },
-            {
-              $push: {
-                communications: {
-                  channel: 'sms',
-                  sentAt: new Date(),
-                  status: 'sent',
-                  messageId: smsResult.messageId || null,
-                  retry: true,
+            // Track communication
+            await db.collection('purchase_orders').updateOne(
+              { _id: new ObjectId(id) },
+              {
+                $push: {
+                  communications: {
+                    channel: 'sms',
+                    sentAt: new Date(),
+                    status: 'sent',
+                    messageId: smsResult.messageIds?.[0] || null,
+                    retry: true,
+                    isMultiPart: true,
+                    totalParts: smsMessage.length,
+                    totalSent: smsResult.totalSent,
+                    totalFailed: smsResult.totalFailed
+                  },
                 },
-              },
-            }
-          );
+              }
+            );
+          } else {
+            throw new Error(smsResult.errors?.[0]?.error || 'SMS send failed');
+          }
         } else {
-          throw new Error(smsResult.error || 'SMS send failed');
+          // Single message
+          smsResult = await sendSMS({
+            to: formattedPhone,
+            message: smsMessage,
+          });
+
+          if (smsResult.success && !smsResult.skipped) {
+            result = { success: true, messageId: smsResult.messageId };
+
+            // Track communication
+            await db.collection('purchase_orders').updateOne(
+              { _id: new ObjectId(id) },
+              {
+                $push: {
+                  communications: {
+                    channel: 'sms',
+                    sentAt: new Date(),
+                    status: 'sent',
+                    messageId: smsResult.messageId || null,
+                    retry: true,
+                  },
+                },
+              }
+            );
+          } else {
+            throw new Error(smsResult.error || 'SMS send failed');
+          }
         }
       } else if (channel === 'push') {
         if (!supplier.pushNotificationsEnabled) {

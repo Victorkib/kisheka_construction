@@ -77,7 +77,7 @@ console.log('   Sending test request to Africa\'s Talking API...\n');
 
 try {
   // Use a registered sandbox number for testing
-  const testPhone = '+254792454039'; // Default sandbox test number
+  const testPhone = '+254797441545'; // Default sandbox test number
   
   // const africasTalkingUrl = 'https://api.africastalking.com/version1/messaging';
   const africasTalkingUrl = 'https://api.sandbox.africastalking.com/version1/messaging';

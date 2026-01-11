@@ -5,7 +5,14 @@
 
 import { ObjectId } from 'mongodb';
 // Import constants for use in validation functions (server-side only)
-import { WORK_ITEM_STATUSES, WORK_ITEM_PRIORITIES, WORK_ITEM_CATEGORIES } from '@/lib/constants/work-item-constants';
+import { 
+  WORK_ITEM_STATUSES, 
+  WORK_ITEM_PRIORITIES, 
+  WORK_ITEM_CATEGORIES,
+  getPriorityLabel,
+  getPriorityColor,
+  getStatusColor
+} from '@/lib/constants/work-item-constants';
 
 /**
  * Work Item Schema
@@ -198,7 +205,8 @@ export function validateWorkItem(data) {
 
 // Re-export client-safe functions from constants file for backward compatibility
 // These functions don't use MongoDB, so they're safe to re-export
-export { getPriorityLabel, getPriorityColor, getStatusColor } from '@/lib/constants/work-item-constants';
+// Note: Functions are imported above, so they're available in module scope for default export
+export { getPriorityLabel, getPriorityColor, getStatusColor };
 
 export default {
   WORK_ITEM_SCHEMA,

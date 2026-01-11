@@ -13,6 +13,7 @@ import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotifications } from '@/lib/notifications';
 import { sendPushToUser } from '@/lib/push-service';
+import { sendSMS, generateModificationApprovalSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { updateCommittedCost, recalculateProjectFinances, validateCapitalAvailability } from '@/lib/financial-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
@@ -107,6 +108,74 @@ export async function POST(request, { params }) {
       }
     }
 
+    // CRITICAL FIX: For bulk orders, update materials array with approved modifications
+    let updatedMaterials = purchaseOrder.materials;
+    if (purchaseOrder.isBulkOrder && purchaseOrder.materials && Array.isArray(purchaseOrder.materials) && purchaseOrder.materialResponses) {
+      // Update materials array based on approved materialResponses
+      updatedMaterials = purchaseOrder.materials.map(material => {
+        const materialResponse = purchaseOrder.materialResponses.find(
+          r => {
+            const responseId = r.materialRequestId?.toString();
+            const materialId = material.materialRequestId?.toString() || material._id?.toString();
+            return responseId === materialId;
+          }
+        );
+        
+        // If material has modifications in response, apply them
+        if (materialResponse && materialResponse.modifications) {
+          const unitCost = materialResponse.modifications.unitCost !== undefined 
+            ? parseFloat(materialResponse.modifications.unitCost) 
+            : material.unitCost;
+          const quantity = materialResponse.modifications.quantityOrdered !== undefined 
+            ? parseFloat(materialResponse.modifications.quantityOrdered) 
+            : material.quantity;
+          
+          // CRITICAL FIX: Validate unitCost > 0
+          if (unitCost === undefined || unitCost === null || isNaN(unitCost) || unitCost <= 0) {
+            throw new Error(
+              `Invalid unit cost in modification for material "${material.materialName || material.materialRequestId}": ${unitCost}. ` +
+              `Unit cost must be greater than 0.`
+            );
+          }
+          
+          // CRITICAL FIX: Validate quantity > 0
+          if (quantity === undefined || quantity === null || isNaN(quantity) || quantity <= 0) {
+            throw new Error(
+              `Invalid quantity in modification for material "${material.materialName || material.materialRequestId}": ${quantity}. ` +
+              `Quantity must be greater than 0.`
+            );
+          }
+          
+          const totalCost = unitCost * quantity;
+          
+          return {
+            ...material,
+            unitCost,
+            quantity,
+            totalCost
+          };
+        }
+        
+        return material; // Keep original if no modifications
+      });
+      
+      // CRITICAL FIX: Validate all updated materials have valid costs
+      for (const material of updatedMaterials) {
+        if (material.unitCost !== undefined && material.unitCost !== null && material.unitCost <= 0) {
+          throw new Error(
+            `Invalid materials array after modification approval: Material "${material.materialName || material.materialRequestId}" has invalid unitCost: ${material.unitCost}. ` +
+            `All materials must have unitCost > 0.`
+          );
+        }
+        if (material.quantity !== undefined && material.quantity !== null && material.quantity <= 0) {
+          throw new Error(
+            `Invalid materials array after modification approval: Material "${material.materialName || material.materialRequestId}" has invalid quantity: ${material.quantity}. ` +
+            `All materials must have quantity > 0.`
+          );
+        }
+      }
+    }
+
     // Prepare update data
     const updateData = {
       modificationApproved: true,
@@ -120,6 +189,8 @@ export async function POST(request, { params }) {
       totalCost: newTotalCost,
       deliveryDate: newDeliveryDate,
       ...(modifications.notes && { notes: modifications.notes }),
+      // CRITICAL: Update materials array for bulk orders
+      ...(updatedMaterials && { materials: updatedMaterials }),
       // Update status based on auto-commit
       status: autoCommit ? 'order_accepted' : 'order_sent',
       supplierResponse: autoCommit ? 'accept' : null,
@@ -142,6 +213,16 @@ export async function POST(request, { params }) {
         newTotalCost,
         'add'
       );
+
+      // CRITICAL FIX: Update phase committed costs immediately
+      try {
+        const { updatePhaseCommittedCostsForPO } = await import('@/lib/phase-helpers');
+        await updatePhaseCommittedCostsForPO(updatedOrder || purchaseOrder);
+      } catch (phaseError) {
+        console.error('[Approve Modification] Phase committed cost update failed (non-critical):', phaseError);
+        // Don't fail the request - phase update can be done later
+      }
+
       await recalculateProjectFinances(purchaseOrder.projectId.toString());
     }
 
@@ -169,6 +250,35 @@ export async function POST(request, { params }) {
         });
       } catch (pushError) {
         console.error('Push notification to supplier failed:', pushError);
+      }
+
+      // Send SMS to supplier if enabled
+      try {
+        const supplierProfile = await db.collection('suppliers').findOne({
+          userId: purchaseOrder.supplierId,
+          status: 'active'
+        });
+
+        if (supplierProfile && supplierProfile.smsEnabled && supplierProfile.phone) {
+          const formattedPhone = formatPhoneNumber(supplierProfile.phone);
+          const smsMessage = generateModificationApprovalSMS({
+            purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
+            modifications: modifications,
+            autoCommit: autoCommit,
+            deliveryDate: newDeliveryDate,
+            supplier: supplierProfile // Pass supplier for language detection
+          });
+
+          await sendSMS({
+            to: formattedPhone,
+            message: smsMessage
+          });
+
+          console.log(`[Approve Modification] SMS sent to supplier for PO ${purchaseOrder.purchaseOrderNumber}`);
+        }
+      } catch (smsError) {
+        console.error('[Approve Modification] SMS send failed:', smsError);
+        // Don't fail the request if SMS fails
       }
     }
 

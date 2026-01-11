@@ -14,6 +14,7 @@ import { getUserProfile } from '@/lib/auth-helpers';
 import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotification, createNotifications } from '@/lib/notifications';
+import { sendSMS, formatPhoneNumber, generateMaterialVerificationSMS, getSupplierLanguage } from '@/lib/sms-service';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
@@ -55,7 +56,7 @@ export async function POST(request, { params }) {
     }
 
     const body = await request.json();
-    const { actualQuantityReceived, notes } = body || {};
+    const { actualQuantityReceived, notes, hasIssue = false, issueType = null, issueDescription = null } = body || {};
 
     const db = await getDatabase();
 
@@ -92,9 +93,13 @@ export async function POST(request, { params }) {
     };
 
     // If actual quantity received is provided and differs from delivered, update it
+    let quantityIssue = false;
+    let quantityIssueDescription = null;
+    
     if (actualQuantityReceived !== undefined && actualQuantityReceived !== null) {
       const actualQty = parseFloat(actualQuantityReceived);
       const purchased = existingMaterial.quantityPurchased || existingMaterial.quantity || 0;
+      const delivered = existingMaterial.quantityDelivered || purchased;
       
       if (actualQty < 0) {
         return errorResponse('Actual quantity received cannot be negative', 400);
@@ -109,6 +114,17 @@ export async function POST(request, { params }) {
 
       updateData.quantityDelivered = actualQty;
       updateData.quantityRemaining = actualQty - (existingMaterial.quantityUsed || 0);
+      
+      // Check for quantity discrepancy
+      if (Math.abs(actualQty - delivered) > 0.01) { // Allow small floating point differences
+        quantityIssue = true;
+        const difference = actualQty - delivered;
+        if (difference < 0) {
+          quantityIssueDescription = `Shortage: Expected ${delivered}, received ${actualQty} (${Math.abs(difference)} ${existingMaterial.unit || 'units'} missing)`;
+        } else {
+          quantityIssueDescription = `Excess: Expected ${delivered}, received ${actualQty} (${difference} ${existingMaterial.unit || 'units'} extra)`;
+        }
+      }
     }
 
     if (notes) {
@@ -165,6 +181,59 @@ export async function POST(request, { params }) {
       }
     }
 
+    // Send SMS to supplier if there's a verification issue
+    if (hasIssue || quantityIssue) {
+      // Get purchase order and supplier information
+      if (existingMaterial.purchaseOrderId) {
+        const purchaseOrder = await db.collection('purchase_orders').findOne({
+          _id: existingMaterial.purchaseOrderId,
+          deletedAt: null,
+        });
+
+        if (purchaseOrder && purchaseOrder.supplierId) {
+          const supplier = await db.collection('suppliers').findOne({
+            _id: purchaseOrder.supplierId,
+            status: 'active',
+            deletedAt: null,
+          });
+
+          if (supplier && supplier.smsEnabled && supplier.phone) {
+            try {
+              const formattedPhone = formatPhoneNumber(supplier.phone);
+              const verificationIssueType = issueType || (quantityIssue ? 'quantity' : 'other');
+              const verificationIssueDescription = issueDescription || quantityIssueDescription || 'Material verification issue detected';
+              const expectedQty = existingMaterial.quantityDelivered || existingMaterial.quantityPurchased || existingMaterial.quantity;
+              const actualQty = actualQuantityReceived !== undefined && actualQuantityReceived !== null 
+                ? parseFloat(actualQuantityReceived) 
+                : null;
+
+              const verificationSMS = generateMaterialVerificationSMS({
+                purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
+                materialName: existingMaterial.name || existingMaterial.materialName,
+                issueType: verificationIssueType,
+                issueDescription: verificationIssueDescription,
+                expectedQuantity: expectedQty,
+                actualQuantity: actualQty,
+                actionRequired: 'Please contact us to resolve this issue',
+                contactPhone: null, // Could add PM/OWNER contact
+                supplier: supplier
+              });
+
+              await sendSMS({
+                to: formattedPhone,
+                message: verificationSMS,
+              });
+
+              console.log(`[Verify Receipt] Verification issue SMS sent to ${formattedPhone} for ${purchaseOrder.purchaseOrderNumber}`);
+            } catch (smsError) {
+              console.error('[Verify Receipt] Failed to send verification issue SMS:', smsError);
+              // Don't fail the verification if SMS fails
+            }
+          }
+        }
+      }
+    }
+
     // Create audit log
     await createAuditLog({
       userId: userProfile._id.toString(),
@@ -179,6 +248,9 @@ export async function POST(request, { params }) {
           userId: userProfile._id.toString(),
           name: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
         },
+        hasIssue: hasIssue || quantityIssue,
+        issueType: issueType || (quantityIssue ? 'quantity' : null),
+        issueDescription: issueDescription || quantityIssueDescription,
       },
     });
 
@@ -186,14 +258,20 @@ export async function POST(request, { params }) {
       {
         material: updatedMaterial,
         purchaseOrderUpdated: !!existingMaterial.purchaseOrderId,
+        issueReported: hasIssue || quantityIssue,
       },
-      'Material receipt verified successfully'
+      'Material receipt verified successfully' + (hasIssue || quantityIssue ? ' (issue reported to supplier)' : '')
     );
   } catch (error) {
     console.error('Verify receipt error:', error);
     return errorResponse('Failed to verify material receipt', 500);
   }
 }
+
+
+
+
+
 
 
 

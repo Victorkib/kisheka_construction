@@ -267,8 +267,14 @@ export async function POST(request) {
       return errorResponse('Quantity ordered must be greater than 0', 400);
     }
 
-    if (unitCost === undefined || unitCost < 0) {
-      return errorResponse('Unit cost must be >= 0', 400);
+    // CRITICAL FIX: Prevent zero unit cost - this causes data loss in material creation
+    if (unitCost === undefined || unitCost === null || isNaN(parseFloat(unitCost)) || parseFloat(unitCost) <= 0) {
+      return errorResponse(
+        'Unit cost is required and must be greater than 0. ' +
+        'Please provide a valid unit cost. ' +
+        'If the material request does not have an estimated unit cost, you must provide one when creating the purchase order.',
+        400
+      );
     }
 
     if (!deliveryDate) {
@@ -640,7 +646,7 @@ export async function POST(request) {
     if (supplier.smsEnabled && supplier.phone) {
       try {
         const formattedPhone = formatPhoneNumber(supplier.phone);
-        const smsMessage = generatePurchaseOrderSMS({
+        const smsMessage = await generatePurchaseOrderSMS({
           purchaseOrderNumber,
           materialName: materialRequest.materialName,
           quantity: quantityOrdered,
@@ -648,7 +654,10 @@ export async function POST(request) {
           totalCost,
           shortLink,
           deliveryDate: deliveryDateObj,
-          unitCost: parseFloat(unitCost)
+          unitCost: parseFloat(unitCost),
+          supplier: supplier, // Pass supplier for language detection
+          projectId: projectId?.toString() || null, // Pass projectId for personalization
+          enablePersonalization: true
         });
 
         const smsResult = await sendSMS({

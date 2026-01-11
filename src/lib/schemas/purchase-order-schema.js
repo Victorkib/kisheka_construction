@@ -187,7 +187,7 @@ export const PURCHASE_ORDER_VALIDATION = {
   unitCost: {
     required: true,
     type: 'number',
-    min: 0,
+    min: 0.01, // CRITICAL FIX: Require unitCost > 0 to prevent data loss
   },
   totalCost: {
     required: true,
@@ -259,8 +259,9 @@ export function validatePurchaseOrder(data) {
   if (!data.quantityOrdered || data.quantityOrdered <= 0) {
     errors.push('quantityOrdered is required and must be greater than 0');
   }
-  if (data.unitCost === undefined || data.unitCost < 0) {
-    errors.push('unitCost is required and must be >= 0');
+  // CRITICAL FIX: Require unitCost > 0 to prevent data loss in material creation
+  if (data.unitCost === undefined || data.unitCost === null || isNaN(parseFloat(data.unitCost)) || parseFloat(data.unitCost) <= 0) {
+    errors.push('unitCost is required and must be greater than 0');
   }
   if (data.totalCost === undefined || data.totalCost < 0) {
     errors.push('totalCost is required and must be >= 0');

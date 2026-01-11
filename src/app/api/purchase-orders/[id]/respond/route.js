@@ -93,7 +93,31 @@ export async function POST(request, { params }) {
       return errorResponse(`Cannot respond to order with status: ${purchaseOrder.status}`, 400);
     }
 
-    // Handle partial responses for bulk orders
+    // CRITICAL FIX: Bulk orders MUST use handlePartialResponse
+    // Prevent bulk orders from using single-order handler to avoid data corruption
+    if (purchaseOrder.isBulkOrder) {
+      // Check if this is a proper bulk order response
+      if (!isPartialResponse || !materialResponses || !Array.isArray(materialResponses) || materialResponses.length === 0) {
+        return errorResponse(
+          'Bulk orders require material-level responses. ' +
+          'Please use the bulk order response interface to respond to individual materials. ' +
+          'Each material must be accepted, rejected, or modified individually.',
+          400
+        );
+      }
+      // Force bulk orders to use handlePartialResponse
+      return await handlePartialResponse({
+        db,
+        purchaseOrder,
+        id,
+        token,
+        materialResponses,
+        supplierNotes,
+        poCreator: await db.collection('users').findOne({ _id: purchaseOrder.createdBy, status: 'active' })
+      });
+    }
+
+    // Handle partial responses for bulk orders (legacy check - should not reach here for bulk orders)
     if (isPartialResponse && materialResponses && Array.isArray(materialResponses) && materialResponses.length > 0) {
       return await handlePartialResponse({
         db,
@@ -106,34 +130,35 @@ export async function POST(request, { params }) {
       });
     }
 
+    // Single order handler (only for non-bulk orders)
+    // CRITICAL FIX: This handler should NEVER process bulk orders
+    // Bulk orders are handled above and redirected to handlePartialResponse
     if (action === 'accept') {
       // Calculate final cost (may differ from original)
       let finalTotalCost = purchaseOrder.totalCost;
       let unitCostToUse = purchaseOrder.unitCost;
 
-      // Handle bulk orders differently
-      if (purchaseOrder.isBulkOrder && purchaseOrder.materials && Array.isArray(purchaseOrder.materials)) {
-        // For bulk orders, if finalUnitCost is provided, we can't apply it to all materials
-        // Instead, we use the original totalCost or recalculate from materials array
-        if (finalUnitCost !== undefined && finalUnitCost >= 0) {
-          // If supplier provides a new unit cost, we need to recalculate from materials
-          // But since different materials have different costs, we'll use a weighted average
-          // For now, we'll keep the original totalCost and log a warning
-          console.warn('[PO Response] Bulk order: finalUnitCost provided but cannot be applied uniformly to all materials. Using original totalCost.');
-          // Keep original totalCost for bulk orders
-          finalTotalCost = purchaseOrder.totalCost;
-        } else {
-          // Use original totalCost
-          finalTotalCost = purchaseOrder.totalCost;
+      // Single material order - can apply finalUnitCost if provided
+      // CRITICAL FIX: Validate unit cost is provided and > 0
+      if (finalUnitCost !== undefined && finalUnitCost !== null) {
+        const parsedUnitCost = parseFloat(finalUnitCost);
+        if (isNaN(parsedUnitCost) || parsedUnitCost <= 0) {
+          return errorResponse(
+            'Invalid unit cost provided. Unit cost must be a positive number greater than 0. ' +
+            'Please provide a valid unit cost when accepting the purchase order.',
+            400
+          );
         }
-        // For bulk orders, unitCost is not applicable (set to 0)
-        unitCostToUse = 0;
-      } else {
-        // Single material order - can apply finalUnitCost if provided
-        if (finalUnitCost !== undefined && finalUnitCost >= 0) {
-          unitCostToUse = parseFloat(finalUnitCost);
-          finalTotalCost = purchaseOrder.quantityOrdered * unitCostToUse;
-        }
+        unitCostToUse = parsedUnitCost;
+        finalTotalCost = purchaseOrder.quantityOrdered * unitCostToUse;
+      } else if (purchaseOrder.unitCost === 0 || purchaseOrder.unitCost === null || purchaseOrder.unitCost === undefined) {
+        // If supplier doesn't provide unit cost and PO has 0 or missing unit cost, require it
+        return errorResponse(
+          'Unit cost is required to accept this purchase order. ' +
+          'The purchase order does not have a valid unit cost. ' +
+          'Please provide the finalUnitCost when accepting the order.',
+          400
+        );
       }
 
       // Validate capital availability
@@ -149,6 +174,25 @@ export async function POST(request, { params }) {
         );
       }
 
+      // CRITICAL FIX: Update materials array for single orders ONLY
+      // This handler should never process bulk orders (they're handled above)
+      // For single orders with materials array (backward compatibility), update with supplier's unit cost
+      let updatedMaterials = purchaseOrder.materials;
+      if (purchaseOrder.materials && Array.isArray(purchaseOrder.materials) && purchaseOrder.materials.length > 0) {
+        // Only update if this is a single order (not bulk)
+        // Bulk orders should never reach this code path
+        if (!purchaseOrder.isBulkOrder) {
+          updatedMaterials = purchaseOrder.materials.map(material => ({
+            ...material,
+            unitCost: unitCostToUse, // Use supplier's actual unit cost
+            quantity: purchaseOrder.actualQuantityDelivered || purchaseOrder.quantityOrdered || material.quantity,
+            totalCost: unitCostToUse * (purchaseOrder.actualQuantityDelivered || purchaseOrder.quantityOrdered || material.quantity || 0)
+          }));
+        }
+        // If somehow a bulk order reaches here, don't update materials array
+        // This should never happen due to the check above, but adding safety check
+      }
+
       // Update order status and invalidate token (one-time use)
       const updateData = {
         status: 'order_accepted',
@@ -160,6 +204,7 @@ export async function POST(request, { params }) {
         financialStatus: 'committed',
         committedAt: new Date(),
         responseTokenUsedAt: new Date(), // Invalidate token - one-time use
+        ...(updatedMaterials && { materials: updatedMaterials }), // Update materials array if it exists
         updatedAt: new Date()
       };
 
@@ -174,6 +219,16 @@ export async function POST(request, { params }) {
         finalTotalCost,
         'add'
       );
+
+      // CRITICAL FIX: Update phase committed costs immediately
+      // This ensures phase financial states are updated right away
+      try {
+        const { updatePhaseCommittedCostsForPO } = await import('@/lib/phase-helpers');
+        await updatePhaseCommittedCostsForPO(purchaseOrder);
+      } catch (phaseError) {
+        console.error('[PO Response] Phase committed cost update failed (non-critical):', phaseError);
+        // Don't fail the request - phase update can be done later
+      }
 
       // Trigger financial recalculation
       await recalculateProjectFinances(purchaseOrder.projectId.toString());
@@ -475,8 +530,18 @@ async function handlePartialResponse({ db, purchaseOrder, id, token, materialRes
         continue;
       }
 
+      // CRITICAL FIX: Validate original material data before processing
       const quantity = material.quantity || material.quantityNeeded || 0;
       const unitCost = material.unitCost || 0;
+      
+      // Validate original material has valid quantity
+      if (quantity <= 0) {
+        throw new Error(
+          `Invalid quantity for material "${material.materialName || material.materialRequestId}": ${quantity}. ` +
+          `Original material data is invalid. Please contact the buyer.`
+        );
+      }
+      
       const materialTotalCost = quantity * unitCost;
 
       const processedResponse = {
@@ -492,9 +557,44 @@ async function handlePartialResponse({ db, purchaseOrder, id, token, materialRes
 
       processedResponses.push(processedResponse);
 
+      // CRITICAL FIX: Validate unit cost for accepted/modified materials
+      if (materialResponse.action === 'accept' || materialResponse.action === 'modify') {
+        // Check if unit cost is available
+        let hasValidUnitCost = false;
+        let finalUnitCost = 0;
+        
+        if (materialResponse.modifications && materialResponse.modifications.unitCost !== undefined && materialResponse.modifications.unitCost !== null) {
+          const parsedUnitCost = parseFloat(materialResponse.modifications.unitCost);
+          if (!isNaN(parsedUnitCost) && parsedUnitCost > 0) {
+            hasValidUnitCost = true;
+            finalUnitCost = parsedUnitCost;
+          }
+        } else if (material.unitCost && material.unitCost > 0) {
+          hasValidUnitCost = true;
+          finalUnitCost = material.unitCost;
+        }
+        
+        // If unit cost is missing or 0, require supplier to provide it
+        if (!hasValidUnitCost) {
+          return errorResponse(
+            `Unit cost is required for material "${material.materialName || material.materialRequestId}". ` +
+            `The material does not have a valid unit cost. ` +
+            `Please provide unitCost in modifications when accepting or modifying this material.`,
+            400
+          );
+        }
+      }
+      
       if (materialResponse.action === 'accept') {
         acceptedMaterials.push(material);
-        totalAcceptedCost += materialTotalCost;
+        // Use unit cost from modifications if provided, otherwise use original
+        const acceptedUnitCost = (materialResponse.modifications && materialResponse.modifications.unitCost !== undefined && materialResponse.modifications.unitCost !== null)
+          ? parseFloat(materialResponse.modifications.unitCost)
+          : (material.unitCost || 0);
+        const acceptedQuantity = (materialResponse.modifications && materialResponse.modifications.quantityOrdered !== undefined && materialResponse.modifications.quantityOrdered !== null)
+          ? parseFloat(materialResponse.modifications.quantityOrdered)
+          : (material.quantity || material.quantityNeeded || 0);
+        totalAcceptedCost += acceptedUnitCost * acceptedQuantity;
       } else if (materialResponse.action === 'reject') {
         rejectedMaterials.push({ ...material, rejectionReason: materialResponse.rejectionReason });
         totalRejectedCost += materialTotalCost;
@@ -521,13 +621,128 @@ async function handlePartialResponse({ db, purchaseOrder, id, token, materialRes
       overallAction = 'modify';
     }
 
-    // Update purchase order with material responses
+    // CRITICAL FIX: Update materials array with actual costs from supplier response
+    // This ensures materials created from PO have correct unitCost and totalCost
+    let updatedMaterials = purchaseOrder.materials || [];
+    if (purchaseOrder.materials && Array.isArray(purchaseOrder.materials) && processedResponses.length > 0) {
+      updatedMaterials = purchaseOrder.materials.map(material => {
+        // Find corresponding response for this material
+        const response = processedResponses.find(
+          r => {
+            const responseId = r.materialRequestId?.toString();
+            const materialId = material.materialRequestId?.toString() || material._id?.toString();
+            return responseId === materialId;
+          }
+        );
+        
+        // If no response or rejected, keep original material data
+        if (!response || response.action === 'reject') {
+          return material;
+        }
+        
+        // For accepted materials: use modifications if provided, otherwise keep original
+        // CRITICAL FIX: Preserve original data when no modifications provided
+        let unitCost = material.unitCost || 0;
+        let quantity = material.quantity || material.quantityNeeded || 0;
+        
+        // Validate original material data exists
+        if (quantity <= 0) {
+          throw new Error(
+            `Invalid quantity for material "${material.materialName || material.materialRequestId}": ${quantity}. ` +
+            `Original material data is invalid. Please contact the buyer.`
+          );
+        }
+        
+        if (response.modifications) {
+          // Apply modifications from supplier response
+          if (response.modifications.unitCost !== undefined && response.modifications.unitCost !== null) {
+            const modifiedUnitCost = parseFloat(response.modifications.unitCost);
+            if (isNaN(modifiedUnitCost) || modifiedUnitCost <= 0) {
+              throw new Error(
+                `Invalid unit cost in modifications for material "${material.materialName || material.materialRequestId}": ${response.modifications.unitCost}. ` +
+                `Unit cost must be a valid positive number.`
+              );
+            }
+            unitCost = modifiedUnitCost;
+          }
+          if (response.modifications.quantityOrdered !== undefined && response.modifications.quantityOrdered !== null) {
+            const modifiedQuantity = parseFloat(response.modifications.quantityOrdered);
+            if (isNaN(modifiedQuantity) || modifiedQuantity <= 0) {
+              throw new Error(
+                `Invalid quantity in modifications for material "${material.materialName || material.materialRequestId}": ${response.modifications.quantityOrdered}. ` +
+                `Quantity must be a valid positive number.`
+              );
+            }
+            quantity = modifiedQuantity;
+          }
+        }
+        
+        // CRITICAL FIX: Validate unitCost is valid after processing
+        // If original unitCost was 0 and no modification provided, this is an error
+        if (unitCost <= 0) {
+          throw new Error(
+            `Invalid unit cost for material "${material.materialName || material.materialRequestId}": ${unitCost}. ` +
+            `Unit cost must be greater than 0. ` +
+            `The original material does not have a valid unit cost. ` +
+            `Please provide unitCost in modifications when accepting or modifying this material.`
+          );
+        }
+        
+        // Recalculate totalCost for this material
+        const totalCost = unitCost * quantity;
+        
+        return {
+          ...material,
+          unitCost: unitCost,
+          quantity: quantity,
+          totalCost: totalCost,
+          // Preserve other fields
+          materialName: material.materialName || material.name,
+          description: material.description || '',
+          unit: material.unit || '',
+          notes: response.notes || material.notes || ''
+        };
+      });
+      
+      // CRITICAL FIX: Validate all updated materials have valid costs, quantities, and consistent totals
+      for (const material of updatedMaterials) {
+        // Validate unitCost
+        if (material.unitCost !== undefined && material.unitCost !== null && material.unitCost <= 0) {
+          throw new Error(
+            `Invalid materials array after update: Material "${material.materialName || material.materialRequestId}" has invalid unitCost: ${material.unitCost}. ` +
+            `All materials must have unitCost > 0.`
+          );
+        }
+        
+        // Validate quantity
+        const materialQuantity = material.quantity || material.quantityNeeded || 0;
+        if (materialQuantity <= 0) {
+          throw new Error(
+            `Invalid materials array after update: Material "${material.materialName || material.materialRequestId}" has invalid quantity: ${materialQuantity}. ` +
+            `All materials must have quantity > 0.`
+          );
+        }
+        
+        // Validate totalCost matches unitCost * quantity (within 0.01 tolerance for floating point)
+        const expectedTotalCost = (material.unitCost || 0) * materialQuantity;
+        const actualTotalCost = material.totalCost || 0;
+        if (Math.abs(actualTotalCost - expectedTotalCost) > 0.01) {
+          throw new Error(
+            `Invalid materials array after update: Material "${material.materialName || material.materialRequestId}" has inconsistent totalCost. ` +
+            `Expected: ${expectedTotalCost.toFixed(2)}, Got: ${actualTotalCost.toFixed(2)}`
+          );
+        }
+      }
+    }
+
+    // Update purchase order with material responses AND updated materials array
     const updateData = {
       status: overallStatus,
       supplierResponse: overallAction,
       supplierResponseDate: new Date(),
       supplierNotes: supplierNotes?.trim() || null,
       materialResponses: processedResponses,
+      materials: updatedMaterials, // CRITICAL: Update materials array with actual costs
       responseTokenUsedAt: new Date(),
       updatedAt: new Date()
     };
@@ -556,6 +771,15 @@ async function handlePartialResponse({ db, purchaseOrder, id, token, materialRes
         totalAcceptedCost,
         'add'
       );
+
+      // CRITICAL FIX: Update phase committed costs immediately
+      try {
+        const { updatePhaseCommittedCostsForPO } = await import('@/lib/phase-helpers');
+        await updatePhaseCommittedCostsForPO({ ...purchaseOrder, ...updateData });
+      } catch (phaseError) {
+        console.error('[PO Partial Response] Phase committed cost update failed (non-critical):', phaseError);
+        // Don't fail the request - phase update can be done later
+      }
     }
 
     await db.collection('purchase_orders').updateOne(
@@ -697,4 +921,3 @@ async function handlePartialResponse({ db, purchaseOrder, id, token, materialRes
     throw error;
   }
 }
-

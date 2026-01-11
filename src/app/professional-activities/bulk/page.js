@@ -200,7 +200,7 @@ function BulkActivityPageContent() {
           <Link href="/professional-activities" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
             ← Back to Professional Activities
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
             Bulk Activity Entry
           </h1>
           <p className="text-gray-600 mt-2">

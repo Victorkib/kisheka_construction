@@ -115,7 +115,7 @@ export default function NewProfessionalFeePage() {
             <p>You do not have permission to create professional fees. Only OWNER, PM, and ACCOUNTANT can create fees.</p>
           </div>
           <Link href="/professional-fees" className="text-blue-600 hover:text-blue-900 underline">
-            ← Back to Professional Fees
+            ← Back to Fees
           </Link>
         </div>
       </AppLayout>
@@ -140,7 +140,7 @@ export default function NewProfessionalFeePage() {
         {/* Header */}
         <div className="mb-8">
           <Link href="/professional-fees" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
-            ← Back to Professional Fees
+            ← Back to Fees
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
             Create Professional Fee

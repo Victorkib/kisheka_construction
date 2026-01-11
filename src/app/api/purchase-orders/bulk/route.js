@@ -16,7 +16,7 @@ import { validateBulkPOCreation, createPOFromSupplierGroup } from '@/lib/helpers
 import { recalculateProjectFinances } from '@/lib/financial-helpers';
 import { withTransaction } from '@/lib/mongodb/transaction-helpers';
 import { sendPurchaseOrderEmail } from '@/lib/email-templates/purchase-order-templates';
-import { sendSMS, generatePurchaseOrderSMS, generateBulkPurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
+import { sendSMS, sendMultipleSMS, generatePurchaseOrderSMS, generateBulkPurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { sendPushToSupplier } from '@/lib/push-service';
 import { generateShortUrl } from '@/lib/generators/url-shortener';
 import { ObjectId } from 'mongodb';
@@ -261,21 +261,28 @@ export async function POST(request) {
             
             // Use detailed bulk order SMS for bulk orders, regular SMS for single orders
             let smsMessage;
+            let isMultiPart = false;
+            
             if (po.isBulkOrder && po.materials && Array.isArray(po.materials) && po.materials.length > 0) {
-              // Bulk order - use detailed message with material breakdown
-              smsMessage = generateBulkPurchaseOrderSMS({
+              // Bulk order - use detailed message with material breakdown (may return array for multi-part)
+              smsMessage = await generateBulkPurchaseOrderSMS({
                 purchaseOrderNumber: po.purchaseOrderNumber,
                 materials: po.materials,
                 totalCost: po.totalCost,
                 shortLink,
-                deliveryDate: po.deliveryDate
+                deliveryDate: po.deliveryDate,
+                enableMultiPart: true,
+                supplier: supplier, // Pass supplier for language detection
+                projectId: po.projectId?.toString() || null,
+                enablePersonalization: true
               });
+              isMultiPart = Array.isArray(smsMessage);
             } else {
               // Single order or fallback - use regular SMS
               const materialSummary = po.materials?.length > 0
                 ? `${po.materials.length} item${po.materials.length > 1 ? 's' : ''}`
                 : po.materialName || 'Materials';
-              smsMessage = generatePurchaseOrderSMS({
+              smsMessage = await generatePurchaseOrderSMS({
                 purchaseOrderNumber: po.purchaseOrderNumber,
                 materialName: materialSummary,
                 quantity: po.quantityOrdered,
@@ -283,21 +290,58 @@ export async function POST(request) {
                 totalCost: po.totalCost,
                 shortLink,
                 deliveryDate: po.deliveryDate,
-                unitCost: po.unitCost || null
+                unitCost: po.unitCost || null,
+                supplier: supplier, // Pass supplier for language detection
+                projectId: po.projectId?.toString() || null,
+                enablePersonalization: true
               });
             }
 
-            const smsResult = await sendSMS({
-              to: formattedPhone,
-              message: smsMessage,
-            });
-            communicationUpdates.push({
-              channel: 'sms',
-              sentAt: new Date(),
-              status: 'sent',
-              messageId: smsResult.messageId || null,
-            });
-            console.log(`[POST /api/purchase-orders/bulk] SMS sent for PO ${po.purchaseOrderNumber}`);
+            let smsResult;
+            if (isMultiPart) {
+              // Send multiple messages for bulk orders with 5+ materials
+              smsResult = await sendMultipleSMS({
+                to: formattedPhone,
+                messages: smsMessage,
+                delayBetweenMessages: 1000
+              });
+              
+              // Store first message ID (or all if needed)
+              communicationUpdates.push({
+                channel: 'sms',
+                sentAt: new Date(),
+                status: smsResult.success ? 'sent' : 'failed',
+                messageId: smsResult.messageIds?.[0] || null,
+                isMultiPart: true,
+                totalParts: smsMessage.length,
+                totalSent: smsResult.totalSent,
+                totalFailed: smsResult.totalFailed,
+                errors: smsResult.errors || []
+              });
+              
+              if (smsResult.success) {
+                console.log(`[POST /api/purchase-orders/bulk] Multi-part SMS sent (${smsResult.totalSent} parts) for PO ${po.purchaseOrderNumber}`);
+              } else {
+                console.warn(`[POST /api/purchase-orders/bulk] Multi-part SMS partially failed (${smsResult.totalSent} sent, ${smsResult.totalFailed} failed) for PO ${po.purchaseOrderNumber}`);
+              }
+            } else {
+              // Single message
+              smsResult = await sendSMS({
+                to: formattedPhone,
+                message: smsMessage,
+              });
+              
+              communicationUpdates.push({
+                channel: 'sms',
+                sentAt: new Date(),
+                status: smsResult.success && !smsResult.skipped ? 'sent' : 'failed',
+                messageId: smsResult.messageId || null,
+              });
+              
+              if (smsResult.success && !smsResult.skipped) {
+                console.log(`[POST /api/purchase-orders/bulk] SMS sent for PO ${po.purchaseOrderNumber}`);
+              }
+            }
           } catch (smsError) {
             console.error(`[POST /api/purchase-orders/bulk] SMS send failed for PO ${po.purchaseOrderNumber}:`, smsError);
             communicationUpdates.push({

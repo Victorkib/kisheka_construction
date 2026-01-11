@@ -24,6 +24,7 @@ export default function StockPage() {
   const toast = useToast();
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
   const [materialRequests, setMaterialRequests] = useState([]); // Track existing requests
   const [filters, setFilters] = useState({
@@ -141,9 +142,13 @@ export default function StockPage() {
     }
   };
 
-  const fetchStockData = async () => {
+  const fetchStockData = async (isRefresh = false) => {
     try {
-      setLoading(true);
+      if (isRefresh) {
+        setRefreshing(true);
+      } else {
+        setLoading(true);
+      }
       setError(null);
 
       // Build query with pagination
@@ -248,12 +253,29 @@ export default function StockPage() {
         pendingDelivery,
         pendingApproval,
       });
+
+      // Show success toast on refresh
+      if (isRefresh) {
+        toast.showSuccess('Stock data refreshed successfully');
+      }
     } catch (err) {
       setError(err.message);
       console.error('Fetch stock error:', err);
+      if (isRefresh) {
+        toast.showError('Failed to refresh stock data');
+      }
     } finally {
-      setLoading(false);
+      if (isRefresh) {
+        setRefreshing(false);
+      } else {
+        setLoading(false);
+      }
     }
+  };
+
+  const handleRefresh = async () => {
+    await fetchStockData(true);
+    await fetchMaterialRequests();
   };
 
   const fetchMaterialRequests = async () => {
@@ -445,8 +467,26 @@ export default function StockPage() {
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Stock Tracking</h1>
             <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Monitor inventory levels and track wastage</p>
           </div>
-          {canAccess('create_bulk_material_request') && summary.lowStockCount > 0 && (
-            <div className="flex flex-col items-end gap-2">
+          <div className="flex flex-col items-end gap-2">
+            {/* Refresh button - available to all users */}
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing || loading}
+              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+              title="Refresh stock data"
+            >
+              {refreshing ? (
+                <>
+                  <span className="animate-spin">⟳</span> Refreshing...
+                </>
+              ) : (
+                <>
+                  ⟳ Refresh
+                </>
+              )}
+            </button>
+            {canAccess('create_bulk_material_request') && summary.lowStockCount > 0 && (
+              <>
               <select
                 value={selectedProjectId}
                 onChange={(e) => setSelectedProjectId(e.target.value)}
@@ -468,8 +508,9 @@ export default function StockPage() {
               >
                 📦 Auto-Create Bulk Request from Low Stock
               </LoadingButton>
-            </div>
-          )}
+              </>
+            )}
+          </div>
         </div>
 
         {/* Summary Cards */}

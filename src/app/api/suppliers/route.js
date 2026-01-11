@@ -139,6 +139,7 @@ export async function POST(request) {
       emailEnabled,
       smsEnabled,
       pushNotificationsEnabled,
+      languagePreference, // 'en', 'sw', or 'both' - defaults to 'en'
       specialties,
       rating,
       notes,
@@ -191,6 +192,7 @@ export async function POST(request) {
       emailEnabled: emailEnabled !== false, // Default to true
       smsEnabled: smsEnabled !== false, // Default to true
       pushNotificationsEnabled: pushNotificationsEnabled !== false, // Default to true
+      languagePreference: languagePreference && ['en', 'sw', 'both'].includes(languagePreference) ? languagePreference : 'en', // Default to English
       specialties: Array.isArray(specialties) ? specialties : [],
       rating: rating || null,
       notes: notes?.trim() || null,

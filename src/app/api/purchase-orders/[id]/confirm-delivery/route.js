@@ -16,6 +16,7 @@ import { hasPermission } from '@/lib/role-helpers';
 import { createMaterialFromPurchaseOrder } from '@/lib/material-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotifications } from '@/lib/notifications';
+import { sendSMS, generateDeliveryConfirmationSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
@@ -57,11 +58,14 @@ export async function POST(request, { params }) {
     }
 
     const body = await request.json();
-    const { deliveryNoteFileUrl, actualQuantityDelivered, actualUnitCost, notes, materialQuantities } = body || {};
+    const { deliveryNoteFileUrl, actualQuantityDelivered, actualUnitCost, notes, materialQuantities, materialUnitCosts } = body || {};
     
     // materialQuantities: Array of { materialRequestId: string, quantity: number } for bulk orders
     // If materialQuantities is provided, it overrides actualQuantityDelivered for bulk orders
     // For single orders, actualQuantityDelivered is used
+    // materialUnitCosts: Array of { materialRequestId: string, unitCost: number } for bulk orders
+    // If materialUnitCosts is provided, it overrides actualUnitCost for bulk orders (per-material)
+    // For single orders, actualUnitCost is used
 
     // Validate delivery note is provided
     if (!deliveryNoteFileUrl || deliveryNoteFileUrl.trim().length === 0) {
@@ -169,6 +173,20 @@ export async function POST(request, { params }) {
         });
       }
 
+      // Prepare per-material unit costs if provided (for bulk orders)
+      let materialUnitCostsMap = null;
+      if (materialUnitCosts && Array.isArray(materialUnitCosts) && materialUnitCosts.length > 0) {
+        materialUnitCostsMap = {};
+        materialUnitCosts.forEach((muc) => {
+          if (muc.materialRequestId && muc.unitCost !== undefined && muc.unitCost !== null) {
+            const cost = parseFloat(muc.unitCost);
+            if (!isNaN(cost) && cost > 0) {
+              materialUnitCostsMap[muc.materialRequestId] = cost;
+            }
+          }
+        });
+      }
+
       materialCreationResult = await createMaterialFromPurchaseOrder({
         purchaseOrderId: id,
         creatorUserProfile: userProfile,
@@ -179,6 +197,7 @@ export async function POST(request, { params }) {
           ? parseFloat(actualUnitCost) 
           : undefined,
         materialQuantities: materialQuantitiesMap, // Per-material quantities for bulk orders
+        materialUnitCosts: materialUnitCostsMap, // Per-material unit costs for bulk orders
         notes: notes && notes.trim() 
           ? notes.trim() 
           : 'Delivery confirmed by Owner/PM',
@@ -254,6 +273,53 @@ export async function POST(request, { params }) {
     } catch (notifError) {
       console.error('Error creating notifications (non-critical):', notifError);
       // Don't fail the request if notifications fail
+    }
+
+    // Send SMS to supplier about delivery confirmation
+    try {
+      const supplier = await db.collection('suppliers').findOne({
+        _id: purchaseOrder.supplierId,
+        status: 'active'
+      });
+
+      if (supplier && supplier.smsEnabled && supplier.phone) {
+        const formattedPhone = formatPhoneNumber(supplier.phone);
+        
+        // Get material details for SMS
+        let materialName = purchaseOrder.materialName || 'Materials';
+        let quantityReceived = actualQuantityDelivered || purchaseOrder.quantityOrdered;
+        let unit = purchaseOrder.unit || '';
+        
+        // For bulk orders, summarize materials
+        if (purchaseOrder.isBulkOrder && purchaseOrder.materials && Array.isArray(purchaseOrder.materials)) {
+          const materialCount = purchaseOrder.materials.length;
+          materialName = `${materialCount} material${materialCount > 1 ? 's' : ''}`;
+          // Sum up quantities if materialQuantities provided
+          if (materialQuantities && Array.isArray(materialQuantities)) {
+            quantityReceived = materialQuantities.reduce((sum, mq) => sum + (mq.quantity || 0), 0);
+          }
+        }
+        
+        const smsMessage = generateDeliveryConfirmationSMS({
+          purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
+          materialName: materialName,
+          quantityReceived: quantityReceived,
+          unit: unit,
+          deliveryDate: new Date(),
+          status: 'approved',
+          supplier: supplier // Pass supplier for language detection
+        });
+
+        await sendSMS({
+          to: formattedPhone,
+          message: smsMessage
+        });
+
+        console.log(`[Confirm Delivery] SMS sent to supplier for PO ${purchaseOrder.purchaseOrderNumber}`);
+      }
+    } catch (smsError) {
+      console.error('[Confirm Delivery] SMS send failed (non-critical):', smsError);
+      // Don't fail the request if SMS fails
     }
 
     // Create audit log

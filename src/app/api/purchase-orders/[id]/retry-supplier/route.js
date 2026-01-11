@@ -13,7 +13,7 @@ import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotifications } from '@/lib/notifications';
 import { sendPurchaseOrderEmail } from '@/lib/email-templates/purchase-order-templates';
-import { sendSMS, generatePurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
+import { sendSMS, generatePurchaseOrderSMS, generateRetryOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { sendPushToSupplier } from '@/lib/push-service';
 import { generateShortUrl } from '@/lib/generators/url-shortener';
 import { ObjectId } from 'mongodb';
@@ -221,15 +221,26 @@ export async function POST(request, { params }) {
               result.error = 'SMS not enabled or no phone number';
             } else {
               const formattedPhone = formatPhoneNumber(supplier.phone);
-              const smsMessage = generatePurchaseOrderSMS({
+              
+              // Use retry order SMS with context
+              const adjustments = {};
+              if (retryOrderData.unitCost !== purchaseOrder.unitCost) {
+                adjustments.unitCost = retryOrderData.unitCost;
+              }
+              if (retryOrderData.quantityOrdered !== purchaseOrder.quantityOrdered) {
+                adjustments.quantityOrdered = retryOrderData.quantityOrdered;
+              }
+              if (retryOrderData.deliveryDate && purchaseOrder.deliveryDate && 
+                  new Date(retryOrderData.deliveryDate).getTime() !== new Date(purchaseOrder.deliveryDate).getTime()) {
+                adjustments.deliveryDate = retryOrderData.deliveryDate;
+              }
+              
+              const smsMessage = generateRetryOrderSMS({
                 purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
-                materialName: materialRequest.materialName,
-                quantity: retryOrderData.quantityOrdered,
-                unit: materialRequest.unit,
-                totalCost: retryOrderData.totalCost,
-                shortLink,
-                isRetry: true,
-                retryCount: currentRetryCount + 1,
+                originalPONumber: purchaseOrder.purchaseOrderNumber,
+                rejectionReason: purchaseOrder.rejectionReason || purchaseOrder.rejectionSubcategory || 'Not specified',
+                adjustments: Object.keys(adjustments).length > 0 ? adjustments : null,
+                supplier: supplier // Pass supplier for language detection
               });
 
               const smsResult = await sendSMS({

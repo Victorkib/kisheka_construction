@@ -79,9 +79,26 @@ export async function POST(request, { params }) {
     let finalTotalCost = purchaseOrder.totalCost;
     let unitCostToUse = purchaseOrder.unitCost;
 
-    if (finalUnitCost !== undefined && finalUnitCost >= 0) {
-      unitCostToUse = parseFloat(finalUnitCost);
+    // CRITICAL FIX: Validate unit cost is provided and > 0
+    if (finalUnitCost !== undefined && finalUnitCost !== null) {
+      const parsedUnitCost = parseFloat(finalUnitCost);
+      if (isNaN(parsedUnitCost) || parsedUnitCost <= 0) {
+        return errorResponse(
+          'Invalid unit cost provided. Unit cost must be a positive number greater than 0. ' +
+          'Please provide a valid unit cost when accepting the purchase order.',
+          400
+        );
+      }
+      unitCostToUse = parsedUnitCost;
       finalTotalCost = purchaseOrder.quantityOrdered * unitCostToUse;
+    } else if (purchaseOrder.unitCost === 0 || purchaseOrder.unitCost === null || purchaseOrder.unitCost === undefined) {
+      // If supplier doesn't provide unit cost and PO has 0 or missing unit cost, require it
+      return errorResponse(
+        'Unit cost is required to accept this purchase order. ' +
+        'The purchase order does not have a valid unit cost. ' +
+        'Please provide the finalUnitCost when accepting the order.',
+        400
+      );
     }
 
     // CRITICAL: Validate capital availability before accepting
@@ -129,6 +146,9 @@ export async function POST(request, { params }) {
         session
       );
 
+      // Note: Phase committed cost update happens outside transaction (non-critical)
+      // It will be called after transaction completes
+
       // 3. Create audit log (atomic with above)
       await createAuditLog({
         userId: userProfile._id.toString(),
@@ -159,6 +179,15 @@ export async function POST(request, { params }) {
     });
 
     // Non-critical operations (can fail without affecting core data)
+    // CRITICAL FIX: Update phase committed costs immediately
+    try {
+      const { updatePhaseCommittedCostsForPO } = await import('@/lib/phase-helpers');
+      await updatePhaseCommittedCostsForPO(updatedOrder || purchaseOrder);
+    } catch (phaseError) {
+      console.error('[POST /api/purchase-orders/[id]/accept] Phase committed cost update failed (non-critical):', phaseError);
+      // Don't fail the request - phase update can be done later
+    }
+
     // Trigger financial recalculation (read-heavy, can happen outside transaction)
     try {
       await recalculateProjectFinances(purchaseOrder.projectId.toString());

@@ -79,7 +79,12 @@ export async function PATCH(request, { params }) {
 
     const hasEditPermission = await hasPermission(user.id, 'edit_work_item');
     if (!hasEditPermission) {
-      return errorResponse('Insufficient permissions. Only PM and OWNER can edit work items.', 403);
+      // Fallback to role check for backward compatibility and safety
+      const userRole = userProfile.role?.toLowerCase();
+      const allowedRoles = ['owner', 'pm', 'project_manager'];
+      if (!allowedRoles.includes(userRole)) {
+        return errorResponse('Insufficient permissions. Only PM and OWNER can edit work items.', 403);
+      }
     }
 
     const { id } = await params;

@@ -95,7 +95,7 @@ function EditProfessionalServicesLibraryPageContent() {
             <p>You do not have permission to manage the professional services library. Only Owners can edit professionals.</p>
           </div>
           <Link href="/professional-services-library" className="text-blue-600 hover:text-blue-900 underline">
-            ← Back to Professional Services Library
+            ← Back to Library
           </Link>
         </div>
       </AppLayout>
@@ -123,7 +123,7 @@ function EditProfessionalServicesLibraryPageContent() {
             <p>{error}</p>
           </div>
           <Link href="/professional-services-library" className="text-blue-600 hover:text-blue-900 underline">
-            ← Back to Professional Services Library
+            ← Back to Library
           </Link>
         </div>
       </AppLayout>
@@ -136,7 +136,7 @@ function EditProfessionalServicesLibraryPageContent() {
         {/* Header */}
         <div className="mb-8">
           <Link href="/professional-services-library" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
-            ← Back to Professional Services Library
+            ← Back to Library
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
             Edit Professional

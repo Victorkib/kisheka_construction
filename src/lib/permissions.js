@@ -230,6 +230,30 @@ export const PERMISSIONS = {
   delete_activity_template: [ROLES.OWNER],
   use_activity_template: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK],
   validate_activity_template: [ROLES.OWNER],
+
+  // ============================================
+  // Work Items Permissions
+  // ============================================
+  create_work_item: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
+  edit_work_item: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
+  delete_work_item: [ROLES.OWNER],
+  view_work_items: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Equipment Permissions
+  // ============================================
+  create_equipment: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
+  edit_equipment: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
+  delete_equipment: [ROLES.OWNER],
+  view_equipment: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Subcontractor Permissions
+  // ============================================
+  create_subcontractor: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
+  edit_subcontractor: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
+  delete_subcontractor: [ROLES.OWNER],
+  view_subcontractors: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
 };
 
 /**
@@ -434,6 +458,24 @@ export const PERMISSION_CATEGORIES = {
     'delete_activity_template',
     'use_activity_template',
     'validate_activity_template',
+  ],
+  WORK_ITEMS: [
+    'create_work_item',
+    'edit_work_item',
+    'delete_work_item',
+    'view_work_items',
+  ],
+  EQUIPMENT: [
+    'create_equipment',
+    'edit_equipment',
+    'delete_equipment',
+    'view_equipment',
+  ],
+  SUBCONTRACTORS: [
+    'create_subcontractor',
+    'edit_subcontractor',
+    'delete_subcontractor',
+    'view_subcontractors',
   ],
 };
 

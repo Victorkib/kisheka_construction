@@ -142,19 +142,52 @@ export async function createPOFromSupplierGroup(supplierGroup, batchId, userProf
 
   // Calculate totals
   let totalCost = 0;
-  const materials = materialRequests.map((req) => {
+  const materials = [];
+  const warnings = [];
+  
+  for (const req of materialRequests) {
     // Check for override in materialOverrides
     const override = supplierGroup.materialOverrides?.find(
       (o) => o.materialRequestId?.toString() === req._id.toString()
     );
 
-    const unitCost = override?.unitCost !== undefined ? parseFloat(override.unitCost) : parseFloat(req.estimatedUnitCost || 0);
+    // CRITICAL: Get unitCost with proper fallback
+    // Priority: override.unitCost > req.estimatedUnitCost > 0 (with warning)
+    let unitCost = 0;
+    if (override?.unitCost !== undefined && override.unitCost !== null) {
+      unitCost = parseFloat(override.unitCost);
+    } else if (req.estimatedUnitCost !== undefined && req.estimatedUnitCost !== null) {
+      unitCost = parseFloat(req.estimatedUnitCost);
+    }
+    
+    // Validate unitCost - CRITICAL: Prevent zero unit cost
+    if (isNaN(unitCost) || unitCost < 0) {
+      throw new Error(
+        `Invalid unit cost for material "${req.materialName}". ` +
+        `Unit cost must be a valid positive number. ` +
+        `Please provide unitCost in materialOverrides or ensure estimatedUnitCost is set in material request.`
+      );
+    }
+    
+    // CRITICAL FIX: Prevent zero unit cost - this causes data loss in material creation
+    if (unitCost === 0) {
+      throw new Error(
+        `Cannot create purchase order: Material "${req.materialName}" has unit cost of 0. ` +
+        `Unit cost is required to create a purchase order. ` +
+        `Please provide unitCost in materialOverrides (for this supplier) or set estimatedUnitCost in the material request. ` +
+        `Material Request ID: ${req._id}, Request Number: ${req.requestNumber || 'N/A'}`
+      );
+    }
+    
     const quantity = parseFloat(req.quantityNeeded);
+    if (isNaN(quantity) || quantity <= 0) {
+      throw new Error(`Invalid quantity for material "${req.materialName}": ${req.quantityNeeded}`);
+    }
+    
     const materialCost = unitCost * quantity;
-
     totalCost += materialCost;
 
-    return {
+    materials.push({
       materialRequestId: req._id,
       materialName: req.materialName,
       description: req.description || '',
@@ -163,8 +196,38 @@ export async function createPOFromSupplierGroup(supplierGroup, batchId, userProf
       unitCost: unitCost,
       totalCost: materialCost,
       notes: override?.notes || '',
-    };
-  });
+    });
+  }
+  
+  // CRITICAL FIX: Validate materials array consistency
+  // Ensure all materials have valid unitCost and quantity
+  for (const material of materials) {
+    if (!material.unitCost || material.unitCost <= 0) {
+      throw new Error(
+        `Invalid materials array: Material "${material.materialName}" has invalid unitCost: ${material.unitCost}. ` +
+        `All materials must have unitCost > 0.`
+      );
+    }
+    if (!material.quantity || material.quantity <= 0) {
+      throw new Error(
+        `Invalid materials array: Material "${material.materialName}" has invalid quantity: ${material.quantity}. ` +
+        `All materials must have quantity > 0.`
+      );
+    }
+    // Validate totalCost matches unitCost * quantity
+    const expectedTotalCost = material.unitCost * material.quantity;
+    if (Math.abs(material.totalCost - expectedTotalCost) > 0.01) {
+      throw new Error(
+        `Invalid materials array: Material "${material.materialName}" has inconsistent totalCost. ` +
+        `Expected: ${expectedTotalCost}, Got: ${material.totalCost}`
+      );
+    }
+  }
+  
+  // Log warnings if any
+  if (warnings.length > 0) {
+    console.warn('[createPOFromSupplierGroup] Warnings:', warnings);
+  }
 
   // Validate capital availability
   const capitalValidation = await validateCapitalAvailability(batch.projectId.toString(), totalCost);

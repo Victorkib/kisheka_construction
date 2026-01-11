@@ -13,6 +13,87 @@ import { calculatePhaseSubcontractorCost, calculatePhaseSubcontractorCommittedCo
 import { calculatePhaseCompletionFromWorkItems } from '@/lib/work-item-helpers';
 
 /**
+ * Get all phase IDs affected by a purchase order
+ * Used to update phase committed costs after PO acceptance/rejection
+ * @param {Object} purchaseOrder - Purchase order document
+ * @returns {Promise<Array<string>>} Array of phase IDs
+ */
+export async function getPhaseIdsFromPurchaseOrder(purchaseOrder) {
+  const db = await getDatabase();
+  const phaseIds = new Set();
+  
+  // Strategy 1: PO has phaseId directly
+  if (purchaseOrder.phaseId && ObjectId.isValid(purchaseOrder.phaseId)) {
+    phaseIds.add(purchaseOrder.phaseId.toString());
+  }
+  
+  // Strategy 2: Get phaseId from material requests
+  if (purchaseOrder.isBulkOrder && purchaseOrder.materialRequestIds && Array.isArray(purchaseOrder.materialRequestIds)) {
+    // Bulk order: get phaseIds from all material requests
+    const materialRequests = await db.collection('material_requests').find({
+      _id: { $in: purchaseOrder.materialRequestIds.map(id => new ObjectId(id)) },
+      deletedAt: null
+    }).toArray();
+    
+    for (const req of materialRequests) {
+      if (req.phaseId && ObjectId.isValid(req.phaseId)) {
+        phaseIds.add(req.phaseId.toString());
+      }
+    }
+  } else if (purchaseOrder.materialRequestId && ObjectId.isValid(purchaseOrder.materialRequestId)) {
+    // Single order: get phaseId from material request
+    const materialRequest = await db.collection('material_requests').findOne({
+      _id: purchaseOrder.materialRequestId,
+      deletedAt: null
+    });
+    
+    if (materialRequest?.phaseId && ObjectId.isValid(materialRequest.phaseId)) {
+      phaseIds.add(materialRequest.phaseId.toString());
+    }
+  }
+  
+  return Array.from(phaseIds);
+}
+
+/**
+ * Update phase committed costs for all phases affected by a purchase order
+ * This should be called after updateCommittedCost() to keep phase financials in sync
+ * @param {Object} purchaseOrder - Purchase order document
+ * @returns {Promise<void>}
+ */
+export async function updatePhaseCommittedCostsForPO(purchaseOrder) {
+  try {
+    // Edge case: If purchaseOrder is null or undefined, skip
+    if (!purchaseOrder) {
+      console.warn('[updatePhaseCommittedCostsForPO] Purchase order is null or undefined, skipping phase update');
+      return;
+    }
+
+    const phaseIds = await getPhaseIdsFromPurchaseOrder(purchaseOrder);
+    
+    // Edge case: If no phaseIds found, log but don't error (PO might not have phaseId yet)
+    if (phaseIds.length === 0) {
+      console.warn(`[updatePhaseCommittedCostsForPO] No phase IDs found for PO ${purchaseOrder._id || purchaseOrder.purchaseOrderNumber || 'unknown'}. PO may not have phaseId set.`);
+      return;
+    }
+    
+    // Recalculate spending for each affected phase
+    // This updates committed cost, actual spending, and remaining budget
+    await Promise.all(
+      phaseIds.map(phaseId =>
+        recalculatePhaseSpending(phaseId).catch((error) => {
+          console.error(`[updatePhaseCommittedCostsForPO] Phase recalculation failed for phase ${phaseId}:`, error);
+          // Don't throw - continue with other phases
+        })
+      )
+    );
+  } catch (error) {
+    console.error('[updatePhaseCommittedCostsForPO] Error updating phase committed costs:', error);
+    // Don't throw - this is non-critical for PO acceptance
+  }
+}
+
+/**
  * Initialize default phases for a project
  * @param {string} projectId - Project ID
  * @param {Object} project - Project object (optional, will fetch if not provided)
@@ -450,23 +531,43 @@ export async function calculatePhaseCommittedCost(phaseId) {
           deletedAt: null
         }).toArray();
         
-        // Check if any of these requests have this phaseId or materials with this phaseId
-        const hasPhaseRequests = materialRequests.some(req => 
+        // Check if any of these requests have this phaseId
+        const phaseRequests = materialRequests.filter(req => 
           req.phaseId && req.phaseId.toString() === phaseId
         );
         
-        const hasPhaseMaterials = await db.collection('materials').countDocuments({
-          materialRequestId: { $in: materialRequests.map(req => req._id) },
-          phaseId: new ObjectId(phaseId),
-          deletedAt: null,
-          status: { $in: MATERIAL_APPROVED_STATUSES }
-        });
+        // If no requests for this phase, skip
+        if (phaseRequests.length === 0) {
+          continue;
+        }
         
-        // If requests have this phaseId or materials exist for this phase, include in committed cost
-        if (hasPhaseRequests || hasPhaseMaterials === 0) {
-          // For bulk orders, we'll include the full PO cost if it relates to this phase
-          // This is a conservative approach - ideally we'd calculate the phase's portion
-          committedCost += po.totalCost || 0;
+        // CRITICAL FIX: Calculate phase portion of committed cost
+        // For bulk orders, split cost proportionally based on material costs per phase
+        if (po.materials && Array.isArray(po.materials) && po.materials.length > 0) {
+          // Calculate total cost for materials in this phase
+          let phaseCost = 0;
+          for (const material of po.materials) {
+            // Find corresponding material request
+            const materialRequest = materialRequests.find(req => 
+              req._id.toString() === (material.materialRequestId?.toString() || material._id?.toString())
+            );
+            
+            // If this material belongs to this phase, add its cost
+            if (materialRequest && materialRequest.phaseId && materialRequest.phaseId.toString() === phaseId) {
+              const materialTotalCost = (material.totalCost || 0) || 
+                                       ((material.unitCost || 0) * (material.quantity || 0));
+              phaseCost += materialTotalCost;
+            }
+          }
+          
+          // Add phase portion to committed cost
+          committedCost += phaseCost;
+        } else {
+          // Fallback: If materials array not available, use proportional allocation
+          // This is less accurate but better than including full cost
+          const phaseProportion = phaseRequests.length / materialRequests.length;
+          const estimatedPhaseCost = (po.totalCost || 0) * phaseProportion;
+          committedCost += estimatedPhaseCost;
         }
       } else {
         // Single order - check if material request has this phaseId

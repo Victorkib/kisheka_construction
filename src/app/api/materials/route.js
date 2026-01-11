@@ -430,8 +430,18 @@ export async function POST(request) {
       return errorResponse('Quantity must be greater than 0', 400);
     }
 
-    // For retroactive entries, unitCost is optional
-    if (materialEntryType === 'new_procurement' && (!unitCost || unitCost < 0)) {
+    // CRITICAL FIX: Validate unitCost based on entry type
+    // For new_procurement entries, unitCost must be > 0
+    // For retroactive entries, allow 0 or missing (will be marked as 'missing' cost status)
+    if (materialEntryType === 'new_procurement') {
+      if (unitCost === undefined || unitCost === null || isNaN(parseFloat(unitCost)) || parseFloat(unitCost) <= 0) {
+        return errorResponse(
+          'Unit cost is required and must be greater than 0 for new procurement entries. ' +
+          'Please provide a valid unit cost when creating the material.',
+          400
+        );
+      }
+    } else if (unitCost !== undefined && unitCost !== null && unitCost < 0) {
       return errorResponse('Unit cost must be non-negative', 400);
     }
     // For retroactive, allow missing unitCost (will be 0)

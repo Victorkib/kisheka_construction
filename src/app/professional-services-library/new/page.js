@@ -66,7 +66,7 @@ export default function NewProfessionalServicesLibraryPage() {
             <p>You do not have permission to manage the professional services library. Only Owners can add professionals.</p>
           </div>
           <Link href="/professional-services-library" className="text-blue-600 hover:text-blue-900 underline">
-            ← Back to Professional Services Library
+            ← Back to Library
           </Link>
         </div>
       </AppLayout>
@@ -79,7 +79,7 @@ export default function NewProfessionalServicesLibraryPage() {
         {/* Header */}
         <div className="mb-8">
           <Link href="/professional-services-library" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
-            ← Back to Professional Services Library
+            ← Back to Library
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
             Add New Professional to Library

@@ -13,6 +13,7 @@ import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotifications } from '@/lib/notifications';
 import { sendPushToUser } from '@/lib/push-service';
+import { sendSMS, generateModificationRejectionSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
@@ -150,6 +151,39 @@ export async function POST(request, { params }) {
         });
       } catch (pushError) {
         console.error('Push notification to supplier failed:', pushError);
+      }
+
+      // Send SMS to supplier if enabled
+      try {
+        const supplierProfile = await db.collection('suppliers').findOne({
+          userId: purchaseOrder.supplierId,
+          status: 'active'
+        });
+
+        if (supplierProfile && supplierProfile.smsEnabled && supplierProfile.phone) {
+          const formattedPhone = formatPhoneNumber(supplierProfile.phone);
+          const smsMessage = generateModificationRejectionSMS({
+            purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
+            rejectionReason: rejectionReason.trim(),
+            originalTerms: revertToOriginal ? originalValues : {
+              unitCost: purchaseOrder.unitCost,
+              quantityOrdered: purchaseOrder.quantityOrdered,
+              deliveryDate: purchaseOrder.deliveryDate
+            },
+            alternativeOffer: null, // Can be enhanced later to include alternative offers
+            supplier: supplierProfile // Pass supplier for language detection
+          });
+
+          await sendSMS({
+            to: formattedPhone,
+            message: smsMessage
+          });
+
+          console.log(`[Reject Modification] SMS sent to supplier for PO ${purchaseOrder.purchaseOrderNumber}`);
+        }
+      } catch (smsError) {
+        console.error('[Reject Modification] SMS send failed:', smsError);
+        // Don't fail the request if SMS fails
       }
     }
 

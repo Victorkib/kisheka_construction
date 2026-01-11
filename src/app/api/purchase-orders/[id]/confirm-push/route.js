@@ -82,6 +82,17 @@ export async function POST(request, { params }) {
     }
 
     if (action === 'accept') {
+      // CRITICAL FIX: Validate unit cost before accepting
+      if (!purchaseOrder.isBulkOrder) {
+        if (purchaseOrder.unitCost === 0 || purchaseOrder.unitCost === null || purchaseOrder.unitCost === undefined) {
+          return errorResponse(
+            'Cannot accept purchase order: Unit cost is missing or zero. ' +
+            'Please provide unit cost information when accepting this order.',
+            400
+          );
+        }
+      }
+      
       // Update order status to accepted
       const updateData = {
         status: 'order_accepted',
@@ -106,6 +117,15 @@ export async function POST(request, { params }) {
         purchaseOrder.totalCost,
         'add'
       );
+
+      // CRITICAL FIX: Update phase committed costs immediately
+      try {
+        const { updatePhaseCommittedCostsForPO } = await import('@/lib/phase-helpers');
+        await updatePhaseCommittedCostsForPO(purchaseOrder);
+      } catch (phaseError) {
+        console.error('[Confirm Push] Phase committed cost update failed (non-critical):', phaseError);
+        // Don't fail the request - phase update can be done later
+      }
 
       // Trigger financial recalculation
       await recalculateProjectFinances(purchaseOrder.projectId.toString());

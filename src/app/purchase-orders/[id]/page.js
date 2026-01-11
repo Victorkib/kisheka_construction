@@ -128,6 +128,15 @@ function PurchaseOrderDetailPageContent() {
     actualUnitCost: "",
     notes: "",
     materialQuantities: {}, // For bulk orders: { materialRequestId: quantity }
+    materialUnitCosts: {}, // For bulk orders: { materialRequestId: unitCost }
+  })
+  const [deliveryValidationErrors, setDeliveryValidationErrors] = useState({
+    deliveryNote: null,
+    quantity: null,
+    unitCost: null,
+    materialQuantities: {}, // { materialRequestId: error }
+    materialUnitCosts: {}, // { materialRequestId: error }
+    summary: null, // Overall validation summary
   })
 
   // Check if user has access to purchase orders
@@ -1073,36 +1082,203 @@ function PurchaseOrderDetailPageContent() {
     }
   }
 
-  const handleConfirmDelivery = async () => {
-    // Validate delivery note is provided
-    if (!confirmDeliveryData.deliveryNoteFileUrl.trim()) {
-      toast.showError("Delivery note is required to confirm delivery")
-      return
+  // Validation helper functions
+  const validateNumber = (value, fieldName, min = 0, allowZero = false) => {
+    if (!value && value !== 0) return null // Empty is valid for optional fields
+    const str = String(value).trim()
+    if (str === "") return null // Empty string is valid for optional fields
+    
+    const num = Number.parseFloat(str)
+    if (isNaN(num)) {
+      return `${fieldName} must be a valid number`
+    }
+    if (!isFinite(num)) {
+      return `${fieldName} must be a finite number`
+    }
+    if (num < min) {
+      return `${fieldName} must be ${allowZero ? 'greater than or equal to' : 'greater than'} ${min}`
+    }
+    if (num > 1000000000) { // Reasonable maximum
+      return `${fieldName} is too large (maximum: 1,000,000,000)`
+    }
+    return null
+  }
+
+  const validateDeliveryNote = (url) => {
+    if (!url || !url.trim()) {
+      return "Delivery note is required to confirm delivery"
+    }
+    // Basic URL validation
+    try {
+      new URL(url)
+    } catch {
+      // Not a full URL, might be a path - that's okay for Cloudinary URLs
+      if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+        return "Delivery note must be a valid file URL"
+      }
+    }
+    return null
+  }
+
+  const validateBulkOrderDelivery = () => {
+    const errors = {
+      deliveryNote: null,
+      materialQuantities: {},
+      materialUnitCosts: {},
+      summary: null,
     }
 
+    // Validate delivery note
+    errors.deliveryNote = validateDeliveryNote(confirmDeliveryData.deliveryNoteFileUrl)
+
+    if (!order?.isBulkOrder || !order?.materials || !Array.isArray(order.materials)) {
+      return errors
+    }
+
+    const materialsRequiringUnitCost = []
+    const invalidQuantities = []
+    const invalidUnitCosts = []
+
+    // Validate each material
+    for (const material of order.materials) {
+      const materialRequestId = material.materialRequestId?.toString() || material._id?.toString()
+      const materialName = material.materialName || material.name || 'Unknown Material'
+      const orderedUnitCost = material.unitCost || 0
+      const hasInvalidCost = !orderedUnitCost || orderedUnitCost <= 0
+
+      // Validate quantity if provided
+      const quantity = confirmDeliveryData.materialQuantities?.[materialRequestId]
+      if (quantity !== undefined && quantity !== null && quantity !== "") {
+        const qtyError = validateNumber(quantity, `Quantity for ${materialName}`, 0.01, false)
+        if (qtyError) {
+          errors.materialQuantities[materialRequestId] = qtyError
+          invalidQuantities.push(materialName)
+        }
+      }
+
+      // Validate unit cost
+      const unitCost = confirmDeliveryData.materialUnitCosts?.[materialRequestId]
+      
+      // If material has invalid ordered cost, unit cost is REQUIRED
+      if (hasInvalidCost) {
+        if (!unitCost || unitCost === "" || unitCost === null || unitCost === undefined) {
+          errors.materialUnitCosts[materialRequestId] = `Unit cost is required for ${materialName}`
+          materialsRequiringUnitCost.push(materialName)
+        } else {
+          const costError = validateNumber(unitCost, `Unit cost for ${materialName}`, 0.01, false)
+          if (costError) {
+            errors.materialUnitCosts[materialRequestId] = costError
+            invalidUnitCosts.push(materialName)
+          }
+        }
+      } else {
+        // If provided, must be valid
+        if (unitCost !== undefined && unitCost !== null && unitCost !== "") {
+          const costError = validateNumber(unitCost, `Unit cost for ${materialName}`, 0.01, false)
+          if (costError) {
+            errors.materialUnitCosts[materialRequestId] = costError
+            invalidUnitCosts.push(materialName)
+          }
+        }
+      }
+    }
+
+    // Create summary error if any issues
+    const allErrors = [
+      errors.deliveryNote,
+      ...Object.values(errors.materialQuantities),
+      ...Object.values(errors.materialUnitCosts),
+    ].filter(Boolean)
+
+    if (allErrors.length > 0) {
+      const errorParts = []
+      if (materialsRequiringUnitCost.length > 0) {
+        errorParts.push(`${materialsRequiringUnitCost.length} material(s) require unit costs: ${materialsRequiringUnitCost.slice(0, 3).join(', ')}${materialsRequiringUnitCost.length > 3 ? '...' : ''}`)
+      }
+      if (invalidQuantities.length > 0) {
+        errorParts.push(`Invalid quantities for: ${invalidQuantities.slice(0, 3).join(', ')}${invalidQuantities.length > 3 ? '...' : ''}`)
+      }
+      if (invalidUnitCosts.length > 0) {
+        errorParts.push(`Invalid unit costs for: ${invalidUnitCosts.slice(0, 3).join(', ')}${invalidUnitCosts.length > 3 ? '...' : ''}`)
+      }
+      if (errors.deliveryNote) {
+        errorParts.push(errors.deliveryNote)
+      }
+      errors.summary = errorParts.join('. ')
+    }
+
+    return errors
+  }
+
+  const validateSingleOrderDelivery = () => {
+    const errors = {
+      deliveryNote: null,
+      quantity: null,
+      unitCost: null,
+      summary: null,
+    }
+
+    // Validate delivery note
+    errors.deliveryNote = validateDeliveryNote(confirmDeliveryData.deliveryNoteFileUrl)
+
     // Validate quantity if provided
-    if (
-      confirmDeliveryData.actualQuantityDelivered &&
-      Number.parseFloat(confirmDeliveryData.actualQuantityDelivered) <= 0
-    ) {
-      toast.showError("Actual quantity delivered must be greater than 0")
-      return
+    if (confirmDeliveryData.actualQuantityDelivered) {
+      errors.quantity = validateNumber(confirmDeliveryData.actualQuantityDelivered, "Actual quantity delivered", 0.01, false)
     }
 
     // Validate unit cost if provided
-    if (confirmDeliveryData.actualUnitCost && Number.parseFloat(confirmDeliveryData.actualUnitCost) < 0) {
-      toast.showError("Actual unit cost cannot be negative")
-      return
+    if (confirmDeliveryData.actualUnitCost) {
+      errors.unitCost = validateNumber(confirmDeliveryData.actualUnitCost, "Actual unit cost", 0.01, false)
     }
 
-    // Validate per-material quantities if provided (for bulk orders)
-    if (order?.isBulkOrder && confirmDeliveryData.materialQuantities && Object.keys(confirmDeliveryData.materialQuantities).length > 0) {
-      for (const [materialRequestId, quantity] of Object.entries(confirmDeliveryData.materialQuantities)) {
-        if (quantity && Number.parseFloat(quantity) <= 0) {
-          toast.showError(`Quantity for material ${materialRequestId} must be greater than 0`)
-          return
-        }
+    // Create summary
+    const allErrors = [errors.deliveryNote, errors.quantity, errors.unitCost].filter(Boolean)
+    if (allErrors.length > 0) {
+      errors.summary = allErrors[0] // Show first error as summary
+    }
+
+    return errors
+  }
+
+  const handleConfirmDelivery = async () => {
+    // Clear previous validation errors
+    setDeliveryValidationErrors({
+      deliveryNote: null,
+      quantity: null,
+      unitCost: null,
+      materialQuantities: {},
+      materialUnitCosts: {},
+      summary: null,
+    })
+
+    // Run comprehensive validation
+    let validationErrors
+    if (order?.isBulkOrder) {
+      validationErrors = validateBulkOrderDelivery()
+    } else {
+      validationErrors = validateSingleOrderDelivery()
+    }
+
+    // Check if there are any errors
+    const hasErrors = 
+      validationErrors.deliveryNote ||
+      validationErrors.quantity ||
+      validationErrors.unitCost ||
+      Object.keys(validationErrors.materialQuantities || {}).length > 0 ||
+      Object.keys(validationErrors.materialUnitCosts || {}).length > 0 ||
+      validationErrors.summary
+
+    if (hasErrors) {
+      // Set validation errors for display
+      setDeliveryValidationErrors(validationErrors)
+      
+      // Show summary error
+      if (validationErrors.summary) {
+        toast.showError(validationErrors.summary)
+      } else {
+        toast.showError("Please fix the errors before confirming delivery")
       }
+      return
     }
 
     setIsConfirmingDelivery(true)
@@ -1122,6 +1298,21 @@ function PurchaseOrderDetailPageContent() {
           }))
       }
 
+      // Prepare materialUnitCosts array for bulk orders
+      let materialUnitCostsArray = undefined
+      if (order?.isBulkOrder && confirmDeliveryData.materialUnitCosts && Object.keys(confirmDeliveryData.materialUnitCosts).length > 0) {
+        materialUnitCostsArray = Object.entries(confirmDeliveryData.materialUnitCosts)
+          .filter(([_, unitCost]) => {
+            if (!unitCost) return false
+            const costStr = typeof unitCost === 'string' ? unitCost.trim() : String(unitCost).trim()
+            return costStr !== "" && !isNaN(Number.parseFloat(costStr)) && Number.parseFloat(costStr) > 0
+          })
+          .map(([materialRequestId, unitCost]) => ({
+            materialRequestId,
+            unitCost: Number.parseFloat(unitCost),
+          }))
+      }
+
       const response = await fetch(`/api/purchase-orders/${orderId}/confirm-delivery`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1134,6 +1325,7 @@ function PurchaseOrderDetailPageContent() {
             ? Number.parseFloat(confirmDeliveryData.actualUnitCost)
             : undefined,
           materialQuantities: materialQuantitiesArray, // Per-material quantities for bulk orders
+          materialUnitCosts: materialUnitCostsArray, // Per-material unit costs for bulk orders
           notes: confirmDeliveryData.notes.trim() || undefined,
         }),
       })
@@ -1152,6 +1344,7 @@ function PurchaseOrderDetailPageContent() {
         actualUnitCost: order.unitCost?.toString() || "",
         notes: "",
         materialQuantities: {},
+        materialUnitCosts: {},
       })
       toast.showSuccess("Delivery confirmed! Material entries have been created automatically.")
 
@@ -2475,6 +2668,16 @@ function PurchaseOrderDetailPageContent() {
               actualUnitCost: order.unitCost?.toString() || "",
               notes: "",
               materialQuantities: {},
+              materialUnitCosts: {},
+            })
+            // Clear validation errors when modal closes
+            setDeliveryValidationErrors({
+              deliveryNote: null,
+              quantity: null,
+              unitCost: null,
+              materialQuantities: {},
+              materialUnitCosts: {},
+              summary: null,
             })
           }}
           onConfirm={handleConfirmDelivery}
@@ -2483,13 +2686,20 @@ function PurchaseOrderDetailPageContent() {
           confirmText="Confirm Delivery"
           cancelText="Cancel"
           confirmColor="green"
+          size="xl"
         >
           <div className="mt-4 space-y-4">
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Delivery Note *</label>
               <CloudinaryUploadWidget
                 value={confirmDeliveryData.deliveryNoteFileUrl}
-                onChange={(url) => setConfirmDeliveryData((prev) => ({ ...prev, deliveryNoteFileUrl: url }))}
+                onChange={(url) => {
+                  setConfirmDeliveryData((prev) => ({ ...prev, deliveryNoteFileUrl: url }))
+                  // Clear error when user provides delivery note
+                  if (url && url.trim()) {
+                    setDeliveryValidationErrors((prev) => ({ ...prev, deliveryNote: null }))
+                  }
+                }}
                 onDelete={() => setConfirmDeliveryData((prev) => ({ ...prev, deliveryNoteFileUrl: "" }))}
                 folder="purchase-orders/delivery-notes"
               />
@@ -2498,104 +2708,459 @@ function PurchaseOrderDetailPageContent() {
                   <ImagePreview imageUrl={confirmDeliveryData.deliveryNoteFileUrl} alt="Delivery Note" />
                 </div>
               )}
-              <p className="text-sm text-gray-600 mt-1">Upload the delivery note or receipt from the supplier</p>
+              {deliveryValidationErrors.deliveryNote && (
+                <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {deliveryValidationErrors.deliveryNote}
+                </p>
+              )}
+              {!deliveryValidationErrors.deliveryNote && (
+                <p className="text-sm text-gray-600 mt-1">Upload the delivery note or receipt from the supplier</p>
+              )}
             </div>
             {order?.isBulkOrder && order?.materials && Array.isArray(order.materials) && order.materials.length > 0 ? (
-              // Bulk order: Show per-material quantity inputs
+              // Bulk order: Consolidated table view for quantities and unit costs
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
-                  Actual Quantities Delivered (Optional)
-                </label>
-                <p className="text-sm text-gray-600 mb-3">
-                  Specify quantities for each material. Leave empty to use ordered quantities.
-                </p>
-                <div className="space-y-3 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-3">
+                <div className="mb-3">
+                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                    Material Delivery Details
+                  </label>
+                  <p className="text-sm text-gray-600">
+                    Update quantities and unit costs as needed. Leave empty to use ordered values. <span className="text-red-600 font-medium">*</span> indicates required fields.
+                  </p>
+                  {deliveryValidationErrors.summary && (
+                    <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex items-start gap-2">
+                        <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        <div className="flex-1">
+                          <p className="text-sm font-semibold text-red-900 mb-1">Please fix the following errors:</p>
+                          <p className="text-sm text-red-800">{deliveryValidationErrors.summary}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Desktop Table View */}
+                <div className="hidden lg:block bg-white rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50 sticky top-0 z-10">
+                        <tr>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Material
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Ordered Qty
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Actual Qty
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Unit
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Ordered Cost
+                          </th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                            Actual Cost
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {(order.materials || []).map((material, index) => {
+                          const materialRequestId = material.materialRequestId?.toString() || material._id?.toString() || `material-${index}`
+                          const currentQuantity = (confirmDeliveryData.materialQuantities && confirmDeliveryData.materialQuantities[materialRequestId]) || ""
+                          const currentUnitCost = (confirmDeliveryData.materialUnitCosts && confirmDeliveryData.materialUnitCosts[materialRequestId]) || ""
+                          const orderedQuantity = material.quantity || material.quantityNeeded || 0
+                          const orderedUnitCost = material.unitCost || 0
+                          const materialName = material.materialName || material.name || `Material ${index + 1}`
+                          const unit = material.unit || order.unit || ""
+                          const hasInvalidCost = !orderedUnitCost || orderedUnitCost <= 0
+
+                          return (
+                            <tr key={materialRequestId} className={hasInvalidCost ? 'bg-yellow-50 hover:bg-yellow-100' : 'hover:bg-gray-50'}>
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {materialName}
+                                  {hasInvalidCost && <span className="text-red-600 ml-1">*</span>}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <div className="text-sm text-gray-600">
+                                  {orderedQuantity} {unit}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <div className="flex items-center gap-1">
+                                  <input
+                                    type="number"
+                                    value={currentQuantity}
+                                    onChange={(e) => {
+                                      setConfirmDeliveryData((prev) => ({
+                                        ...prev,
+                                        materialQuantities: {
+                                          ...(prev.materialQuantities || {}),
+                                          [materialRequestId]: e.target.value,
+                                        },
+                                      }))
+                                      // Clear error when user provides valid quantity
+                                      if (e.target.value) {
+                                        const error = validateNumber(e.target.value, `Quantity for ${materialName}`, 0.01, false)
+                                        setDeliveryValidationErrors((prev) => ({
+                                          ...prev,
+                                          materialQuantities: {
+                                            ...(prev.materialQuantities || {}),
+                                            [materialRequestId]: error,
+                                          },
+                                        }))
+                                      } else {
+                                        setDeliveryValidationErrors((prev) => ({
+                                          ...prev,
+                                          materialQuantities: {
+                                            ...(prev.materialQuantities || {}),
+                                            [materialRequestId]: null,
+                                          },
+                                        }))
+                                      }
+                                    }}
+                                    min="0.01"
+                                    step="0.01"
+                                    placeholder={orderedQuantity.toString()}
+                                    className={`w-20 px-2 py-1.5 text-sm bg-white text-gray-900 border rounded focus:outline-none focus:ring-2 placeholder:text-gray-400 ${
+                                      deliveryValidationErrors.materialQuantities?.[materialRequestId]
+                                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                                        : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                                    }`}
+                                  />
+                                  <span className="text-xs text-gray-500">{unit}</span>
+                                </div>
+                                {deliveryValidationErrors.materialQuantities?.[materialRequestId] && (
+                                  <p className="text-xs text-red-600 mt-1">{deliveryValidationErrors.materialQuantities[materialRequestId]}</p>
+                                )}
+                              </td>
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <div className="text-sm text-gray-600">{unit}</div>
+                              </td>
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <div className="text-sm text-gray-600">
+                                  {orderedUnitCost > 0 
+                                    ? new Intl.NumberFormat("en-US", { style: "currency", currency: "KES" }).format(orderedUnitCost)
+                                    : <span className="text-red-600">Missing</span>}
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 whitespace-nowrap">
+                                <div className="flex items-center gap-1">
+                                  <span className="text-xs text-gray-500">KES</span>
+                                  <input
+                                    type="number"
+                                    value={currentUnitCost}
+                                    onChange={(e) => {
+                                      setConfirmDeliveryData((prev) => ({
+                                        ...prev,
+                                        materialUnitCosts: {
+                                          ...(prev.materialUnitCosts || {}),
+                                          [materialRequestId]: e.target.value,
+                                        },
+                                      }))
+                                      // Validate unit cost
+                                      if (e.target.value) {
+                                        const error = validateNumber(e.target.value, `Unit cost for ${materialName}`, 0.01, false)
+                                        setDeliveryValidationErrors((prev) => ({
+                                          ...prev,
+                                          materialUnitCosts: {
+                                            ...(prev.materialUnitCosts || {}),
+                                            [materialRequestId]: error,
+                                          },
+                                        }))
+                                      } else if (hasInvalidCost) {
+                                        // Required field is empty
+                                        setDeliveryValidationErrors((prev) => ({
+                                          ...prev,
+                                          materialUnitCosts: {
+                                            ...(prev.materialUnitCosts || {}),
+                                            [materialRequestId]: `Unit cost is required for ${materialName}`,
+                                          },
+                                        }))
+                                      } else {
+                                        setDeliveryValidationErrors((prev) => ({
+                                          ...prev,
+                                          materialUnitCosts: {
+                                            ...(prev.materialUnitCosts || {}),
+                                            [materialRequestId]: null,
+                                          },
+                                        }))
+                                      }
+                                    }}
+                                    min="0.01"
+                                    step="0.01"
+                                    placeholder={orderedUnitCost > 0 ? orderedUnitCost.toString() : "Required"}
+                                    className={`w-28 px-2 py-1.5 text-sm bg-white text-gray-900 border rounded focus:outline-none focus:ring-2 placeholder:text-gray-400 ${
+                                      deliveryValidationErrors.materialUnitCosts?.[materialRequestId]
+                                        ? 'border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500'
+                                        : hasInvalidCost
+                                        ? 'border-yellow-400 bg-yellow-50 focus:ring-green-500 focus:border-green-500'
+                                        : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                                    }`}
+                                  />
+                                </div>
+                                {deliveryValidationErrors.materialUnitCosts?.[materialRequestId] && (
+                                  <p className="text-xs text-red-600 mt-1">{deliveryValidationErrors.materialUnitCosts[materialRequestId]}</p>
+                                )}
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Mobile/Tablet Card View */}
+                <div className="lg:hidden space-y-3 max-h-[400px] overflow-y-auto">
                   {(order.materials || []).map((material, index) => {
                     const materialRequestId = material.materialRequestId?.toString() || material._id?.toString() || `material-${index}`
                     const currentQuantity = (confirmDeliveryData.materialQuantities && confirmDeliveryData.materialQuantities[materialRequestId]) || ""
+                    const currentUnitCost = (confirmDeliveryData.materialUnitCosts && confirmDeliveryData.materialUnitCosts[materialRequestId]) || ""
                     const orderedQuantity = material.quantity || material.quantityNeeded || 0
+                    const orderedUnitCost = material.unitCost || 0
                     const materialName = material.materialName || material.name || `Material ${index + 1}`
                     const unit = material.unit || order.unit || ""
+                    const hasInvalidCost = !orderedUnitCost || orderedUnitCost <= 0
 
                     return (
-                      <div key={materialRequestId} className="border-b border-gray-100 pb-3 last:border-b-0 last:pb-0">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          {materialName}
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            value={currentQuantity}
-                            onChange={(e) => {
-                              setConfirmDeliveryData((prev) => ({
-                                ...prev,
-                                materialQuantities: {
-                                  ...(prev.materialQuantities || {}),
-                                  [materialRequestId]: e.target.value,
-                                },
-                              }))
-                            }}
-                            min="0.01"
-                            step="0.01"
-                            placeholder={orderedQuantity.toString()}
-                            className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:text-gray-500"
-                          />
-                          <span className="text-sm text-gray-600 whitespace-nowrap">{unit}</span>
+                      <div key={materialRequestId} className={`border rounded-lg p-4 ${hasInvalidCost ? 'bg-yellow-50 border-yellow-300' : 'bg-white border-gray-200'}`}>
+                        <div className="mb-3">
+                          <h4 className="text-sm font-semibold text-gray-900">
+                            {materialName}
+                            {hasInvalidCost && <span className="text-red-600 ml-1">*</span>}
+                          </h4>
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          Ordered: {orderedQuantity} {unit}
-                        </p>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Quantity
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <input
+                                type="number"
+                                value={currentQuantity}
+                                onChange={(e) => {
+                                  setConfirmDeliveryData((prev) => ({
+                                    ...prev,
+                                    materialQuantities: {
+                                      ...(prev.materialQuantities || {}),
+                                      [materialRequestId]: e.target.value,
+                                    },
+                                  }))
+                                  // Clear error when user provides valid quantity
+                                  if (e.target.value) {
+                                    const error = validateNumber(e.target.value, `Quantity for ${materialName}`, 0.01, false)
+                                    setDeliveryValidationErrors((prev) => ({
+                                      ...prev,
+                                      materialQuantities: {
+                                        ...(prev.materialQuantities || {}),
+                                        [materialRequestId]: error,
+                                      },
+                                    }))
+                                  } else {
+                                    setDeliveryValidationErrors((prev) => ({
+                                      ...prev,
+                                      materialQuantities: {
+                                        ...(prev.materialQuantities || {}),
+                                        [materialRequestId]: null,
+                                      },
+                                    }))
+                                  }
+                                }}
+                                min="0.01"
+                                step="0.01"
+                                placeholder={orderedQuantity.toString()}
+                                className={`flex-1 px-3 py-2 text-sm bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 placeholder:text-gray-400 ${
+                                  deliveryValidationErrors.materialQuantities?.[materialRequestId]
+                                    ? 'border-red-500 focus:ring-red-500 focus:border-red-500'
+                                    : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                                }`}
+                              />
+                              <span className="text-xs text-gray-600 whitespace-nowrap">{unit}</span>
+                            </div>
+                            {deliveryValidationErrors.materialQuantities?.[materialRequestId] ? (
+                              <p className="text-xs text-red-600 mt-1">{deliveryValidationErrors.materialQuantities[materialRequestId]}</p>
+                            ) : (
+                              <p className="text-xs text-gray-500 mt-1">
+                                Ordered: {orderedQuantity} {unit}
+                              </p>
+                            )}
+                          </div>
+                          <div>
+                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                              Unit Cost
+                            </label>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-600">KES</span>
+                              <input
+                                type="number"
+                                value={currentUnitCost}
+                                onChange={(e) => {
+                                  setConfirmDeliveryData((prev) => ({
+                                    ...prev,
+                                    materialUnitCosts: {
+                                      ...(prev.materialUnitCosts || {}),
+                                      [materialRequestId]: e.target.value,
+                                    },
+                                  }))
+                                  // Validate unit cost
+                                  if (e.target.value) {
+                                    const error = validateNumber(e.target.value, `Unit cost for ${materialName}`, 0.01, false)
+                                    setDeliveryValidationErrors((prev) => ({
+                                      ...prev,
+                                      materialUnitCosts: {
+                                        ...(prev.materialUnitCosts || {}),
+                                        [materialRequestId]: error,
+                                      },
+                                    }))
+                                  } else if (hasInvalidCost) {
+                                    // Required field is empty
+                                    setDeliveryValidationErrors((prev) => ({
+                                      ...prev,
+                                      materialUnitCosts: {
+                                        ...(prev.materialUnitCosts || {}),
+                                        [materialRequestId]: `Unit cost is required for ${materialName}`,
+                                      },
+                                    }))
+                                  } else {
+                                    setDeliveryValidationErrors((prev) => ({
+                                      ...prev,
+                                      materialUnitCosts: {
+                                        ...(prev.materialUnitCosts || {}),
+                                        [materialRequestId]: null,
+                                      },
+                                    }))
+                                  }
+                                }}
+                                min="0.01"
+                                step="0.01"
+                                placeholder={orderedUnitCost > 0 ? orderedUnitCost.toString() : "Required"}
+                                className={`flex-1 px-3 py-2 text-sm bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 placeholder:text-gray-400 ${
+                                  deliveryValidationErrors.materialUnitCosts?.[materialRequestId]
+                                    ? 'border-red-500 bg-red-50 focus:ring-red-500 focus:border-red-500'
+                                    : hasInvalidCost
+                                    ? 'border-yellow-400 bg-yellow-50 focus:ring-green-500 focus:border-green-500'
+                                    : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                                }`}
+                              />
+                            </div>
+                            {deliveryValidationErrors.materialUnitCosts?.[materialRequestId] ? (
+                              <p className="text-xs text-red-600 mt-1">{deliveryValidationErrors.materialUnitCosts[materialRequestId]}</p>
+                            ) : (
+                              <p className="text-xs text-gray-500 mt-1">
+                                {orderedUnitCost > 0 
+                                  ? `Ordered: ${new Intl.NumberFormat("en-US", { style: "currency", currency: "KES" }).format(orderedUnitCost)}`
+                                  : <span className="text-red-600">⚠️ Required</span>}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     )
                   })}
                 </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  Or use the single quantity field below to apply the same quantity to all materials.
-                </p>
               </div>
             ) : (
               // Single order: Show single quantity input
+              <>
+                <div>
+                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                    Actual Quantity Delivered (Optional)
+                  </label>
+                  <input
+                    type="number"
+                    value={confirmDeliveryData.actualQuantityDelivered}
+                    onChange={(e) => {
+                      setConfirmDeliveryData((prev) => ({ ...prev, actualQuantityDelivered: e.target.value }))
+                      // Clear error when user provides valid quantity
+                      if (e.target.value) {
+                        const error = validateNumber(e.target.value, "Actual quantity delivered", 0.01, false)
+                        setDeliveryValidationErrors((prev) => ({ ...prev, quantity: error }))
+                      } else {
+                        setDeliveryValidationErrors((prev) => ({ ...prev, quantity: null }))
+                      }
+                    }}
+                    min="0.01"
+                    step="0.01"
+                    placeholder={order.quantityOrdered?.toString() || ""}
+                    className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 placeholder:text-gray-500 ${
+                      deliveryValidationErrors.quantity 
+                        ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                        : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                    }`}
+                  />
+                  {deliveryValidationErrors.quantity && (
+                    <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {deliveryValidationErrors.quantity}
+                    </p>
+                  )}
+                  {!deliveryValidationErrors.quantity && (
+                    <p className="text-sm text-gray-600 mt-1">
+                      Leave empty to use ordered quantity ({order.quantityOrdered || 0} {order.unit || ""})
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
+            {!order?.isBulkOrder && (
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                  Actual Quantity Delivered (Optional)
+                  Actual Unit Cost (Optional)
                 </label>
                 <input
                   type="number"
-                  value={confirmDeliveryData.actualQuantityDelivered}
-                  onChange={(e) =>
-                    setConfirmDeliveryData((prev) => ({ ...prev, actualQuantityDelivered: e.target.value }))
-                  }
+                  value={confirmDeliveryData.actualUnitCost}
+                  onChange={(e) => {
+                    setConfirmDeliveryData((prev) => ({ ...prev, actualUnitCost: e.target.value }))
+                    // Clear error when user provides valid unit cost
+                    if (e.target.value) {
+                      const error = validateNumber(e.target.value, "Actual unit cost", 0.01, false)
+                      setDeliveryValidationErrors((prev) => ({ ...prev, unitCost: error }))
+                    } else {
+                      setDeliveryValidationErrors((prev) => ({ ...prev, unitCost: null }))
+                    }
+                  }}
                   min="0.01"
                   step="0.01"
-                  placeholder={order.quantityOrdered?.toString() || ""}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:text-gray-500"
+                  placeholder={order.unitCost?.toString() || ""}
+                  className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 placeholder:text-gray-500 ${
+                    deliveryValidationErrors.unitCost 
+                      ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                      : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+                  }`}
                 />
-                <p className="text-sm text-gray-600 mt-1">
-                  Leave empty to use ordered quantity ({order.quantityOrdered || 0} {order.unit || ""})
-                </p>
+                {deliveryValidationErrors.unitCost && (
+                  <p className="text-sm text-red-600 mt-1 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {deliveryValidationErrors.unitCost}
+                  </p>
+                )}
+                {!deliveryValidationErrors.unitCost && (
+                  <p className="text-sm text-gray-600 mt-1">
+                    Leave empty to use ordered unit cost (
+                    {order.unitCost
+                      ? new Intl.NumberFormat("en-US", { style: "currency", currency: "KES" }).format(order.unitCost)
+                      : "N/A"}
+                    )
+                  </p>
+                )}
               </div>
             )}
-            <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                Actual Unit Cost (Optional)
-              </label>
-              <input
-                type="number"
-                value={confirmDeliveryData.actualUnitCost}
-                onChange={(e) => setConfirmDeliveryData((prev) => ({ ...prev, actualUnitCost: e.target.value }))}
-                min="0"
-                step="0.01"
-                placeholder={order.unitCost?.toString() || ""}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:text-gray-500"
-              />
-              <p className="text-sm text-gray-600 mt-1">
-                Leave empty to use ordered unit cost (
-                {order.unitCost
-                  ? new Intl.NumberFormat("en-US", { style: "currency", currency: "KES" }).format(order.unitCost)
-                  : "N/A"}
-                )
-              </p>
-            </div>
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Delivery Notes (Optional)

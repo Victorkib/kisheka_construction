@@ -78,6 +78,7 @@ function isPublicApiRoute(pathname) {
     '/api/auth/register',
     '/api/auth/forgot-password',
     '/api/auth/reset-password',
+    '/api/sms/webhook', // SMS webhook from Africa's Talking (external service)
   ];
   return publicApiRoutes.some((route) => pathname.startsWith(route));
 }

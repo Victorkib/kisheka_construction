@@ -24,12 +24,8 @@ const SMS_ENABLED = process.env.SMS_ENABLED === 'true' || false;
  * @returns {Promise<Object>} Send result with messageId
  */
 export async function sendSMS({ to, message }) {
-  console.log('\n[SMS Service] ========================================');
-  console.log('[SMS Service] Starting SMS send process');
-  console.log('[SMS Service] ========================================');
-  
   if (!SMS_ENABLED) {
-    console.log('[SMS Service] ⚠️  SMS is disabled. Skipping SMS send.');
+    console.log('SMS is disabled. Skipping SMS send.');
     return {
       success: false,
       error: 'SMS is disabled',
@@ -38,12 +34,11 @@ export async function sendSMS({ to, message }) {
   }
 
   if (!AFRICASTALKING_API_KEY || !AFRICASTALKING_USERNAME) {
-    console.error('[SMS Service] ❌ Africa\'s Talking credentials not configured');
+    console.error('Africa\'s Talking credentials not configured');
     throw new Error('Africa\'s Talking credentials not configured');
   }
 
   if (!to || !message) {
-    console.error('[SMS Service] ❌ Missing required parameters:', { to: !!to, message: !!message });
     throw new Error('Recipient phone number and message are required');
   }
 
@@ -53,15 +48,6 @@ export async function sendSMS({ to, message }) {
 
     // const africasTalkingUrl = 'https://api.africastalking.com/version1/messaging';
     const africasTalkingUrl = 'https://api.sandbox.africastalking.com/version1/messaging';
-    
-    console.log('[SMS Service] Request Details:');
-    console.log('[SMS Service]   - URL:', africasTalkingUrl);
-    console.log('[SMS Service]   - To:', formattedPhone);
-    console.log('[SMS Service]   - From (Sender ID):', AFRICASTALKING_SENDER_ID);
-    console.log('[SMS Service]   - Username:', AFRICASTALKING_USERNAME);
-    console.log('[SMS Service]   - Message Length:', message.length, 'characters');
-    console.log('[SMS Service]   - Message Preview:', message.substring(0, 100) + (message.length > 100 ? '...' : ''));
-    
     const response = await fetch(africasTalkingUrl, {
       method: 'POST',
       headers: {
@@ -77,116 +63,43 @@ export async function sendSMS({ to, message }) {
       })
     });
 
-    // LOG HTTP STATUS ALWAYS (even when successful)
-    console.log('[SMS Service] HTTP Response Received:');
-    console.log('[SMS Service]   - Status Code:', response.status);
-    console.log('[SMS Service]   - Status Text:', response.statusText);
-    console.log('[SMS Service]   - Response OK:', response.ok);
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[SMS Service] ❌ HTTP Error Response (not OK)');
-      console.error('[SMS Service] Error Response Body:', errorText);
-      console.error('[SMS Service] API Key (first 10 chars):', AFRICASTALKING_API_KEY?.substring(0, 10) + '...');
-      console.error('[SMS Service] Username:', AFRICASTALKING_USERNAME);
-      console.error('[SMS Service] Sender ID:', AFRICASTALKING_SENDER_ID);
+      console.error('Africa\'s Talking API error:', errorText);
+      console.error('API Key (first 10 chars):', AFRICASTALKING_API_KEY?.substring(0, 10) + '...');
+      console.error('Username:', AFRICASTALKING_USERNAME);
+      console.error('Sender ID:', AFRICASTALKING_SENDER_ID);
+      console.error('Response Status:', response.status, response.statusText);
       
       // Try to parse error response as JSON
       let errorDetails = errorText;
       try {
         const errorJson = JSON.parse(errorText);
         errorDetails = JSON.stringify(errorJson, null, 2);
-        console.error('[SMS Service] Parsed Error JSON:', errorDetails);
       } catch (e) {
-        console.error('[SMS Service] Error response is not JSON, using raw text');
+        // Not JSON, use as-is
       }
       
       throw new Error(`SMS send failed: ${response.status} ${response.statusText}. Details: ${errorDetails}`);
     }
 
-    // LOG FULL RESPONSE BEFORE PARSING
-    console.log('[SMS Service] ✅ HTTP Response OK, reading response body...');
-    const responseText = await response.text();
-    console.log('[SMS Service] Raw Response Text Length:', responseText.length, 'characters');
-    console.log('[SMS Service] Raw Response Text:', responseText);
+    const data = await response.json();
     
-    let data;
-    try {
-      data = JSON.parse(responseText);
-      console.log('[SMS Service] ✅ JSON Parsed Successfully');
-      console.log('[SMS Service] Parsed Response Structure:', JSON.stringify(data, null, 2));
-    } catch (parseError) {
-      console.error('[SMS Service] ❌ JSON Parse Error:', parseError.message);
-      console.error('[SMS Service] Parse Error Stack:', parseError.stack);
-      console.error('[SMS Service] Response Text that failed to parse:', responseText);
-      throw new Error(`Failed to parse API response as JSON: ${parseError.message}. Response: ${responseText.substring(0, 500)}`);
-    }
-    
-    // LOG RESPONSE STRUCTURE VALIDATION
-    console.log('[SMS Service] Validating Response Structure:');
-    console.log('[SMS Service]   - Has SMSMessageData:', !!data.SMSMessageData);
-    console.log('[SMS Service]   - Has Recipients:', !!data.SMSMessageData?.Recipients);
-    console.log('[SMS Service]   - Recipients Length:', data.SMSMessageData?.Recipients?.length || 0);
-    console.log('[SMS Service]   - First Recipient:', data.SMSMessageData?.Recipients?.[0] || 'N/A');
-    
-    // Check if response structure is valid
-    if (!data.SMSMessageData || !data.SMSMessageData.Recipients || data.SMSMessageData.Recipients.length === 0) {
-      console.error('[SMS Service] ❌ Invalid Response Structure');
-      console.error('[SMS Service] Expected: { SMSMessageData: { Recipients: [...] } }');
-      console.error('[SMS Service] Received:', JSON.stringify(data, null, 2));
-      throw new Error('Invalid API response structure: Missing SMSMessageData or Recipients array');
-    }
-
-    const recipient = data.SMSMessageData.Recipients[0];
-    const statusCode = recipient.statusCode;
-    const status = recipient.status;
-    const messageId = recipient.messageId;
-    const number = recipient.number;
-    const cost = recipient.cost;
-    
-    console.log('[SMS Service] Recipient Details:');
-    console.log('[SMS Service]   - Status Code:', statusCode);
-    console.log('[SMS Service]   - Status:', status);
-    console.log('[SMS Service]   - Message ID:', messageId);
-    console.log('[SMS Service]   - Number:', number);
-    console.log('[SMS Service]   - Cost:', cost);
-    console.log('[SMS Service]   - Full Recipient Object:', JSON.stringify(recipient, null, 2));
-    
-    // Check for success (101 = Sent, 102 = Queued, status = "Success")
-    // Also check for "Success" status string as some APIs return that
-    const isSuccess = statusCode === 101 || statusCode === 102 || status === 'Success' || status === 'Sent';
-    
-    if (isSuccess) {
-      console.log('[SMS Service] ✅ SMS SENT SUCCESSFULLY');
-      console.log('[SMS Service]   - Message ID:', messageId);
-      console.log('[SMS Service]   - Status:', status);
-      console.log('[SMS Service]   - Status Code:', statusCode);
-      console.log('[SMS Service] ========================================\n');
-      
+    // Check response structure
+    if (data.SMSMessageData?.Recipients?.[0]?.statusCode === 101) {
       return {
         success: true,
-        messageId: messageId,
+        messageId: data.SMSMessageData.Recipients[0].messageId,
         provider: 'africas_talking',
-        status: status,
-        statusCode: statusCode
+        status: data.SMSMessageData.Recipients[0].status
       };
     } else {
-      console.error('[SMS Service] ❌ SMS SEND FAILED');
-      console.error('[SMS Service]   - Status Code:', statusCode);
-      console.error('[SMS Service]   - Status:', status);
-      console.error('[SMS Service]   - Full Recipient:', JSON.stringify(recipient, null, 2));
-      console.error('[SMS Service]   - Full Response:', JSON.stringify(data, null, 2));
-      console.log('[SMS Service] ========================================\n');
-      
-      const errorMessage = status || `SMS send failed (Status Code: ${statusCode})`;
+      const errorMessage = data.SMSMessageData?.Recipients?.[0]?.status || 'SMS send failed';
+      console.error('SMS send error:', errorMessage);
       throw new Error(errorMessage);
     }
   } catch (error) {
-    console.error('[SMS Service] ❌ EXCEPTION CAUGHT');
-    console.error('[SMS Service]   - Error Name:', error.name);
-    console.error('[SMS Service]   - Error Message:', error.message);
-    console.error('[SMS Service]   - Error Stack:', error.stack);
-    console.log('[SMS Service] ========================================\n');
+    console.error('SMS send error:', error);
     throw error;
   }
 }

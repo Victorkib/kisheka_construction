@@ -4,7 +4,7 @@
  */
 
 import { getDatabase } from '@/lib/mongodb/connection';
-import { sendSMS } from './sms-service';
+import { sendSMS, formatPhoneNumber, generateDeliveryReminderSMS, generateReminderSMS, getSupplierLanguage } from './sms-service';
 import { sendPushToUser } from './push-service';
 import { ObjectId } from 'mongodb';
 
@@ -40,43 +40,43 @@ export async function sendPurchaseOrderReminder(purchaseOrder, supplier, options
       }
     }
 
-    // Build reminder message
+    // Build reminder message using enhanced SMS generation
     let message;
     if (customMessage) {
       message = customMessage;
     } else {
-      const urgencyText = reminderType === 'urgent' ? 'URGENT: ' : 
-                         reminderType === 'final' ? 'FINAL REMINDER: ' : '';
-      
-      message = `${urgencyText}Reminder: Please respond to Purchase Order ${purchaseOrder.purchaseOrderNumber}. `;
-      
-      if (purchaseOrder.isBulkOrder) {
-        message += `${purchaseOrder.materials?.length || 0} materials pending response. `;
-      } else {
-        message += `Material: ${purchaseOrder.materialName}. `;
-      }
-      
-      message += `Total: KES ${(purchaseOrder.totalCost || 0).toLocaleString()}. `;
-      
-      if (purchaseOrder.responseToken) {
-        // Include response link if available
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://app.kisheka.com';
-        const responseUrl = `${baseUrl}/purchase-orders/respond/${purchaseOrder.responseToken}`;
-        message += `Respond: ${responseUrl}`;
-      } else {
-        message += 'Please contact us to respond.';
-      }
+      // Use enhanced reminder SMS generation with language support
+      const db = await getDatabase();
+      const materialRequest = purchaseOrder.materialRequestId 
+        ? await db.collection('material_requests').findOne({ _id: purchaseOrder.materialRequestId })
+        : null;
+
+      message = await generateReminderSMS({
+        purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
+        materialName: purchaseOrder.materialName || materialRequest?.materialName || 'Materials',
+        quantity: purchaseOrder.quantityOrdered || 0,
+        unit: purchaseOrder.unit || materialRequest?.unit || '',
+        totalCost: purchaseOrder.totalCost || 0,
+        shortLink: purchaseOrder.responseToken 
+          ? `${process.env.NEXT_PUBLIC_APP_URL || 'https://app.kisheka.com'}/purchase-orders/respond/${purchaseOrder.responseToken}`
+          : null,
+        reminderType,
+        daysSinceSent,
+        supplier: supplier,
+        projectId: purchaseOrder.projectId?.toString()
+      });
     }
 
     // Send SMS to supplier
     let smsSent = false;
     let smsError = null;
     
-    if (supplier.phone) {
+    if (supplier.smsEnabled && supplier.phone) {
       try {
+        const formattedPhone = formatPhoneNumber(supplier.phone);
         await sendSMS({
-          to: supplier.phone,
-          message: message.substring(0, 160), // SMS character limit
+          to: formattedPhone,
+          message: message
         });
         smsSent = true;
       } catch (smsErr) {
@@ -394,6 +394,326 @@ export async function sendPendingReminders(options = {}) {
     throw error;
   }
 }
+
+/**
+ * Send delivery reminder to supplier for accepted purchase order
+ * @param {Object} purchaseOrder - Purchase order document
+ * @param {Object} supplier - Supplier document
+ * @param {Object} options - Reminder options
+ * @returns {Promise<Object>} Result of reminder send
+ */
+export async function sendDeliveryReminder(purchaseOrder, supplier, options = {}) {
+  try {
+    const {
+      daysBeforeDelivery = 1, // Default: send reminder 1 day before delivery
+      customMessage = null
+    } = options;
+
+    if (!purchaseOrder || !supplier) {
+      throw new Error('Purchase order and supplier are required');
+    }
+
+    // Only send for accepted orders with delivery dates
+    if (purchaseOrder.status !== 'order_accepted' && purchaseOrder.status !== 'ready_for_delivery') {
+      return {
+        sent: false,
+        reason: `Order status is ${purchaseOrder.status}, not accepted or ready for delivery`
+      };
+    }
+
+    if (!purchaseOrder.deliveryDate) {
+      return {
+        sent: false,
+        reason: 'No delivery date set for this order'
+      };
+    }
+
+    // Check if delivery reminder was already sent recently (within last 24 hours)
+    const lastDeliveryReminder = purchaseOrder.lastDeliveryReminderSentAt;
+    if (lastDeliveryReminder) {
+      const hoursSinceLastReminder = (new Date() - new Date(lastDeliveryReminder)) / (1000 * 60 * 60);
+      if (hoursSinceLastReminder < 24) {
+        return {
+          sent: false,
+          reason: 'Delivery reminder sent recently (within 24 hours)',
+          lastReminderAt: lastDeliveryReminder
+        };
+      }
+    }
+
+    // Check if delivery date is in the past
+    const deliveryDate = new Date(purchaseOrder.deliveryDate);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    deliveryDate.setHours(0, 0, 0, 0);
+
+    if (deliveryDate < today) {
+      return {
+        sent: false,
+        reason: 'Delivery date is in the past'
+      };
+    }
+
+    // Calculate days until delivery
+    const daysUntilDelivery = Math.ceil((deliveryDate - today) / (1000 * 60 * 60 * 24));
+
+    // Only send if within the reminder window
+    if (daysUntilDelivery > daysBeforeDelivery + 1) {
+      return {
+        sent: false,
+        reason: `Delivery is more than ${daysBeforeDelivery + 1} days away`
+      };
+    }
+
+    // Build delivery reminder message
+    let message;
+    if (customMessage) {
+      message = customMessage;
+    } else {
+      const db = await getDatabase();
+      const materialRequest = purchaseOrder.materialRequestId 
+        ? await db.collection('material_requests').findOne({ _id: purchaseOrder.materialRequestId })
+        : null;
+
+      // Use delivery reminder SMS generation
+      message = generateDeliveryReminderSMS({
+        purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,
+        materialName: purchaseOrder.materialName || materialRequest?.materialName || 'Materials',
+        quantity: purchaseOrder.quantityOrdered || 0,
+        unit: purchaseOrder.unit || materialRequest?.unit || '',
+        deliveryDate: purchaseOrder.deliveryDate,
+        supplier: supplier
+      });
+    }
+
+    // Send SMS to supplier
+    let smsSent = false;
+    let smsError = null;
+    
+    if (supplier.smsEnabled && supplier.phone) {
+      try {
+        const formattedPhone = formatPhoneNumber(supplier.phone);
+        await sendSMS({
+          to: formattedPhone,
+          message: message
+        });
+        smsSent = true;
+      } catch (smsErr) {
+        console.error('[Reminder Service] Delivery reminder SMS send failed:', smsErr);
+        smsError = smsErr.message;
+      }
+    }
+
+    // Update purchase order with delivery reminder tracking
+    const db = await getDatabase();
+    const reminderEntry = {
+      sentAt: new Date(),
+      type: 'delivery',
+      daysUntilDelivery,
+      daysBeforeDelivery,
+      smsSent,
+      smsError: smsError || null,
+      message: message.substring(0, 500), // Store truncated message
+    };
+
+    await db.collection('purchase_orders').updateOne(
+      { _id: purchaseOrder._id },
+      {
+        $set: {
+          lastDeliveryReminderSentAt: new Date(),
+          deliveryReminderCount: (purchaseOrder.deliveryReminderCount || 0) + 1,
+          updatedAt: new Date()
+        },
+        $push: {
+          deliveryReminders: reminderEntry
+        }
+      }
+    );
+
+    return {
+      sent: true,
+      smsSent,
+      smsError,
+      daysUntilDelivery,
+      deliveryReminderCount: (purchaseOrder.deliveryReminderCount || 0) + 1
+    };
+  } catch (error) {
+    console.error('[Reminder Service] Error sending delivery reminder:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get purchase orders that need delivery reminders
+ * @param {Object} options - Query options
+ * @returns {Promise<Array>} Purchase orders needing delivery reminders
+ */
+export async function getOrdersNeedingDeliveryReminders(options = {}) {
+  try {
+    const {
+      projectId = null,
+      daysBeforeDelivery = 1, // Default: send reminder 1 day before
+      maxReminders = 2 // Maximum number of delivery reminders to send
+    } = options;
+
+    const db = await getDatabase();
+
+    // Calculate date range for delivery reminders
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const reminderDate = new Date(today);
+    reminderDate.setDate(reminderDate.getDate() + daysBeforeDelivery);
+    reminderDate.setHours(23, 59, 59, 999);
+
+    // Build query - orders accepted/ready for delivery with delivery dates in the reminder window
+    const query = {
+      status: { $in: ['order_accepted', 'ready_for_delivery'] },
+      deletedAt: null,
+      deliveryDate: {
+        $gte: today,
+        $lte: reminderDate
+      },
+      $or: [
+        { lastDeliveryReminderSentAt: { $exists: false } }, // Never sent reminder
+        { 
+          lastDeliveryReminderSentAt: { 
+            $lt: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last reminder was at least 24 hours ago
+          } 
+        }
+      ]
+    };
+
+    // Limit reminder count
+    query.$or.push(
+      { deliveryReminderCount: { $exists: false } },
+      { deliveryReminderCount: { $lt: maxReminders } }
+    );
+
+    if (projectId && ObjectId.isValid(projectId)) {
+      query.projectId = new ObjectId(projectId);
+    }
+
+    // Get orders
+    const orders = await db.collection('purchase_orders')
+      .find(query)
+      .toArray();
+
+    // Calculate days until delivery for each order
+    return orders.map(order => {
+      const deliveryDate = new Date(order.deliveryDate);
+      deliveryDate.setHours(0, 0, 0, 0);
+      const daysUntilDelivery = Math.ceil((deliveryDate - today) / (1000 * 60 * 60 * 24));
+      
+      return {
+        ...order,
+        daysUntilDelivery
+      };
+    });
+  } catch (error) {
+    console.error('[Reminder Service] Error getting orders needing delivery reminders:', error);
+    throw error;
+  }
+}
+
+/**
+ * Send delivery reminders for all orders that need them
+ * @param {Object} options - Reminder options
+ * @returns {Promise<Object>} Summary of reminders sent
+ */
+export async function sendPendingDeliveryReminders(options = {}) {
+  try {
+    const {
+      projectId = null,
+      daysBeforeDelivery = 1,
+      maxReminders = 2,
+      dryRun = false // If true, don't actually send, just return what would be sent
+    } = options;
+
+    const orders = await getOrdersNeedingDeliveryReminders({
+      projectId,
+      daysBeforeDelivery,
+      maxReminders
+    });
+
+    const db = await getDatabase();
+    const results = {
+      attempted: 0,
+      sent: 0,
+      failed: 0,
+      errors: []
+    };
+
+    for (const order of orders) {
+      try {
+        results.attempted++;
+        
+        if (dryRun) {
+          results.sent++;
+          continue;
+        }
+
+        const supplier = await db.collection('suppliers').findOne({
+          _id: order.supplierId,
+          status: 'active',
+          deletedAt: null
+        });
+
+        if (!supplier) {
+          results.failed++;
+          results.errors.push({
+            orderId: order._id.toString(),
+            orderNumber: order.purchaseOrderNumber,
+            reason: 'Supplier not found'
+          });
+          continue;
+        }
+
+        const result = await sendDeliveryReminder(order, supplier, {
+          daysBeforeDelivery,
+          customMessage: null
+        });
+
+        if (result.sent) {
+          results.sent++;
+        } else {
+          results.failed++;
+          results.errors.push({
+            orderId: order._id.toString(),
+            orderNumber: order.purchaseOrderNumber,
+            reason: result.reason || 'Failed to send'
+          });
+        }
+      } catch (error) {
+        results.failed++;
+        results.errors.push({
+          orderId: order._id.toString(),
+          orderNumber: order.purchaseOrderNumber,
+          reason: error.message
+        });
+      }
+    }
+
+    return {
+      success: true,
+      summary: {
+        totalAttempted: results.attempted,
+        totalSent: results.sent,
+        totalFailed: results.failed
+      },
+      details: results,
+      dryRun
+    };
+  } catch (error) {
+    console.error('[Reminder Service] Error sending pending delivery reminders:', error);
+    throw error;
+  }
+}
+
+
+
+
+
 
 
 

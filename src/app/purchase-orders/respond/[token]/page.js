@@ -12,6 +12,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
 import { getRejectionReasonOptions, getSubcategoryOptions } from '@/lib/rejection-reasons';
+import { SupplierResponseInterface } from '@/components/purchase-orders/SupplierResponseInterface';
 
 function PurchaseOrderResponsePageContent() {
   const router = useRouter();
@@ -132,6 +133,14 @@ function PurchaseOrderResponsePageContent() {
 
       if (action === 'modify' && !formData.notes.trim()) {
         setError('Please provide notes explaining the requested modifications');
+        setSubmitting(false);
+        return;
+      }
+
+      // CRITICAL FIX: Bulk orders should not use this handler
+      // They should use SupplierResponseInterface component instead
+      if (purchaseOrder.isBulkOrder) {
+        setError('Bulk orders require material-level responses. Please use the bulk order response interface above.');
         setSubmitting(false);
         return;
       }
@@ -548,12 +557,49 @@ function PurchaseOrderResponsePageContent() {
           </div>
         </div>
 
-        {/* Action Selection */}
-        {!action && (
+        {/* CRITICAL FIX: Use SupplierResponseInterface for bulk orders */}
+        {purchaseOrder.isBulkOrder ? (
           <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-300">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">How would you like to respond to this order?</h2>
-            <p className="text-base text-gray-700 mb-8">Please select one of the following options to proceed:</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <SupplierResponseInterface
+              order={purchaseOrder}
+              token={token}
+              onResponse={async (payload) => {
+                try {
+                  setSubmitting(true);
+                  setError(null);
+
+                  const response = await fetch(`/api/purchase-orders/${purchaseOrder._id}/respond`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                  });
+
+                  const data = await response.json();
+
+                  if (!data.success) {
+                    throw new Error(data.error || 'Failed to process response');
+                  }
+
+                  setSuccess(true);
+                } catch (err) {
+                  setError(err.message);
+                  console.error('Response submission error:', err);
+                } finally {
+                  setSubmitting(false);
+                }
+              }}
+            />
+          </div>
+        ) : (
+          <>
+            {/* Action Selection for Single Orders */}
+            {!action && (
+              <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-300">
+                <h2 className="text-xl font-bold text-gray-900 mb-6">How would you like to respond to this order?</h2>
+                <p className="text-base text-gray-700 mb-8">Please select one of the following options to proceed:</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <button
                 onClick={() => setAction('accept')}
                 className="p-6 border-2 border-green-600 rounded-xl hover:bg-green-50 transition-all duration-200 text-center group hover:shadow-lg"
@@ -589,10 +635,10 @@ function PurchaseOrderResponsePageContent() {
               </button>
             </div>
           </div>
-        )}
+            )}
 
-        {/* Response Form */}
-        {action && (
+            {/* Response Form for Single Orders */}
+            {action && (
           <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-8 border border-gray-300">
             <h2 className="text-xl font-bold text-gray-900 mb-6 pb-4 border-b border-gray-300">
               {action === 'accept' && 'Accept Purchase Order'}
@@ -796,6 +842,8 @@ function PurchaseOrderResponsePageContent() {
               </button>
             </div>
           </form>
+            )}
+          </>
         )}
       </div>
     </div>

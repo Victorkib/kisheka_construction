@@ -38,6 +38,7 @@ export async function createMaterialFromPurchaseOrder({
   actualQuantityReceived,
   actualUnitCost,
   materialQuantities, // Map of materialRequestId -> quantity for bulk orders
+  materialUnitCosts, // Map of materialRequestId -> unitCost for bulk orders
   notes,
   isAutomatic = false,
   allowFromAccepted = false,
@@ -174,12 +175,33 @@ export async function createMaterialFromPurchaseOrder({
       } else if (purchaseOrder.isBulkOrder) {
         // For bulk orders, ALWAYS use materialData.quantity (NEVER use actualQuantityReceived)
         // This ensures each material gets its correct individual quantity, not the total
-        if (materialData && materialData.quantity !== undefined && materialData.quantity !== null) {
+        if (materialData && materialData.quantity !== undefined && materialData.quantity !== null && materialData.quantity > 0) {
           // Use quantity from PO's materials array (REQUIRED for bulk orders)
-          // Note: Check for undefined/null, not falsy (0 is valid)
+          // Note: Check for > 0 to avoid using 0 quantities (which indicate missing data)
           quantityReceived = parseFloat(materialData.quantity);
           if (isNaN(quantityReceived) || quantityReceived <= 0) {
             throw new Error(`Invalid quantity in PO materials array for ${materialRequest.materialName}: ${materialData.quantity}`);
+          }
+        } else if (purchaseOrder.materialResponses && Array.isArray(purchaseOrder.materialResponses)) {
+          // CRITICAL FIX: Check materialResponses array if materials array has 0 or missing quantity
+          const materialResponse = purchaseOrder.materialResponses.find(
+            r => {
+              const responseId = r.materialRequestId?.toString();
+              const requestId = materialRequest._id.toString();
+              return responseId === requestId;
+            }
+          );
+          
+          if (materialResponse && materialResponse.modifications && materialResponse.modifications.quantityOrdered !== undefined && materialResponse.modifications.quantityOrdered !== null) {
+            // Use quantity from supplier response modifications
+            quantityReceived = parseFloat(materialResponse.modifications.quantityOrdered);
+            if (isNaN(quantityReceived) || quantityReceived <= 0) {
+              throw new Error(`Invalid quantityOrdered in materialResponse modifications for ${materialRequest.materialName}: ${materialResponse.modifications.quantityOrdered}`);
+            }
+            console.log(`[createMaterialFromPurchaseOrder] Using quantity from materialResponses for ${materialRequest.materialName}: ${quantityReceived}`);
+          } else {
+            // For bulk orders, we MUST have materialData with quantity or materialResponse with modifications
+            throw new Error(`Cannot determine quantity for bulk order material "${materialRequest.materialName}". Material data not found in PO materials array or materialResponses, or quantity is missing.`);
           }
         } else {
           // For bulk orders, we MUST have materialData with quantity - throw error
@@ -212,25 +234,55 @@ export async function createMaterialFromPurchaseOrder({
         console.warn(`[createMaterialFromPurchaseOrder] WARNING: Using material request quantity as fallback for ${materialRequest.materialName}: ${quantityReceived}. This should not happen for bulk orders.`);
       }
 
-      // Unit cost priority: actualUnitCost > materialData.unitCost > PO unitCost > materialRequest.estimatedUnitCost
+      // Unit cost priority: materialUnitCosts[requestId] > actualUnitCost > materialData.unitCost > materialResponses.modifications.unitCost > PO unitCost > materialRequest.estimatedUnitCost
       let unitCost;
-      if (actualUnitCost !== undefined && actualUnitCost !== null) {
+      if (materialUnitCosts && materialUnitCosts[materialRequest._id.toString()] !== undefined && materialUnitCosts[materialRequest._id.toString()] !== null) {
+        // CRITICAL FIX: Use per-material unit cost from delivery confirmation (for bulk orders)
+        unitCost = parseFloat(materialUnitCosts[materialRequest._id.toString()]);
+        if (isNaN(unitCost) || unitCost <= 0) {
+          throw new Error(`Invalid unitCost in materialUnitCosts for ${materialRequest.materialName}: ${materialUnitCosts[materialRequest._id.toString()]}`);
+        }
+        console.log(`[createMaterialFromPurchaseOrder] Using per-material unitCost from delivery confirmation for ${materialRequest.materialName}: ${unitCost}`);
+      } else if (actualUnitCost !== undefined && actualUnitCost !== null) {
         unitCost = parseFloat(actualUnitCost);
         if (isNaN(unitCost) || unitCost < 0) {
           throw new Error(`Invalid actualUnitCost: ${actualUnitCost}`);
         }
-      } else if (materialData && materialData.unitCost !== undefined && materialData.unitCost !== null) {
+      } else if (materialData && materialData.unitCost !== undefined && materialData.unitCost !== null && materialData.unitCost > 0) {
         // Use unit cost from PO's materials array (PREFERRED for bulk orders)
-        // Note: 0 is a valid cost, so we check for undefined/null, not falsy
+        // Note: Check for > 0 to avoid using 0 costs (which indicate missing data)
         unitCost = parseFloat(materialData.unitCost);
         if (isNaN(unitCost) || unitCost < 0) {
           throw new Error(`Invalid unitCost in PO materials array for ${materialRequest.materialName}: ${materialData.unitCost}`);
         }
+      } else if (purchaseOrder.isBulkOrder && purchaseOrder.materialResponses && Array.isArray(purchaseOrder.materialResponses)) {
+        // CRITICAL FIX: Check materialResponses array if materials array has 0 or missing unitCost
+        // This handles cases where supplier responded but materials array wasn't updated yet
+        const materialResponse = purchaseOrder.materialResponses.find(
+          r => {
+            const responseId = r.materialRequestId?.toString();
+            const requestId = materialRequest._id.toString();
+            return responseId === requestId;
+          }
+        );
+        
+        if (materialResponse && materialResponse.modifications && materialResponse.modifications.unitCost !== undefined && materialResponse.modifications.unitCost !== null) {
+          // Use unitCost from supplier response modifications
+          unitCost = parseFloat(materialResponse.modifications.unitCost);
+          if (isNaN(unitCost) || unitCost < 0) {
+            throw new Error(`Invalid unitCost in materialResponse modifications for ${materialRequest.materialName}: ${materialResponse.modifications.unitCost}`);
+          }
+          console.log(`[createMaterialFromPurchaseOrder] Using unitCost from materialResponses for ${materialRequest.materialName}: ${unitCost}`);
+        } else if (purchaseOrder.isBulkOrder) {
+          // For bulk orders, we MUST have materialData with unitCost or materialResponse with modifications
+          throw new Error(`Cannot determine unit cost for bulk order material "${materialRequest.materialName}". Material data not found in PO materials array or materialResponses, or unitCost is missing.`);
+        }
       } else if (purchaseOrder.isBulkOrder) {
         // For bulk orders, we MUST have materialData with unitCost - throw error
         throw new Error(`Cannot determine unit cost for bulk order material "${materialRequest.materialName}". Material data not found in PO materials array or unitCost is missing.`);
-      } else if (purchaseOrder.unitCost !== undefined && purchaseOrder.unitCost !== null) {
+      } else if (purchaseOrder.unitCost !== undefined && purchaseOrder.unitCost !== null && purchaseOrder.unitCost > 0) {
         // Use PO-level unit cost (single orders)
+        // Note: Check for > 0 to avoid using 0 costs
         unitCost = parseFloat(purchaseOrder.unitCost);
         if (isNaN(unitCost) || unitCost < 0) {
           throw new Error(`Invalid unitCost in PO: ${purchaseOrder.unitCost}`);
@@ -242,6 +294,17 @@ export async function createMaterialFromPurchaseOrder({
           unitCost = 0; // Default to 0 if invalid
         }
         console.warn(`[createMaterialFromPurchaseOrder] WARNING: Using material request estimatedUnitCost as fallback for ${materialRequest.materialName}: ${unitCost}. This should not happen for bulk orders.`);
+      }
+
+      // CRITICAL FIX: Validate unit cost is > 0 before creating material
+      // This prevents materials with zero cost which cause financial calculation errors
+      if (unitCost === 0 || unitCost === null || unitCost === undefined || isNaN(unitCost)) {
+        throw new Error(
+          `Cannot create material for "${materialRequest.materialName}": Unit cost is 0 or missing. ` +
+          `Unit cost must be greater than 0 to create a material entry. ` +
+          `Please ensure the purchase order has a valid unit cost, or provide actualUnitCost when confirming delivery. ` +
+          `Material Request ID: ${materialRequest._id}, Request Number: ${materialRequest.requestNumber || 'N/A'}`
+        );
       }
 
       const totalCost = calculateTotalCost(quantityReceived, unitCost);

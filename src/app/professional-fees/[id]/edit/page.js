@@ -128,7 +128,7 @@ function EditProfessionalFeePageContent() {
             <p>You do not have permission to edit professional fees. Only OWNER, PM, and ACCOUNTANT can edit fees.</p>
           </div>
           <Link href="/professional-fees" className="text-blue-600 hover:text-blue-900 underline">
-            ← Back to Professional Fees
+            ← Back to Fees
           </Link>
         </div>
       </AppLayout>
@@ -156,7 +156,7 @@ function EditProfessionalFeePageContent() {
             <p>{error}</p>
           </div>
           <Link href="/professional-fees" className="text-blue-600 hover:text-blue-900 underline">
-            ← Back to Professional Fees
+            ← Back to Fees
           </Link>
         </div>
       </AppLayout>
@@ -169,7 +169,7 @@ function EditProfessionalFeePageContent() {
         {/* Header */}
         <div className="mb-8">
           <Link href="/professional-fees" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
-            ← Back to Professional Fees
+            ← Back to Fees
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
             Edit Professional Fee

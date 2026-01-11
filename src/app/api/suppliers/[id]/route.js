@@ -127,6 +127,7 @@ export async function PATCH(request, { params }) {
       emailEnabled,
       smsEnabled,
       pushNotificationsEnabled,
+      languagePreference, // 'en', 'sw', or 'both' - defaults to 'en'
       specialties,
       rating,
       notes,
@@ -182,6 +183,14 @@ export async function PATCH(request, { params }) {
     if (emailEnabled !== undefined) updateData.emailEnabled = emailEnabled;
     if (smsEnabled !== undefined) updateData.smsEnabled = smsEnabled;
     if (pushNotificationsEnabled !== undefined) updateData.pushNotificationsEnabled = pushNotificationsEnabled;
+    if (languagePreference !== undefined) {
+      // Validate language preference
+      if (['en', 'sw', 'both'].includes(languagePreference)) {
+        updateData.languagePreference = languagePreference;
+      } else {
+        return errorResponse('Invalid language preference. Must be "en", "sw", or "both"', 400);
+      }
+    }
     if (specialties !== undefined) updateData.specialties = Array.isArray(specialties) ? specialties : [];
     if (rating !== undefined) updateData.rating = rating || null;
     if (notes !== undefined) updateData.notes = notes?.trim() || null;

@@ -15,7 +15,7 @@ import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotifications } from '@/lib/notifications';
 import { sendPurchaseOrderEmail } from '@/lib/email-templates/purchase-order-templates';
-import { sendSMS, generatePurchaseOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
+import { sendSMS, generatePurchaseOrderSMS, generateAlternativeOrderSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { sendPushToSupplier } from '@/lib/push-service';
 import { generateShortUrl } from '@/lib/generators/url-shortener';
 import { 
@@ -858,13 +858,14 @@ export async function POST(request, { params }) {
                   result.error = 'SMS not enabled or no phone number';
                 } else {
                   const formattedPhone = formatPhoneNumber(supplier.phone);
-                  const smsMessage = generatePurchaseOrderSMS({
+                  
+                  // Use alternative order SMS with context
+                  const smsMessage = generateAlternativeOrderSMS({
                     purchaseOrderNumber: newOrder.purchaseOrderNumber,
-                    materialName: newOrder.materialName,
-                    quantity: newOrder.quantityOrdered,
-                    unit: newOrder.unit,
-                    totalCost: newOrder.totalCost,
-                    shortLink,
+                    originalPONumber: purchaseOrder.purchaseOrderNumber,
+                    originalRejectionReason: purchaseOrder.rejectionReason || purchaseOrder.rejectionSubcategory || 'Not specified',
+                    alternativeType: null, // Can be enhanced to detect type based on differences
+                    supplier: supplier // Pass supplier for language detection
                   });
 
                   const smsResult = await sendSMS({
@@ -1100,13 +1101,18 @@ export async function POST(request, { params }) {
                   result.error = 'SMS not enabled or no phone number';
                 } else {
                   const formattedPhone = formatPhoneNumber(supplier.phone);
-                  const smsMessage = generatePurchaseOrderSMS({
+                  const smsMessage = await generatePurchaseOrderSMS({
                     purchaseOrderNumber: newOrder.purchaseOrderNumber,
                     materialName: materialRequest.materialName,
                     quantity: alternativeOrderData.quantityOrdered,
                     unit: materialRequest.unit,
                     totalCost: alternativeOrderData.totalCost,
                     shortLink,
+                    deliveryDate: alternativeOrderData.deliveryDate,
+                    unitCost: alternativeOrderData.unitCost || null,
+                    supplier: supplier, // Pass supplier for language detection
+                    projectId: newOrder.projectId?.toString() || null,
+                    enablePersonalization: true
                   });
 
                   const smsResult = await sendSMS({

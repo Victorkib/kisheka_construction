@@ -215,7 +215,7 @@ function ProfessionalServicesLibraryPageContent() {
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
-              Professional Services Library
+              Library
             </h1>
             <p className="text-gray-600 mt-2">
               Manage architects and engineers for quick assignment to projects
