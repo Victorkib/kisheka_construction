@@ -208,11 +208,33 @@ export async function GET(request) {
       ])
       .toArray();
 
+    // Get total from labour entries (approved/paid only)
+    const labourQuery = { deletedAt: null, status: { $in: ['approved', 'paid'] } };
+    if (projectId && ObjectId.isValid(projectId)) {
+      labourQuery.projectId = new ObjectId(projectId);
+    } else if (allowedProjectIds && allowedProjectIds.length > 0) {
+      labourQuery.projectId = { $in: allowedProjectIds };
+    }
+
+    const labourTotal = await db
+      .collection('labour_entries')
+      .aggregate([
+        { $match: labourQuery },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$totalCost' },
+          },
+        },
+      ])
+      .toArray();
+
     // Calculate total used
     const totalExpenses = expensesTotal[0]?.total || 0;
     const totalMaterials = materialsTotal[0]?.total || 0;
     const totalInitialExpenses = initialExpensesTotal[0]?.total || 0;
-    const totalUsed = totalExpenses + totalMaterials + totalInitialExpenses;
+    const totalLabour = labourTotal[0]?.total || 0;
+    const totalUsed = totalExpenses + totalMaterials + totalInitialExpenses + totalLabour;
 
     // Calculate project-specific totals from allocations (if projectId provided)
     let totalInvested = 0;

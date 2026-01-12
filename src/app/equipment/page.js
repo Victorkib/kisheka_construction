@@ -29,7 +29,7 @@ function EquipmentPageContent() {
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
   const [projects, setProjects] = useState([]);
-  const [isInfoExpanded, setIsInfoExpanded] = useState(true);
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   
   // Get projectId from context (prioritize current project over URL param)
   const projectIdFromContext = normalizeProjectId(currentProject?._id);

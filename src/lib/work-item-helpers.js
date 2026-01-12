@@ -59,8 +59,12 @@ export async function getPhaseWorkItems(phaseId, options = {}) {
     query.category = options.category;
   }
   
+  // Handle assignedTo filter - support array queries
   if (options.assignedTo) {
-    query.assignedTo = new ObjectId(options.assignedTo);
+    if (ObjectId.isValid(options.assignedTo)) {
+      // Filter work items where this worker is in the assignedTo array
+      query.assignedTo = { $in: [new ObjectId(options.assignedTo)] };
+    }
   }
   
   const sortOrder = options.sortBy === 'priority' 

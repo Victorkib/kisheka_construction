@@ -45,6 +45,7 @@ export async function GET(request) {
     const status = searchParams.get('status');
     const assignedTo = searchParams.get('assignedTo');
     const category = searchParams.get('category');
+    const search = searchParams.get('search');
 
     if (projectId && ObjectId.isValid(projectId)) {
       query.projectId = new ObjectId(projectId);
@@ -58,12 +59,46 @@ export async function GET(request) {
       query.status = status;
     }
 
-    if (assignedTo && ObjectId.isValid(assignedTo)) {
-      query.assignedTo = new ObjectId(assignedTo);
+    // Handle assignedTo filter - support both single worker and array
+    if (assignedTo) {
+      if (ObjectId.isValid(assignedTo)) {
+        // Filter work items where this worker is in the assignedTo array
+        query.assignedTo = { $in: [new ObjectId(assignedTo)] };
+      }
+    }
+    
+    // Support unassigned filter
+    const unassigned = searchParams.get('unassigned');
+    if (unassigned === 'true') {
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [
+          { assignedTo: { $exists: false } },
+          { assignedTo: { $eq: [] } },
+          { assignedTo: null }
+        ]
+      });
+    }
+
+    // Support search filter
+    if (search && search.trim()) {
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [
+          { name: { $regex: search.trim(), $options: 'i' } },
+          { description: { $regex: search.trim(), $options: 'i' } },
+          { category: { $regex: search.trim(), $options: 'i' } }
+        ]
+      });
     }
 
     if (category) {
       query.category = category;
+    }
+
+    // Clean up $and if empty (MongoDB doesn't like empty $and arrays)
+    if (query.$and && query.$and.length === 0) {
+      delete query.$and;
     }
 
     // Pagination
@@ -99,11 +134,77 @@ export async function GET(request) {
       phaseMap[phase._id.toString()] = phase.phaseName || phase.name || 'Unknown';
     });
 
-    // Add phase names to work items
-    const workItemsWithPhases = workItems.map(item => ({
-      ...item,
-      phaseName: item.phaseId ? phaseMap[item.phaseId.toString()] : 'Unknown'
-    }));
+    // Populate assigned workers
+    const allAssignedWorkerIds = [];
+    workItems.forEach(item => {
+      if (item.assignedTo && Array.isArray(item.assignedTo)) {
+        item.assignedTo.forEach(workerId => {
+          if (workerId && !allAssignedWorkerIds.includes(workerId.toString())) {
+            allAssignedWorkerIds.push(workerId.toString());
+          }
+        });
+      } else if (item.assignedTo && !Array.isArray(item.assignedTo)) {
+        // Backward compatibility: handle single ObjectId
+        const workerIdStr = item.assignedTo.toString();
+        if (!allAssignedWorkerIds.includes(workerIdStr)) {
+          allAssignedWorkerIds.push(workerIdStr);
+        }
+      }
+    });
+
+    const workers = allAssignedWorkerIds.length > 0
+      ? await db.collection('worker_profiles').find({
+          $or: [
+            { _id: { $in: allAssignedWorkerIds.map(id => new ObjectId(id)) } },
+            { userId: { $in: allAssignedWorkerIds.map(id => new ObjectId(id)) } }
+          ],
+          deletedAt: null
+        }).toArray()
+      : [];
+
+    const workerMap = {};
+    workers.forEach(worker => {
+      const id = worker._id.toString();
+      const userId = worker.userId?.toString();
+      workerMap[id] = {
+        _id: worker._id,
+        workerName: worker.workerName || worker.name || 'Unknown Worker',
+        employeeId: worker.employeeId,
+        workerType: worker.workerType,
+        skillType: worker.skillType
+      };
+      if (userId) {
+        workerMap[userId] = workerMap[id];
+      }
+    });
+
+    // Add phase names and assigned workers to work items
+    const workItemsWithPhases = workItems.map(item => {
+      const assignedWorkers = [];
+      if (item.assignedTo) {
+        if (Array.isArray(item.assignedTo)) {
+          item.assignedTo.forEach(workerId => {
+            const workerIdStr = workerId?.toString();
+            if (workerIdStr && workerMap[workerIdStr]) {
+              assignedWorkers.push(workerMap[workerIdStr]);
+            }
+          });
+        } else {
+          // Backward compatibility
+          const workerIdStr = item.assignedTo?.toString();
+          if (workerIdStr && workerMap[workerIdStr]) {
+            assignedWorkers.push(workerMap[workerIdStr]);
+          }
+        }
+      }
+      
+      return {
+        ...item,
+        phaseName: item.phaseId ? phaseMap[item.phaseId.toString()] : 'Unknown',
+        assignedWorkers: assignedWorkers,
+        assignedWorkersCount: assignedWorkers.length
+      };
+    });
 
     const total = await db.collection('work_items').countDocuments(query);
 

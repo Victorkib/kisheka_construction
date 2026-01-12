@@ -256,11 +256,32 @@ export async function getCurrentTotalUsed(projectId) {
     ])
     .toArray();
 
+  // Get total from labour entries (approved/paid only)
+  const labourTotal = await db
+    .collection('labour_entries')
+    .aggregate([
+      {
+        $match: {
+          projectId: new ObjectId(projectId),
+          deletedAt: null,
+          status: { $in: ['approved', 'paid'] },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$totalCost' },
+        },
+      },
+    ])
+    .toArray();
+
   const totalExpenses = expensesTotal[0]?.total || 0;
   const totalMaterials = materialsTotal[0]?.total || 0;
   const totalInitialExpenses = initialExpensesTotal[0]?.total || 0;
+  const totalLabour = labourTotal[0]?.total || 0;
 
-  return totalExpenses + totalMaterials + totalInitialExpenses;
+  return totalExpenses + totalMaterials + totalInitialExpenses + totalLabour;
 }
 
 /**
@@ -900,10 +921,26 @@ export async function getFinancialOverview(projectId) {
     ])
     .toArray();
 
+  // Get labour costs for breakdown
+  const labourTotal = await db
+    .collection('labour_entries')
+    .aggregate([
+      {
+        $match: {
+          projectId: new ObjectId(projectId),
+          deletedAt: null,
+          status: { $in: ['approved', 'paid'] },
+        },
+      },
+      { $group: { _id: null, total: { $sum: '$totalCost' } } },
+    ])
+    .toArray();
+
   const breakdown = {
     expenses: expensesTotal[0]?.total || 0,
     materials: materialsTotal[0]?.total || 0,
     initialExpenses: initialExpensesTotal[0]?.total || 0,
+    labour: labourTotal[0]?.total || 0,
     total: totalUsed,
   };
 

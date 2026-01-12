@@ -151,9 +151,32 @@ export async function GET(request) {
     const materialsCommitted = materialsBreakdown.committed || 0;
     const materialsEstimated = materialsBreakdown.estimated || 0;
 
-    // Calculate total actual (materials + expenses + initial expenses)
+    // Calculate actual labour cost from approved/paid labour entries
+    const labourActualResult = await db
+      .collection('labour_entries')
+      .aggregate([
+        {
+          $match: {
+            projectId: new ObjectId(projectId),
+            deletedAt: null,
+            status: { $in: ['approved', 'paid'] },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$totalCost' },
+            count: { $sum: 1 },
+          },
+        },
+      ])
+      .toArray();
+    
+    const labourActual = labourActualResult[0]?.total || 0;
+
+    // Calculate total actual (materials + expenses + initial expenses + labour)
     // Note: Materials budget is separate, expenses and initial expenses typically come from contingency
-    const totalActual = materialsActualCost + actualExpensesCost + actualInitialExpensesCost;
+    const totalActual = materialsActualCost + actualExpensesCost + actualInitialExpensesCost + labourActual;
 
     // Calculate variance
     const materialsVariance = materialsBudget - materialsActualCost;
@@ -172,8 +195,7 @@ export async function GET(request) {
       ? ((materialsEstimatedVariance / materialsBudget) * 100).toFixed(2)
       : 0;
 
-    // Labour variance (labour tracking not yet implemented, so actual is 0)
-    const labourActual = 0; // TODO: Will be implemented in Phase 3
+    // Labour variance (labourActual already calculated above)
     const labourVariance = budget.labour - labourActual;
     const labourVariancePercentage = budget.labour > 0
       ? ((labourVariance / budget.labour) * 100).toFixed(2)

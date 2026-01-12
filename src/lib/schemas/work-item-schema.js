@@ -24,7 +24,8 @@ import {
  * @property {string} [description] - Work item description
  * @property {string} category - Work category (required)
  * @property {string} status - 'not_started' | 'in_progress' | 'completed' | 'blocked'
- * @property {ObjectId} [assignedTo] - Assigned worker or subcontractor
+ * @property {Array<ObjectId>} [assignedTo] - Assigned workers or subcontractors (multiple)
+ * @property {Array<Object>} [assignmentHistory] - History of assignment changes
  * @property {number} estimatedHours - Estimated hours (>= 0)
  * @property {number} actualHours - Actual hours (>= 0)
  * @property {number} estimatedCost - Estimated cost (>= 0)
@@ -57,7 +58,8 @@ export const WORK_ITEM_SCHEMA = {
   description: String,
   category: String, // Required
   status: String, // Required: 'not_started' | 'in_progress' | 'completed' | 'blocked'
-  assignedTo: 'ObjectId', // Optional
+  assignedTo: ['ObjectId'], // Optional - Array of worker IDs
+  assignmentHistory: [Object], // Optional - History of assignment changes
   estimatedHours: Number, // Default: 0
   actualHours: Number, // Default: 0
   estimatedCost: Number, // Default: 0
@@ -105,6 +107,29 @@ export function createWorkItem(input, projectId, phaseId, createdBy) {
     notes
   } = input;
 
+  // Handle assignedTo as array (support both single and multiple)
+  let assignedToArray = [];
+  if (assignedTo) {
+    if (Array.isArray(assignedTo)) {
+      // Array of worker IDs
+      assignedToArray = assignedTo
+        .filter(id => id && ObjectId.isValid(id))
+        .map(id => new ObjectId(id));
+    } else if (ObjectId.isValid(assignedTo)) {
+      // Single worker ID (backward compatibility)
+      assignedToArray = [new ObjectId(assignedTo)];
+    }
+  }
+
+  // Create initial assignment history entry if workers are assigned
+  const assignmentHistory = assignedToArray.length > 0 ? [{
+    previousWorkers: [],
+    assignedWorkers: assignedToArray.map(id => id.toString()),
+    assignedBy: typeof createdBy === 'string' ? new ObjectId(createdBy) : createdBy,
+    assignedAt: new Date(),
+    action: 'assigned'
+  }] : [];
+
   return {
     projectId: typeof projectId === 'string' ? new ObjectId(projectId) : projectId,
     phaseId: typeof phaseId === 'string' ? new ObjectId(phaseId) : phaseId,
@@ -112,7 +137,8 @@ export function createWorkItem(input, projectId, phaseId, createdBy) {
     description: description?.trim() || '',
     category: category || 'other',
     status: status || 'not_started',
-    assignedTo: assignedTo && ObjectId.isValid(assignedTo) ? new ObjectId(assignedTo) : null,
+    assignedTo: assignedToArray,
+    assignmentHistory: assignmentHistory,
     estimatedHours: parseFloat(estimatedHours) || 0,
     actualHours: parseFloat(actualHours) || 0,
     estimatedCost: parseFloat(estimatedCost) || 0,

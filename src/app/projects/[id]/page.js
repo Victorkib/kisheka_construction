@@ -1815,6 +1815,18 @@ export default function ProjectDetailPage() {
             </div>
           </Link>
           <Link
+            href={`/labour/entries?projectId=${projectId}`}
+            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
+          >
+            <div className="flex items-center gap-3">
+              <div className="text-3xl">👷</div>
+              <div>
+                <h3 className="font-semibold text-gray-900">View Labour</h3>
+                <p className="text-sm text-gray-600">Labour entries & workers</p>
+              </div>
+            </div>
+          </Link>
+          <Link
             href={`/items/new?projectId=${projectId}`}
             className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
           >

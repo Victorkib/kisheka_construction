@@ -16,6 +16,8 @@ import { useToast } from '@/components/toast';
 import { usePermissions } from '@/hooks/use-permissions';
 import { ConfirmationModal } from '@/components/modals';
 import { WORK_ITEM_STATUSES, WORK_ITEM_CATEGORIES, WORK_ITEM_PRIORITIES, getStatusColor, getPriorityColor, getPriorityLabel } from '@/lib/constants/work-item-constants';
+import { WorkItemLabourTracking } from '@/components/work-items/labour-tracking';
+import { MultiWorkerSelector } from '@/components/work-items/multi-worker-selector';
 
 export default function WorkItemDetailPage() {
   const router = useRouter();
@@ -34,12 +36,13 @@ export default function WorkItemDetailPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [isInfoExpanded, setIsInfoExpanded] = useState(true);
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     category: '',
     status: 'not_started',
+    assignedTo: [], // Array of worker IDs
     estimatedHours: '',
     actualHours: '',
     estimatedCost: '',
@@ -77,11 +80,22 @@ export default function WorkItemDetailPage() {
       setWorkItem(data.data);
       
       // Populate form data
+      // Handle assignedTo - support both array and single ObjectId (backward compatibility)
+      let assignedToArray = [];
+      if (data.data.assignedTo) {
+        if (Array.isArray(data.data.assignedTo)) {
+          assignedToArray = data.data.assignedTo.map(id => id?.toString()).filter(Boolean);
+        } else {
+          assignedToArray = [data.data.assignedTo.toString()];
+        }
+      }
+      
       setFormData({
         name: data.data.name || '',
         description: data.data.description || '',
         category: data.data.category || '',
         status: data.data.status || 'not_started',
+        assignedTo: assignedToArray,
         estimatedHours: data.data.estimatedHours || '',
         actualHours: data.data.actualHours || '',
         estimatedCost: data.data.estimatedCost || '',
@@ -137,6 +151,7 @@ export default function WorkItemDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          assignedTo: Array.isArray(formData.assignedTo) ? formData.assignedTo : (formData.assignedTo ? [formData.assignedTo] : []),
           estimatedHours: formData.estimatedHours ? parseFloat(formData.estimatedHours) : 0,
           actualHours: formData.actualHours ? parseFloat(formData.actualHours) : 0,
           estimatedCost: formData.estimatedCost ? parseFloat(formData.estimatedCost) : 0,
@@ -413,6 +428,51 @@ export default function WorkItemDetailPage() {
           </div>
         )}
 
+        {/* Assigned Workers */}
+        {workItem.assignedWorkers && workItem.assignedWorkers.length > 0 && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              Assigned Workers ({workItem.assignedWorkers.length})
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              {workItem.assignedWorkers.map((worker) => (
+                <Link
+                  key={worker._id?.toString()}
+                  href={`/labour/workers/${worker._id}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                >
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span className="font-medium text-blue-900">{worker.workerName}</span>
+                  {worker.employeeId && (
+                    <span className="text-xs text-blue-600">({worker.employeeId})</span>
+                  )}
+                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              ))}
+            </div>
+            {canAccess('create_labour_entry') && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <Link
+                  href={`/labour/entries/new?workItemId=${workItem._id}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Create Entry for Assigned Workers
+                </Link>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Notes */}
         {workItem.notes && (
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
@@ -427,6 +487,30 @@ export default function WorkItemDetailPage() {
             </div>
           </div>
         )}
+
+        {/* Assignment History */}
+        {workItem.assignmentHistory && workItem.assignmentHistory.length > 0 && (
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              Assignment History
+            </h2>
+            <AssignmentHistory assignmentHistory={workItem.assignmentHistory} />
+          </div>
+        )}
+
+        {/* Labour Tracking */}
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+            Labour Tracking
+          </h2>
+          <WorkItemLabourTracking workItemId={params.id} />
+        </div>
 
         {/* Edit Modal */}
         {showEditModal && canEdit && (
@@ -561,6 +645,17 @@ export default function WorkItemDetailPage() {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  {/* Worker Assignment */}
+                  <div>
+                    <MultiWorkerSelector
+                      value={formData.assignedTo || []}
+                      onChange={(workerIds) => setFormData({ ...formData, assignedTo: workerIds })}
+                      projectId={workItem?.projectId?.toString()}
+                      phaseId={workItem?.phaseId?.toString()}
+                      category={formData.category}
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

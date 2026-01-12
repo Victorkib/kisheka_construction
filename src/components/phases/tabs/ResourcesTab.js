@@ -8,6 +8,7 @@
 import Link from 'next/link';
 import { EquipmentSection } from './EquipmentSection';
 import { SubcontractorSection } from './SubcontractorSection';
+import { WorkersSection } from './WorkersSection';
 
 export function ResourcesTab({ phase, formatCurrency }) {
   return (
@@ -56,24 +57,8 @@ export function ResourcesTab({ phase, formatCurrency }) {
         </Link>
       </div>
 
-      {/* Workers Section - Placeholder */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Workers</h3>
-          <button
-            disabled
-            className="px-4 py-2 bg-gray-300 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed"
-            title="Labor system coming soon"
-          >
-            + Add Worker
-          </button>
-        </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-900">
-            <strong>Coming Soon:</strong> The labor management system will allow you to assign workers to phases, track labor costs, and monitor worker utilization.
-          </p>
-        </div>
-      </div>
+      {/* Workers Section */}
+      <WorkersSection phase={phase} formatCurrency={formatCurrency} />
 
       {/* Equipment Section */}
       <EquipmentSection phase={phase} formatCurrency={formatCurrency} />

@@ -30,13 +30,14 @@ function WorkItemsPageContent() {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
-  const [isInfoExpanded, setIsInfoExpanded] = useState(true);
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   const [filters, setFilters] = useState({
     projectId: searchParams.get('projectId') || '',
     phaseId: searchParams.get('phaseId') || '',
     status: searchParams.get('status') || '',
     category: searchParams.get('category') || '',
-    search: searchParams.get('search') || ''
+    search: searchParams.get('search') || '',
+    unassigned: searchParams.get('unassigned') === 'true' || false
   });
 
   useEffect(() => {
@@ -119,6 +120,7 @@ function WorkItemsPageContent() {
       if (filters.status) queryParams.set('status', filters.status);
       if (filters.category) queryParams.set('category', filters.category);
       if (filters.search) queryParams.set('search', filters.search);
+      if (filters.unassigned) queryParams.set('unassigned', 'true');
 
       const response = await fetch(`/api/work-items?${queryParams.toString()}`);
       const data = await response.json();
@@ -143,7 +145,13 @@ function WorkItemsPageContent() {
     
     const params = new URLSearchParams();
     Object.entries({ ...filters, [key]: value }).forEach(([k, v]) => {
-      if (v) params.set(k, v);
+      if (v && v !== false) {
+        if (k === 'unassigned' && v === true) {
+          params.set(k, 'true');
+        } else if (k !== 'unassigned') {
+          params.set(k, v);
+        }
+      }
     });
     router.push(`/work-items?${params.toString()}`, { scroll: false });
   };
@@ -313,7 +321,7 @@ function WorkItemsPageContent() {
 
         {/* Filters */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-7 gap-4">
             <div>
               <label htmlFor="project-filter" className="block text-sm font-semibold text-gray-900 mb-2">
                 Project
@@ -394,6 +402,20 @@ function WorkItemsPageContent() {
               </select>
             </div>
 
+            <div className="flex items-end">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={filters.unassigned}
+                  onChange={(e) => handleFilterChange('unassigned', e.target.checked)}
+                  className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <span className="text-sm font-semibold text-gray-900">
+                  Unassigned Only
+                </span>
+              </label>
+            </div>
+
             <div>
               <label htmlFor="search-filter" className="block text-sm font-semibold text-gray-900 mb-2">
                 Search
@@ -411,7 +433,7 @@ function WorkItemsPageContent() {
             <div className="flex items-end">
               <button
                 onClick={() => {
-                  setFilters({ projectId: '', phaseId: '', status: '', category: '', search: '' });
+                  setFilters({ projectId: '', phaseId: '', status: '', category: '', search: '', unassigned: false });
                   router.push('/work-items', { scroll: false });
                 }}
                 className="w-full px-4 py-2.5 border-2 border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-gray-900 font-semibold rounded-lg transition-all duration-200"
@@ -446,6 +468,9 @@ function WorkItemsPageContent() {
                       Phase
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                      Assigned To
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
                       Status
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
@@ -456,6 +481,9 @@ function WorkItemsPageContent() {
                     </th>
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
                       Hours
+                    </th>
+                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                      Labour
                     </th>
                     <th className="px-6 py-4 text-right text-xs font-bold text-gray-900 uppercase tracking-wider">
                       Actions
@@ -506,6 +534,29 @@ function WorkItemsPageContent() {
                             )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
+                            {item.assignedWorkers && item.assignedWorkers.length > 0 ? (
+                              <div className="flex flex-wrap gap-1">
+                                {item.assignedWorkers.slice(0, 2).map((worker) => (
+                                  <Link
+                                    key={worker._id?.toString()}
+                                    href={`/labour/workers/${worker._id}`}
+                                    className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                    title={worker.workerName}
+                                  >
+                                    {worker.workerName}
+                                  </Link>
+                                ))}
+                                {item.assignedWorkers.length > 2 && (
+                                  <span className="text-xs text-gray-500">
+                                    +{item.assignedWorkers.length - 2} more
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-400 italic">Unassigned</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`px-3 py-1 text-xs font-bold rounded-full ${getStatusColor(item.status)}`}>
                               {item.status?.replace('_', ' ').toUpperCase() || 'UNKNOWN'}
                             </span>
@@ -535,21 +586,56 @@ function WorkItemsPageContent() {
                               <span className="text-gray-700">{item.estimatedHours || 0}</span>
                               <span className="text-gray-500 ml-1">hrs</span>
                             </div>
+                            {item.estimatedCost > 0 && (
+                              <div className="text-xs text-gray-600 mt-1">
+                                {(item.actualCost || 0).toLocaleString()} / {item.estimatedCost.toLocaleString()} KES
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex flex-col gap-1">
+                              <Link
+                                href={`/labour/entries?workItemId=${item._id}`}
+                                className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                              >
+                                View Entries →
+                              </Link>
+                              {canEdit && (
+                                <div className="flex gap-2 mt-1">
+                                  <Link
+                                    href={`/labour/entries/new?workItemId=${item._id}`}
+                                    className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200 font-medium"
+                                    title="Add Entry"
+                                  >
+                                    + Entry
+                                  </Link>
+                                  <Link
+                                    href={`/labour/batches/new?workItemId=${item._id}`}
+                                    className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 font-medium"
+                                    title="Bulk Entry"
+                                  >
+                                    Bulk
+                                  </Link>
+                                </div>
+                              )}
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <Link
-                              href={`/work-items/${item._id}`}
-                              className="text-blue-600 hover:text-blue-800 font-semibold transition-colors"
-                            >
-                              View →
-                            </Link>
+                            <div className="flex items-center justify-end gap-2">
+                              <Link
+                                href={`/work-items/${item._id}`}
+                                className="text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+                              >
+                                View →
+                              </Link>
+                            </div>
                           </td>
                         </tr>
                       );
                     })
                   ) : (
                     <tr>
-                      <td colSpan="7" className="px-6 py-4 text-center text-gray-500 font-medium">
+                      <td colSpan="9" className="px-6 py-4 text-center text-gray-500 font-medium">
                         No work items found
                       </td>
                     </tr>

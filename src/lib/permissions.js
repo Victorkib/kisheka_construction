@@ -254,6 +254,58 @@ export const PERMISSIONS = {
   edit_subcontractor: [ROLES.PROJECT_MANAGER, ROLES.OWNER],
   delete_subcontractor: [ROLES.OWNER],
   view_subcontractors: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Labour Entry Permissions
+  // ============================================
+  create_labour_entry: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK],
+  edit_labour_entry: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  delete_labour_entry: [ROLES.OWNER],
+  approve_labour_entry: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  view_labour_entries: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Labour Batch Permissions
+  // ============================================
+  create_labour_batch: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK],
+  edit_labour_batch: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  delete_labour_batch: [ROLES.OWNER],
+  approve_labour_batch: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  view_labour_batches: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Worker Profile Permissions
+  // ============================================
+  create_worker_profile: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  edit_worker_profile: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  delete_worker_profile: [ROLES.OWNER],
+  view_worker_profiles: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Labour Template Permissions
+  // ============================================
+  create_labour_template: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  edit_labour_template: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  delete_labour_template: [ROLES.OWNER],
+  apply_labour_template: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK],
+  view_labour_templates: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Supervisor Submission Permissions
+  // ============================================
+  create_supervisor_submission: [ROLES.SUPERVISOR, ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.CLERK],
+  edit_supervisor_submission: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  delete_supervisor_submission: [ROLES.OWNER],
+  approve_supervisor_submission: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  reject_supervisor_submission: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  view_supervisor_submissions: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
+
+  // ============================================
+  // Labour Reports Permissions
+  // ============================================
+  view_labour_reports: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT, ROLES.SUPERVISOR],
+  view_labour_cost_summaries: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
+  view_labour_budget_alerts: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT],
 };
 
 /**
@@ -476,6 +528,46 @@ export const PERMISSION_CATEGORIES = {
     'edit_subcontractor',
     'delete_subcontractor',
     'view_subcontractors',
+  ],
+  LABOUR_ENTRIES: [
+    'create_labour_entry',
+    'edit_labour_entry',
+    'delete_labour_entry',
+    'approve_labour_entry',
+    'view_labour_entries',
+  ],
+  LABOUR_BATCHES: [
+    'create_labour_batch',
+    'edit_labour_batch',
+    'delete_labour_batch',
+    'approve_labour_batch',
+    'view_labour_batches',
+  ],
+  WORKER_PROFILES: [
+    'create_worker_profile',
+    'edit_worker_profile',
+    'delete_worker_profile',
+    'view_worker_profiles',
+  ],
+  LABOUR_TEMPLATES: [
+    'create_labour_template',
+    'edit_labour_template',
+    'delete_labour_template',
+    'apply_labour_template',
+    'view_labour_templates',
+  ],
+  SUPERVISOR_SUBMISSIONS: [
+    'create_supervisor_submission',
+    'edit_supervisor_submission',
+    'delete_supervisor_submission',
+    'approve_supervisor_submission',
+    'reject_supervisor_submission',
+    'view_supervisor_submissions',
+  ],
+  LABOUR_REPORTS: [
+    'view_labour_reports',
+    'view_labour_cost_summaries',
+    'view_labour_budget_alerts',
   ],
 };
 

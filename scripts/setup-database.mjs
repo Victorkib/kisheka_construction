@@ -625,6 +625,246 @@ async function setupDatabase() {
     console.log('✅ Budget reallocations collection ready\n');
     
     // ============================================
+    // LABOUR ENTRIES COLLECTION (Labour System)
+    // ============================================
+    console.log('📝 Setting up labour_entries collection...');
+    const labourEntriesCollection = db.collection('labour_entries');
+    
+    await labourEntriesCollection.createIndex(
+      { batchId: 1, entryDate: -1 },
+      { name: 'batchId_entryDate_idx', sparse: true }
+    );
+    await labourEntriesCollection.createIndex(
+      { projectId: 1, entryDate: -1 },
+      { name: 'projectId_entryDate_idx' }
+    );
+    await labourEntriesCollection.createIndex(
+      { phaseId: 1, entryDate: -1 },
+      { name: 'phaseId_entryDate_idx' }
+    );
+    await labourEntriesCollection.createIndex(
+      { workerId: 1, entryDate: -1 },
+      { name: 'workerId_entryDate_idx', sparse: true }
+    );
+    await labourEntriesCollection.createIndex(
+      { floorId: 1 },
+      { name: 'floorId_idx', sparse: true }
+    );
+    await labourEntriesCollection.createIndex(
+      { categoryId: 1 },
+      { name: 'categoryId_idx', sparse: true }
+    );
+    await labourEntriesCollection.createIndex(
+      { workItemId: 1 },
+      { name: 'workItemId_idx', sparse: true }
+    );
+    await labourEntriesCollection.createIndex(
+      { workerType: 1, workerRole: 1 },
+      { name: 'workerType_workerRole_idx' }
+    );
+    await labourEntriesCollection.createIndex(
+      { skillType: 1 },
+      { name: 'skillType_idx' }
+    );
+    await labourEntriesCollection.createIndex(
+      { status: 1 },
+      { name: 'status_idx' }
+    );
+    await labourEntriesCollection.createIndex(
+      { entryDate: -1 },
+      { name: 'entryDate_desc' }
+    );
+    await labourEntriesCollection.createIndex(
+      { createdAt: -1 },
+      { name: 'createdAt_desc' }
+    );
+    await labourEntriesCollection.createIndex(
+      { deletedAt: 1 },
+      { name: 'deletedAt_idx', sparse: true }
+    );
+    console.log('✅ Labour entries collection ready\n');
+    
+    // ============================================
+    // LABOUR BATCHES COLLECTION (Labour System)
+    // ============================================
+    console.log('📝 Setting up labour_batches collection...');
+    const labourBatchesCollection = db.collection('labour_batches');
+    
+    await labourBatchesCollection.createIndex(
+      { batchNumber: 1 },
+      { unique: true, name: 'batchNumber_unique' }
+    );
+    await labourBatchesCollection.createIndex(
+      { projectId: 1, createdAt: -1 },
+      { name: 'projectId_createdAt_idx' }
+    );
+    await labourBatchesCollection.createIndex(
+      { status: 1 },
+      { name: 'status_idx' }
+    );
+    await labourBatchesCollection.createIndex(
+      { createdBy: 1, createdAt: -1 },
+      { name: 'createdBy_createdAt_idx' }
+    );
+    await labourBatchesCollection.createIndex(
+      { approvedBy: 1 },
+      { name: 'approvedBy_idx', sparse: true }
+    );
+    await labourBatchesCollection.createIndex(
+      { deletedAt: 1 },
+      { name: 'deletedAt_idx', sparse: true }
+    );
+    console.log('✅ Labour batches collection ready\n');
+    
+    // ============================================
+    // WORKER PROFILES COLLECTION (Labour System)
+    // ============================================
+    console.log('📝 Setting up worker_profiles collection...');
+    const workerProfilesCollection = db.collection('worker_profiles');
+    
+    await workerProfilesCollection.createIndex(
+      { employeeId: 1 },
+      { unique: true, name: 'employeeId_unique' }
+    );
+    await workerProfilesCollection.createIndex(
+      { userId: 1 },
+      { unique: true, name: 'userId_unique', sparse: true }
+    );
+    await workerProfilesCollection.createIndex(
+      { nationalId: 1 },
+      { name: 'nationalId_idx', sparse: true }
+    );
+    await workerProfilesCollection.createIndex(
+      { workerType: 1, profession: 1 },
+      { name: 'workerType_profession_idx', sparse: true }
+    );
+    await workerProfilesCollection.createIndex(
+      { skillTypes: 1 },
+      { name: 'skillTypes_idx' }
+    );
+    await workerProfilesCollection.createIndex(
+      { status: 1 },
+      { name: 'status_idx' }
+    );
+    await workerProfilesCollection.createIndex(
+      { workerName: 1 },
+      { name: 'workerName_idx' }
+    );
+    await workerProfilesCollection.createIndex(
+      { createdAt: -1 },
+      { name: 'createdAt_desc' }
+    );
+    console.log('✅ Worker profiles collection ready\n');
+    
+    // ============================================
+    // LABOUR COST SUMMARIES COLLECTION (Labour System)
+    // ============================================
+    console.log('📝 Setting up labour_cost_summaries collection...');
+    const labourCostSummariesCollection = db.collection('labour_cost_summaries');
+    
+    await labourCostSummariesCollection.createIndex(
+      { projectId: 1, periodStart: -1 },
+      { name: 'projectId_periodStart_idx' }
+    );
+    await labourCostSummariesCollection.createIndex(
+      { phaseId: 1, periodStart: -1 },
+      { name: 'phaseId_periodStart_idx', sparse: true }
+    );
+    await labourCostSummariesCollection.createIndex(
+      { periodType: 1, periodStart: -1 },
+      { name: 'periodType_periodStart_idx' }
+    );
+    await labourCostSummariesCollection.createIndex(
+      { floorId: 1 },
+      { name: 'floorId_idx', sparse: true }
+    );
+    await labourCostSummariesCollection.createIndex(
+      { categoryId: 1 },
+      { name: 'categoryId_idx', sparse: true }
+    );
+    console.log('✅ Labour cost summaries collection ready\n');
+    
+    // ============================================
+    // LABOUR TEMPLATES COLLECTION (Labour System)
+    // ============================================
+    console.log('📝 Setting up labour_templates collection...');
+    const labourTemplatesCollection = db.collection('labour_templates');
+    
+    await labourTemplatesCollection.createIndex(
+      { name: 1 },
+      { name: 'name_idx' }
+    );
+    await labourTemplatesCollection.createIndex(
+      { createdBy: 1, createdAt: -1 },
+      { name: 'createdBy_createdAt_idx' }
+    );
+    await labourTemplatesCollection.createIndex(
+      { isPublic: 1, status: 1 },
+      { name: 'isPublic_status_idx' }
+    );
+    await labourTemplatesCollection.createIndex(
+      { templateCategory: 1, templateType: 1 },
+      { name: 'templateCategory_templateType_idx', sparse: true }
+    );
+    await labourTemplatesCollection.createIndex(
+      { tags: 1 },
+      { name: 'tags_idx' }
+    );
+    await labourTemplatesCollection.createIndex(
+      { usageCount: -1 },
+      { name: 'usageCount_desc' }
+    );
+    await labourTemplatesCollection.createIndex(
+      { lastUsedAt: -1 },
+      { name: 'lastUsedAt_desc', sparse: true }
+    );
+    await labourTemplatesCollection.createIndex(
+      { deletedAt: 1 },
+      { name: 'deletedAt_idx', sparse: true }
+    );
+    console.log('✅ Labour templates collection ready\n');
+    
+    // ============================================
+    // SUPERVISOR SUBMISSIONS COLLECTION (Labour System)
+    // ============================================
+    console.log('📝 Setting up supervisor_submissions collection...');
+    const supervisorSubmissionsCollection = db.collection('supervisor_submissions');
+    
+    await supervisorSubmissionsCollection.createIndex(
+      { submissionNumber: 1 },
+      { unique: true, name: 'submissionNumber_unique' }
+    );
+    await supervisorSubmissionsCollection.createIndex(
+      { projectId: 1, submittedAt: -1 },
+      { name: 'projectId_submittedAt_idx' }
+    );
+    await supervisorSubmissionsCollection.createIndex(
+      { phaseId: 1, submittedAt: -1 },
+      { name: 'phaseId_submittedAt_idx' }
+    );
+    await supervisorSubmissionsCollection.createIndex(
+      { status: 1, submittedAt: -1 },
+      { name: 'status_submittedAt_idx' }
+    );
+    await supervisorSubmissionsCollection.createIndex(
+      { submissionChannel: 1 },
+      { name: 'submissionChannel_idx' }
+    );
+    await supervisorSubmissionsCollection.createIndex(
+      { submittedBy: 1 },
+      { name: 'submittedBy_idx' }
+    );
+    await supervisorSubmissionsCollection.createIndex(
+      { reviewedBy: 1 },
+      { name: 'reviewedBy_idx', sparse: true }
+    );
+    await supervisorSubmissionsCollection.createIndex(
+      { labourBatchId: 1 },
+      { name: 'labourBatchId_idx', sparse: true }
+    );
+    console.log('✅ Supervisor submissions collection ready\n');
+    
+    // ============================================
     // SUMMARY
     // ============================================
     console.log('📊 Database Setup Summary:');

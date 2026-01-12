@@ -109,10 +109,32 @@ export async function GET(request) {
       ])
       .toArray();
 
+    // Get labour costs - filtered by project if provided
+    const labourTotal = await db
+      .collection('labour_entries')
+      .aggregate([
+        {
+          $match: {
+            deletedAt: null,
+            status: { $in: ['approved', 'paid'] },
+            ...projectFilter,
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$totalCost' },
+            count: { $sum: 1 },
+          },
+        },
+      ])
+      .toArray();
+
     const totalMaterialsCost = materialsTotal[0]?.total || 0;
     const totalExpensesCost = expensesTotal[0]?.total || 0;
     const totalInitialExpensesCost = initialExpensesTotal[0]?.total || 0;
-    const totalOverallCost = totalMaterialsCost + totalExpensesCost + totalInitialExpensesCost;
+    const totalLabourCost = labourTotal[0]?.total || 0;
+    const totalOverallCost = totalMaterialsCost + totalExpensesCost + totalInitialExpensesCost + totalLabourCost;
 
     // Get pending approvals count - filtered by project if provided
     const pendingMaterials = await db.collection('materials').countDocuments({
@@ -196,6 +218,7 @@ export async function GET(request) {
         totalMaterialsCost,
         totalExpensesCost,
         totalInitialExpensesCost,
+        totalLabourCost,
         totalOverallCost,
         totalPendingApprovals,
         pendingBreakdown: {

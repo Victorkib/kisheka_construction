@@ -50,7 +50,97 @@ export async function GET(request, { params }) {
       return errorResponse('Work item not found', 404);
     }
 
-    return successResponse(workItem, 'Work item retrieved successfully');
+    // Populate assigned workers
+    const assignedWorkerIds = [];
+    if (workItem.assignedTo) {
+      if (Array.isArray(workItem.assignedTo)) {
+        workItem.assignedTo.forEach(id => {
+          if (id) assignedWorkerIds.push(id.toString());
+        });
+      } else {
+        assignedWorkerIds.push(workItem.assignedTo.toString());
+      }
+    }
+
+    const assignedWorkers = assignedWorkerIds.length > 0
+      ? await db.collection('worker_profiles').find({
+          $or: [
+            { _id: { $in: assignedWorkerIds.map(id => new ObjectId(id)) } },
+            { userId: { $in: assignedWorkerIds.map(id => new ObjectId(id)) } }
+          ],
+          deletedAt: null
+        }).toArray()
+      : [];
+
+    const workerMap = {};
+    assignedWorkers.forEach(worker => {
+      const id = worker._id.toString();
+      const userId = worker.userId?.toString();
+      workerMap[id] = {
+        _id: worker._id,
+        workerName: worker.workerName || worker.name || 'Unknown Worker',
+        employeeId: worker.employeeId,
+        workerType: worker.workerType,
+        skillType: worker.skillType
+      };
+      if (userId) {
+        workerMap[userId] = workerMap[id];
+      }
+    });
+
+    // Get all unique user IDs from assignment history
+    const assignedByUserIds = [...new Set((workItem.assignmentHistory || [])
+      .map(entry => entry.assignedBy)
+      .filter(Boolean))];
+
+    // Fetch user profiles for assignedBy
+    const userProfiles = assignedByUserIds.length > 0
+      ? await db.collection('user_profiles').find({
+          _id: { $in: assignedByUserIds.map(id => new ObjectId(id)) }
+        }).toArray()
+      : [];
+
+    const userMap = {};
+    userProfiles.forEach(user => {
+      userMap[user._id.toString()] = user.name || user.email || 'Unknown User';
+    });
+
+    // Populate assignment history with worker names and user names
+    const populatedHistory = (workItem.assignmentHistory || []).map(entry => {
+      const previousWorkers = (entry.previousWorkers || []).map(id => {
+        if (typeof id === 'string') {
+          return workerMap[id] || { _id: id, workerName: 'Unknown Worker' };
+        }
+        return id;
+      });
+      const assignedWorkers = (entry.assignedWorkers || []).map(id => {
+        if (typeof id === 'string') {
+          return workerMap[id] || { _id: id, workerName: 'Unknown Worker' };
+        }
+        return id;
+      });
+      
+      // Get assignedBy user name
+      const assignedByName = entry.assignedBy 
+        ? (userMap[entry.assignedBy.toString()] || 'Unknown User')
+        : 'Unknown User';
+      
+      return {
+        ...entry,
+        previousWorkersDetails: previousWorkers,
+        assignedWorkersDetails: assignedWorkers,
+        assignedByName: assignedByName
+      };
+    });
+
+    const populatedWorkItem = {
+      ...workItem,
+      assignedWorkers: assignedWorkerIds.map(id => workerMap[id]).filter(Boolean),
+      assignedWorkersCount: assignedWorkerIds.length,
+      assignmentHistory: populatedHistory
+    };
+
+    return successResponse(populatedWorkItem, 'Work item retrieved successfully');
   } catch (error) {
     console.error('Get work item error:', error);
     return errorResponse('Failed to retrieve work item', 500);
@@ -171,12 +261,48 @@ export async function PATCH(request, { params }) {
     }
 
     if (assignedTo !== undefined) {
-      if (assignedTo === null || assignedTo === '') {
-        updateData.assignedTo = null;
-      } else if (ObjectId.isValid(assignedTo)) {
-        updateData.assignedTo = new ObjectId(assignedTo);
-      } else {
-        return errorResponse('Invalid assignedTo ID format', 400);
+      // Handle assignedTo as array (support multiple workers)
+      let newAssignedTo = [];
+      if (assignedTo !== null && assignedTo !== '') {
+        if (Array.isArray(assignedTo)) {
+          newAssignedTo = assignedTo
+            .filter(id => id && ObjectId.isValid(id))
+            .map(id => new ObjectId(id));
+        } else if (ObjectId.isValid(assignedTo)) {
+          // Backward compatibility: single worker ID
+          newAssignedTo = [new ObjectId(assignedTo)];
+        } else {
+          return errorResponse('Invalid assignedTo ID format', 400);
+        }
+      }
+      
+      // Get existing assigned workers (handle both array and single ObjectId for backward compatibility)
+      const existingAssignedTo = existingWorkItem.assignedTo || [];
+      const existingIds = Array.isArray(existingAssignedTo)
+        ? existingAssignedTo.map(id => id?.toString()).filter(Boolean).sort()
+        : existingAssignedTo
+        ? [existingAssignedTo.toString()].sort()
+        : [];
+      
+      const newIds = newAssignedTo.map(id => id.toString()).sort();
+      
+      // Check if assignment changed
+      const assignmentChanged = JSON.stringify(existingIds) !== JSON.stringify(newIds);
+      
+      if (assignmentChanged) {
+        updateData.assignedTo = newAssignedTo;
+        
+        // Track assignment history
+        const existingHistory = existingWorkItem.assignmentHistory || [];
+        const historyEntry = {
+          previousWorkers: existingIds,
+          assignedWorkers: newIds,
+          assignedBy: userProfile._id.toString(),
+          assignedAt: new Date(),
+          action: newIds.length === 0 ? 'unassigned' : (existingIds.length === 0 ? 'assigned' : 'reassigned')
+        };
+        
+        updateData.assignmentHistory = [...existingHistory, historyEntry];
       }
     }
 

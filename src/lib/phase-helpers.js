@@ -316,14 +316,36 @@ export async function getProjectPhases(projectId, includeFinancials = true) {
       const { calculatePhaseProfessionalServicesSpending } = await import('@/lib/professional-services-helpers');
       const professionalServicesSpending = await calculatePhaseProfessionalServicesSpending(phase._id.toString());
       
-      // TODO: Add labour spending when labour system is implemented
-      const labourSpending = 0;
+      // Calculate labour spending from approved/paid labour entries
+      const { recalculatePhaseLabourSpending } = await import('@/lib/labour-financial-helpers');
+      let labourSpending = 0;
+      try {
+        labourSpending = await recalculatePhaseLabourSpending(phase._id.toString());
+      } catch (error) {
+        console.error(`Error calculating labour spending for phase ${phase._id}:`, error);
+        // Fall back to phase.actualSpending.labour if recalculation fails
+        labourSpending = phase.actualSpending?.labour || 0;
+      }
       
-      // TODO: Add equipment spending when equipment system is implemented
-      const equipmentSpending = 0;
+      // Calculate equipment spending
+      const { calculatePhaseEquipmentCost } = await import('@/lib/equipment-helpers');
+      let equipmentSpending = 0;
+      try {
+        equipmentSpending = await calculatePhaseEquipmentCost(phase._id.toString());
+      } catch (error) {
+        console.error(`Error calculating equipment spending for phase ${phase._id}:`, error);
+        equipmentSpending = phase.actualSpending?.equipment || 0;
+      }
       
-      // TODO: Add subcontractor spending when subcontractor system is implemented
-      const subcontractorSpending = 0;
+      // Calculate subcontractor spending
+      const { calculatePhaseSubcontractorCost } = await import('@/lib/subcontractor-helpers');
+      let subcontractorSpending = 0;
+      try {
+        subcontractorSpending = await calculatePhaseSubcontractorCost(phase._id.toString());
+      } catch (error) {
+        console.error(`Error calculating subcontractor spending for phase ${phase._id}:`, error);
+        subcontractorSpending = phase.actualSpending?.subcontractors || 0;
+      }
       
       // Update phase with actual spending (professional fees are tracked separately for visibility)
       phase.actualSpending = {
@@ -657,8 +679,9 @@ export async function recalculatePhaseSpending(phaseId) {
   // Calculate estimated cost
   const estimatedCost = await calculatePhaseEstimatedCost(phaseId);
   
-  // TODO: Add labour spending when labour system is implemented
-  const labourSpending = 0;
+  // Calculate labour spending
+  const { recalculatePhaseLabourSpending } = await import('@/lib/labour-financial-helpers');
+  const labourSpending = await recalculatePhaseLabourSpending(phaseId.toString());
   
   // Phase 4: Calculate equipment spending
   const equipmentSpending = await calculatePhaseEquipmentCost(phaseId);

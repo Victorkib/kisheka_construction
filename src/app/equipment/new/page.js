@@ -29,7 +29,7 @@ export default function NewEquipmentPage() {
   const [loadingSuppliers, setLoadingSuppliers] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-  const [isInfoExpanded, setIsInfoExpanded] = useState(true);
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   
   const projectIdFromUrl = searchParams.get('projectId');
   const phaseIdFromUrl = searchParams.get('phaseId');

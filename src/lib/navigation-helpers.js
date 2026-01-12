@@ -201,6 +201,60 @@ export const NAVIGATION_SECTIONS = {
       },
     ],
   },
+  labour: {
+    label: 'Labour',
+    icon: 'users',
+    roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant', 'supervisor'],
+    children: [
+      {
+        label: 'Dashboard',
+        href: '/labour',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant', 'supervisor'],
+        icon: 'home',
+      },
+      {
+        label: 'Quick Entry',
+        href: '/labour/entries/new',
+        roles: ['owner'],
+        icon: 'plus',
+      },
+      {
+        label: 'Bulk Entry',
+        href: '/labour/batches/new',
+        roles: ['owner'],
+        icon: 'shopping-cart',
+      },
+      {
+        label: 'All Entries',
+        href: '/labour/entries',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant', 'supervisor'],
+      },
+      {
+        label: 'Workers',
+        href: '/labour/workers',
+        roles: ['owner', 'pm', 'project_manager'],
+        icon: 'users',
+      },
+      {
+        label: 'Templates',
+        href: '/labour/templates',
+        roles: ['owner', 'pm', 'project_manager'],
+        icon: 'file-text',
+      },
+      {
+        label: 'Reports',
+        href: '/labour/reports',
+        roles: ['owner', 'pm', 'project_manager', 'accountant'],
+        icon: 'bar-chart',
+      },
+      {
+        label: 'Supervisor Submissions',
+        href: '/labour/supervisor-submissions',
+        roles: ['owner', 'pm', 'project_manager'],
+        icon: 'message-square',
+      },
+    ],
+  },
   professionalServices: {
     label: 'Professionals',
     icon: 'users',

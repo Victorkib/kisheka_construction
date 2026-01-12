@@ -92,8 +92,22 @@ export async function GET(request, { params }) {
     const { calculatePhaseProfessionalServicesSpending } = await import('@/lib/professional-services-helpers');
     const professionalServicesSpending = await calculatePhaseProfessionalServicesSpending(id);
 
-    // TODO: Add labour spending when labour system is implemented
-    const labourSpending = 0;
+    // Calculate labour spending from approved/paid labour entries
+    // Use phase.actualSpending.labour if available and recent, otherwise recalculate
+    let labourSpending = phase.actualSpending?.labour || 0;
+    
+    // Verify labour spending is accurate by recalculating from entries
+    // This ensures data consistency even if actualSpending wasn't updated
+    const { recalculatePhaseLabourSpending } = await import('@/lib/labour-financial-helpers');
+    try {
+      const recalculatedLabour = await recalculatePhaseLabourSpending(id);
+      // Use recalculated value for accuracy
+      labourSpending = recalculatedLabour;
+    } catch (error) {
+      console.error('Error recalculating phase labour spending:', error);
+      // Fall back to phase.actualSpending.labour if recalculation fails
+      labourSpending = phase.actualSpending?.labour || 0;
+    }
     
     // Phase 4: Calculate equipment spending
     const equipmentSpending = await calculatePhaseEquipmentCost(id);

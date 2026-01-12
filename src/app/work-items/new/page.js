@@ -15,6 +15,7 @@ import { LoadingButton } from '@/components/loading';
 import { useToast } from '@/components/toast';
 import { usePermissions } from '@/hooks/use-permissions';
 import { WORK_ITEM_STATUSES, WORK_ITEM_CATEGORIES, WORK_ITEM_PRIORITIES } from '@/lib/constants/work-item-constants';
+import { MultiWorkerSelector } from '@/components/work-items/multi-worker-selector';
 
 export default function NewWorkItemPage() {
   const router = useRouter();
@@ -27,10 +28,11 @@ export default function NewWorkItemPage() {
   const [loadingPhases, setLoadingPhases] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
-  const [isInfoExpanded, setIsInfoExpanded] = useState(true);
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   
   const projectIdFromUrl = searchParams.get('projectId');
   const phaseIdFromUrl = searchParams.get('phaseId');
+  const workerIdFromUrl = searchParams.get('workerId'); // Support workerId from URL
   
   const [formData, setFormData] = useState({
     projectId: projectIdFromUrl || '',
@@ -39,7 +41,7 @@ export default function NewWorkItemPage() {
     description: '',
     category: '',
     status: 'not_started',
-    assignedTo: '',
+    assignedTo: [], // Array of worker IDs
     estimatedHours: '',
     actualHours: '',
     estimatedCost: '',
@@ -127,6 +129,7 @@ export default function NewWorkItemPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          assignedTo: Array.isArray(formData.assignedTo) ? formData.assignedTo : (formData.assignedTo ? [formData.assignedTo] : []),
           estimatedHours: formData.estimatedHours ? parseFloat(formData.estimatedHours) : 0,
           actualHours: formData.actualHours ? parseFloat(formData.actualHours) : 0,
           estimatedCost: formData.estimatedCost ? parseFloat(formData.estimatedCost) : 0,
@@ -412,6 +415,17 @@ export default function NewWorkItemPage() {
                     ))}
                   </select>
                 </div>
+              </div>
+
+              {/* Worker Assignment */}
+              <div className="mt-6">
+                <MultiWorkerSelector
+                  value={formData.assignedTo || []}
+                  onChange={(workerIds) => setFormData(prev => ({ ...prev, assignedTo: workerIds }))}
+                  projectId={formData.projectId}
+                  phaseId={formData.phaseId}
+                  category={formData.category}
+                />
               </div>
             </div>
 

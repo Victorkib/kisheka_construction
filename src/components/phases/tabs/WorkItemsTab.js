@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Clock, DollarSign, Users, Briefcase } from 'lucide-react';
 import { WORK_ITEM_STATUSES, WORK_ITEM_CATEGORIES, getStatusColor, getPriorityColor, getPriorityLabel } from '@/lib/constants/work-item-constants';
 
 export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
@@ -218,7 +219,7 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
                       {item.description && (
                         <p className="text-xs text-gray-600 mb-2 line-clamp-2">{item.description}</p>
                       )}
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
                         {item.estimatedHours > 0 && (
                           <span>{item.estimatedHours}h</span>
                         )}
@@ -227,6 +228,50 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
                             {item.category.replace(/\b\w/g, l => l.toUpperCase())}
                           </span>
                         )}
+                      </div>
+                      {/* Labour Indicators */}
+                      <div className="border-t border-gray-200 pt-2 mt-2 space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <div className="flex items-center gap-1 text-gray-600">
+                            <Clock className="w-3 h-3" />
+                            <span>
+                              {item.actualHours || 0}/{item.estimatedHours || 0} hrs
+                            </span>
+                          </div>
+                          {item.estimatedHours > 0 && (
+                            <span className="text-gray-500">
+                              {Math.min(100, Math.round(((item.actualHours || 0) / item.estimatedHours) * 100))}%
+                            </span>
+                          )}
+                        </div>
+                        {item.estimatedCost > 0 && (
+                          <div className="flex items-center gap-1 text-xs text-gray-600">
+                            <DollarSign className="w-3 h-3" />
+                            <span>
+                              {formatCurrency(item.actualCost || 0)} / {formatCurrency(item.estimatedCost)}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
+                          <Link
+                            href={`/labour/entries?workItemId=${item._id}`}
+                            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            View Labour →
+                          </Link>
+                          {canEdit && (
+                            <>
+                              <Link
+                                href={`/labour/entries/new?workItemId=${item._id}&phaseId=${phase._id}&projectId=${phase.projectId}`}
+                                className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200 font-medium"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                + Entry
+                              </Link>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </Link>
                   ))}
@@ -262,6 +307,9 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Labour
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -308,6 +356,53 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(item.status)}`}>
                         {item.status?.replace('_', ' ').toUpperCase() || 'UNKNOWN'}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1 text-xs text-gray-600">
+                          <Clock className="w-3 h-3" />
+                          <span>
+                            {item.actualHours || 0}/{item.estimatedHours || 0} hrs
+                          </span>
+                          {item.estimatedHours > 0 && (
+                            <span className="text-gray-500 ml-1">
+                              ({Math.min(100, Math.round(((item.actualHours || 0) / item.estimatedHours) * 100))}%)
+                            </span>
+                          )}
+                        </div>
+                        {item.estimatedCost > 0 && (
+                          <div className="flex items-center gap-1 text-xs text-gray-600">
+                            <DollarSign className="w-3 h-3" />
+                            <span>
+                              {formatCurrency(item.actualCost || 0)} / {formatCurrency(item.estimatedCost)}
+                            </span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-2 mt-1">
+                          <Link
+                            href={`/labour/entries?workItemId=${item._id}`}
+                            className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            View →
+                          </Link>
+                          {canEdit && (
+                            <>
+                              <Link
+                                href={`/labour/entries/new?workItemId=${item._id}&phaseId=${phase._id}&projectId=${phase.projectId}`}
+                                className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200 font-medium"
+                              >
+                                + Entry
+                              </Link>
+                              <Link
+                                href={`/labour/batches/new?workItemId=${item._id}&defaultPhaseId=${phase._id}&projectId=${phase.projectId}`}
+                                className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 font-medium"
+                              >
+                                Bulk
+                              </Link>
+                            </>
+                          )}
+                        </div>
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link
