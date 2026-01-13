@@ -16,6 +16,7 @@ import { EQUIPMENT_TYPES, EQUIPMENT_STATUSES, ACQUISITION_TYPES } from '@/lib/co
  * @property {string} equipmentName - Equipment name (required)
  * @property {string} equipmentType - Equipment type (required)
  * @property {string} acquisitionType - 'rental' | 'purchase' | 'owned' (required)
+ * @property {string} equipmentScope - 'phase_specific' | 'site_wide' (required, default: 'phase_specific')
  * @property {ObjectId} [supplierId] - Supplier ID (for rental/purchase)
  * @property {Date} startDate - Assignment start date (required)
  * @property {Date} [endDate] - Assignment end date
@@ -39,10 +40,11 @@ export { EQUIPMENT_TYPES, EQUIPMENT_STATUSES, ACQUISITION_TYPES };
  */
 export const EQUIPMENT_SCHEMA = {
   projectId: 'ObjectId', // Required
-  phaseId: 'ObjectId', // Required
+  phaseId: 'ObjectId', // Required (can be null for site-wide equipment)
   equipmentName: String, // Required
   equipmentType: String, // Required
   acquisitionType: String, // Required: 'rental' | 'purchase' | 'owned'
+  equipmentScope: String, // Required: 'phase_specific' | 'site_wide' (default: 'phase_specific')
   supplierId: 'ObjectId', // Optional
   startDate: Date, // Required
   endDate: Date, // Optional
@@ -74,6 +76,7 @@ export function createEquipment(input, projectId, phaseId, createdBy) {
     equipmentName,
     equipmentType,
     acquisitionType,
+    equipmentScope,
     supplierId,
     startDate,
     endDate,
@@ -82,6 +85,12 @@ export function createEquipment(input, projectId, phaseId, createdBy) {
     status,
     notes
   } = input;
+  
+  // Determine equipment scope
+  const scope = equipmentScope || 'phase_specific';
+  
+  // For site-wide equipment, phaseId can be null (it's project-level, not phase-specific)
+  const finalPhaseId = scope === 'site_wide' ? null : (phaseId || null);
 
   const start = new Date(startDate);
   const end = endDate ? new Date(endDate) : null;
@@ -92,10 +101,11 @@ export function createEquipment(input, projectId, phaseId, createdBy) {
 
   return {
     projectId: typeof projectId === 'string' ? new ObjectId(projectId) : projectId,
-    phaseId: typeof phaseId === 'string' ? new ObjectId(phaseId) : phaseId,
+    phaseId: finalPhaseId && ObjectId.isValid(finalPhaseId) ? (typeof finalPhaseId === 'string' ? new ObjectId(finalPhaseId) : finalPhaseId) : null,
     equipmentName: equipmentName?.trim() || '',
     equipmentType: equipmentType || 'other',
     acquisitionType: acquisitionType || 'rental',
+    equipmentScope: scope, // 'phase_specific' or 'site_wide'
     supplierId: supplierId && ObjectId.isValid(supplierId) ? new ObjectId(supplierId) : null,
     startDate: start,
     endDate: end,
@@ -127,8 +137,17 @@ export function validateEquipment(data) {
     errors.push('Valid projectId is required');
   }
   
-  if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
-    errors.push('Valid phaseId is required');
+  // PhaseId is required only for phase-specific equipment
+  // Site-wide equipment can have null phaseId
+  if (data.equipmentScope !== 'site_wide') {
+    if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
+      errors.push('Valid phaseId is required for phase-specific equipment');
+    }
+  }
+  
+  // Validate equipmentScope
+  if (data.equipmentScope && !['phase_specific', 'site_wide'].includes(data.equipmentScope)) {
+    errors.push('Equipment scope must be either "phase_specific" or "site_wide"');
   }
   
   if (!data.equipmentName || data.equipmentName.trim().length < 2) {

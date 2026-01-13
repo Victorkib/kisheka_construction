@@ -276,6 +276,27 @@ export async function POST(request) {
       return errorResponse('Project not found', 404);
     }
 
+    // Validate indirect costs budget before creating expense (only if marked as indirect)
+    let budgetValidation = null;
+    if (finalIsIndirectCost && finalIndirectCostCategory) {
+      const { validateIndirectCostsBudget } = await import('@/lib/indirect-costs-helpers');
+      budgetValidation = await validateIndirectCostsBudget(
+        projectId,
+        parseFloat(amount),
+        finalIndirectCostCategory
+      );
+
+      // If budget validation fails, return error (unless it's just a warning)
+      if (!budgetValidation.isValid) {
+        return errorResponse(budgetValidation.message, 400);
+      }
+
+      // If budget validation shows a warning, we'll still allow creation but log it
+      if (budgetValidation.warning) {
+        console.warn(`Indirect costs budget warning for project ${projectId}:`, budgetValidation.message);
+      }
+    }
+
     // Phase Management: Strongly recommend phaseId for phase-centric tracking
     const warnings = [];
     
@@ -328,6 +349,7 @@ export async function POST(request) {
       phaseId: new ObjectId(phaseId), // Required - validated above (for timeline tracking)
       isIndirectCost: finalIsIndirectCost || false, // NEW: Mark as indirect cost
       indirectCostCategory: finalIsIndirectCost ? finalIndirectCostCategory : null, // NEW: Indirect cost category
+      budgetValidation: finalIsIndirectCost && budgetValidation?.warning ? { warning: true, message: budgetValidation.message } : null,
       submittedBy: {
         userId: new ObjectId(userProfile._id),
         name: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,

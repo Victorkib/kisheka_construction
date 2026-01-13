@@ -20,6 +20,8 @@ import {
   Phone, Mail, Calendar, Briefcase, User, FileText
 } from 'lucide-react';
 import { ConfirmationModal } from '@/components/modals';
+import { WorkerDetailDrawer } from '@/components/workers/WorkerDetailDrawer';
+import { EditWorkerDrawer } from '@/components/workers/EditWorkerDrawer';
 import { 
   VALID_SKILL_TYPES, 
   VALID_WORKER_TYPES,
@@ -42,10 +44,11 @@ function WorkersPageContent() {
   const [deletingId, setDeletingId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [workerToDelete, setWorkerToDelete] = useState(null);
-  const [showWorkerModal, setShowWorkerModal] = useState(false);
-  const [selectedWorker, setSelectedWorker] = useState(null);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [editingWorker, setEditingWorker] = useState(null);
+  const [showWorkerDetailDrawer, setShowWorkerDetailDrawer] = useState(false);
+  const [selectedWorkerId, setSelectedWorkerId] = useState(null);
+  const [showEditDrawer, setShowEditDrawer] = useState(false);
+  const [editingWorkerId, setEditingWorkerId] = useState(null);
+  const [exporting, setExporting] = useState(false);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -124,41 +127,18 @@ function WorkersPageContent() {
     }
   };
 
-  const handleViewWorker = async (workerId) => {
-    try {
-      const response = await fetch(`/api/labour/workers/${workerId}`);
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch worker details');
-      }
-
-      setSelectedWorker(data.data);
-      setShowWorkerModal(true);
-    } catch (err) {
-      console.error('Error fetching worker:', err);
-      toast.showError('Failed to load worker details');
-    }
+  const handleViewWorker = (workerId) => {
+    setSelectedWorkerId(workerId);
+    setShowWorkerDetailDrawer(true);
   };
 
-  const handleEditWorker = async (workerId) => {
-    try {
-      const response = await fetch(`/api/labour/workers/${workerId}`);
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch worker details');
-      }
-
-      setEditingWorker(data.data);
-      setShowEditModal(true);
-    } catch (err) {
-      console.error('Error fetching worker:', err);
-      toast.showError('Failed to load worker details');
-    }
+  const handleEditWorker = (workerId) => {
+    setEditingWorkerId(workerId);
+    setShowEditDrawer(true);
   };
 
   const handleExport = async () => {
+    setExporting(true);
     try {
       // Build export query
       const queryParams = new URLSearchParams({
@@ -231,6 +211,8 @@ function WorkersPageContent() {
     } catch (err) {
       console.error('Error exporting workers:', err);
       toast.showError('Failed to export workers');
+    } finally {
+      setExporting(false);
     }
   };
 
@@ -302,13 +284,16 @@ function WorkersPageContent() {
                 </Link>
               </>
             )}
-            <button
+            <LoadingButton
               onClick={handleExport}
+              loading={exporting}
+              loadingText="Exporting..."
+              disabled={exporting}
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Download className="w-5 h-5" />
               Export
-            </button>
+            </LoadingButton>
           </div>
         </div>
 
@@ -567,10 +552,15 @@ function WorkersPageContent() {
                                   setWorkerToDelete(worker);
                                   setShowDeleteModal(true);
                                 }}
-                                className="text-red-600 hover:text-red-900"
+                                disabled={deletingId === worker._id}
+                                className="text-red-600 hover:text-red-900 disabled:opacity-50 disabled:cursor-not-allowed"
                                 title="Delete"
                               >
-                                <Trash2 className="w-4 h-4" />
+                                {deletingId === worker._id ? (
+                                  <LoadingSpinner size="sm" color="red-600" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
                               </button>
                             )}
                           </div>
@@ -634,475 +624,40 @@ function WorkersPageContent() {
           isLoading={deletingId === workerToDelete?._id}
         />
 
-        {/* Worker Detail Modal */}
-        {showWorkerModal && selectedWorker && (
-          <WorkerDetailModal
-            worker={selectedWorker}
-            onClose={() => {
-              setShowWorkerModal(false);
-              setSelectedWorker(null);
-            }}
-            onEdit={() => {
-              setShowWorkerModal(false);
-              handleEditWorker(selectedWorker._id);
-            }}
-          />
-        )}
+        {/* Worker Detail Drawer */}
+        <WorkerDetailDrawer
+          workerId={selectedWorkerId}
+          isOpen={showWorkerDetailDrawer}
+          onClose={() => {
+            setShowWorkerDetailDrawer(false);
+            setSelectedWorkerId(null);
+          }}
+          onEdit={(workerId) => {
+            setShowWorkerDetailDrawer(false);
+            setSelectedWorkerId(null);
+            handleEditWorker(workerId);
+          }}
+        />
 
-        {/* Edit Worker Modal */}
-        {showEditModal && editingWorker && (
-          <EditWorkerModal
-            worker={editingWorker}
-            onClose={() => {
-              setShowEditModal(false);
-              setEditingWorker(null);
-            }}
-            onSave={() => {
-              setShowEditModal(false);
-              setEditingWorker(null);
-              fetchWorkers();
-            }}
-          />
-        )}
+        {/* Edit Worker Drawer */}
+        <EditWorkerDrawer
+          workerId={editingWorkerId}
+          isOpen={showEditDrawer}
+          onClose={() => {
+            setShowEditDrawer(false);
+            setEditingWorkerId(null);
+          }}
+          onSave={() => {
+            setShowEditDrawer(false);
+            setEditingWorkerId(null);
+            fetchWorkers(); // Refresh the list
+          }}
+        />
       </div>
     </AppLayout>
   );
 }
 
-// Worker Detail Modal Component
-function WorkerDetailModal({ worker, onClose, onEdit }) {
-  const { canAccess } = usePermissions();
-  const stats = worker.statistics || {};
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Worker Details</h2>
-          <div className="flex items-center gap-2">
-            {canAccess('edit_worker_profile') && (
-              <button
-                onClick={onEdit}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                <Edit className="w-4 h-4 inline mr-2" />
-                Edit
-              </button>
-            )}
-            <button
-              onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <XCircle className="w-6 h-6" />
-            </button>
-          </div>
-        </div>
-
-        <div className="p-6 space-y-6">
-          {/* Action Buttons */}
-          <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
-            {canAccess('create_labour_entry') && (
-              <>
-                <Link
-                  href={`/labour/entries/new?workerId=${worker.userId || worker._id}`}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-                >
-                  <Plus className="w-4 h-4" />
-                  Create Entry
-                </Link>
-                <Link
-                  href={`/labour/batches/new?workerId=${worker.userId || worker._id}`}
-                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
-                >
-                  <FileText className="w-4 h-4" />
-                  Add to Bulk Entry
-                </Link>
-              </>
-            )}
-            <Link
-              href={`/labour/entries?workerId=${worker.userId || worker._id}`}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
-            >
-              <Eye className="w-4 h-4" />
-              View All Entries
-            </Link>
-          </div>
-
-          {/* Basic Info */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700">Name</label>
-                <p className="text-gray-900">{worker.workerName}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Employee ID</label>
-                <p className="text-gray-900">{worker.employeeId}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Worker Type</label>
-                <p className="text-gray-900">{getWorkerTypeLabel(worker.workerType)}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Status</label>
-                <span
-                  className={`inline-block px-2 py-1 text-xs rounded-full ${
-                    worker.status === 'active'
-                      ? 'bg-green-100 text-green-800'
-                      : worker.status === 'inactive'
-                      ? 'bg-gray-100 text-gray-800'
-                      : worker.status === 'terminated'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-yellow-100 text-yellow-800'
-                  }`}
-                >
-                  {worker.status?.charAt(0).toUpperCase() + worker.status?.slice(1).replace(/_/g, ' ')}
-                </span>
-              </div>
-              {worker.phoneNumber && (
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Phone</label>
-                  <p className="text-gray-900">{worker.phoneNumber}</p>
-                </div>
-              )}
-              {worker.email && (
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Email</label>
-                  <p className="text-gray-900">{worker.email}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Skills & Rates */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills & Rates</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-gray-700">Skills</label>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {(worker.skillTypes || []).map((skill, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded"
-                    >
-                      {getSkillTypeLabel(skill)}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-gray-700">Hourly Rate</label>
-                <p className="text-gray-900">{worker.defaultHourlyRate?.toLocaleString()} KES/hr</p>
-              </div>
-              {worker.defaultDailyRate && (
-                <div>
-                  <label className="text-sm font-medium text-gray-700">Daily Rate</label>
-                  <p className="text-gray-900">{worker.defaultDailyRate.toLocaleString()} KES/day</p>
-                </div>
-              )}
-              <div>
-                <label className="text-sm font-medium text-gray-700">Employment Type</label>
-                <p className="text-gray-900">
-                  {worker.employmentType?.charAt(0).toUpperCase() + worker.employmentType?.slice(1).replace(/_/g, ' ')}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Statistics */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Statistics</h3>
-            <div className="grid grid-cols-4 gap-4">
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-700">Total Hours</span>
-                </div>
-                <div className="text-2xl font-bold text-blue-600">
-                  {stats.totalHoursWorked?.toFixed(1) || '0'}
-                </div>
-              </div>
-              <div className="p-4 bg-green-50 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <DollarSign className="w-5 h-5 text-green-600" />
-                  <span className="text-sm font-medium text-gray-700">Total Earned</span>
-                </div>
-                <div className="text-2xl font-bold text-green-600">
-                  {stats.totalEarned?.toLocaleString() || '0'} KES
-                </div>
-              </div>
-              <div className="p-4 bg-purple-50 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-5 h-5 text-purple-600" />
-                  <span className="text-sm font-medium text-gray-700">Entries</span>
-                </div>
-                <div className="text-2xl font-bold text-purple-600">
-                  {stats.entryCount || '0'}
-                </div>
-              </div>
-              <div className="p-4 bg-yellow-50 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <User className="w-5 h-5 text-yellow-600" />
-                  <span className="text-sm font-medium text-gray-700">Rating</span>
-                </div>
-                <div className="text-2xl font-bold text-yellow-600">
-                  {stats.averageRating?.toFixed(1) || '0'}/5
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Edit Worker Modal Component
-function EditWorkerModal({ worker, onClose, onSave }) {
-  const toast = useToast();
-  const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    workerName: worker.workerName || '',
-    employeeId: worker.employeeId || '',
-    workerType: worker.workerType || 'internal',
-    phoneNumber: worker.phoneNumber || '',
-    email: worker.email || '',
-    skillTypes: worker.skillTypes || [],
-    defaultHourlyRate: worker.defaultHourlyRate || 0,
-    defaultDailyRate: worker.defaultDailyRate || '',
-    employmentType: worker.employmentType || 'casual',
-    status: worker.status || 'active',
-  });
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const response = await fetch(`/api/labour/workers/${worker._id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to update worker');
-      }
-
-      toast.showSuccess('Worker updated successfully');
-      onSave();
-    } catch (err) {
-      console.error('Error updating worker:', err);
-      toast.showError(err.message || 'Failed to update worker');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const toggleSkill = (skill) => {
-    setFormData(prev => ({
-      ...prev,
-      skillTypes: prev.skillTypes.includes(skill)
-        ? prev.skillTypes.filter(s => s !== skill)
-        : [...prev.skillTypes, skill],
-    }));
-  };
-
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Edit Worker</h2>
-          <button
-            onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
-          >
-            <XCircle className="w-6 h-6" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Worker Name *
-              </label>
-              <input
-                type="text"
-                value={formData.workerName}
-                onChange={(e) => setFormData(prev => ({ ...prev, workerName: e.target.value }))}
-                required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Employee ID *
-              </label>
-              <input
-                type="text"
-                value={formData.employeeId}
-                onChange={(e) => setFormData(prev => ({ ...prev, employeeId: e.target.value }))}
-                required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Worker Type *
-              </label>
-              <select
-                value={formData.workerType}
-                onChange={(e) => setFormData(prev => ({ ...prev, workerType: e.target.value }))}
-                required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                {VALID_WORKER_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {getWorkerTypeLabel(type)}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status *
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                {VALID_WORKER_STATUSES.map((status) => (
-                  <option key={status} value={status}>
-                    {status.charAt(0).toUpperCase() + status.slice(1).replace(/_/g, ' ')}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={formData.phoneNumber}
-                onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Hourly Rate (KES) *
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.defaultHourlyRate}
-                onChange={(e) => setFormData(prev => ({ ...prev, defaultHourlyRate: parseFloat(e.target.value) || 0 }))}
-                required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Daily Rate (KES)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.defaultDailyRate}
-                onChange={(e) => setFormData(prev => ({ ...prev, defaultDailyRate: e.target.value ? parseFloat(e.target.value) : '' }))}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Employment Type *
-              </label>
-              <select
-                value={formData.employmentType}
-                onChange={(e) => setFormData(prev => ({ ...prev, employmentType: e.target.value }))}
-                required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                {VALID_EMPLOYMENT_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ')}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Skills
-            </label>
-            <div className="border border-gray-300 rounded-lg p-4 max-h-48 overflow-y-auto">
-              <div className="grid grid-cols-3 gap-2">
-                {VALID_SKILL_TYPES.map((skill) => (
-                  <label key={skill} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={formData.skillTypes.includes(skill)}
-                      onChange={() => toggleSkill(skill)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm text-gray-700">{getSkillTypeLabel(skill)}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end gap-3 pt-4 border-t">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-            >
-              {loading ? <LoadingSpinner size="sm" /> : 'Save Changes'}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-}
 
 export default function WorkersPage() {
   return (

@@ -24,6 +24,7 @@ export const PROFESSIONAL_TYPES = PROFESSIONAL_TYPES_CONST_IMPORT;
  * @property {ObjectId} libraryId - Link to professional_services_library (required)
  * @property {ObjectId} projectId - Link to project (required)
  * @property {ObjectId} [phaseId] - Optional: primary phase assignment
+ * @property {string} serviceCategory - 'preconstruction' | 'construction' (required, default: 'construction')
  * @property {string} professionalCode - Auto-generated code (e.g., "ARCH-PROJ001-001")
  * @property {string} type - Denormalized from library: 'architect' or 'engineer'
  * @property {Date} assignedDate - When assigned to project (required)
@@ -62,6 +63,7 @@ export const PROFESSIONAL_SERVICES_SCHEMA = {
   libraryId: 'ObjectId', // Required, link to professional_services_library
   projectId: 'ObjectId', // Required, link to project
   phaseId: 'ObjectId', // Optional: primary phase assignment
+  serviceCategory: String, // Required: 'preconstruction' | 'construction' (default: 'construction')
   professionalCode: String, // Auto-generated
   type: String, // Denormalized: 'architect' or 'engineer'
   assignedDate: Date, // Required
@@ -186,6 +188,11 @@ export function validateProfessionalServices(data, libraryData = null) {
 
   if (data.phaseId && !ObjectId.isValid(data.phaseId)) {
     errors.push('Valid phaseId is required if provided');
+  }
+
+  // Validate serviceCategory
+  if (data.serviceCategory && !['preconstruction', 'construction'].includes(data.serviceCategory)) {
+    errors.push('serviceCategory must be either "preconstruction" or "construction"');
   }
 
   if (!data.contractType || !CONTRACT_TYPES.ALL.includes(data.contractType)) {

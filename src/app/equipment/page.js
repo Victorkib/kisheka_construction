@@ -90,14 +90,24 @@ function EquipmentPageContent() {
       }
 
       setEquipment(data.data.equipment || []);
-      setPagination(prev => data.data.pagination || prev);
+      setPagination(prev => {
+        const newPagination = data.data.pagination || prev;
+        // Only update if values actually changed
+        if (prev.page === newPagination.page && 
+            prev.limit === newPagination.limit && 
+            prev.total === newPagination.total && 
+            prev.pages === newPagination.pages) {
+          return prev; // Return same reference to prevent re-render
+        }
+        return newPagination;
+      });
     } catch (err) {
       setError(err.message);
       console.error('Fetch equipment error:', err);
     } finally {
       setLoading(false);
     }
-  }, [filters, pagination.page, pagination.limit]);
+  }, [filters.projectId, filters.phaseId, filters.status, filters.equipmentType, filters.acquisitionType, pagination.page, pagination.limit]);
 
   // Fetch equipment
   useEffect(() => {

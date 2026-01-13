@@ -11,7 +11,7 @@ import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingSpinner, LoadingButton } from '@/components/loading';
+import { LoadingSpinner, LoadingButton, LoadingSelect } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
 import { WizardProgress } from '@/components/bulk-request/wizard-progress';
@@ -528,13 +528,14 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Project <span className="text-red-500">*</span>
           </label>
-          <select
+          <LoadingSelect
             name="projectId"
             value={wizardData.projectId}
             onChange={handleChange}
             required
-            disabled={loadingProjects}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+            loading={loadingProjects}
+            loadingText="Loading projects..."
+            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select Project</option>
             {projects.map((project) => (
@@ -542,20 +543,22 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
                 {project.projectName} ({project.projectCode})
               </option>
             ))}
-          </select>
+          </LoadingSelect>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Phase <span className="text-red-500">*</span>
           </label>
-          <select
+          <LoadingSelect
             name="defaultPhaseId"
             value={wizardData.defaultPhaseId}
             onChange={handleChange}
             required
-            disabled={!wizardData.projectId || loadingPhases}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+            loading={loadingPhases}
+            loadingText="Loading phases..."
+            disabled={!wizardData.projectId}
+            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select Phase</option>
             {phases.map((phase) => (
@@ -563,19 +566,21 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
                 {phase.phaseName} ({phase.phaseCode})
               </option>
             ))}
-          </select>
+          </LoadingSelect>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Floor (Optional)
           </label>
-          <select
+          <LoadingSelect
             name="defaultFloorId"
             value={wizardData.defaultFloorId}
             onChange={handleChange}
-            disabled={!wizardData.projectId || loadingFloors}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+            loading={loadingFloors}
+            loadingText="Loading floors..."
+            disabled={!wizardData.projectId}
+            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">Select Floor</option>
             {floors.map((floor) => (
@@ -583,7 +588,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
                 {floor.name} (Floor {floor.floorNumber})
               </option>
             ))}
-          </select>
+          </LoadingSelect>
         </div>
 
         <div>
@@ -671,12 +676,14 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Work Item (Optional)
           </label>
-          <select
+          <LoadingSelect
             name="workItemId"
             value={wizardData.workItemId}
             onChange={handleChange}
-            disabled={!wizardData.defaultPhaseId || loadingWorkItems}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+            loading={loadingWorkItems}
+            loadingText="Loading work items..."
+            disabled={!wizardData.defaultPhaseId}
+            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="">No Work Item (General Labour)</option>
             {workItems.map((item) => (
@@ -684,7 +691,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
                 {item.name} ({item.category || 'Other'}) - {item.status || 'not_started'}
               </option>
             ))}
-          </select>
+          </LoadingSelect>
           {wizardData.workItemId && selectedWorkItem && (
             <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-start gap-2">

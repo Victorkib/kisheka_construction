@@ -151,6 +151,7 @@ export async function POST(request) {
       equipmentName,
       equipmentType,
       acquisitionType,
+      equipmentScope,
       supplierId,
       startDate,
       endDate,
@@ -169,25 +170,34 @@ export async function POST(request) {
       return errorResponse('Invalid project ID', 400);
     }
 
-    if (!phaseId) {
-      return errorResponse('Phase ID is required', 400);
-    }
+    // Determine equipment scope
+    const scope = equipmentScope || 'phase_specific';
 
-    if (!ObjectId.isValid(phaseId)) {
-      return errorResponse('Invalid phase ID', 400);
+    // Phase ID is required only for phase-specific equipment
+    // Site-wide equipment doesn't need a phase
+    if (scope === 'phase_specific') {
+      if (!phaseId) {
+        return errorResponse('Phase ID is required for phase-specific equipment', 400);
+      }
+
+      if (!ObjectId.isValid(phaseId)) {
+        return errorResponse('Invalid phase ID', 400);
+      }
     }
 
     const db = await getDatabase();
 
-    // Verify phase exists and belongs to project
-    const phase = await db.collection('phases').findOne({
-      _id: new ObjectId(phaseId),
-      projectId: new ObjectId(projectId),
-      deletedAt: null
-    });
+    // Verify phase exists and belongs to project (only for phase-specific)
+    if (scope === 'phase_specific' && phaseId) {
+      const phase = await db.collection('phases').findOne({
+        _id: new ObjectId(phaseId),
+        projectId: new ObjectId(projectId),
+        deletedAt: null
+      });
 
-    if (!phase) {
-      return errorResponse('Phase not found or does not belong to this project', 400);
+      if (!phase) {
+        return errorResponse('Phase not found or does not belong to this project', 400);
+      }
     }
 
     // Verify supplier exists if provided
@@ -205,10 +215,11 @@ export async function POST(request) {
     // Prepare equipment data for validation
     const equipmentData = {
       projectId,
-      phaseId,
+      phaseId: scope === 'site_wide' ? null : phaseId,
       equipmentName,
       equipmentType,
       acquisitionType,
+      equipmentScope: scope,
       supplierId,
       startDate,
       endDate,
@@ -229,6 +240,7 @@ export async function POST(request) {
         equipmentName,
         equipmentType,
         acquisitionType,
+        equipmentScope: scope,
         supplierId,
         startDate,
         endDate,
@@ -238,7 +250,7 @@ export async function POST(request) {
         notes
       },
       projectId,
-      phaseId,
+      scope === 'site_wide' ? null : phaseId,
       userProfile._id
     );
 
@@ -247,12 +259,20 @@ export async function POST(request) {
 
     const insertedEquipment = { ...equipment, _id: result.insertedId };
 
-    // Recalculate phase spending
-    try {
-      await recalculatePhaseSpending(phaseId);
-    } catch (phaseError) {
-      console.error('Error recalculating phase spending after equipment creation:', phaseError);
-      // Don't fail the request, just log the error
+    // Recalculate phase spending (only for phase-specific equipment)
+    // Site-wide equipment is charged to indirect costs, not phase budget
+    if (scope === 'phase_specific' && phaseId) {
+      try {
+        await recalculatePhaseSpending(phaseId);
+      } catch (phaseError) {
+        console.error('Error recalculating phase spending after equipment creation:', phaseError);
+        // Don't fail the request, just log the error
+      }
+    } else if (scope === 'site_wide') {
+      // Site-wide equipment should be tracked as indirect cost
+      // This will be handled separately - equipment costs are typically tracked differently
+      // For now, we'll just log that it's site-wide
+      console.log('Site-wide equipment created - should be tracked as indirect cost');
     }
 
     // Create audit log

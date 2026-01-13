@@ -29,6 +29,7 @@ export function ProfessionalServicesAssignmentForm({
     libraryId: '',
     projectId: '',
     phaseId: '',
+    serviceCategory: 'construction', // NEW: Service category (preconstruction or construction)
     assignedDate: new Date().toISOString().split('T')[0],
     contractType: '',
     contractValue: '',
@@ -60,6 +61,7 @@ export function ProfessionalServicesAssignmentForm({
         libraryId: initialData.libraryId?.toString() || initialData.library?._id?.toString() || '',
         projectId: initialData.projectId?.toString() || initialData.project?._id?.toString() || '',
         phaseId: initialData.phaseId?.toString() || initialData.phase?._id?.toString() || '',
+        serviceCategory: initialData.serviceCategory || 'construction',
         assignedDate: initialData.assignedDate ? new Date(initialData.assignedDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         contractType: initialData.contractType || '',
         contractValue: initialData.contractValue?.toString() || '',
@@ -283,6 +285,33 @@ export function ProfessionalServicesAssignmentForm({
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Service Category */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">
+              Service Category <span className="text-red-500">*</span>
+            </label>
+            <select
+              name="serviceCategory"
+              value={formData.serviceCategory}
+              onChange={handleChange}
+              required
+              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.serviceCategory ? 'border-red-300' : 'border-gray-300'
+              }`}
+            >
+              <option value="construction">Construction Services</option>
+              <option value="preconstruction">Preconstruction Services</option>
+            </select>
+            {validationErrors.serviceCategory && (
+              <p className="mt-1 text-sm text-red-600">{validationErrors.serviceCategory}</p>
+            )}
+            <p className="mt-1 text-xs text-gray-600">
+              {formData.serviceCategory === 'preconstruction' 
+                ? 'Preconstruction services (design, permits, approvals) are charged to the preconstruction budget.'
+                : 'Construction services (site inspections, construction oversight) are charged to the construction budget.'}
+            </p>
           </div>
 
           <div>

@@ -62,6 +62,16 @@ body {
   background: transparent;
 }
 
+/* Hide Scrollbar Utility */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
 /* Fade In Animation for Info Cards */
 @keyframes fadeIn {
   from {

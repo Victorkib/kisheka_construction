@@ -299,4 +299,3 @@ export async function DELETE(request, { params }) {
     return errorResponse(error.message || 'Failed to delete worker profile', 500);
   }
 }
-

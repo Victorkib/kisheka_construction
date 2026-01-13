@@ -1,236 +1,374 @@
 /**
  * Forecasting Helpers
- * Functions for cost forecasting and predictive analytics
+ * Functions for predicting future spending and budget outcomes
  */
 
 import { getDatabase } from '@/lib/mongodb/connection';
 import { ObjectId } from 'mongodb';
-import { MATERIAL_APPROVED_STATUSES, EXPENSE_APPROVED_STATUSES } from '@/lib/status-constants';
+import {
+  getPreConstructionBudget,
+  getPreConstructionSpending,
+} from '@/lib/financial-helpers';
+import {
+  getIndirectCostsBudget,
+  calculateIndirectCostsSpending,
+} from '@/lib/indirect-costs-helpers';
+import {
+  getContingencyReserveBudget,
+  calculateContingencyUsage,
+} from '@/lib/contingency-helpers';
+import { calculateTotalPhaseBudgets } from '@/lib/phase-helpers';
 
 /**
- * Calculate cost forecast for a phase based on historical spending patterns
- * @param {string} phaseId - Phase ID
- * @param {Object} options - Forecasting options
+ * Calculate spending velocity (rate of spending per day)
+ * @param {Array} spendingHistory - Array of { date: Date, amount: number }
+ * @returns {number} Daily spending rate
+ */
+export function calculateSpendingVelocity(spendingHistory) {
+  if (!spendingHistory || spendingHistory.length < 2) {
+    return 0;
+  }
+
+  // Sort by date
+  const sorted = [...spendingHistory].sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+  const first = sorted[0];
+  const last = sorted[sorted.length - 1];
+  
+  if (!first || !last || !first.date || !last.date) {
+    return 0;
+  }
+  
+  const totalAmount = sorted.reduce((sum, entry) => sum + (entry.amount || 0), 0);
+  const daysDiff = Math.max(1, Math.ceil((new Date(last.date) - new Date(first.date)) / (1000 * 60 * 60 * 24)));
+  
+  return daysDiff > 0 ? totalAmount / daysDiff : 0;
+}
+
+/**
+ * Forecast spending based on current velocity
+ * @param {number} currentSpending - Current total spending
+ * @param {number} dailyVelocity - Daily spending rate
+ * @param {number} daysRemaining - Days until project completion
+ * @returns {number} Forecasted total spending
+ */
+export function forecastSpending(currentSpending, dailyVelocity, daysRemaining) {
+  return currentSpending + (dailyVelocity * daysRemaining);
+}
+
+/**
+ * Get spending history for a category
+ * @param {string} projectId - Project ID
+ * @param {string} category - Cost category ('dcc', 'preconstruction', 'indirect', 'contingency')
+ * @param {number} daysBack - Number of days to look back (default: 90)
+ * @returns {Promise<Array>} Spending history array
+ */
+export async function getCategorySpendingHistory(projectId, category, daysBack = 90) {
+  const db = await getDatabase();
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - daysBack);
+
+  const history = [];
+
+  switch (category) {
+    case 'dcc': {
+      // Get phase spending over time from materials, labour, equipment
+      const phases = await db.collection('phases').find({
+        projectId: new ObjectId(projectId),
+        deletedAt: null,
+      }).toArray();
+
+      for (const phase of phases) {
+        // Materials
+        const materials = await db.collection('materials').find({
+          phaseId: phase._id,
+          deletedAt: null,
+          createdAt: { $gte: cutoffDate },
+        }).toArray();
+
+        materials.forEach(material => {
+          if (material.approvedAt) {
+            history.push({
+              date: material.approvedAt,
+              amount: material.totalCost || 0,
+              type: 'material',
+              phaseId: phase._id.toString(),
+            });
+          }
+        });
+
+        // Labour entries
+        const labourEntries = await db.collection('labour_entries').find({
+          phaseId: phase._id,
+          deletedAt: null,
+          createdAt: { $gte: cutoffDate },
+          isIndirectLabour: { $ne: true },
+        }).toArray();
+
+        labourEntries.forEach(entry => {
+          if (entry.status === 'approved' || entry.status === 'paid') {
+            history.push({
+              date: entry.entryDate || entry.createdAt,
+              amount: entry.totalCost || 0,
+              type: 'labour',
+              phaseId: phase._id.toString(),
+            });
+          }
+        });
+
+        // Equipment
+        const equipment = await db.collection('equipment').find({
+          phaseId: phase._id,
+          deletedAt: null,
+          createdAt: { $gte: cutoffDate },
+          equipmentScope: { $ne: 'site_wide' },
+        }).toArray();
+
+        equipment.forEach(eq => {
+          history.push({
+            date: eq.startDate || eq.createdAt,
+            amount: eq.totalCost || 0,
+            type: 'equipment',
+            phaseId: phase._id.toString(),
+          });
+        });
+      }
+      break;
+    }
+
+    case 'preconstruction': {
+      const initialExpenses = await db.collection('initial_expenses').find({
+        projectId: new ObjectId(projectId),
+        deletedAt: null,
+        createdAt: { $gte: cutoffDate },
+      }).toArray();
+
+      initialExpenses.forEach(expense => {
+        if (expense.status === 'approved') {
+          history.push({
+            date: expense.approvedAt || expense.createdAt,
+            amount: expense.amount || 0,
+            type: 'initial_expense',
+          });
+        }
+      });
+      break;
+    }
+
+    case 'indirect': {
+      // Expenses marked as indirect
+      const expenses = await db.collection('expenses').find({
+        projectId: new ObjectId(projectId),
+        deletedAt: null,
+        isIndirectCost: true,
+        createdAt: { $gte: cutoffDate },
+      }).toArray();
+
+      expenses.forEach(expense => {
+        if (expense.status === 'approved') {
+          history.push({
+            date: expense.approvedAt || expense.createdAt,
+            amount: expense.amount || 0,
+            type: 'expense',
+          });
+        }
+      });
+
+      // Site-wide equipment
+      const siteWideEquipment = await db.collection('equipment').find({
+        projectId: new ObjectId(projectId),
+        deletedAt: null,
+        equipmentScope: 'site_wide',
+        createdAt: { $gte: cutoffDate },
+      }).toArray();
+
+      siteWideEquipment.forEach(eq => {
+        history.push({
+          date: eq.startDate || eq.createdAt,
+          amount: eq.totalCost || 0,
+          type: 'equipment',
+        });
+      });
+
+      // Indirect labour
+      const indirectLabour = await db.collection('labour_entries').find({
+        projectId: new ObjectId(projectId),
+        deletedAt: null,
+        isIndirectLabour: true,
+        createdAt: { $gte: cutoffDate },
+      }).toArray();
+
+      indirectLabour.forEach(entry => {
+        if (entry.status === 'approved' || entry.status === 'paid') {
+          history.push({
+            date: entry.entryDate || entry.createdAt,
+            amount: entry.totalCost || 0,
+            type: 'labour',
+          });
+        }
+      });
+      break;
+    }
+
+    case 'contingency': {
+      const contingencyDraws = await db.collection('contingency_draws').find({
+        projectId: new ObjectId(projectId),
+        deletedAt: null,
+        status: { $in: ['approved', 'completed'] },
+        createdAt: { $gte: cutoffDate },
+      }).toArray();
+
+      contingencyDraws.forEach(draw => {
+        if (draw.approvedAt) {
+          history.push({
+            date: draw.approvedAt,
+            amount: draw.amount || 0,
+            type: 'contingency_draw',
+            drawType: draw.drawType,
+          });
+        }
+      });
+      break;
+    }
+  }
+
+  // Sort by date
+  return history.sort((a, b) => new Date(a.date) - new Date(b.date));
+}
+
+/**
+ * Forecast category spending
+ * @param {string} projectId - Project ID
+ * @param {string} category - Cost category
+ * @param {Date} projectEndDate - Project end date
  * @returns {Promise<Object>} Forecast data
  */
-export async function forecastPhaseCosts(phaseId, options = {}) {
+export async function forecastCategorySpending(projectId, category, projectEndDate) {
   const db = await getDatabase();
   
-  const phase = await db.collection('phases').findOne({
-    _id: new ObjectId(phaseId),
-    deletedAt: null
-  });
+  // Get current spending
+  let currentSpending = 0;
+  let budgeted = 0;
 
-  if (!phase) {
-    throw new Error('Phase not found');
+  if (category === 'dcc') {
+    const allocatedToPhases = await calculateTotalPhaseBudgets(projectId);
+    const phases = await db.collection('phases').find({
+      projectId: new ObjectId(projectId),
+      deletedAt: null,
+    }).toArray();
+    
+    currentSpending = phases.reduce((sum, phase) => {
+      return sum + (phase.actualSpending?.total || 0);
+    }, 0);
+    
+    const project = await db.collection('projects').findOne({
+      _id: new ObjectId(projectId),
+    });
+    budgeted = project?.budget?.directConstructionCosts || 0;
+  } else if (category === 'preconstruction') {
+    budgeted = await getPreConstructionBudget(projectId);
+    const spending = await getPreConstructionSpending(projectId);
+    currentSpending = spending.total || 0;
+  } else if (category === 'indirect') {
+    budgeted = await getIndirectCostsBudget(projectId);
+    currentSpending = await calculateIndirectCostsSpending(projectId);
+  } else if (category === 'contingency') {
+    budgeted = await getContingencyReserveBudget(projectId);
+    currentSpending = await calculateContingencyUsage(projectId);
   }
 
-  const budgetAllocation = phase.budgetAllocation?.total || 0;
-  const actualSpending = phase.actualSpending?.total || 0;
-  const committedCost = phase.financialStates?.committed || 0;
-  const completionPercentage = phase.completionPercentage || 0;
-
-  // Calculate spending rate (per percentage point)
-  const spendingRate = completionPercentage > 0 
-    ? actualSpending / completionPercentage 
-    : 0;
-
-  // Forecast completion cost based on current rate
-  const forecastCompletionCost = spendingRate > 0
-    ? spendingRate * 100
-    : budgetAllocation;
-
-  // Calculate variance forecast
-  const forecastVariance = forecastCompletionCost - budgetAllocation;
-  const forecastVariancePercentage = budgetAllocation > 0
-    ? (forecastVariance / budgetAllocation) * 100
-    : 0;
-
-  // Calculate remaining forecast
-  const remainingWork = 100 - completionPercentage;
-  const forecastRemainingCost = spendingRate * remainingWork;
-
+  // Get spending history
+  const history = await getCategorySpendingHistory(projectId, category, 90);
+  
+  // Calculate velocity
+  const velocity = calculateSpendingVelocity(history);
+  
+  // Calculate days remaining
+  const today = new Date();
+  const daysRemaining = Math.max(0, Math.ceil((projectEndDate - today) / (1000 * 60 * 60 * 24)));
+  
+  // Forecast
+  const forecastedSpending = forecastSpending(currentSpending, velocity, daysRemaining);
+  
+  // Calculate variance
+  const variance = forecastedSpending - budgeted;
+  const variancePercentage = budgeted > 0 ? (variance / budgeted) * 100 : 0;
+  
   // Risk assessment
   let riskLevel = 'low';
-  let riskIndicators = [];
-
-  if (forecastVariancePercentage > 20) {
+  if (variancePercentage > 10) {
     riskLevel = 'high';
-    riskIndicators.push('Projected to exceed budget by more than 20%');
-  } else if (forecastVariancePercentage > 10) {
+  } else if (variancePercentage > 5) {
     riskLevel = 'medium';
-    riskIndicators.push('Projected to exceed budget by more than 10%');
-  }
-
-  if (actualSpending > budgetAllocation * 0.8 && completionPercentage < 50) {
-    riskLevel = 'high';
-    riskIndicators.push('High spending rate early in phase');
-  }
-
-  if (committedCost + actualSpending > budgetAllocation) {
-    riskLevel = 'high';
-    riskIndicators.push('Committed costs exceed budget allocation');
   }
 
   return {
-    phaseId: phaseId,
-    phaseName: phase.phaseName,
-    budgetAllocation,
-    actualSpending,
-    committedCost,
-    completionPercentage,
-    spendingRate,
-    forecastCompletionCost,
-    forecastRemainingCost,
-    forecastVariance,
-    forecastVariancePercentage: parseFloat(forecastVariancePercentage.toFixed(2)),
+    category,
+    currentSpending,
+    budgeted,
+    forecastedSpending,
+    variance,
+    variancePercentage,
     riskLevel,
-    riskIndicators,
-    projectedCompletionDate: null, // Can be calculated based on progress rate if needed
-    confidence: completionPercentage > 20 ? 'medium' : 'low'
+    dailyVelocity: velocity,
+    daysRemaining,
+    historyPoints: history.length,
   };
 }
 
 /**
- * Calculate cost forecast for all phases in a project
+ * Forecast all categories for a project
  * @param {string} projectId - Project ID
- * @returns {Promise<Array>} Array of phase forecasts
+ * @returns {Promise<Object>} Complete forecast data
  */
-export async function forecastProjectPhases(projectId) {
-  const db = await getDatabase();
-  
-  const phases = await db.collection('phases').find({
-    projectId: new ObjectId(projectId),
-    deletedAt: null
-  }).sort({ sequence: 1 }).toArray();
-
-  const forecasts = await Promise.all(
-    phases.map(phase => forecastPhaseCosts(phase._id.toString()))
-  );
-
-  return forecasts;
-}
-
-/**
- * Calculate overall project forecast
- * @param {string} projectId - Project ID
- * @returns {Promise<Object>} Project forecast
- */
-export async function forecastProject(projectId) {
+export async function forecastProjectSpending(projectId) {
   const db = await getDatabase();
   
   const project = await db.collection('projects').findOne({
     _id: new ObjectId(projectId),
-    deletedAt: null
+    deletedAt: null,
   });
 
   if (!project) {
     throw new Error('Project not found');
   }
 
-  const phaseForecasts = await forecastProjectPhases(projectId);
+  const projectEndDate = project.endDate ? new Date(project.endDate) : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000); // Default to 1 year from now
 
-  const totalBudget = phaseForecasts.reduce((sum, f) => sum + f.budgetAllocation, 0);
-  const totalActual = phaseForecasts.reduce((sum, f) => sum + f.actualSpending, 0);
-  const totalCommitted = phaseForecasts.reduce((sum, f) => sum + f.committedCost, 0);
-  const totalForecast = phaseForecasts.reduce((sum, f) => sum + f.forecastCompletionCost, 0);
+  const categories = ['dcc', 'preconstruction', 'indirect', 'contingency'];
+  const forecasts = {};
 
-  const overallVariance = totalForecast - totalBudget;
-  const overallVariancePercentage = totalBudget > 0
-    ? (overallVariance / totalBudget) * 100
-    : 0;
+  for (const category of categories) {
+    forecasts[category] = await forecastCategorySpending(projectId, category, projectEndDate);
+  }
 
-  // Count risk levels
-  const highRiskPhases = phaseForecasts.filter(f => f.riskLevel === 'high').length;
-  const mediumRiskPhases = phaseForecasts.filter(f => f.riskLevel === 'medium').length;
+  // Calculate totals
+  const totalBudgeted = Object.values(forecasts).reduce((sum, f) => sum + f.budgeted, 0);
+  const totalCurrentSpending = Object.values(forecasts).reduce((sum, f) => sum + f.currentSpending, 0);
+  const totalForecasted = Object.values(forecasts).reduce((sum, f) => sum + f.forecastedSpending, 0);
+  const totalVariance = totalForecasted - totalBudgeted;
+  const totalVariancePercentage = totalBudgeted > 0 ? (totalVariance / totalBudgeted) * 100 : 0;
 
-  let overallRiskLevel = 'low';
-  if (highRiskPhases > 0 || overallVariancePercentage > 15) {
-    overallRiskLevel = 'high';
-  } else if (mediumRiskPhases > 0 || overallVariancePercentage > 5) {
-    overallRiskLevel = 'medium';
+  // Overall risk assessment
+  let overallRisk = 'low';
+  if (totalVariancePercentage > 10) {
+    overallRisk = 'high';
+  } else if (totalVariancePercentage > 5) {
+    overallRisk = 'medium';
   }
 
   return {
     projectId,
-    projectName: project.projectName,
-    totalBudget,
-    totalActual,
-    totalCommitted,
-    totalForecast,
-    overallVariance,
-    overallVariancePercentage: parseFloat(overallVariancePercentage.toFixed(2)),
-    overallRiskLevel,
-    highRiskPhases,
-    mediumRiskPhases,
-    phaseForecasts
+    projectEndDate,
+    forecasts,
+    summary: {
+      totalBudgeted,
+      totalCurrentSpending,
+      totalForecasted,
+      totalVariance,
+      totalVariancePercentage,
+      overallRisk,
+    },
+    generatedAt: new Date(),
   };
 }
-
-/**
- * Get spending trends for a phase
- * @param {string} phaseId - Phase ID
- * @param {number} days - Number of days to analyze
- * @returns {Promise<Object>} Spending trends
- */
-export async function getPhaseSpendingTrends(phaseId, days = 30) {
-  const db = await getDatabase();
-  
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - days);
-
-  // Get materials spending by date
-  const materialsTrends = await db.collection('materials').aggregate([
-    {
-      $match: {
-        phaseId: new ObjectId(phaseId),
-        deletedAt: null,
-        status: { $in: MATERIAL_APPROVED_STATUSES },
-        datePurchased: { $gte: startDate }
-      }
-    },
-    {
-      $group: {
-        _id: {
-          $dateToString: { format: '%Y-%m-%d', date: '$datePurchased' }
-        },
-        total: { $sum: '$totalCost' },
-        count: { $sum: 1 }
-      }
-    },
-    {
-      $sort: { _id: 1 }
-    }
-  ]).toArray();
-
-  // Get expenses spending by date
-  const expensesTrends = await db.collection('expenses').aggregate([
-    {
-      $match: {
-        phaseId: new ObjectId(phaseId),
-        deletedAt: null,
-        status: { $in: EXPENSE_APPROVED_STATUSES },
-        date: { $gte: startDate }
-      }
-    },
-    {
-      $group: {
-        _id: {
-          $dateToString: { format: '%Y-%m-%d', date: '$date' }
-        },
-        total: { $sum: '$amount' },
-        count: { $sum: 1 }
-      }
-    },
-    {
-      $sort: { _id: 1 }
-    }
-  ]).toArray();
-
-  return {
-    materials: materialsTrends,
-    expenses: expensesTrends,
-    period: { startDate, endDate: new Date(), days }
-  };
-}
-

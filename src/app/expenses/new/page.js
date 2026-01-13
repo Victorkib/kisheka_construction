@@ -23,6 +23,7 @@ function NewExpensePageContent() {
   const [projects, setProjects] = useState([]);
   const [phases, setPhases] = useState([]);
   const [loadingPhases, setLoadingPhases] = useState(false);
+  const [phaseError, setPhaseError] = useState(null);
 
   const [formData, setFormData] = useState({
     projectId: '',
@@ -40,6 +41,9 @@ function NewExpensePageContent() {
     isIndirectCost: false, // NEW: Flag for indirect costs
     indirectCostCategory: '', // NEW: Indirect cost category
   });
+  const [budgetInfo, setBudgetInfo] = useState(null);
+  const [budgetLoading, setBudgetLoading] = useState(false);
+  const [budgetError, setBudgetError] = useState(null);
 
   // Fetch projects on mount
   useEffect(() => {
@@ -82,29 +86,38 @@ function NewExpensePageContent() {
   const fetchPhases = async (projectId) => {
     if (!projectId) {
       setPhases([]);
+      setPhaseError(null);
       return;
     }
     setLoadingPhases(true);
+    setPhaseError(null);
     try {
       const response = await fetch(`/api/phases?projectId=${projectId}`);
       const data = await response.json();
       if (data.success) {
-        setPhases(data.data || []);
+        const phasesList = data.data || [];
+        setPhases(phasesList);
         // Clear phase selection if current phase is not in the new list
         setFormData((prev) => {
           const currentPhaseId = prev.phaseId;
-          const phaseExists = data.data.some(p => p._id === currentPhaseId);
+          const phaseExists = phasesList.some(p => p._id === currentPhaseId);
           return {
             ...prev,
             phaseId: phaseExists ? currentPhaseId : ''
           };
         });
+        // Show error if no phases available
+        if (phasesList.length === 0) {
+          setPhaseError('No phases found for this project. Please create phases first.');
+        }
       } else {
         setPhases([]);
+        setPhaseError(data.error || 'Failed to load phases. Please try again.');
       }
     } catch (err) {
       console.error('Error fetching phases:', err);
       setPhases([]);
+      setPhaseError('Failed to load phases. Please check your connection and try again.');
     } finally {
       setLoadingPhases(false);
     }
@@ -114,33 +127,102 @@ function NewExpensePageContent() {
     const { name, value, type, checked } = e.target;
     const newValue = type === 'checkbox' ? checked : value;
     
-    setFormData((prev) => {
-      const updated = { ...prev, [name]: newValue };
+    const newFormData = { ...formData };
+    newFormData[name] = newValue;
+    
+    // Auto-suggest isIndirectCost based on category
+    if (name === 'category') {
+      const indirectCategories = ['utilities', 'transport', 'safety'];
+      const suggestedIsIndirect = indirectCategories.includes(value);
       
-      // Auto-suggest isIndirectCost based on category
-      if (name === 'category') {
-        const indirectCategories = ['utilities', 'transport', 'safety'];
-        const suggestedIsIndirect = indirectCategories.includes(value);
-        
-        // Auto-map category to indirectCostCategory
-        const categoryMap = {
-          'utilities': 'utilities',
-          'transport': 'transportation',
-          'safety': 'safetyCompliance',
-          'accommodation': 'siteOverhead',
-        };
-        
-        updated.isIndirectCost = suggestedIsIndirect;
-        updated.indirectCostCategory = categoryMap[value] || '';
+      // Auto-map category to indirectCostCategory
+      const categoryMap = {
+        'utilities': 'utilities',
+        'transport': 'transportation',
+        'safety': 'safetyCompliance',
+        'accommodation': 'siteOverhead',
+      };
+      
+      newFormData.isIndirectCost = suggestedIsIndirect;
+      newFormData.indirectCostCategory = categoryMap[value] || '';
+    }
+    
+    // Clear indirectCostCategory if isIndirectCost is unchecked
+    if (name === 'isIndirectCost' && !checked) {
+      newFormData.indirectCostCategory = '';
+      setBudgetInfo(null); // Clear budget info when indirect cost is unchecked
+    }
+    
+    setFormData(newFormData);
+    
+    // Validate budget when project, amount, or indirect cost settings change
+    if (name === 'projectId' || name === 'amount' || name === 'isIndirectCost' || name === 'indirectCostCategory' || name === 'category') {
+      if (name === 'projectId' || name === 'isIndirectCost' || name === 'category') {
+        // Reset budget info when project or indirect cost settings change
+        setBudgetInfo(null);
       }
-      
-      // Clear indirectCostCategory if isIndirectCost is unchecked
-      if (name === 'isIndirectCost' && !checked) {
-        updated.indirectCostCategory = '';
+      // Validate budget after a short delay (debounce) for amount changes
+      if (name === 'amount' && newValue && newFormData.isIndirectCost && newFormData.indirectCostCategory) {
+        setTimeout(() => {
+          validateIndirectCostsBudget(newFormData);
+        }, 500);
+      } else if ((name === 'isIndirectCost' || name === 'indirectCostCategory') && newFormData.amount && newFormData.isIndirectCost && newFormData.indirectCostCategory) {
+        // Also validate if indirect cost settings change and amount exists
+        setTimeout(() => {
+          validateIndirectCostsBudget(newFormData);
+        }, 300);
       }
-      
-      return updated;
-    });
+    }
+  };
+
+  const validateIndirectCostsBudget = async (formDataToUse = formData) => {
+    if (!formDataToUse.projectId || !formDataToUse.amount || !formDataToUse.isIndirectCost || !formDataToUse.indirectCostCategory) {
+      setBudgetInfo(null);
+      return;
+    }
+
+    const amount = parseFloat(formDataToUse.amount);
+    if (isNaN(amount) || amount <= 0) {
+      setBudgetInfo(null);
+      return;
+    }
+
+    setBudgetLoading(true);
+    setBudgetError(null);
+
+    try {
+      // Fetch indirect costs summary
+      const summaryResponse = await fetch(`/api/projects/${formDataToUse.projectId}/indirect-costs`);
+      const summaryResult = await summaryResponse.json();
+
+      if (!summaryResult.success) {
+        throw new Error(summaryResult.error || 'Failed to fetch budget information');
+      }
+
+      const summary = summaryResult.data;
+      const available = summary.remaining || 0;
+      const isValid = amount <= available;
+      const usageAfter = summary.budgeted > 0 
+        ? ((summary.spent + amount) / summary.budgeted) * 100 
+        : 0;
+
+      setBudgetInfo({
+        budgeted: summary.budgeted,
+        spent: summary.spent,
+        available,
+        isValid,
+        shortfall: Math.max(0, amount - available),
+        usageAfter,
+        warning: usageAfter >= 80 && usageAfter < 100,
+        exceeded: amount > available,
+      });
+    } catch (err) {
+      console.error('Budget validation error:', err);
+      setBudgetError(err.message);
+      setBudgetInfo(null);
+    } finally {
+      setBudgetLoading(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -157,6 +239,20 @@ function NewExpensePageContent() {
 
     if (parseFloat(formData.amount) <= 0) {
       setError('Amount must be greater than 0');
+      setLoading(false);
+      return;
+    }
+
+    // Phase is required for phase tracking and financial management
+    if (!formData.phaseId || formData.phaseId.trim() === '') {
+      setError('Phase selection is required for phase tracking and financial management. Please select a phase for this expense.');
+      setLoading(false);
+      return;
+    }
+
+    // Check indirect costs budget validation before submitting (only if marked as indirect)
+    if (formData.isIndirectCost && formData.indirectCostCategory && budgetInfo && budgetInfo.exceeded) {
+      setError(`Cannot create expense: Insufficient indirect costs budget. Available: ${new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.available)}, Required: ${new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(parseFloat(formData.amount))}`);
       setLoading(false);
       return;
     }
@@ -293,9 +389,80 @@ function NewExpensePageContent() {
                   min="0"
                   step="0.01"
                   required
-                  className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className={`flex-1 px-3 py-2 bg-white text-gray-900 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 ${
+                    budgetInfo?.exceeded ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                  }`}
                 />
               </div>
+              
+              {/* Indirect Costs Budget Validation Info - Only show if marked as indirect cost */}
+              {formData.isIndirectCost && formData.indirectCostCategory && (
+                <>
+                  {budgetLoading && (
+                    <div className="mt-2 text-sm text-gray-600">
+                      <span className="inline-flex items-center">
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Validating budget...
+                      </span>
+                    </div>
+                  )}
+
+                  {budgetInfo && !budgetLoading && (
+                    <div className={`mt-2 p-3 rounded-lg border ${
+                      budgetInfo.exceeded 
+                        ? 'bg-red-50 border-red-200' 
+                        : budgetInfo.warning 
+                          ? 'bg-yellow-50 border-yellow-200' 
+                          : 'bg-green-50 border-green-200'
+                    }`}>
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <p className={`text-sm font-semibold ${
+                            budgetInfo.exceeded 
+                              ? 'text-red-800' 
+                              : budgetInfo.warning 
+                                ? 'text-yellow-800' 
+                                : 'text-green-800'
+                          }`}>
+                            {budgetInfo.exceeded 
+                              ? '⚠️ Insufficient Indirect Costs Budget' 
+                              : budgetInfo.warning 
+                                ? '⚠️ Budget Warning' 
+                                : '✓ Budget Available'}
+                          </p>
+                          <p className="text-xs text-gray-600 mt-1">
+                            Available: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.available)}
+                          </p>
+                        </div>
+                        {budgetInfo.exceeded && (
+                          <p className="text-sm font-semibold text-red-800">
+                            Shortfall: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.shortfall)}
+                          </p>
+                        )}
+                      </div>
+                      {budgetInfo.warning && !budgetInfo.exceeded && (
+                        <p className="text-xs text-yellow-700">
+                          Indirect costs budget usage will be {budgetInfo.usageAfter.toFixed(1)}% after this expense
+                        </p>
+                      )}
+                      {budgetInfo.exceeded && (
+                        <p className="text-xs text-red-700">
+                          This expense exceeds available indirect costs budget. Please adjust the amount or increase the budget.
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {budgetError && (
+                    <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
+                      Could not validate budget: {budgetError}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
 
             <div>
@@ -322,23 +489,41 @@ function NewExpensePageContent() {
           {/* Construction Phase */}
           <div>
             <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-              Construction Phase
+              Construction Phase <span className="text-red-500">*</span>
             </label>
             {!formData.projectId ? (
               <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
                 Please select a project first to see available phases
               </div>
-            ) : phases.length === 0 ? (
+            ) : loadingPhases ? (
+              <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
+                Loading phases...
+              </div>
+            ) : phaseError ? (
               <div className="space-y-2">
-                <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
-                  No phases available for this project. Phases can be created in the project phases section.
+                <div className="px-3 py-2 bg-red-50 border border-red-300 rounded-lg text-red-700 text-sm">
+                  {phaseError}
                 </div>
                 <Link
                   href={`/phases?projectId=${formData.projectId}`}
                   className="text-sm text-blue-600 hover:underline"
                   target="_blank"
                 >
-                  Manage phases for this project →
+                  Create phases for this project →
+                </Link>
+              </div>
+            ) : phases.length === 0 ? (
+              <div className="space-y-2">
+                <div className="px-3 py-2 bg-red-50 border border-red-300 rounded-lg text-red-700 text-sm">
+                  No phases available for this project. You must create at least one phase before creating an expense.
+                </div>
+                <Link
+                  href={`/phases?projectId=${formData.projectId}`}
+                  className="text-sm text-blue-600 hover:underline"
+                  target="_blank"
+                >
+                  Create phases for this project →
                 </Link>
               </div>
             ) : (
@@ -346,22 +531,22 @@ function NewExpensePageContent() {
                 name="phaseId"
                 value={formData.phaseId}
                 onChange={handleChange}
+                required
                 disabled={loadingPhases || loading || !formData.projectId}
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loadingPhases ? (
-                  <option>Loading phases...</option>
-                ) : (
-                  <>
-                    <option value="">Select phase (optional)</option>
-                    {phases.map((phase) => (
-                      <option key={phase._id} value={phase._id}>
-                        {phase.name} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
-                      </option>
-                    ))}
-                  </>
-                )}
+                <option value="">Select a phase (required)</option>
+                {phases.map((phase) => (
+                  <option key={phase._id} value={phase._id}>
+                    {phase.phaseName || phase.name || 'Unnamed Phase'} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
+                  </option>
+                ))}
               </select>
+            )}
+            {formData.projectId && phases.length > 0 && !formData.phaseId && (
+              <p className="mt-1 text-sm text-red-600">
+                Phase selection is required for phase tracking and financial management.
+              </p>
             )}
           </div>
 

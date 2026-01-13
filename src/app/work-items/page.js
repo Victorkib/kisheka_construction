@@ -64,7 +64,7 @@ function WorkItemsPageContent() {
       fetchWorkItems();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, isEmpty]);
+  }, [filters.projectId, filters.phaseId, filters.status, filters.category, filters.search, filters.unassigned, isEmpty, fetchWorkItems]);
 
   const fetchUser = async () => {
     try {
@@ -138,22 +138,27 @@ function WorkItemsPageContent() {
     } finally {
       setLoading(false);
     }
-  }, [filters, isEmpty, toast]);
+  }, [filters.projectId, filters.phaseId, filters.status, filters.category, filters.search, filters.unassigned, isEmpty, toast]);
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-    
-    const params = new URLSearchParams();
-    Object.entries({ ...filters, [key]: value }).forEach(([k, v]) => {
-      if (v && v !== false) {
-        if (k === 'unassigned' && v === true) {
-          params.set(k, 'true');
-        } else if (k !== 'unassigned') {
-          params.set(k, v);
+    setFilters(prev => {
+      const updatedFilters = { ...prev, [key]: value };
+      
+      // Update URL params
+      const params = new URLSearchParams();
+      Object.entries(updatedFilters).forEach(([k, v]) => {
+        if (v && v !== false) {
+          if (k === 'unassigned' && v === true) {
+            params.set(k, 'true');
+          } else if (k !== 'unassigned') {
+            params.set(k, v);
+          }
         }
-      }
+      });
+      router.push(`/work-items?${params.toString()}`, { scroll: false });
+      
+      return updatedFilters;
     });
-    router.push(`/work-items?${params.toString()}`, { scroll: false });
   };
 
   const getStatusColor = (status) => {

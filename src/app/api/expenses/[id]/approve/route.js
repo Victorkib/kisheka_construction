@@ -17,7 +17,7 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateCapitalAvailability, recalculateProjectFinances } from '@/lib/financial-helpers';
 import { recalculatePhaseSpending } from '@/lib/phase-helpers';
-import { updateIndirectCostsSpending } from '@/lib/indirect-costs-helpers';
+import { updateIndirectCostsSpending, validateIndirectCostsBudget } from '@/lib/indirect-costs-helpers';
 
 /**
  * POST /api/expenses/[id]/approve
@@ -75,9 +75,11 @@ export async function POST(request, { params }) {
       );
     }
 
-    // Validate capital availability before approval
+    // Validate capital availability and indirect costs budget before approval
     if (existingExpense.projectId) {
       const expenseAmount = existingExpense.amount || 0;
+      
+      // Validate capital availability
       try {
         const capitalValidation = await validateCapitalAvailability(
           existingExpense.projectId.toString(),
@@ -113,6 +115,33 @@ export async function POST(request, { params }) {
           'Unable to validate capital availability. Please try again or contact support if the issue persists.',
           500
         );
+      }
+
+      // Validate indirect costs budget if expense is marked as indirect cost
+      if (existingExpense.isIndirectCost && existingExpense.indirectCostCategory) {
+        try {
+          const budgetValidation = await validateIndirectCostsBudget(
+            existingExpense.projectId.toString(),
+            expenseAmount,
+            existingExpense.indirectCostCategory
+          );
+
+          // If budget validation fails, return error (unless it's just a warning)
+          if (!budgetValidation.isValid) {
+            return errorResponse(
+              `Cannot approve expense: ${budgetValidation.message}`,
+              400
+            );
+          }
+
+          // If budget validation shows a warning, log it but allow approval
+          if (budgetValidation.warning) {
+            console.warn(`Indirect costs budget warning for project ${existingExpense.projectId}:`, budgetValidation.message);
+          }
+        } catch (validationError) {
+          console.error('Indirect costs budget validation error:', validationError);
+          // Don't fail approval if budget validation fails - just log it
+        }
       }
     }
 

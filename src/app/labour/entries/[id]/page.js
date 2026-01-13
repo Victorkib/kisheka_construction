@@ -495,7 +495,7 @@ function LabourEntryDetailPageContent() {
               </div>
             )}
             <div className="flex justify-between py-2 font-bold text-lg">
-              <span>Total Cost</span>
+              <span className="text-gray-900 font-bold">Total Cost</span>
               <span className="text-gray-900 font-bold">{entry.totalCost?.toLocaleString()} KES</span>
             </div>
           </div>

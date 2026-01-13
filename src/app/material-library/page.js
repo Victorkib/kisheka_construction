@@ -108,7 +108,7 @@ function MaterialLibraryPageContent() {
     } finally {
       setLoading(false);
     }
-  }, [pagination.page, pagination.limit, filterValues]);
+  }, [pagination.page, pagination.limit, filterValues.categoryId, filterValues.category, filterValues.isCommon, filterValues.isActive, filterValues.search, filterValues.sortBy, filterValues.sortOrder]);
 
   useEffect(() => {
     fetchMaterials();

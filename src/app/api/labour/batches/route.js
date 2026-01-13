@@ -241,6 +241,19 @@ export async function POST(request) {
     const validatedEntries = [];
     const workerProfileDataMap = new Map(); // Track unique workers to create profiles for
 
+    // Normalize optional rating fields (handle empty strings, NaN, invalid values)
+    const normalizeRating = (value) => {
+      if (value === undefined || value === null || value === '') {
+        return null;
+      }
+      const num = typeof value === 'string' ? parseFloat(value.trim()) : Number(value);
+      if (isNaN(num)) {
+        return null;
+      }
+      // Only return if in valid range (1-5), otherwise null
+      return (num >= 1 && num <= 5) ? num : null;
+    };
+
     for (const entryData of labourEntries) {
       // Use default values from batch if not provided in entry
       const entryWithDefaults = {
@@ -252,6 +265,8 @@ export async function POST(request) {
         entryDate: entryData.entryDate || defaultDate || new Date(),
         workerRole: entryData.workerRole || defaultWorkerRole || 'skilled',
         workItemId: entryData.workItemId || workItemId || null, // Use batch-level workItemId if entry doesn't have one
+        qualityRating: normalizeRating(entryData.qualityRating),
+        productivityRating: normalizeRating(entryData.productivityRating),
         createdBy: userProfile._id, // Add createdBy before validation
       };
 

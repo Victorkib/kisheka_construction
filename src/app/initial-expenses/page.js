@@ -85,15 +85,33 @@ function InitialExpensesPageContent() {
       }
 
       setExpenses(data.data.expenses || []);
-      setPagination(prev => data.data.pagination || prev);
-      setTotals(prev => data.data.totals || prev);
+      setPagination(prev => {
+        const newPagination = data.data.pagination || prev;
+        // Only update if values actually changed
+        if (prev.page === newPagination.page && 
+            prev.limit === newPagination.limit && 
+            prev.total === newPagination.total && 
+            prev.pages === newPagination.pages) {
+          return prev; // Return same reference to prevent re-render
+        }
+        return newPagination;
+      });
+      setTotals(prev => {
+        const newTotals = data.data.totals || prev;
+        // Only update if values actually changed
+        if (prev.totalAmount === newTotals.totalAmount && 
+            prev.totalCost === newTotals.totalCost) {
+          return prev; // Return same reference to prevent re-render
+        }
+        return newTotals;
+      });
     } catch (err) {
       setError(err.message);
       console.error('Fetch initial expenses error:', err);
     } finally {
       setLoading(false);
     }
-  }, [filters, pagination.page, pagination.limit, projectId]);
+  }, [filters.category, filters.status, filters.search, filters.startDate, filters.endDate, pagination.page, pagination.limit, projectId]);
 
   // Fetch expenses
   useEffect(() => {
@@ -323,7 +341,12 @@ function InitialExpensesPageContent() {
                   {expenses.map((expense) => (
                     <tr key={expense._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {expense.expenseCode}
+                        <Link
+                          href={`/initial-expenses/${expense._id}`}
+                          className="text-blue-600 hover:text-blue-900"
+                        >
+                          {expense.expenseCode}
+                        </Link>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
                         {expense.itemName}

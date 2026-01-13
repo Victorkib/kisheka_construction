@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -46,52 +46,21 @@ function ExpensesPageContent() {
   });
   const [phases, setPhases] = useState([]);
   const [loadingPhases, setLoadingPhases] = useState(false);
+  const fetchingRef = useRef(false);
 
-  const fetchExpenses = useCallback(async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Build query string
-      const queryParams = new URLSearchParams({
-        page: pagination.page.toString(),
-        limit: pagination.limit.toString(),
-        ...(filters.projectId && { projectId: filters.projectId }),
-        ...(filters.category && { category: filters.category }),
-        ...(filters.phaseId && { phaseId: filters.phaseId }),
-        ...(filters.status && { status: filters.status }),
-        ...(filters.vendor && { vendor: filters.vendor }),
-        ...(filters.search && { search: filters.search }),
-        ...(filters.startDate && { startDate: filters.startDate }),
-        ...(filters.endDate && { endDate: filters.endDate }),
-        ...(filters.isIndirectCost && { isIndirectCost: filters.isIndirectCost }), // NEW: Filter by indirect costs
-      });
-
-      const response = await fetch(`/api/expenses?${queryParams}`);
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch expenses');
-      }
-
-      setExpenses(data.data.expenses || []);
-      setPagination(data.data.pagination || pagination);
-    } catch (err) {
-      setError(err.message);
-      console.error('Fetch expenses error:', err);
-    } finally {
-      setLoading(false);
-    }
-  }, [filters, pagination]);
-
-  // Update filters when project changes
+  // Update filters when project changes (only if different)
   useEffect(() => {
-    if (projectIdFromContext && filters.projectId !== projectIdFromContext) {
-      setFilters(prev => ({ ...prev, projectId: projectIdFromContext }));
+    if (projectIdFromContext && projectIdFromContext !== activeProjectId) {
+      setFilters(prev => {
+        if (prev.projectId === projectIdFromContext) {
+          return prev; // No change needed, return same reference
+        }
+        return { ...prev, projectId: projectIdFromContext };
+      });
     }
-  }, [projectIdFromContext, filters.projectId]);
+  }, [projectIdFromContext, activeProjectId]);
 
-  // Fetch expenses
+  // Fetch expenses when filters or pagination changes
   useEffect(() => {
     // Don't fetch if empty state
     if (isEmpty) {
@@ -99,9 +68,61 @@ function ExpensesPageContent() {
       setExpenses([]);
       return;
     }
+
+    // Prevent duplicate calls
+    if (fetchingRef.current) return;
     
-    fetchExpenses();
-  }, [fetchExpenses, isEmpty]);
+    const fetchData = async () => {
+      fetchingRef.current = true;
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Build query string
+        const queryParams = new URLSearchParams({
+          page: pagination.page.toString(),
+          limit: pagination.limit.toString(),
+          ...(filters.projectId && { projectId: filters.projectId }),
+          ...(filters.category && { category: filters.category }),
+          ...(filters.phaseId && { phaseId: filters.phaseId }),
+          ...(filters.status && { status: filters.status }),
+          ...(filters.vendor && { vendor: filters.vendor }),
+          ...(filters.search && { search: filters.search }),
+          ...(filters.startDate && { startDate: filters.startDate }),
+          ...(filters.endDate && { endDate: filters.endDate }),
+          ...(filters.isIndirectCost && { isIndirectCost: filters.isIndirectCost }),
+        });
+
+        const response = await fetch(`/api/expenses?${queryParams}`);
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to fetch expenses');
+        }
+
+        setExpenses(data.data.expenses || []);
+        setPagination(prev => {
+          const newPagination = data.data.pagination || prev;
+          // Only update if values actually changed
+          if (prev.page === newPagination.page && 
+              prev.limit === newPagination.limit && 
+              prev.total === newPagination.total && 
+              prev.pages === newPagination.pages) {
+            return prev; // Return same reference to prevent re-render
+          }
+          return newPagination;
+        });
+      } catch (err) {
+        setError(err.message);
+        console.error('Fetch expenses error:', err);
+      } finally {
+        setLoading(false);
+        fetchingRef.current = false;
+      }
+    };
+
+    fetchData();
+  }, [isEmpty, filters.projectId, filters.category, filters.phaseId, filters.status, filters.vendor, filters.search, filters.startDate, filters.endDate, filters.isIndirectCost, pagination.page, pagination.limit]);
 
   const fetchAllPhases = async () => {
     setLoadingPhases(true);
@@ -212,7 +233,7 @@ function ExpensesPageContent() {
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl md:text-2xl font-semibold mb-4 leading-tight">Filters</h2>
+          <h2 className="text-xl md:text-2xl font-semibold mb-4 leading-tight text-gray-900">Filters</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Search</label>

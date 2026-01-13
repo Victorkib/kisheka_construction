@@ -14,7 +14,7 @@ import { createAuditLog } from '@/lib/audit-log';
 import { createNotification } from '@/lib/notifications';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
-import { validateCapitalAvailability, recalculateProjectFinances, updatePreConstructionSpending } from '@/lib/financial-helpers';
+import { validateCapitalAvailability, recalculateProjectFinances, updatePreConstructionSpending, validatePreConstructionBudget } from '@/lib/financial-helpers';
 
 /**
  * POST /api/initial-expenses/[id]/approve
@@ -78,9 +78,11 @@ export async function POST(request, { params }) {
       );
     }
 
-    // Validate capital availability before approval (only if approving)
+    // Validate capital availability and pre-construction budget before approval (only if approving)
     if (approved && existingExpense.projectId) {
       const expenseAmount = existingExpense.amount || 0;
+      
+      // Validate capital availability
       const capitalValidation = await validateCapitalAvailability(
         existingExpense.projectId.toString(),
         expenseAmount
@@ -91,6 +93,29 @@ export async function POST(request, { params }) {
           `Cannot approve initial expense: ${capitalValidation.message}. Available capital: ${capitalValidation.available.toLocaleString()}, Required: ${capitalValidation.required.toLocaleString()}`,
           400
         );
+      }
+
+      // Validate pre-construction budget
+      const budgetSource = existingExpense.budgetSource;
+      if (budgetSource && budgetSource.subCategory) {
+        const budgetValidation = await validatePreConstructionBudget(
+          existingExpense.projectId.toString(),
+          expenseAmount,
+          budgetSource.subCategory
+        );
+
+        // If budget validation fails, return error (unless it's just a warning)
+        if (!budgetValidation.isValid) {
+          return errorResponse(
+            `Cannot approve initial expense: ${budgetValidation.message}`,
+            400
+          );
+        }
+
+        // If budget validation shows a warning, log it but allow approval
+        if (budgetValidation.warning) {
+          console.warn(`Pre-construction budget warning for project ${existingExpense.projectId}:`, budgetValidation.message);
+        }
       }
     }
 

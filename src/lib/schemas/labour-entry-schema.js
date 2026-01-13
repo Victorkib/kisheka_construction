@@ -22,7 +22,8 @@ import {
  * @property {ObjectId} [batchId] - Batch ID (if part of bulk operation)
  * @property {string} [batchNumber] - Denormalized batch number
  * @property {ObjectId} projectId - Project ID (required, indexed)
- * @property {ObjectId} phaseId - Phase ID (required, indexed)
+ * @property {ObjectId} phaseId - Phase ID (required for direct labour, optional for indirect)
+ * @property {boolean} isIndirectLabour - Whether this is indirect labour (site management, security, etc.)
  * @property {ObjectId} [floorId] - Floor ID (optional, indexed)
  * @property {ObjectId} [categoryId] - Category ID (optional, indexed)
  * @property {ObjectId} [workItemId] - Work item ID (optional, indexed)
@@ -66,7 +67,8 @@ export const LABOUR_ENTRY_SCHEMA = {
   batchId: 'ObjectId', // Optional
   batchNumber: String, // Optional, denormalized
   projectId: 'ObjectId', // Required
-  phaseId: 'ObjectId', // Required
+  phaseId: 'ObjectId', // Required for direct labour, optional for indirect
+  isIndirectLabour: Boolean, // Whether this is indirect labour (default: false)
   floorId: 'ObjectId', // Optional
   categoryId: 'ObjectId', // Optional
   workItemId: 'ObjectId', // Optional
@@ -188,6 +190,7 @@ export function createLabourEntry(input, createdBy) {
     batchNumber,
     projectId,
     phaseId,
+    isIndirectLabour,
     floorId,
     categoryId,
     workItemId,
@@ -216,6 +219,13 @@ export function createLabourEntry(input, createdBy) {
     equipmentId,
     subcontractorId,
   } = input;
+  
+  // Determine if this is indirect labour
+  // Indirect labour: site management, security, general site office staff
+  const indirectLabour = isIndirectLabour === true;
+  
+  // For indirect labour, phaseId can be null (it's project-level, not phase-specific)
+  const finalPhaseId = indirectLabour ? null : (phaseId && ObjectId.isValid(phaseId) ? new ObjectId(phaseId) : null);
 
   // Calculate hours
   let totalHours = 0;
@@ -255,7 +265,8 @@ export function createLabourEntry(input, createdBy) {
     batchId: batchId && ObjectId.isValid(batchId) ? new ObjectId(batchId) : null,
     batchNumber: batchNumber || null,
     projectId: ObjectId.isValid(projectId) ? new ObjectId(projectId) : projectId,
-    phaseId: ObjectId.isValid(phaseId) ? new ObjectId(phaseId) : phaseId,
+    phaseId: finalPhaseId,
+    isIndirectLabour: indirectLabour,
     floorId: floorId && ObjectId.isValid(floorId) ? new ObjectId(floorId) : null,
     categoryId: categoryId && ObjectId.isValid(categoryId) ? new ObjectId(categoryId) : null,
     workItemId: workItemId && ObjectId.isValid(workItemId) ? new ObjectId(workItemId) : null,
@@ -310,8 +321,12 @@ export function validateLabourEntry(data) {
     errors.push('Valid projectId is required');
   }
 
-  if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
-    errors.push('Valid phaseId is required');
+  // PhaseId is required only for direct labour
+  // Indirect labour (site management, security, etc.) doesn't need a phase
+  if (!data.isIndirectLabour) {
+    if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
+      errors.push('Valid phaseId is required for direct labour');
+    }
   }
 
   if (!data.workerName || data.workerName.trim().length < 2) {
@@ -359,12 +374,20 @@ export function validateLabourEntry(data) {
     errors.push('overtimeHours must be >= 0');
   }
 
-  if (data.qualityRating !== undefined && (data.qualityRating < 1 || data.qualityRating > 5)) {
-    errors.push('qualityRating must be between 1 and 5');
+  // Validate qualityRating - handle empty strings, NaN, and invalid values
+  if (data.qualityRating !== undefined && data.qualityRating !== null && data.qualityRating !== '') {
+    const rating = typeof data.qualityRating === 'string' ? parseFloat(data.qualityRating) : Number(data.qualityRating);
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      errors.push('qualityRating must be between 1 and 5');
+    }
   }
 
-  if (data.productivityRating !== undefined && (data.productivityRating < 1 || data.productivityRating > 5)) {
-    errors.push('productivityRating must be between 1 and 5');
+  // Validate productivityRating - handle empty strings, NaN, and invalid values
+  if (data.productivityRating !== undefined && data.productivityRating !== null && data.productivityRating !== '') {
+    const rating = typeof data.productivityRating === 'string' ? parseFloat(data.productivityRating) : Number(data.productivityRating);
+    if (isNaN(rating) || rating < 1 || rating > 5) {
+      errors.push('productivityRating must be between 1 and 5');
+    }
   }
 
   // Validate dates

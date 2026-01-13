@@ -260,6 +260,7 @@ export async function POST(request) {
       libraryId: new ObjectId(body.libraryId),
       projectId: new ObjectId(body.projectId),
       phaseId: body.phaseId && ObjectId.isValid(body.phaseId) ? new ObjectId(body.phaseId) : null,
+      serviceCategory: body.serviceCategory || 'construction', // Default to construction
       type: libraryEntry.type, // Denormalized
       assignedDate: body.assignedDate ? new Date(body.assignedDate) : new Date(),
       contractType: body.contractType || libraryEntry.defaultContractType || 'full_service',

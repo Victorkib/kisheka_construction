@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { Plus, Trash2, X, CheckCircle, UserPlus } from 'lucide-react';
+import { LoadingSpinner } from '@/components/loading';
 import { VALID_WORKER_TYPES, VALID_WORKER_ROLES, VALID_SKILL_TYPES } from '@/lib/constants/labour-constants';
 import { TemplateSelector } from './template-selector';
 import { EnhancedWorkerSelector } from './enhanced-worker-selector';
@@ -16,6 +17,8 @@ export function Step2AddWorkers({ wizardData, onUpdate, onValidationChange, preS
   const [availableWorkers, setAvailableWorkers] = useState([]);
   const [suggestedWorkers, setSuggestedWorkers] = useState([]);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [loadingWorkers, setLoadingWorkers] = useState(false);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
 
   // Initialize workers from wizardData (only on mount)
   const initializedRef = useRef(false);
@@ -81,6 +84,7 @@ export function Step2AddWorkers({ wizardData, onUpdate, onValidationChange, preS
       return;
     }
 
+    setLoadingSuggestions(true);
     try {
       const params = new URLSearchParams();
       if (wizardData.defaultPhaseId) {
@@ -98,6 +102,8 @@ export function Step2AddWorkers({ wizardData, onUpdate, onValidationChange, preS
       }
     } catch (err) {
       console.error('Error fetching suggested workers:', err);
+    } finally {
+      setLoadingSuggestions(false);
     }
   };
 
@@ -141,6 +147,7 @@ export function Step2AddWorkers({ wizardData, onUpdate, onValidationChange, preS
   }, [workers]); // Only depend on workers, use refs for callbacks
 
   const fetchWorkers = async () => {
+    setLoadingWorkers(true);
     try {
       const response = await fetch('/api/labour/workers?status=active');
       const data = await response.json();
@@ -149,6 +156,8 @@ export function Step2AddWorkers({ wizardData, onUpdate, onValidationChange, preS
       }
     } catch (err) {
       console.error('Error fetching workers:', err);
+    } finally {
+      setLoadingWorkers(false);
     }
   };
 
@@ -379,6 +388,13 @@ export function Step2AddWorkers({ wizardData, onUpdate, onValidationChange, preS
                   <td className="px-3 py-2 text-sm text-gray-600">{index + 1}</td>
                   <td className="px-3 py-2">
                     <div className="space-y-2">
+                      {/* Loading Indicator */}
+                      {(loadingWorkers || loadingSuggestions) && (
+                        <div className="mb-2 flex items-center gap-2 text-xs text-gray-500">
+                          <LoadingSpinner size="sm" color="gray-600" />
+                          <span>Loading workers...</span>
+                        </div>
+                      )}
                       {/* Enhanced Selector (Primary - Searchable) */}
                       <EnhancedWorkerSelector
                         value={worker.workerId || ''}

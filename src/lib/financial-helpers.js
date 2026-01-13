@@ -86,6 +86,120 @@ export async function updatePreConstructionSpending(projectId, category, amount)
 }
 
 /**
+ * Calculate comprehensive DCC spending
+ * Aggregates all direct construction costs from multiple sources
+ * @param {string} projectId - Project ID
+ * @returns {Promise<Object>} DCC spending breakdown
+ */
+export async function calculateDCCSpending(projectId) {
+  const db = await getDatabase();
+  
+  // 1. Get phase spending (already aggregated)
+  const phases = await db.collection('phases').find({
+    projectId: new ObjectId(projectId),
+    deletedAt: null,
+  }).toArray();
+  
+  const phaseSpending = phases.reduce((sum, phase) => {
+    return sum + (phase.actualSpending?.total || 0);
+  }, 0);
+  
+  // 2. Get materials spending (approved, phase-linked, not indirect)
+  const materials = await db.collection('materials').find({
+    projectId: new ObjectId(projectId),
+    deletedAt: null,
+    status: { $in: MATERIAL_APPROVED_STATUSES },
+    phaseId: { $ne: null }, // Only phase-linked materials
+  }).toArray();
+  
+  const materialsSpending = materials.reduce((sum, material) => {
+    return sum + (material.totalCost || 0);
+  }, 0);
+  
+  // 3. Get labour entries spending (direct labour, not indirect, phase-linked)
+  const labourEntries = await db.collection('labour_entries').find({
+    projectId: new ObjectId(projectId),
+    deletedAt: null,
+    isIndirectLabour: { $ne: true },
+    phaseId: { $ne: null }, // Only phase-linked labour
+    status: { $in: ['approved', 'paid'] },
+  }).toArray();
+  
+  const labourSpending = labourEntries.reduce((sum, entry) => {
+    return sum + (entry.totalCost || 0);
+  }, 0);
+  
+  // 4. Get equipment spending (phase-specific, not site-wide)
+  const equipment = await db.collection('equipment').find({
+    projectId: new ObjectId(projectId),
+    deletedAt: null,
+    equipmentScope: { $ne: 'site_wide' },
+    phaseId: { $ne: null }, // Only phase-linked equipment
+  }).toArray();
+  
+  const equipmentSpending = equipment.reduce((sum, eq) => {
+    return sum + (eq.totalCost || 0);
+  }, 0);
+  
+  // 5. Get expenses spending (not indirect costs, DCC-related)
+  const expenses = await db.collection('expenses').find({
+    projectId: new ObjectId(projectId),
+    deletedAt: null,
+    isIndirectCost: { $ne: true },
+    status: { $in: EXPENSE_APPROVED_STATUSES },
+  }).toArray();
+  
+  const expensesSpending = expenses.reduce((sum, expense) => {
+    return sum + (expense.amount || 0);
+  }, 0);
+  
+  // 6. Get work items spending (actual costs)
+  const workItems = await db.collection('work_items').find({
+    projectId: new ObjectId(projectId),
+    deletedAt: null,
+    phaseId: { $ne: null }, // Only phase-linked work items
+  }).toArray();
+  
+  const workItemsSpending = workItems.reduce((sum, item) => {
+    return sum + (item.actualCost || 0);
+  }, 0);
+  
+  // Total DCC spending
+  // Phase spending is the primary source as it's already aggregated and includes
+  // materials, labour, equipment, and work items within phases
+  // We also include expenses that are DCC-related (not indirect costs, not in phases)
+  // Direct calculation is used for verification and to catch any discrepancies
+  
+  // Note: Phase spending already includes materials, labour, equipment, and work items
+  // So we use phase spending as the base, and add any DCC expenses that might not be in phases
+  // For now, we'll use phase spending as the primary source since it's the most accurate
+  const directCalculation = materialsSpending + labourSpending + equipmentSpending + workItemsSpending;
+  
+  // Use phase spending as primary (it's the source of truth)
+  // Add expenses that are DCC-related but might not be reflected in phase spending yet
+  // In most cases, phase spending should be sufficient
+  const totalDCCSpending = phaseSpending;
+  
+  return {
+    total: totalDCCSpending,
+    breakdown: {
+      phaseSpending, // Primary source (includes materials, labour, equipment, work items within phases)
+      expenses: expensesSpending, // DCC-related expenses (for reference, may already be in phase spending)
+      // Detailed breakdown for reference and verification
+      materials: materialsSpending,
+      labour: labourSpending,
+      equipment: equipmentSpending,
+      workItems: workItemsSpending,
+    },
+    // Verification: phase spending should roughly match direct calculation
+    // Allow 10% variance for timing differences and expenses not yet in phase spending
+    verified: phaseSpending > 0 && Math.abs(phaseSpending - directCalculation) / phaseSpending < 0.10,
+    // Note about data: phase spending is the source of truth
+    note: 'Phase spending is the primary source and includes all materials, labour, equipment, and work items within phases.',
+  };
+}
+
+/**
  * Get pre-construction spending for a project
  * @param {string} projectId - Project ID
  * @returns {Promise<Object>} Pre-construction spending breakdown
@@ -113,11 +227,11 @@ export async function getPreConstructionSpending(projectId) {
 }
 
 /**
- * Get pre-construction budget remaining
+ * Get pre-construction budget for a project
  * @param {string} projectId - Project ID
- * @returns {Promise<number>} Remaining pre-construction budget
+ * @returns {Promise<number>} Pre-construction budget
  */
-export async function getPreConstructionRemaining(projectId) {
+export async function getPreConstructionBudget(projectId) {
   const db = await getDatabase();
   
   const project = await db.collection('projects').findOne({
@@ -129,20 +243,164 @@ export async function getPreConstructionRemaining(projectId) {
   }
   
   const budget = project.budget;
-  let preConstructionBudget = 0;
   
   if (isEnhancedBudget(budget)) {
-    preConstructionBudget = budget.preConstructionCosts || 0;
+    return budget.preConstructionCosts || 0;
   } else {
     // Legacy: Estimate 5% of total
     const totalBudget = getBudgetTotal(budget);
-    preConstructionBudget = totalBudget * 0.05;
+    return totalBudget * 0.05;
   }
-  
+}
+
+/**
+ * Get pre-construction budget remaining
+ * @param {string} projectId - Project ID
+ * @returns {Promise<number>} Remaining pre-construction budget
+ */
+export async function getPreConstructionRemaining(projectId) {
+  const preConstructionBudget = await getPreConstructionBudget(projectId);
   const spending = await getPreConstructionSpending(projectId);
   const remaining = Math.max(0, preConstructionBudget - spending.total);
-  
   return remaining;
+}
+
+/**
+ * Get complete pre-construction budget summary (budget, spent, remaining, by category)
+ * @param {string} projectId - Project ID
+ * @returns {Promise<Object>} Complete pre-construction summary
+ */
+export async function getPreConstructionSummary(projectId) {
+  const budget = await getPreConstructionBudget(projectId);
+  const spending = await getPreConstructionSpending(projectId);
+  const remaining = Math.max(0, budget - spending.total);
+  
+  return {
+    budgeted: budget,
+    spent: spending.total || 0,
+    remaining,
+    byCategory: spending.byCategory || {
+      landAcquisition: 0,
+      legalRegulatory: 0,
+      permitsApprovals: 0,
+      sitePreparation: 0
+    }
+  };
+}
+
+/**
+ * Validate if pre-construction expense fits within budget
+ * @param {string} projectId - Project ID
+ * @param {number} amount - Expense amount to validate
+ * @param {string} [category] - Optional: sub-category for category-level validation
+ * @returns {Promise<Object>} { isValid: boolean, available: number, required: number, shortfall: number, message: string }
+ */
+export async function validatePreConstructionBudget(projectId, amount, category = null) {
+  if (!projectId || !ObjectId.isValid(projectId)) {
+    return {
+      isValid: false,
+      available: 0,
+      required: amount || 0,
+      shortfall: amount || 0,
+      message: 'Invalid project ID',
+    };
+  }
+
+  if (!amount || amount <= 0) {
+    return {
+      isValid: true,
+      available: 0,
+      required: 0,
+      shortfall: 0,
+      message: 'No amount provided. Budget validation will occur when expense is approved.',
+    };
+  }
+
+  const db = await getDatabase();
+  const project = await db.collection('projects').findOne({
+    _id: new ObjectId(projectId),
+    deletedAt: null,
+  });
+
+  if (!project) {
+    return {
+      isValid: false,
+      available: 0,
+      required: amount,
+      shortfall: amount,
+      message: 'Project not found',
+    };
+  }
+
+  // Get pre-construction budget
+  const preConstructionBudget = await getPreConstructionBudget(projectId);
+  
+  if (preConstructionBudget <= 0) {
+    return {
+      isValid: false,
+      available: 0,
+      required: amount,
+      shortfall: amount,
+      message: 'Pre-construction budget not set. Please set a project budget with pre-construction costs first.',
+    };
+  }
+
+  // Get current spending
+  const spending = await getPreConstructionSpending(projectId);
+  const currentSpending = spending.total || 0;
+  const available = Math.max(0, preConstructionBudget - currentSpending);
+
+  // If category is provided, also check category-level budget
+  if (category) {
+    const categorySpending = spending.byCategory?.[category] || 0;
+    // For category-level, we estimate based on typical distribution
+    // This is a simplified check - in reality, categories don't have separate budgets
+    // but we can warn if a category is consuming too much
+    const categoryPercentage = (categorySpending / preConstructionBudget) * 100;
+    if (categoryPercentage > 50) {
+      // Warning if category exceeds 50% of total budget
+      return {
+        isValid: true,
+        available,
+        required: amount,
+        shortfall: Math.max(0, amount - available),
+        message: `Warning: ${category} category is already ${categoryPercentage.toFixed(1)}% of pre-construction budget. Proceed with caution.`,
+        warning: true,
+      };
+    }
+  }
+
+  // Check if amount fits within available budget
+  if (amount > available) {
+    return {
+      isValid: false,
+      available,
+      required: amount,
+      shortfall: amount - available,
+      message: `Insufficient pre-construction budget. Available: ${available.toLocaleString()} KES, Required: ${amount.toLocaleString()} KES, Shortfall: ${(amount - available).toLocaleString()} KES.`,
+    };
+  }
+
+  // Check if approaching budget limit (80% threshold)
+  const usagePercentage = ((currentSpending + amount) / preConstructionBudget) * 100;
+  if (usagePercentage >= 80 && usagePercentage < 100) {
+    return {
+      isValid: true,
+      available,
+      required: amount,
+      shortfall: 0,
+      message: `Warning: Pre-construction budget usage will be ${usagePercentage.toFixed(1)}% after this expense.`,
+      warning: true,
+    };
+  }
+
+  return {
+    isValid: true,
+    available,
+    required: amount,
+    shortfall: 0,
+    message: 'Budget validation passed',
+  };
 }
 
 /**
@@ -944,6 +1202,15 @@ export async function getFinancialOverview(projectId) {
     total: totalUsed,
   };
 
+  // Get contingency summary for suggestions
+  let contingencySummary = null;
+  try {
+    const { getContingencySummary } = await import('@/lib/contingency-helpers');
+    contingencySummary = await getContingencySummary(projectId);
+  } catch (err) {
+    console.error('Error fetching contingency summary:', err);
+  }
+
   // Determine warnings
   const warnings = [];
   if (budgetWithLegacy.total > totalInvested) {
@@ -961,17 +1228,45 @@ export async function getFinancialOverview(projectId) {
     });
   }
   if (availableCapital < 0) {
+    const overspendAmount = Math.abs(availableCapital);
     warnings.push({
       type: 'overspent',
       severity: 'error',
-      message: `Overspent by ${Math.abs(availableCapital).toLocaleString()} (including committed costs)`,
+      message: `Overspent by ${overspendAmount.toLocaleString()} (including committed costs)`,
     });
+    
+    // Suggest contingency usage if available
+    if (contingencySummary && contingencySummary.remaining > 0) {
+      const suggestedAmount = Math.min(overspendAmount, contingencySummary.remaining);
+      warnings.push({
+        type: 'contingency_suggestion',
+        severity: 'info',
+        message: `Consider using contingency reserve to cover overspend. Available: ${contingencySummary.remaining.toLocaleString()} KES. Suggested draw: ${suggestedAmount.toLocaleString()} KES.`,
+        suggestedContingencyDraw: suggestedAmount,
+        contingencyAvailable: contingencySummary.remaining,
+      });
+    }
   }
   if (committedCost > 0 && availableCapital < committedCost) {
     warnings.push({
       type: 'high_commitment',
       severity: 'warning',
       message: `High committed costs: ${committedCost.toLocaleString()} (${((committedCost / totalInvested) * 100).toFixed(1)}% of capital)`,
+    });
+  }
+
+  // Check if budget is exceeded and suggest contingency
+  // Note: budgetRemaining is already calculated above at line 1004
+  if (budgetRemaining < 0 && contingencySummary && contingencySummary.remaining > 0) {
+    const budgetOverspend = Math.abs(budgetRemaining);
+    const suggestedAmount = Math.min(budgetOverspend, contingencySummary.remaining);
+    warnings.push({
+      type: 'budget_overrun_contingency_suggestion',
+      severity: 'warning',
+      message: `Budget exceeded by ${budgetOverspend.toLocaleString()} KES. Consider using contingency reserve. Available: ${contingencySummary.remaining.toLocaleString()} KES. Suggested draw: ${suggestedAmount.toLocaleString()} KES.`,
+      suggestedContingencyDraw: suggestedAmount,
+      contingencyAvailable: contingencySummary.remaining,
+      budgetOverspend,
     });
   }
 
@@ -1025,6 +1320,11 @@ export async function getFinancialOverview(projectId) {
     actual: breakdown,
     spendingLimit: totalInvested, // Capital is the actual limit
     warnings,
+    contingency: contingencySummary ? {
+      budgeted: contingencySummary.budgeted,
+      used: contingencySummary.used,
+      remaining: contingencySummary.remaining,
+    } : null,
     status: {
       budgetStatus: budgetRemaining >= 0 ? 'on_budget' : 'over_budget',
       capitalStatus: capitalBalance >= 0 ? 'sufficient' : 'insufficient',

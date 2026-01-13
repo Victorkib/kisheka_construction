@@ -40,6 +40,7 @@ export default function NewEquipmentPage() {
     equipmentName: '',
     equipmentType: '',
     acquisitionType: 'rental',
+    equipmentScope: 'phase_specific', // NEW: Equipment scope
     supplierId: '',
     startDate: '',
     endDate: '',
@@ -136,11 +137,21 @@ export default function NewEquipmentPage() {
     setSaving(true);
     setError(null);
 
+    // Validation: Phase is required only for phase-specific equipment
+    if (formData.equipmentScope === 'phase_specific' && !formData.phaseId) {
+      setError('Phase selection is required for phase-specific equipment');
+      setSaving(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/equipment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          phaseId: formData.equipmentScope === 'site_wide' ? null : formData.phaseId,
+        }),
       });
 
       const data = await response.json();
@@ -282,44 +293,75 @@ export default function NewEquipmentPage() {
                   )}
                 </div>
 
-                {/* Phase Selection */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
-                    Phase <span className="text-red-600">*</span>
-                  </label>
-                  {loadingPhases ? (
-                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
-                      Loading phases...
-                    </div>
-                  ) : !formData.projectId ? (
-                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
-                      Select Project First
-                    </div>
-                  ) : phases.length === 0 ? (
-                    <div className="w-full px-4 py-2.5 bg-yellow-50 border-2 border-yellow-300 rounded-lg text-yellow-800">
-                      No phases available for this project
-                    </div>
-                  ) : (
-                    <select
-                      name="phaseId"
-                      value={formData.phaseId}
-                      onChange={handleChange}
-                      required
-                      disabled={loadingPhases || !formData.projectId}
-                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
-                    >
-                      <option value="" className="text-gray-500">Select Phase</option>
-                      {phases.map((phase) => (
-                        <option key={phase._id} value={phase._id} className="text-gray-900">
-                          {phase.phaseName || phase.name} {phase.phaseCode ? `(${phase.phaseCode})` : ''}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                  {formData.projectId && phases.length > 0 && !formData.phaseId && (
-                    <p className="text-xs text-gray-600 mt-1.5">Please select a phase</p>
-                  )}
-                </div>
+                {/* Phase Selection - Only required for phase-specific equipment */}
+                {formData.equipmentScope === 'phase_specific' && (
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                      Phase <span className="text-red-600">*</span>
+                    </label>
+                    {loadingPhases ? (
+                      <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                        Loading phases...
+                      </div>
+                    ) : !formData.projectId ? (
+                      <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                        Select Project First
+                      </div>
+                    ) : phases.length === 0 ? (
+                      <div className="w-full px-4 py-2.5 bg-yellow-50 border-2 border-yellow-300 rounded-lg text-yellow-800">
+                        No phases available for this project
+                      </div>
+                    ) : (
+                      <select
+                        name="phaseId"
+                        value={formData.phaseId}
+                        onChange={handleChange}
+                        required
+                        disabled={loadingPhases || !formData.projectId}
+                        className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                      >
+                        <option value="" className="text-gray-500">Select Phase</option>
+                        {phases.map((phase) => (
+                          <option key={phase._id} value={phase._id} className="text-gray-900">
+                            {phase.phaseName || phase.name} {phase.phaseCode ? `(${phase.phaseCode})` : ''}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                    {formData.projectId && phases.length > 0 && !formData.phaseId && (
+                      <p className="text-xs text-gray-600 mt-1.5">Please select a phase</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Equipment Scope Selection */}
+              <div className="mt-4">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  Equipment Scope <span className="text-red-600">*</span>
+                </label>
+                <select
+                  name="equipmentScope"
+                  value={formData.equipmentScope}
+                  onChange={(e) => {
+                    const newScope = e.target.value;
+                    setFormData((prev) => ({
+                      ...prev,
+                      equipmentScope: newScope,
+                      phaseId: newScope === 'site_wide' ? '' : prev.phaseId, // Clear phase if site-wide
+                    }));
+                  }}
+                  required
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                >
+                  <option value="phase_specific">Phase-Specific (DCC)</option>
+                  <option value="site_wide">Site-Wide (Indirect Cost)</option>
+                </select>
+                <p className="text-xs text-gray-600 mt-1.5">
+                  {formData.equipmentScope === 'phase_specific' 
+                    ? 'Phase-specific equipment is charged to the phase budget (DCC)'
+                    : 'Site-wide equipment is charged to indirect costs (generators, site office equipment, etc.)'}
+                </p>
               </div>
             </div>
 

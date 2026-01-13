@@ -356,10 +356,10 @@ export default function InitialExpenseDetailPage() {
         {/* Approval Actions (if pending) */}
         {expense.status === 'pending_approval' && canAccess('approve_initial_expense') && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-yellow-900 mb-2">Pending Approval</h3>
+            <h3 className="font-semibold text-gray-900 mb-2">Pending Approval</h3>
             {/* Capital Balance Warning */}
             {expense.projectId && (
-              <div className="mb-3">
+              <div className="mb-3 text-gray-900">
                 <CapitalBalanceWarning
                   projectId={expense.projectId}
                   amountToApprove={expense.amount || 0}
@@ -372,7 +372,7 @@ export default function InitialExpenseDetailPage() {
                 onChange={(e) => setApprovalNotes(e.target.value)}
                 placeholder="Add approval notes (optional)..."
                 rows={2}
-                className="w-full px-3 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                className="w-full px-3 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-gray-900"
               />
               <div className="flex gap-3">
                 <LoadingButton
@@ -444,7 +444,7 @@ export default function InitialExpenseDetailPage() {
           <div className="lg:col-span-2 space-y-6">
             {/* Basic Information */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Basic Information</h2>
               <dl className="grid grid-cols-2 gap-4">
                 {expense.project && (
                   <div className="col-span-2">
@@ -505,14 +505,14 @@ export default function InitialExpenseDetailPage() {
             {/* Notes */}
             {expense.notes && (
               <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Notes</h2>
+                <h2 className="text-xl font-semibold mb-4 text-gray-900">Notes</h2>
                 <p className="text-gray-700 whitespace-pre-wrap">{expense.notes}</p>
               </div>
             )}
 
             {/* Documents */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Documents</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Documents</h2>
               <div className="space-y-4">
                 {expense.receiptFileUrl && (
                   <div>
@@ -544,7 +544,7 @@ export default function InitialExpenseDetailPage() {
             {/* Project Information */}
             {expense.project && (
               <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Project</h2>
+                <h2 className="text-xl font-semibold mb-4 text-gray-900">Project</h2>
                 <div className="space-y-2">
                   <Link
                     href={`/projects/${expense.projectId}`}
@@ -564,7 +564,7 @@ export default function InitialExpenseDetailPage() {
 
             {/* Approval Information */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Approval Information</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Approval Information</h2>
               <dl className="space-y-4">
                 <div>
                   <dt className="text-sm font-medium text-gray-500">Status</dt>
@@ -657,7 +657,7 @@ export default function InitialExpenseDetailPage() {
             {/* Quick Actions */}
             {expense.status === 'draft' && (
               <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
+                <h2 className="text-xl font-semibold mb-4 text-gray-900">Quick Actions</h2>
                 <div className="space-y-2">
                   <Link
                     href={`/initial-expenses/${expense._id}/edit`}

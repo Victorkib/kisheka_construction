@@ -271,6 +271,7 @@ export async function POST(request) {
     const {
       projectId,
       phaseId,
+      isIndirectLabour,
       floorId,
       categoryId,
       workItemId,
@@ -306,8 +307,13 @@ export async function POST(request) {
       return errorResponse('Valid projectId is required', 400);
     }
 
-    if (!phaseId || !ObjectId.isValid(phaseId)) {
-      return errorResponse('Valid phaseId is required', 400);
+    // PhaseId is required only for direct labour
+    // Indirect labour (site management, security, etc.) doesn't need a phase
+    const indirectLabour = isIndirectLabour === true;
+    if (!indirectLabour) {
+      if (!phaseId || !ObjectId.isValid(phaseId)) {
+        return errorResponse('Valid phaseId is required for direct labour', 400);
+      }
     }
 
     if (!workerName || workerName.trim().length < 2) {
@@ -318,10 +324,27 @@ export async function POST(request) {
       return errorResponse('hourlyRate is required and must be >= 0', 400);
     }
 
+    // Normalize optional rating fields (handle empty strings, NaN, invalid values)
+    const normalizeRating = (value) => {
+      if (value === undefined || value === null || value === '') {
+        return null;
+      }
+      const num = typeof value === 'string' ? parseFloat(value.trim()) : Number(value);
+      if (isNaN(num)) {
+        return null;
+      }
+      // Only return if in valid range (1-5), otherwise null
+      return (num >= 1 && num <= 5) ? num : null;
+    };
+
+    const normalizedQualityRating = normalizeRating(qualityRating);
+    const normalizedProductivityRating = normalizeRating(productivityRating);
+
     // Create labour entry object
     const labourEntryData = {
       projectId,
-      phaseId,
+      phaseId: indirectLabour ? null : phaseId, // PhaseId is null for indirect labour
+      isIndirectLabour: indirectLabour,
       floorId,
       categoryId,
       workItemId,
@@ -345,8 +368,8 @@ export async function POST(request) {
       serviceType,
       visitPurpose,
       deliverables,
-      qualityRating,
-      productivityRating,
+      qualityRating: normalizedQualityRating,
+      productivityRating: normalizedProductivityRating,
       notes,
       equipmentId,
       subcontractorId,
@@ -363,16 +386,39 @@ export async function POST(request) {
     const labourEntry = createLabourEntry(labourEntryData, userProfile._id);
 
     // CRITICAL: Validate budget BEFORE creating entry
-    const budgetValidation = await validatePhaseLabourBudget(
-      phaseId,
-      labourEntry.totalCost
-    );
-
-    if (!budgetValidation.isValid) {
-      return errorResponse(
-        `Budget validation failed: ${budgetValidation.message}`,
-        400
+    // For indirect labour, validate against indirect costs budget
+    // For direct labour, validate against phase budget
+    if (indirectLabour) {
+      // Validate against indirect costs budget
+      const { validateIndirectCostsBudget } = await import('@/lib/indirect-costs-helpers');
+      // For indirect labour, we need to determine the category
+      // Site management, security, etc. would be 'siteOverhead'
+      const indirectCategory = 'siteOverhead'; // Default for indirect labour
+      const budgetValidation = await validateIndirectCostsBudget(
+        projectId,
+        labourEntry.totalCost,
+        indirectCategory
       );
+
+      if (!budgetValidation.isValid) {
+        return errorResponse(
+          `Indirect costs budget validation failed: ${budgetValidation.message}`,
+          400
+        );
+      }
+    } else {
+      // Validate against phase budget (direct labour)
+      const budgetValidation = await validatePhaseLabourBudget(
+        phaseId,
+        labourEntry.totalCost
+      );
+
+      if (!budgetValidation.isValid) {
+        return errorResponse(
+          `Budget validation failed: ${budgetValidation.message}`,
+          400
+        );
+      }
     }
 
     const db = await getDatabase();
@@ -424,15 +470,18 @@ export async function POST(request) {
       const insertedEntry = { ...labourEntry, _id: entryResult.insertedId };
       console.log('[POST /api/labour/entries] Labour entry inserted:', entryResult.insertedId);
 
-      // STEP 2: Update phase actual spending (atomic)
-      await updatePhaseLabourSpending(
-        phaseId,
-        labourEntry.totalCost,
-        'add',
-        session
-      );
+      // STEP 2: Update phase actual spending (atomic) - only for direct labour
+      // Indirect labour doesn't have a phase, so skip phase spending update
+      if (!indirectLabour && phaseId) {
+        await updatePhaseLabourSpending(
+          phaseId,
+          labourEntry.totalCost,
+          'add',
+          session
+        );
+      }
 
-      // STEP 3: Update project budget (atomic)
+      // STEP 3: Update project budget (atomic) - for both direct and indirect labour
       await updateProjectLabourSpending(
         projectId,
         labourEntry.totalCost,
@@ -519,12 +568,19 @@ export async function POST(request) {
     console.log('[POST /api/labour/entries] Transaction completed successfully');
 
     // After transaction: Recalculate phase spending (ensures accuracy)
-    await recalculatePhaseSpending(phaseId);
+    // Recalculate phase spending only for direct labour (phaseId is not null)
+    // Indirect labour doesn't have a phase, so skip phase recalculation
+    if (!indirectLabour && phaseId) {
+      await recalculatePhaseSpending(phaseId);
+    }
 
     // Update labour cost summaries (async, non-blocking)
     setImmediate(async () => {
       try {
-        await updateLabourCostSummary(projectId, phaseId, 'phase_total');
+        // Only update phase labour summary if this is direct labour
+        if (!indirectLabour && phaseId) {
+          await updateLabourCostSummary(projectId, phaseId, 'phase_total');
+        }
         await updateLabourCostSummary(projectId, null, 'project_total');
       } catch (error) {
         console.error('Error updating labour cost summaries:', error);

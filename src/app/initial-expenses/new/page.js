@@ -33,6 +33,9 @@ export default function NewInitialExpensePage() {
     datePaid: new Date().toISOString().split('T')[0],
     notes: '',
   });
+  const [budgetInfo, setBudgetInfo] = useState(null);
+  const [budgetLoading, setBudgetLoading] = useState(false);
+  const [budgetError, setBudgetError] = useState(null);
 
   // Fetch projects on mount
   useEffect(() => {
@@ -57,8 +60,94 @@ export default function NewInitialExpensePage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const newFormData = { ...formData, [name]: value };
+    setFormData(newFormData);
+    
+    // Validate budget when project, category, or amount changes
+    if (name === 'projectId' || name === 'category' || name === 'amount') {
+      if (name === 'projectId' || name === 'category') {
+        // Reset budget info when project or category changes
+        setBudgetInfo(null);
+      }
+      // Validate budget after a short delay (debounce)
+      if (name === 'amount' && value) {
+        setTimeout(() => {
+          // Use updated formData for validation
+          validateBudgetWithData(newFormData);
+        }, 500);
+      } else if ((name === 'projectId' || name === 'category') && newFormData.amount) {
+        // Also validate if project/category changes and amount exists
+        setTimeout(() => {
+          validateBudgetWithData(newFormData);
+        }, 300);
+      }
+    }
   };
+
+  const validateBudgetWithData = async (formDataToUse = formData) => {
+    if (!formDataToUse.projectId || !formDataToUse.category || !formDataToUse.amount) {
+      setBudgetInfo(null);
+      return;
+    }
+
+    const amount = parseFloat(formDataToUse.amount);
+    if (isNaN(amount) || amount <= 0) {
+      setBudgetInfo(null);
+      return;
+    }
+
+    setBudgetLoading(true);
+    setBudgetError(null);
+
+    try {
+      // Map category to subcategory
+      const categoryToSubCategory = {
+        'land': 'landAcquisition',
+        'transfer_fees': 'legalRegulatory',
+        'county_fees': 'legalRegulatory',
+        'permits': 'permitsApprovals',
+        'approvals': 'permitsApprovals',
+        'boreholes': 'sitePreparation',
+        'electricity': 'sitePreparation',
+        'other': 'sitePreparation',
+      };
+
+      const subCategory = categoryToSubCategory[formDataToUse.category] || 'sitePreparation';
+
+      // Fetch preconstruction summary
+      const summaryResponse = await fetch(`/api/projects/${formDataToUse.projectId}/preconstruction`);
+      const summaryResult = await summaryResponse.json();
+
+      if (!summaryResult.success) {
+        throw new Error(summaryResult.error || 'Failed to fetch budget information');
+      }
+
+      const summary = summaryResult.data;
+      const available = summary.remaining || 0;
+      const isValid = amount <= available;
+      const usageAfter = summary.budgeted > 0 
+        ? ((summary.spent + amount) / summary.budgeted) * 100 
+        : 0;
+
+      setBudgetInfo({
+        budgeted: summary.budgeted,
+        spent: summary.spent,
+        available,
+        isValid,
+        shortfall: Math.max(0, amount - available),
+        usageAfter,
+        warning: usageAfter >= 80 && usageAfter < 100,
+        exceeded: amount > available,
+      });
+    } catch (err) {
+      console.error('Budget validation error:', err);
+      setBudgetError(err.message);
+      setBudgetInfo(null);
+    } finally {
+      setBudgetLoading(false);
+    }
+  };
+
 
   const validateStep = (step) => {
     switch (step) {
@@ -102,6 +191,13 @@ export default function NewInitialExpensePage() {
     setError(null);
 
     if (!validateStep(2)) {
+      setLoading(false);
+      return;
+    }
+
+    // Check budget validation before submitting
+    if (budgetInfo && budgetInfo.exceeded) {
+      setError(`Cannot create expense: Insufficient preconstruction budget. Available: ${new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.available)}, Required: ${new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(parseFloat(formData.amount))}`);
       setLoading(false);
       return;
     }
@@ -215,7 +311,7 @@ export default function NewInitialExpensePage() {
           {/* Step 1: Project & Category */}
           {currentStep === 1 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold mb-4">Step 1: Project & Category</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Step 1: Project & Category</h2>
               
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
@@ -277,7 +373,7 @@ export default function NewInitialExpensePage() {
           {/* Step 2: Item Details */}
           {currentStep === 2 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold mb-4">Step 2: Item Details</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Step 2: Item Details</h2>
               
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
@@ -307,8 +403,76 @@ export default function NewInitialExpensePage() {
                   min="0"
                   step="0.01"
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 ${
+                    budgetInfo?.exceeded ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                  }`}
                 />
+                
+                {/* Budget Validation Info */}
+                {budgetLoading && (
+                  <div className="mt-2 text-sm text-gray-600">
+                    <span className="inline-flex items-center">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Validating budget...
+                    </span>
+                  </div>
+                )}
+
+                {budgetInfo && !budgetLoading && (
+                  <div className={`mt-2 p-3 rounded-lg border ${
+                    budgetInfo.exceeded 
+                      ? 'bg-red-50 border-red-200' 
+                      : budgetInfo.warning 
+                        ? 'bg-yellow-50 border-yellow-200' 
+                        : 'bg-green-50 border-green-200'
+                  }`}>
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <p className={`text-sm font-semibold ${
+                          budgetInfo.exceeded 
+                            ? 'text-red-800' 
+                            : budgetInfo.warning 
+                              ? 'text-yellow-800' 
+                              : 'text-green-800'
+                        }`}>
+                          {budgetInfo.exceeded 
+                            ? '⚠️ Insufficient Budget' 
+                            : budgetInfo.warning 
+                              ? '⚠️ Budget Warning' 
+                              : '✓ Budget Available'}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          Available: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.available)}
+                        </p>
+                      </div>
+                      {budgetInfo.exceeded && (
+                        <p className="text-sm font-semibold text-red-800">
+                          Shortfall: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.shortfall)}
+                        </p>
+                      )}
+                    </div>
+                    {budgetInfo.warning && !budgetInfo.exceeded && (
+                      <p className="text-xs text-yellow-700">
+                        Budget usage will be {budgetInfo.usageAfter.toFixed(1)}% after this expense
+                      </p>
+                    )}
+                    {budgetInfo.exceeded && (
+                      <p className="text-xs text-red-700">
+                        This expense exceeds available preconstruction budget. Please adjust the amount or increase the budget.
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {budgetError && (
+                  <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
+                    Could not validate budget: {budgetError}
+                  </div>
+                )}
+
                 {needsApproval && (
                   <p className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded p-2 mt-2">
                     ⚠️ This expense requires approval (amount &gt;= 100,000 KES)
@@ -394,7 +558,7 @@ export default function NewInitialExpensePage() {
           {/* Step 3: Documents */}
           {currentStep === 3 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold mb-4">Step 3: Documents</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Step 3: Documents</h2>
               
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
@@ -473,29 +637,29 @@ export default function NewInitialExpensePage() {
           {/* Step 4: Review & Submit */}
           {currentStep === 4 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold mb-4">Step 4: Review & Submit</h2>
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">Step 4: Review & Submit</h2>
               
               <div className="bg-gray-50 rounded-lg p-4 space-y-3">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-600">Project</p>
-                    <p className="font-medium">
+                    <p className="font-medium text-gray-900">
                       {projects.find((p) => p._id === formData.projectId)?.projectName || 'N/A'}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Category</p>
-                    <p className="font-medium">
+                    <p className="font-medium text-gray-900">
                       {initialExpenseCategories.find((c) => c.value === formData.category)?.label || 'N/A'}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Item Name</p>
-                    <p className="font-medium">{formData.itemName}</p>
+                    <p className="font-medium text-gray-900">{formData.itemName}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Amount</p>
-                    <p className="font-medium text-lg">
+                    <p className="font-medium text-lg text-gray-900">
                       {new Intl.NumberFormat('en-KE', {
                         style: 'currency',
                         currency: 'KES',
@@ -504,11 +668,11 @@ export default function NewInitialExpensePage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Supplier</p>
-                    <p className="font-medium">{formData.supplier || 'N/A'}</p>
+                    <p className="font-medium text-gray-900">{formData.supplier || 'N/A'}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Date Paid</p>
-                    <p className="font-medium">
+                    <p className="font-medium text-gray-900">
                       {new Date(formData.datePaid).toLocaleDateString('en-KE')}
                     </p>
                   </div>

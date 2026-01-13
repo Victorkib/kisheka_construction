@@ -11,7 +11,7 @@ import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingSpinner, LoadingButton } from '@/components/loading';
+import { LoadingSpinner, LoadingButton, LoadingSelect } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
 import { VALID_WORKER_TYPES, VALID_WORKER_ROLES, VALID_SKILL_TYPES } from '@/lib/constants/labour-constants';
@@ -38,6 +38,7 @@ function NewLabourEntryPageContent() {
   const [formData, setFormData] = useState({
     projectId: '',
     phaseId: '',
+    isIndirectLabour: false, // NEW: Whether this is indirect labour
     floorId: '',
     categoryId: '',
     workItemId: '',
@@ -407,8 +408,16 @@ function NewLabourEntryPageContent() {
           serviceType: formData.serviceType || null,
           visitPurpose: formData.visitPurpose || null,
           deliverables: Array.isArray(formData.deliverables) ? formData.deliverables : (formData.deliverables ? [formData.deliverables] : []),
-          qualityRating: formData.qualityRating ? parseFloat(formData.qualityRating) : null,
-          productivityRating: formData.productivityRating ? parseFloat(formData.productivityRating) : null,
+          qualityRating: (formData.qualityRating && 
+            (typeof formData.qualityRating === 'string' ? formData.qualityRating.trim() !== '' : formData.qualityRating !== '') &&
+            !isNaN(parseFloat(formData.qualityRating))) 
+            ? parseFloat(formData.qualityRating) 
+            : null,
+          productivityRating: (formData.productivityRating && 
+            (typeof formData.productivityRating === 'string' ? formData.productivityRating.trim() !== '' : formData.productivityRating !== '') &&
+            !isNaN(parseFloat(formData.productivityRating))) 
+            ? parseFloat(formData.productivityRating) 
+            : null,
           clockInTime: formData.clockInTime ? new Date(`${formData.entryDate}T${formData.clockInTime}`).toISOString() : null,
           clockOutTime: formData.clockOutTime ? new Date(`${formData.entryDate}T${formData.clockOutTime}`).toISOString() : null,
           entryDate: formData.entryDate,
@@ -479,13 +488,14 @@ function NewLabourEntryPageContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Project <span className="text-red-500">*</span>
                 </label>
-                <select
+                <LoadingSelect
                   name="projectId"
                   value={formData.projectId}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
-                  disabled={loadingProjects}
+                  loading={loadingProjects}
+                  loadingText="Loading projects..."
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select Project</option>
                   {projects.map((project) => (
@@ -493,28 +503,61 @@ function NewLabourEntryPageContent() {
                       {project.projectName} ({project.projectCode})
                     </option>
                   ))}
-                </select>
+                </LoadingSelect>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Phase <span className="text-red-500">*</span>
-                </label>
-                <select
-                  name="phaseId"
-                  value={formData.phaseId}
-                  onChange={handleChange}
-                  required
-                  disabled={!formData.projectId || loadingPhases}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
-                >
-                  <option value="">Select Phase</option>
-                  {phases.map((phase) => (
-                    <option key={phase._id} value={phase._id}>
-                      {phase.phaseName} ({phase.phaseCode})
-                    </option>
-                  ))}
-                </select>
+              {/* Phase Selection - Only required for direct labour */}
+              {!formData.isIndirectLabour && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phase <span className="text-red-500">*</span>
+                  </label>
+                  <LoadingSelect
+                    name="phaseId"
+                    value={formData.phaseId}
+                    onChange={handleChange}
+                    required
+                    loading={loadingPhases}
+                    loadingText="Loading phases..."
+                    disabled={!formData.projectId}
+                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select Phase</option>
+                    {phases.map((phase) => (
+                      <option key={phase._id} value={phase._id}>
+                        {phase.phaseName} ({phase.phaseCode})
+                      </option>
+                    ))}
+                  </LoadingSelect>
+                </div>
+              )}
+            </div>
+
+            {/* Indirect Labour Option */}
+            <div className="border-t pt-4">
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  id="isIndirectLabour"
+                  name="isIndirectLabour"
+                  checked={formData.isIndirectLabour}
+                  onChange={(e) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      isIndirectLabour: e.target.checked,
+                      phaseId: e.target.checked ? '' : prev.phaseId, // Clear phase if indirect
+                    }));
+                  }}
+                  className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <div className="flex-1">
+                  <label htmlFor="isIndirectLabour" className="block text-sm font-medium text-gray-700 mb-1">
+                    This is Indirect Labour
+                  </label>
+                  <p className="text-xs text-gray-600">
+                    Indirect labour (site management, security, general site office staff) is charged to the project-level indirect costs budget, not the phase budget. Phase selection is not required for indirect labour.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -524,12 +567,14 @@ function NewLabourEntryPageContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Floor (Optional)
                 </label>
-                <select
+                <LoadingSelect
                   name="floorId"
                   value={formData.floorId}
                   onChange={handleChange}
-                  disabled={!formData.projectId || loadingFloors}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  loading={loadingFloors}
+                  loadingText="Loading floors..."
+                  disabled={!formData.projectId}
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select Floor</option>
                   {floors.map((floor) => (
@@ -537,7 +582,7 @@ function NewLabourEntryPageContent() {
                       {floor.name} (Floor {floor.floorNumber})
                     </option>
                   ))}
-                </select>
+                </LoadingSelect>
               </div>
 
               <div>
@@ -845,7 +890,15 @@ function NewLabourEntryPageContent() {
                 </div>n 
 
                 {/* Budget Validation */}
-                {budgetInfo && (
+                {validatingBudget && (
+                  <div className="mt-3 p-3 rounded bg-blue-50 border border-blue-200">
+                    <div className="flex items-center gap-2">
+                      <LoadingSpinner size="sm" color="blue-600" />
+                      <p className="text-sm font-medium text-blue-800">Validating budget...</p>
+                    </div>
+                  </div>
+                )}
+                {budgetInfo && !validatingBudget && (
                   <div className={`mt-3 p-3 rounded ${budgetInfo.isValid ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
                     <p className={`text-sm font-medium ${budgetInfo.isValid ? 'text-green-800' : 'text-red-800'}`}>
                       {budgetInfo.isValid ? '✅' : '⚠️'} {budgetInfo.message}
@@ -945,12 +998,12 @@ function NewLabourEntryPageContent() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Work Item (Optional)
                 </label>
-                <select
+                <LoadingSelect
                   name="workItemId"
                   value={formData.workItemId}
                   onChange={handleChange}
                   disabled={!formData.phaseId}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select Work Item</option>
                   {workItems.map((item) => (
@@ -958,12 +1011,57 @@ function NewLabourEntryPageContent() {
                       {item.name} ({item.category})
                     </option>
                   ))}
-                </select>
+                </LoadingSelect>
+              </div>
+            </div>
+
+            {/* Performance Ratings (Optional) */}
+            <div className="border-t pt-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Performance Ratings (Optional)</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Quality Rating
+                    <span className="text-gray-500 text-xs font-normal ml-1">(1-5, Optional)</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="qualityRating"
+                    value={formData.qualityRating}
+                    onChange={handleChange}
+                    min="1"
+                    max="5"
+                    step="1"
+                    placeholder="1-5"
+                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Rate the quality of work (1 = Poor, 5 = Excellent)</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Productivity Rating
+                    <span className="text-gray-500 text-xs font-normal ml-1">(1-5, Optional)</span>
+                  </label>
+                  <input
+                    type="number"
+                    name="productivityRating"
+                    value={formData.productivityRating}
+                    onChange={handleChange}
+                    min="1"
+                    max="5"
+                    step="1"
+                    placeholder="1-5"
+                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Rate the productivity/efficiency (1 = Low, 5 = High)</p>
+                </div>
               </div>
             </div>
 
             {/* Notes */}
-            <div>
+            <div className="border-t pt-6">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Notes
               </label>

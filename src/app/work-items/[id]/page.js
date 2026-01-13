@@ -18,6 +18,7 @@ import { ConfirmationModal } from '@/components/modals';
 import { WORK_ITEM_STATUSES, WORK_ITEM_CATEGORIES, WORK_ITEM_PRIORITIES, getStatusColor, getPriorityColor, getPriorityLabel } from '@/lib/constants/work-item-constants';
 import { WorkItemLabourTracking } from '@/components/work-items/labour-tracking';
 import { MultiWorkerSelector } from '@/components/work-items/multi-worker-selector';
+import { AssignmentHistory } from '@/components/work-items/assignment-history';
 
 export default function WorkItemDetailPage() {
   const router = useRouter();

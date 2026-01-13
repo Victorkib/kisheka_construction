@@ -23,6 +23,7 @@ import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { ProjectHealthDashboard } from '@/components/project-health/ProjectHealthDashboard';
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { HierarchicalBudgetDisplay } from '@/components/budget/HierarchicalBudgetDisplay';
+import { CostManagementSummary } from '@/components/budget/CostManagementSummary';
 import { EnhancedBudgetInput } from '@/components/budget/EnhancedBudgetInput';
 import { BudgetVisualization } from '@/components/budget/BudgetVisualization';
 
@@ -1625,6 +1626,11 @@ export default function ProjectDetailPage() {
         {/* Budget Breakdown */}
         <div className="mb-6">
           <HierarchicalBudgetDisplay budget={project.budget} />
+        </div>
+
+        {/* Cost Management Summary */}
+        <div className="mb-6">
+          <CostManagementSummary projectId={projectId} />
         </div>
 
         {/* Budget Visualization */}

@@ -479,7 +479,7 @@ export default function ExpenseDetailPage() {
             {/* Approval Actions */}
             {expense.status === 'PENDING' && canAccess('approve_expense') && (
               <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold mb-4">Actions</h3>
+                <h3 className="text-lg font-semibold mb-4 text-gray-900">Actions</h3>
                 {/* Capital Balance Warning */}
                 {expense.projectId && (
                   <div className="mb-4">
@@ -491,7 +491,7 @@ export default function ExpenseDetailPage() {
                 )}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                    <label className="block text-base font-semibold text-gray-900 mb-2 leading-normal">
                       Approval Notes (Optional)
                     </label>
                     <textarea
@@ -499,7 +499,7 @@ export default function ExpenseDetailPage() {
                       onChange={(e) => setApprovalNotes(e.target.value)}
                       rows={3}
                       placeholder="Add notes for approval/rejection..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 text-gray-900"
                     />
                   </div>
                   <div className="flex gap-2">
@@ -568,7 +568,7 @@ export default function ExpenseDetailPage() {
 
             {/* Quick Info */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold mb-4">Quick Info</h3>
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">Quick Info</h3>
               <dl className="space-y-3">
                 <div>
                   <dt className="text-sm font-semibold text-gray-700 leading-normal">Created</dt>

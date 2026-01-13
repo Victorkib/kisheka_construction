@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable } from '@/components/loading';
+import { LoadingTable, LoadingSelect, LoadingSpinner } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
 import { Plus, Search, Filter, Download, Edit, Trash2, CheckCircle, XCircle, Eye, Calendar, Clock, DollarSign, Users } from 'lucide-react';
@@ -33,8 +33,13 @@ function LabourEntriesPageContent() {
   const [workItems, setWorkItems] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+  const [approvingId, setApprovingId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState(null);
+  const [loadingProjects, setLoadingProjects] = useState(false);
+  const [loadingPhases, setLoadingPhases] = useState(false);
+  const [loadingWorkers, setLoadingWorkers] = useState(false);
+  const [loadingWorkItems, setLoadingWorkItems] = useState(false);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -87,6 +92,7 @@ function LabourEntriesPageContent() {
   }, [filters, pagination.page, pagination.limit, sortConfig]);
 
   const fetchProjects = async () => {
+    setLoadingProjects(true);
     try {
       const response = await fetch('/api/projects/accessible');
       const data = await response.json();
@@ -95,11 +101,14 @@ function LabourEntriesPageContent() {
       }
     } catch (err) {
       console.error('Error fetching projects:', err);
+    } finally {
+      setLoadingProjects(false);
     }
   };
 
   const fetchPhases = async (projectId) => {
     if (!projectId) return;
+    setLoadingPhases(true);
     try {
       const response = await fetch(`/api/phases?projectId=${projectId}`);
       const data = await response.json();
@@ -108,10 +117,13 @@ function LabourEntriesPageContent() {
       }
     } catch (err) {
       console.error('Error fetching phases:', err);
+    } finally {
+      setLoadingPhases(false);
     }
   };
 
   const fetchWorkers = async () => {
+    setLoadingWorkers(true);
     try {
       const response = await fetch('/api/labour/workers?status=active&limit=100');
       const data = await response.json();
@@ -120,11 +132,14 @@ function LabourEntriesPageContent() {
       }
     } catch (err) {
       console.error('Error fetching workers:', err);
+    } finally {
+      setLoadingWorkers(false);
     }
   };
 
   const fetchWorkItems = async (projectId, phaseId) => {
     if (!projectId || !phaseId) return;
+    setLoadingWorkItems(true);
     try {
       const response = await fetch(`/api/work-items?projectId=${projectId}&phaseId=${phaseId}`);
       const data = await response.json();
@@ -134,6 +149,8 @@ function LabourEntriesPageContent() {
     } catch (err) {
       console.error('Error fetching work items:', err);
       setWorkItems([]);
+    } finally {
+      setLoadingWorkItems(false);
     }
   };
 
@@ -242,6 +259,7 @@ function LabourEntriesPageContent() {
   };
 
   const handleApprove = async (entryId) => {
+    setApprovingId(entryId);
     try {
       const response = await fetch(`/api/labour/entries/${entryId}/approve`, {
         method: 'POST',
@@ -258,6 +276,8 @@ function LabourEntriesPageContent() {
     } catch (err) {
       console.error('Error approving entry:', err);
       toast.showError(err.message || 'Failed to approve entry');
+    } finally {
+      setApprovingId(null);
     }
   };
 
@@ -358,9 +378,11 @@ function LabourEntriesPageContent() {
             <div className="p-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
-                <select
+                <LoadingSelect
                   value={filters.projectId}
                   onChange={(e) => handleFilterChange('projectId', e.target.value)}
+                  loading={loadingProjects}
+                  loadingText="Loading projects..."
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Projects</option>
@@ -369,16 +391,18 @@ function LabourEntriesPageContent() {
                       {project.projectName}
                     </option>
                   ))}
-                </select>
+                </LoadingSelect>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Phase</label>
-                <select
+                <LoadingSelect
                   value={filters.phaseId}
                   onChange={(e) => handleFilterChange('phaseId', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  loading={loadingPhases}
+                  loadingText="Loading phases..."
                   disabled={!filters.projectId}
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Phases</option>
                   {phases.map((phase) => (
@@ -386,16 +410,18 @@ function LabourEntriesPageContent() {
                       {phase.phaseName}
                     </option>
                   ))}
-                </select>
+                </LoadingSelect>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Work Item</label>
-                <select
+                <LoadingSelect
                   value={filters.workItemId}
                   onChange={(e) => handleFilterChange('workItemId', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed"
+                  loading={loadingWorkItems}
+                  loadingText="Loading work items..."
                   disabled={!filters.phaseId}
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Work Items</option>
                   {workItems.map((item) => (
@@ -403,14 +429,16 @@ function LabourEntriesPageContent() {
                       {item.name} ({item.category || 'Other'})
                     </option>
                   ))}
-                </select>
+                </LoadingSelect>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Worker</label>
-                <select
+                <LoadingSelect
                   value={filters.workerId}
                   onChange={(e) => handleFilterChange('workerId', e.target.value)}
+                  loading={loadingWorkers}
+                  loadingText="Loading workers..."
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Workers</option>
@@ -419,7 +447,7 @@ function LabourEntriesPageContent() {
                       {worker.workerName}
                     </option>
                   ))}
-                </select>
+                </LoadingSelect>
               </div>
 
               <div>
@@ -624,10 +652,15 @@ function LabourEntriesPageContent() {
                           {canApprove && entry.status === 'pending_approval' && (
                             <button
                               onClick={() => handleApprove(entry._id)}
-                              className="text-green-600 hover:text-green-800"
+                              disabled={approvingId === entry._id}
+                              className="text-green-600 hover:text-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Approve"
                             >
-                              <CheckCircle className="w-4 h-4" />
+                              {approvingId === entry._id ? (
+                                <LoadingSpinner size="sm" color="green-600" />
+                              ) : (
+                                <CheckCircle className="w-4 h-4" />
+                              )}
                             </button>
                           )}
                           {canDelete && (entry.status === 'draft' || entry.status === 'rejected') && (
@@ -636,11 +669,15 @@ function LabourEntriesPageContent() {
                                 setEntryToDelete(entry);
                                 setShowDeleteModal(true);
                               }}
-                              className="text-red-600 hover:text-red-800"
+                              className="text-red-600 hover:text-red-800 disabled:opacity-50 disabled:cursor-not-allowed"
                               title="Delete"
                               disabled={deletingId === entry._id}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              {deletingId === entry._id ? (
+                                <LoadingSpinner size="sm" color="red-600" />
+                              ) : (
+                                <Trash2 className="w-4 h-4" />
+                              )}
                             </button>
                           )}
                         </div>

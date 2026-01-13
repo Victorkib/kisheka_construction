@@ -229,11 +229,6 @@ export async function POST(request) {
       'electricity': 'sitePreparation',
       'other': 'sitePreparation' // Default to sitePreparation for other
     };
-    
-    const budgetSource = {
-      category: 'preConstruction',
-      subCategory: categoryToBudgetSource[category] || 'sitePreparation'
-    };
 
     if (!itemName || itemName.trim().length === 0) {
       return errorResponse('Item name is required', 400);
@@ -255,6 +250,28 @@ export async function POST(request) {
       .findOne({ _id: new ObjectId(projectId) });
     if (!project) {
       return errorResponse('Project not found', 404);
+    }
+
+    // Validate pre-construction budget before creating expense
+    const { validatePreConstructionBudget } = await import('@/lib/financial-helpers');
+    const budgetSource = {
+      category: 'preConstruction',
+      subCategory: categoryToBudgetSource[category] || 'sitePreparation'
+    };
+    const budgetValidation = await validatePreConstructionBudget(
+      projectId,
+      parseFloat(amount),
+      budgetSource.subCategory
+    );
+
+    // If budget validation fails, return error (unless it's just a warning)
+    if (!budgetValidation.isValid) {
+      return errorResponse(budgetValidation.message, 400);
+    }
+
+    // If budget validation shows a warning, we'll still allow creation but log it
+    if (budgetValidation.warning) {
+      console.warn(`Pre-construction budget warning for project ${projectId}:`, budgetValidation.message);
     }
 
     // Generate expense code
@@ -285,7 +302,11 @@ export async function POST(request) {
       approvalNotes: status === 'approved' ? 'Auto-approved (amount < 100k)' : '',
       status,
       notes: notes?.trim() || '',
-      budgetSource, // NEW: Link to pre-construction budget
+      budgetSource: {
+        category: 'preConstruction',
+        subCategory: categoryToBudgetSource[category] || 'sitePreparation'
+      }, // Link to pre-construction budget
+      budgetValidation: budgetValidation.warning ? { warning: true, message: budgetValidation.message } : null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
