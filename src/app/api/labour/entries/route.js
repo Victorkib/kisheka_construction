@@ -272,6 +272,7 @@ export async function POST(request) {
       projectId,
       phaseId,
       isIndirectLabour,
+      indirectCostCategory,
       floorId,
       categoryId,
       workItemId,
@@ -320,6 +321,17 @@ export async function POST(request) {
       return errorResponse('workerName is required and must be at least 2 characters', 400);
     }
 
+    // Validate indirect cost category when isIndirectLabour is true
+    if (indirectLabour && indirectCostCategory) {
+      const validCategories = ['utilities', 'siteOverhead', 'transportation', 'safetyCompliance'];
+      if (!validCategories.includes(indirectCostCategory)) {
+        return errorResponse(
+          `Invalid indirectCostCategory. Must be one of: ${validCategories.join(', ')}`,
+          400
+        );
+      }
+    }
+
     if (hourlyRate === undefined || hourlyRate === null || isNaN(hourlyRate) || hourlyRate < 0) {
       return errorResponse('hourlyRate is required and must be >= 0', 400);
     }
@@ -345,6 +357,7 @@ export async function POST(request) {
       projectId,
       phaseId: indirectLabour ? null : phaseId, // PhaseId is null for indirect labour
       isIndirectLabour: indirectLabour,
+      indirectCostCategory: indirectLabour ? indirectCostCategory : null, // Only set for indirect labour
       floorId,
       categoryId,
       workItemId,
@@ -385,20 +398,34 @@ export async function POST(request) {
     // Create entry object
     const labourEntry = createLabourEntry(labourEntryData, userProfile._id);
 
+    // CRITICAL: Declare budgetValidation outside if/else for use in transaction and response
+    // This variable will hold validation result from either indirect or direct labour validation
+    let budgetValidation;
+
     // CRITICAL: Validate budget BEFORE creating entry
     // For indirect labour, validate against indirect costs budget
     // For direct labour, validate against phase budget
     if (indirectLabour) {
       // Validate against indirect costs budget
-      const { validateIndirectCostsBudget } = await import('@/lib/indirect-costs-helpers');
-      // For indirect labour, we need to determine the category
-      // Site management, security, etc. would be 'siteOverhead'
-      const indirectCategory = 'siteOverhead'; // Default for indirect labour
-      const budgetValidation = await validateIndirectCostsBudget(
-        projectId,
-        labourEntry.totalCost,
-        indirectCategory
-      );
+      try {
+        const { validateIndirectCostsBudget } = await import('@/lib/indirect-costs-helpers');
+        if (typeof validateIndirectCostsBudget !== 'function') {
+          throw new Error('validateIndirectCostsBudget is not exported from indirect-costs-helpers');
+        }
+        // For indirect labour, use the selected category (fallback to siteOverhead)
+        const indirectCategory = indirectCostCategory || 'siteOverhead';
+        budgetValidation = await validateIndirectCostsBudget(
+          projectId,
+          labourEntry.totalCost,
+          indirectCategory
+        );
+      } catch (error) {
+        console.error('Indirect costs budget validation error:', error);
+        return errorResponse(
+          `Indirect costs budget validation failed: ${error.message}`,
+          500
+        );
+      }
 
       if (!budgetValidation.isValid) {
         return errorResponse(
@@ -408,7 +435,7 @@ export async function POST(request) {
       }
     } else {
       // Validate against phase budget (direct labour)
-      const budgetValidation = await validatePhaseLabourBudget(
+      budgetValidation = await validatePhaseLabourBudget(
         phaseId,
         labourEntry.totalCost
       );
@@ -481,6 +508,22 @@ export async function POST(request) {
         );
       }
 
+      // STEP 2.5: Update indirect costs spending (atomic) - only for indirect labour
+      // CRITICAL: Indirect labour must update indirect costs budget, not phase budget
+      if (indirectLabour && indirectCostCategory) {
+        try {
+          const { updateIndirectCostsSpending } = await import('@/lib/indirect-costs-helpers');
+          // CRITICAL: Use the actual indirectCostCategory from the entry, not hardcoded
+          // This allows proper tracking by category (utilities, siteOverhead, transportation, safetyCompliance)
+          await updateIndirectCostsSpending(projectId, indirectCostCategory, labourEntry.totalCost, session);
+          console.log(`[POST /api/labour/entries] Indirect costs updated: ${projectId} | ${indirectCostCategory} | ${labourEntry.totalCost}`);
+        } catch (error) {
+          console.error('Error updating indirect costs spending:', error);
+          // Don't fail the entry creation - log and continue
+          // The budget validation already passed, this is just tracking
+        }
+      }
+
       // STEP 3: Update project budget (atomic) - for both direct and indirect labour
       await updateProjectLabourSpending(
         projectId,
@@ -543,10 +586,12 @@ export async function POST(request) {
           changes: {
             created: insertedEntry,
             labourCost: labourEntry.totalCost,
-            phaseBudgetImpact: {
-              before: budgetValidation.currentSpending,
-              after: budgetValidation.currentSpending + labourEntry.totalCost,
-              budget: budgetValidation.budget,
+            budgetImpact: {
+              type: indirectLabour ? 'indirectCosts' : 'phaseLaborBudget',
+              before: budgetValidation.available + labourEntry.totalCost,
+              after: budgetValidation.available,
+              shortfall: budgetValidation.shortfall,
+              message: budgetValidation.message,
             },
           },
         },
@@ -602,8 +647,11 @@ export async function POST(request) {
         entry: createdEntry,
         budgetValidation: {
           available: budgetValidation.available,
-          used: budgetValidation.currentSpending + labourEntry.totalCost,
-          budget: budgetValidation.budget,
+          used: budgetValidation.available - budgetValidation.shortfall,
+          required: budgetValidation.required,
+          shortfall: budgetValidation.shortfall,
+          isValid: budgetValidation.isValid,
+          message: budgetValidation.message,
         },
         workerProfileCreated: transactionResult.workerProfileCreated,
         createdWorkerProfile: transactionResult.createdWorkerProfile,

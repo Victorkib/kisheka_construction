@@ -123,13 +123,18 @@ export function Step2AddWorkers({ wizardData, onUpdate, onValidationChange, preS
   useEffect(() => {
     const isValid = workers.length > 0 &&
       workers.every((worker) => {
+        const isIndirect = worker.isIndirectLabour || wizardData.isIndirectLabour;
+        const hasIndirectCategory = isIndirect
+          ? worker.indirectCostCategory || wizardData.indirectCostCategory
+          : true;
         return worker.workerName &&
           worker.workerName.trim().length >= 2 &&
           worker.skillType &&
           worker.hourlyRate &&
           parseFloat(worker.hourlyRate) >= 0 &&
           worker.totalHours &&
-          parseFloat(worker.totalHours) > 0;
+          parseFloat(worker.totalHours) > 0 &&
+          hasIndirectCategory;
       });
 
     // Only call onValidationChange if validation state changed

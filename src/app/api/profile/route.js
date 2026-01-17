@@ -44,6 +44,7 @@ export async function GET(request) {
 
     return successResponse({
       id: user.id,
+      _id: _id?.toString(),
       email: user.email,
       ...profileData,
     });
@@ -214,6 +215,7 @@ export async function PATCH(request) {
     return successResponse(
       {
         id: user.id,
+        _id: _id?.toString(),
         email: user.email,
         ...profileData,
       },

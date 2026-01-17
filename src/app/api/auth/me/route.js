@@ -35,6 +35,7 @@ export async function GET(request) {
 
     return successResponse({
       id: user.id,
+      _id: _id?.toString(),
       email: user.email,
       ...profileData,
     });

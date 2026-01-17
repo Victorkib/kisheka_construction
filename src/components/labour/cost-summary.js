@@ -280,16 +280,16 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
         </div>
       </div>
 
-      {/* Direct vs Subcontractor Breakdown */}
+      {/* Direct vs Subcontractor vs Indirect Breakdown */}
       {summary.direct && summary.subcontractor && (
         <div className="bg-white rounded-lg shadow">
           <div className="px-4 py-3 border-b border-gray-200">
-            <h4 className="text-md font-semibold text-gray-900">Direct vs Subcontractor Labour</h4>
+            <h4 className="text-md font-semibold text-gray-900">Labour Breakdown by Type</h4>
           </div>
           <div className="p-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Direct Labour</p>
+                <p className="text-sm font-medium text-gray-700 mb-2">Direct Labour (Phase Budget)</p>
                 <div className="space-y-1">
                   <p className="text-lg font-bold text-blue-600">
                     {summary.direct.cost.toLocaleString()} KES
@@ -327,6 +327,24 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
                   )}
                 </div>
               </div>
+              {summary.indirect && summary.indirect.cost > 0 && (
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Indirect Labour (Project Budget)</p>
+                  <div className="space-y-1">
+                    <p className="text-lg font-bold text-amber-600">
+                      {summary.indirect.cost.toLocaleString()} KES
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      {summary.indirect.hours.toFixed(1)} hours • {summary.indirect.entries} entries
+                    </p>
+                    {costs.total?.cost > 0 && (
+                      <p className="text-xs text-gray-600">
+                        {((summary.indirect.cost / costs.total.cost) * 100).toFixed(1)}% of total
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -291,9 +291,7 @@ export async function DELETE(request, { params }) {
       changes: {
         deleted: existingWorker,
       },
-    });
-
-    return successResponse(null, 'Worker profile deleted successfully');
+    });    return successResponse(null, 'Worker profile deleted successfully');
   } catch (error) {
     console.error('DELETE /api/labour/workers/[id] error:', error);
     return errorResponse(error.message || 'Failed to delete worker profile', 500);

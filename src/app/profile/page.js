@@ -14,6 +14,7 @@ import { LoadingSpinner } from '@/components/loading';
 import { ProfileHeader } from '@/components/profile/profile-header';
 import { ProfileInfo } from '@/components/profile/profile-info';
 import { NotificationPreferences } from '@/components/profile/notification-preferences';
+import { NotificationStatusCard } from '@/components/push-notifications/notification-status-indicator';
 import { ActivitySummary } from '@/components/profile/activity-summary';
 import { ChangePassword } from '@/components/profile/change-password';
 
@@ -117,6 +118,9 @@ export default function ProfilePage() {
 
           {/* Right Column */}
           <div className="space-y-6">
+            {/* Browser Notifications Status */}
+            <NotificationStatusCard onRefresh={fetchProfile} />
+
             {/* Notification Preferences */}
             <NotificationPreferences
               user={user}

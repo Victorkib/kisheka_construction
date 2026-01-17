@@ -1,7 +1,7 @@
 /**
  * New Labour Entry Page
  * Form for creating a new labour entry
- * 
+ *
  * Route: /labour/entries/new
  */
 
@@ -11,10 +11,18 @@ import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingSpinner, LoadingButton, LoadingSelect } from '@/components/loading';
+import {
+  LoadingSpinner,
+  LoadingButton,
+  LoadingSelect,
+} from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
-import { VALID_WORKER_TYPES, VALID_WORKER_ROLES, VALID_SKILL_TYPES } from '@/lib/constants/labour-constants';
+import {
+  VALID_WORKER_TYPES,
+  VALID_WORKER_ROLES,
+  VALID_SKILL_TYPES,
+} from '@/lib/constants/labour-constants';
 
 function NewLabourEntryPageContent() {
   const router = useRouter();
@@ -39,6 +47,7 @@ function NewLabourEntryPageContent() {
     projectId: '',
     phaseId: '',
     isIndirectLabour: false, // NEW: Whether this is indirect labour
+    indirectCostCategory: '', // NEW: Category for indirect labour (empty = must select)
     floorId: '',
     categoryId: '',
     workItemId: '',
@@ -82,19 +91,19 @@ function NewLabourEntryPageContent() {
     const workerIdFromUrl = searchParams.get('workerId');
     const phaseIdFromUrl = searchParams.get('phaseId');
     const workItemIdFromUrl = searchParams.get('workItemId');
-    
+
     if (projectIdFromUrl) {
       setFormData((prev) => ({ ...prev, projectId: projectIdFromUrl }));
     }
-    
+
     if (phaseIdFromUrl) {
       setFormData((prev) => ({ ...prev, phaseId: phaseIdFromUrl }));
     }
-    
+
     if (workerIdFromUrl) {
       setFormData((prev) => ({ ...prev, workerId: workerIdFromUrl }));
     }
-    
+
     if (workItemIdFromUrl) {
       setFormData((prev) => ({ ...prev, workItemId: workItemIdFromUrl }));
     }
@@ -110,7 +119,12 @@ function NewLabourEntryPageContent() {
       setPhases([]);
       setFloors([]);
       setWorkItems([]);
-      setFormData((prev) => ({ ...prev, phaseId: '', floorId: '', workItemId: '' }));
+      setFormData((prev) => ({
+        ...prev,
+        phaseId: '',
+        floorId: '',
+        workItemId: '',
+      }));
     }
   }, [formData.projectId]);
 
@@ -131,32 +145,44 @@ function NewLabourEntryPageContent() {
     if (workItemIdFromUrl) {
       // Fetch work item to get projectId, phaseId, and assigned workers
       fetch(`/api/work-items/${workItemIdFromUrl}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           if (data.success && data.data) {
             const workItem = data.data;
             setWorkItemDetails(workItem);
-            
+
             // Pre-populate projectId and phaseId from work item
             if (workItem.projectId && !formData.projectId) {
-              setFormData(prev => ({ ...prev, projectId: workItem.projectId.toString() }));
+              setFormData((prev) => ({
+                ...prev,
+                projectId: workItem.projectId.toString(),
+              }));
             }
             if (workItem.phaseId && !formData.phaseId) {
-              setFormData(prev => ({ ...prev, phaseId: workItem.phaseId.toString() }));
+              setFormData((prev) => ({
+                ...prev,
+                phaseId: workItem.phaseId.toString(),
+              }));
             }
-            
+
             // Pre-fill workerId from assigned workers (suggest first assigned worker)
-            if (workItem.assignedWorkers && workItem.assignedWorkers.length > 0 && !formData.workerId) {
+            if (
+              workItem.assignedWorkers &&
+              workItem.assignedWorkers.length > 0 &&
+              !formData.workerId
+            ) {
               const firstAssignedWorker = workItem.assignedWorkers[0];
-              const workerId = firstAssignedWorker._id?.toString() || firstAssignedWorker.userId?.toString();
+              const workerId =
+                firstAssignedWorker._id?.toString() ||
+                firstAssignedWorker.userId?.toString();
               if (workerId) {
                 setSuggestedWorker(firstAssignedWorker);
-                setFormData(prev => ({ ...prev, workerId: workerId }));
+                setFormData((prev) => ({ ...prev, workerId: workerId }));
               }
             }
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.error('Error fetching work item:', err);
         });
     } else {
@@ -171,67 +197,136 @@ function NewLabourEntryPageContent() {
 
   // Memoize validateBudget to prevent recreation on every render
   const validateBudget = useCallback(async () => {
-    if (!formData.phaseId || !formData.totalHours || !formData.hourlyRate) {
-      setBudgetInfo(null);
-      return;
-    }
-
-    setValidatingBudget(true);
-    try {
-      // Use schema calculation logic
-      const totalHours = parseFloat(formData.totalHours) || 0;
-      const hourlyRate = parseFloat(formData.hourlyRate) || 0;
-      const calculatedOvertimeHours = Math.max(0, totalHours - 8);
-      const finalOvertimeHours = (parseFloat(formData.overtimeHours) || 0) > 0 
-        ? parseFloat(formData.overtimeHours) 
-        : calculatedOvertimeHours;
-      const finalRegularHours = totalHours - finalOvertimeHours;
-      const overtimeRate = hourlyRate * 1.5;
-      const totalCost = finalRegularHours * hourlyRate + finalOvertimeHours * overtimeRate;
-
-      const response = await fetch(
-        `/api/labour/financial/validate?phaseId=${formData.phaseId}&labourCost=${totalCost}`
-      );
-      const data = await response.json();
-      if (data.success) {
-        setBudgetInfo(data.data);
+    // Determine which validation to use based on labour type
+    if (formData.isIndirectLabour) {
+      // Indirect labour validation
+      if (!formData.projectId || !formData.totalHours || !formData.hourlyRate) {
+        setBudgetInfo(null);
+        return;
       }
-    } catch (err) {
-      console.error('Error validating budget:', err);
-    } finally {
-      setValidatingBudget(false);
+
+      setValidatingBudget(true);
+      try {
+        // Use schema calculation logic
+        const totalHours = parseFloat(formData.totalHours) || 0;
+        const hourlyRate = parseFloat(formData.hourlyRate) || 0;
+        const calculatedOvertimeHours = Math.max(0, totalHours - 8);
+        const finalOvertimeHours =
+          (parseFloat(formData.overtimeHours) || 0) > 0
+            ? parseFloat(formData.overtimeHours)
+            : calculatedOvertimeHours;
+        const finalRegularHours = totalHours - finalOvertimeHours;
+        const overtimeRate = hourlyRate * 1.5;
+        const totalCost =
+          finalRegularHours * hourlyRate + finalOvertimeHours * overtimeRate;
+
+        const category = formData.indirectCostCategory || 'siteOverhead';
+        const response = await fetch(
+          `/api/labour/financial/validate-indirect?projectId=${formData.projectId}&indirectCost=${totalCost}&category=${category}`
+        );
+        const data = await response.json();
+        if (data.success) {
+          setBudgetInfo(data.data);
+        } else {
+          setBudgetInfo(null);
+        }
+      } catch (err) {
+        console.error('Error validating indirect costs budget:', err);
+      } finally {
+        setValidatingBudget(false);
+      }
+    } else {
+      // Direct labour validation
+      if (!formData.phaseId || !formData.totalHours || !formData.hourlyRate) {
+        setBudgetInfo(null);
+        return;
+      }
+
+      setValidatingBudget(true);
+      try {
+        // Use schema calculation logic
+        const totalHours = parseFloat(formData.totalHours) || 0;
+        const hourlyRate = parseFloat(formData.hourlyRate) || 0;
+        const calculatedOvertimeHours = Math.max(0, totalHours - 8);
+        const finalOvertimeHours =
+          (parseFloat(formData.overtimeHours) || 0) > 0
+            ? parseFloat(formData.overtimeHours)
+            : calculatedOvertimeHours;
+        const finalRegularHours = totalHours - finalOvertimeHours;
+        const overtimeRate = hourlyRate * 1.5;
+        const totalCost =
+          finalRegularHours * hourlyRate + finalOvertimeHours * overtimeRate;
+
+        const response = await fetch(
+          `/api/labour/financial/validate?phaseId=${formData.phaseId}&labourCost=${totalCost}`
+        );
+        const data = await response.json();
+        if (data.success) {
+          setBudgetInfo(data.data);
+        } else {
+          setBudgetInfo(null);
+        }
+      } catch (err) {
+        console.error('Error validating phase budget:', err);
+      } finally {
+        setValidatingBudget(false);
+      }
     }
-  }, [formData.phaseId, formData.totalHours, formData.hourlyRate]);
+  }, [formData.isIndirectLabour, formData.projectId, formData.phaseId, formData.totalHours, formData.hourlyRate, formData.overtimeHours, formData.indirectCostCategory]);
 
   // Auto-calculate overtimeHours when totalHours changes (using schema logic)
   useEffect(() => {
     if (formData.totalHours) {
       const totalHours = parseFloat(formData.totalHours) || 0;
       const calculatedOvertimeHours = Math.max(0, totalHours - 8);
-      
+
       // Only auto-set if user hasn't manually set overtimeHours
       // If overtimeHours is 0 or not set, use calculated value
       const currentOvertimeHours = parseFloat(formData.overtimeHours) || 0;
-      const shouldAutoSet = currentOvertimeHours === 0 || !formData.overtimeHours;
-      
-      if (shouldAutoSet && prevOvertimeHoursRef.current !== calculatedOvertimeHours) {
+      const shouldAutoSet =
+        currentOvertimeHours === 0 || !formData.overtimeHours;
+
+      if (
+        shouldAutoSet &&
+        prevOvertimeHoursRef.current !== calculatedOvertimeHours
+      ) {
         prevOvertimeHoursRef.current = calculatedOvertimeHours;
-        setFormData((prev) => ({ ...prev, overtimeHours: calculatedOvertimeHours }));
+        setFormData((prev) => ({
+          ...prev,
+          overtimeHours: calculatedOvertimeHours,
+        }));
       }
     }
   }, [formData.totalHours, formData.overtimeHours]);
 
   // Validate budget when cost changes
   useEffect(() => {
-    if (formData.phaseId && formData.totalHours && formData.hourlyRate) {
-      const currentParams = `${formData.phaseId}-${formData.totalHours}-${formData.hourlyRate}`;
-      // Only validate if parameters actually changed
-      if (prevBudgetParamsRef.current !== currentParams) {
-        prevBudgetParamsRef.current = currentParams;
-        validateBudget();
-      }
+    const shouldValidate = formData.isIndirectLabour
+      ? formData.projectId && formData.totalHours && formData.hourlyRate
+      : formData.phaseId && formData.totalHours && formData.hourlyRate;
+    if (!shouldValidate) {
+      setBudgetInfo(null);
+      return;
     }
-  }, [formData.phaseId, formData.totalHours, formData.hourlyRate, validateBudget]);
+
+    const currentParams = formData.isIndirectLabour
+      ? `${formData.projectId}-${formData.totalHours}-${formData.hourlyRate}-${formData.overtimeHours}-${formData.indirectCostCategory}`
+      : `${formData.phaseId}-${formData.totalHours}-${formData.hourlyRate}-${formData.overtimeHours}`;
+    // Only validate if parameters actually changed
+    if (prevBudgetParamsRef.current !== currentParams) {
+      prevBudgetParamsRef.current = currentParams;
+      validateBudget();
+    }
+  }, [
+    formData.isIndirectLabour,
+    formData.projectId,
+    formData.phaseId,
+    formData.totalHours,
+    formData.hourlyRate,
+    formData.overtimeHours,
+    formData.indirectCostCategory,
+    validateBudget,
+  ]);
 
   // Track previous workerId to prevent unnecessary auto-fills
   const prevWorkerIdRef = useRef(null);
@@ -240,7 +335,9 @@ function NewLabourEntryPageContent() {
   useEffect(() => {
     if (formData.workerId && formData.workerId !== prevWorkerIdRef.current) {
       prevWorkerIdRef.current = formData.workerId;
-      const worker = workers.find((w) => w._id === formData.workerId || w.userId === formData.workerId);
+      const worker = workers.find(
+        (w) => w._id === formData.workerId || w.userId === formData.workerId
+      );
       if (worker) {
         setFormData((prev) => ({
           ...prev,
@@ -357,31 +454,50 @@ function NewLabourEntryPageContent() {
 
     try {
       // Validation
-      if (!formData.projectId || !formData.phaseId) {
-        throw new Error('Project and Phase are required');
+      if (formData.isIndirectLabour) {
+        if (!formData.projectId) {
+          throw new Error('Project is required for indirect labour');
+        }
+      } else {
+        if (!formData.projectId || !formData.phaseId) {
+          throw new Error('Project and Phase are required');
+        }
       }
-      
+
+      // Validate indirect cost category for indirect labour
+      if (formData.isIndirectLabour && !formData.indirectCostCategory) {
+        throw new Error('Cost category is required for indirect labour entries');
+      }
+
       if (!formData.workerName || formData.workerName.trim().length < 2) {
-        throw new Error('Worker name is required and must be at least 2 characters');
+        throw new Error(
+          'Worker name is required and must be at least 2 characters'
+        );
       }
-      
+
       if (!formData.hourlyRate || parseFloat(formData.hourlyRate) < 0) {
         throw new Error('Hourly rate is required and must be >= 0');
       }
-      
+
       if (!formData.totalHours || parseFloat(formData.totalHours) <= 0) {
         throw new Error('Total hours is required and must be > 0');
       }
-      
+
       const breakDuration = parseFloat(formData.breakDuration) || 0;
       if (breakDuration < 0 || breakDuration > 480) {
-        throw new Error('Break duration must be between 0 and 480 minutes (8 hours)');
+        throw new Error(
+          'Break duration must be between 0 and 480 minutes (8 hours)'
+        );
       }
-      
+
       // Validate clock times if both provided
       if (formData.clockInTime && formData.clockOutTime) {
-        const clockIn = new Date(`${formData.entryDate}T${formData.clockInTime}`);
-        const clockOut = new Date(`${formData.entryDate}T${formData.clockOutTime}`);
+        const clockIn = new Date(
+          `${formData.entryDate}T${formData.clockInTime}`
+        );
+        const clockOut = new Date(
+          `${formData.entryDate}T${formData.clockOutTime}`
+        );
         if (clockOut <= clockIn) {
           throw new Error('Clock out time must be after clock in time');
         }
@@ -398,28 +514,49 @@ function NewLabourEntryPageContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          indirectCostCategory: formData.isIndirectLabour ? formData.indirectCostCategory : null,
           totalHours,
           overtimeHours: overtimeHours > 0 ? overtimeHours : 0, // Schema will calculate if 0
           hourlyRate,
           breakDuration: breakDuration,
-          quantityCompleted: formData.quantityCompleted ? parseFloat(formData.quantityCompleted) : null,
+          quantityCompleted: formData.quantityCompleted
+            ? parseFloat(formData.quantityCompleted)
+            : null,
           unitRate: formData.unitRate ? parseFloat(formData.unitRate) : null,
           dailyRate: formData.dailyRate ? parseFloat(formData.dailyRate) : null,
           serviceType: formData.serviceType || null,
           visitPurpose: formData.visitPurpose || null,
-          deliverables: Array.isArray(formData.deliverables) ? formData.deliverables : (formData.deliverables ? [formData.deliverables] : []),
-          qualityRating: (formData.qualityRating && 
-            (typeof formData.qualityRating === 'string' ? formData.qualityRating.trim() !== '' : formData.qualityRating !== '') &&
-            !isNaN(parseFloat(formData.qualityRating))) 
-            ? parseFloat(formData.qualityRating) 
+          deliverables: Array.isArray(formData.deliverables)
+            ? formData.deliverables
+            : formData.deliverables
+            ? [formData.deliverables]
+            : [],
+          qualityRating:
+            formData.qualityRating &&
+            (typeof formData.qualityRating === 'string'
+              ? formData.qualityRating.trim() !== ''
+              : formData.qualityRating !== '') &&
+            !isNaN(parseFloat(formData.qualityRating))
+              ? parseFloat(formData.qualityRating)
+              : null,
+          productivityRating:
+            formData.productivityRating &&
+            (typeof formData.productivityRating === 'string'
+              ? formData.productivityRating.trim() !== ''
+              : formData.productivityRating !== '') &&
+            !isNaN(parseFloat(formData.productivityRating))
+              ? parseFloat(formData.productivityRating)
+              : null,
+          clockInTime: formData.clockInTime
+            ? new Date(
+                `${formData.entryDate}T${formData.clockInTime}`
+              ).toISOString()
             : null,
-          productivityRating: (formData.productivityRating && 
-            (typeof formData.productivityRating === 'string' ? formData.productivityRating.trim() !== '' : formData.productivityRating !== '') &&
-            !isNaN(parseFloat(formData.productivityRating))) 
-            ? parseFloat(formData.productivityRating) 
+          clockOutTime: formData.clockOutTime
+            ? new Date(
+                `${formData.entryDate}T${formData.clockOutTime}`
+              ).toISOString()
             : null,
-          clockInTime: formData.clockInTime ? new Date(`${formData.entryDate}T${formData.clockInTime}`).toISOString() : null,
-          clockOutTime: formData.clockOutTime ? new Date(`${formData.entryDate}T${formData.clockOutTime}`).toISOString() : null,
           entryDate: formData.entryDate,
         }),
       });
@@ -451,9 +588,10 @@ function NewLabourEntryPageContent() {
   const totalHours = parseFloat(formData.totalHours) || 0;
   const hourlyRate = parseFloat(formData.hourlyRate) || 0;
   const calculatedOvertimeHours = Math.max(0, totalHours - 8);
-  const finalOvertimeHours = (parseFloat(formData.overtimeHours) || 0) > 0 
-    ? parseFloat(formData.overtimeHours) 
-    : calculatedOvertimeHours;
+  const finalOvertimeHours =
+    (parseFloat(formData.overtimeHours) || 0) > 0
+      ? parseFloat(formData.overtimeHours)
+      : calculatedOvertimeHours;
   const finalRegularHours = totalHours - finalOvertimeHours;
   const overtimeRate = hourlyRate * 1.5;
   const regularCost = finalRegularHours * hourlyRate;
@@ -470,8 +608,12 @@ function NewLabourEntryPageContent() {
           >
             ← Back to Labour
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">New Labour Entry</h1>
-          <p className="text-gray-600 mt-1">Create a new labour entry for tracking work and costs</p>
+          <h1 className="text-3xl font-bold text-gray-900 mt-2">
+            New Labour Entry
+          </h1>
+          <p className="text-gray-600 mt-1">
+            Create a new labour entry for tracking work and costs
+          </p>
         </div>
 
         {error && (
@@ -480,7 +622,10 @@ function NewLabourEntryPageContent() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-lg shadow p-6"
+        >
           <div className="space-y-6">
             {/* Project & Phase Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -533,8 +678,14 @@ function NewLabourEntryPageContent() {
               )}
             </div>
 
-            {/* Indirect Labour Option */}
-            <div className="border-t pt-4">
+            {/* Indirect Labour Option - Enhanced with visual distinction */}
+            <div
+              className={`border-t pt-4 -mx-6 px-6 py-4 ${
+                formData.isIndirectLabour
+                  ? 'bg-amber-50 border-b border-amber-200'
+                  : 'bg-transparent'
+              }`}
+            >
               <div className="flex items-start gap-3">
                 <input
                   type="checkbox"
@@ -548,18 +699,88 @@ function NewLabourEntryPageContent() {
                       phaseId: e.target.checked ? '' : prev.phaseId, // Clear phase if indirect
                     }));
                   }}
-                  className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="mt-1 w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
                 />
                 <div className="flex-1">
-                  <label htmlFor="isIndirectLabour" className="block text-sm font-medium text-gray-700 mb-1">
+                  <label
+                    htmlFor="isIndirectLabour"
+                    className={`block font-medium mb-2 ${
+                      formData.isIndirectLabour
+                        ? 'text-amber-900 text-base'
+                        : 'text-gray-700 text-sm'
+                    }`}
+                  >
                     This is Indirect Labour
                   </label>
-                  <p className="text-xs text-gray-600">
-                    Indirect labour (site management, security, general site office staff) is charged to the project-level indirect costs budget, not the phase budget. Phase selection is not required for indirect labour.
+                  <p
+                    className={`${
+                      formData.isIndirectLabour
+                        ? 'text-amber-800 text-sm font-medium mb-2'
+                        : 'text-xs text-gray-600 mb-2'
+                    }`}
+                  >
+                    {formData.isIndirectLabour
+                      ? '📍 Budget Route: Project-level indirect costs budget'
+                      : 'Indirect labour (site management, security, general site office staff) is charged to the project-level indirect costs budget, not the phase budget.'}
                   </p>
+                  <div
+                    className={`text-xs space-y-1 ${
+                      formData.isIndirectLabour
+                        ? 'text-amber-700'
+                        : 'text-gray-600'
+                    }`}
+                  >
+                    <p>
+                      • Phase selection:{' '}
+                      {formData.isIndirectLabour
+                        ? '❌ Not required'
+                        : '✅ Required'}
+                    </p>
+                    <p>
+                      • Budget validation:{' '}
+                      {formData.isIndirectLabour
+                        ? 'Indirect Costs Budget'
+                        : 'Phase Labour Budget'}
+                    </p>
+                    <p>
+                      • Work item linking:{' '}
+                      {formData.isIndirectLabour
+                        ? '❌ Not supported'
+                        : '✅ Supported'}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Indirect Cost Category Selector (only for indirect labour) */}
+            {formData.isIndirectLabour && (
+              <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <h4 className="font-semibold text-amber-900 mb-3">Indirect Cost Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Cost Category <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      name="indirectCostCategory"
+                      value={formData.indirectCostCategory}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    >
+                      <option value="">-- Select Category --</option>
+                      <option value="siteOverhead">Site Overhead (management, admin, office)</option>
+                      <option value="utilities">Utilities (power, water, internet)</option>
+                      <option value="transportation">Transportation (vehicles, fuel, logistics)</option>
+                      <option value="safetyCompliance">Safety Compliance (training, gear, protocols)</option>
+                    </select>
+                    <p className="text-xs text-gray-600 mt-1">
+                      💡 Helps track which categories consume budget. Appears in audit trail and reports.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Floor & Category (Optional) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -607,30 +828,48 @@ function NewLabourEntryPageContent() {
 
             {/* Worker Information */}
             <div className="border-t pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Worker Information</h2>
-              
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Worker Information
+              </h2>
+
               {/* Assigned Worker Suggestion */}
               {suggestedWorker && workItemDetails && (
                 <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                   <div className="flex items-start gap-2">
-                    <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                     <div className="flex-1">
                       <p className="text-sm font-medium text-blue-900">
-                        This work item is assigned to <strong>{suggestedWorker.workerName}</strong>
+                        This work item is assigned to{' '}
+                        <strong>{suggestedWorker.workerName}</strong>
                         {workItemDetails.assignedWorkersCount > 1 && (
-                          <span className="text-blue-700"> and {workItemDetails.assignedWorkersCount - 1} other worker(s)</span>
+                          <span className="text-blue-700">
+                            {' '}
+                            and {workItemDetails.assignedWorkersCount - 1} other
+                            worker(s)
+                          </span>
                         )}
                       </p>
                       <p className="text-xs text-blue-700 mt-1">
-                        Worker has been pre-selected. You can change it if needed.
+                        Worker has been pre-selected. You can change it if
+                        needed.
                       </p>
                     </div>
                   </div>
                 </div>
               )}
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -642,23 +881,38 @@ function NewLabourEntryPageContent() {
                     onChange={handleChange}
                     className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
-                    <option value="">Select Worker (or enter name below)</option>
-                    {workItemDetails?.assignedWorkers && workItemDetails.assignedWorkers.length > 0 && (
-                      <optgroup label="✨ Assigned Workers">
-                        {workItemDetails.assignedWorkers.map((worker) => (
-                          <option key={worker._id?.toString()} value={worker._id?.toString() || worker.userId?.toString()}>
-                            {worker.workerName} ({worker.employeeId || 'N/A'}) - Assigned
-                          </option>
-                        ))}
-                      </optgroup>
-                    )}
+                    <option value="">
+                      Select Worker (or enter name below)
+                    </option>
+                    {workItemDetails?.assignedWorkers &&
+                      workItemDetails.assignedWorkers.length > 0 && (
+                        <optgroup label="✨ Assigned Workers">
+                          {workItemDetails.assignedWorkers.map((worker) => (
+                            <option
+                              key={worker._id?.toString()}
+                              value={
+                                worker._id?.toString() ||
+                                worker.userId?.toString()
+                              }
+                            >
+                              {worker.workerName} ({worker.employeeId || 'N/A'})
+                              - Assigned
+                            </option>
+                          ))}
+                        </optgroup>
+                      )}
                     {workers.map((worker) => {
                       const isAssigned = workItemDetails?.assignedWorkers?.some(
-                        aw => (aw._id?.toString() || aw.userId?.toString()) === (worker.userId || worker._id)?.toString()
+                        (aw) =>
+                          (aw._id?.toString() || aw.userId?.toString()) ===
+                          (worker.userId || worker._id)?.toString()
                       );
                       if (isAssigned) return null; // Already shown in assigned group
                       return (
-                        <option key={worker._id} value={worker.userId || worker._id}>
+                        <option
+                          key={worker._id}
+                          value={worker.userId || worker._id}
+                        >
                           {worker.workerName} ({worker.employeeId})
                         </option>
                       );
@@ -734,7 +988,9 @@ function NewLabourEntryPageContent() {
                   >
                     {VALID_SKILL_TYPES.map((skill) => (
                       <option key={skill} value={skill}>
-                        {skill.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                        {skill
+                          .replace(/_/g, ' ')
+                          .replace(/\b\w/g, (l) => l.toUpperCase())}
                       </option>
                     ))}
                   </select>
@@ -744,8 +1000,10 @@ function NewLabourEntryPageContent() {
 
             {/* Time Tracking */}
             <div className="border-t pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Time Tracking</h2>
-              
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Time Tracking
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -820,21 +1078,26 @@ function NewLabourEntryPageContent() {
                     step="1"
                     className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Maximum 8 hours (480 minutes)</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Maximum 8 hours (480 minutes)
+                  </p>
                 </div>
               </div>
 
               <div className="mt-4">
                 <p className="text-sm text-gray-600">
-                  Regular Hours: {finalRegularHours.toFixed(2)} hrs | Overtime: {finalOvertimeHours.toFixed(2)} hrs
+                  Regular Hours: {finalRegularHours.toFixed(2)} hrs | Overtime:{' '}
+                  {finalOvertimeHours.toFixed(2)} hrs
                 </p>
               </div>
             </div>
 
             {/* Cost Information */}
             <div className="border-t pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Cost Information</h2>
-              
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Cost Information
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -871,43 +1134,107 @@ function NewLabourEntryPageContent() {
 
               {/* Cost Summary */}
               <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Cost Calculation</h3>
+                <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                  Cost Calculation
+                </h3>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-900">Regular Hours ({finalRegularHours.toFixed(2)} hrs × {hourlyRate.toLocaleString()}):</span>
-                    <span className="font-medium text-gray-900">{regularCost.toLocaleString()} KES</span>
+                    <span className="text-gray-900">
+                      Regular Hours ({finalRegularHours.toFixed(2)} hrs ×{' '}
+                      {hourlyRate.toLocaleString()}):
+                    </span>
+                    <span className="font-medium text-gray-900">
+                      {regularCost.toLocaleString()} KES
+                    </span>
                   </div>
                   {finalOvertimeHours > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-900">Overtime Hours ({finalOvertimeHours.toFixed(2)} hrs × {(hourlyRate * 1.5).toLocaleString()}):</span>
-                      <span className="font-medium text-gray-900">{overtimeCost.toLocaleString()} KES</span>
+                      <span className="text-gray-900">
+                        Overtime Hours ({finalOvertimeHours.toFixed(2)} hrs ×{' '}
+                        {(hourlyRate * 1.5).toLocaleString()}):
+                      </span>
+                      <span className="font-medium text-gray-900">
+                        {overtimeCost.toLocaleString()} KES
+                      </span>
                     </div>
                   )}
                   <div className="flex justify-between pt-2 border-t border-blue-200">
-                    <span className="font-semibold text-gray-900">Total Cost:</span>
-                    <span className="font-bold text-gray-900">{totalCost.toLocaleString()} KES</span>
+                    <span className="font-semibold text-gray-900">
+                      Total Cost:
+                    </span>
+                    <span className="font-bold text-gray-900">
+                      {totalCost.toLocaleString()} KES
+                    </span>
                   </div>
-                </div>n 
-
+                </div>
                 {/* Budget Validation */}
                 {validatingBudget && (
                   <div className="mt-3 p-3 rounded bg-blue-50 border border-blue-200">
                     <div className="flex items-center gap-2">
                       <LoadingSpinner size="sm" color="blue-600" />
-                      <p className="text-sm font-medium text-blue-800">Validating budget...</p>
+                      <p className="text-sm font-medium text-blue-800">
+                        Validating budget...
+                      </p>
                     </div>
                   </div>
                 )}
                 {budgetInfo && !validatingBudget && (
-                  <div className={`mt-3 p-3 rounded ${budgetInfo.isValid ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
-                    <p className={`text-sm font-medium ${budgetInfo.isValid ? 'text-green-800' : 'text-red-800'}`}>
+                  <div
+                    className={`mt-3 p-4 rounded ${
+                      formData.isIndirectLabour
+                        ? `${
+                            budgetInfo.isValid
+                              ? 'bg-orange-50 border border-orange-200'
+                              : 'bg-red-50 border border-red-200'
+                          }`
+                        : `${
+                            budgetInfo.isValid
+                              ? 'bg-green-50 border border-green-200'
+                              : 'bg-red-50 border border-red-200'
+                          }`
+                    }`}
+                  >
+                    <h4 className={`text-sm font-semibold mb-2 ${
+                      formData.isIndirectLabour
+                        ? budgetInfo.isValid ? 'text-orange-900' : 'text-red-900'
+                        : budgetInfo.isValid ? 'text-green-900' : 'text-red-900'
+                    }`}>
+                      {formData.isIndirectLabour
+                        ? 'Project Indirect Costs Budget'
+                        : 'Phase Labour Budget'}
+                    </h4>
+                    <p
+                      className={`text-sm font-medium ${
+                        budgetInfo.isValid ? 'text-green-800' : 'text-red-800'
+                      }`}
+                    >
                       {budgetInfo.isValid ? '✅' : '⚠️'} {budgetInfo.message}
                     </p>
-                    {budgetInfo.budget && (
-                      <p className="text-xs text-gray-600 mt-1">
-                        Budget: {budgetInfo.budget.toLocaleString()} KES | 
-                        Available: {budgetInfo.available.toLocaleString()} KES | 
-                        Current: {budgetInfo.currentSpending.toLocaleString()} KES
+                    {formData.isIndirectLabour && formData.indirectCostCategory && (
+                      <p className="text-xs text-gray-700 mt-2 font-medium">
+                        Category: {formData.indirectCostCategory}
+                      </p>
+                    )}
+                    {budgetInfo.available !== undefined && (
+                      <div className="text-xs text-gray-700 mt-2 space-y-1">
+                        <p>Available: {budgetInfo.available.toLocaleString()} KES</p>
+                        {budgetInfo.required !== undefined && (
+                          <p>This Entry: {budgetInfo.required.toLocaleString()} KES</p>
+                        )}
+                        {budgetInfo.available >= 0 && budgetInfo.required !== undefined && (
+                          <p className={`font-medium ${
+                            budgetInfo.available - budgetInfo.required >= 0
+                              ? 'text-green-700'
+                              : 'text-red-700'
+                          }`}>
+                            Remaining After: {(budgetInfo.available - budgetInfo.required).toLocaleString()} KES
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {budgetInfo.warning && (
+                      <p className="text-xs text-orange-700 mt-2 font-medium">
+                        ⚠️ {budgetInfo.message}
                       </p>
                     )}
                   </div>
@@ -918,8 +1245,10 @@ function NewLabourEntryPageContent() {
             {/* Professional Services Fields (Conditional) */}
             {formData.workerType === 'professional' && (
               <div className="border-t pt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Professional Service Details</h2>
-                
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                  Professional Service Details
+                </h2>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -964,22 +1293,29 @@ function NewLabourEntryPageContent() {
                     name="deliverables"
                     value={formData.deliverables?.join(', ') || ''}
                     onChange={(e) => {
-                      const deliverables = e.target.value.split(',').map((d) => d.trim()).filter(Boolean);
+                      const deliverables = e.target.value
+                        .split(',')
+                        .map((d) => d.trim())
+                        .filter(Boolean);
                       setFormData((prev) => ({ ...prev, deliverables }));
                     }}
                     rows="3"
                     className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
                     placeholder="Enter deliverables separated by commas (e.g., Site plan, Structural drawings, Inspection report)"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Separate multiple deliverables with commas</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Separate multiple deliverables with commas
+                  </p>
                 </div>
               </div>
             )}
 
             {/* Task Information */}
             <div className="border-t pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Task Information</h2>
-              
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Task Information
+              </h2>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Task Description
@@ -1017,13 +1353,17 @@ function NewLabourEntryPageContent() {
 
             {/* Performance Ratings (Optional) */}
             <div className="border-t pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Performance Ratings (Optional)</h2>
-              
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                Performance Ratings (Optional)
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Quality Rating
-                    <span className="text-gray-500 text-xs font-normal ml-1">(1-5, Optional)</span>
+                    <span className="text-gray-500 text-xs font-normal ml-1">
+                      (1-5, Optional)
+                    </span>
                   </label>
                   <input
                     type="number"
@@ -1036,13 +1376,17 @@ function NewLabourEntryPageContent() {
                     placeholder="1-5"
                     className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Rate the quality of work (1 = Poor, 5 = Excellent)</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Rate the quality of work (1 = Poor, 5 = Excellent)
+                  </p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Productivity Rating
-                    <span className="text-gray-500 text-xs font-normal ml-1">(1-5, Optional)</span>
+                    <span className="text-gray-500 text-xs font-normal ml-1">
+                      (1-5, Optional)
+                    </span>
                   </label>
                   <input
                     type="number"
@@ -1055,7 +1399,9 @@ function NewLabourEntryPageContent() {
                     placeholder="1-5"
                     className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Rate the productivity/efficiency (1 = Low, 5 = High)</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Rate the productivity/efficiency (1 = Low, 5 = High)
+                  </p>
                 </div>
               </div>
             </div>
@@ -1105,4 +1451,3 @@ export default function NewLabourEntryPage() {
     </Suspense>
   );
 }
-

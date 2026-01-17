@@ -24,6 +24,7 @@ import {
  * @property {ObjectId} projectId - Project ID (required, indexed)
  * @property {ObjectId} phaseId - Phase ID (required for direct labour, optional for indirect)
  * @property {boolean} isIndirectLabour - Whether this is indirect labour (site management, security, etc.)
+ * @property {string} [indirectCostCategory] - Indirect cost category when `isIndirectLabour` is true: 'utilities' | 'siteOverhead' | 'transportation' | 'safetyCompliance'
  * @property {ObjectId} [floorId] - Floor ID (optional, indexed)
  * @property {ObjectId} [categoryId] - Category ID (optional, indexed)
  * @property {ObjectId} [workItemId] - Work item ID (optional, indexed)
@@ -69,6 +70,7 @@ export const LABOUR_ENTRY_SCHEMA = {
   projectId: 'ObjectId', // Required
   phaseId: 'ObjectId', // Required for direct labour, optional for indirect
   isIndirectLabour: Boolean, // Whether this is indirect labour (default: false)
+  indirectCostCategory: String, // Optional: 'utilities' | 'siteOverhead' | 'transportation' | 'safetyCompliance'
   floorId: 'ObjectId', // Optional
   categoryId: 'ObjectId', // Optional
   workItemId: 'ObjectId', // Optional
@@ -127,8 +129,12 @@ export const LABOUR_ENTRY_VALIDATION = {
     type: 'ObjectId',
   },
   phaseId: {
-    required: true,
+    required: false,
     type: 'ObjectId',
+  },
+  indirectCostCategory: {
+    required: false,
+    type: 'string',
   },
   workerName: {
     required: true,
@@ -191,6 +197,7 @@ export function createLabourEntry(input, createdBy) {
     projectId,
     phaseId,
     isIndirectLabour,
+    indirectCostCategory,
     floorId,
     categoryId,
     workItemId,
@@ -218,7 +225,7 @@ export function createLabourEntry(input, createdBy) {
     notes,
     equipmentId,
     subcontractorId,
-  } = input;
+    } = input;
   
   // Determine if this is indirect labour
   // Indirect labour: site management, security, general site office staff
@@ -268,6 +275,7 @@ export function createLabourEntry(input, createdBy) {
     phaseId: finalPhaseId,
     isIndirectLabour: indirectLabour,
     floorId: floorId && ObjectId.isValid(floorId) ? new ObjectId(floorId) : null,
+    indirectCostCategory: indirectCostCategory || null,
     categoryId: categoryId && ObjectId.isValid(categoryId) ? new ObjectId(categoryId) : null,
     workItemId: workItemId && ObjectId.isValid(workItemId) ? new ObjectId(workItemId) : null,
     workerId: workerId && ObjectId.isValid(workerId) ? new ObjectId(workerId) : null,
@@ -326,6 +334,16 @@ export function validateLabourEntry(data) {
   if (!data.isIndirectLabour) {
     if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
       errors.push('Valid phaseId is required for direct labour');
+    }
+  }
+  // If indirect labour, ensure phaseId is not provided and category is present
+  if (data.isIndirectLabour) {
+    if (data.phaseId && ObjectId.isValid(data.phaseId)) {
+      errors.push('phaseId must be empty (null) for indirect labour entries');
+    }
+    const VALID_INDIRECT_CATEGORIES = ['utilities', 'siteOverhead', 'transportation', 'safetyCompliance'];
+    if (!data.indirectCostCategory || !VALID_INDIRECT_CATEGORIES.includes(data.indirectCostCategory)) {
+      errors.push(`indirectCostCategory is required for indirect labour and must be one of: ${VALID_INDIRECT_CATEGORIES.join(', ')}`);
     }
   }
 

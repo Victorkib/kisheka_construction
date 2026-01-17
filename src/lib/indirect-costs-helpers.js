@@ -10,13 +10,15 @@ import { isEnhancedBudget, getBudgetTotal } from '@/lib/schemas/budget-schema';
 
 /**
  * Calculate total indirect costs spending for a project
+ * Includes both indirect cost expenses AND indirect labour entries
  * @param {string} projectId - Project ID
  * @returns {Promise<number>} Total indirect costs spent
  */
 export async function calculateIndirectCostsSpending(projectId) {
   const db = await getDatabase();
   
-  const result = await db.collection('expenses').aggregate([
+  // Calculate expenses marked as indirect costs
+  const expenseResult = await db.collection('expenses').aggregate([
     {
       $match: {
         projectId: new ObjectId(projectId),
@@ -33,18 +35,44 @@ export async function calculateIndirectCostsSpending(projectId) {
     }
   ]).toArray();
   
-  return result[0]?.total || 0;
+  const expenseTotal = expenseResult[0]?.total || 0;
+  
+  // Calculate labour entries marked as indirect labour
+  // CRITICAL: Include labour entries in indirect costs spending
+  const labourResult = await db.collection('labour_entries').aggregate([
+    {
+      $match: {
+        projectId: new ObjectId(projectId),
+        deletedAt: null,
+        isIndirectLabour: true,
+        indirectCostCategory: { $exists: true, $ne: null },
+        status: { $in: ['approved', 'paid', 'APPROVED', 'PAID'] } // Labour entries are approved on creation
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        total: { $sum: '$totalCost' }
+      }
+    }
+  ]).toArray();
+  
+  const labourTotal = labourResult[0]?.total || 0;
+  
+  return expenseTotal + labourTotal;
 }
 
 /**
  * Calculate indirect costs spending by category
+ * Includes both indirect cost expenses AND indirect labour entries
  * @param {string} projectId - Project ID
  * @returns {Promise<Object>} Breakdown by category
  */
 export async function calculateIndirectCostsByCategory(projectId) {
   const db = await getDatabase();
   
-  const result = await db.collection('expenses').aggregate([
+  // Get expenses by category
+  const expenseResult = await db.collection('expenses').aggregate([
     {
       $match: {
         projectId: new ObjectId(projectId),
@@ -61,6 +89,25 @@ export async function calculateIndirectCostsByCategory(projectId) {
     }
   ]).toArray();
   
+  // Get labour entries by category
+  const labourResult = await db.collection('labour_entries').aggregate([
+    {
+      $match: {
+        projectId: new ObjectId(projectId),
+        deletedAt: null,
+        isIndirectLabour: true,
+        indirectCostCategory: { $exists: true, $ne: null },
+        status: { $in: ['approved', 'paid', 'APPROVED', 'PAID'] }
+      }
+    },
+    {
+      $group: {
+        _id: '$indirectCostCategory',
+        total: { $sum: '$totalCost' }
+      }
+    }
+  ]).toArray();
+  
   // Initialize all categories to 0
   const byCategory = {
     utilities: 0,
@@ -69,10 +116,17 @@ export async function calculateIndirectCostsByCategory(projectId) {
     safetyCompliance: 0
   };
   
-  // Fill in actual values
-  result.forEach(item => {
+  // Fill in actual values from expenses
+  expenseResult.forEach(item => {
     if (item._id && byCategory.hasOwnProperty(item._id)) {
-      byCategory[item._id] = item.total;
+      byCategory[item._id] += item.total;
+    }
+  });
+  
+  // Fill in actual values from labour entries (accumulate with expenses)
+  labourResult.forEach(item => {
+    if (item._id && byCategory.hasOwnProperty(item._id)) {
+      byCategory[item._id] += item.total;
     }
   });
   
@@ -84,15 +138,17 @@ export async function calculateIndirectCostsByCategory(projectId) {
  * @param {string} projectId - Project ID
  * @param {string} category - Indirect cost category (utilities, siteOverhead, transportation, safetyCompliance)
  * @param {number} amount - Expense amount
+ * @param {Object} [session] - MongoDB session for transaction (optional)
  * @returns {Promise<void>}
  */
-export async function updateIndirectCostsSpending(projectId, category, amount) {
+export async function updateIndirectCostsSpending(projectId, category, amount, session = null) {
   const db = await getDatabase();
   
   // Get or create project_finances record
-  let projectFinances = await db.collection('project_finances').findOne({
-    projectId: new ObjectId(projectId)
-  });
+  let projectFinances = await db.collection('project_finances').findOne(
+    { projectId: new ObjectId(projectId) },
+    session ? { session } : undefined
+  );
   
   if (!projectFinances) {
     // Create new project_finances record
@@ -112,7 +168,7 @@ export async function updateIndirectCostsSpending(projectId, category, amount) {
       createdAt: new Date(),
       updatedAt: new Date()
     };
-    await db.collection('project_finances').insertOne(projectFinances);
+    await db.collection('project_finances').insertOne(projectFinances, session ? { session } : undefined);
   }
   
   // Initialize indirectCosts if it doesn't exist
@@ -155,6 +211,8 @@ export async function updateIndirectCostsSpending(projectId, category, amount) {
   const newCategory = currentCategory + amount;
   const remaining = Math.max(0, projectFinances.indirectCosts.budgeted - newTotal);
   
+  const updateOptions = session ? { session } : undefined;
+  
   await db.collection('project_finances').updateOne(
     { projectId: new ObjectId(projectId) },
     {
@@ -164,7 +222,8 @@ export async function updateIndirectCostsSpending(projectId, category, amount) {
         'indirectCosts.remaining': remaining,
         updatedAt: new Date()
       }
-    }
+    },
+    updateOptions
   );
 }
 
@@ -210,6 +269,7 @@ export async function getIndirectCostsRemaining(projectId) {
 export async function getIndirectCostsByPhase(projectId, phaseId) {
   const db = await getDatabase();
   
+  // Get indirect cost expenses for this phase
   const expenses = await db.collection('expenses').find({
     projectId: new ObjectId(projectId),
     phaseId: new ObjectId(phaseId),
@@ -218,7 +278,22 @@ export async function getIndirectCostsByPhase(projectId, phaseId) {
     status: { $in: ['APPROVED', 'PAID'] }
   }).sort({ datePaid: 1 }).toArray();
   
-  return expenses;
+  // Get indirect labour entries for this phase (if any - indirect labour is typically project-level)
+  const labourEntries = await db.collection('labour_entries').find({
+    projectId: new ObjectId(projectId),
+    phaseId: new ObjectId(phaseId),
+    deletedAt: null,
+    isIndirectLabour: true,
+    indirectCostCategory: { $exists: true, $ne: null },
+    status: { $in: ['approved', 'paid', 'APPROVED', 'PAID'] }
+  }).sort({ entryDate: 1 }).toArray();
+  
+  // Combine results
+  return {
+    expenses,
+    labourEntries,
+    all: [...expenses, ...labourEntries]
+  };
 }
 
 /**

@@ -12,7 +12,7 @@ import { getUserProfile } from '@/lib/auth-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { getProjectPhases, getPhaseSummary } from '@/lib/phase-helpers';
-import { forecastProject } from '@/lib/forecasting-helpers';
+import { forecastProjectSpending } from '@/lib/forecasting-helpers';
 import { getBudgetTotal } from '@/lib/schemas/budget-schema';
 import { getFinancialOverview } from '@/lib/financial-helpers';
 
@@ -57,7 +57,7 @@ export async function GET(request, { params }) {
     // Get phase forecasts
     let forecast = null;
     try {
-      forecast = await forecastProject(id);
+      forecast = await forecastProjectSpending(id);
     } catch (error) {
       console.error('Error calculating forecast:', error);
       // Continue without forecast if it fails

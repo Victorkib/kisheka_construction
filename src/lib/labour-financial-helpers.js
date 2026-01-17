@@ -520,9 +520,9 @@ export async function updateLabourCostSummary(projectId, phaseId = null, periodT
     }
   }
 
-  // Get direct vs subcontractor breakdown
+  // Get direct vs subcontractor vs indirect breakdown
   const directSummary = await db.collection('labour_entries').aggregate([
-    { $match: { ...matchCriteria, subcontractorId: null } },
+    { $match: { ...matchCriteria, subcontractorId: null, isIndirectLabour: { $ne: true } } },
     {
       $group: {
         _id: null,
@@ -534,7 +534,7 @@ export async function updateLabourCostSummary(projectId, phaseId = null, periodT
   ]).toArray();
 
   const subcontractorSummary = await db.collection('labour_entries').aggregate([
-    { $match: { ...matchCriteria, subcontractorId: { $ne: null } } },
+    { $match: { ...matchCriteria, subcontractorId: { $ne: null }, isIndirectLabour: { $ne: true } } },
     {
       $group: {
         _id: null,
@@ -542,6 +542,18 @@ export async function updateLabourCostSummary(projectId, phaseId = null, periodT
         cost: { $sum: '$totalCost' },
         entries: { $sum: 1 },
         uniqueSubcontractors: { $addToSet: '$subcontractorId' },
+      },
+    },
+  ]).toArray();
+
+  const indirectSummary = await db.collection('labour_entries').aggregate([
+    { $match: { ...matchCriteria, isIndirectLabour: true } },
+    {
+      $group: {
+        _id: null,
+        hours: { $sum: '$totalHours' },
+        cost: { $sum: '$totalCost' },
+        entries: { $sum: 1 },
       },
     },
   ]).toArray();
@@ -589,6 +601,7 @@ export async function updateLabourCostSummary(projectId, phaseId = null, periodT
 
   const direct = directSummary[0] || { hours: 0, cost: 0, entries: 0 };
   const subcontractor = subcontractorSummary[0] || { hours: 0, cost: 0, entries: 0, uniqueSubcontractors: [] };
+  const indirect = indirectSummary[0] || { hours: 0, cost: 0, entries: 0 };
 
   const summaryData = {
     projectId: new ObjectId(projectId),
@@ -635,6 +648,11 @@ export async function updateLabourCostSummary(projectId, phaseId = null, periodT
       cost: subcontractor.cost,
       entries: subcontractor.entries,
       subcontractorCount: subcontractor.uniqueSubcontractors?.length || 0,
+    },
+    indirect: {
+      hours: indirect.hours,
+      cost: indirect.cost,
+      entries: indirect.entries,
     },
     bySkillType: bySkillType.reduce((acc, item) => {
       acc[item._id || 'unknown'] = {

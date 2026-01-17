@@ -1,0 +1,13 @@
+[32m✔[0m [33mConsole Ninja[0m extension is connected to [33mNext.js[0m, see [36mhttps://tinyurl.com/2vt8jxzw[0m
+⚠ Console Ninja Turbopack support is a PRO feature, [33mcurrently available to community users while in preview[0m
+ ⚠ Port 3000 is in use by process 13056, using available port 3001 instead.
+   ▲ Next.js 16.0.3 (Turbopack)
+   - Local:         http://localhost:3001
+   - Network:       http://192.168.0.107:3001
+   - Environments: .env.local
+
+ ✓ Starting...
+[baseline-browser-mapping] The data in this module is over two months old.  To ensure accurate Baseline data, please update: `npm i baseline-browser-mapping@latest -D`
+ ⨯ Unable to acquire lock at C:\Users\qinal\OneDrive\Desktop\qin\clients\Sanford\Projects\kisheka_construction\.next\dev\lock, is another instance of next dev running?
+   Suggestion: If you intended to restart next dev, terminate the other process, and then try again.
+[?25h

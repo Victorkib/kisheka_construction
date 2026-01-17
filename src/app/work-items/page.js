@@ -40,71 +40,7 @@ function WorkItemsPageContent() {
     unassigned: searchParams.get('unassigned') === 'true' || false
   });
 
-  useEffect(() => {
-    fetchUser();
-    fetchProjects();
-  }, []);
-
-  useEffect(() => {
-    if (currentProject && !filters.projectId) {
-      setFilters(prev => ({ ...prev, projectId: normalizeProjectId(currentProject._id) }));
-    }
-  }, [currentProject, filters.projectId]);
-
-  useEffect(() => {
-    if (filters.projectId) {
-      fetchPhases();
-    }
-  }, [filters.projectId]);
-
-  useEffect(() => {
-    if (filters.projectId) {
-      fetchWorkItems();
-    } else if (!isEmpty) {
-      fetchWorkItems();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters.projectId, filters.phaseId, filters.status, filters.category, filters.search, filters.unassigned, isEmpty, fetchWorkItems]);
-
-  const fetchUser = async () => {
-    try {
-      const response = await fetch('/api/auth/me');
-      const data = await response.json();
-      if (data.success) {
-        setUser(data.data);
-        const role = data.data.role?.toLowerCase();
-        setCanEdit(['owner', 'pm', 'project_manager'].includes(role));
-      }
-    } catch (err) {
-      console.error('Fetch user error:', err);
-    }
-  };
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects/accessible');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data || []);
-      }
-    } catch (err) {
-      console.error('Fetch projects error:', err);
-    }
-  };
-
-  const fetchPhases = async () => {
-    if (!filters.projectId) return;
-    try {
-      const response = await fetch(`/api/phases?projectId=${filters.projectId}`);
-      const data = await response.json();
-      if (data.success) {
-        setPhases(data.data || []);
-      }
-    } catch (err) {
-      console.error('Fetch phases error:', err);
-    }
-  };
-
+  // Define fetchWorkItems BEFORE useEffect that uses it
   const fetchWorkItems = useCallback(async () => {
     if (isEmpty) {
       setLoading(false);
@@ -139,6 +75,71 @@ function WorkItemsPageContent() {
       setLoading(false);
     }
   }, [filters.projectId, filters.phaseId, filters.status, filters.category, filters.search, filters.unassigned, isEmpty, toast]);
+
+  const fetchUser = async () => {
+    try {
+      const response = await fetch('/api/auth/me');
+      const data = await response.json();
+      if (data.success) {
+        setUser(data.data);
+        const role = data.data.role?.toLowerCase();
+        setCanEdit(['owner', 'pm', 'project_manager'].includes(role));
+      }
+    } catch (err) {
+      console.error('Fetch user error:', err);
+    }
+  };
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects/accessible');
+      const data = await response.json();
+      if (data.success) {
+        setProjects(data.data || []);
+      }
+    } catch (err) {
+      console.error('Fetch projects error:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+    fetchProjects();
+  }, []);
+
+  useEffect(() => {
+    if (currentProject && !filters.projectId) {
+      setFilters(prev => ({ ...prev, projectId: normalizeProjectId(currentProject._id) }));
+    }
+  }, [currentProject, filters.projectId]);
+
+  useEffect(() => {
+    if (filters.projectId) {
+      fetchPhases();
+    }
+  }, [filters.projectId]);
+
+  useEffect(() => {
+    if (filters.projectId) {
+      fetchWorkItems();
+    } else if (!isEmpty) {
+      fetchWorkItems();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.projectId, filters.phaseId, filters.status, filters.category, filters.search, filters.unassigned, isEmpty, fetchWorkItems]);
+
+  const fetchPhases = async () => {
+    if (!filters.projectId) return;
+    try {
+      const response = await fetch(`/api/phases?projectId=${filters.projectId}`);
+      const data = await response.json();
+      if (data.success) {
+        setPhases(data.data || []);
+      }
+    } catch (err) {
+      console.error('Fetch phases error:', err);
+    }
+  };
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => {

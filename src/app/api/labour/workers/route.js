@@ -92,10 +92,16 @@ export async function GET(request) {
     const workersWithStats = await Promise.all(
       workers.map(async (worker) => {
         // Get labour entry statistics
+        const workerIdMatches = [];
+        if (worker.userId) {
+          workerIdMatches.push(worker.userId);
+        }
+        workerIdMatches.push(worker._id);
+
         const stats = await db.collection('labour_entries').aggregate([
           {
             $match: {
-              workerId: worker.userId || null,
+              workerId: { $in: workerIdMatches },
               status: { $in: ['approved', 'paid'] },
               deletedAt: null,
             },

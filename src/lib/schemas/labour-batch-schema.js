@@ -12,12 +12,14 @@ import { ObjectId } from 'mongodb';
  * @property {string} batchNumber - Auto-generated: LABOUR-YYYYMMDD-001 (unique)
  * @property {string} [batchName] - Optional user-defined name
  * @property {ObjectId} projectId - Project ID (required, indexed)
- * @property {ObjectId} [defaultPhaseId] - Default phase ID (optional)
+ * @property {ObjectId} [defaultPhaseId] - Default phase ID (optional, null for indirect labour batches)
  * @property {ObjectId} [defaultFloorId] - Default floor ID (optional)
  * @property {ObjectId} [defaultCategoryId] - Default category ID (optional)
  * @property {Date} [defaultDate] - Default entry date for all entries
  * @property {string} entryType - 'time_based' | 'task_based' | 'professional_service' | 'mixed' (required)
  * @property {string} [defaultWorkerRole] - Default worker role (optional)
+ * @property {boolean} isIndirectLabour - NEW: Whether all entries in this batch are indirect labour (default: false)
+ * @property {string} [indirectCostCategory] - NEW: Category for indirect costs (siteOverhead, utilities, transportation, safetyCompliance) - only if isIndirectLabour is true
  * @property {ObjectId[]} labourEntryIds - Array of labour entry IDs
  * @property {number} totalEntries - Count of entries
  * @property {number} totalHours - Sum of all hours
@@ -38,12 +40,14 @@ export const LABOUR_BATCH_SCHEMA = {
   batchNumber: String, // Auto-generated: LABOUR-YYYYMMDD-001
   batchName: String, // Optional
   projectId: 'ObjectId', // Required
-  defaultPhaseId: 'ObjectId', // Optional
+  defaultPhaseId: 'ObjectId', // Optional (null for indirect labour batches)
   defaultFloorId: 'ObjectId', // Optional
   defaultCategoryId: 'ObjectId', // Optional
   defaultDate: Date, // Optional
   entryType: String, // Required: 'time_based' | 'task_based' | 'professional_service' | 'mixed'
   defaultWorkerRole: String, // Optional
+  isIndirectLabour: Boolean, // NEW: Whether this batch is all indirect labour (default: false)
+  indirectCostCategory: String, // NEW: Category for indirect costs (only if isIndirectLabour is true)
   labourEntryIds: ['ObjectId'], // Array of entry IDs
   totalEntries: Number, // Count
   totalHours: Number, // Sum
@@ -161,6 +165,18 @@ export function validateLabourBatch(data) {
     });
   }
 
+  // If batch is marked as indirect, require indirectCostCategory
+  if (data.isIndirectLabour) {
+    const VALID_INDIRECT_CATEGORIES = ['utilities', 'siteOverhead', 'transportation', 'safetyCompliance'];
+    if (!data.indirectCostCategory || !VALID_INDIRECT_CATEGORIES.includes(data.indirectCostCategory)) {
+      errors.push(`indirectCostCategory is required for indirect labour batches and must be one of: ${VALID_INDIRECT_CATEGORIES.join(', ')}`);
+    }
+    // Ensure defaultPhaseId is not provided for indirect batches
+    if (data.defaultPhaseId && ObjectId.isValid(data.defaultPhaseId)) {
+      errors.push('defaultPhaseId must be empty (null) for indirect labour batches');
+    }
+  }
+
   return {
     isValid: errors.length === 0,
     errors,
@@ -202,6 +218,8 @@ export function createLabourBatch(input, createdBy, createdByName) {
     batchName: batchName?.trim() || null,
     projectId: ObjectId.isValid(projectId) ? new ObjectId(projectId) : projectId,
     defaultPhaseId: defaultPhaseId && ObjectId.isValid(defaultPhaseId) ? new ObjectId(defaultPhaseId) : null,
+    isIndirectLabour: input.isIndirectLabour === true,
+    indirectCostCategory: input.indirectCostCategory || null,
     defaultFloorId: defaultFloorId && ObjectId.isValid(defaultFloorId) ? new ObjectId(defaultFloorId) : null,
     defaultCategoryId: defaultCategoryId && ObjectId.isValid(defaultCategoryId) ? new ObjectId(defaultCategoryId) : null,
     defaultDate: defaultDate ? new Date(defaultDate) : new Date(),

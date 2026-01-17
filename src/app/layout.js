@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/toast";
 import { ServiceWorkerRegister } from "@/components/push-notifications/service-worker-register";
+import { NotificationPermissionRequest } from "@/components/push-notifications/notification-permission-request";
 import { ProjectContextProvider } from "@/contexts/ProjectContext";
 
 const geistSans = Geist({
@@ -28,6 +29,7 @@ export default function RootLayout({ children }) {
         <ToastProvider>
           <ProjectContextProvider>
             <ServiceWorkerRegister />
+            <NotificationPermissionRequest />
             {children}
           </ProjectContextProvider>
         </ToastProvider>
