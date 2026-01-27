@@ -39,7 +39,7 @@ export async function POST(request) {
       const result = await db.collection('users').insertOne(newUser);
       userProfile = { _id: result.insertedId, ...newUser };
     } else {
-      // Update existing user's name and timestamp
+      // Update existing user's name and timestamp, but preserve their role
       await db.collection('users').updateOne(
         { supabaseId },
         {
@@ -50,10 +50,15 @@ export async function POST(request) {
           },
         }
       );
+
+      // Refresh the profile to get updated data
+      userProfile = await db.collection('users').findOne({
+        supabaseId: supabaseId,
+      });
     }
 
     return successResponse(
-      { userId: supabaseId, _id: userProfile._id?.toString() },
+      { userId: supabaseId, _id: userProfile._id?.toString(), role: userProfile.role },
       'User synced successfully',
       200
     );

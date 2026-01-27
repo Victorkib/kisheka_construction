@@ -52,6 +52,12 @@ export async function GET(request) {
     const projectId = searchParams.get('projectId');
     const forceRecalculate = searchParams.get('forceRecalculate') === 'true';
 
+    // Check if user has permission to view project finances
+    const allowedRoles = ['owner', 'investor', 'accountant', 'project_manager', 'pm'];
+    if (!allowedRoles.includes(userRole)) {
+      return errorResponse('You do not have permission to view project finances', 403);
+    }
+
     const db = await getDatabase();
 
     // CRITICAL FIX: For investor role, filter to only show allocated projects
