@@ -26,7 +26,7 @@ export async function POST(request) {
     const db = await getDatabase();
     const normalizedEmail = email.toLowerCase().trim();
     let invitation = null;
-    let assignedRole = 'site_clerk'; // Default role
+    let assignedRole = 'owner'; // Default role
 
     // If invitation token is provided, verify it
     if (invitationToken) {
@@ -52,7 +52,7 @@ export async function POST(request) {
       }
 
       // Use role from invitation
-      assignedRole = invitation.role || 'site_clerk';
+      assignedRole = invitation.role || 'owner';
     }
 
     // Check if user already exists
