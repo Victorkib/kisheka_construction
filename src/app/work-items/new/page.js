@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -17,7 +17,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { WORK_ITEM_STATUSES, WORK_ITEM_CATEGORIES, WORK_ITEM_PRIORITIES } from '@/lib/constants/work-item-constants';
 import { MultiWorkerSelector } from '@/components/work-items/multi-worker-selector';
 
-export default function NewWorkItemPage() {
+function NewWorkItemPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
@@ -630,3 +630,10 @@ export default function NewWorkItemPage() {
   );
 }
 
+export default function NewWorkItemPage() {
+  return (
+    <Suspense fallback={null}>
+      <NewWorkItemPageContent />
+    </Suspense>
+  );
+}

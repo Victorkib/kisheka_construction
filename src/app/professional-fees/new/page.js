@@ -1,13 +1,6 @@
-/**
- * Create New Professional Fee Page
- * Form for creating a new professional fee
- * 
- * Route: /professional-fees/new
- * Auth: OWNER/PM/ACCOUNTANT
- */
-
 'use client';
 
+import { Suspense } from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
@@ -17,7 +10,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ProfessionalFeesForm } from '@/components/professional-fees/professional-fees-form';
 
-export default function NewProfessionalFeePage() {
+function NewProfessionalFeePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
@@ -207,7 +200,18 @@ export default function NewProfessionalFeePage() {
   );
 }
 
-
-
-
-
+export default function NewProfessionalFeePage() {
+  return (
+    <Suspense fallback={
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="flex justify-center items-center h-64">
+            <LoadingSpinner />
+          </div>
+        </div>
+      </AppLayout>
+    }>
+      <NewProfessionalFeePageContent />
+    </Suspense>
+  );
+}
