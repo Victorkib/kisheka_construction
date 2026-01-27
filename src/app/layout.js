@@ -4,6 +4,7 @@ import { ToastProvider } from '@/components/toast';
 import { ServiceWorkerRegister } from '@/components/push-notifications/service-worker-register';
 import { NotificationPermissionRequest } from '@/components/push-notifications/notification-permission-request';
 import { ProjectContextProvider } from '@/contexts/ProjectContext';
+import { OAuthSync } from '@/components/auth/oauth-sync';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -193,6 +194,7 @@ export default function RootLayout({ children }) {
       >
         <ToastProvider>
           <ProjectContextProvider>
+            <OAuthSync />
             <ServiceWorkerRegister />
             <NotificationPermissionRequest />
             {children}

@@ -3,11 +3,9 @@
  * Handles OAuth provider callbacks (Google, Discord) and email verification
  * GET /api/auth/callback
  * 
- * This route is called after:
- * 1. User authenticates with OAuth provider
- * 2. User clicks email verification link
- * 
- * It exchanges the code for a session and syncs user to MongoDB
+ * Note: With Supabase modern flow, this route is optional.
+ * Supabase now handles session internally and redirects to origin.
+ * This route handles edge cases and MongoDB syncing.
  */
 
 import { NextResponse } from 'next/server';
@@ -20,6 +18,7 @@ export async function GET(request) {
   const type = requestUrl.searchParams.get('type'); // 'signup' for email verification
   const next = requestUrl.searchParams.get('next') || '/dashboard';
 
+  // If there's a code, exchange it (for email verification links)
   if (code) {
     const supabase = await createClient();
 
@@ -41,11 +40,10 @@ export async function GET(request) {
         
         // Sync user to MongoDB
         await syncUserToMongoDB(data.user, {
-          // OAuth users are automatically verified, email verification users are now verified
           isVerified: data.user.email_confirmed_at ? true : false,
         });
 
-        // If this was an email verification, redirect to login with success message
+        // Redirect based on verification type
         if (isEmailVerification) {
           return NextResponse.redirect(
             new URL('/auth/login?verified=true', request.url)
@@ -62,6 +60,10 @@ export async function GET(request) {
       );
     }
   }
+
+  // If no code, just redirect to origin
+  // Supabase now handles the OAuth session internally
+  return NextResponse.redirect(new URL(next, request.url));
 
   // If no code, redirect to login
   return NextResponse.redirect(new URL('/auth/login', request.url));
