@@ -5,36 +5,55 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
-import { syncUserToMongoDB } from '@/lib/auth-helpers';
+import { getDatabase } from '@/lib/mongodb/connection';
 import { errorResponse, successResponse } from '@/lib/api-response';
 
 export async function POST(request) {
   try {
     const { supabaseId, email, firstName, lastName } = await request.json();
 
-    if (!supabaseId) {
-      return errorResponse('Supabase ID required', 400);
+    if (!supabaseId || !email) {
+      return errorResponse('Supabase ID and email required', 400);
     }
 
-    const supabase = await createClient();
+    const db = await getDatabase();
 
-    // Verify the user is actually authenticated
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user || user.id !== supabaseId) {
-      return errorResponse('Unauthorized', 401);
-    }
-
-    // Sync user to MongoDB
-    await syncUserToMongoDB(user, {
-      firstName: firstName || '',
-      lastName: lastName || '',
-      isVerified: user.email_confirmed_at ? true : false,
+    // Check if user exists in MongoDB
+    let userProfile = await db.collection('users').findOne({
+      supabaseId: supabaseId,
     });
 
+    // If user doesn't exist, create them
+    if (!userProfile) {
+      const newUser = {
+        supabaseId,
+        email: email.toLowerCase().trim(),
+        firstName: firstName || '',
+        lastName: lastName || '',
+        role: 'site_clerk', // Default role for OAuth users
+        status: 'active',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const result = await db.collection('users').insertOne(newUser);
+      userProfile = { _id: result.insertedId, ...newUser };
+    } else {
+      // Update existing user's name and timestamp
+      await db.collection('users').updateOne(
+        { supabaseId },
+        {
+          $set: {
+            firstName: firstName || userProfile.firstName || '',
+            lastName: lastName || userProfile.lastName || '',
+            updatedAt: new Date(),
+          },
+        }
+      );
+    }
+
     return successResponse(
-      { userId: user.id },
+      { userId: supabaseId, _id: userProfile._id?.toString() },
       'User synced successfully',
       200
     );
