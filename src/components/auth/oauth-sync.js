@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 /**
@@ -11,14 +11,18 @@ import { createClient } from '@/lib/supabase/client';
  */
 export function OAuthSync() {
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     const supabase = createClient();
+    let isMounted = true;
 
     // Check current user and sync if needed
     async function syncUser() {
       try {
         const { data: { user }, error } = await supabase.auth.getUser();
+
+        if (!isMounted) return;
 
         if (user && !error) {
           // User is authenticated, sync to MongoDB
@@ -38,12 +42,11 @@ export function OAuthSync() {
             return;
           }
 
-          // Check if we're on an auth page (login/register)
-          const currentPath = window.location.pathname;
-          const isAuthPage = currentPath?.includes('/auth/');
-
-          // If on auth page, redirect to dashboard
-          if (isAuthPage) {
+          // If user is logged in and NOT on dashboard, redirect to dashboard
+          // This handles both:
+          // 1. Coming from /auth/* pages after login
+          // 2. OAuth redirects to root (/) after authentication
+          if (pathname !== '/dashboard' && !pathname?.startsWith('/dashboard/')) {
             router.push('/dashboard');
           }
         }
@@ -67,9 +70,10 @@ export function OAuthSync() {
     });
 
     return () => {
+      isMounted = false;
       subscription?.unsubscribe();
     };
-  }, [router]);
+  }, [router, pathname]);
 
   return null; // This component doesn't render anything
 }
