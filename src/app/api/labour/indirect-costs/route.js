@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getDatabase } from '@/lib/mongodb/connection';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { LABOUR_APPROVED_STATUSES } from '@/lib/status-constants';
 
 /**
  * GET /api/labour/indirect-costs
@@ -53,7 +54,7 @@ export async function GET(request) {
       deletedAt: null,
       isIndirectLabour: true,
       indirectCostCategory: { $exists: true, $ne: null },
-      status: { $in: ['approved', 'paid', 'APPROVED', 'PAID'] }
+      status: { $in: LABOUR_APPROVED_STATUSES }
     };
 
     // Add date filters if provided

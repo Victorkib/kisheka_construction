@@ -11,6 +11,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
+import { CATEGORY_TYPE_OPTIONS } from '@/lib/constants/category-constants';
 
 function CategoriesPageContent() {
   const router = useRouter();
@@ -19,10 +20,11 @@ function CategoriesPageContent() {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [canCreate, setCanCreate] = useState(false);
+  const [categoryType, setCategoryType] = useState(CATEGORY_TYPE_OPTIONS[0].value);
 
   useEffect(() => {
     fetchUser();
-    fetchCategories();
+    fetchCategories(CATEGORY_TYPE_OPTIONS[0].value);
   }, []);
 
   const fetchUser = async () => {
@@ -39,12 +41,12 @@ function CategoriesPageContent() {
     }
   };
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (type) => {
     try {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/categories');
+      const response = await fetch(`/api/categories?type=${encodeURIComponent(type)}`);
       const data = await response.json();
 
       if (!data.success) {
@@ -67,7 +69,7 @@ function CategoriesPageContent() {
         <div className="mb-8 flex justify-between items-center">
           <div>
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Categories</h1>
-            <p className="text-gray-600 mt-2">Manage material categories</p>
+            <p className="text-gray-600 mt-2">Manage categories by area</p>
           </div>
           {canCreate && (
             <Link
@@ -85,6 +87,28 @@ function CategoriesPageContent() {
             {error}
           </div>
         )}
+
+        {/* Category Type Filter */}
+        <div className="mb-6">
+          <label className="block text-sm font-semibold text-gray-700 mb-2">
+            Category Type
+          </label>
+          <select
+            value={categoryType}
+            onChange={(e) => {
+              const nextType = e.target.value;
+              setCategoryType(nextType);
+              fetchCategories(nextType);
+            }}
+            className="w-full max-w-xs px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {CATEGORY_TYPE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
         {/* Categories Grid */}
         {loading ? (
@@ -127,9 +151,12 @@ function CategoriesPageContent() {
                       {category.description && (
                         <p className="text-sm text-gray-600 mt-1">{category.description}</p>
                       )}
+                      <p className="text-xs text-gray-500 mt-1">
+                        Type: {(category.type || categoryType).replace('_', ' ')}
+                      </p>
                       {category.usageCount !== undefined && (
                         <p className="text-xs text-gray-500 mt-1">
-                          Used by {category.usageCount} material{category.usageCount !== 1 ? 's' : ''}
+                          Used by {category.usageCount} record{category.usageCount !== 1 ? 's' : ''}
                         </p>
                       )}
                     </div>

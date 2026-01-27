@@ -264,6 +264,15 @@ export default function NewProjectPage() {
         toast.showInfo(data.data.capitalInfo.message, { duration: 10000 });
       }
       
+      // Show floor creation warning if present
+      if (data.data.floorCreationWarning) {
+        const warning = data.data.floorCreationWarning;
+        toast.showWarning(
+          warning.details || warning.message,
+          { duration: 12000, title: 'Floor Setup Issue' }
+        );
+      }
+      
       // Show phase initialization warning if present
       if (data.data.phaseInitializationWarning) {
         const warning = data.data.phaseInitializationWarning;
@@ -577,7 +586,7 @@ export default function NewProjectPage() {
                         value={formData.client}
                         onChange={handleChange}
                         placeholder="Client name"
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-black"
                       />
                     </div>
                   </div>

@@ -26,6 +26,9 @@ function ArchivedProjectsPageContent() {
   const [canManage, setCanManage] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [impactLoading, setImpactLoading] = useState(false);
+  const [dependencies, setDependencies] = useState(null);
+  const [financialData, setFinancialData] = useState(null);
   const [showRestoreModal, setShowRestoreModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -102,9 +105,37 @@ function ArchivedProjectsPageContent() {
     }
   };
 
-  const handleDeleteClick = (project) => {
+  const handleDeleteClick = async (project) => {
     setSelectedProject(project);
     setShowDeleteModal(true);
+    setImpactLoading(true);
+
+    try {
+      const response = await fetch(`/api/projects/${project._id}/dependencies`);
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        const { dependencies: dependencyMap, investorAllocations, finances } = data.data;
+        setDependencies({
+          ...(dependencyMap || {}),
+          investorAllocations: investorAllocations || dependencyMap?.investorAllocations || 0,
+        });
+        setFinancialData({
+          totalUsed: finances?.totalUsed || 0,
+          totalInvested: finances?.totalInvested || 0,
+          capitalBalance: finances?.capitalBalance || 0,
+        });
+      } else {
+        setDependencies(null);
+        setFinancialData(null);
+      }
+    } catch (err) {
+      console.error('Fetch dependency map error:', err);
+      setDependencies(null);
+      setFinancialData(null);
+    } finally {
+      setImpactLoading(false);
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -123,8 +154,10 @@ function ArchivedProjectsPageContent() {
       }
 
       toast.showSuccess(data.message || 'Project permanently deleted successfully!');
-      setShowDeleteModal(false);
+    setShowDeleteModal(false);
       setSelectedProject(null);
+    setDependencies(null);
+    setFinancialData(null);
       await fetchProjects();
     } catch (err) {
       toast.showError(err.message || 'Failed to delete project');
@@ -367,7 +400,13 @@ function ArchivedProjectsPageContent() {
         {/* Delete Confirmation Modal */}
         <ConfirmationModal
           isOpen={showDeleteModal}
-          onClose={() => !deleting && setShowDeleteModal(false)}
+          onClose={() => {
+            if (deleting || impactLoading) return;
+            setShowDeleteModal(false);
+            setSelectedProject(null);
+            setDependencies(null);
+            setFinancialData(null);
+          }}
           onConfirm={handleDeleteConfirm}
           title="Delete Project Permanently"
           message={
@@ -376,7 +415,16 @@ function ArchivedProjectsPageContent() {
                 <p className="mb-3">
                   Are you sure you want to permanently delete <strong>"{selectedProject.projectName}"</strong>?
                 </p>
-                <p className="text-red-600 font-medium">This action cannot be undone.</p>
+                <p className="text-sm text-gray-600">
+                  This will permanently remove the project and all linked records.
+                </p>
+                {impactLoading && (
+                  <div className="text-xs text-gray-500 mt-2 flex items-center gap-2">
+                    <LoadingSpinner size="sm" />
+                    <span>Loading impact summary...</span>
+                  </div>
+                )}
+                <p className="text-red-600 font-medium mt-2">This action cannot be undone.</p>
               </>
             ) : (
               'Are you sure you want to proceed?'
@@ -386,6 +434,10 @@ function ArchivedProjectsPageContent() {
           cancelText="Cancel"
           variant="danger"
           isLoading={deleting}
+          financialImpact={financialData}
+          dependencies={dependencies}
+        actionsDisabled={impactLoading}
+        actionsDisabledReason={impactLoading ? 'Loading impact summary before enabling delete...' : ''}
         />
       </div>
     </AppLayout>

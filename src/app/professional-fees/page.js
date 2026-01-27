@@ -11,16 +11,25 @@ import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable } from '@/components/loading';
+import { LoadingTable, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { useProjectContext } from '@/contexts/ProjectContext';
 
 function ProfessionalFeesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
+  const {
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   
   const [fees, setFees] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +39,7 @@ function ProfessionalFeesPageContent() {
   const [assignments, setAssignments] = useState([]);
   
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: searchParams.get('projectId') || currentProjectId || '',
     professionalServiceId: searchParams.get('professionalServiceId') || '',
     feeType: searchParams.get('feeType') || '',
     status: searchParams.get('status') || '',
@@ -53,9 +62,18 @@ function ProfessionalFeesPageContent() {
   });
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Fetch projects and assignments on mount
   useEffect(() => {
-    fetchProjects();
+    setProjects(accessibleProjects || []);
+  }, [accessibleProjects]);
+
+  useEffect(() => {
+    if (currentProjectId && currentProjectId !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: currentProjectId }));
+    }
+  }, [currentProjectId, filters.projectId]);
+
+  // Fetch assignments on mount
+  useEffect(() => {
     fetchAssignments();
   }, []);
 
@@ -119,20 +137,19 @@ function ProfessionalFeesPageContent() {
   }, [pagination.page, pagination.limit, filterValues]);
 
   useEffect(() => {
-    fetchFees();
-  }, [fetchFees]);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data || []);
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
+    if (isEmpty) {
+      setLoading(false);
+      setFees([]);
+      return;
     }
-  };
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setFees([]);
+      return;
+    }
+    fetchFees();
+  }, [fetchFees, filters.projectId, isEmpty, projectLoading]);
 
   const fetchAssignments = async () => {
     try {
@@ -148,7 +165,9 @@ function ProfessionalFeesPageContent() {
 
   const handleFilterChange = useCallback((key, value) => {
     setFilters((prev) => {
-      const newFilters = { ...prev, [key]: value };
+      const newFilters = key === 'projectId'
+        ? { ...prev, projectId: value }
+        : { ...prev, [key]: value };
       
       setTimeout(() => {
         const params = new URLSearchParams();
@@ -164,7 +183,12 @@ function ProfessionalFeesPageContent() {
       if (prev.page === 1) return prev;
       return { ...prev, page: 1 };
     });
-  }, [router]);
+    if (key === 'projectId' && value && value !== currentProjectId) {
+      switchProject(value).catch((err) => {
+        console.error('Error switching project:', err);
+      });
+    }
+  }, [router, currentProjectId, switchProject]);
 
   const handleApproveClick = (feeId) => {
     setSelectedFeeId(feeId);
@@ -199,6 +223,34 @@ function ProfessionalFeesPageContent() {
       setActionLoading(false);
       setSelectedFeeId(null);
       setApprovalNotes('');
+    }
+  };
+
+  const handleQuickApprove = async (feeId) => {
+    const targetId = feeId || selectedFeeId;
+    if (!targetId) return;
+    setActionLoading(true);
+    try {
+      const response = await fetch(`/api/professional-fees/${targetId}/approve`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ approvalNotes: 'Quick-approved from list' }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        toast.showSuccess('Fee approved successfully. Expense record created automatically.');
+        if (data.data?.financialWarning) {
+          toast.showWarning(data.data.financialWarning.message);
+        }
+        fetchFees();
+      } else {
+        toast.showError(`Error: ${data.error}`);
+      }
+    } catch (err) {
+      toast.showError(`Error: ${err.message}`);
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -308,6 +360,11 @@ function ProfessionalFeesPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={actionLoading}
+          message="Updating fee..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -330,6 +387,20 @@ function ProfessionalFeesPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Fees depend on assignments"
+          description="Fees are tied to professional service assignments and projects."
+          prerequisites={[
+            'At least one professional assignment exists',
+            'Project is selected for tracking',
+          ]}
+          actions={[
+            { href: '/professional-services', label: 'View Assignments' },
+            { href: '/professional-fees/new', label: 'Create Fee' },
+          ]}
+          tip="If you do not see a professional, add the assignment first."
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -536,6 +607,12 @@ function ProfessionalFeesPageContent() {
                                 className="text-green-600 hover:text-green-900"
                               >
                                 Approve
+                              </button>
+                              <button
+                                onClick={() => handleQuickApprove(fee._id)}
+                                className="text-emerald-600 hover:text-emerald-900"
+                              >
+                                Quick Approve
                               </button>
                               <button
                                 onClick={() => handleRejectClick(fee._id)}

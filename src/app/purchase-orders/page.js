@@ -17,23 +17,30 @@ import { useToast } from '@/components/toast';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState } from '@/components/empty-states';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { PhaseFilter } from '@/components/filters/PhaseFilter';
 
 function PurchaseOrdersPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess, user } = usePermissions();
-  const { currentProject, isEmpty } = useProjectContext();
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const toast = useToast();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
-  const [projects, setProjects] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
   
   // Get projectId from context (prioritize current project over URL param)
-  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
   const activeProjectId = projectIdFromContext || projectIdFromUrl || '';
   
@@ -63,17 +70,11 @@ function PurchaseOrdersPageContent() {
     }
   }, [user, canAccess, router, toast]);
 
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data.projects || []);
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
+  useEffect(() => {
+    if (projectIdFromContext && projectIdFromContext !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: projectIdFromContext, phaseId: '' }));
     }
-  };
+  }, [projectIdFromContext, filters.projectId]);
 
   const fetchSuppliers = async () => {
     try {
@@ -129,17 +130,32 @@ function PurchaseOrdersPageContent() {
       setOrders([]);
       return;
     }
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setOrders([]);
+      return;
+    }
     
     fetchOrders();
-  }, [fetchOrders, isEmpty]);
+  }, [fetchOrders, isEmpty, projectLoading, filters.projectId]);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    let updatedFilters = { ...filters, [key]: value };
+    if (key === 'projectId') {
+      updatedFilters = { ...filters, projectId: value, phaseId: '' };
+      if (value && value !== currentProjectId) {
+        switchProject(value).catch((err) => {
+          console.error('Error switching project:', err);
+        });
+      }
+    }
+    setFilters(updatedFilters);
     setPagination((prev) => ({ ...prev, page: 1 })); // Reset to page 1 on filter change
     
     // Update URL params
     const params = new URLSearchParams();
-    Object.entries({ ...filters, [key]: value }).forEach(([k, v]) => {
+    Object.entries(updatedFilters).forEach(([k, v]) => {
       if (v) params.set(k, v);
     });
     router.push(`/purchase-orders?${params.toString()}`, { scroll: false });
@@ -233,6 +249,23 @@ function PurchaseOrdersPageContent() {
           )}
         </div>
 
+        <PrerequisiteGuide
+          title="Before creating a purchase order"
+          description="Purchase orders rely on projects, suppliers, and approved material requests."
+          prerequisites={[
+            'Project is created',
+            'Suppliers are onboarded',
+            'Material requests are prepared or approved',
+          ]}
+          actions={[
+            { href: '/projects/new', label: 'Create Project' },
+            { href: '/suppliers/new', label: 'Add Supplier' },
+            { href: '/material-requests/new', label: 'New Material Request' },
+            { href: '/purchase-orders/new', label: 'New Order' },
+          ]}
+          tip="Use filters to focus on one project and avoid duplicates."
+        />
+
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -244,7 +277,7 @@ function PurchaseOrdersPageContent() {
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Projects</option>
-                {projects.map((project, index) => (
+                {accessibleProjects.map((project, index) => (
                   <option key={project._id?.toString() || project.id?.toString() || `project-${index}`} value={project._id?.toString() || project.id?.toString() || ''}>
                     {project.projectName}
                   </option>
@@ -307,8 +340,13 @@ function PurchaseOrdersPageContent() {
             <div className="flex items-end">
               <button
                 onClick={() => {
-                  setFilters({ projectId: '', status: '', supplierId: '', phaseId: '', search: '' });
-                  router.push('/purchase-orders', { scroll: false });
+                  const resetFilters = { projectId: currentProjectId || '', status: '', supplierId: '', phaseId: '', search: '' };
+                  setFilters(resetFilters);
+                  const params = new URLSearchParams();
+                  Object.entries(resetFilters).forEach(([k, v]) => {
+                    if (v) params.set(k, v);
+                  });
+                  router.push(`/purchase-orders?${params.toString()}`, { scroll: false });
                 }}
                 className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition"
               >

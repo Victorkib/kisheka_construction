@@ -3,7 +3,7 @@
  * GET: List work items (optionally filtered by project, phase, status, assignedTo)
  * POST: Create new work item (PM, OWNER only)
  * 
- * GET /api/work-items?projectId=xxx&phaseId=xxx&status=xxx&assignedTo=xxx
+ * GET /api/work-items?projectId=xxx&phaseId=xxx&floorId=xxx&status=xxx&assignedTo=xxx
  * POST /api/work-items
  */
 
@@ -18,12 +18,43 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { createWorkItem, validateWorkItem, WORK_ITEM_STATUSES } from '@/lib/schemas/work-item-schema';
 import { validateWorkItemDependencies } from '@/lib/work-item-helpers';
 import { calculatePhaseCompletionFromWorkItems } from '@/lib/work-item-helpers';
+import { CATEGORY_TYPES } from '@/lib/constants/category-constants';
+
+const resolveWorkItemCategory = async (db, { categoryId, category }) => {
+  let resolvedCategoryId = null;
+  let resolvedCategory = category?.trim() || '';
+
+  if (categoryId && ObjectId.isValid(categoryId)) {
+    const categoryDoc = await db.collection('categories').findOne({
+      _id: new ObjectId(categoryId),
+      type: CATEGORY_TYPES.WORK_ITEMS,
+    });
+    if (categoryDoc) {
+      resolvedCategoryId = categoryDoc._id;
+      resolvedCategory = categoryDoc.name;
+      return { resolvedCategoryId, resolvedCategory };
+    }
+  }
+
+  if (resolvedCategory) {
+    const categoryDoc = await db.collection('categories').findOne({
+      name: { $regex: new RegExp(`^${resolvedCategory}$`, 'i') },
+      type: CATEGORY_TYPES.WORK_ITEMS,
+    });
+    if (categoryDoc) {
+      resolvedCategoryId = categoryDoc._id;
+      resolvedCategory = categoryDoc.name;
+    }
+  }
+
+  return { resolvedCategoryId, resolvedCategory };
+};
 
 /**
  * GET /api/work-items
  * Returns work items, optionally filtered by projectId, phaseId, status, assignedTo
  * Auth: All authenticated users
- * Query params: projectId (optional), phaseId (optional), status (optional), assignedTo (optional), category (optional), page (optional), limit (optional)
+ * Query params: projectId (optional), phaseId (optional), floorId (optional), status (optional), assignedTo (optional), category (optional), page (optional), limit (optional)
  */
 export async function GET(request) {
   try {
@@ -42,6 +73,7 @@ export async function GET(request) {
     // Filters
     const projectId = searchParams.get('projectId');
     const phaseId = searchParams.get('phaseId');
+    const floorId = searchParams.get('floorId');
     const status = searchParams.get('status');
     const assignedTo = searchParams.get('assignedTo');
     const category = searchParams.get('category');
@@ -53,6 +85,15 @@ export async function GET(request) {
 
     if (phaseId && ObjectId.isValid(phaseId)) {
       query.phaseId = new ObjectId(phaseId);
+    }
+
+    if (floorId === 'unassigned' || floorId === 'none' || floorId === 'missing') {
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [{ floorId: { $exists: false } }, { floorId: null }],
+      });
+    } else if (floorId && ObjectId.isValid(floorId)) {
+      query.floorId = new ObjectId(floorId);
     }
 
     if (status && WORK_ITEM_STATUSES.includes(status)) {
@@ -306,13 +347,18 @@ export async function POST(request) {
       return errorResponse('Phase not found or does not belong to this project', 400);
     }
 
+    const { resolvedCategoryId, resolvedCategory } = await resolveWorkItemCategory(db, {
+      categoryId,
+      category,
+    });
+
     // Prepare work item data for validation
     const workItemData = {
       projectId,
       phaseId,
       name,
       description,
-      category,
+      category: resolvedCategory || category,
       status: status || 'not_started',
       assignedTo,
       estimatedHours,
@@ -324,7 +370,9 @@ export async function POST(request) {
       actualEndDate,
       dependencies: dependencies || [],
       floorId,
-      categoryId,
+      categoryId: resolvedCategoryId
+        ? resolvedCategoryId.toString()
+        : (categoryId && ObjectId.isValid(categoryId) ? categoryId : null),
       priority,
       notes
     };
@@ -348,7 +396,7 @@ export async function POST(request) {
       {
         name,
         description,
-        category,
+        category: resolvedCategory || category,
         status: status || 'not_started',
         assignedTo,
         estimatedHours,
@@ -360,7 +408,9 @@ export async function POST(request) {
         actualEndDate,
         dependencies: dependencies || [],
         floorId,
-        categoryId,
+        categoryId: resolvedCategoryId
+          ? resolvedCategoryId.toString()
+          : (categoryId && ObjectId.isValid(categoryId) ? categoryId : null),
         priority,
         notes
       },

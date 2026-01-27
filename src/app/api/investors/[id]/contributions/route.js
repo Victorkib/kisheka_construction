@@ -67,19 +67,25 @@ export async function GET(request, { params }) {
       (a, b) => new Date(b.date) - new Date(a.date)
     );
 
-    // Calculate totals
     const totals = contributions.reduce(
       (acc, contrib) => {
-        acc.total += contrib.amount || 0;
+        const amount = contrib.amount || 0;
+        if (contrib.type === 'RETURN') {
+          acc.returned += Math.abs(amount);
+          acc.netTotal += amount;
+          return acc;
+        }
+        acc.total += amount;
+        acc.netTotal += amount;
         if (contrib.type === 'EQUITY' || contrib.type === 'MIXED') {
-          acc.equity += contrib.amount || 0;
+          acc.equity += amount;
         }
         if (contrib.type === 'LOAN' || contrib.type === 'MIXED') {
-          acc.loan += contrib.amount || 0;
+          acc.loan += amount;
         }
         return acc;
       },
-      { total: 0, equity: 0, loan: 0 }
+      { total: 0, equity: 0, loan: 0, returned: 0, netTotal: 0 }
     );
 
     return successResponse({

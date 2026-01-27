@@ -87,6 +87,9 @@ async function verifyAllIndexes() {
     const floorsUniqueIndex = floorsIndexes.find(idx => 
       idx.name === 'project_floorNumber_unique'
     );
+    const legacyFloorsIndex = floorsIndexes.find(idx =>
+      idx.name === 'floorNumber_unique'
+    );
     
     if (floorsUniqueIndex) {
       console.log('   ✅ Unique index exists');
@@ -96,6 +99,11 @@ async function verifyAllIndexes() {
     } else {
       console.log('   ❌ Unique index not found');
       verification.phase2.failed.push('Floors unique index missing');
+    }
+    
+    if (legacyFloorsIndex) {
+      console.log('   ❌ Legacy floorNumber_unique index still exists');
+      verification.phase2.failed.push('Legacy floors unique index still exists');
     }
     
     // 2.2 Initial Expenses Index

@@ -145,7 +145,6 @@ export function EnhancedBudgetInput({
       }
     }
   })
-  console.log('budgetData ', budgetData)
 
   useEffect(() => {
     if (value) {

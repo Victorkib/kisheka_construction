@@ -12,34 +12,56 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingTable, LoadingSpinner } from '@/components/loading';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { usePermissions } from '@/hooks/use-permissions';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { NoProjectsEmptyState } from '@/components/empty-states';
 
 function BudgetReallocationsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
+  const {
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const [reallocations, setReallocations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
-  const [projects, setProjects] = useState([]);
   const [phases, setPhases] = useState([]);
   
   // Filters
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: searchParams.get('projectId') || currentProjectId || '',
     status: searchParams.get('status') || '',
   });
 
-  // Fetch projects and phases on mount
+  // Sync current project into filters
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    if (currentProjectId && currentProjectId !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: currentProjectId }));
+    }
+  }, [currentProjectId, filters.projectId]);
 
   // Fetch reallocations when filters or page change
   useEffect(() => {
+    if (isEmpty) {
+      setLoading(false);
+      setReallocations([]);
+      return;
+    }
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setReallocations([]);
+      return;
+    }
     fetchReallocations();
-  }, [filters, pagination.page]);
+  }, [filters, pagination.page, isEmpty, projectLoading]);
 
   // Fetch phases when project is selected
   useEffect(() => {
@@ -49,18 +71,6 @@ function BudgetReallocationsPageContent() {
       setPhases([]);
     }
   }, [filters.projectId]);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data?.projects || data.data || []);
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
-    }
-  };
 
   const fetchPhases = async (projectId) => {
     try {
@@ -106,8 +116,22 @@ function BudgetReallocationsPageContent() {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    const updatedFilters = key === 'projectId'
+      ? { ...filters, projectId: value }
+      : { ...filters, [key]: value };
+    setFilters(updatedFilters);
     setPagination((prev) => ({ ...prev, page: 1 }));
+    if (key === 'projectId' && value && value !== currentProjectId) {
+      switchProject(value).catch((err) => {
+        console.error('Error switching project:', err);
+      });
+    }
+
+    const params = new URLSearchParams();
+    Object.entries(updatedFilters).forEach(([k, v]) => {
+      if (v) params.set(k, v);
+    });
+    router.push(`/budget-reallocations?${params.toString()}`, { scroll: false });
   };
 
   const getStatusBadgeColor = (status) => {
@@ -148,6 +172,23 @@ function BudgetReallocationsPageContent() {
     return labels[type] || type;
   };
 
+  if (isEmpty && !loading) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Budget Reallocations</h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage budget transfers between phases and projects</p>
+          </div>
+          <NoProjectsEmptyState
+            canCreate={canAccess('create_project')}
+            role={canAccess('create_project') ? 'owner' : 'pm'}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -166,6 +207,21 @@ function BudgetReallocationsPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Reallocations need budgets and approvals"
+          description="Move budget between categories after the project budget is set."
+          prerequisites={[
+            'Project budget exists',
+            'Categories are defined',
+          ]}
+          actions={[
+            { href: '/projects', label: 'View Projects' },
+            { href: '/dashboard/budget', label: 'Set Budgets' },
+            { href: '/budget-reallocations/new', label: 'New Request' },
+          ]}
+          tip="Add clear notes to speed up approvals."
+        />
 
         {/* Error Message */}
         {error && (
@@ -186,7 +242,7 @@ function BudgetReallocationsPageContent() {
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Projects</option>
-                {projects.map((project) => (
+                {accessibleProjects.map((project) => (
                   <option key={project._id} value={project._id}>
                     {project.projectName || project.projectCode}
                   </option>

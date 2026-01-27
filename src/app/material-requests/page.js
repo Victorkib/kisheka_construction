@@ -11,26 +11,33 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable } from '@/components/loading';
+import { LoadingTable, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState } from '@/components/empty-states';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { PhaseFilter } from '@/components/filters/PhaseFilter';
 
 function MaterialRequestsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
-  const { currentProject, isEmpty } = useProjectContext();
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const toast = useToast();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
-  const [projects, setProjects] = useState([]);
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
@@ -44,35 +51,24 @@ function MaterialRequestsPageContent() {
   const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
   
   // Get projectId from context (prioritize current project over URL param)
-  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
   const activeProjectId = projectIdFromContext || projectIdFromUrl || '';
   
   // Filters
   const [filters, setFilters] = useState({
-    projectId: activeProjectId,
+    projectId: activeProjectId || '',
     status: searchParams.get('status') || '',
     urgency: searchParams.get('urgency') || '',
     phaseId: searchParams.get('phaseId') || '',
     search: searchParams.get('search') || '',
   });
 
-  // Fetch projects for filter dropdown
   useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data.projects || []);
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
+    if (projectIdFromContext && projectIdFromContext !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: projectIdFromContext, phaseId: '' }));
     }
-  };
+  }, [projectIdFromContext, filters.projectId]);
 
   const fetchRequests = useCallback(async () => {
     try {
@@ -115,17 +111,32 @@ function MaterialRequestsPageContent() {
       setRequests([]);
       return;
     }
-    
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setRequests([]);
+      return;
+    }
+
     fetchRequests();
-  }, [fetchRequests, isEmpty]);
+  }, [fetchRequests, isEmpty, projectLoading, filters.projectId]);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    let updatedFilters = { ...filters, [key]: value };
+    if (key === 'projectId') {
+      updatedFilters = { ...filters, projectId: value, phaseId: '' };
+      if (value && value !== currentProjectId) {
+        switchProject(value).catch((err) => {
+          console.error('Error switching project:', err);
+        });
+      }
+    }
+    setFilters(updatedFilters);
     setPagination((prev) => ({ ...prev, page: 1 })); // Reset to page 1 on filter change
     
     // Update URL params
     const params = new URLSearchParams();
-    Object.entries({ ...filters, [key]: value }).forEach(([k, v]) => {
+    Object.entries(updatedFilters).forEach(([k, v]) => {
       if (v) params.set(k, v);
     });
     router.push(`/material-requests?${params.toString()}`, { scroll: false });
@@ -352,6 +363,11 @@ function MaterialRequestsPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={bulkActionLoading || actionLoading}
+          message="Processing material requests..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
@@ -386,6 +402,22 @@ function MaterialRequestsPageContent() {
           </div>
         </div>
 
+        <PrerequisiteGuide
+          title="Start with projects and items"
+          description="Material requests depend on projects and item or library definitions."
+          prerequisites={[
+            'Project is created',
+            'Items or material library entries exist',
+          ]}
+          actions={[
+            { href: '/projects/new', label: 'Create Project' },
+            { href: '/material-library', label: 'Material Library' },
+            { href: '/items/new', label: 'Add Item' },
+            { href: '/material-requests/new', label: 'New Request' },
+          ]}
+          tip="Bulk requests are best for large lists from the library."
+        />
+
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -397,7 +429,7 @@ function MaterialRequestsPageContent() {
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="" className="text-gray-900">All Projects</option>
-                {projects.map((project) => (
+                {accessibleProjects.map((project) => (
                   <option key={project._id} value={project._id} className="text-gray-900">
                     {project.projectName}
                   </option>
@@ -453,8 +485,13 @@ function MaterialRequestsPageContent() {
             <div className="flex items-end">
               <button
                 onClick={() => {
-                  setFilters({ projectId: '', status: '', urgency: '', phaseId: '', search: '' });
-                  router.push('/material-requests', { scroll: false });
+                  const resetFilters = { projectId: currentProjectId || '', status: '', urgency: '', phaseId: '', search: '' };
+                  setFilters(resetFilters);
+                  const params = new URLSearchParams();
+                  Object.entries(resetFilters).forEach(([k, v]) => {
+                    if (v) params.set(k, v);
+                  });
+                  router.push(`/material-requests?${params.toString()}`, { scroll: false });
                 }}
                 className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition"
               >

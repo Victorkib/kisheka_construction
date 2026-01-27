@@ -23,7 +23,14 @@ function RejectionsDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess, user } = usePermissions();
-  const { currentProject, isEmpty } = useProjectContext();
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const toast = useToast();
   
   const [rejections, setRejections] = useState([]);
@@ -36,7 +43,7 @@ function RejectionsDashboardContent() {
   const [reassigningOrderId, setReassigningOrderId] = useState(null);
   
   // Get projectId from context
-  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
   // Prioritize context over URL, but use URL if context not available yet
   const activeProjectId = projectIdFromContext || projectIdFromUrl || '';
@@ -45,7 +52,7 @@ function RejectionsDashboardContent() {
   const [filters, setFilters] = useState(() => {
     // Get initial projectId - prioritize URL, then context
     const urlProjectId = searchParams.get('projectId');
-    const contextProjectId = normalizeProjectId(currentProject?._id);
+    const contextProjectId = normalizeProjectId(currentProject?._id) || currentProjectId || '';
     const initialProjectId = urlProjectId || contextProjectId || '';
     
     return {
@@ -117,24 +124,9 @@ function RejectionsDashboardContent() {
     }
   }, [user, canAccess, router, toast]);
 
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        // API returns data.data as an array of projects
-        const projectsList = Array.isArray(data.data) ? data.data : (data.data?.projects || []);
-        setProjects(projectsList);
-        console.log('[Rejections Dashboard] Loaded projects:', projectsList.length);
-      } else {
-        console.error('[Rejections Dashboard] Failed to fetch projects:', data.error);
-        setProjects([]);
-      }
-    } catch (err) {
-      console.error('[Rejections Dashboard] Error fetching projects:', err);
-      setProjects([]); // Set empty array on error
-    }
-  };
+  useEffect(() => {
+    setProjects(accessibleProjects || []);
+  }, [accessibleProjects]);
 
   const fetchSuppliers = async () => {
     try {
@@ -235,10 +227,9 @@ function RejectionsDashboardContent() {
     }
   }, [filters.projectId]);
 
-  // Fetch projects and suppliers on mount (independent of other filters)
+  // Fetch suppliers on mount (independent of other filters)
   useEffect(() => {
     if (!isEmpty) {
-      fetchProjects();
       fetchSuppliers();
     }
   }, [isEmpty]); // Run when isEmpty changes
@@ -252,24 +243,35 @@ function RejectionsDashboardContent() {
       return;
     }
     
+    if (!filters.projectId && projectLoading) {
+      return;
+    }
     // Only fetch rejections and analytics if we have a projectId
     // This ensures we don't fetch all projects' data when project context is loading
     if (filters.projectId || projectIdFromContext || projectIdFromUrl) {
       fetchRejections();
       fetchAnalytics();
     }
-  }, [fetchRejections, fetchAnalytics, isEmpty, filters.projectId, projectIdFromContext, projectIdFromUrl]);
+  }, [fetchRejections, fetchAnalytics, isEmpty, filters.projectId, projectIdFromContext, projectIdFromUrl, projectLoading]);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    const updatedFilters = key === 'projectId'
+      ? { ...filters, projectId: value }
+      : { ...filters, [key]: value };
+    setFilters(updatedFilters);
     setPagination((prev) => ({ ...prev, page: 1 }));
     
     // Update URL params
     const params = new URLSearchParams();
-    Object.entries({ ...filters, [key]: value }).forEach(([k, v]) => {
+    Object.entries(updatedFilters).forEach(([k, v]) => {
       if (v) params.set(k, v);
     });
     router.push(`/purchase-orders/rejections?${params.toString()}`, { scroll: false });
+    if (key === 'projectId' && value && value !== currentProjectId) {
+      switchProject(value).catch((err) => {
+        console.error('Error switching project:', err);
+      });
+    }
   };
 
   const handleAutoReassign = async (orderId, mode = 'simple') => {

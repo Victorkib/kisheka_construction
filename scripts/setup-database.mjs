@@ -70,7 +70,8 @@ async function setupDatabase() {
     console.log('📝 Setting up categories collection...');
     const categoriesCollection = db.collection('categories');
     
-    await categoriesCollection.createIndex({ name: 1 }, { unique: true, name: 'name_unique' });
+    await categoriesCollection.createIndex({ name: 1, type: 1 }, { unique: true, name: 'name_type_unique' });
+    await categoriesCollection.createIndex({ type: 1, name: 1 }, { name: 'type_name_idx' });
     await categoriesCollection.createIndex({ createdAt: -1 }, { name: 'createdAt_desc' });
     console.log('✅ Categories collection ready\n');
 
@@ -80,7 +81,11 @@ async function setupDatabase() {
     console.log('📝 Setting up floors collection...');
     const floorsCollection = db.collection('floors');
     
-    await floorsCollection.createIndex({ floorNumber: 1 }, { unique: true, name: 'floorNumber_unique' });
+    await floorsCollection.createIndex(
+      { projectId: 1, floorNumber: 1 },
+      { unique: true, name: 'project_floorNumber_unique' }
+    );
+    await floorsCollection.createIndex({ projectId: 1 }, { name: 'projectId_idx' });
     await floorsCollection.createIndex({ status: 1 }, { name: 'status_idx' });
     await floorsCollection.createIndex({ createdAt: -1 }, { name: 'createdAt_desc' });
     console.log('✅ Floors collection ready\n');

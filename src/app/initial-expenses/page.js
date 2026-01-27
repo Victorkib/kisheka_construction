@@ -15,12 +15,21 @@ import { LoadingTable } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { NoProjectsEmptyState } from '@/components/empty-states';
 
 function InitialExpensesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
-  const { currentProject } = useProjectContext();
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,14 +37,12 @@ function InitialExpensesPageContent() {
   const [totals, setTotals] = useState({ totalAmount: 0, approvedAmount: 0 });
   
   // Get projectId from context (prioritize current project over URL param)
-  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
-  const projectId = projectIdFromContext || projectIdFromUrl || '';
-  
-  const [projects, setProjects] = useState([]);
   
   // Filters
   const [filters, setFilters] = useState({
+    projectId: projectIdFromContext || projectIdFromUrl || '',
     category: searchParams.get('category') || '',
     status: searchParams.get('status') || '',
     search: searchParams.get('search') || '',
@@ -43,22 +50,11 @@ function InitialExpensesPageContent() {
     endDate: searchParams.get('endDate') || '',
   });
 
-  // Fetch projects for filter
   useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data || []);
-      }
-    } catch (err) {
-      console.error('Fetch projects error:', err);
+    if (projectIdFromContext && projectIdFromContext !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: projectIdFromContext }));
     }
-  };
+  }, [projectIdFromContext, filters.projectId]);
 
   const fetchExpenses = useCallback(async () => {
     try {
@@ -69,7 +65,7 @@ function InitialExpensesPageContent() {
       const queryParams = new URLSearchParams({
         page: pagination.page.toString(),
         limit: pagination.limit.toString(),
-        ...(projectId && { projectId }),
+        ...(filters.projectId && { projectId: filters.projectId }),
         ...(filters.category && { category: filters.category }),
         ...(filters.status && { status: filters.status }),
         ...(filters.search && { search: filters.search }),
@@ -111,15 +107,35 @@ function InitialExpensesPageContent() {
     } finally {
       setLoading(false);
     }
-  }, [filters.category, filters.status, filters.search, filters.startDate, filters.endDate, pagination.page, pagination.limit, projectId]);
+  }, [filters.projectId, filters.category, filters.status, filters.search, filters.startDate, filters.endDate, pagination.page, pagination.limit]);
 
   // Fetch expenses
   useEffect(() => {
+    if (isEmpty) {
+      setLoading(false);
+      setExpenses([]);
+      return;
+    }
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setExpenses([]);
+      return;
+    }
     fetchExpenses();
-  }, [fetchExpenses]);
+  }, [fetchExpenses, isEmpty, projectLoading, filters.projectId]);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    let updatedFilters = { ...filters, [key]: value };
+    if (key === 'projectId') {
+      updatedFilters = { ...filters, projectId: value };
+      if (value && value !== currentProjectId) {
+        switchProject(value).catch((err) => {
+          console.error('Error switching project:', err);
+        });
+      }
+    }
+    setFilters(updatedFilters);
     setPagination((prev) => ({ ...prev, page: 1 }));
   };
 
@@ -174,6 +190,23 @@ function InitialExpensesPageContent() {
     other: 'Other',
   };
 
+  if (isEmpty && !loading) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Initial Expenses</h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track pre-construction expenses (land, permits, approvals, etc.)</p>
+          </div>
+          <NoProjectsEmptyState
+            canCreate={canAccess('create_project')}
+            role={canAccess('create_project') ? 'owner' : 'site_clerk'}
+          />
+        </div>
+      </AppLayout>
+    );
+  }
+
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -192,6 +225,21 @@ function InitialExpensesPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Initial expenses are tied to projects"
+          description="Record pre-construction costs once the project is created."
+          prerequisites={[
+            'Project exists',
+            'Budget categories are defined',
+          ]}
+          actions={[
+            { href: '/projects/new', label: 'Create Project' },
+            { href: '/projects', label: 'Set Budgets' },
+            { href: '/initial-expenses/new', label: 'Add Initial Expense' },
+          ]}
+          tip="Keep receipts ready for approvals."
+        />
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -223,15 +271,12 @@ function InitialExpensesPageContent() {
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Project</label>
               <select
-                value={projectId}
-                onChange={(e) => {
-                  setProjectId(e.target.value);
-                  setPagination((prev) => ({ ...prev, page: 1 }));
-                }}
+                value={filters.projectId}
+                onChange={(e) => handleFilterChange('projectId', e.target.value)}
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
               >
                 <option value="">All Projects</option>
-                {projects.map((project) => (
+                {accessibleProjects.map((project) => (
                   <option key={project._id} value={project._id}>
                     {project.projectName}
                   </option>

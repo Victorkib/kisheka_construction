@@ -20,6 +20,7 @@ import {
   ACTIVITY_STATUSES,
   generateActivityCode,
 } from '@/lib/schemas/professional-activities-schema';
+import { normalizeUserRole, isRole } from '@/lib/role-constants';
 
 /**
  * GET /api/professional-activities
@@ -282,6 +283,12 @@ export async function POST(request) {
     );
 
     // Build activity document
+    const requestedRequiresApproval = body.requiresApproval !== undefined ? body.requiresApproval : true;
+    const requestedStatus = body.status || (requestedRequiresApproval ? 'pending_approval' : 'approved');
+    const userRole = normalizeUserRole(userProfile.role);
+    const canAutoApprove = isRole(userRole, 'owner') || isRole(userRole, 'pm') || isRole(userRole, 'project_manager');
+    const shouldAutoApprove = canAutoApprove && requestedStatus === 'pending_approval';
+
     const activity = {
       professionalServiceId: new ObjectId(body.professionalServiceId),
       libraryId: professionalService.libraryId,
@@ -342,12 +349,18 @@ export async function POST(request) {
       recommendations: body.recommendations || null,
       followUpRequired: body.followUpRequired || false,
       followUpDate: body.followUpDate ? new Date(body.followUpDate) : null,
-      status: body.status || 'draft',
-      requiresApproval: body.requiresApproval !== undefined ? body.requiresApproval : true,
-      approvedBy: null,
-      approvedAt: null,
-      approvalNotes: null,
-      approvalChain: [],
+      status: shouldAutoApprove ? 'approved' : requestedStatus,
+      requiresApproval: shouldAutoApprove ? false : requestedRequiresApproval,
+      approvedBy: shouldAutoApprove ? new ObjectId(userProfile._id) : null,
+      approvedAt: shouldAutoApprove ? new Date() : null,
+      approvalNotes: shouldAutoApprove ? 'Auto-approved by Owner/PM at creation' : null,
+      approvalChain: shouldAutoApprove ? [{
+        approverId: new ObjectId(userProfile._id),
+        approverName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
+        status: 'approved',
+        notes: 'Auto-approved by Owner/PM at creation',
+        approvedAt: new Date(),
+      }] : [],
       createdBy: new ObjectId(userProfile._id),
       createdByName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
       createdAt: new Date(),

@@ -58,6 +58,16 @@ export function ProjectContextProvider({ children }) {
         return;
       }
 
+      const trySwitchProject = async (projectId, updatePreferences) => {
+        try {
+          await switchProject(projectId, updatePreferences);
+          return true;
+        } catch (switchError) {
+          console.warn('Failed to switch project:', switchError);
+          return false;
+        }
+      };
+
       // Try to load last project from preferences
       try {
         const response = await fetch('/api/user/project-preferences');
@@ -73,22 +83,28 @@ export function ProjectContextProvider({ children }) {
             }
           );
           if (projectExists) {
-            await switchProject(data.data.lastProjectId, false); // Don't update preferences (already set)
+            const switched = await trySwitchProject(data.data.lastProjectId, false);
+            if (!switched && projects.length > 0) {
+              const fallbackProject = projects.find(
+                (p) => !projectIdsMatch(p._id?.toString() || p._id, data.data.lastProjectId)
+              ) || projects[0];
+              await trySwitchProject(fallbackProject._id, true);
+            }
           } else {
             // Last project no longer accessible, use first available
             if (projects.length > 0) {
-              await switchProject(projects[0]._id, true);
+              await trySwitchProject(projects[0]._id, true);
             }
           }
         } else if (projects.length > 0) {
           // No last project, use first available
-          await switchProject(projects[0]._id, true);
+          await trySwitchProject(projects[0]._id, true);
         }
       } catch (prefError) {
         console.error('Error loading preferences:', prefError);
         // If preferences fail, use first available project
         if (projects.length > 0) {
-          await switchProject(projects[0]._id, true);
+          await trySwitchProject(projects[0]._id, true);
         }
       }
     } catch (error) {

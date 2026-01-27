@@ -15,46 +15,55 @@ import { LoadingTable } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { NoProjectsEmptyState } from '@/components/empty-states';
 
 function BatchesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
+  const {
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const [batches, setBatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
-  const [projects, setProjects] = useState([]);
 
   // Filters
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: searchParams.get('projectId') || currentProjectId || '',
     status: searchParams.get('status') || '',
     search: searchParams.get('search') || '',
   });
 
-  // Fetch projects for filter dropdown
+  // Sync current project into filters
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    if (currentProjectId && currentProjectId !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: currentProjectId }));
+    }
+  }, [currentProjectId, filters.projectId]);
 
   // Fetch batches
   useEffect(() => {
-    fetchBatches();
-  }, [filters, pagination.page]);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data.projects || []);
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
+    if (isEmpty) {
+      setLoading(false);
+      setBatches([]);
+      return;
     }
-  };
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setBatches([]);
+      return;
+    }
+    fetchBatches();
+  }, [filters, pagination.page, isEmpty, projectLoading]);
 
   const fetchBatches = async () => {
     try {
@@ -88,15 +97,23 @@ function BatchesPageContent() {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    const updatedFilters = key === 'projectId'
+      ? { ...filters, projectId: value }
+      : { ...filters, [key]: value };
+    setFilters(updatedFilters);
     setPagination((prev) => ({ ...prev, page: 1 })); // Reset to page 1 on filter change
 
     // Update URL params
     const params = new URLSearchParams();
-    Object.entries({ ...filters, [key]: value }).forEach(([k, v]) => {
+    Object.entries(updatedFilters).forEach(([k, v]) => {
       if (v) params.set(k, v);
     });
     router.push(`/material-requests/batches?${params.toString()}`, { scroll: false });
+    if (key === 'projectId' && value && value !== currentProjectId) {
+      switchProject(value).catch((err) => {
+        console.error('Error switching project:', err);
+      });
+    }
   };
 
   const formatCurrency = (amount) => {
@@ -131,11 +148,25 @@ function BatchesPageContent() {
   };
 
   const getProjectName = (projectId) => {
-    const project = projects.find((p) => p._id === projectId);
+    const project = accessibleProjects.find((p) => p._id === projectId);
     return project ? `${project.projectCode} - ${project.projectName}` : 'Unknown Project';
   };
 
   const canAssignSuppliers = canAccess('create_bulk_purchase_orders');
+
+  if (isEmpty && !loading) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Bulk Material Request Batches</h1>
+            <p className="text-gray-600 mt-2">View and manage all bulk material request batches</p>
+          </div>
+          <NoProjectsEmptyState />
+        </div>
+      </AppLayout>
+    );
+  }
 
   if (loading) {
     return (
@@ -199,7 +230,7 @@ function BatchesPageContent() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Projects</option>
-                {projects.map((project) => (
+                {accessibleProjects.map((project) => (
                   <option key={project._id} value={project._id}>
                     {project.projectCode} - {project.projectName}
                   </option>

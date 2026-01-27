@@ -52,7 +52,7 @@ export async function getProjectIdFromRequest(request, params = {}) {
  * @param {string} projectId - Project ID
  * @returns {Promise<{hasAccess: boolean, membership: Object|null, error: string|null}>}
  */
-export async function validateProjectAccess(userId, projectId) {
+export async function validateProjectAccess(userId, projectId, options = {}) {
   try {
     if (!ObjectId.isValid(projectId)) {
       return {
@@ -81,13 +81,16 @@ export async function validateProjectAccess(userId, projectId) {
 
     const userRole = userProfile.role?.toLowerCase();
 
+    const { allowArchived = false } = options || {};
+
     // Global admins (OWNER) have access to all projects
     if (['owner', 'admin'].includes(userRole)) {
       // Verify project exists
-      const project = await db.collection('projects').findOne({
-        _id: projectObjectId,
-        deletedAt: null,
-      });
+      const projectQuery = { _id: projectObjectId };
+      if (!allowArchived) {
+        projectQuery.deletedAt = null;
+      }
+      const project = await db.collection('projects').findOne(projectQuery);
 
       if (!project) {
         return {

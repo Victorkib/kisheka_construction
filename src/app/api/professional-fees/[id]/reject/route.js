@@ -101,6 +101,7 @@ export async function POST(request, { params }) {
       { _id: fee.professionalServiceId },
       {
         $inc: {
+          totalFees: -fee.amount,
           feesPending: -fee.amount,
         },
         $set: {
@@ -108,6 +109,23 @@ export async function POST(request, { params }) {
         },
       }
     );
+
+    // Restore committed cost when a pending fee is rejected
+    const assignment = await db.collection('professional_services').findOne({
+      _id: fee.professionalServiceId,
+    });
+    if (assignment?.status === 'active' && assignment.contractValue > 0) {
+      try {
+        const { updateCommittedCost } = await import('@/lib/financial-helpers');
+        await updateCommittedCost(
+          fee.projectId.toString(),
+          fee.amount,
+          'add'
+        );
+      } catch (financialError) {
+        console.error('Error restoring committed cost after fee rejection:', financialError);
+      }
+    }
 
     // Create approval record in approvals collection
     await db.collection('approvals').insertOne({

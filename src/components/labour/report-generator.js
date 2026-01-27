@@ -15,6 +15,10 @@ export function ReportGenerator({
   title,
   description,
   defaultFilters = {},
+  groupByOptions = null,
+  showGroupBy = true,
+  extraFilters = [],
+  onFiltersChange,
   children,
   onDataLoaded,
 }) {
@@ -49,6 +53,12 @@ export function ReportGenerator({
       generateReport();
     }
   }, [filters, filters.projectId]);
+
+  useEffect(() => {
+    if (onFiltersChange) {
+      onFiltersChange(filters);
+    }
+  }, [filters, onFiltersChange]);
 
   const fetchProjects = async () => {
     try {
@@ -241,7 +251,7 @@ export function ReportGenerator({
         </div>
 
         {/* Additional Filters */}
-        {filters.groupBy !== undefined && (
+        {filters.groupBy !== undefined && showGroupBy && (
           <div className="mt-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">Group By</label>
             <select
@@ -250,10 +260,63 @@ export function ReportGenerator({
               className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Default</option>
-              <option value="phase">Phase</option>
-              <option value="worker">Worker</option>
-              <option value="skill">Skill</option>
+              {(groupByOptions || [
+                { value: 'phase', label: 'Phase' },
+                { value: 'worker', label: 'Worker' },
+                { value: 'skill', label: 'Skill' },
+              ]).map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
+          </div>
+        )}
+
+        {extraFilters.length > 0 && (
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {extraFilters.map((filter) => {
+              if (filter.type === 'select') {
+                return (
+                  <div key={filter.key}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      {filter.label}
+                      {filter.required && <span className="text-red-600"> *</span>}
+                    </label>
+                    <select
+                      value={filters[filter.key] || ''}
+                      onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      disabled={filter.disabled}
+                    >
+                      <option value="">{filter.placeholder || 'Select'}</option>
+                      {(filter.options || []).map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              }
+
+              return (
+                <div key={filter.key}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {filter.label}
+                    {filter.required && <span className="text-red-600"> *</span>}
+                  </label>
+                  <input
+                    type={filter.type || 'text'}
+                    value={filters[filter.key] || ''}
+                    onChange={(e) => handleFilterChange(filter.key, e.target.value)}
+                    placeholder={filter.placeholder}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    disabled={filter.disabled}
+                  />
+                </div>
+              );
+            })}
           </div>
         )}
 

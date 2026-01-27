@@ -252,24 +252,14 @@ export async function DELETE(request, { params }) {
       return errorResponse('Insufficient permissions. You do not have permission to delete worker profiles.', 403);
     }
 
-    const { id } = await params;
-
-    if (!id || !ObjectId.isValid(id)) {
+    const { id } = await params;    if (!id || !ObjectId.isValid(id)) {
       return errorResponse('Valid worker ID is required', 400);
-    }
-
-    const db = await getDatabase();
-
-    // Get existing worker
+    }    const db = await getDatabase();    // Get existing worker
     const existingWorker = await db.collection('worker_profiles').findOne({
       _id: new ObjectId(id),
-    });
-
-    if (!existingWorker) {
+    });    if (!existingWorker) {
       return errorResponse('Worker profile not found', 404);
-    }
-
-    // Soft delete - set deletedAt timestamp
+    }    // Soft delete - set deletedAt timestamp
     await db.collection('worker_profiles').updateOne(
       { _id: new ObjectId(id) },
       {
@@ -279,9 +269,7 @@ export async function DELETE(request, { params }) {
           updatedAt: new Date(),
         },
       }
-    );
-
-    // Create audit log
+    );    // Create audit log
     await createAuditLog({
       userId: userProfile._id.toString(),
       action: 'DELETED',

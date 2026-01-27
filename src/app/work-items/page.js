@@ -15,12 +15,13 @@ import { LoadingTable } from '@/components/loading';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState, NoDataEmptyState } from '@/components/empty-states';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { useToast } from '@/components/toast';
 
 function WorkItemsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentProject, isEmpty } = useProjectContext();
+  const { currentProject, currentProjectId, loading: projectLoading, isEmpty, switchProject } = useProjectContext();
   const toast = useToast();
 
   const [workItems, setWorkItems] = useState([]);
@@ -32,7 +33,7 @@ function WorkItemsPageContent() {
   const [canEdit, setCanEdit] = useState(false);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: searchParams.get('projectId') || currentProjectId || '',
     phaseId: searchParams.get('phaseId') || '',
     status: searchParams.get('status') || '',
     category: searchParams.get('category') || '',
@@ -108,10 +109,11 @@ function WorkItemsPageContent() {
   }, []);
 
   useEffect(() => {
-    if (currentProject && !filters.projectId) {
-      setFilters(prev => ({ ...prev, projectId: normalizeProjectId(currentProject._id) }));
+    const nextProjectId = normalizeProjectId(currentProject?._id) || currentProjectId || '';
+    if (nextProjectId && nextProjectId !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: nextProjectId, phaseId: '' }));
     }
-  }, [currentProject, filters.projectId]);
+  }, [currentProject?._id, currentProjectId, filters.projectId]);
 
   useEffect(() => {
     if (filters.projectId) {
@@ -143,7 +145,9 @@ function WorkItemsPageContent() {
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => {
-      const updatedFilters = { ...prev, [key]: value };
+      const updatedFilters = key === 'projectId'
+        ? { ...prev, projectId: value, phaseId: '' }
+        : { ...prev, [key]: value };
       
       // Update URL params
       const params = new URLSearchParams();
@@ -160,6 +164,12 @@ function WorkItemsPageContent() {
       
       return updatedFilters;
     });
+
+    if (key === 'projectId' && value && value !== currentProjectId) {
+      switchProject(value).catch((err) => {
+        console.error('Error switching project:', err);
+      });
+    }
   };
 
   const getStatusColor = (status) => {
@@ -238,6 +248,23 @@ function WorkItemsPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Get ready to assign work items"
+          description="Work items depend on projects, phases, and available workers. Create those first so assignments are fast and consistent."
+          prerequisites={[
+            'At least one project is available',
+            'Phases exist for the selected project',
+            'Workers are added for assignment',
+          ]}
+          actions={[
+            { href: '/projects/new', label: 'Create Project' },
+            { href: '/phases/new', label: 'Create Phase' },
+            { href: '/labour/workers/new', label: 'Add Worker' },
+            { href: '/work-items/new', label: 'New Work Item' },
+          ]}
+          tip="Use the filters below to narrow by phase or status once your project is set."
+        />
 
         {/* Information Card */}
         <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 rounded-xl border-2 border-blue-200 p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
@@ -607,21 +634,32 @@ function WorkItemsPageContent() {
                                 View Entries →
                               </Link>
                               {canEdit && (
-                                <div className="flex gap-2 mt-1">
-                                  <Link
-                                    href={`/labour/entries/new?workItemId=${item._id}`}
-                                    className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200 font-medium"
-                                    title="Add Entry"
-                                  >
-                                    + Entry
-                                  </Link>
-                                  <Link
-                                    href={`/labour/batches/new?workItemId=${item._id}`}
-                                    className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 font-medium"
-                                    title="Bulk Entry"
-                                  >
-                                    Bulk
-                                  </Link>
+                                <div className="flex flex-col gap-1 mt-1">
+                                  <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
+                                    Log labour
+                                  </span>
+                                  <div className="flex gap-2">
+                                    {item.assignedWorkers && item.assignedWorkers.length > 1 ? (
+                                      <Link
+                                        href={`/labour/batches/new?workItemId=${item._id}&workerIds=${item.assignedWorkers
+                                          .map((worker) => worker._id?.toString() || worker.userId?.toString())
+                                          .filter(Boolean)
+                                          .join(',')}`}
+                                        className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 font-medium"
+                                        title="Bulk Entry (Prefilled)"
+                                      >
+                                        Bulk
+                                      </Link>
+                                    ) : (
+                                      <Link
+                                        href={`/labour/entries/new?workItemId=${item._id}&workerId=${item.assignedWorkers?.[0]?._id?.toString() || item.assignedWorkers?.[0]?.userId?.toString() || ''}`}
+                                        className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200 font-medium"
+                                        title="Quick Entry"
+                                      >
+                                        Quick
+                                      </Link>
+                                    )}
+                                  </div>
                                 </div>
                               )}
                             </div>

@@ -335,6 +335,9 @@ export function validateLabourEntry(data) {
     if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
       errors.push('Valid phaseId is required for direct labour');
     }
+    if (!data.workItemId || !ObjectId.isValid(data.workItemId)) {
+      errors.push('Valid workItemId is required for direct labour');
+    }
   }
   // If indirect labour, ensure phaseId is not provided and category is present
   if (data.isIndirectLabour) {

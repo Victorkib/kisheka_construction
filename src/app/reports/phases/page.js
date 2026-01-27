@@ -16,40 +16,33 @@ import { useToast } from '@/components/toast';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState } from '@/components/empty-states';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 
 function PhaseReportsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentProject, isEmpty } = useProjectContext();
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const toast = useToast();
 
   const [reportData, setReportData] = useState(null);
-  const [projects, setProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState('');
+  const [selectedProjectId, setSelectedProjectId] = useState(
+    searchParams.get('projectId') || currentProjectId || ''
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  useEffect(() => {
     if (currentProject && !selectedProjectId) {
-      setSelectedProjectId(normalizeProjectId(currentProject._id));
+      setSelectedProjectId(normalizeProjectId(currentProject._id) || currentProjectId || '');
     }
-  }, [currentProject, selectedProjectId]);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects/accessible');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data || []);
-      }
-    } catch (err) {
-      console.error('Fetch projects error:', err);
-    }
-  };
+  }, [currentProject, currentProjectId, selectedProjectId]);
 
   const fetchReportData = useCallback(async () => {
     if (isEmpty) {
@@ -141,16 +134,17 @@ function PhaseReportsPageContent() {
   }, [selectedProjectId, isEmpty, toast]);
 
   useEffect(() => {
-    if (selectedProjectId || !isEmpty) {
-      fetchReportData();
+    if (isEmpty) {
+      setLoading(false);
+      return;
     }
-  }, [fetchReportData, selectedProjectId, isEmpty]);
-
-  useEffect(() => {
-    if (selectedProjectId || !isEmpty) {
-      fetchReportData();
+    if (!selectedProjectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      return;
     }
-  }, [fetchReportData, selectedProjectId, isEmpty]);
+    fetchReportData();
+  }, [fetchReportData, selectedProjectId, isEmpty, projectLoading]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-KE', {
@@ -203,6 +197,22 @@ function PhaseReportsPageContent() {
           <p className="text-gray-600 mt-1">Comprehensive phase analytics and reporting</p>
         </div>
 
+        <PrerequisiteGuide
+          title="Reports are best after phases are configured"
+          description="Phase reports use budgets, completion status, and financial summaries."
+          prerequisites={[
+            'Projects and phases are created',
+            'Phase budgets are set',
+            'Progress is tracked',
+          ]}
+          actions={[
+            { href: '/projects', label: 'View Projects' },
+            { href: '/phases/new', label: 'Create Phase' },
+            { href: '/dashboard/budget', label: 'Set Budgets' },
+          ]}
+          tip="Select a project to narrow reporting and reduce noise."
+        />
+
         {/* Project Filter */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <label htmlFor="project-filter" className="block text-sm font-medium text-gray-700 mb-2">
@@ -211,11 +221,22 @@ function PhaseReportsPageContent() {
           <select
             id="project-filter"
             value={selectedProjectId}
-            onChange={(e) => setSelectedProjectId(e.target.value)}
+            onChange={(e) => {
+              const nextProjectId = e.target.value;
+              setSelectedProjectId(nextProjectId);
+              const params = new URLSearchParams();
+              if (nextProjectId) params.set('projectId', nextProjectId);
+              router.push(`/reports/phases?${params.toString()}`, { scroll: false });
+              if (nextProjectId && nextProjectId !== currentProjectId) {
+                switchProject(nextProjectId).catch((err) => {
+                  console.error('Error switching project:', err);
+                });
+              }
+            }}
             className="w-full max-w-md px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Projects</option>
-            {projects.map((project) => (
+            {accessibleProjects.map((project) => (
               <option key={project._id} value={project._id}>
                 {project.projectName}
               </option>

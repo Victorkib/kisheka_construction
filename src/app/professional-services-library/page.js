@@ -11,10 +11,11 @@ import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable } from '@/components/loading';
+import { LoadingTable, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 
 function ProfessionalServicesLibraryPageContent() {
   const router = useRouter();
@@ -211,6 +212,11 @@ function ProfessionalServicesLibraryPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={actionLoading}
+          message="Updating library..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -233,6 +239,17 @@ function ProfessionalServicesLibraryPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Library entries power assignments"
+          description="Create service types here before assigning professionals."
+          prerequisites={['Professional service types are defined']}
+          actions={[
+            { href: '/professional-services-library/new', label: 'Add Service Type' },
+            { href: '/professional-services', label: 'View Assignments' },
+          ]}
+          tip="Use consistent naming so reports group correctly."
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">

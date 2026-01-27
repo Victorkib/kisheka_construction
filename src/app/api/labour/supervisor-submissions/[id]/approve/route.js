@@ -88,6 +88,13 @@ export async function POST(request, { params }) {
       return errorResponse('Submission has no labour entries', 400);
     }
 
+    const hasMissingWorkItems =
+      !submission.workItemId &&
+      submission.labourEntries.some((entry) => !entry.workItemId);
+    if (hasMissingWorkItems) {
+      return errorResponse('Work item is required before approval', 400);
+    }
+
     // Convert submission entries to labour entries
     const labourEntries = submission.labourEntries.map((entry) =>
       createLabourEntry(
@@ -96,6 +103,7 @@ export async function POST(request, { params }) {
           phaseId: submission.phaseId,
           floorId: submission.floorId,
           categoryId: submission.categoryId,
+          workItemId: entry.workItemId || submission.workItemId || null,
           workerName: entry.workerName,
           workerType: entry.workerType || 'internal',
           workerRole: entry.workerRole || 'skilled',

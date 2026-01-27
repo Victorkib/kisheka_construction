@@ -11,7 +11,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingSpinner, LoadingCard, LoadingButton } from '@/components/loading';
+import { LoadingSpinner, LoadingCard, LoadingButton, LoadingOverlay } from '@/components/loading';
 import { AuditTrail } from '@/components/audit-trail';
 import { usePermissions } from '@/hooks/use-permissions';
 import { ConfirmationModal } from '@/components/modals';
@@ -19,10 +19,19 @@ import { useToast } from '@/components/toast';
 import { ImagePreview } from '@/components/uploads/image-preview';
 import { PAYMENT_METHODS } from '@/lib/constants/professional-fees-constants';
 
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
+
 function ProfessionalFeeDetailPageContent() {
   const router = useRouter();
   const params = useParams();
-  const feeId = params?.id;
+  const feeId = normalizeId(params?.id);
   const { canAccess, user } = usePermissions();
   const toast = useToast();
   const [fee, setFee] = useState(null);
@@ -304,13 +313,18 @@ function ProfessionalFeeDetailPageContent() {
 
   const canApprove = canAccess('approve_professional_fee') && fee.status === 'PENDING';
   const canReject = canAccess('approve_professional_fee') && fee.status === 'PENDING';
-  const canRecordPayment = canAccess('record_professional_fee_payment') && fee.status === 'APPROVED' && fee.paymentStatus !== 'PAID';
+  const canRecordPayment = canAccess('record_professional_fee_payment') && fee.status === 'APPROVED';
   const canEdit = canAccess('edit_professional_fee') && (fee.status !== 'PAID' || user?.role?.toLowerCase() === 'owner');
   const canDelete = canAccess('delete_professional_fee') && user?.role?.toLowerCase() === 'owner';
 
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={isApproving || isRejecting || isDeleting}
+          message="Updating fee..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -332,7 +346,7 @@ function ProfessionalFeeDetailPageContent() {
                 >
                   {fee.status || 'N/A'}
                 </span>
-                {fee.paymentStatus === 'PAID' && (
+                {fee.status === 'PAID' && (
                   <span className="px-4 py-2 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
                     PAID
                   </span>
@@ -413,7 +427,7 @@ function ProfessionalFeeDetailPageContent() {
                   <dd className="mt-1 text-sm text-gray-900">
                     {fee.professionalService ? (
                       <Link
-                        href={`/professional-services/${fee.professionalService._id}`}
+                        href={`/professional-services/${normalizeId(fee.professionalService._id)}`}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         {fee.professionalService.professionalCode || 'N/A'}
@@ -429,7 +443,7 @@ function ProfessionalFeeDetailPageContent() {
                   <dd className="mt-1 text-sm text-gray-900">
                     {fee.project ? (
                       <Link
-                        href={`/projects/${fee.project._id}`}
+                        href={`/projects/${normalizeId(fee.project._id)}`}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         {fee.project.projectCode} - {fee.project.projectName}
@@ -445,7 +459,7 @@ function ProfessionalFeeDetailPageContent() {
                     <dt className="text-sm font-medium text-gray-500">Linked Activity</dt>
                     <dd className="mt-1 text-sm text-gray-900">
                       <Link
-                        href={`/professional-activities/${fee.activity._id}`}
+                        href={`/professional-activities/${normalizeId(fee.activity._id)}`}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         {fee.activity.activityCode || 'N/A'}
@@ -459,7 +473,7 @@ function ProfessionalFeeDetailPageContent() {
                     <dt className="text-sm font-medium text-gray-500">Linked Expense</dt>
                     <dd className="mt-1 text-sm text-gray-900">
                       <Link
-                        href={`/expenses/${fee.expense._id}`}
+                        href={`/expenses/${normalizeId(fee.expense._id)}`}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         {fee.expense.expenseCode || 'N/A'}

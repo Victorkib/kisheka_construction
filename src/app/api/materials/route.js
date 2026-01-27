@@ -20,6 +20,8 @@ import { validateCapitalAvailability } from '@/lib/financial-helpers';
 import { recalculatePhaseSpending } from '@/lib/phase-helpers';
 import { recalculateFloorSpending } from '@/lib/material-helpers';
 import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
+import { normalizeUserRole, isRole } from '@/lib/role-constants';
+import { incrementLibraryUsage } from '@/lib/helpers/material-library-helpers';
 
 /**
  * GET /api/materials
@@ -70,7 +72,12 @@ export async function GET(request) {
       }
     }
 
-    if (floor && ObjectId.isValid(floor)) {
+    if (floor === 'unassigned' || floor === 'none' || floor === 'missing') {
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [{ floor: { $exists: false } }, { floor: null }],
+      });
+    } else if (floor && ObjectId.isValid(floor)) {
       query.floor = new ObjectId(floor);
     }
 
@@ -282,6 +289,7 @@ export async function POST(request) {
       quantityPurchased,
       unit,
       unitCost,
+      estimatedUnitCost,
       supplierName,
       supplier,
       paymentMethod,
@@ -289,6 +297,7 @@ export async function POST(request) {
       invoiceDate,
       datePurchased,
       notes,
+      libraryMaterialId,
       // File uploads
       receiptFileUrl,
       receiptUrl,
@@ -430,22 +439,46 @@ export async function POST(request) {
       return errorResponse('Quantity must be greater than 0', 400);
     }
 
+    const parsedUnitCost = unitCost !== undefined && unitCost !== null ? parseFloat(unitCost) : null;
+    const parsedEstimatedUnitCost =
+      estimatedUnitCost !== undefined && estimatedUnitCost !== null ? parseFloat(estimatedUnitCost) : null;
+
     // CRITICAL FIX: Validate unitCost based on entry type
     // For new_procurement entries, unitCost must be > 0
-    // For retroactive entries, allow 0 or missing (will be marked as 'missing' cost status)
+    // For retroactive entries, allow missing and support estimated unit cost
     if (materialEntryType === 'new_procurement') {
-      if (unitCost === undefined || unitCost === null || isNaN(parseFloat(unitCost)) || parseFloat(unitCost) <= 0) {
+      if (parsedUnitCost === null || isNaN(parsedUnitCost) || parsedUnitCost <= 0) {
         return errorResponse(
           'Unit cost is required and must be greater than 0 for new procurement entries. ' +
           'Please provide a valid unit cost when creating the material.',
           400
         );
       }
-    } else if (unitCost !== undefined && unitCost !== null && unitCost < 0) {
-      return errorResponse('Unit cost must be non-negative', 400);
+    } else {
+      if (parsedUnitCost !== null && (isNaN(parsedUnitCost) || parsedUnitCost < 0)) {
+        return errorResponse('Unit cost must be non-negative', 400);
+      }
+      if (parsedEstimatedUnitCost !== null && (isNaN(parsedEstimatedUnitCost) || parsedEstimatedUnitCost < 0)) {
+        return errorResponse('Estimated unit cost must be non-negative', 400);
+      }
     }
-    // For retroactive, allow missing unitCost (will be 0)
-    const finalUnitCost = unitCost || 0;
+
+    let finalUnitCost = parsedUnitCost || 0;
+    let resolvedCostStatus = costStatus || null;
+
+    if (materialEntryType === 'retroactive_entry' && (!parsedUnitCost || parsedUnitCost === 0)) {
+      if (parsedEstimatedUnitCost && parsedEstimatedUnitCost > 0) {
+        finalUnitCost = parsedEstimatedUnitCost;
+        if (!resolvedCostStatus || resolvedCostStatus === 'missing') {
+          resolvedCostStatus = 'estimated';
+        }
+      } else {
+        finalUnitCost = 0;
+        if (!resolvedCostStatus) {
+          resolvedCostStatus = 'missing';
+        }
+      }
+    }
 
     // For retroactive entries, validate supplier if supplierId provided
     let supplierNameValue = supplierName || supplier || 'Unknown';
@@ -475,12 +508,12 @@ export async function POST(request) {
         supplierNameValue = 'Unknown';
       }
       
-      if (!costStatus) {
+      if (materialEntryType === 'retroactive_entry') {
         const calculatedTotal = calculateTotalCost(qty, finalUnitCost);
-        body.costStatus = (calculatedTotal > 0) ? 'actual' : 'missing';
-      }
-      if (!documentationStatus) {
-        body.documentationStatus = (receiptFileUrl || receiptUrl || invoiceFileUrl) ? 'complete' : 'missing';
+        body.costStatus = resolvedCostStatus || (calculatedTotal > 0 ? 'actual' : 'missing');
+        if (!documentationStatus) {
+          body.documentationStatus = (receiptFileUrl || receiptUrl || invoiceFileUrl) ? 'complete' : 'missing';
+        }
       }
     }
     // Only require supplier for new procurement
@@ -527,6 +560,27 @@ export async function POST(request) {
       console.error('Capital check error during material creation:', capitalError);
     }
 
+    const userRole = normalizeUserRole(userProfile.role);
+    const canAutoReceiveRetroactive =
+      materialEntryType === 'retroactive_entry' &&
+      (isRole(userRole, 'owner') || isRole(userRole, 'pm') || isRole(userRole, 'project_manager'));
+
+    const retroactiveDeliveryDate = originalPurchaseDate
+      ? new Date(originalPurchaseDate)
+      : (datePurchased ? new Date(datePurchased) : new Date());
+
+    const materialStatus = materialEntryType === 'retroactive_entry'
+      ? (canAutoReceiveRetroactive ? 'received' : 'submitted')
+      : 'draft';
+
+    const approvalChain = canAutoReceiveRetroactive ? [{
+      approverId: new ObjectId(userProfile._id),
+      approverName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
+      status: 'approved',
+      notes: 'Auto-approved for retroactive entry',
+      approvedAt: new Date(),
+    }] : [];
+
     // Build material document (using standard field names only)
     const material = {
       projectId: new ObjectId(projectId),
@@ -537,7 +591,7 @@ export async function POST(request) {
       ...(floor && ObjectId.isValid(floor) && { floor: new ObjectId(floor) }),
       ...(phaseId && ObjectId.isValid(phaseId) && { phaseId: new ObjectId(phaseId) }),
       quantityPurchased: parseFloat(qty), // Standard field name
-      quantityDelivered: 0,
+      quantityDelivered: materialEntryType === 'retroactive_entry' ? parseFloat(qty) : 0,
       quantityUsed: 0,
       quantityRemaining: parseFloat(qty), // Initially same as purchased
       wastage: 0,
@@ -549,27 +603,28 @@ export async function POST(request) {
       invoiceNumber: invoiceNumber?.trim() || '',
       invoiceDate: invoiceDate ? new Date(invoiceDate) : null,
       datePurchased: datePurchased ? new Date(datePurchased) : new Date(),
-      dateDelivered: null,
+      dateDelivered: materialEntryType === 'retroactive_entry' ? retroactiveDeliveryDate : null,
       dateUsed: null,
       receiptFileUrl: receiptFileUrl || receiptUrl || null, // Standard field name (backward compatible for reading)
       invoiceFileUrl: invoiceFileUrl || null,
       deliveryNoteFileUrl: deliveryNoteFileUrl || null,
       receiptUploadedAt: (receiptFileUrl || receiptUrl) ? new Date() : null,
-      status: 'draft',
+      status: materialStatus,
       submittedBy: {
         userId: new ObjectId(userProfile._id),
         name: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
         email: userProfile.email,
       },
       enteredBy: new ObjectId(userProfile._id),
-      receivedBy: null,
-      approvedBy: null,
+      receivedBy: canAutoReceiveRetroactive ? new ObjectId(userProfile._id) : null,
+      approvedBy: canAutoReceiveRetroactive ? new ObjectId(userProfile._id) : null,
       verifiedBy: null,
-      approvalChain: [],
+      approvalChain: approvalChain,
       notes: notes?.trim() || '',
-      approvalNotes: '',
+      approvalNotes: canAutoReceiveRetroactive ? 'Auto-approved for retroactive entry' : '',
       // Finishing details (Module 3) - optional field for finishing stage materials
       ...(finishingDetails && { finishingDetails }),
+      ...(libraryMaterialId && ObjectId.isValid(libraryMaterialId) && { libraryMaterialId: new ObjectId(libraryMaterialId) }),
       // Dual Workflow fields
       entryType: materialEntryType,
       isRetroactiveEntry: materialEntryType === 'retroactive_entry',
@@ -578,8 +633,8 @@ export async function POST(request) {
       orderFulfillmentDate: orderFulfillmentDate ? new Date(orderFulfillmentDate) : null,
       retroactiveNotes: retroactiveNotes?.trim() || null,
       originalPurchaseDate: originalPurchaseDate ? new Date(originalPurchaseDate) : null,
-      documentationStatus: documentationStatus || null,
-      costStatus: costStatus || 'actual',
+      documentationStatus: documentationStatus || body.documentationStatus || null,
+      costStatus: resolvedCostStatus || body.costStatus || 'actual',
       costVerified: costVerified || false,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -590,6 +645,15 @@ export async function POST(request) {
     const result = await db.collection('materials').insertOne(material);
 
     const insertedMaterial = { ...material, _id: result.insertedId };
+
+    // Increment library usage if material was selected from library (non-critical)
+    if (libraryMaterialId && ObjectId.isValid(libraryMaterialId)) {
+      try {
+        await incrementLibraryUsage(libraryMaterialId, userProfile._id.toString());
+      } catch (libraryError) {
+        console.error('Library usage increment failed:', libraryError);
+      }
+    }
 
     // Create audit log
     await createAuditLog({

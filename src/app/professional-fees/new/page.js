@@ -9,7 +9,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner } from '@/components/loading';
@@ -19,6 +19,7 @@ import { ProfessionalFeesForm } from '@/components/professional-fees/professiona
 
 export default function NewProfessionalFeePage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
   
@@ -28,11 +29,34 @@ export default function NewProfessionalFeePage() {
   const [projects, setProjects] = useState([]);
   const [phases, setPhases] = useState([]);
   const [activities, setActivities] = useState([]);
+  const [prefillData, setPrefillData] = useState(null);
   const [loadingData, setLoadingData] = useState(true);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const professionalServiceId = searchParams.get('professionalServiceId');
+    const projectId = searchParams.get('projectId');
+    const phaseId = searchParams.get('phaseId');
+    const activityId = searchParams.get('activityId');
+    const amount = searchParams.get('amount');
+    const description = searchParams.get('description');
+    const feeType = searchParams.get('feeType');
+
+    if (professionalServiceId || projectId || phaseId || activityId || amount || description || feeType) {
+      setPrefillData({
+        professionalServiceId: professionalServiceId || '',
+        projectId: projectId || '',
+        phaseId: phaseId || '',
+        activityId: activityId || '',
+        amount: amount || '',
+        description: description || '',
+        feeType: feeType || '',
+      });
+    }
+  }, [searchParams]);
 
   const fetchData = async () => {
     try {
@@ -73,7 +97,7 @@ export default function NewProfessionalFeePage() {
     }
   };
 
-  const handleSubmit = async (formData) => {
+  const handleSubmit = async (formData, options = {}) => {
     setLoading(true);
     setError(null);
 
@@ -92,7 +116,21 @@ export default function NewProfessionalFeePage() {
         throw new Error(data.error || 'Failed to create fee');
       }
 
-      toast.showSuccess('Professional fee created successfully');
+      if (options.autoApprove) {
+        const approveResponse = await fetch(`/api/professional-fees/${data.data._id}/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ approvalNotes: 'Auto-approved on creation' }),
+        });
+
+        const approveData = await approveResponse.json();
+        if (!approveData.success) {
+          throw new Error(approveData.error || 'Fee created but approval failed');
+        }
+        toast.showSuccess('Professional fee created and approved successfully');
+      } else {
+        toast.showSuccess('Professional fee created successfully');
+      }
       router.push('/professional-fees');
     } catch (err) {
       setError(err.message);
@@ -155,11 +193,13 @@ export default function NewProfessionalFeePage() {
             projects={projects}
             phases={phases}
             activities={activities}
+            prefillData={prefillData}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
             loading={loading}
             error={error}
             isEdit={false}
+            canAutoApprove={canAccess('approve_professional_fee')}
           />
         </div>
       </div>

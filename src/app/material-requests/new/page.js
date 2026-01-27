@@ -17,6 +17,7 @@ import { useToast } from '@/components/toast';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { WorkflowGuide } from '@/components/workflow/WorkflowGuide';
 import { HelpIcon, FieldHelp } from '@/components/help/HelpTooltip';
+import { MaterialLibraryPicker } from '@/components/material-library/material-library-picker';
 
 function NewMaterialRequestPageContent() {
   const router = useRouter();
@@ -47,6 +48,7 @@ function NewMaterialRequestPageContent() {
     materialName: '',
     description: '',
     quantityNeeded: '',
+    libraryMaterialId: '',
     unit: 'piece',
     customUnit: '',
     urgency: 'medium',
@@ -268,6 +270,20 @@ function NewMaterialRequestPageContent() {
     }
   };
 
+  const handleLibrarySelect = (material) => {
+    setFormData((prev) => ({
+      ...prev,
+      materialName: material.name || prev.materialName,
+      description: material.description || prev.description,
+      unit: material.defaultUnit || prev.unit || 'piece',
+      categoryId: material.categoryId?.toString() || prev.categoryId,
+      category: material.category || prev.category,
+      estimatedUnitCost: prev.estimatedUnitCost || material.defaultUnitCost || '',
+      quantityNeeded: prev.quantityNeeded || 1,
+      libraryMaterialId: material._id?.toString() || prev.libraryMaterialId,
+    }));
+  };
+
   const fetchAvailableCapital = async (projectId) => {
     if (!canAccess('view_financing')) return; // Only show if user has permission
 
@@ -382,6 +398,10 @@ function NewMaterialRequestPageContent() {
       setError('Quantity needed must be greater than 0');
       return;
     }
+    if (!formData.phaseId) {
+      setError('Construction phase is required');
+      return;
+    }
     // Validate unit - if "others" is selected, customUnit must be provided
     if (!formData.unit || formData.unit.trim().length === 0) {
       setError('Unit is required');
@@ -420,6 +440,7 @@ function NewMaterialRequestPageContent() {
         urgency: formData.urgency,
         reason: formData.reason?.trim() || '',
         notes: formData.notes?.trim() || '',
+        ...(formData.libraryMaterialId && { libraryMaterialId: formData.libraryMaterialId }),
         ...(formData.floorId && { floorId: formData.floorId }),
         ...(formData.phaseId && { phaseId: formData.phaseId }),
         ...(formData.categoryId && { categoryId: formData.categoryId }),
@@ -648,18 +669,18 @@ function NewMaterialRequestPageContent() {
               </div>
             )}
 
-            {/* Phase Selection (Optional) */}
+            {/* Phase Selection (Required) */}
             {formData.projectId && (
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                  Construction Phase (Optional)
+                  Construction Phase <span className="text-red-500">*</span>
                   <HelpIcon 
-                    content="Select the construction phase if this material is for a specific phase. This helps with phase-based budget tracking and financial management."
+                    content="Select the construction phase for this material. This is required for phase-based budget tracking and financial management."
                     position="right"
                   />
                 </label>
                 <FieldHelp>
-                  Optional: Specify which construction phase these materials are for. Helps track phase-based spending and budget allocation.
+                  Required: Specify which construction phase these materials are for. Helps track phase-based spending and budget allocation.
                 </FieldHelp>
                 {!formData.projectId ? (
                   <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
@@ -690,7 +711,7 @@ function NewMaterialRequestPageContent() {
                       <option>Loading phases...</option>
                     ) : (
                       <>
-                        <option value="" className="text-gray-900">Select phase (optional)</option>
+                        <option value="" className="text-gray-900">Select phase</option>
                         {phases.map((phase) => (
                           <option key={phase._id} value={phase._id} className="text-gray-900">
                             {phase.phaseName || phase.name} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
@@ -728,6 +749,17 @@ function NewMaterialRequestPageContent() {
                   </>
                 )}
               </select>
+            </div>
+
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Select From Material Library (Optional)</h3>
+              <p className="text-xs text-gray-600 mb-3">
+                Use the library to prefill material name, unit, category, and estimated unit cost.
+              </p>
+              <MaterialLibraryPicker
+                onSelectMaterial={handleLibrarySelect}
+                selectedMaterialId={formData.libraryMaterialId}
+              />
             </div>
 
             {/* Material Name */}

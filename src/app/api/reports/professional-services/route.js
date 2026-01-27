@@ -124,23 +124,24 @@ export async function GET(request) {
     const qualityChecks = filteredActivities.filter(a => a.activityType === 'quality_check').length;
 
     // Calculate fees
-    const totalFees = filteredFees.reduce((sum, fee) => sum + (fee.amount || 0), 0);
-    const paidFees = filteredFees
+    const activeFees = filteredFees.filter((fee) => !['REJECTED', 'ARCHIVED'].includes(fee.status));
+    const totalFees = activeFees.reduce((sum, fee) => sum + (fee.amount || 0), 0);
+    const paidFees = activeFees
       .filter(fee => fee.status === 'PAID')
       .reduce((sum, fee) => sum + (fee.amount || 0), 0);
-    const pendingFees = filteredFees
+    const pendingFees = activeFees
       .filter(fee => fee.status === 'PENDING' || fee.status === 'APPROVED')
       .reduce((sum, fee) => sum + (fee.amount || 0), 0);
 
     // Calculate fees by type
-    const architectFees = filteredFees
+    const architectFees = activeFees
       .filter(fee => {
         const assignment = assignments.find(a => a._id.toString() === fee.professionalServiceId?.toString());
         return assignment?.type === 'architect';
       })
       .reduce((sum, fee) => sum + (fee.amount || 0), 0);
 
-    const engineerFees = filteredFees
+    const engineerFees = activeFees
       .filter(fee => {
         const assignment = assignments.find(a => a._id.toString() === fee.professionalServiceId?.toString());
         return assignment?.type === 'engineer';
@@ -168,7 +169,7 @@ export async function GET(request) {
 
     // Fees breakdown by month
     const feesByMonth = {};
-    filteredFees.forEach(fee => {
+    activeFees.forEach(fee => {
       const month = new Date(fee.createdAt || fee.invoiceDate || new Date()).toISOString().slice(0, 7);
       if (!feesByMonth[month]) {
         feesByMonth[month] = {
@@ -192,7 +193,7 @@ export async function GET(request) {
         const assignmentActivities = filteredActivities.filter(
           a => a.professionalServiceId?.toString() === assignment._id.toString()
         );
-        const assignmentFees = filteredFees.filter(
+        const assignmentFees = activeFees.filter(
           f => f.professionalServiceId?.toString() === assignment._id.toString()
         );
 

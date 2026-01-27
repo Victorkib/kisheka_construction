@@ -16,6 +16,7 @@
     "setup:bulk-procurement": "node scripts/setup-database.mjs && node scripts/seed-material-library.mjs",
     "test:db": "node scripts/test-connection.mjs",
     "test:connections": "node scripts/test-connections.mjs",
+    "test:dependencies": "node --test tests/project-dependencies.test.mjs",
     "update:user-role": "node scripts/update-user-role.mjs",
     "migrate:investor-links": "node scripts/migrate-investor-user-links.mjs",
     "migrate:role-naming": "node scripts/migrate-role-naming.mjs",
@@ -48,6 +49,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "babel-plugin-react-compiler": "1.0.0",
+    "baseline-browser-mapping": "^2.9.15",
     "dotenv": "^16.4.5",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",

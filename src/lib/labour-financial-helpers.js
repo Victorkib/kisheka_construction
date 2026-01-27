@@ -12,6 +12,7 @@ import {
   generateLabourBudgetAlerts,
   sendLabourBudgetAlertsToUsers,
 } from './labour-budget-alerts';
+import { LABOUR_APPROVED_STATUSES } from '@/lib/status-constants';
 
 /**
  * Validate if labour cost fits within phase labour budget
@@ -352,7 +353,7 @@ export async function recalculatePhaseLabourSpending(phaseId) {
     {
       $match: {
         phaseId: new ObjectId(phaseId),
-        status: { $in: ['approved', 'paid'] },
+        status: { $in: LABOUR_APPROVED_STATUSES },
         deletedAt: null,
       },
     },
@@ -399,7 +400,7 @@ export async function calculateLabourCostSummary(projectId, phaseId = null, peri
 
   const matchCriteria = {
     projectId: new ObjectId(projectId),
-    status: { $in: ['approved', 'paid'] },
+    status: { $in: LABOUR_APPROVED_STATUSES },
     deletedAt: null,
   };
 

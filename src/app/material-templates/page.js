@@ -15,6 +15,7 @@ import { LoadingTable, LoadingButton } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { TEMPLATE_STATUS, PROJECT_PHASES } from '@/lib/schemas/material-template-schema';
 
 function MaterialTemplatesPageContent() {
@@ -161,6 +162,21 @@ function MaterialTemplatesPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Templates speed up material requests"
+          description="Define templates after your typical item sets are known."
+          prerequisites={[
+            'Common materials are identified',
+            'Projects or phases are defined',
+          ]}
+          actions={[
+            { href: '/material-library', label: 'Material Library' },
+            { href: '/material-templates/new', label: 'Create Template' },
+            { href: '/material-requests/new', label: 'New Request' },
+          ]}
+          tip="Use templates for recurring procurement cycles."
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">

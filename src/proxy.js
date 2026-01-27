@@ -1,16 +1,16 @@
 /**
- * Next.js Middleware
- * 
+ * Next.js Proxy (Middleware replacement)
+ *
  * Protects routes and handles authentication using Supabase SSR.
  * Runs on every request before the page renders to ensure:
  * - Protected routes require authentication
  * - Authenticated users are redirected away from auth pages
  * - Session cookies are properly managed
- * 
+ *
  * @see https://nextjs.org/docs/app/building-your-application/routing/middleware
  * @see https://supabase.com/docs/guides/auth/server-side/creating-a-client
- * 
- * @module middleware
+ *
+ * @module proxy
  */
 
 import { NextResponse } from 'next/server';
@@ -84,22 +84,22 @@ function isPublicApiRoute(pathname) {
 }
 
 /**
- * Next.js Middleware Function
- * 
+ * Next.js Proxy Function
+ *
  * Handles authentication and route protection for the application.
- * 
+ *
  * @param {import('next/server').NextRequest} request - The incoming request
  * @returns {Promise<import('next/server').NextResponse>} Response with appropriate redirects or continuation
  */
-export async function middleware(request) {
+export async function proxy(request) {
   const { pathname } = request.nextUrl;
 
-  // Skip middleware for public routes
+  // Skip proxy for public routes
   if (matchesRoute(pathname, PUBLIC_ROUTES)) {
     return NextResponse.next();
   }
 
-  // Skip middleware for public API routes
+  // Skip proxy for public API routes
   if (isPublicApiRoute(pathname)) {
     return NextResponse.next();
   }
@@ -128,7 +128,7 @@ export async function middleware(request) {
       return response;
     }
 
-    // Create Supabase client for middleware
+    // Create Supabase client for proxy
     const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
       cookies: {
         getAll() {
@@ -150,7 +150,7 @@ export async function middleware(request) {
 
     // Handle session errors gracefully
     if (sessionError) {
-      console.error('Session error in middleware:', sessionError);
+      console.error('Session error in proxy:', sessionError);
       // If there's a session error on a protected route, redirect to login
       if (isProtectedRoute) {
         const url = new URL('/auth/login', request.url);
@@ -180,13 +180,13 @@ export async function middleware(request) {
     return response;
   } catch (error) {
     // Log error but don't crash the application
-    console.error('Middleware error:', error);
-    
+    console.error('Proxy error:', error);
+
     // For protected routes, redirect to login on error
     if (isProtectedRoute) {
       const url = new URL('/auth/login', request.url);
       url.searchParams.set('redirect', pathname);
-      url.searchParams.set('error', 'middleware_error');
+      url.searchParams.set('error', 'proxy_error');
       return NextResponse.redirect(url);
     }
 
@@ -196,9 +196,9 @@ export async function middleware(request) {
 }
 
 /**
- * Middleware Configuration
- * 
- * Defines which routes the middleware should run on.
+ * Proxy Configuration
+ *
+ * Defines which routes the proxy should run on.
  * Uses a negative lookahead regex to exclude:
  * - Static files (_next/static)
  * - Image optimization files (_next/image)
@@ -206,7 +206,7 @@ export async function middleware(request) {
  * - Image files (svg, png, jpg, jpeg, gif, webp)
  * - Font files (woff, woff2, ttf, eot)
  * - Other static assets
- * 
+ *
  * @see https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
  */
 export const config = {
@@ -217,9 +217,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - Static assets (images, fonts, etc.)
-     * - API routes that don't need auth (handled in middleware function)
+     * - API routes that don't need auth (handled in proxy function)
      */
     '/((?!_next/static|_next/image|_next/webpack-hmr|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff|woff2|ttf|eot|css|js)$).*)',
   ],
 };
-

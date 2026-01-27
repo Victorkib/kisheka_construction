@@ -1,6 +1,6 @@
 /**
  * Create New Category Page
- * Form for creating a new material category
+ * Form for creating a new category
  * 
  * Route: /categories/new
  * Auth: OWNER only
@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
+import { CATEGORY_TYPE_OPTIONS } from '@/lib/constants/category-constants';
 
 export default function NewCategoryPage() {
   const router = useRouter();
@@ -25,6 +26,7 @@ export default function NewCategoryPage() {
     description: '',
     icon: '',
     subcategories: [],
+    type: CATEGORY_TYPE_OPTIONS[0].value,
   });
 
   const [newSubcategory, setNewSubcategory] = useState('');
@@ -100,6 +102,7 @@ export default function NewCategoryPage() {
           description: formData.description.trim(),
           icon: formData.icon.trim(),
           subcategories: formData.subcategories,
+          type: formData.type,
         }),
       });
 
@@ -144,7 +147,7 @@ export default function NewCategoryPage() {
             ← Back to Categories
           </Link>
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create New Category</h1>
-          <p className="text-gray-600 mt-2">Add a new material category</p>
+          <p className="text-gray-600 mt-2">Add a new category for a specific area</p>
         </div>
 
         {/* Error Message */}
@@ -165,6 +168,31 @@ export default function NewCategoryPage() {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+          {/* Category Type */}
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Category Type</h2>
+            <div>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Type <span className="text-red-500">*</span>
+              </label>
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                {CATEGORY_TYPE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              <p className="text-sm text-gray-600 mt-1 leading-normal">
+                Keeps categories organized by feature area
+              </p>
+            </div>
+          </div>
+
           {/* Basic Information */}
           <div>
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>

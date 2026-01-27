@@ -7,13 +7,14 @@
 
 'use client';
 
-import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable } from '@/components/loading';
+import { LoadingTable, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { MaterialLibraryTable } from '@/components/material-library/material-library-table';
 import { MaterialLibraryFilters } from '@/components/material-library/material-library-filters';
 import { MaterialLibrarySearch } from '@/components/material-library/material-library-search';
@@ -44,6 +45,9 @@ function MaterialLibraryPageContent() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [materialToDelete, setMaterialToDelete] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const fetchKeyRef = useRef('');
+  const fetchAbortRef = useRef(null);
+  const loadingRef = useRef(false);
 
   // Fetch categories on mount
   useEffect(() => {
@@ -63,9 +67,27 @@ function MaterialLibraryPageContent() {
 
   // Fetch materials when filters or page change
   const fetchMaterials = useCallback(async () => {
+    const fetchKey = JSON.stringify({
+      page: pagination.page,
+      limit: pagination.limit,
+      ...filterValues,
+    });
+
+    if (fetchKeyRef.current === fetchKey && loadingRef.current) {
+      return;
+    }
+
     try {
+      fetchKeyRef.current = fetchKey;
+      loadingRef.current = true;
       setLoading(true);
       setError(null);
+
+      if (fetchAbortRef.current) {
+        fetchAbortRef.current.abort();
+      }
+      const controller = new AbortController();
+      fetchAbortRef.current = controller;
 
       const queryParams = new URLSearchParams({
         page: pagination.page.toString(),
@@ -79,7 +101,9 @@ function MaterialLibraryPageContent() {
         sortOrder: filterValues.sortOrder,
       });
 
-      const response = await fetch(`/api/material-library?${queryParams}`);
+      const response = await fetch(`/api/material-library?${queryParams}`, {
+        signal: controller.signal,
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -103,12 +127,16 @@ function MaterialLibraryPageContent() {
         });
       }
     } catch (err) {
+      if (err.name === 'AbortError') {
+        return;
+      }
       setError(err.message);
       console.error('Fetch materials error:', err);
     } finally {
+      loadingRef.current = false;
       setLoading(false);
     }
-  }, [pagination.page, pagination.limit, filterValues.categoryId, filterValues.category, filterValues.isCommon, filterValues.isActive, filterValues.search, filterValues.sortBy, filterValues.sortOrder]);
+  }, [pagination.page, pagination.limit, filterValues]);
 
   useEffect(() => {
     fetchMaterials();
@@ -258,6 +286,11 @@ function MaterialLibraryPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={actionLoading}
+          message="Updating material library..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-6 flex justify-between items-center">
           <div>
@@ -288,6 +321,21 @@ function MaterialLibraryPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Library entries fuel requests and templates"
+          description="Keep the library accurate to speed up purchasing."
+          prerequisites={[
+            'Common materials are known',
+            'Categories are defined',
+          ]}
+          actions={[
+            { href: '/material-library/new', label: 'Add Material' },
+            { href: '/material-templates', label: 'Material Templates' },
+            { href: '/material-requests/new', label: 'New Request' },
+          ]}
+          tip="Include unit costs to improve budget accuracy."
+        />
 
         {/* Search */}
         <div className="mb-4">

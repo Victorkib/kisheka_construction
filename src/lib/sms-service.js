@@ -14,6 +14,12 @@ import * as swahiliTemplates from './sms-templates/swahili.js';
 const AFRICASTALKING_API_KEY = process.env.AFRICASTALKING_API_KEY;
 const AFRICASTALKING_USERNAME = process.env.AFRICASTALKING_USERNAME;
 const AFRICASTALKING_SENDER_ID = process.env.AFRICASTALKING_SENDER_ID || 'KISHEKA';
+const AFRICASTALKING_ENV = process.env.AFRICASTALKING_ENV || 'sandbox';
+const AFRICASTALKING_API_URL = process.env.AFRICASTALKING_API_URL || (
+  AFRICASTALKING_ENV === 'production'
+    ? 'https://api.africastalking.com'
+    : 'https://api.sandbox.africastalking.com'
+);
 const SMS_ENABLED = process.env.SMS_ENABLED === 'true' || false;
 
 /**
@@ -51,8 +57,7 @@ export async function sendSMS({ to, message }) {
     // Format phone number (ensure it starts with +)
     const formattedPhone = to.startsWith('+') ? to : `+${to}`;
 
-    // const africasTalkingUrl = 'https://api.africastalking.com/version1/messaging';
-    const africasTalkingUrl = 'https://api.sandbox.africastalking.com/version1/messaging';
+    const africasTalkingUrl = `${AFRICASTALKING_API_URL}/version1/messaging`;
     
     console.log('[SMS Service] Request Details:');
     console.log('[SMS Service]   - URL:', africasTalkingUrl);

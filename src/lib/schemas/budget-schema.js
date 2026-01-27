@@ -363,25 +363,27 @@ export function createEnhancedBudget(input) {
     phaseAllocations
   } = input;
   
-  // Calculate totals if not provided
-  const calculatedTotal = total || 
-    (directConstructionCosts || 0) + 
-    (preConstructionCosts || 0) + 
-    (indirectCosts || 0) + 
-    (contingencyReserve || 0);
-  
-  const calculatedDCC = directConstructionCosts || 
+  const resolvedContingency = contingencyReserve ?? contingency?.total ?? 0;
+
+  const calculatedDCC = directConstructionCosts ?? 
     ((directCosts?.materials?.total || 0) +
      (directCosts?.labour?.total || 0) +
      (directCosts?.equipment?.total || 0) +
      (directCosts?.subcontractors?.total || 0));
+
+  // Calculate totals if not provided
+  const calculatedTotal = total ?? 
+    calculatedDCC + 
+    (preConstructionCosts || 0) + 
+    (indirectCosts || 0) + 
+    resolvedContingency;
   
   return {
     total: calculatedTotal,
     directConstructionCosts: calculatedDCC,
     preConstructionCosts: preConstructionCosts || 0,
     indirectCosts: indirectCosts || 0,
-    contingencyReserve: contingencyReserve || contingency?.total || 0,
+    contingencyReserve: resolvedContingency,
     
     directCosts: directCosts || {
       materials: { total: 0, structural: 0, finishing: 0, mep: 0, specialty: 0 },
@@ -407,7 +409,7 @@ export function createEnhancedBudget(input) {
     },
     
     contingency: contingency || {
-      total: contingencyReserve || 0,
+      total: resolvedContingency,
       designContingency: 0,
       constructionContingency: 0,
       ownersReserve: 0
@@ -426,7 +428,7 @@ export function createEnhancedBudget(input) {
     // Legacy compatibility fields
     materials: directCosts?.materials?.total || 0,
     labour: directCosts?.labour?.total || 0,
-    contingency: contingencyReserve || contingency?.total || 0,
+    contingency: resolvedContingency,
     spent: 0
   };
 }

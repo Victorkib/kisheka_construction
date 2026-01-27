@@ -35,11 +35,37 @@ const defaultProject = {
   plannedEndDate: null, // To be set by project manager
   actualEndDate: null,
   budget: {
-    total: 0, // To be set by project manager
-    materials: 0,
-    labour: 0,
-    contingency: 0,
-    spent: 0,
+    total: 0,
+    directConstructionCosts: 0,
+    preConstructionCosts: 0,
+    indirectCosts: 0,
+    contingencyReserve: 0,
+    directCosts: {
+      materials: { total: 0, structural: 0, finishing: 0, mep: 0, specialty: 0 },
+      labour: { total: 0, skilled: 0, unskilled: 0, supervisory: 0, specialized: 0 },
+      equipment: { total: 0, rental: 0, purchase: 0, maintenance: 0 },
+      subcontractors: { total: 0, specializedTrades: 0, professionalServices: 0 },
+    },
+    preConstruction: {
+      total: 0,
+      landAcquisition: 0,
+      legalRegulatory: 0,
+      permitsApprovals: 0,
+      sitePreparation: 0,
+    },
+    indirect: {
+      total: 0,
+      siteOverhead: 0,
+      transportation: 0,
+      utilities: 0,
+      safetyCompliance: 0,
+    },
+    contingency: {
+      total: 0,
+      designContingency: 0,
+      constructionContingency: 0,
+      ownersReserve: 0,
+    },
   },
   siteManager: null,
   teamMembers: [],

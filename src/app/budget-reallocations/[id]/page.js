@@ -11,7 +11,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingSpinner } from '@/components/loading';
+import { LoadingSpinner, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 
@@ -189,6 +189,11 @@ function BudgetReallocationDetailPageContent() {
   return (
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={actionLoading}
+          message="Updating reallocation request..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-8">
           <Link href="/budget-reallocations" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">

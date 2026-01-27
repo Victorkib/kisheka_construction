@@ -16,19 +16,20 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState } from '@/components/empty-states';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 
 function ExpensesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
-  const { currentProject, isEmpty } = useProjectContext();
+  const { currentProject, currentProjectId, loading: projectLoading, isEmpty } = useProjectContext();
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
   
   // Get projectId from context (prioritize current project over URL param)
-  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
   const activeProjectId = projectIdFromContext || projectIdFromUrl || '';
   
@@ -55,15 +56,29 @@ function ExpensesPageContent() {
         if (prev.projectId === projectIdFromContext) {
           return prev; // No change needed, return same reference
         }
-        return { ...prev, projectId: projectIdFromContext };
+        return { ...prev, projectId: projectIdFromContext, phaseId: '' };
       });
     }
   }, [projectIdFromContext, activeProjectId]);
+
+  useEffect(() => {
+    if (!filters.projectId) {
+      setPhases([]);
+      return;
+    }
+    fetchAllPhases(filters.projectId);
+  }, [filters.projectId]);
 
   // Fetch expenses when filters or pagination changes
   useEffect(() => {
     // Don't fetch if empty state
     if (isEmpty) {
+      setLoading(false);
+      setExpenses([]);
+      return;
+    }
+    if (!filters.projectId) {
+      if (projectLoading) return;
       setLoading(false);
       setExpenses([]);
       return;
@@ -122,12 +137,16 @@ function ExpensesPageContent() {
     };
 
     fetchData();
-  }, [isEmpty, filters.projectId, filters.category, filters.phaseId, filters.status, filters.vendor, filters.search, filters.startDate, filters.endDate, filters.isIndirectCost, pagination.page, pagination.limit]);
+  }, [isEmpty, projectLoading, filters.projectId, filters.category, filters.phaseId, filters.status, filters.vendor, filters.search, filters.startDate, filters.endDate, filters.isIndirectCost, pagination.page, pagination.limit]);
 
-  const fetchAllPhases = async () => {
+  const fetchAllPhases = async (projectId) => {
+    if (!projectId) {
+      setPhases([]);
+      return;
+    }
     setLoadingPhases(true);
     try {
-      const response = await fetch('/api/phases');
+      const response = await fetch(`/api/phases?projectId=${projectId}`);
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -223,6 +242,21 @@ function ExpensesPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Expenses track services and overhead"
+          description="Record expenses after projects and budgets are set."
+          prerequisites={[
+            'Project exists',
+            'Budget categories are defined',
+          ]}
+          actions={[
+            { href: '/projects/new', label: 'Create Project' },
+            { href: '/projects', label: 'Set Budgets' },
+            { href: '/expenses/new', label: 'Add Expense' },
+          ]}
+          tip="Use categories to keep reporting clean."
+        />
 
         {/* Error Message */}
         {error && (

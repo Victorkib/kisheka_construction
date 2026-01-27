@@ -12,7 +12,13 @@ import { VALID_WORKER_TYPES, VALID_WORKER_ROLES, VALID_SKILL_TYPES } from '@/lib
 import { TemplateSelector } from './template-selector';
 import { EnhancedWorkerSelector } from './enhanced-worker-selector';
 
-export function Step2AddWorkers({ wizardData, onUpdate, onValidationChange, preSelectedWorkerId = null }) {
+export function Step2AddWorkers({
+  wizardData,
+  onUpdate,
+  onValidationChange,
+  preSelectedWorkerId = null,
+  preSelectedWorkerIds = [],
+}) {
   const [workers, setWorkers] = useState([]);
   const [availableWorkers, setAvailableWorkers] = useState([]);
   const [suggestedWorkers, setSuggestedWorkers] = useState([]);
@@ -27,50 +33,51 @@ export function Step2AddWorkers({ wizardData, onUpdate, onValidationChange, preS
       initializedRef.current = true;
       if (wizardData.labourEntries && wizardData.labourEntries.length > 0) {
         setWorkers(wizardData.labourEntries);
-      } else {
-        // Start with one empty row
-        const initialWorker = createEmptyWorker();
-        // If preSelectedWorkerId is provided, pre-select that worker
-        if (preSelectedWorkerId) {
-          initialWorker.workerId = preSelectedWorkerId;
-          // Find worker in availableWorkers and auto-fill
-          const selectedWorker = availableWorkers.find(
-            (w) => (w.userId || w._id).toString() === preSelectedWorkerId.toString()
-          );
-          if (selectedWorker) {
-            initialWorker.workerName = selectedWorker.workerName;
-            initialWorker.hourlyRate = selectedWorker.defaultHourlyRate?.toString() || '';
-            initialWorker.workerType = selectedWorker.workerType || 'internal';
-            initialWorker.skillType = selectedWorker.skillTypes?.[0] || 'general_worker';
-          }
-        }
-        setWorkers([initialWorker]);
+        return;
       }
+
+      const selectedIds = preSelectedWorkerIds.length > 0
+        ? preSelectedWorkerIds
+        : (preSelectedWorkerId ? [preSelectedWorkerId] : []);
+
+      if (selectedIds.length > 0) {
+        const initialWorkers = selectedIds.map((id) => buildWorkerFromId(id));
+        setWorkers(initialWorkers);
+        return;
+      }
+
+      // Start with one empty row
+      setWorkers([createEmptyWorker()]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
 
   // Handle pre-selected worker after availableWorkers are loaded
   useEffect(() => {
-    if (preSelectedWorkerId && availableWorkers.length > 0 && workers.length > 0 && !workers[0].workerId) {
-      const selectedWorker = availableWorkers.find(
-        (w) => (w.userId || w._id).toString() === preSelectedWorkerId.toString()
-      );
-      if (selectedWorker) {
-        const updatedWorkers = [...workers];
-        updatedWorkers[0] = {
-          ...updatedWorkers[0],
-          workerId: preSelectedWorkerId,
-          workerName: selectedWorker.workerName,
-          hourlyRate: selectedWorker.defaultHourlyRate?.toString() || updatedWorkers[0].hourlyRate,
-          workerType: selectedWorker.workerType || updatedWorkers[0].workerType,
-          skillType: selectedWorker.skillTypes?.[0] || updatedWorkers[0].skillType,
-        };
-        setWorkers(updatedWorkers);
+    if (!availableWorkers.length || workers.length === 0) return;
+
+    const updatedWorkers = workers.map((worker) => {
+      if (!worker.workerId || worker.workerName) {
+        return worker;
       }
+      const selectedWorker = availableWorkers.find(
+        (w) => (w.userId || w._id).toString() === worker.workerId.toString()
+      );
+      if (!selectedWorker) return worker;
+      return {
+        ...worker,
+        workerName: selectedWorker.workerName,
+        hourlyRate: selectedWorker.defaultHourlyRate?.toString() || worker.hourlyRate,
+        workerType: selectedWorker.workerType || worker.workerType,
+        skillType: selectedWorker.skillTypes?.[0] || worker.skillType,
+      };
+    });
+
+    if (JSON.stringify(updatedWorkers) !== JSON.stringify(workers)) {
+      setWorkers(updatedWorkers);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preSelectedWorkerId, availableWorkers]);
+  }, [availableWorkers]);
 
   // Fetch available workers and suggestions
   useEffect(() => {
@@ -185,6 +192,28 @@ export function Step2AddWorkers({ wizardData, onUpdate, onValidationChange, preS
       floorId: wizardData.defaultFloorId || '',
       categoryId: wizardData.defaultCategoryId || '',
       entryDate: wizardData.defaultDate || new Date().toISOString().split('T')[0],
+    };
+  }
+
+  function buildWorkerFromId(workerId) {
+    const baseWorker = createEmptyWorker();
+    if (!workerId) return baseWorker;
+    const selectedWorker = availableWorkers.find(
+      (w) => (w.userId || w._id).toString() === workerId.toString()
+    );
+    if (!selectedWorker) {
+      return {
+        ...baseWorker,
+        workerId,
+      };
+    }
+    return {
+      ...baseWorker,
+      workerId,
+      workerName: selectedWorker.workerName,
+      hourlyRate: selectedWorker.defaultHourlyRate?.toString() || baseWorker.hourlyRate,
+      workerType: selectedWorker.workerType || baseWorker.workerType,
+      skillType: selectedWorker.skillTypes?.[0] || baseWorker.skillType,
     };
   }
 

@@ -32,7 +32,7 @@ import crypto from 'crypto';
  * GET /api/purchase-orders
  * Returns purchase orders with filtering, sorting, and pagination
  * Auth: PM, OWNER, SUPPLIER, ACCOUNTANT
- * Query params: projectId, status, supplierId, search, page, limit, sortBy, sortOrder
+ * Query params: projectId, status, supplierId, floorId, phaseId, search, page, limit, sortBy, sortOrder
  */
 export async function GET(request) {
   try {
@@ -59,6 +59,7 @@ export async function GET(request) {
     const status = searchParams.get('status');
     const supplierId = searchParams.get('supplierId');
     const phaseId = searchParams.get('phaseId');
+    const floorId = searchParams.get('floorId');
     const search = searchParams.get('search');
     const rejectionReason = searchParams.get('rejectionReason');
     const isRetryable = searchParams.get('isRetryable');
@@ -105,6 +106,15 @@ export async function GET(request) {
     // Phase Management: Add phaseId filter
     if (phaseId && ObjectId.isValid(phaseId)) {
       query.phaseId = new ObjectId(phaseId);
+    }
+
+    if (floorId === 'unassigned' || floorId === 'none' || floorId === 'missing') {
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [{ floorId: { $exists: false } }, { floorId: null }],
+      });
+    } else if (floorId && ObjectId.isValid(floorId)) {
+      query.floorId = new ObjectId(floorId);
     }
 
     // Rejection-specific filters

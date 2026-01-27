@@ -11,19 +11,27 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable } from '@/components/loading';
+import { LoadingTable, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState, NoDataEmptyState } from '@/components/empty-states';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 
 function ItemsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
-  const { currentProject, isEmpty } = useProjectContext();
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const toast = useToast();
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +41,6 @@ function ItemsPageContent() {
     key: null,
     direction: 'asc',
   });
-  const [projects, setProjects] = useState([]);
   const [selectedMaterials, setSelectedMaterials] = useState([]);
   const [bulkActionLoading, setBulkActionLoading] = useState(false);
   const [showBulkApproveModal, setShowBulkApproveModal] = useState(false);
@@ -46,7 +53,7 @@ function ItemsPageContent() {
   
   // Filters
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: searchParams.get('projectId') || currentProjectId || '',
     category: searchParams.get('category') || '',
     floor: searchParams.get('floor') || '',
     phaseId: searchParams.get('phaseId') || '',
@@ -58,16 +65,20 @@ function ItemsPageContent() {
   const [phases, setPhases] = useState([]);
   const [loadingPhases, setLoadingPhases] = useState(false);
 
-  // Fetch projects for filter dropdown
   useEffect(() => {
-    fetchProjects();
-    fetchAllPhases();
-  }, []);
+    if (currentProjectId) {
+      fetchPhases(currentProjectId);
+    }
+  }, [currentProjectId]);
 
-  const fetchAllPhases = async () => {
+  const fetchPhases = async (projectId) => {
+    if (!projectId) {
+      setPhases([]);
+      return;
+    }
     setLoadingPhases(true);
     try {
-      const response = await fetch('/api/phases');
+      const response = await fetch(`/api/phases?projectId=${projectId}`);
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -76,18 +87,6 @@ function ItemsPageContent() {
       console.error('Error fetching phases:', err);
     } finally {
       setLoadingPhases(false);
-    }
-  };
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data.projects || []);
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
     }
   };
 
@@ -177,16 +176,30 @@ function ItemsPageContent() {
     } finally {
       setLoading(false);
     }
-  }, [filters.projectId, filters.category, filters.status, filters.search, filters.supplierId, pagination.page, pagination.limit, sortConfig.key, sortConfig.direction]);
+  }, [
+    filters.projectId,
+    filters.category,
+    filters.floor,
+    filters.phaseId,
+    filters.status,
+    filters.supplier,
+    filters.entryType,
+    filters.search,
+    pagination.page,
+    pagination.limit,
+    sortConfig.key,
+    sortConfig.direction,
+  ]);
 
   // Update filters when project changes
   useEffect(() => {
-    const newProjectId = normalizeProjectId(currentProject?._id);
+    const newProjectId = normalizeProjectId(currentProject?._id) || currentProjectId || '';
     if (newProjectId && filters.projectId !== newProjectId) {
-      setFilters(prev => ({ ...prev, projectId: newProjectId }));
+      setFilters((prev) => ({ ...prev, projectId: newProjectId, phaseId: '' }));
+      fetchPhases(newProjectId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentProject?._id]);
+  }, [currentProject?._id, currentProjectId]);
 
   // Fetch materials
   useEffect(() => {
@@ -196,17 +209,39 @@ function ItemsPageContent() {
       setMaterials([]);
       return;
     }
-    
+
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setMaterials([]);
+      return;
+    }
+
     fetchMaterials();
-  }, [fetchMaterials, isEmpty]);
+  }, [fetchMaterials, isEmpty, projectLoading, filters.projectId]);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    let updatedFilters = { ...filters, [key]: value };
+    if (key === 'projectId') {
+      updatedFilters = { ...filters, projectId: value, phaseId: '' };
+      setFilters(updatedFilters);
+      setPhases([]);
+      if (value) {
+        fetchPhases(value);
+        if (value !== currentProjectId) {
+          switchProject(value).catch((err) => {
+            console.error('Error switching project:', err);
+          });
+        }
+      }
+    } else {
+      setFilters(updatedFilters);
+    }
     setPagination((prev) => ({ ...prev, page: 1 })); // Reset to page 1 on filter change
-    
+
     // Update URL params
     const params = new URLSearchParams();
-    Object.entries({ ...filters, [key]: value }).forEach(([k, v]) => {
+    Object.entries(updatedFilters).forEach(([k, v]) => {
       if (v) params.set(k, v);
     });
     router.push(`/items?${params.toString()}`, { scroll: false });
@@ -490,6 +525,11 @@ function ItemsPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={bulkActionLoading}
+          message="Processing materials..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
@@ -548,6 +588,21 @@ function ItemsPageContent() {
           </div>
         </div>
 
+        <PrerequisiteGuide
+          title="Set up items before requesting materials"
+          description="Materials and items fuel purchasing and inventory tracking."
+          prerequisites={[
+            'Project is created',
+            'Material library or items are defined',
+          ]}
+          actions={[
+            { href: '/projects/new', label: 'Create Project' },
+            { href: '/material-library', label: 'Material Library' },
+            { href: '/items/new', label: 'Add Item' },
+          ]}
+          tip="Use categories and suppliers to improve reporting."
+        />
+
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
           <div className="space-y-4">
@@ -583,7 +638,7 @@ function ItemsPageContent() {
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="" className="text-gray-900">All Projects</option>
-                  {projects.map((project) => (
+                  {accessibleProjects.map((project) => (
                     <option key={project._id} value={project._id} className="text-gray-900">
                       {project.projectName || project.projectCode || project._id}
                     </option>
@@ -671,8 +726,8 @@ function ItemsPageContent() {
               <div className="flex items-end">
                 <button
                   onClick={() => {
-                    setFilters({
-                      projectId: '',
+                    const resetFilters = {
+                      projectId: currentProjectId || '',
                       category: '',
                       floor: '',
                       phaseId: '',
@@ -680,8 +735,19 @@ function ItemsPageContent() {
                       supplier: '',
                       entryType: '',
                       search: '',
-                    });
+                    };
+                    setFilters(resetFilters);
                     setPagination((prev) => ({ ...prev, page: 1 }));
+                    if (resetFilters.projectId) {
+                      fetchPhases(resetFilters.projectId);
+                    } else {
+                      setPhases([]);
+                    }
+                    const params = new URLSearchParams();
+                    Object.entries(resetFilters).forEach(([k, v]) => {
+                      if (v) params.set(k, v);
+                    });
+                    router.push(`/items?${params.toString()}`, { scroll: false });
                   }}
                   className="w-full px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 font-medium transition-colors"
                 >

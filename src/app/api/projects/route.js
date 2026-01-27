@@ -346,6 +346,8 @@ export async function POST(request) {
 
     // Auto-create floors (configurable)
     const defaultFloors = [];
+    let floorsCreatedCount = 0;
+    let floorCreationWarning = null;
     if (autoCreateFloors !== false) { // Default: true for backward compatibility
       const requestedFloorCount = floorCount !== undefined ? parseInt(floorCount) : 10; // Default: 10
       const maxFloors = Math.min(Math.max(0, requestedFloorCount), 50); // Cap at 50 floors, minimum 0
@@ -408,11 +410,19 @@ export async function POST(request) {
     // Insert floors if any were created
     if (defaultFloors.length > 0) {
       try {
-        await db.collection('floors').insertMany(defaultFloors);
-        console.log(`✅ Auto-created ${defaultFloors.length} floors for project ${insertedProject.projectCode}`);
+        const insertResult = await db.collection('floors').insertMany(defaultFloors);
+        floorsCreatedCount = insertResult?.insertedCount || defaultFloors.length;
+        console.log(`✅ Auto-created ${floorsCreatedCount} floors for project ${insertedProject.projectCode}`);
       } catch (floorError) {
         // Log error but don't fail project creation
         console.error('Error auto-creating floors:', floorError);
+        floorCreationWarning = {
+          type: 'floor_creation_failed',
+          message: 'Failed to auto-create floors',
+          details: `Auto-creating ${defaultFloors.length} floor${defaultFloors.length !== 1 ? 's' : ''} failed. ` +
+                   'The project was created, but floors were not added. You can create floors manually from the Floors page.',
+          requestedCount: defaultFloors.length,
+        };
         // Continue with project creation even if floor creation fails
       }
     }
@@ -510,6 +520,10 @@ export async function POST(request) {
       responseData.capitalInfo = capitalInfo;
       warnings.push(capitalInfo.message);
     }
+    if (floorCreationWarning) {
+      responseData.floorCreationWarning = floorCreationWarning;
+      warnings.push(floorCreationWarning.message);
+    }
     if (phaseInitializationWarning) {
       responseData.phaseInitializationWarning = phaseInitializationWarning;
       warnings.push(phaseInitializationWarning.message);
@@ -518,7 +532,8 @@ export async function POST(request) {
     // Add summary of what was created
     responseData.creationSummary = {
       projectCreated: true,
-      floorsCreated: defaultFloors.length,
+      floorsCreated: floorsCreatedCount,
+      floorsRequested: defaultFloors.length,
       phasesCreated: phasesCreated,
       financesInitialized: true,
       warnings: warnings.length > 0 ? warnings : null,
@@ -527,8 +542,8 @@ export async function POST(request) {
 
     // Build success message with details
     let successMessage = 'Project created successfully';
-    if (defaultFloors.length > 0) {
-      successMessage += `. ${defaultFloors.length} floor${defaultFloors.length !== 1 ? 's' : ''} created.`;
+    if (floorsCreatedCount > 0) {
+      successMessage += `. ${floorsCreatedCount} floor${floorsCreatedCount !== 1 ? 's' : ''} created.`;
     }
     if (phasesCreated) {
       successMessage += ' Default phases initialized.';

@@ -16,6 +16,8 @@ import { LoadingTable, LoadingSpinner } from '@/components/loading';
 function InvestorsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
+  const returnProjectId = searchParams.get('projectId');
   const [investors, setInvestors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -113,6 +115,32 @@ function InvestorsPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {returnTo && (
+          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-blue-800">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-sm">
+                <p className="font-semibold">Return to bulk material request</p>
+                <p className="text-xs">Allocate funds, then jump back to continue supplier assignment.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {returnProjectId && (
+                  <Link
+                    href={`/financing?projectId=${returnProjectId}&returnTo=${encodeURIComponent(returnTo)}`}
+                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                  >
+                    View Financing
+                  </Link>
+                )}
+                <Link
+                  href={returnTo}
+                  className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                >
+                  Back to Bulk Request
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="mb-6">
           <div className="flex justify-between items-center">
             <div>
@@ -261,7 +289,7 @@ function InvestorsPageContent() {
                   <tr key={investor._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Link
-                        href={`/investors/${investor._id}`}
+                        href={`/investors/${investor._id}${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}${returnProjectId ? `&projectId=${returnProjectId}` : ''}` : ''}`}
                         className="text-sm font-medium text-blue-600 hover:text-blue-900"
                       >
                         {investor.name}
@@ -296,7 +324,7 @@ function InvestorsPageContent() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Link
-                        href={`/investors/${investor._id}`}
+                        href={`/investors/${investor._id}${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}${returnProjectId ? `&projectId=${returnProjectId}` : ''}` : ''}`}
                         className="text-blue-600 hover:text-blue-900"
                       >
                         View

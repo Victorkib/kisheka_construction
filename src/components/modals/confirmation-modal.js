@@ -35,10 +35,12 @@ export function ConfirmationModal({
   isLoading = false,
   isArchiving = false, // New: Archive loading state
   isDeleting = false, // New: Delete loading state
+  actionsDisabled = false, // New: Disable actions while loading context
+  actionsDisabledReason = '', // New: Explain why actions are disabled
   showIcon = true,
   showRecommendation = false, // New: Show recommendation banner
   financialImpact = null, // New: { totalUsed, totalInvested, capitalBalance }
-  dependencies = null, // New: { materials, expenses, initialExpenses, floors, allocations }
+  dependencies = null, // New: dependency map (counts by entity type)
   size = 'md', // New: 'sm', 'md', 'lg', 'xl', 'full' - controls modal max width
   children, // Custom content (form fields, etc.) to render between message and buttons
 }) {
@@ -132,6 +134,91 @@ export function ConfirmationModal({
   };
 
   const loadingMessage = overallLoading ? getLoadingMessage() : '';
+
+  const dependencyLabelMap = {
+    materials: 'Materials',
+    expenses: 'Expenses',
+    initialExpenses: 'Initial expenses',
+    floors: 'Floors',
+    phases: 'Phases',
+    workItems: 'Work items',
+    labourEntries: 'Labour entries',
+    labourBatches: 'Labour batches',
+    labourCostSummaries: 'Labour summaries',
+    materialRequests: 'Material requests',
+    materialRequestBatches: 'Request batches',
+    purchaseOrders: 'Purchase orders',
+    equipment: 'Equipment',
+    subcontractors: 'Subcontractors',
+    professionalServices: 'Professional services',
+    professionalFees: 'Professional fees',
+    professionalActivities: 'Professional activities',
+    siteReports: 'Site reports',
+    supervisorSubmissions: 'Supervisor submissions',
+    budgetReallocations: 'Budget reallocations',
+    budgetAdjustments: 'Budget adjustments',
+    budgetTransfers: 'Budget transfers',
+    contingencyDraws: 'Contingency draws',
+    approvals: 'Approvals',
+    projectMemberships: 'Project team',
+    projectTeams: 'Project teams',
+    notifications: 'Notifications',
+    auditLogs: 'Audit logs',
+    investorAllocations: 'Investor allocations',
+  };
+
+  const normalizeDependencies = (deps) => {
+    if (!deps) return null;
+    const normalized = { ...deps };
+    if (normalized.allocations && !normalized.investorAllocations) {
+      normalized.investorAllocations = normalized.allocations;
+    }
+    delete normalized.allocations;
+    return normalized;
+  };
+
+  const normalizedDependencies = normalizeDependencies(dependencies);
+  const dependencyEntries = normalizedDependencies
+    ? Object.entries(normalizedDependencies)
+        .filter(([, value]) => typeof value === 'number' && value > 0)
+        .map(([key, value]) => ({
+          key,
+          label: dependencyLabelMap[key] || key,
+          count: value,
+        }))
+    : [];
+
+  const dependencyPriority = [
+    'materials',
+    'expenses',
+    'initialExpenses',
+    'purchaseOrders',
+    'materialRequests',
+    'phases',
+    'floors',
+    'labourEntries',
+    'workItems',
+    'professionalServices',
+    'equipment',
+    'subcontractors',
+    'investorAllocations',
+  ];
+
+  const sortedDependencies = dependencyEntries.sort((a, b) => {
+    const aIndex = dependencyPriority.indexOf(a.key);
+    const bIndex = dependencyPriority.indexOf(b.key);
+    if (aIndex !== -1 || bIndex !== -1) {
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      if (aIndex !== bIndex) return aIndex - bIndex;
+    }
+    return b.count - a.count;
+  });
+
+  const maxVisibleDependencies = 6;
+  const visibleDependencies = sortedDependencies.slice(0, maxVisibleDependencies);
+  const hiddenDependencyCount = Math.max(0, sortedDependencies.length - visibleDependencies.length);
+  const totalDependencyRecords = sortedDependencies.reduce((sum, entry) => sum + entry.count, 0);
 
   // Map size prop to maxWidth classes
   const sizeMap = {
@@ -256,6 +343,13 @@ export function ConfirmationModal({
                 </div>
               </div>
             )}
+
+            {actionsDisabled && actionsDisabledReason && (
+              <p className="mt-3 text-xs text-gray-500 flex items-center gap-2">
+                <span className="h-3 w-3 border border-gray-400 border-t-transparent rounded-full animate-spin" />
+                {actionsDisabledReason}
+              </p>
+            )}
             
             {/* Financial Impact Summary */}
             {financialImpact && (
@@ -283,39 +377,35 @@ export function ConfirmationModal({
             {/* Dependencies Summary */}
             {dependencies && (
               <div className="mt-5 p-4 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-lg">
-                <p className="text-xs font-semibold text-gray-900 mb-3 uppercase tracking-wide">This will affect:</p>
-                <div className="grid grid-cols-2 gap-3 text-sm text-gray-700">
-                  {dependencies.materials > 0 && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full" />
-                      <span>{dependencies.materials} material(s)</span>
+                <p className="text-xs font-semibold text-gray-900 mb-2 uppercase tracking-wide">Impact overview</p>
+                {sortedDependencies.length > 0 ? (
+                  <>
+                    <p className="text-sm text-gray-700 mb-3">
+                      About <span className="font-semibold text-gray-900">{totalDependencyRecords.toLocaleString()}</span> records across{' '}
+                      <span className="font-semibold text-gray-900">{sortedDependencies.length}</span> areas will be affected.
+                    </p>
+                    <div className="flex flex-wrap gap-2 text-sm text-gray-700">
+                      {visibleDependencies.map((entry) => (
+                        <span
+                          key={entry.key}
+                          className="inline-flex items-center gap-2 rounded-full border border-gray-200/60 bg-white/80 px-3 py-1 shadow-sm"
+                        >
+                          <span className="font-semibold text-gray-900">{entry.count.toLocaleString()}</span>
+                          <span>{entry.label}</span>
+                        </span>
+                      ))}
                     </div>
-                  )}
-                  {dependencies.expenses > 0 && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full" />
-                      <span>{dependencies.expenses} expense(s)</span>
-                    </div>
-                  )}
-                  {dependencies.initialExpenses > 0 && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full" />
-                      <span>{dependencies.initialExpenses} initial expense(s)</span>
-                    </div>
-                  )}
-                  {dependencies.floors > 0 && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full" />
-                      <span>{dependencies.floors} floor(s)</span>
-                    </div>
-                  )}
-                  {dependencies.allocations > 0 && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-2 h-2 bg-gray-400 rounded-full" />
-                      <span>{dependencies.allocations} investor allocation(s)</span>
-                    </div>
-                  )}
-                </div>
+                    {hiddenDependencyCount > 0 && (
+                      <p className="text-xs text-gray-500 mt-3">
+                        Plus {hiddenDependencyCount} more record type{hiddenDependencyCount === 1 ? '' : 's'}.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <p className="text-sm text-gray-600">
+                    No linked records found for this project.
+                  </p>
+                )}
               </div>
             )}
           </div>
@@ -349,7 +439,7 @@ export function ConfirmationModal({
                 ref={confirmButtonRef}
                 type="button"
                 onClick={onArchive}
-                disabled={isLoading || isArchiving || isDeleting}
+                disabled={actionsDisabled || isLoading || isArchiving || isDeleting}
                 className="relative w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-100"
               >
                 {isArchiving ? (
@@ -366,7 +456,7 @@ export function ConfirmationModal({
               <button
                 type="button"
                 onClick={onDelete}
-                disabled={isLoading || isArchiving || isDeleting}
+                disabled={actionsDisabled || isLoading || isArchiving || isDeleting}
                 className="relative w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-red-500 to-red-600 rounded-xl hover:from-red-600 hover:to-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg shadow-red-500/30 hover:shadow-xl hover:shadow-red-500/40 hover:scale-105 active:scale-100"
               >
                 {isDeleting ? (
@@ -384,7 +474,7 @@ export function ConfirmationModal({
               ref={confirmButtonRef}
               type="button"
               onClick={onConfirm}
-              disabled={isLoading || isArchiving || isDeleting}
+              disabled={actionsDisabled || isLoading || isArchiving || isDeleting}
               className={`relative w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-100 ${
                 variant === 'danger'
                   ? 'bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-red-500/30 hover:shadow-red-500/40 focus:ring-red-500'

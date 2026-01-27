@@ -135,22 +135,22 @@ export function Step4Review({ wizardData, user, onValidationChange }) {
                     <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                       <div>
                         <span className="text-gray-600">Quantity: </span>
-                        <span className="font-medium">{material.quantityNeeded} {material.unit}</span>
+                        <span className="font-medium text-gray-900">{material.quantityNeeded} {material.unit}</span>
                       </div>
                       {material.category && (
                         <div>
                           <span className="text-gray-600">Category: </span>
-                          <span className="font-medium">{material.category}</span>
+                          <span className="font-medium text-gray-900">{material.category}</span>
                         </div>
                       )}
                       <div>
                         <span className="text-gray-600">Urgency: </span>
-                        <span className="font-medium capitalize">{material.urgency || wizardData.defaultUrgency || 'medium'}</span>
+                        <span className="font-medium text-gray-900 capitalize">{material.urgency || wizardData.defaultUrgency || 'medium'}</span>
                       </div>
                       {material.estimatedUnitCost && (
                         <div>
                           <span className="text-gray-600">Unit Cost: </span>
-                          <span className="font-medium">{formatCurrency(material.estimatedUnitCost)}</span>
+                          <span className="font-medium text-gray-900">{formatCurrency(material.estimatedUnitCost)}</span>
                         </div>
                       )}
                     </div>

@@ -8,6 +8,15 @@
 import { useState, useEffect } from 'react';
 import { ACTIVITY_TYPES, VISIT_PURPOSES, INSPECTION_TYPES, COMPLIANCE_STATUSES } from '@/lib/constants/professional-activities-constants';
 
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
+
 export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
   const [activities, setActivities] = useState(wizardData.activities || []);
   const [phases, setPhases] = useState([]);
@@ -32,12 +41,14 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
   }, [wizardData.activities, wizardData.defaultPhaseId, wizardData.defaultFloorId, onUpdate]);
 
   useEffect(() => {
-    if (wizardData.projectId) {
-      fetchPhases(wizardData.projectId);
-      fetchFloors(wizardData.projectId);
+    const projectId = normalizeId(wizardData.projectId);
+    if (projectId) {
+      fetchPhases(projectId);
+      fetchFloors(projectId);
     }
-    if (wizardData.professionalServiceId) {
-      fetchProfessionalService(wizardData.professionalServiceId);
+    const professionalServiceId = normalizeId(wizardData.professionalServiceId);
+    if (professionalServiceId) {
+      fetchProfessionalService(professionalServiceId);
     }
   }, [wizardData.projectId, wizardData.professionalServiceId]);
 

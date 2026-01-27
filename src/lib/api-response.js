@@ -36,18 +36,40 @@ export function successResponse(data, message, statusCode = 200) {
 
 /**
  * Creates an error API response
- * @param {string} error - Error message
- * @param {number} [statusCode=400] - HTTP status code
+ * @param {string|Object} error - Error message or error data object
+ * @param {string|number} [messageOrStatusCode] - Error message (if error is object) or status code (if error is string)
+ * @param {number} [statusCode=400] - HTTP status code (when error and message are both provided)
  * @returns {NextResponse<ApiResponse>}
  */
-export function errorResponse(error, statusCode = 400) {
+export function errorResponse(error, messageOrStatusCode = 400, statusCode = 400) {
+  // Handle different parameter patterns
+  let errorMessage = error;
+  let errorData = null;
+  let httpStatus = 400;
+
+  if (typeof error === 'object' && error !== null) {
+    // Pattern: errorResponse(data, message, statusCode)
+    errorData = error;
+    errorMessage = typeof messageOrStatusCode === 'string' ? messageOrStatusCode : 'An error occurred';
+    httpStatus = typeof statusCode === 'number' ? statusCode : 400;
+  } else if (typeof messageOrStatusCode === 'number') {
+    // Pattern: errorResponse(message, statusCode)
+    errorMessage = error;
+    httpStatus = messageOrStatusCode;
+  } else {
+    // Pattern: errorResponse(message, statusCode, ignored)
+    errorMessage = error;
+    httpStatus = statusCode;
+  }
+
   return NextResponse.json(
     {
       success: false,
-      error,
+      error: errorMessage,
+      ...(errorData && { data: errorData }),
       timestamp: new Date().toISOString(),
     },
-    { status: statusCode }
+    { status: httpStatus }
   );
 }
 

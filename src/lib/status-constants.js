@@ -81,6 +81,12 @@ export const INITIAL_EXPENSE_PENDING_STATUSES = [
 ];
 
 // ============================================================================
+// LABOUR STATUS VALUES
+// ============================================================================
+// Labour entries use lowercase status values, but legacy data may include uppercase.
+export const LABOUR_APPROVED_STATUSES = ['approved', 'paid', 'APPROVED', 'PAID'];
+
+// ============================================================================
 // INVESTOR STATUS VALUES
 // ============================================================================
 export const INVESTOR_STATUS = {

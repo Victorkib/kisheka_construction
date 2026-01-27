@@ -11,7 +11,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable } from '@/components/loading';
+import { LoadingTable, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { BatchApprovalTable } from '@/components/bulk-request/batch-approval-table';
@@ -255,6 +255,11 @@ function BatchApprovalPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={actionLoading}
+          message="Processing approvals..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-8">
           <Link

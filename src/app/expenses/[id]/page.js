@@ -12,7 +12,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ImagePreview } from '@/components/uploads/image-preview';
-import { LoadingSpinner, LoadingCard, LoadingButton } from '@/components/loading';
+import { LoadingSpinner, LoadingCard, LoadingButton, LoadingOverlay } from '@/components/loading';
 import { AuditTrail } from '@/components/audit-trail';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CapitalBalanceWarning } from '@/components/financial/capital-balance-warning';
@@ -310,6 +310,11 @@ export default function ExpenseDetailPage() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={isDeleting}
+          message="Deleting expense..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-8">
           <Link

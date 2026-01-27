@@ -5,7 +5,7 @@
  * Run with: node scripts/seed-floors.mjs
  */
 
-import { MongoClient } from 'mongodb';
+import { MongoClient, ObjectId } from 'mongodb';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -24,26 +24,6 @@ if (!MONGODB_URI) {
   process.exit(1);
 }
 
-// Generate floors: Ground (0) + Floors 1-9
-const defaultFloors = [];
-for (let i = 0; i <= 9; i++) {
-  const floorNumber = i;
-  const floorName = i === 0 ? 'Ground Floor' : `Floor ${i}`;
-  
-  defaultFloors.push({
-    floorNumber,
-    name: floorName,
-    description: `${floorName} of the 10-storey building`,
-    status: 'NOT_STARTED',
-    startDate: null,
-    completionDate: null,
-    totalBudget: 0,
-    actualCost: 0,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  });
-}
-
 async function seedFloors() {
   let client;
   
@@ -57,13 +37,52 @@ async function seedFloors() {
     console.log('🌱 Seeding floors...\n');
     
     const floorsCollection = db.collection('floors');
+    const projectsCollection = db.collection('projects');
     
-    // Check if floors already exist
-    const existingCount = await floorsCollection.countDocuments();
+    const projectCode = process.env.SEED_FLOORS_PROJECT_CODE || 'KISHEKA-001';
+    let project = await projectsCollection.findOne({ projectCode });
+    
+    if (!project) {
+      project = await projectsCollection.findOne({}, { sort: { createdAt: 1 } });
+    }
+    
+    if (!project) {
+      console.error('❌ No project found. Create a project first, then re-run this script.');
+      process.exit(1);
+    }
+    
+    const projectId = new ObjectId(project._id);
+    const projectName = project.projectName || 'the building';
+    
+    // Check if floors already exist for this project
+    const existingCount = await floorsCollection.countDocuments({
+      projectId: projectId,
+    });
     if (existingCount > 0) {
-      console.log(`⚠️  Floors collection already has ${existingCount} floors.`);
-      console.log('   To re-seed, delete existing floors first.\n');
+      console.log(`⚠️  Project already has ${existingCount} floors.`);
+      console.log('   To re-seed, delete existing floors for this project first.\n');
       return;
+    }
+    
+    // Generate floors: Ground (0) + Floors 1-9
+    const defaultFloors = [];
+    for (let i = 0; i <= 9; i++) {
+      const floorNumber = i;
+      const floorName = i === 0 ? 'Ground Floor' : `Floor ${i}`;
+      
+      defaultFloors.push({
+        projectId: projectId,
+        floorNumber,
+        name: floorName,
+        description: `${floorName} of ${projectName}`,
+        status: 'NOT_STARTED',
+        startDate: null,
+        completionDate: null,
+        totalBudget: 0,
+        actualCost: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
     }
     
     // Insert floors

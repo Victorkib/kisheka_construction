@@ -18,6 +18,15 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateAllocations } from '@/lib/investment-allocation';
 import { recalculateProjectFinances, validateCapitalRemoval } from '@/lib/financial-helpers';
 
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
+
 /**
  * GET /api/investors/[id]/allocations
  * Returns investment allocations for an investor
@@ -68,15 +77,16 @@ export async function GET(request, { params }) {
     const allocationsWithProjects = [];
 
     for (const allocation of allocations) {
-      if (allocation.projectId && ObjectId.isValid(allocation.projectId)) {
+      const allocationProjectId = normalizeId(allocation.projectId);
+      if (allocationProjectId && ObjectId.isValid(allocationProjectId)) {
         const project = await db
           .collection('projects')
-          .findOne({ _id: new ObjectId(allocation.projectId) });
+          .findOne({ _id: new ObjectId(allocationProjectId) });
 
         if (project) {
           allocationsWithProjects.push({
             ...allocation,
-            projectId: allocation.projectId,
+            projectId: allocationProjectId,
             projectName: project.projectName,
             projectCode: project.projectCode,
           });
@@ -145,7 +155,12 @@ export async function POST(request, { params }) {
     }
 
     const body = await request.json();
-    const { allocations } = body;
+    const allocations = Array.isArray(body?.allocations)
+      ? body.allocations.map((alloc) => ({
+          ...alloc,
+          projectId: normalizeId(alloc.projectId),
+        }))
+      : body?.allocations;
 
     if (!Array.isArray(allocations)) {
       return errorResponse('Allocations must be an array', 400);
@@ -279,7 +294,10 @@ export async function POST(request, { params }) {
     // If recalculation failed for any project, include warning in response
     // But still return success since allocations were saved
     const responseData = {
-      allocations: processedAllocations,
+      allocations: processedAllocations.map((alloc) => ({
+        ...alloc,
+        projectId: alloc.projectId.toString(),
+      })),
       totalInvested: validation.totalInvested,
       totalAllocated: validation.totalAllocated,
       unallocated: validation.unallocated,

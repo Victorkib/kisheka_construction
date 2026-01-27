@@ -29,12 +29,20 @@ function SupervisorSubmissionReviewPageContent() {
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
+  const [workItems, setWorkItems] = useState([]);
+  const [selectedWorkItemId, setSelectedWorkItemId] = useState('');
 
   useEffect(() => {
     if (params.id) {
       fetchSubmission();
     }
   }, [params.id]);
+
+  useEffect(() => {
+    if (submission?.projectId) {
+      fetchWorkItems(submission.projectId, submission.phaseId);
+    }
+  }, [submission?.projectId, submission?.phaseId]);
 
   // Track previous values to prevent unnecessary validations
   const prevSubmissionRef = useRef(null);
@@ -67,7 +75,12 @@ function SupervisorSubmissionReviewPageContent() {
   useEffect(() => {
     if (submission && submission !== prevSubmissionRef.current) {
       prevSubmissionRef.current = submission;
-      setEditedEntries(submission.labourEntries || []);
+      setSelectedWorkItemId(submission.workItem?.workItemId || submission.workItemId || '');
+      const entriesWithDefaults = (submission.labourEntries || []).map((entry) => ({
+        ...entry,
+        workItemId: entry.workItemId || submission.workItem?.workItemId || submission.workItemId || '',
+      }));
+      setEditedEntries(entriesWithDefaults);
       // Validate budget after setting entries (will be called after editedEntries updates)
     }
   }, [submission]);
@@ -102,6 +115,26 @@ function SupervisorSubmissionReviewPageContent() {
     }
   };
 
+  const fetchWorkItems = async (projectId, phaseId) => {
+    try {
+      if (!projectId) {
+        setWorkItems([]);
+        return;
+      }
+      const params = new URLSearchParams({ projectId });
+      if (phaseId) {
+        params.set('phaseId', phaseId.toString());
+      }
+      const response = await fetch(`/api/work-items?${params.toString()}`);
+      const data = await response.json();
+      if (data.success) {
+        setWorkItems(data.data?.workItems || []);
+      }
+    } catch (err) {
+      console.error('Error fetching work items:', err);
+    }
+  };
+
   // Validate budget when editing and entries change
   useEffect(() => {
     if (editing && submission && submission.phaseId) {
@@ -120,6 +153,15 @@ function SupervisorSubmissionReviewPageContent() {
     setEditedEntries(updated);
   };
 
+  const applyWorkItemToAll = () => {
+    if (!selectedWorkItemId) return;
+    const updated = editedEntries.map((entry) => ({
+      ...entry,
+      workItemId: selectedWorkItemId,
+    }));
+    setEditedEntries(updated);
+  };
+
   const handleSaveEdits = async () => {
     try {
       const response = await fetch(`/api/labour/supervisor-submissions/${params.id}`, {
@@ -127,6 +169,7 @@ function SupervisorSubmissionReviewPageContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           labourEntries: editedEntries,
+          workItemId: selectedWorkItemId || null,
         }),
       });
 
@@ -424,6 +467,42 @@ function SupervisorSubmissionReviewPageContent() {
             )}
           </div>
 
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-blue-900">Work Item Linking</p>
+                <p className="text-xs text-blue-700">
+                  Link these entries to a work item for accurate progress tracking and completion reports.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <select
+                  value={selectedWorkItemId}
+                  onChange={(e) => setSelectedWorkItemId(e.target.value)}
+                  className="px-3 py-2 border border-blue-200 rounded-lg text-sm bg-white"
+                  disabled={workItems.length === 0}
+                >
+                  <option value="">{workItems.length === 0 ? 'No work items available' : 'Select work item'}</option>
+                  {workItems.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+                {editing && (
+                  <button
+                    type="button"
+                    onClick={applyWorkItemToAll}
+                    className="px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                    disabled={!selectedWorkItemId}
+                  >
+                    Apply to all
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -461,6 +540,9 @@ function SupervisorSubmissionReviewPageContent() {
                     Worker Name
                   </th>
                   <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    Work Item
+                  </th>
+                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
                     Skill
                   </th>
                   <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
@@ -492,6 +574,26 @@ function SupervisorSubmissionReviewPageContent() {
                           />
                         ) : (
                           <span className="font-medium text-gray-900">{entry.workerName}</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-2 text-sm">
+                        {editing ? (
+                          <select
+                            value={entry.workItemId || ''}
+                            onChange={(e) => handleEditEntry(index, 'workItemId', e.target.value)}
+                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                          >
+                            <option value="">Unlinked</option>
+                            {workItems.map((item) => (
+                              <option key={item._id} value={item._id}>
+                                {item.name}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <span className="text-gray-600">
+                            {entry.workItemName || 'Unlinked'}
+                          </span>
                         )}
                       </td>
                       <td className="px-3 py-2 text-sm text-gray-600">

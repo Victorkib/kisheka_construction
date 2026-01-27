@@ -11,10 +11,11 @@ import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable } from '@/components/loading';
+import { LoadingTable, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 
 function ActivityTemplatesPageContent() {
   const router = useRouter();
@@ -181,6 +182,11 @@ function ActivityTemplatesPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={actionLoading}
+          message="Updating template..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -203,6 +209,21 @@ function ActivityTemplatesPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Templates speed up activity logs"
+          description="Create templates after you standardize activity types."
+          prerequisites={[
+            'Common activity types are defined',
+            'Professional services are available',
+          ]}
+          actions={[
+            { href: '/professional-services-library', label: 'Service Library' },
+            { href: '/activity-templates/new', label: 'Create Template' },
+            { href: '/professional-activities/new', label: 'Log Activity' },
+          ]}
+          tip="Use templates to keep approvals consistent."
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">

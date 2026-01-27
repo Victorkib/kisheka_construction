@@ -11,16 +11,25 @@ import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable } from '@/components/loading';
+import { LoadingTable, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { useProjectContext } from '@/contexts/ProjectContext';
 
 function ProfessionalActivitiesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
+  const {
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +39,7 @@ function ProfessionalActivitiesPageContent() {
   const [assignments, setAssignments] = useState([]);
   
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: searchParams.get('projectId') || currentProjectId || '',
     professionalServiceId: searchParams.get('professionalServiceId') || '',
     activityType: searchParams.get('activityType') || '',
     status: searchParams.get('status') || '',
@@ -46,9 +55,18 @@ function ProfessionalActivitiesPageContent() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Fetch projects and assignments on mount
   useEffect(() => {
-    fetchProjects();
+    setProjects(accessibleProjects || []);
+  }, [accessibleProjects]);
+
+  useEffect(() => {
+    if (currentProjectId && currentProjectId !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: currentProjectId }));
+    }
+  }, [currentProjectId, filters.projectId]);
+
+  // Fetch assignments on mount
+  useEffect(() => {
     fetchAssignments();
   }, []);
 
@@ -112,20 +130,19 @@ function ProfessionalActivitiesPageContent() {
   }, [pagination.page, pagination.limit, filterValues]);
 
   useEffect(() => {
-    fetchActivities();
-  }, [fetchActivities]);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data || []);
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
+    if (isEmpty) {
+      setLoading(false);
+      setActivities([]);
+      return;
     }
-  };
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setActivities([]);
+      return;
+    }
+    fetchActivities();
+  }, [fetchActivities, filters.projectId, isEmpty, projectLoading]);
 
   const fetchAssignments = async () => {
     try {
@@ -141,7 +158,9 @@ function ProfessionalActivitiesPageContent() {
 
   const handleFilterChange = useCallback((key, value) => {
     setFilters((prev) => {
-      const newFilters = { ...prev, [key]: value };
+      const newFilters = key === 'projectId'
+        ? { ...prev, projectId: value }
+        : { ...prev, [key]: value };
       
       setTimeout(() => {
         const params = new URLSearchParams();
@@ -157,7 +176,12 @@ function ProfessionalActivitiesPageContent() {
       if (prev.page === 1) return prev;
       return { ...prev, page: 1 };
     });
-  }, [router]);
+    if (key === 'projectId' && value && value !== currentProjectId) {
+      switchProject(value).catch((err) => {
+        console.error('Error switching project:', err);
+      });
+    }
+  }, [router, currentProjectId, switchProject]);
 
   const handleApproveClick = (activityId) => {
     setSelectedActivityId(activityId);
@@ -246,6 +270,11 @@ function ProfessionalActivitiesPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={actionLoading}
+          message="Updating activity..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -268,6 +297,20 @@ function ProfessionalActivitiesPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Log activities after assigning professionals"
+          description="Activities are tied to professional assignments and projects."
+          prerequisites={[
+            'Professional assignment exists',
+            'Project is selected',
+          ]}
+          actions={[
+            { href: '/professional-services', label: 'View Assignments' },
+            { href: '/professional-activities/new', label: 'Log Activity' },
+          ]}
+          tip="Filter by project to keep approvals clean and focused."
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">

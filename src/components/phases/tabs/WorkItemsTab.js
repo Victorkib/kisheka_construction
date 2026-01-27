@@ -8,7 +8,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Clock, DollarSign, Users, Briefcase } from 'lucide-react';
-import { WORK_ITEM_STATUSES, WORK_ITEM_CATEGORIES, getStatusColor, getPriorityColor, getPriorityLabel } from '@/lib/constants/work-item-constants';
+import { WORK_ITEM_STATUSES, getStatusColor, getPriorityColor, getPriorityLabel } from '@/lib/constants/work-item-constants';
 
 export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
   const [workItems, setWorkItems] = useState([]);

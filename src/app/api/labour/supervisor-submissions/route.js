@@ -94,12 +94,34 @@ export async function GET(request) {
       .limit(limit)
       .toArray();
 
+    const workItemIds = [...new Set(submissions.map((sub) => sub.workItemId?.toString()).filter(Boolean))];
+    const workItems = workItemIds.length > 0
+      ? await db.collection('work_items').find({
+        _id: { $in: workItemIds.map((id) => new ObjectId(id)) },
+        deletedAt: null,
+      }).toArray()
+      : [];
+    const workItemMap = {};
+    workItems.forEach((item) => {
+      workItemMap[item._id.toString()] = {
+        workItemName: item.name,
+        workItemStatus: item.status,
+      };
+    });
+
+    const submissionsWithWorkItems = submissions.map((submission) => ({
+      ...submission,
+      workItemName: submission.workItemId
+        ? workItemMap[submission.workItemId.toString()]?.workItemName || null
+        : null,
+    }));
+
     // Get total count for pagination
     const total = await db.collection('supervisor_submissions').countDocuments(query);
 
     return successResponse(
       {
-        submissions,
+        submissions: submissionsWithWorkItems,
         pagination: {
           page,
           limit,
@@ -138,6 +160,7 @@ export async function POST(request) {
       phaseId,
       floorId,
       categoryId,
+      workItemId,
       entryDate,
       submittedBy,
       attachments = [],
@@ -225,6 +248,14 @@ export async function POST(request) {
       parsedEntries = parsed;
     }
 
+    // If submission-level work item is provided, apply to entries missing one
+    if (workItemId && ObjectId.isValid(workItemId)) {
+      parsedEntries = parsedEntries.map((entry) => ({
+        ...entry,
+        workItemId: entry.workItemId || workItemId,
+      }));
+    }
+
     // Match workers to profiles
     const workerNames = [...new Set(parsedEntries.map((e) => e.workerName))];
     const workerProfiles = await db.collection('worker_profiles').find({
@@ -259,6 +290,7 @@ export async function POST(request) {
       phaseId,
       floorId,
       categoryId,
+      workItemId,
       entryDate,
       labourEntries: enrichedEntries,
       submittedBy,

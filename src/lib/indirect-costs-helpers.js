@@ -5,7 +5,7 @@
 
 import { getDatabase } from '@/lib/mongodb/connection';
 import { ObjectId } from 'mongodb';
-import { INITIAL_EXPENSE_APPROVED_STATUSES } from '@/lib/status-constants';
+import { INITIAL_EXPENSE_APPROVED_STATUSES, LABOUR_APPROVED_STATUSES } from '@/lib/status-constants';
 import { isEnhancedBudget, getBudgetTotal } from '@/lib/schemas/budget-schema';
 
 /**
@@ -46,7 +46,7 @@ export async function calculateIndirectCostsSpending(projectId) {
         deletedAt: null,
         isIndirectLabour: true,
         indirectCostCategory: { $exists: true, $ne: null },
-        status: { $in: ['approved', 'paid', 'APPROVED', 'PAID'] } // Labour entries are approved on creation
+        status: { $in: LABOUR_APPROVED_STATUSES } // Labour entries are approved on creation
       }
     },
     {
@@ -97,7 +97,7 @@ export async function calculateIndirectCostsByCategory(projectId) {
         deletedAt: null,
         isIndirectLabour: true,
         indirectCostCategory: { $exists: true, $ne: null },
-        status: { $in: ['approved', 'paid', 'APPROVED', 'PAID'] }
+        status: { $in: LABOUR_APPROVED_STATUSES }
       }
     },
     {

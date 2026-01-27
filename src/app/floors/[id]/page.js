@@ -33,6 +33,17 @@ export default function FloorDetailPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
   const [dependencies, setDependencies] = useState(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [floorSummary, setFloorSummary] = useState({
+    materials: { count: 0, totalCost: 0 },
+    requests: { count: 0, totalEstimated: 0 },
+    purchaseOrders: { count: 0, totalCost: 0 },
+    labour: { count: 0, totalCost: 0, totalHours: 0 },
+    workItems: { count: 0, totalCost: 0, phaseCount: 0 },
+    equipment: { count: 0, totalCost: 0 },
+  });
+  const [ledgerItems, setLedgerItems] = useState([]);
+  const [phaseBreakdown, setPhaseBreakdown] = useState([]);
 
   const [formData, setFormData] = useState({
     status: 'NOT_STARTED',
@@ -108,7 +119,8 @@ export default function FloorDetailPage() {
       
       // Check dependencies for deletion
       if (floorData._id) {
-        checkDependencies(floorData._id);
+        checkDependencies(floorData._id, floorData.projectId);
+        loadFloorInsights(floorData);
       }
     } catch (err) {
       setError(err.message);
@@ -118,19 +130,176 @@ export default function FloorDetailPage() {
     }
   };
 
-  const checkDependencies = async (floorId) => {
+  const loadFloorInsights = async (floorData) => {
+    if (!floorData?._id || !floorData?.projectId) {
+      return;
+    }
+    setInsightsLoading(true);
+    const floorId = floorData._id.toString();
+    const projectId = floorData.projectId.toString();
+
+    const toNumber = (value) => {
+      if (typeof value === 'number') return value;
+      const parsed = parseFloat(value);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    };
+
+    const safeGet = async (url) => {
+      const response = await fetch(url);
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to load data');
+      }
+      return data.data;
+    };
+
+    try {
+      const [
+        materialsData,
+        requestsData,
+        purchaseOrdersData,
+        labourData,
+        workItemsData,
+        equipmentData,
+      ] = await Promise.all([
+        safeGet(`/api/materials?projectId=${projectId}&floor=${floorId}&limit=200&sortBy=createdAt&sortOrder=desc`),
+        safeGet(`/api/material-requests?projectId=${projectId}&floorId=${floorId}&limit=200&sortBy=createdAt&sortOrder=desc`),
+        safeGet(`/api/purchase-orders?projectId=${projectId}&floorId=${floorId}&limit=200&sortBy=createdAt&sortOrder=desc`),
+        safeGet(`/api/labour/entries?projectId=${projectId}&floorId=${floorId}&limit=200&sortBy=entryDate&sortOrder=desc`),
+        safeGet(`/api/work-items?projectId=${projectId}&floorId=${floorId}&limit=200&sortBy=createdAt&sortOrder=desc`),
+        safeGet(`/api/equipment?projectId=${projectId}&limit=200`),
+      ]);
+
+      const materials = materialsData?.materials || materialsData || [];
+      const requests = requestsData?.requests || requestsData || [];
+      const orders = purchaseOrdersData?.orders || purchaseOrdersData || [];
+      const labourEntries = labourData?.entries || labourData || [];
+      const workItems = workItemsData?.workItems || workItemsData || [];
+      const equipment = equipmentData?.equipment || equipmentData || [];
+
+      const materialsTotal = materials.reduce((sum, item) => sum + toNumber(item.totalCost), 0);
+      const requestsTotal = requests.reduce((sum, item) => sum + toNumber(item.estimatedCost), 0);
+      const ordersTotal = orders.reduce((sum, item) => sum + toNumber(item.totalCost), 0);
+      const labourTotal = labourEntries.reduce((sum, item) => sum + toNumber(item.totalCost), 0);
+      const labourHours = labourEntries.reduce((sum, item) => sum + toNumber(item.totalHours), 0);
+      const workItemsTotal = workItems.reduce(
+        (sum, item) => sum + toNumber(item.actualCost || item.estimatedCost),
+        0
+      );
+
+      const floorPhaseIds = new Set(
+        workItems.map((item) => item.phaseId?.toString()).filter(Boolean)
+      );
+      const floorEquipment = equipment.filter((item) => {
+        if (!item.phaseId) return false;
+        return floorPhaseIds.has(item.phaseId.toString());
+      });
+      const equipmentTotal = floorEquipment.reduce((sum, item) => sum + toNumber(item.totalCost), 0);
+
+      const phaseMap = workItems.reduce((acc, item) => {
+        const key = item.phaseId?.toString() || 'unknown';
+        if (!acc[key]) {
+          acc[key] = {
+            phaseId: item.phaseId,
+            phaseName: item.phaseName || 'Unknown Phase',
+            count: 0,
+            totalCost: 0,
+          };
+        }
+        acc[key].count += 1;
+        acc[key].totalCost += toNumber(item.actualCost || item.estimatedCost);
+        return acc;
+      }, {});
+
+      const phaseSummary = Object.values(phaseMap)
+        .sort((a, b) => b.totalCost - a.totalCost)
+        .slice(0, 5);
+
+      setFloorSummary({
+        materials: { count: materials.length, totalCost: materialsTotal },
+        requests: { count: requests.length, totalEstimated: requestsTotal },
+        purchaseOrders: { count: orders.length, totalCost: ordersTotal },
+        labour: { count: labourEntries.length, totalCost: labourTotal, totalHours: labourHours },
+        workItems: { count: workItems.length, totalCost: workItemsTotal, phaseCount: phaseSummary.length },
+        equipment: { count: floorEquipment.length, totalCost: equipmentTotal },
+      });
+      setPhaseBreakdown(phaseSummary);
+
+      const ledger = [
+        ...materials.slice(0, 10).map((item) => ({
+          id: item._id,
+          type: 'Material',
+          title: item.name || item.materialName || 'Material',
+          amount: toNumber(item.totalCost),
+          date: item.createdAt || item.updatedAt,
+          link: `/items/${item._id}`,
+        })),
+        ...requests.slice(0, 10).map((item) => ({
+          id: item._id,
+          type: 'Material Request',
+          title: item.requestNumber || item.materialName || 'Material Request',
+          amount: toNumber(item.estimatedCost),
+          date: item.createdAt || item.updatedAt,
+          link: `/material-requests/${item._id}`,
+        })),
+        ...orders.slice(0, 10).map((item) => ({
+          id: item._id,
+          type: 'Purchase Order',
+          title: item.purchaseOrderNumber || item.materialName || 'Purchase Order',
+          amount: toNumber(item.totalCost),
+          date: item.createdAt || item.sentAt,
+          link: `/purchase-orders/${item._id}`,
+        })),
+        ...labourEntries.slice(0, 10).map((item) => ({
+          id: item._id,
+          type: 'Labour Entry',
+          title: item.workerName || item.entryNumber || 'Labour Entry',
+          amount: toNumber(item.totalCost),
+          date: item.entryDate || item.createdAt,
+          link: null,
+        })),
+        ...workItems.slice(0, 10).map((item) => ({
+          id: item._id,
+          type: 'Work Item',
+          title: item.name || 'Work Item',
+          amount: toNumber(item.actualCost || item.estimatedCost),
+          date: item.updatedAt || item.createdAt,
+          link: `/work-items/${item._id}`,
+        })),
+        ...floorEquipment.slice(0, 10).map((item) => ({
+          id: item._id,
+          type: 'Equipment',
+          title: item.equipmentName || 'Equipment',
+          amount: toNumber(item.totalCost),
+          date: item.startDate || item.createdAt,
+          link: `/equipment/${item._id}`,
+        })),
+      ]
+        .filter((item) => item.date)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+        .slice(0, 20);
+
+      setLedgerItems(ledger);
+    } catch (insightsError) {
+      console.error('Error loading floor insights:', insightsError);
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
+
+  const checkDependencies = async (floorId, projectId) => {
     try {
       // Check if floor has dependencies
       const [materialsRes, requestsRes] = await Promise.all([
-        fetch(`/api/materials?floorId=${floorId}&limit=1`).catch(() => ({ json: () => ({ data: [] }) })),
-        fetch(`/api/material-requests?floorId=${floorId}&limit=1`).catch(() => ({ json: () => ({ data: [] }) })),
+        fetch(`/api/materials?projectId=${projectId}&floor=${floorId}&limit=1`).catch(() => ({ json: () => ({ data: [] }) })),
+        fetch(`/api/material-requests?projectId=${projectId}&floorId=${floorId}&limit=1`).catch(() => ({ json: () => ({ data: { requests: [], pagination: { total: 0 } } }) })),
       ]);
       
       const materialsData = await materialsRes.json();
       const requestsData = await requestsRes.json();
       
       const materialCount = materialsData.data?.length || 0;
-      const requestCount = requestsData.data?.length || 0;
+      const requestCount = requestsData.data?.pagination?.total || requestsData.data?.requests?.length || 0;
       
       if (materialCount > 0 || requestCount > 0) {
         setDependencies({
@@ -406,6 +575,145 @@ export default function FloorDetailPage() {
           </div>
         </div>
 
+        {/* Floor Accountability Snapshot */}
+        <div className="bg-white rounded-lg shadow p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">Floor Accountability Snapshot</h2>
+              <p className="text-sm text-gray-600">Materials, labour, requests, orders, and equipment tied to this floor</p>
+            </div>
+            {insightsLoading && (
+              <span className="text-xs text-gray-500">Refreshing…</span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-6 gap-4">
+            <div className="border border-gray-200 rounded-lg p-4">
+              <p className="text-xs uppercase text-gray-500">Materials</p>
+              <p className="text-lg font-semibold text-gray-900 mt-2">{floorSummary.materials.count}</p>
+              <p className="text-sm text-gray-600">{formatCurrency(floorSummary.materials.totalCost)}</p>
+              <Link
+                href={`/items?floor=${floor._id}&projectId=${floor.projectId}`}
+                className="text-xs text-blue-600 hover:text-blue-800 mt-2 inline-block"
+              >
+                View materials →
+              </Link>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-4">
+              <p className="text-xs uppercase text-gray-500">Material Requests</p>
+              <p className="text-lg font-semibold text-gray-900 mt-2">{floorSummary.requests.count}</p>
+              <p className="text-sm text-gray-600">{formatCurrency(floorSummary.requests.totalEstimated)}</p>
+              <Link
+                href={`/material-requests?floorId=${floor._id}&projectId=${floor.projectId}`}
+                className="text-xs text-blue-600 hover:text-blue-800 mt-2 inline-block"
+              >
+                View requests →
+              </Link>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-4">
+              <p className="text-xs uppercase text-gray-500">Purchase Orders</p>
+              <p className="text-lg font-semibold text-gray-900 mt-2">{floorSummary.purchaseOrders.count}</p>
+              <p className="text-sm text-gray-600">{formatCurrency(floorSummary.purchaseOrders.totalCost)}</p>
+              <Link
+                href={`/purchase-orders?floorId=${floor._id}&projectId=${floor.projectId}`}
+                className="text-xs text-blue-600 hover:text-blue-800 mt-2 inline-block"
+              >
+                View orders →
+              </Link>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-4">
+              <p className="text-xs uppercase text-gray-500">Labour</p>
+              <p className="text-lg font-semibold text-gray-900 mt-2">{floorSummary.labour.count}</p>
+              <p className="text-sm text-gray-600">{formatCurrency(floorSummary.labour.totalCost)}</p>
+              <p className="text-xs text-gray-500 mt-1">{floorSummary.labour.totalHours} hrs logged</p>
+              <Link
+                href={`/labour/entries?floorId=${floor._id}&projectId=${floor.projectId}`}
+                className="text-xs text-blue-600 hover:text-blue-800 mt-2 inline-block"
+              >
+                View entries →
+              </Link>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-4">
+              <p className="text-xs uppercase text-gray-500">Work Items</p>
+              <p className="text-lg font-semibold text-gray-900 mt-2">{floorSummary.workItems.count}</p>
+              <p className="text-sm text-gray-600">{formatCurrency(floorSummary.workItems.totalCost)}</p>
+              <p className="text-xs text-gray-500 mt-1">{floorSummary.workItems.phaseCount} phases</p>
+              <Link
+                href={`/work-items?floorId=${floor._id}&projectId=${floor.projectId}`}
+                className="text-xs text-blue-600 hover:text-blue-800 mt-2 inline-block"
+              >
+                View work items →
+              </Link>
+            </div>
+            <div className="border border-gray-200 rounded-lg p-4">
+              <p className="text-xs uppercase text-gray-500">Equipment</p>
+              <p className="text-lg font-semibold text-gray-900 mt-2">{floorSummary.equipment.count}</p>
+              <p className="text-sm text-gray-600">{formatCurrency(floorSummary.equipment.totalCost)}</p>
+              <p className="text-xs text-gray-500 mt-1">Phase-linked</p>
+              <Link
+                href={`/equipment?projectId=${floor.projectId}`}
+                className="text-xs text-blue-600 hover:text-blue-800 mt-2 inline-block"
+              >
+                View equipment →
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            <div className="border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-semibold text-gray-900">Recent Activity Ledger</h3>
+                <span className="text-xs text-gray-500">Last 20 items</span>
+              </div>
+              {ledgerItems.length === 0 ? (
+                <p className="text-sm text-gray-500">No floor activity recorded yet.</p>
+              ) : (
+                <div className="space-y-3">
+                  {ledgerItems.map((item) => (
+                    <div key={`${item.type}-${item.id}`} className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{item.title}</p>
+                        <p className="text-xs text-gray-500">
+                          {item.type} • {item.date ? formatDate(item.date) : 'Unknown date'}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-semibold text-gray-900">{formatCurrency(item.amount)}</p>
+                        {item.link && (
+                          <Link href={item.link} className="text-xs text-blue-600 hover:text-blue-800">
+                            View →
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">Phase Coverage & Budget</h3>
+              {phaseBreakdown.length === 0 ? (
+                <p className="text-sm text-gray-500">No work items linked to this floor yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {phaseBreakdown.map((phase) => (
+                    <div key={phase.phaseId?.toString() || phase.phaseName} className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{phase.phaseName}</p>
+                        <p className="text-xs text-gray-500">{phase.count} work item(s)</p>
+                      </div>
+                      <p className="text-sm font-semibold text-gray-900">{formatCurrency(phase.totalCost)}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <p className="text-xs text-gray-500 mt-3">
+                Equipment totals reflect phase-linked assignments mapped to this floor.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Floor Information */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Floor Information</h2>
@@ -631,6 +939,7 @@ export default function FloorDetailPage() {
 
 // Floor Progress Section Component
 function FloorProgressSection({ floorId, canEdit }) {
+  const toast = useToast();
   const [progress, setProgress] = useState(null);
   const [loading, setLoading] = useState(true);
   const [completionPercentage, setCompletionPercentage] = useState(0);

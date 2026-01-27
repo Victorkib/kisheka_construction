@@ -322,6 +322,10 @@ export async function POST(request) {
         ? entryData.indirectCostCategory || indirectCostCategory || 'siteOverhead'
         : null;
 
+      if (!entryIsIndirect && !entryWorkItemId) {
+        return errorResponse('Work item is required for direct labour entries', 400);
+      }
+
       // Use default values from batch if not provided in entry
       const entryWithDefaults = {
         ...entryData,

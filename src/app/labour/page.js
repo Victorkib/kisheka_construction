@@ -136,6 +136,17 @@ export default function LabourDashboardPage() {
               <div className="text-sm text-purple-100">Use saved templates</div>
             </div>
           </Link>
+
+          <Link
+            href="/labour/site-reports/new"
+            className="flex items-center gap-3 p-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+          >
+            <FileText className="w-6 h-6" />
+            <div>
+              <div className="font-semibold">Site Report</div>
+              <div className="text-sm text-indigo-100">Log site updates</div>
+            </div>
+          </Link>
         </div>
 
         {/* Today's Summary */}

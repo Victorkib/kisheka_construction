@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ImagePreview } from '@/components/uploads/image-preview';
@@ -23,7 +23,10 @@ import { useToast } from '@/components/toast';
 export default function InvestorDetailPage() {
   const router = useRouter();
   const params = useParams();
+  const searchParams = useSearchParams();
   const investorId = params?.id;
+  const returnTo = searchParams.get('returnTo');
+  const returnProjectId = searchParams.get('projectId');
   const { canAccess } = usePermissions();
   const toast = useToast();
   const [investor, setInvestor] = useState(null);
@@ -33,6 +36,7 @@ export default function InvestorDetailPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fetchingContributions, setFetchingContributions] = useState(false);
+  const [reconciling, setReconciling] = useState(false);
   const [showStatementGenerator, setShowStatementGenerator] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [archiving, setArchiving] = useState(false);
@@ -154,6 +158,34 @@ export default function InvestorDetailPage() {
 
   const handleDeleteClick = () => {
     setShowDeleteModal(true);
+  };
+
+  const handleReconcileContributions = async () => {
+    if (!investorId) {
+      toast.showError('Invalid investor ID');
+      return;
+    }
+
+    setReconciling(true);
+    try {
+      const response = await fetch(`/api/investors/${investorId}/reconcile`, {
+        method: 'POST',
+      });
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to reconcile contributions');
+      }
+
+      toast.showSuccess(data.message || 'Contributions reconciled successfully!');
+      await fetchInvestor();
+      await fetchContributions();
+    } catch (err) {
+      toast.showError(err.message || 'Failed to reconcile contributions');
+      console.error('Reconcile contributions error:', err);
+    } finally {
+      setReconciling(false);
+    }
   };
 
   const handleArchiveConfirm = async () => {
@@ -297,6 +329,32 @@ export default function InvestorDetailPage() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {returnTo && (
+          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-blue-800">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-sm">
+                <p className="font-semibold">Return to bulk material request</p>
+                <p className="text-xs">Allocate funds, then jump back to continue supplier assignment.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {returnProjectId && (
+                  <Link
+                    href={`/financing?projectId=${returnProjectId}&returnTo=${encodeURIComponent(returnTo)}`}
+                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                  >
+                    View Financing
+                  </Link>
+                )}
+                <Link
+                  href={returnTo}
+                  className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                >
+                  Back to Bulk Request
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="mb-6">
           <Link
             href="/investors"
@@ -378,6 +436,31 @@ export default function InvestorDetailPage() {
             <div className="text-xl font-semibold text-gray-900 mt-1">{investor.status}</div>
           </div>
         </div>
+
+        {canAccess('manage_investors') && investor && contributions.length > 0 && (
+          (() => {
+            const contributionsTotal = contributions
+              .filter((entry) => entry.type !== 'RETURN')
+              .reduce((sum, entry) => sum + (entry.amount || 0), 0);
+            const totalInvested = investor.totalInvested || 0;
+            const delta = totalInvested - contributionsTotal;
+            if (Math.abs(delta) < 0.01) return null;
+            return (
+              <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                <div>
+                  <span className="font-semibold">Data mismatch detected.</span> Contributions total {formatCurrency(contributionsTotal)} but Total Invested is {formatCurrency(totalInvested)}.
+                </div>
+                <button
+                  onClick={handleReconcileContributions}
+                  disabled={reconciling}
+                  className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-amber-600 text-white font-medium hover:bg-amber-700 disabled:opacity-60"
+                >
+                  {reconciling ? 'Reconciling...' : 'Reconcile Contributions'}
+                </button>
+              </div>
+            );
+          })()
+        )}
 
         {/* Investment Allocations */}
         <div className="mb-6">

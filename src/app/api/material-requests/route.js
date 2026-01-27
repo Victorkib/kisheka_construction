@@ -17,6 +17,7 @@ import { createNotification, createNotifications } from '@/lib/notifications';
 import { generateRequestNumber } from '@/lib/generators/request-number-generator';
 import { validateMaterialRequest, VALID_URGENCY_LEVELS } from '@/lib/schemas/material-request-schema';
 import { validateCapitalAvailability } from '@/lib/financial-helpers';
+import { incrementLibraryUsage } from '@/lib/helpers/material-library-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
@@ -51,6 +52,7 @@ export async function GET(request) {
     const status = searchParams.get('status');
     const urgency = searchParams.get('urgency');
     const phaseId = searchParams.get('phaseId');
+    const floorId = searchParams.get('floorId');
     const search = searchParams.get('search');
     const page = parseInt(searchParams.get('page') || '1', 10);
     const limit = parseInt(searchParams.get('limit') || '20', 10);
@@ -100,6 +102,15 @@ export async function GET(request) {
     // Phase Management: Add phaseId filter
     if (phaseId && ObjectId.isValid(phaseId)) {
       query.phaseId = new ObjectId(phaseId);
+    }
+    
+    if (floorId === 'unassigned' || floorId === 'none' || floorId === 'missing') {
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [{ floorId: { $exists: false } }, { floorId: null }],
+      });
+    } else if (floorId && ObjectId.isValid(floorId)) {
+      query.floorId = new ObjectId(floorId);
     }
 
     // Search filter
@@ -204,6 +215,7 @@ export async function POST(request) {
       estimatedUnitCost,
       reason,
       notes,
+      libraryMaterialId,
     } = body;
 
     // Validate required fields
@@ -383,6 +395,7 @@ export async function POST(request) {
       ...(categoryId && ObjectId.isValid(categoryId) && { categoryId: new ObjectId(categoryId) }),
       ...(category && { category: category.trim() }),
       phaseId: new ObjectId(phaseId), // Required - validated above
+      ...(libraryMaterialId && ObjectId.isValid(libraryMaterialId) && { libraryMaterialId: new ObjectId(libraryMaterialId) }),
       materialName: materialName.trim(),
       description: description?.trim() || '',
       quantityNeeded: parseFloat(quantityNeeded),
@@ -403,6 +416,15 @@ export async function POST(request) {
     const result = await db.collection('material_requests').insertOne(materialRequest);
 
     const insertedRequest = { ...materialRequest, _id: result.insertedId };
+
+    // Increment library usage if selected from library (non-critical)
+    if (libraryMaterialId && ObjectId.isValid(libraryMaterialId)) {
+      try {
+        await incrementLibraryUsage(libraryMaterialId, userProfile._id.toString());
+      } catch (libraryError) {
+        console.error('Library usage increment failed:', libraryError);
+      }
+    }
 
     // Collect warnings (from validation and capital check)
     const warnings = [];

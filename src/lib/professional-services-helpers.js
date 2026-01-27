@@ -37,11 +37,12 @@ export async function calculateProjectProfessionalServicesStats(projectId) {
   const architectsCount = assignments.filter(a => a.type === 'architect').length;
   const engineersCount = assignments.filter(a => a.type === 'engineer').length;
   
-  const totalFees = fees.reduce((sum, fee) => sum + (fee.amount || 0), 0);
-  const paidFees = fees
+  const activeFees = fees.filter((fee) => !['REJECTED', 'ARCHIVED'].includes(fee.status));
+  const totalFees = activeFees.reduce((sum, fee) => sum + (fee.amount || 0), 0);
+  const paidFees = activeFees
     .filter(fee => fee.status === 'PAID')
     .reduce((sum, fee) => sum + (fee.amount || 0), 0);
-  const pendingFees = fees
+  const pendingFees = activeFees
     .filter(fee => fee.status === 'PENDING' || fee.status === 'APPROVED')
     .reduce((sum, fee) => sum + (fee.amount || 0), 0);
 
@@ -51,14 +52,14 @@ export async function calculateProjectProfessionalServicesStats(projectId) {
   const designRevisions = activities.filter(a => a.activityType === 'design_revision').length;
 
   // Calculate fees by professional type
-  const architectFees = fees
+  const architectFees = activeFees
     .filter(fee => {
       const assignment = assignments.find(a => a._id.toString() === fee.professionalServiceId?.toString());
       return assignment?.type === 'architect';
     })
     .reduce((sum, fee) => sum + (fee.amount || 0), 0);
 
-  const engineerFees = fees
+  const engineerFees = activeFees
     .filter(fee => {
       const assignment = assignments.find(a => a._id.toString() === fee.professionalServiceId?.toString());
       return assignment?.type === 'engineer';
@@ -184,8 +185,9 @@ export async function getProjectProfessionalServicesBreakdown(projectId) {
         deletedAt: null,
       }).toArray();
 
-      const totalFees = fees.reduce((sum, fee) => sum + (fee.amount || 0), 0);
-      const paidFees = fees
+      const activeFees = fees.filter((fee) => !['REJECTED', 'ARCHIVED'].includes(fee.status));
+      const totalFees = activeFees.reduce((sum, fee) => sum + (fee.amount || 0), 0);
+      const paidFees = activeFees
         .filter(fee => fee.status === 'PAID')
         .reduce((sum, fee) => sum + (fee.amount || 0), 0);
 
@@ -200,7 +202,9 @@ export async function getProjectProfessionalServicesBreakdown(projectId) {
           activitiesCount,
           totalFees,
           paidFees,
-          pendingFees: totalFees - paidFees,
+          pendingFees: activeFees
+            .filter((fee) => ['PENDING', 'APPROVED'].includes(fee.status))
+            .reduce((sum, fee) => sum + (fee.amount || 0), 0),
         },
       };
     })

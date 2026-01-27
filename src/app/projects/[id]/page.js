@@ -11,7 +11,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { ConfirmationModal, EditModal, RestoreModal } from '@/components/modals';
+import { BaseModal, ConfirmationModal, EditModal, RestoreModal } from '@/components/modals';
 import { ArchiveBadge } from '@/components/badges';
 import { useToast } from '@/components/toast';
 import { LoadingOverlay } from '@/components/loading';
@@ -930,8 +930,18 @@ export default function ProjectDetailPage() {
   const [originalFormData, setOriginalFormData] = useState(null);
   const [financialData, setFinancialData] = useState(null);
   const [fetchingFinancialData, setFetchingFinancialData] = useState(false);
+  const [impactLoaded, setImpactLoaded] = useState(false);
   const [dependencies, setDependencies] = useState(null);
   const [floors, setFloors] = useState([]);
+  const [floorsLoading, setFloorsLoading] = useState(true);
+  const [initializingFloors, setInitializingFloors] = useState(false);
+  const [showFloorInitModal, setShowFloorInitModal] = useState(false);
+  const [floorInitError, setFloorInitError] = useState('');
+  const [floorInitForm, setFloorInitForm] = useState({
+    floorCount: 10,
+    includeBasements: false,
+    basementCount: 0,
+  });
 
   const [formData, setFormData] = useState({
     projectName: '',
@@ -967,11 +977,18 @@ export default function ProjectDetailPage() {
     if (projectId) {
       fetchUser();
       fetchProject();
+      fetchFloors();
     } else {
       setError('Invalid project ID');
       setLoading(false);
     }
   }, [projectId]);
+
+  useEffect(() => {
+    if (projectId && canDelete) {
+      fetchFinancialData();
+    }
+  }, [projectId, canDelete]);
 
   const fetchUser = async () => {
     try {
@@ -1041,6 +1058,29 @@ export default function ProjectDetailPage() {
       console.error('Fetch project error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchFloors = async () => {
+    if (!projectId) {
+      setFloors([]);
+      setFloorsLoading(false);
+      return;
+    }
+    try {
+      setFloorsLoading(true);
+      const response = await fetch(`/api/floors?projectId=${projectId}`);
+      const data = await response.json();
+      if (data.success) {
+        setFloors(data.data || []);
+      } else {
+        setFloors([]);
+      }
+    } catch (err) {
+      console.error('Fetch floors error:', err);
+      setFloors([]);
+    } finally {
+      setFloorsLoading(false);
     }
   };
 
@@ -1217,71 +1257,121 @@ export default function ProjectDetailPage() {
   const fetchFinancialData = async () => {
     try {
       setFetchingFinancialData(true);
-      // Fetch project finances
-      const financesResponse = await fetch(`/api/project-finances?projectId=${projectId}`);
-      const financesData = await financesResponse.json();
-      
-      if (financesData.success && financesData.data) {
-        const pf = financesData.data;
+      setImpactLoaded(false);
+
+      const response = await fetch(`/api/projects/${projectId}/dependencies`);
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        const { finances, dependencies: dependencyMap, investorAllocations } = data.data;
+
         setFinancialData({
-          totalUsed: pf.totalUsed || 0,
-          totalInvested: pf.totalInvested || 0,
-          capitalBalance: pf.capitalBalance || 0,
+          totalUsed: finances?.totalUsed || 0,
+          totalInvested: finances?.totalInvested || 0,
+          capitalBalance: finances?.capitalBalance || 0,
         });
-      }
-      
-      // Fetch dependency counts (use count queries if available, otherwise estimate from list)
-      try {
-        const [materialsRes, expensesRes, initialExpensesRes, floorsRes] = await Promise.all([
-          fetch(`/api/materials?projectId=${projectId}&limit=1`).catch(() => ({ json: () => ({ data: [] }) })),
-          fetch(`/api/expenses?projectId=${projectId}&limit=1`).catch(() => ({ json: () => ({ data: [] }) })),
-          fetch(`/api/initial-expenses?projectId=${projectId}&limit=1`).catch(() => ({ json: () => ({ data: [] }) })),
-          fetch(`/api/floors?projectId=${projectId}`).catch(() => ({ json: () => ({ data: [] }) })),
-        ]);
-        
-        const materialsData = await materialsRes.json();
-        const expensesData = await expensesRes.json();
-        const initialExpensesData = await initialExpensesRes.json();
-        const floorsData = await floorsRes.json();
-        
-        // Get allocations count from project data if available
-        const allocationsCount = project?.statistics?.investorAllocations || 0;
-        
-        // Store floors for visualization
-        if (floorsData.success && floorsData.data) {
-          setFloors(floorsData.data);
-        }
-        
+
         setDependencies({
-          materials: materialsData.data?.length || 0,
-          expenses: expensesData.data?.length || 0,
-          initialExpenses: initialExpensesData.data?.length || 0,
-          floors: floorsData.data?.length || 0,
-          allocations: allocationsCount,
+          ...(dependencyMap || {}),
+          investorAllocations: investorAllocations || dependencyMap?.investorAllocations || 0,
         });
-      } catch (err) {
-        console.error('Error fetching dependencies:', err);
-        setDependencies({
-          materials: 0,
-          expenses: 0,
-          initialExpenses: 0,
-          floors: 0,
-          allocations: 0,
-        });
+      } else {
+        setDependencies(null);
       }
     } catch (err) {
       console.error('Error fetching financial/dependency data:', err);
+      setDependencies(null);
     } finally {
       setFetchingFinancialData(false);
+      setImpactLoaded(true);
+    }
+  };
+
+  const handleInitializeFloors = () => {
+    setFloorInitError('');
+    setFloorInitForm((prev) => ({
+      floorCount: typeof prev.floorCount === 'number' ? prev.floorCount : 10,
+      includeBasements: !!prev.includeBasements,
+      basementCount: typeof prev.basementCount === 'number' ? prev.basementCount : 0,
+    }));
+    setShowFloorInitModal(true);
+  };
+
+  const handleFloorInitChange = (field, value) => {
+    setFloorInitError('');
+    setFloorInitForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleSubmitFloorInit = async () => {
+    if (!projectId) {
+      toast.showError('Invalid project ID');
+      return;
+    }
+
+    const floorCount = parseInt(floorInitForm.floorCount, 10);
+    const basementCount = parseInt(floorInitForm.basementCount, 10);
+    const includeBasements = !!floorInitForm.includeBasements;
+
+    if (isNaN(floorCount) || floorCount < 0 || floorCount > 50) {
+      setFloorInitError('Floor count must be a number between 0 and 50.');
+      return;
+    }
+
+    if (includeBasements && (isNaN(basementCount) || basementCount < 0 || basementCount > 10)) {
+      setFloorInitError('Basement count must be a number between 0 and 10.');
+      return;
+    }
+
+    if (floorCount === 0 && (!includeBasements || basementCount === 0)) {
+      setFloorInitError('Please add at least one floor or basement.');
+      return;
+    }
+
+    try {
+      setInitializingFloors(true);
+      const response = await fetch(`/api/projects/${projectId}/floors/initialize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          floorCount,
+          includeBasements,
+          basementCount: includeBasements ? basementCount : 0,
+        }),
+      });
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to initialize floors');
+      }
+
+      toast.showSuccess(`Successfully initialized ${data.data.count} floors`);
+      setShowFloorInitModal(false);
+      await fetchFloors();
+    } catch (err) {
+      const message = err.message || 'Failed to initialize floors';
+      setFloorInitError(message);
+      toast.showError(message);
+      console.error('Initialize floors error:', err);
+    } finally {
+      setInitializingFloors(false);
     }
   };
 
   const handleArchiveClick = () => {
     setShowDeleteModal(true);
+    if (!fetchingFinancialData) {
+      fetchFinancialData();
+    }
   };
 
   const handleDeleteClick = () => {
     setShowDeleteModal(true);
+    if (!fetchingFinancialData) {
+      fetchFinancialData();
+    }
   };
 
   const handleArchiveConfirm = async () => {
@@ -1311,14 +1401,20 @@ export default function ProjectDetailPage() {
   const handleDeleteConfirm = async () => {
     setDeleting(true);
     try {
-      const response = await fetch(`/api/projects/${projectId}?force=true`, {
+      const deleteUrl = project?.status === 'archived'
+        ? `/api/projects/${projectId}?force=true`
+        : `/api/projects/${projectId}`;
+      const response = await fetch(deleteUrl, {
         method: 'DELETE',
       });
 
       const data = await response.json();
 
       if (!data.success) {
-        throw new Error(data.error || 'Failed to delete project');
+        const errorMessage = typeof data.error === 'string'
+          ? data.error
+          : data.error?.message || 'Failed to delete project';
+        throw new Error(errorMessage);
       }
 
       toast.showSuccess(data.message || 'Project permanently deleted successfully!');
@@ -1693,6 +1789,34 @@ export default function ProjectDetailPage() {
         {/* Project Setup Checklist */}
         <ProjectSetupChecklist projectId={projectId} />
 
+        {/* Floors Setup */}
+        {!floorsLoading && floors.length === 0 && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold text-gray-900">Floors</h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  No floors have been created for this project yet.
+                </p>
+              </div>
+              {canEdit && (
+                <button
+                  onClick={handleInitializeFloors}
+                  disabled={initializingFloors}
+                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium"
+                >
+                  {initializingFloors ? 'Creating Floors...' : 'Auto-create Floors'}
+                </button>
+              )}
+            </div>
+            {canEdit && (
+              <p className="text-xs text-gray-500 mt-3">
+                This will create a ground floor and the number of upper floors you specify. Basements are optional.
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Floor Visualization */}
         {floors.length > 0 && (
           <FloorVisualization
@@ -1982,23 +2106,14 @@ export default function ProjectDetailPage() {
                   </>
                 ) : (
                   <>
-                    What would you like to do with <strong>"{project.projectName}"</strong>?
+                    Choose what to do with <strong>"{project.projectName}"</strong>.
                   </>
                 )}
               </p>
               {project.status !== 'archived' && (
-                <>
-                  <p className="mb-2 font-medium">Permanent deletion will:</p>
-                  <ul className="list-disc list-inside mb-3 space-y-1 text-gray-600">
-                    <li>Remove all investor allocations</li>
-                    <li>Permanently delete all materials, expenses, and initial expenses</li>
-                    <li>Delete all floors</li>
-                    <li>Recalculate finances for affected projects</li>
-                    {financialData && financialData.capitalBalance > 0 && (
-                      <li>Return unused capital to investors</li>
-                    )}
-                  </ul>
-                </>
+                <p className="text-sm text-gray-600">
+                  Archive keeps the project and records but hides it from active views. Delete permanently removes the project and linked data.
+                </p>
               )}
             </>
           ) : (
@@ -2014,6 +2129,8 @@ export default function ProjectDetailPage() {
         showRecommendation={project?.status !== 'archived' && financialData && financialData.totalUsed > 0}
         financialImpact={financialData}
         dependencies={dependencies}
+        actionsDisabled={!impactLoaded}
+        actionsDisabledReason={!impactLoaded ? 'Loading impact summary before enabling actions...' : ''}
       />
 
       {/* Restore Modal */}
@@ -2026,6 +2143,111 @@ export default function ProjectDetailPage() {
         itemName={project?.projectName}
         isLoading={restoring}
       />
+
+      {/* Auto-create Floors Modal */}
+      <BaseModal
+        isOpen={showFloorInitModal}
+        onClose={() => !initializingFloors && setShowFloorInitModal(false)}
+        maxWidth="max-w-2xl"
+        variant="indigo"
+        showCloseButton={true}
+        isLoading={initializingFloors}
+        loadingMessage="Creating floors..."
+        preventCloseDuringLoading={true}
+      >
+        <div className="px-8 py-6 border-b border-gray-200/50">
+          <div className="flex items-center gap-3">
+            <div className="bg-indigo-600/90 text-white rounded-xl p-3 shadow-lg shadow-indigo-500/30">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="text-2xl font-bold text-gray-900">Auto-create Floors</h3>
+              <p className="text-sm text-gray-600">
+                Generate a default floor stack for this project.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-8 py-6 space-y-6">
+          {floorInitError && (
+            <div className="bg-red-50/80 border border-red-200/70 text-red-700 px-4 py-3 rounded-xl">
+              {floorInitError}
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Number of Floors
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="50"
+                value={floorInitForm.floorCount}
+                onChange={(e) => handleFloorInitChange('floorCount', e.target.value)}
+                className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              />
+              <p className="text-xs text-gray-500 mt-2">
+                Includes ground floor. Range: 0-50.
+              </p>
+            </div>
+
+            <div className="bg-gradient-to-br from-indigo-50/70 to-blue-50/70 border border-indigo-200/50 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-gray-800">Include Basements</p>
+                  <p className="text-xs text-gray-600">Optional underground floors</p>
+                </div>
+                <input
+                  type="checkbox"
+                  checked={floorInitForm.includeBasements}
+                  onChange={(e) => handleFloorInitChange('includeBasements', e.target.checked)}
+                  className="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                />
+              </div>
+              {floorInitForm.includeBasements && (
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Basement Count
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="10"
+                    value={floorInitForm.basementCount}
+                    onChange={(e) => handleFloorInitChange('basementCount', e.target.value)}
+                    className="w-full px-4 py-2.5 bg-white/90 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">Range: 0-10.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="px-8 py-6 border-t border-gray-200/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 bg-gradient-to-br from-gray-50/60 to-transparent">
+          <button
+            type="button"
+            onClick={() => setShowFloorInitModal(false)}
+            disabled={initializingFloors}
+            className="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-gray-700 bg-white/70 backdrop-blur-sm border border-gray-300/50 rounded-xl hover:bg-white/90 hover:border-gray-400/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmitFloorInit}
+            disabled={initializingFloors}
+            className="relative w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl hover:from-indigo-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40"
+          >
+            {initializingFloors ? 'Creating Floors...' : 'Create Floors'}
+          </button>
+        </div>
+      </BaseModal>
     </AppLayout>
   );
 }

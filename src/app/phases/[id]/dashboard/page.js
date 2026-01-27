@@ -19,6 +19,7 @@ export default function PhaseDashboardPage() {
   const params = useParams();
   const toast = useToast();
   const [dashboardData, setDashboardData] = useState(null);
+  const [floorData, setFloorData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -32,28 +33,37 @@ export default function PhaseDashboardPage() {
     try {
       setLoading(true);
       setError(null);
+      const [dashboardResponse, floorsResponse] = await Promise.all([
+        fetch(`/api/phases/${params.id}/dashboard`),
+        fetch(`/api/phases/${params.id}/floors`),
+      ]);
 
-      const response = await fetch(`/api/phases/${params.id}/dashboard`);
-      
-      // Check if response is OK and is JSON
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText.substring(0, 100)}`);
+      if (!dashboardResponse.ok) {
+        const errorText = await dashboardResponse.text();
+        throw new Error(`HTTP ${dashboardResponse.status}: ${errorText.substring(0, 100)}`);
       }
 
-      const contentType = response.headers.get('content-type');
+      const contentType = dashboardResponse.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
-        const text = await response.text();
+        const text = await dashboardResponse.text();
         throw new Error(`Expected JSON but got ${contentType}. Response: ${text.substring(0, 200)}`);
       }
 
-      const data = await response.json();
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to fetch dashboard data');
+      const dashboardPayload = await dashboardResponse.json();
+      if (!dashboardPayload.success) {
+        throw new Error(dashboardPayload.error || 'Failed to fetch dashboard data');
       }
 
-      setDashboardData(data.data);
+      let floorsPayload = null;
+      if (floorsResponse.ok) {
+        floorsPayload = await floorsResponse.json();
+        if (!floorsPayload.success) {
+          floorsPayload = null;
+        }
+      }
+
+      setDashboardData(dashboardPayload.data);
+      setFloorData(floorsPayload?.data || null);
     } catch (err) {
       setError(err.message);
       console.error('Fetch dashboard error:', err);
@@ -118,6 +128,22 @@ export default function PhaseDashboardPage() {
   }
 
   const { phase, project, financialSummary, statistics, recentActivity } = dashboardData;
+  const floorTotals = (floorData?.floors || []).reduce((acc, floor) => {
+    const total = (floor.totals?.materials || 0)
+      + (floor.totals?.materialRequests || 0)
+      + (floor.totals?.purchaseOrders || 0)
+      + (floor.totals?.labour || 0)
+      + (floor.totals?.workItems || 0);
+    const group = floor.group || 'unknown';
+    acc[group] = (acc[group] || 0) + total;
+    acc.all = (acc.all || 0) + total;
+    return acc;
+  }, { all: 0, basement: 0, superstructure: 0, unknown: 0 });
+  const unassignedTotal = (floorData?.unassigned?.totals?.materials || 0)
+    + (floorData?.unassigned?.totals?.materialRequests || 0)
+    + (floorData?.unassigned?.totals?.purchaseOrders || 0)
+    + (floorData?.unassigned?.totals?.labour || 0)
+    + (floorData?.unassigned?.totals?.workItems || 0);
 
   return (
     <AppLayout>
@@ -235,6 +261,36 @@ export default function PhaseDashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Floor Breakdown */}
+        {floorData && (
+          <div className="bg-white rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Floor Breakdown</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="border border-gray-200 rounded-lg p-4">
+                <p className="text-sm text-gray-600">Basement</p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(floorTotals.basement || 0)}</p>
+              </div>
+              <div className="border border-gray-200 rounded-lg p-4">
+                <p className="text-sm text-gray-600">Superstructure</p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(floorTotals.superstructure || 0)}</p>
+              </div>
+              <div className="border border-gray-200 rounded-lg p-4">
+                <p className="text-sm text-gray-600">Unassigned Floors</p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(unassignedTotal)}</p>
+                <p className="text-xs text-gray-500 mt-1">Assign floors to improve accuracy</p>
+              </div>
+            </div>
+            <div className="mt-4">
+              <Link
+                href={`/phases/${params.id}?tab=floors`}
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
+                View floor breakdown →
+              </Link>
+            </div>
+          </div>
+        )}
 
         {/* Statistics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">

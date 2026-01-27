@@ -301,6 +301,14 @@ export const PERMISSIONS = {
   view_supervisor_submissions: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
 
   // ============================================
+  // Site Report Permissions
+  // ============================================
+  create_site_report: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK],
+  edit_site_report: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  approve_site_report: [ROLES.OWNER, ROLES.PROJECT_MANAGER],
+  view_site_reports: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.SUPERVISOR, ROLES.CLERK, ROLES.ACCOUNTANT],
+
+  // ============================================
   // Labour Reports Permissions
   // ============================================
   view_labour_reports: [ROLES.OWNER, ROLES.PROJECT_MANAGER, ROLES.ACCOUNTANT, ROLES.SUPERVISOR],
@@ -563,6 +571,12 @@ export const PERMISSION_CATEGORIES = {
     'approve_supervisor_submission',
     'reject_supervisor_submission',
     'view_supervisor_submissions',
+  ],
+  SITE_REPORTS: [
+    'create_site_report',
+    'edit_site_report',
+    'approve_site_report',
+    'view_site_reports',
   ],
   LABOUR_REPORTS: [
     'view_labour_reports',

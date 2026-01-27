@@ -14,6 +14,15 @@
 import { useState, useEffect } from 'react';
 import { LoadingButton, LoadingOverlay } from '@/components/loading';
 
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
+
 export function AllocationManager({ investorId, totalInvested, onUpdate }) {
   const [allocations, setAllocations] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -48,8 +57,17 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
         throw new Error(projectsData.error || 'Failed to fetch projects');
       }
 
-      setAllocations(allocationsData.data.allocations || []);
-      setProjects(projectsData.data || []);
+      const normalizedAllocations = (allocationsData.data.allocations || []).map((alloc) => ({
+        ...alloc,
+        projectId: normalizeId(alloc.projectId),
+      }));
+      const normalizedProjects = (projectsData.data || []).map((project) => ({
+        ...project,
+        _id: normalizeId(project._id),
+      }));
+
+      setAllocations(normalizedAllocations);
+      setProjects(normalizedProjects);
     } catch (err) {
       setError(err.message || 'Failed to load data');
       console.error('Fetch error:', err);
@@ -100,7 +118,7 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
       const validAllocations = allocations
         .filter((alloc) => alloc.projectId && alloc.amount > 0)
         .map((alloc) => ({
-          projectId: alloc.projectId,
+          projectId: normalizeId(alloc.projectId),
           amount: parseFloat(alloc.amount) || 0,
           notes: alloc.notes || null,
         }));
@@ -118,7 +136,11 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
       }
 
       setSuccess(true);
-      setAllocations(data.data.allocations || []);
+      const updatedAllocations = (data.data.allocations || []).map((alloc) => ({
+        ...alloc,
+        projectId: normalizeId(alloc.projectId),
+      }));
+      setAllocations(updatedAllocations);
       
       if (onUpdate) {
         onUpdate(data.data);

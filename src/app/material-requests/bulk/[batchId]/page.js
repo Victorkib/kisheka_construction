@@ -11,7 +11,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable, LoadingButton } from '@/components/loading';
+import { LoadingTable, LoadingButton, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ApprovalSummary } from '@/components/bulk-request/approval-summary';
@@ -31,6 +31,9 @@ function BatchDetailPageContent() {
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [projectFinances, setProjectFinances] = useState(null);
+  const [financeLoading, setFinanceLoading] = useState(false);
+  const [financeError, setFinanceError] = useState(null);
 
   useEffect(() => {
     if (params.batchId) {
@@ -41,6 +44,7 @@ function BatchDetailPageContent() {
   useEffect(() => {
     if (batch?.projectId) {
       fetchProject(batch.projectId);
+      fetchProjectFinances(batch.projectId);
     }
   }, [batch?.projectId]);
 
@@ -74,6 +78,23 @@ function BatchDetailPageContent() {
       }
     } catch (err) {
       console.error('Error fetching project:', err);
+    }
+  };
+
+  const fetchProjectFinances = async (projectId) => {
+    try {
+      setFinanceLoading(true);
+      setFinanceError(null);
+      const response = await fetch(`/api/project-finances?projectId=${projectId}`);
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to fetch project finances');
+      }
+      setProjectFinances(data.data || null);
+    } catch (err) {
+      setFinanceError(err.message);
+    } finally {
+      setFinanceLoading(false);
     }
   };
 
@@ -166,15 +187,78 @@ function BatchDetailPageContent() {
   const canAssignSuppliers = batch.status === 'approved' && (hasPermission || isOwner || isPM);
   
   const canDelete = ['draft', 'pending_approval'].includes(batch.status);
+  const returnTo = `/material-requests/bulk/${params.batchId}`;
+  const availableCapital = projectFinances?.availableCapital ?? null;
+  const estimatedBatchCost = batch?.totals?.totalEstimatedCost || 0;
+  const hasCapital = availableCapital === null ? true : availableCapital > 0;
+  const isCapitalShort = availableCapital !== null && availableCapital < estimatedBatchCost;
 
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={actionLoading}
+          message="Updating batch..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-8">
           <Link href="/material-requests" className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
             ← Back to Material Requests
           </Link>
+          {(financeLoading || projectFinances || financeError) && (
+            <div className={`mb-4 rounded-lg border px-4 py-3 ${
+              financeError
+                ? 'bg-red-50 border-red-200 text-red-700'
+                : !hasCapital
+                  ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                  : isCapitalShort
+                    ? 'bg-amber-50 border-amber-200 text-amber-800'
+                    : 'bg-green-50 border-green-200 text-green-800'
+            }`}>
+              {financeLoading ? (
+                <p className="text-sm">Checking project capital availability...</p>
+              ) : financeError ? (
+                <p className="text-sm">Capital check failed: {financeError}</p>
+              ) : (
+                <div className="text-sm">
+                  <p className="font-semibold">Project capital check</p>
+                  <p>
+                    Available: <span className="font-medium">{formatCurrency(availableCapital)}</span>
+                  </p>
+                  <p className="text-xs mt-1">
+                    Batch estimated cost: {formatCurrency(estimatedBatchCost)}.
+                  </p>
+                  {!hasCapital && (
+                    <p className="text-xs mt-2">
+                      This project has no available capital. Allocate funds before approving or assigning suppliers.
+                    </p>
+                  )}
+                  {hasCapital && isCapitalShort && (
+                    <p className="text-xs mt-2">
+                      Available capital is below the batch estimate. You may need to add funding before ordering.
+                    </p>
+                  )}
+                  {batch?.projectId && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Link
+                        href={`/financing?projectId=${batch.projectId.toString()}&returnTo=${encodeURIComponent(returnTo)}`}
+                        className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 bg-white text-amber-800 hover:bg-amber-100"
+                      >
+                        Open Financing
+                      </Link>
+                      <Link
+                        href={`/investors?projectId=${batch.projectId.toString()}&returnTo=${encodeURIComponent(returnTo)}`}
+                        className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 bg-white text-amber-800 hover:bg-amber-100"
+                      >
+                        Allocate Funds (Investors)
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-3">

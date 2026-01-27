@@ -84,7 +84,12 @@ export async function GET(request) {
       query.phaseId = new ObjectId(phaseId);
     }
 
-    if (floorId && ObjectId.isValid(floorId)) {
+    if (floorId === 'unassigned' || floorId === 'none' || floorId === 'missing') {
+      query.$and = query.$and || [];
+      query.$and.push({
+        $or: [{ floorId: { $exists: false } }, { floorId: null }],
+      });
+    } else if (floorId && ObjectId.isValid(floorId)) {
       query.floorId = new ObjectId(floorId);
     }
 
@@ -314,6 +319,12 @@ export async function POST(request) {
     if (!indirectLabour) {
       if (!phaseId || !ObjectId.isValid(phaseId)) {
         return errorResponse('Valid phaseId is required for direct labour', 400);
+      }
+    }
+
+    if (!indirectLabour) {
+      if (!workItemId || !ObjectId.isValid(workItemId)) {
+        return errorResponse('Valid workItemId is required for direct labour', 400);
       }
     }
 

@@ -10,6 +10,7 @@ import { getDatabase } from '@/lib/mongodb/connection';
 import { getUserProfile } from '@/lib/auth-helpers';
 import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
+import { supportsTransactions, withTransactionOrFallback } from '@/lib/mongodb/transaction-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
@@ -56,98 +57,264 @@ export async function POST(request, { params }) {
     }
 
     // Check dependencies for summary
-    const materialsCount = await db.collection('materials').countDocuments({
-      projectId: new ObjectId(id),
-      deletedAt: null,
-    });
-
-    const expensesCount = await db.collection('expenses').countDocuments({
-      projectId: new ObjectId(id),
-      deletedAt: null,
-    });
-
-    const initialExpensesCount = await db.collection('initial_expenses').countDocuments({
-      projectId: new ObjectId(id),
-      status: { $ne: 'deleted' },
-    });
-
-    const floorsCount = await db.collection('floors').countDocuments({
-      projectId: new ObjectId(id),
-    });
+    const projectObjectId = new ObjectId(id);
+    const [
+      materialsCount,
+      expensesCount,
+      initialExpensesCount,
+      floorsCount,
+      phasesCount,
+      workItemsCount,
+      labourEntriesCount,
+      labourBatchesCount,
+      labourCostSummariesCount,
+      materialRequestsCount,
+      materialRequestBatchesCount,
+      purchaseOrdersCount,
+      equipmentCount,
+      subcontractorsCount,
+      professionalServicesCount,
+      professionalFeesCount,
+      professionalActivitiesCount,
+      siteReportsCount,
+      supervisorSubmissionsCount,
+      budgetReallocationsCount,
+      budgetAdjustmentsCount,
+      budgetTransfersCount,
+      contingencyDrawsCount,
+      approvalsCount,
+      membershipsCount,
+      teamLinksCount,
+      notificationsCount,
+    ] = await Promise.all([
+      db.collection('materials').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('expenses').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('initial_expenses').countDocuments({ projectId: projectObjectId, status: { $ne: 'deleted' } }),
+      db.collection('floors').countDocuments({ projectId: projectObjectId }),
+      db.collection('phases').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('work_items').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('labour_entries').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('labour_batches').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('labour_cost_summaries').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('material_requests').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('material_request_batches').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('purchase_orders').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('equipment').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('subcontractors').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('professional_services').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('professional_fees').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('professional_activities').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('site_reports').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('supervisor_submissions').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('budget_reallocations').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('budget_adjustments').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('budget_transfers').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('contingency_draws').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('approvals').countDocuments({ projectId: projectObjectId }),
+      db.collection('project_memberships').countDocuments({ projectId: projectObjectId, status: 'active' }),
+      db.collection('project_teams').countDocuments({ projectId: projectObjectId }),
+      db.collection('notifications').countDocuments({ projectId: projectObjectId }),
+    ]);
 
     const investorsWithAllocations = await db
       .collection('investors')
       .find({
         status: 'ACTIVE',
-        'projectAllocations.projectId': new ObjectId(id),
+        'projectAllocations.projectId': projectObjectId,
       })
       .toArray();
 
     const allocationsCount = investorsWithAllocations.length;
 
     const now = new Date();
+    const archiveMeta = {
+      archivedAt: now,
+      archivedBy: new ObjectId(userProfile._id),
+      updatedAt: now,
+    };
+    const softDeleteMeta = {
+      ...archiveMeta,
+      deletedAt: now,
+    };
 
-    // Soft delete related entities
-    // Soft delete materials
-    if (materialsCount > 0) {
-      await db.collection('materials').updateMany(
-        {
-          projectId: new ObjectId(id),
-          deletedAt: null,
-        },
-        {
-          $set: {
-            deletedAt: now,
-            updatedAt: now,
-          },
-        }
+    const transactionsSupported = await supportsTransactions();
+    if (!transactionsSupported) {
+      return errorResponse(
+        'Project archive requires database transactions. Enable a replica set to proceed.',
+        503
       );
     }
 
-    // Soft delete expenses
-    if (expensesCount > 0) {
-      await db.collection('expenses').updateMany(
-        {
-          projectId: new ObjectId(id),
-          deletedAt: null,
-        },
-        {
-          $set: {
-            deletedAt: now,
-            status: 'ARCHIVED',
-            updatedAt: now,
-          },
-        }
-      );
-    }
+    const result = await withTransactionOrFallback(
+      async ({ db: transactionDb, session }) => {
+        const updateOptions = session ? { session } : {};
 
-    // Soft delete initial expenses
-    if (initialExpensesCount > 0) {
-      await db.collection('initial_expenses').updateMany(
-        {
-          projectId: new ObjectId(id),
-          status: { $ne: 'deleted' },
-        },
-        {
-          $set: {
-            status: 'deleted',
-            updatedAt: now,
-          },
-        }
-      );
-    }
+        await transactionDb.collection('materials').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
 
-    // Archive project (soft delete)
-    const result = await db.collection('projects').findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      {
-        $set: {
-          status: 'archived',
-          deletedAt: now,
-          updatedAt: now,
-        },
+        await transactionDb.collection('expenses').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: { ...softDeleteMeta, status: 'ARCHIVED' } },
+          updateOptions
+        );
+
+        await transactionDb.collection('initial_expenses').updateMany(
+          { projectId: projectObjectId, status: { $ne: 'deleted' } },
+          { $set: { ...archiveMeta, status: 'deleted', deletedAt: now } },
+          updateOptions
+        );
+
+        await transactionDb.collection('floors').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('phases').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('work_items').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('labour_entries').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('labour_batches').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('labour_cost_summaries').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('site_reports').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('supervisor_submissions').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('material_requests').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('material_request_batches').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('purchase_orders').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('equipment').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('subcontractors').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('professional_services').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('professional_fees').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('professional_activities').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('budget_reallocations').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('budget_adjustments').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('budget_transfers').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('contingency_draws').updateMany(
+          { projectId: projectObjectId, deletedAt: null },
+          { $set: softDeleteMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('approvals').updateMany(
+          { projectId: projectObjectId },
+          { $set: archiveMeta },
+          updateOptions
+        );
+
+        await transactionDb.collection('project_memberships').updateMany(
+          { projectId: projectObjectId, status: 'active' },
+          { $set: { ...archiveMeta, status: 'archived', removedAt: now } },
+          updateOptions
+        );
+
+        await transactionDb.collection('project_teams').updateMany(
+          { projectId: projectObjectId },
+          { $set: archiveMeta },
+          updateOptions
+        );
+
+        const projectUpdate = await transactionDb.collection('projects').findOneAndUpdate(
+          { _id: projectObjectId },
+          { $set: { ...archiveMeta, status: 'archived', deletedAt: now } },
+          { returnDocument: 'after', ...updateOptions }
+        );
+
+        return projectUpdate;
       },
-      { returnDocument: 'after' }
+      async () => {},
+      { maxTimeMS: 60000 }
     );
 
     if (!result.value) {
@@ -181,6 +348,29 @@ export async function POST(request, { params }) {
           expenses: expensesCount,
           initialExpenses: initialExpensesCount,
           floors: floorsCount,
+          phases: phasesCount,
+          workItems: workItemsCount,
+          labourEntries: labourEntriesCount,
+          labourBatches: labourBatchesCount,
+          labourCostSummaries: labourCostSummariesCount,
+          materialRequests: materialRequestsCount,
+          materialRequestBatches: materialRequestBatchesCount,
+          purchaseOrders: purchaseOrdersCount,
+          equipment: equipmentCount,
+          subcontractors: subcontractorsCount,
+          professionalServices: professionalServicesCount,
+          professionalFees: professionalFeesCount,
+          professionalActivities: professionalActivitiesCount,
+          siteReports: siteReportsCount,
+          supervisorSubmissions: supervisorSubmissionsCount,
+          budgetReallocations: budgetReallocationsCount,
+          budgetAdjustments: budgetAdjustmentsCount,
+          budgetTransfers: budgetTransfersCount,
+          contingencyDraws: contingencyDrawsCount,
+          approvals: approvalsCount,
+          projectMemberships: membershipsCount,
+          projectTeams: teamLinksCount,
+          notifications: notificationsCount,
           investorAllocations: allocationsCount,
         },
       },

@@ -15,6 +15,7 @@ import { CloudinaryUploadWidget } from '@/components/uploads/cloudinary-upload-w
 
 export function ProfessionalFeesForm({
   initialData = null,
+  prefillData = null,
   professionalServices = [],
   projects = [],
   phases = [],
@@ -24,6 +25,7 @@ export function ProfessionalFeesForm({
   loading = false,
   error = null,
   isEdit = false,
+  canAutoApprove = false,
 }) {
   const [formData, setFormData] = useState({
     professionalServiceId: '',
@@ -47,6 +49,7 @@ export function ProfessionalFeesForm({
 
   const [selectedProfessional, setSelectedProfessional] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
+  const [autoApprove, setAutoApprove] = useState(false);
 
   // Load initial data if editing
   useEffect(() => {
@@ -82,19 +85,39 @@ export function ProfessionalFeesForm({
     }
   }, [initialData, professionalServices]);
 
+  // Apply prefill data for new fee creation
+  useEffect(() => {
+    if (!isEdit && prefillData) {
+      setFormData((prev) => ({
+        ...prev,
+        professionalServiceId: prev.professionalServiceId || prefillData.professionalServiceId || '',
+        activityId: prev.activityId || prefillData.activityId || '',
+        projectId: prev.projectId || prefillData.projectId || '',
+        phaseId: prev.phaseId || prefillData.phaseId || '',
+        feeType: prev.feeType || prefillData.feeType || '',
+        description: prev.description || prefillData.description || '',
+        amount: prev.amount || prefillData.amount || '',
+      }));
+    }
+  }, [isEdit, prefillData]);
+
   // Update selected professional when professionalServiceId changes
   useEffect(() => {
     if (formData.professionalServiceId) {
       const service = professionalServices.find(s => s._id?.toString() === formData.professionalServiceId);
       if (service) {
         setSelectedProfessional(service);
-        // Auto-set projectId if not already set
-        if (!formData.projectId && service.project?._id) {
-          setFormData((prev) => ({
+        setFormData((prev) => {
+          const nextProjectId = service.project?._id?.toString() || service.projectId?.toString() || prev.projectId;
+          const nextPhaseId = service.phase?._id?.toString() || service.phaseId?.toString() || prev.phaseId;
+          const projectChanged = prev.projectId && nextProjectId && prev.projectId !== nextProjectId;
+          return {
             ...prev,
-            projectId: service.project._id.toString(),
-          }));
-        }
+            projectId: nextProjectId,
+            phaseId: projectChanged ? (nextPhaseId || '') : (nextPhaseId || prev.phaseId),
+            activityId: projectChanged ? '' : prev.activityId,
+          };
+        });
       }
     } else {
       setSelectedProfessional(null);
@@ -128,7 +151,7 @@ export function ProfessionalFeesForm({
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, options = {}) => {
     e.preventDefault();
     
     // Basic validation
@@ -163,7 +186,7 @@ export function ProfessionalFeesForm({
       amount: parseFloat(formData.amount),
     };
 
-    onSubmit(submitData);
+    onSubmit(submitData, { ...options, autoApprove: options.autoApprove ?? autoApprove });
   };
 
   // Get available fee types based on selected professional
@@ -516,14 +539,49 @@ export function ProfessionalFeesForm({
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update Fee' : 'Create Fee')}
-        </button>
+        {isEdit ? (
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Updating...' : 'Update Fee'}
+          </button>
+        ) : (
+          <>
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? 'Creating...' : 'Create Fee'}
+            </button>
+            {canAutoApprove && (
+              <button
+                type="button"
+                disabled={loading}
+                onClick={(e) => handleSubmit(e, { autoApprove: true })}
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {loading ? 'Approving...' : 'Create & Approve'}
+              </button>
+            )}
+          </>
+        )}
       </div>
+
+      {!isEdit && canAutoApprove && (
+        <div className="flex items-center justify-end gap-2 text-sm text-gray-600">
+          <input
+            type="checkbox"
+            id="autoApproveFee"
+            checked={autoApprove}
+            onChange={(e) => setAutoApprove(e.target.checked)}
+            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label htmlFor="autoApproveFee">Auto-approve on create (Owner/PM/Accountant)</label>
+        </div>
+      )}
     </form>
   );
 }

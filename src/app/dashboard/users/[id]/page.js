@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingCard, LoadingSpinner } from '@/components/loading';
+import { LoadingCard, LoadingSpinner, LoadingOverlay } from '@/components/loading';
 import { ConfirmationModal, EditModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
 
@@ -390,6 +390,11 @@ export default function UserDetailPage() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={isSaving}
+          message="Saving user changes..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-8">
           <Link href="/dashboard/users" className="text-blue-600 hover:underline mb-4 inline-block">

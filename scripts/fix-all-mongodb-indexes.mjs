@@ -199,9 +199,18 @@ async function fixAllIndexes() {
       
       // Check if index already exists
       const existingIndexes = await floorsCollection.indexes();
+      const legacyIndex = existingIndexes.find(idx =>
+        idx.name === 'floorNumber_unique'
+      );
       const existingIndex = existingIndexes.find(idx => 
         idx.name === 'project_floorNumber_unique'
       );
+      
+      if (legacyIndex) {
+        console.log('   ⚠️  Found legacy floorNumber_unique index, dropping...');
+        await floorsCollection.dropIndex('floorNumber_unique');
+        console.log('   ✅ Dropped legacy floorNumber_unique index');
+      }
       
       if (!existingIndex) {
         await floorsCollection.createIndex(
@@ -417,6 +426,10 @@ async function fixAllIndexes() {
       const initialExpensesCollection = db.collection('initial_expenses');
       const existingIndexes = await initialExpensesCollection.indexes();
       const indexNames = existingIndexes.map(idx => idx.name);
+      const findIndexByKey = (key) => {
+        const keyString = JSON.stringify(key);
+        return existingIndexes.find(idx => JSON.stringify(idx.key) === keyString);
+      };
       
       const indexesToCreate = [
         { key: { projectId: 1, createdAt: -1 }, name: 'projectId_createdAt_desc' },
@@ -426,12 +439,18 @@ async function fixAllIndexes() {
       
       for (const indexDef of indexesToCreate) {
         if (!indexNames.includes(indexDef.name)) {
-          await initialExpensesCollection.createIndex(
-            indexDef.key,
-            { name: indexDef.name, background: true }
-          );
-          console.log(`   ✅ Created index: ${indexDef.name}`);
-          results.phase3.success.push(`Initial Expenses: ${indexDef.name}`);
+          const existingByKey = findIndexByKey(indexDef.key);
+          if (existingByKey) {
+            console.log(`   ℹ️  Index already exists with name: ${existingByKey.name}`);
+            results.phase3.success.push(`Initial Expenses: ${existingByKey.name}`);
+          } else {
+            await initialExpensesCollection.createIndex(
+              indexDef.key,
+              { name: indexDef.name, background: true }
+            );
+            console.log(`   ✅ Created index: ${indexDef.name}`);
+            results.phase3.success.push(`Initial Expenses: ${indexDef.name}`);
+          }
         } else {
           console.log(`   ℹ️  Index already exists: ${indexDef.name}`);
         }

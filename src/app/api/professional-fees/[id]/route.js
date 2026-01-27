@@ -333,7 +333,7 @@ export async function PATCH(request, { params }) {
     }
 
     // Update professional service assignment financial statistics if amount changed
-    if (amountChanged) {
+    if (amountChanged && !['REJECTED', 'ARCHIVED'].includes(existing.status)) {
       const amountDiff = updateData.amount - oldAmount;
       const updatedAssignment = await db.collection('professional_services').findOneAndUpdate(
         { _id: existing.professionalServiceId },
@@ -470,7 +470,7 @@ export async function DELETE(request, { params }) {
       { _id: existing.professionalServiceId },
       {
         $inc: {
-          totalFees: -existing.amount,
+          totalFees: ['REJECTED', 'ARCHIVED'].includes(existing.status) ? 0 : -existing.amount,
           feesPending: existing.status === 'PENDING' ? -existing.amount : 0,
           feesPaid: existing.status === 'PAID' ? -existing.amount : 0,
         },
@@ -479,6 +479,25 @@ export async function DELETE(request, { params }) {
         },
       }
     );
+
+    // Restore committed cost when removing a fee that reduced remaining commitment
+    if (existing.status === 'PENDING' && existing.projectId) {
+      const assignment = await db.collection('professional_services').findOne({
+        _id: existing.professionalServiceId,
+      });
+      if (assignment?.status === 'active' && assignment.contractValue > 0) {
+        try {
+          const { updateCommittedCost } = await import('@/lib/financial-helpers');
+          await updateCommittedCost(
+            existing.projectId.toString(),
+            existing.amount,
+            'add'
+          );
+        } catch (financialError) {
+          console.error('Error restoring committed cost after fee deletion:', financialError);
+        }
+      }
+    }
 
     // Create audit log
     await createAuditLog({

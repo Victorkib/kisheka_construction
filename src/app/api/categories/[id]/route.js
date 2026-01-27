@@ -11,6 +11,7 @@ import { getDatabase } from '@/lib/mongodb/connection';
 import { hasPermission } from '@/lib/role-helpers';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { ObjectId } from 'mongodb';
+import { CATEGORY_TYPES } from '@/lib/constants/category-constants';
 
 /**
  * DELETE /api/categories/[id]
@@ -49,17 +50,34 @@ export async function DELETE(request, { params }) {
       return errorResponse('Category not found', 404);
     }
 
-    // Check if category is used by materials
-    const materialCount = await db.collection('materials').countDocuments({
-      categoryId: new ObjectId(id),
-      deletedAt: null,
-    });
+    const categoryType = category.type || CATEGORY_TYPES.MATERIALS;
+    const categoryObjectId = new ObjectId(id);
 
-    if (materialCount > 0) {
-      return errorResponse(
-        `Cannot delete category. It is used by ${materialCount} material(s). Please reassign materials first.`,
-        400
-      );
+    const usageChecks = categoryType === CATEGORY_TYPES.WORK_ITEMS
+      ? [
+          { collection: 'work_items', field: 'categoryId', filter: { deletedAt: null }, label: 'work item(s)' },
+          { collection: 'labour_entries', field: 'categoryId', filter: { deletedAt: null }, label: 'labour entry(ies)' },
+          { collection: 'labour_batches', field: 'defaultCategoryId', filter: { deletedAt: null }, label: 'labour batch(es)' },
+          { collection: 'supervisor_submissions', field: 'categoryId', filter: { deletedAt: null }, label: 'supervisor submission(s)' },
+        ]
+      : [
+          { collection: 'materials', field: 'categoryId', filter: { deletedAt: null }, label: 'material(s)' },
+          { collection: 'material_library', field: 'categoryId', filter: { deletedAt: null }, label: 'library material(s)' },
+          { collection: 'material_requests', field: 'categoryId', filter: { deletedAt: null }, label: 'material request(s)' },
+          { collection: 'purchase_orders', field: 'categoryId', filter: {}, label: 'purchase order(s)' },
+        ];
+
+    for (const check of usageChecks) {
+      const count = await db.collection(check.collection).countDocuments({
+        ...check.filter,
+        [check.field]: categoryObjectId,
+      });
+      if (count > 0) {
+        return errorResponse(
+          `Cannot delete category. It is used by ${count} ${check.label}. Please reassign before deleting.`,
+          400
+        );
+      }
     }
 
     // Delete category

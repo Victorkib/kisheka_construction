@@ -11,7 +11,8 @@ import { useState, useEffect, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { AppLayout } from "@/components/layout/app-layout"
-import { LoadingSpinner, LoadingButton, LoadingTable } from "@/components/loading"
+import { LoadingSpinner, LoadingButton, LoadingTable, LoadingOverlay } from "@/components/loading"
+import PrerequisiteGuide from "@/components/help/PrerequisiteGuide"
 import { usePermissions } from "@/hooks/use-permissions"
 import { useToast } from "@/components/toast/toast-container"
 import { Plus, Search, Filter, Download, Edit, Trash2, Eye, Users, ChevronDown } from "lucide-react"
@@ -331,6 +332,11 @@ function WorkersPageContent() {
   return (
     <AppLayout>
       <div className="container mx-auto px-4 py-8">
+        <LoadingOverlay
+          isLoading={Boolean(deletingId)}
+          message="Deleting worker..."
+          fullScreen
+        />
         <div className="mb-8">
           {/* Title Section */}
           <div className="mb-6">
@@ -356,6 +362,20 @@ function WorkersPageContent() {
             </LoadingButton>
           </div>
         </div>
+
+        <PrerequisiteGuide
+          title="Workers enable labour tracking"
+          description="Add workers before creating labour entries or assignments."
+          prerequisites={[
+            "Worker details are available",
+            "Project and phase context is known",
+          ]}
+          actions={[
+            { href: "/labour/workers/new", label: "Add Worker" },
+            { href: "/labour/entries/new", label: "Log Labour Entry" },
+          ]}
+          tip="Use bulk import for large teams."
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">

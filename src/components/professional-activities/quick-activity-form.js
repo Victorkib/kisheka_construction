@@ -134,6 +134,17 @@ export function QuickActivityForm({
       const service = professionalServices.find(s => s._id?.toString() === formData.professionalServiceId);
       if (service) {
         setSelectedProfessional(service);
+        setFormData((prev) => {
+          const nextProjectId = service.project?._id?.toString() || service.projectId?.toString() || prev.projectId;
+          const nextPhaseId = service.phase?._id?.toString() || service.phaseId?.toString() || prev.phaseId;
+          const projectChanged = prev.projectId && nextProjectId && prev.projectId !== nextProjectId;
+          return {
+            ...prev,
+            projectId: nextProjectId,
+            phaseId: projectChanged ? nextPhaseId || '' : (nextPhaseId || prev.phaseId),
+            floorId: projectChanged ? '' : prev.floorId,
+          };
+        });
       }
     } else {
       setSelectedProfessional(null);
@@ -287,7 +298,7 @@ export function QuickActivityForm({
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e, statusOverride = null) => {
     e.preventDefault();
     
     // Basic validation
@@ -312,8 +323,11 @@ export function QuickActivityForm({
     }
 
     // Prepare submission data
+    const finalStatus = isEdit ? formData.status : (statusOverride || formData.status || 'draft');
     const submitData = {
       ...formData,
+      status: finalStatus,
+      requiresApproval: isEdit ? formData.requiresApproval : finalStatus === 'pending_approval',
       visitDuration: formData.visitDuration ? parseFloat(formData.visitDuration) : null,
       inspectionDuration: formData.inspectionDuration ? parseFloat(formData.inspectionDuration) : null,
       feesCharged: formData.feesCharged ? parseFloat(formData.feesCharged) : null,
@@ -325,7 +339,7 @@ export function QuickActivityForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
       {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2">
@@ -1165,13 +1179,34 @@ export function QuickActivityForm({
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {loading ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update Activity' : 'Create Activity')}
-        </button>
+        {isEdit ? (
+          <button
+            type="submit"
+            disabled={loading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Updating...' : 'Update Activity'}
+          </button>
+        ) : (
+          <>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={(e) => handleSubmit(e, 'draft')}
+              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Save Draft
+            </button>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={(e) => handleSubmit(e, 'pending_approval')}
+              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Submit for Approval
+            </button>
+          </>
+        )}
       </div>
     </form>
   );

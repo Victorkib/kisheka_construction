@@ -12,18 +12,27 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingTable, LoadingSpinner } from '@/components/loading';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
 import { Plus, Search, Filter, Calendar, Users, Clock, DollarSign } from 'lucide-react';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { NoProjectsEmptyState } from '@/components/empty-states';
 
 function LabourBatchesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
+  const {
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
 
   const [batches, setBatches] = useState([]);
-  const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
@@ -35,32 +44,33 @@ function LabourBatchesPageContent() {
 
   // Filters
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: searchParams.get('projectId') || currentProjectId || '',
     status: searchParams.get('status') || '',
     search: searchParams.get('search') || '',
   });
 
-  // Fetch projects for filter dropdown
+  // Sync current project into filters
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    if (currentProjectId && currentProjectId !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: currentProjectId }));
+    }
+  }, [currentProjectId, filters.projectId]);
 
   // Fetch batches when filters or page changes
   useEffect(() => {
-    fetchBatches();
-  }, [filters, pagination.page]);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects/accessible');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data || []);
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
+    if (isEmpty) {
+      setLoading(false);
+      setBatches([]);
+      return;
     }
-  };
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setBatches([]);
+      return;
+    }
+    fetchBatches();
+  }, [filters, pagination.page, isEmpty, projectLoading]);
 
   const fetchBatches = async () => {
     try {
@@ -96,8 +106,22 @@ function LabourBatchesPageContent() {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    const updatedFilters = key === 'projectId'
+      ? { ...filters, projectId: value }
+      : { ...filters, [key]: value };
+    setFilters(updatedFilters);
     setPagination((prev) => ({ ...prev, page: 1 })); // Reset to first page
+    if (key === 'projectId' && value && value !== currentProjectId) {
+      switchProject(value).catch((err) => {
+        console.error('Error switching project:', err);
+      });
+    }
+
+    const params = new URLSearchParams();
+    Object.entries(updatedFilters).forEach(([k, v]) => {
+      if (v) params.set(k, v);
+    });
+    router.push(`/labour/batches?${params.toString()}`, { scroll: false });
   };
 
   const handleSearch = (e) => {
@@ -136,9 +160,23 @@ function LabourBatchesPageContent() {
 
   const getProjectName = (projectId) => {
     if (!projectId) return 'N/A';
-    const project = projects.find((p) => p._id === projectId);
+    const project = accessibleProjects.find((p) => p._id === projectId);
     return project ? `${project.projectCode} - ${project.projectName}` : 'Unknown Project';
   };
+
+  if (isEmpty && !loading) {
+    return (
+      <AppLayout>
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">Labour Batches</h1>
+            <p className="text-gray-600 mt-1">View and manage all labour batches</p>
+          </div>
+          <NoProjectsEmptyState />
+        </div>
+      </AppLayout>
+    );
+  }
 
   if (loading && batches.length === 0) {
     return (
@@ -171,6 +209,21 @@ function LabourBatchesPageContent() {
             )}
           </div>
 
+          <PrerequisiteGuide
+            title="Batches organize multiple labour entries"
+            description="Create batches after workers and project phases are defined."
+            prerequisites={[
+              'Workers are available',
+              'Project and phase context is set',
+            ]}
+            actions={[
+              { href: '/labour/workers/new', label: 'Add Worker' },
+              { href: '/phases', label: 'View Phases' },
+              { href: '/labour/batches/new', label: 'Create Batch' },
+            ]}
+            tip="Batch approvals speed up labour review."
+          />
+
           {/* Filters */}
           <div className="bg-white rounded-lg shadow p-4 mb-6">
             <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -182,7 +235,7 @@ function LabourBatchesPageContent() {
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Projects</option>
-                  {projects.map((project) => (
+                  {accessibleProjects.map((project) => (
                     <option key={project._id} value={project._id}>
                       {project.projectCode} - {project.projectName}
                     </option>

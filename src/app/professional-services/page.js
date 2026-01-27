@@ -11,16 +11,34 @@ import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable } from '@/components/loading';
+import { LoadingTable, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { useProjectContext } from '@/contexts/ProjectContext';
+
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
 
 function ProfessionalServicesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
+  const {
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +47,7 @@ function ProfessionalServicesPageContent() {
   const [projects, setProjects] = useState([]);
   
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: searchParams.get('projectId') || currentProjectId || '',
     libraryId: searchParams.get('libraryId') || '',
     type: searchParams.get('type') || '',
     status: searchParams.get('status') || '',
@@ -42,10 +60,15 @@ function ProfessionalServicesPageContent() {
   const [assignmentToTerminate, setAssignmentToTerminate] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  // Fetch projects on mount
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    setProjects(accessibleProjects || []);
+  }, [accessibleProjects]);
+
+  useEffect(() => {
+    if (currentProjectId && currentProjectId !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: currentProjectId }));
+    }
+  }, [currentProjectId, filters.projectId]);
 
   // Memoize filter values
   const filterValues = useMemo(() => ({
@@ -107,24 +130,25 @@ function ProfessionalServicesPageContent() {
   }, [pagination.page, pagination.limit, filterValues]);
 
   useEffect(() => {
-    fetchAssignments();
-  }, [fetchAssignments]);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data || []);
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
+    if (isEmpty) {
+      setLoading(false);
+      setAssignments([]);
+      return;
     }
-  };
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setAssignments([]);
+      return;
+    }
+    fetchAssignments();
+  }, [fetchAssignments, filters.projectId, isEmpty, projectLoading]);
 
   const handleFilterChange = useCallback((key, value) => {
     setFilters((prev) => {
-      const newFilters = { ...prev, [key]: value };
+      const newFilters = key === 'projectId'
+        ? { ...prev, projectId: value }
+        : { ...prev, [key]: value };
       
       setTimeout(() => {
         const params = new URLSearchParams();
@@ -140,10 +164,16 @@ function ProfessionalServicesPageContent() {
       if (prev.page === 1) return prev;
       return { ...prev, page: 1 };
     });
-  }, [router]);
+    if (key === 'projectId' && value && value !== currentProjectId) {
+      switchProject(value).catch((err) => {
+        console.error('Error switching project:', err);
+      });
+    }
+  }, [router, currentProjectId, switchProject]);
 
   const handleTerminate = (assignmentId, professionalName) => {
-    setAssignmentToTerminate({ id: assignmentId, name: professionalName });
+    const normalizedId = normalizeId(assignmentId);
+    setAssignmentToTerminate({ id: normalizedId, name: professionalName });
     setShowTerminateModal(true);
   };
 
@@ -204,6 +234,11 @@ function ProfessionalServicesPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={actionLoading}
+          message="Updating assignment..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
@@ -227,6 +262,21 @@ function ProfessionalServicesPageContent() {
           )}
         </div>
 
+        <PrerequisiteGuide
+          title="Before you create an assignment"
+          description="Assignments link a professional to a project and scope. Set up the project and service library first."
+          prerequisites={[
+            'Project exists for the assignment',
+            'Professional service library entry is created',
+          ]}
+          actions={[
+            { href: '/projects/new', label: 'Create Project' },
+            { href: '/professional-services-library/new', label: 'Add Service Type' },
+            { href: '/professional-services/new', label: 'New Assignment' },
+          ]}
+          tip="Use project filters to keep billing and activity tracking aligned."
+        />
+
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -238,7 +288,7 @@ function ProfessionalServicesPageContent() {
               <select
                 value={filters.projectId}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
               >
                 <option value="">All Projects</option>
                 {projects.map((project) => (
@@ -257,7 +307,7 @@ function ProfessionalServicesPageContent() {
               <select
                 value={filters.type}
                 onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
               >
                 <option value="">All Types</option>
                 <option value="architect">Architects</option>
@@ -273,7 +323,7 @@ function ProfessionalServicesPageContent() {
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
               >
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
@@ -293,7 +343,7 @@ function ProfessionalServicesPageContent() {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search by professional name..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
               />
             </div>
           </div>
@@ -365,8 +415,10 @@ function ProfessionalServicesPageContent() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {assignments.map((assignment) => (
-                    <tr key={assignment._id} className="hover:bg-gray-50">
+                  {assignments.map((assignment) => {
+                    const assignmentId = normalizeId(assignment._id);
+                    return (
+                      <tr key={assignmentId || assignment._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div>
@@ -424,14 +476,14 @@ function ProfessionalServicesPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end gap-2">
                           <Link
-                            href={`/professional-services/${assignment._id}`}
+                            href={`/professional-services/${assignmentId}`}
                             className="text-blue-600 hover:text-blue-900"
                           >
                             View
                           </Link>
                           {canAccess('edit_professional_service_assignment') && (
                             <Link
-                              href={`/professional-services/${assignment._id}/edit`}
+                              href={`/professional-services/${assignmentId}/edit`}
                               className="text-indigo-600 hover:text-indigo-900"
                             >
                               Edit
@@ -439,7 +491,7 @@ function ProfessionalServicesPageContent() {
                           )}
                           {canAccess('terminate_professional_service') && assignment.status === 'active' && (
                             <button
-                              onClick={() => handleTerminate(assignment._id, assignment.library?.name)}
+                              onClick={() => handleTerminate(assignmentId, assignment.library?.name)}
                               className="text-red-600 hover:text-red-900"
                             >
                               Terminate
@@ -447,8 +499,9 @@ function ProfessionalServicesPageContent() {
                           )}
                         </div>
                       </td>
-                    </tr>
-                  ))}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

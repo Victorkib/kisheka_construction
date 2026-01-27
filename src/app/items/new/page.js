@@ -15,6 +15,7 @@ import { CloudinaryUploadWidget } from '@/components/uploads/cloudinary-upload-w
 import { LoadingSpinner, LoadingOverlay, LoadingButton } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
+import { MaterialLibraryPicker } from '@/components/material-library/material-library-picker';
 
 function NewItemPageContent() {
   const router = useRouter();
@@ -71,6 +72,8 @@ function NewItemPageContent() {
     unit: 'piece',
     customUnit: '',
     unitCost: '',
+    estimatedUnitCost: '',
+    libraryMaterialId: '',
     supplierName: '',
     paymentMethod: 'CASH',
     invoiceNumber: '',
@@ -285,8 +288,21 @@ function NewItemPageContent() {
 
   const calculateTotal = () => {
     const qty = parseFloat(formData.quantity) || 0;
-    const cost = parseFloat(formData.unitCost) || 0;
+    const cost = parseFloat(formData.unitCost || formData.estimatedUnitCost) || 0;
     return (qty * cost).toFixed(2);
+  };
+
+  const handleLibrarySelect = (material) => {
+    setFormData((prev) => ({
+      ...prev,
+      name: material.name || prev.name,
+      description: material.description || prev.description,
+      unit: material.defaultUnit || prev.unit || 'piece',
+      categoryId: material.categoryId?.toString() || prev.categoryId,
+      category: material.category || prev.category,
+      estimatedUnitCost: prev.unitCost ? prev.estimatedUnitCost : (material.defaultUnitCost || prev.estimatedUnitCost),
+      libraryMaterialId: material._id?.toString() || prev.libraryMaterialId,
+    }));
   };
 
   // Helper function to check if category is a finishing category
@@ -349,6 +365,12 @@ function NewItemPageContent() {
       return;
     }
 
+    if (!formData.phaseId) {
+      setError('Please select a construction phase');
+      setLoading(false);
+      return;
+    }
+
     if (!formData.quantity || parseFloat(formData.quantity) <= 0) {
       setError('Please enter a valid quantity');
       setLoading(false);
@@ -361,6 +383,11 @@ function NewItemPageContent() {
       // But if unitCost is provided, it must be valid
       if (formData.unitCost && parseFloat(formData.unitCost) <= 0) {
         setError('If provided, unit cost must be greater than 0');
+        setLoading(false);
+        return;
+      }
+      if (formData.estimatedUnitCost && parseFloat(formData.estimatedUnitCost) <= 0) {
+        setError('If provided, estimated unit cost must be greater than 0');
         setLoading(false);
         return;
       }
@@ -407,8 +434,10 @@ function NewItemPageContent() {
         unit: formData.unit === 'others' ? formData.customUnit.trim() : formData.unit.trim(),
         category: categoryName,
         categoryId: formData.categoryId || null,
-        entryType: entryType === 'retroactive_entry' ? 'retroactive_entry' : 'retroactive_entry', // Default to retroactive for direct creation
+        entryType: 'retroactive_entry', // Direct creation is always retroactive
         isRetroactiveEntry: entryType === 'retroactive_entry',
+        ...(formData.libraryMaterialId && { libraryMaterialId: formData.libraryMaterialId }),
+        ...(formData.estimatedUnitCost && { estimatedUnitCost: parseFloat(formData.estimatedUnitCost) }),
         ...(finishingDetails && { finishingDetails }),
         // Retroactive entry fields
         ...(entryType === 'retroactive_entry' && {
@@ -462,6 +491,10 @@ function NewItemPageContent() {
           setError('Material name is required');
           return false;
         }
+        if (!formData.phaseId) {
+          setError('Please select a construction phase');
+          return false;
+        }
         return true;
       case 2:
         if (!formData.quantity || parseFloat(formData.quantity) <= 0) {
@@ -483,6 +516,10 @@ function NewItemPageContent() {
         if (entryType === 'retroactive_entry') {
           if (formData.unitCost && parseFloat(formData.unitCost) <= 0) {
             setError('If provided, unit cost must be greater than 0');
+            return false;
+          }
+          if (formData.estimatedUnitCost && parseFloat(formData.estimatedUnitCost) <= 0) {
+            setError('If provided, estimated unit cost must be greater than 0');
             return false;
           }
         } else {
@@ -595,6 +632,35 @@ function NewItemPageContent() {
             <p className="text-sm text-blue-800 mb-4">
               For new purchases, please create a Material Request first. This ensures proper approval and purchase order workflow.
             </p>
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-blue-900 mb-2">
+                Project (optional)
+              </label>
+              {projects.length > 0 ? (
+                <select
+                  name="projectId"
+                  value={formData.projectId}
+                  onChange={handleChange}
+                  disabled={loadingProjects || loading}
+                  className="w-full px-3 py-2 bg-white text-gray-900 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loadingProjects ? (
+                    <option>Loading projects...</option>
+                  ) : (
+                    <>
+                      <option value="">Select a project</option>
+                      {projects.map((project) => (
+                        <option key={project._id} value={project._id}>
+                          {project.projectName || project.projectCode} {project.location ? `- ${project.location}` : ''}
+                        </option>
+                      ))}
+                    </>
+                  )}
+                </select>
+              ) : (
+                <p className="text-xs text-blue-800">No projects available yet.</p>
+              )}
+            </div>
             <div className="flex gap-3">
               <Link
                 href={`/material-requests/new${formData.projectId ? `?projectId=${formData.projectId}` : ''}`}
@@ -792,6 +858,17 @@ function NewItemPageContent() {
                 </p>
               </div>
 
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                <h3 className="text-sm font-semibold text-gray-900 mb-2">Select From Material Library (Optional)</h3>
+                <p className="text-xs text-gray-600 mb-3">
+                  Use the library to prefill material name, unit, category, and estimated unit cost.
+                </p>
+                <MaterialLibraryPicker
+                  onSelectMaterial={handleLibrarySelect}
+                  selectedMaterialId={formData.libraryMaterialId}
+                />
+              </div>
+
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Material Name <span className="text-red-500">*</span>
@@ -943,7 +1020,7 @@ function NewItemPageContent() {
 
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                  Construction Phase
+                  Construction Phase <span className="text-red-500">*</span>
                 </label>
                 {!formData.projectId ? (
                   <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
@@ -968,13 +1045,14 @@ function NewItemPageContent() {
                     value={formData.phaseId}
                     onChange={handleChange}
                     disabled={loadingPhases || loading || !formData.projectId}
+                    required
                     className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loadingPhases ? (
                       <option>Loading phases...</option>
                     ) : (
                       <>
-                        <option value="">Select phase (optional)</option>
+                        <option value="">Select phase</option>
                         {phases.map((phase) => (
                           <option key={phase._id} value={phase._id}>
                             {phase.name} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
@@ -1093,6 +1171,25 @@ function NewItemPageContent() {
                     <p className="text-xs text-gray-500 mt-1">Optional for retroactive entries</p>
                   )}
                 </div>
+                {entryType === 'retroactive_entry' && (
+                  <div>
+                    <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                      Estimated Unit Cost (KES) <span className="text-gray-500">(Optional)</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="estimatedUnitCost"
+                      value={formData.estimatedUnitCost}
+                      onChange={handleChange}
+                      min="0"
+                      step="0.01"
+                      className="w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 placeholder:text-gray-400 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Use this if the actual unit cost is unknown. The system will mark costs as estimated.
+                    </p>
+                  </div>
+                )}
 
                 <div>
                   <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
@@ -1101,7 +1198,9 @@ function NewItemPageContent() {
                   <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
                     <span className="text-lg font-semibold">{calculateTotal()}</span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1 leading-normal">Auto-calculated</p>
+                  <p className="text-sm text-gray-600 mt-1 leading-normal">
+                    Auto-calculated {formData.unitCost ? '(actual)' : formData.estimatedUnitCost ? '(estimated)' : ''}
+                  </p>
                 </div>
               </div>
 
@@ -1618,7 +1717,10 @@ function NewItemPageContent() {
                 </div>
                 <div className="flex justify-between">
                   <span className="font-medium">Unit Cost:</span>
-                  <span>KES {parseFloat(formData.unitCost || 0).toLocaleString()}</span>
+                  <span>
+                    KES {parseFloat(formData.unitCost || formData.estimatedUnitCost || 0).toLocaleString()}
+                    {formData.unitCost ? '' : formData.estimatedUnitCost ? ' (Estimated)' : ' (Missing)'}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="font-medium">Total Cost:</span>

@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingButton } from '@/components/loading';
+import { LoadingButton, LoadingOverlay } from '@/components/loading';
 import { exportToPDF, exportToExcel, exportToCSV } from '@/lib/export-helpers';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
@@ -693,6 +693,11 @@ function WastageAnalyticsPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={exporting.pdf || exporting.excel || exporting.csv || savingThresholds}
+          message="Processing analytics..."
+          fullScreen
+        />
         <div className="mb-8 flex justify-between items-start">
           <div>
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Wastage & Loss Analytics</h1>

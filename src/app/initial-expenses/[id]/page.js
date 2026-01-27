@@ -12,7 +12,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ImagePreview } from '@/components/uploads/image-preview';
-import { LoadingButton, LoadingCard } from '@/components/loading';
+import { LoadingButton, LoadingCard, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { CapitalBalanceWarning } from '@/components/financial/capital-balance-warning';
 import { ConfirmationModal, RestoreModal } from '@/components/modals';
@@ -331,6 +331,11 @@ export default function InitialExpenseDetailPage() {
   return (
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={isDeleting}
+          message="Deleting initial expense..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-6">
           <Link

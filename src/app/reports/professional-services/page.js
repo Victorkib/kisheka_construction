@@ -11,10 +11,11 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingCard, LoadingSpinner } from '@/components/loading';
+import { LoadingCard, LoadingSpinner, LoadingOverlay } from '@/components/loading';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState } from '@/components/empty-states';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import {
   BarChart,
   Bar,
@@ -31,40 +32,42 @@ import {
 
 function ProfessionalServicesReportsContent() {
   const searchParams = useSearchParams();
-  const { currentProject, isEmpty } = useProjectContext();
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const [reportData, setReportData] = useState(null);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [exportLoading, setExportLoading] = useState(false);
   
   // Get projectId from context (prioritize current project over URL param)
-  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
   const activeProjectId = projectIdFromContext || projectIdFromUrl || '';
   
   // Filters
   const [filters, setFilters] = useState({
-    projectId: activeProjectId,
+    projectId: activeProjectId || '',
     startDate: searchParams.get('startDate') || '',
     endDate: searchParams.get('endDate') || '',
     type: searchParams.get('type') || 'all',
   });
 
-  // Fetch projects
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const response = await fetch('/api/projects/accessible');
-        if (response.ok) {
-          const data = await response.json();
-          setProjects(data.projects || []);
-        }
-      } catch (err) {
-        console.error('Error fetching projects:', err);
-      }
-    };
-    fetchProjects();
-  }, []);
+    setProjects(accessibleProjects || []);
+  }, [accessibleProjects]);
+
+  useEffect(() => {
+    if (projectIdFromContext && projectIdFromContext !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: projectIdFromContext }));
+    }
+  }, [projectIdFromContext, filters.projectId]);
 
   // Fetch report data
   const fetchReport = async () => {
@@ -98,15 +101,35 @@ function ProfessionalServicesReportsContent() {
   };
 
   useEffect(() => {
+    if (isEmpty) {
+      setLoading(false);
+      setReportData(null);
+      return;
+    }
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setReportData(null);
+      return;
+    }
     fetchReport();
-  }, [filters.projectId, filters.startDate, filters.endDate, filters.type]);
+  }, [filters.projectId, filters.startDate, filters.endDate, filters.type, isEmpty, projectLoading]);
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    const updatedFilters = key === 'projectId'
+      ? { ...filters, projectId: value }
+      : { ...filters, [key]: value };
+    setFilters(updatedFilters);
+    if (key === 'projectId' && value && value !== currentProjectId) {
+      switchProject(value).catch((err) => {
+        console.error('Error switching project:', err);
+      });
+    }
   };
 
   const handleExport = async (format = 'pdf') => {
     try {
+      setExportLoading(true);
       const params = new URLSearchParams();
       if (filters.projectId) params.append('projectId', filters.projectId);
       if (filters.startDate) params.append('startDate', filters.startDate);
@@ -131,6 +154,8 @@ function ProfessionalServicesReportsContent() {
     } catch (err) {
       console.error('Export error:', err);
       alert('Failed to export report');
+    } finally {
+      setExportLoading(false);
     }
   };
 
@@ -147,6 +172,11 @@ function ProfessionalServicesReportsContent() {
   return (
     <AppLayout>
       <div className="space-y-6">
+        <LoadingOverlay
+          isLoading={exportLoading}
+          message="Preparing report export..."
+          fullScreen
+        />
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
@@ -156,18 +186,35 @@ function ProfessionalServicesReportsContent() {
           <div className="flex gap-2">
             <button
               onClick={() => handleExport('pdf')}
+              disabled={exportLoading}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
             >
-              Export PDF
+              {exportLoading ? 'Exporting...' : 'Export PDF'}
             </button>
             <button
               onClick={() => handleExport('xlsx')}
+              disabled={exportLoading}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
             >
-              Export Excel
+              {exportLoading ? 'Exporting...' : 'Export Excel'}
             </button>
           </div>
         </div>
+
+        <PrerequisiteGuide
+          title="Reports rely on assignments and activities"
+          description="Populate assignments, activities, and fees before reporting."
+          prerequisites={[
+            'Professional assignments exist',
+            'Activities and fees are logged',
+          ]}
+          actions={[
+            { href: '/professional-services', label: 'View Assignments' },
+            { href: '/professional-activities', label: 'View Activities' },
+            { href: '/professional-fees', label: 'View Fees' },
+          ]}
+          tip="Filter by project for clearer insights."
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6">

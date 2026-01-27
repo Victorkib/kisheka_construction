@@ -135,6 +135,18 @@ function NewLabourEntryPageContent() {
     }
   }, [formData.phaseId]);
 
+  // Sync category with selected work item (if available)
+  useEffect(() => {
+    if (!formData.workItemId) return;
+    const selected = workItems.find((item) => item._id?.toString() === formData.workItemId);
+    if (selected?.categoryId && formData.categoryId !== selected.categoryId.toString()) {
+      setFormData((prev) => ({
+        ...prev,
+        categoryId: selected.categoryId.toString(),
+      }));
+    }
+  }, [formData.workItemId, workItems, formData.categoryId]);
+
   // State for work item details and assigned worker suggestion
   const [workItemDetails, setWorkItemDetails] = useState(null);
   const [suggestedWorker, setSuggestedWorker] = useState(null);
@@ -162,6 +174,12 @@ function NewLabourEntryPageContent() {
               setFormData((prev) => ({
                 ...prev,
                 phaseId: workItem.phaseId.toString(),
+              }));
+            }
+            if (workItem.categoryId && !formData.categoryId) {
+              setFormData((prev) => ({
+                ...prev,
+                categoryId: workItem.categoryId.toString(),
               }));
             }
 
@@ -400,7 +418,7 @@ function NewLabourEntryPageContent() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch('/api/categories?type=work_items');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
@@ -461,6 +479,9 @@ function NewLabourEntryPageContent() {
       } else {
         if (!formData.projectId || !formData.phaseId) {
           throw new Error('Project and Phase are required');
+        }
+        if (!formData.workItemId) {
+          throw new Error('Work item is required for direct labour entries');
         }
       }
 
@@ -808,7 +829,7 @@ function NewLabourEntryPageContent() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Category (Optional)
+                  Work Category (Optional)
                 </label>
                 <select
                   name="categoryId"
@@ -1332,7 +1353,7 @@ function NewLabourEntryPageContent() {
 
               <div className="mt-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Work Item (Optional)
+                  Work Item {!formData.isIndirectLabour && <span className="text-red-600">*</span>}
                 </label>
                 <LoadingSelect
                   name="workItemId"
@@ -1348,6 +1369,11 @@ function NewLabourEntryPageContent() {
                     </option>
                   ))}
                 </LoadingSelect>
+                {!formData.isIndirectLabour && (
+                  <p className="mt-1 text-xs text-gray-500">
+                    Direct labour entries must be linked to a work item.
+                  </p>
+                )}
               </div>
             </div>
 

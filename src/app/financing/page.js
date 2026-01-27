@@ -32,7 +32,14 @@ import {
 
 function FinancingPageContent() {
   const searchParams = useSearchParams();
-  const { currentProject, isEmpty } = useProjectContext();
+  const returnTo = searchParams.get('returnTo');
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+  } = useProjectContext();
   const [finances, setFinances] = useState(null);
   const [investors, setInvestors] = useState([]);
   const [projects, setProjects] = useState([]);
@@ -42,7 +49,7 @@ function FinancingPageContent() {
   const [error, setError] = useState(null);
   
   // Get projectId from context (prioritize current project over URL param)
-  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
   const projectId = projectIdFromContext || projectIdFromUrl;
 
@@ -78,7 +85,11 @@ function FinancingPageContent() {
 
   const fetchInvestors = async () => {
     try {
-      const response = await fetch(`/api/investors?projectId=${projectIdFromContext}&status=ACTIVE`);
+      if (!projectId) {
+        setInvestors([]);
+        return;
+      }
+      const response = await fetch(`/api/investors?projectId=${projectId}&status=ACTIVE`);
       const data = await response.json();
 
       if (data.success) {
@@ -95,49 +106,46 @@ function FinancingPageContent() {
       setLoading(false);
       setFinances(null);
       setInvestors([]);
+      setProjects([]);
       return;
     }
-    
-    if (projectIdFromContext) {
-      fetchFinances();
-      fetchInvestors();
-    } else if (!projectId) {
-      fetchProjects();
+    if (!projectId) {
+      if (projectLoading) return;
+      fetchProjectsOverview();
+      return;
     }
-  }, [projectIdFromContext, projectId, isEmpty]);
+    fetchFinances();
+    fetchInvestors();
+  }, [projectIdFromContext, projectId, isEmpty, projectLoading]);
 
-  const fetchProjects = async () => {
+  const fetchProjectsOverview = async () => {
     try {
       setProjectsLoading(true);
-      const response = await fetch('/api/projects');
-      const data = await response.json();
+      const projectsList = accessibleProjects || [];
+      const projectsWithFinances = await Promise.all(
+        projectsList.map(async (project) => {
+          try {
+            // Fetch project-specific finances to get actual used amount
+            const financesResponse = await fetch(`/api/project-finances?projectId=${project._id}`);
+            const financesData = await financesResponse.json();
 
-      if (data.success) {
-        const projectsWithFinances = await Promise.all(
-          (data.data || []).map(async (project) => {
-            try {
-              // Fetch project-specific finances to get actual used amount
-              const financesResponse = await fetch(`/api/project-finances?projectId=${project._id}`);
-              const financesData = await financesResponse.json();
-              
-              if (financesData.success) {
-                return {
-                  ...project,
-                  finances: {
-                    totalUsed: financesData.data.totalUsed || 0,
-                    capitalBalance: financesData.data.capitalBalance || 0,
-                  },
-                };
-              }
-              return project;
-            } catch (err) {
-              console.error(`Error fetching finances for project ${project._id}:`, err);
-              return project;
+            if (financesData.success) {
+              return {
+                ...project,
+                finances: {
+                  totalUsed: financesData.data.totalUsed || 0,
+                  capitalBalance: financesData.data.capitalBalance || 0,
+                },
+              };
             }
-          })
-        );
-        setProjects(projectsWithFinances);
-      }
+            return project;
+          } catch (err) {
+            console.error(`Error fetching finances for project ${project._id}:`, err);
+            return project;
+          }
+        })
+      );
+      setProjects(projectsWithFinances);
     } catch (err) {
       console.error('Fetch projects error:', err);
     } finally {
@@ -202,6 +210,32 @@ function FinancingPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {returnTo && (
+          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-blue-800">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="text-sm">
+                <p className="font-semibold">Return to bulk material request</p>
+                <p className="text-xs">Fund the project, then return to supplier assignment.</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {projectId && (
+                  <Link
+                    href={`/investors?projectId=${projectId}&returnTo=${encodeURIComponent(returnTo)}`}
+                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                  >
+                    Allocate via Investors
+                  </Link>
+                )}
+                <Link
+                  href={returnTo}
+                  className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                >
+                  Back to Bulk Request
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="mb-6 flex justify-between items-start">
           <div>
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Financing Dashboard</h1>

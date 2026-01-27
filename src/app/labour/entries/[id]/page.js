@@ -11,7 +11,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingSpinner, LoadingButton } from '@/components/loading';
+import { LoadingSpinner, LoadingButton, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
 import { ConfirmationModal } from '@/components/modals';
@@ -230,6 +230,11 @@ function LabourEntryDetailPageContent() {
   return (
     <AppLayout>
       <div className="container mx-auto px-4 py-8">
+        <LoadingOverlay
+          isLoading={isDeleting}
+          message="Deleting entry..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-6">
           <Link

@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 
 function SuppliersPageContent() {
   const router = useRouter();
@@ -177,6 +178,21 @@ function SuppliersPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Suppliers power purchase orders"
+          description="Create suppliers before raising material requests or purchase orders."
+          prerequisites={[
+            'Supplier contact details are ready',
+            'Categories or items to supply are known',
+          ]}
+          actions={[
+            { href: '/suppliers/new', label: 'Add Supplier' },
+            { href: '/material-requests', label: 'Material Requests' },
+            { href: '/purchase-orders/new', label: 'New Purchase Order' },
+          ]}
+          tip="Add accurate contact info to speed up approvals and notifications."
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">

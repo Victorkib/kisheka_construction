@@ -98,11 +98,19 @@ export async function returnCapitalToInvestors(projectId, capitalBalance, userId
     const allocationPercentage = amount / totalAllocatedToProject;
     const returnAmount = capitalBalance * allocationPercentage;
 
-    // Update investor: add to unallocated, reduce totalInvested
+    // Update investor: record a return entry but keep totalInvested unchanged
     const currentTotalInvested = investor.totalInvested || 0;
-    const newTotalInvested = Math.max(0, currentTotalInvested - returnAmount);
+    const returnEntry = {
+      amount: -returnAmount,
+      date: new Date(),
+      type: 'RETURN',
+      notes: `Capital returned after project deletion (${project.projectName || 'project'}).`,
+      receiptUrl: null,
+      relatedProjectId: new ObjectId(projectId),
+    };
+    const updatedContributions = [...(investor.contributions || []), returnEntry];
 
-    // Calculate new unallocated amount
+    // Calculate new unallocated amount (for audit only)
     const remainingAllocations = (investor.projectAllocations || []).filter(
       (alloc) => alloc.projectId && alloc.projectId.toString() !== projectId.toString()
     );
@@ -110,14 +118,14 @@ export async function returnCapitalToInvestors(projectId, capitalBalance, userId
       (sum, alloc) => sum + (alloc.amount || 0),
       0
     );
-    const newUnallocated = Math.max(0, newTotalInvested - remainingAllocated);
+    const newUnallocated = Math.max(0, currentTotalInvested - remainingAllocated);
 
-    // Update investor document
     await db.collection('investors').updateOne(
       { _id: investor._id },
       {
         $set: {
-          totalInvested: newTotalInvested,
+          totalInvested: currentTotalInvested,
+          contributions: updatedContributions,
           updatedAt: new Date(),
         },
       }
@@ -137,11 +145,20 @@ export async function returnCapitalToInvestors(projectId, capitalBalance, userId
         },
         totalInvested: {
           oldValue: currentTotalInvested,
-          newValue: newTotalInvested,
+          newValue: currentTotalInvested,
         },
         unallocated: {
           oldValue: currentTotalInvested - (await getTotalAllocatedAmount(investor._id.toString())),
           newValue: newUnallocated,
+        },
+        contribution: {
+          oldValue: null,
+          newValue: {
+            amount: returnEntry.amount,
+            type: returnEntry.type,
+            date: returnEntry.date,
+            relatedProjectId: returnEntry.relatedProjectId,
+          },
         },
         reason: {
           oldValue: null,

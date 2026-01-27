@@ -7,7 +7,7 @@ import { getDatabase } from '@/lib/mongodb/connection';
 import { ObjectId } from 'mongodb';
 import { createPhase, DEFAULT_PHASES, PHASE_TYPES } from '@/lib/schemas/phase-schema';
 import { getBudgetTotal, isEnhancedBudget } from '@/lib/schemas/budget-schema';
-import { MATERIAL_APPROVED_STATUSES } from '@/lib/status-constants';
+import { EXPENSE_APPROVED_STATUSES, MATERIAL_APPROVED_STATUSES } from '@/lib/status-constants';
 import { calculatePhaseEquipmentCost, calculatePhaseEquipmentCommittedCost } from '@/lib/equipment-helpers';
 import { calculatePhaseSubcontractorCost, calculatePhaseSubcontractorCommittedCost } from '@/lib/subcontractor-helpers';
 import { calculatePhaseCompletionFromWorkItems } from '@/lib/work-item-helpers';
@@ -657,7 +657,7 @@ export async function recalculatePhaseSpending(phaseId) {
       $match: {
         phaseId: new ObjectId(phaseId),
         deletedAt: null,
-        status: { $in: ['APPROVED'] },
+        status: { $in: EXPENSE_APPROVED_STATUSES },
         isIndirectCost: { $ne: true } // EXCLUDE indirect costs from phase spending
       }
     },

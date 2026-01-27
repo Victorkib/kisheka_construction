@@ -182,7 +182,7 @@ export async function DELETE(request, { params }) {
       }),
       // Check if any purchase orders reference this floor through material requests
       db.collection('purchase_orders').countDocuments({
-        'materialRequest.floorId': new ObjectId(id),
+        floorId: new ObjectId(id),
         deletedAt: null,
       }),
     ]);

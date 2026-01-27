@@ -20,6 +20,7 @@ import { returnCapitalToInvestors } from '@/lib/financial-rollback';
 import { calculateProjectTotals } from '@/lib/investment-allocation';
 import { isEnhancedBudget, createEnhancedBudget, validateBudget, getBudgetTotal, convertLegacyToEnhanced } from '@/lib/schemas/budget-schema';
 import { calculateTotalPhaseBudgets } from '@/lib/phase-helpers';
+import { supportsTransactions } from '@/lib/mongodb/transaction-helpers';
 
 /**
  * GET /api/projects/[id]
@@ -172,6 +173,14 @@ export async function PATCH(request, { params }) {
     const userProfile = await getUserProfile(user.id);
     if (!userProfile) {
       return errorResponse('User profile not found', 404);
+    }
+
+    const transactionsSupported = await supportsTransactions();
+    if (!transactionsSupported) {
+      return errorResponse(
+        'Project deletion requires database transactions. Enable a replica set to proceed.',
+        503
+      );
     }
 
     const userRole = userProfile.role?.toLowerCase();
@@ -435,14 +444,14 @@ export async function DELETE(request, { params }) {
       return errorResponse('Project not found', 404);
     }
 
-    // Check if project is already archived or deleted
-    if (existingProject.status === 'archived') {
-      return errorResponse('Project is already archived. Use restore endpoint to restore it first.', 400);
-    }
-
     // Get query parameters
     const { searchParams } = new URL(request.url);
     const force = searchParams.get('force') === 'true';
+
+    // Check if project is already archived or deleted
+    if (existingProject.status === 'archived' && !force) {
+      return errorResponse('Project is archived. Add ?force=true to delete permanently from archive.', 400);
+    }
 
     // Get project finances to check spending
     const projectFinances = await db
@@ -455,24 +464,66 @@ export async function DELETE(request, { params }) {
     const hasSpending = totalUsed > 0;
 
     // Check dependencies
-    const materialsCount = await db.collection('materials').countDocuments({
-      projectId: new ObjectId(id),
-      deletedAt: null,
-    });
-
-    const expensesCount = await db.collection('expenses').countDocuments({
-      projectId: new ObjectId(id),
-      deletedAt: null,
-    });
-
-    const initialExpensesCount = await db.collection('initial_expenses').countDocuments({
-      projectId: new ObjectId(id),
-      status: { $ne: 'deleted' },
-    });
-
-    const floorsCount = await db.collection('floors').countDocuments({
-      projectId: new ObjectId(id),
-    });
+    const projectObjectId = new ObjectId(id);
+    const [
+      materialsCount,
+      expensesCount,
+      initialExpensesCount,
+      floorsCount,
+      phasesCount,
+      workItemsCount,
+      labourEntriesCount,
+      labourBatchesCount,
+      labourCostSummariesCount,
+      materialRequestsCount,
+      materialRequestBatchesCount,
+      purchaseOrdersCount,
+      equipmentCount,
+      subcontractorsCount,
+      professionalServicesCount,
+      professionalFeesCount,
+      professionalActivitiesCount,
+      siteReportsCount,
+      supervisorSubmissionsCount,
+      budgetReallocationsCount,
+      budgetAdjustmentsCount,
+      budgetTransfersCount,
+      contingencyDrawsCount,
+      approvalsCount,
+      membershipsCount,
+      teamLinksCount,
+      notificationsCount,
+      auditLogsCount,
+    ] = await Promise.all([
+      db.collection('materials').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('expenses').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('initial_expenses').countDocuments({ projectId: projectObjectId, status: { $ne: 'deleted' } }),
+      db.collection('floors').countDocuments({ projectId: projectObjectId }),
+      db.collection('phases').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('work_items').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('labour_entries').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('labour_batches').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('labour_cost_summaries').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('material_requests').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('material_request_batches').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('purchase_orders').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('equipment').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('subcontractors').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('professional_services').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('professional_fees').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('professional_activities').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('site_reports').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('supervisor_submissions').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('budget_reallocations').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('budget_adjustments').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('budget_transfers').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('contingency_draws').countDocuments({ projectId: projectObjectId, deletedAt: null }),
+      db.collection('approvals').countDocuments({ projectId: projectObjectId }),
+      db.collection('project_memberships').countDocuments({ projectId: projectObjectId }),
+      db.collection('project_teams').countDocuments({ projectId: projectObjectId }),
+      db.collection('notifications').countDocuments({ projectId: projectObjectId }),
+      db.collection('audit_logs').countDocuments({ projectId: projectObjectId }),
+    ]);
 
     // Get investors with allocations to this project
     const investorsWithAllocations = await db
@@ -491,6 +542,30 @@ export async function DELETE(request, { params }) {
       expenses: expensesCount,
       initialExpenses: initialExpensesCount,
       floors: floorsCount,
+      phases: phasesCount,
+      workItems: workItemsCount,
+      labourEntries: labourEntriesCount,
+      labourBatches: labourBatchesCount,
+      labourCostSummaries: labourCostSummariesCount,
+      materialRequests: materialRequestsCount,
+      materialRequestBatches: materialRequestBatchesCount,
+      purchaseOrders: purchaseOrdersCount,
+      equipment: equipmentCount,
+      subcontractors: subcontractorsCount,
+      professionalServices: professionalServicesCount,
+      professionalFees: professionalFeesCount,
+      professionalActivities: professionalActivitiesCount,
+      siteReports: siteReportsCount,
+      supervisorSubmissions: supervisorSubmissionsCount,
+      budgetReallocations: budgetReallocationsCount,
+      budgetAdjustments: budgetAdjustmentsCount,
+      budgetTransfers: budgetTransfersCount,
+      contingencyDraws: contingencyDrawsCount,
+      approvals: approvalsCount,
+      projectMemberships: membershipsCount,
+      projectTeams: teamLinksCount,
+      notifications: notificationsCount,
+      auditLogs: auditLogsCount,
       investorAllocations: allocationsCount,
       totalUsed,
       totalInvested,
@@ -499,17 +574,22 @@ export async function DELETE(request, { params }) {
 
     // If project has spending and force is not set, recommend archive instead
     if (hasSpending && !force) {
-      return errorResponse(
+      return NextResponse.json(
         {
-          message: 'Project has spending. Archive recommended instead of permanent delete.',
-          recommendation: 'archive',
-          totalUsed,
-          totalInvested,
-          capitalBalance,
-          dependencies: dependencySummary,
+          success: false,
+          error: 'Project has spending. Archive recommended instead of permanent delete.',
+          data: {
+            message: 'Project has spending. Archive recommended instead of permanent delete.',
+            recommendation: 'archive',
+            totalUsed,
+            totalInvested,
+            capitalBalance,
+            dependencies: dependencySummary,
+            details: `This project has KES ${totalUsed.toLocaleString()} in spending. We strongly recommend archiving instead of permanently deleting to preserve financial records. Use POST /api/projects/${id}/archive to archive, or add ?force=true to proceed with permanent deletion.`,
+          },
+          timestamp: new Date().toISOString(),
         },
-        `This project has KES ${totalUsed.toLocaleString()} in spending. We strongly recommend archiving instead of permanently deleting to preserve financial records. Use POST /api/projects/${id}/archive to archive, or add ?force=true to proceed with permanent deletion.`,
-        400
+        { status: 400 }
       );
     }
 
@@ -630,7 +710,7 @@ export async function DELETE(request, { params }) {
       if (materialsCount > 0) {
         const materials = await db
           .collection('materials')
-          .find({ projectId: new ObjectId(id) })
+          .find({ projectId: projectObjectId })
           .toArray();
         
         for (const material of materials) {
@@ -643,7 +723,7 @@ export async function DELETE(request, { params }) {
       if (expensesCount > 0) {
         const expenses = await db
           .collection('expenses')
-          .find({ projectId: new ObjectId(id) })
+          .find({ projectId: projectObjectId })
           .toArray();
         
         for (const expense of expenses) {
@@ -656,7 +736,7 @@ export async function DELETE(request, { params }) {
       if (initialExpensesCount > 0) {
         const initialExpenses = await db
           .collection('initial_expenses')
-          .find({ projectId: new ObjectId(id) })
+          .find({ projectId: projectObjectId })
           .toArray();
         
         for (const initialExpense of initialExpenses) {
@@ -673,34 +753,178 @@ export async function DELETE(request, { params }) {
     // Hard delete materials
     if (materialsCount > 0) {
       await db.collection('materials').deleteMany({
-        projectId: new ObjectId(id),
+        projectId: projectObjectId,
       });
     }
 
     // Hard delete expenses
     if (expensesCount > 0) {
       await db.collection('expenses').deleteMany({
-        projectId: new ObjectId(id),
+        projectId: projectObjectId,
       });
     }
 
     // Hard delete initial expenses
     if (initialExpensesCount > 0) {
       await db.collection('initial_expenses').deleteMany({
-        projectId: new ObjectId(id),
+        projectId: projectObjectId,
+      });
+    }
+
+    if (materialRequestsCount > 0) {
+      await db.collection('material_requests').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (materialRequestBatchesCount > 0) {
+      await db.collection('material_request_batches').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (purchaseOrdersCount > 0) {
+      await db.collection('purchase_orders').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (labourEntriesCount > 0) {
+      await db.collection('labour_entries').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (labourBatchesCount > 0) {
+      await db.collection('labour_batches').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (labourCostSummariesCount > 0) {
+      await db.collection('labour_cost_summaries').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (siteReportsCount > 0) {
+      await db.collection('site_reports').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (supervisorSubmissionsCount > 0) {
+      await db.collection('supervisor_submissions').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (equipmentCount > 0) {
+      await db.collection('equipment').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (subcontractorsCount > 0) {
+      await db.collection('subcontractors').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (professionalServicesCount > 0) {
+      await db.collection('professional_services').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (professionalFeesCount > 0) {
+      await db.collection('professional_fees').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (professionalActivitiesCount > 0) {
+      await db.collection('professional_activities').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (budgetReallocationsCount > 0) {
+      await db.collection('budget_reallocations').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (budgetAdjustmentsCount > 0) {
+      await db.collection('budget_adjustments').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (budgetTransfersCount > 0) {
+      await db.collection('budget_transfers').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (contingencyDrawsCount > 0) {
+      await db.collection('contingency_draws').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (approvalsCount > 0) {
+      await db.collection('approvals').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (membershipsCount > 0) {
+      await db.collection('project_memberships').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (teamLinksCount > 0) {
+      await db.collection('project_teams').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (notificationsCount > 0) {
+      await db.collection('notifications').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (auditLogsCount > 0) {
+      await db.collection('audit_logs').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (phasesCount > 0) {
+      await db.collection('phases').deleteMany({
+        projectId: projectObjectId,
+      });
+    }
+
+    if (workItemsCount > 0) {
+      await db.collection('work_items').deleteMany({
+        projectId: projectObjectId,
       });
     }
 
     // Step 5: Delete floors (hard delete as they're project-specific)
     if (floorsCount > 0) {
       await db.collection('floors').deleteMany({
-        projectId: new ObjectId(id),
+        projectId: projectObjectId,
       });
     }
 
     // Step 6: Delete project finances record
     await db.collection('project_finances').deleteOne({
-      projectId: new ObjectId(id),
+      projectId: projectObjectId,
     });
 
     // Step 7: Hard delete project (permanent deletion)

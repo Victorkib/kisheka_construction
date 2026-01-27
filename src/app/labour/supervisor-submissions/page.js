@@ -201,6 +201,9 @@ function SupervisorSubmissionsPageContent() {
                     Supervisor
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Work Item
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                     Entries
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
@@ -232,6 +235,9 @@ function SupervisorSubmissionsPageContent() {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {submission.submittedBy}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {submission.workItemName || 'Unlinked'}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {entryCount} worker{entryCount !== 1 ? 's' : ''}

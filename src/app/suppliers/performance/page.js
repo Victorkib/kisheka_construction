@@ -7,13 +7,13 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import AppLayout from '@/components/layout/AppLayout';
 import LoadingCard from '@/components/ui/LoadingCard';
 import { useToast } from '@/components/ui/Toast';
 import { createClient } from '@/lib/supabase/client';
-import { getUserProfile } from '@/lib/auth-helpers';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 
 // Components
 import PerformanceOverview from '@/components/suppliers/performance/PerformanceOverview';
@@ -71,13 +71,19 @@ function SupplierPerformanceDashboard() {
         setUser(authUser);
 
         // Get user profile
-        const profile = await getUserProfile(authUser.id);
-        if (!profile) {
+        const profileResponse = await fetch('/api/auth/me');
+        if (!profileResponse.ok) {
           toast.showError('User profile not found');
           return;
         }
 
-        setUserProfile(profile);
+        const profileResult = await profileResponse.json();
+        if (!profileResult.success || !profileResult.data) {
+          toast.showError('User profile not found');
+          return;
+        }
+
+        setUserProfile(profileResult.data);
 
         // Check permissions
         const response = await fetch('/api/auth/permissions', {
@@ -246,6 +252,20 @@ function SupplierPerformanceDashboard() {
               </button>
             </div>
           </div>
+
+          <PrerequisiteGuide
+            title="Performance data requires supplier activity"
+            description="Metrics are built from purchase orders and supplier history."
+            prerequisites={[
+              'Suppliers are onboarded',
+              'Purchase orders have been processed',
+            ]}
+            actions={[
+              { href: '/suppliers', label: 'View Suppliers' },
+              { href: '/purchase-orders', label: 'View Orders' },
+            ]}
+            tip="Allow some time after orders are processed for metrics to update."
+          />
 
           {/* Filters */}
           <div className="mt-6 flex flex-wrap gap-4">

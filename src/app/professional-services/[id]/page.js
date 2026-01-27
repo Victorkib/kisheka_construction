@@ -18,10 +18,19 @@ import { ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
 import { ImagePreview } from '@/components/uploads/image-preview';
 
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
+
 function ProfessionalServiceDetailPageContent() {
   const router = useRouter();
   const params = useParams();
-  const assignmentId = params?.id;
+  const assignmentId = normalizeId(params?.id);
   const { canAccess } = usePermissions();
   const toast = useToast();
   const [assignment, setAssignment] = useState(null);

@@ -11,12 +11,21 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingSpinner, LoadingCard, LoadingButton } from '@/components/loading';
+import { LoadingSpinner, LoadingCard, LoadingButton, LoadingOverlay } from '@/components/loading';
 import { AuditTrail } from '@/components/audit-trail';
 import { usePermissions } from '@/hooks/use-permissions';
 import { ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
 import { ImagePreview } from '@/components/uploads/image-preview';
+
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
 
 function ProfessionalActivityDetailPageContent() {
   const router = useRouter();
@@ -241,10 +250,25 @@ function ProfessionalActivityDetailPageContent() {
   const canReject = canAccess('approve_professional_activity') && activity.status === 'pending_approval';
   const canEdit = canAccess('edit_professional_activity') && (activity.status !== 'approved' || user?.role?.toLowerCase() === 'owner');
   const canDelete = canAccess('delete_professional_activity') && user?.role?.toLowerCase() === 'owner';
+  const canCreateFee = canAccess('create_professional_fee')
+    && activity.status === 'approved'
+    && !activity.feeId;
+
+  const feeProfessionalServiceId = normalizeId(activity.professionalServiceId || activity.professionalService?._id);
+  const feeProjectId = normalizeId(activity.projectId || activity.project?._id);
+  const feePhaseId = normalizeId(activity.phaseId || activity.phase?._id);
+  const feeActivityId = normalizeId(activity._id);
+  const feeAmount = activity.feesCharged || '';
+  const feeDescription = activity.notes || activity.observations || activity.recommendations || '';
 
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={isApproving || isRejecting || isDeleting}
+          message="Updating activity..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -272,6 +296,14 @@ function ProfessionalActivityDetailPageContent() {
               </p>
             </div>
             <div className="flex gap-2">
+              {canCreateFee && (
+                <Link
+                  href={`/professional-fees/new?professionalServiceId=${encodeURIComponent(feeProfessionalServiceId)}&projectId=${encodeURIComponent(feeProjectId)}${feePhaseId ? `&phaseId=${encodeURIComponent(feePhaseId)}` : ''}&activityId=${encodeURIComponent(feeActivityId)}${feeAmount ? `&amount=${encodeURIComponent(feeAmount)}` : ''}${feeDescription ? `&description=${encodeURIComponent(feeDescription)}` : ''}`}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition"
+                >
+                  Create Fee
+                </Link>
+              )}
               {canApprove && (
                 <button
                   onClick={handleApproveClick}
@@ -332,7 +364,7 @@ function ProfessionalActivityDetailPageContent() {
                   <dd className="mt-1 text-sm text-gray-900">
                     {activity.professionalService ? (
                       <Link
-                        href={`/professional-services/${activity.professionalService._id}`}
+                        href={`/professional-services/${normalizeId(activity.professionalService._id)}`}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         {activity.professionalService.professionalCode || 'N/A'}
@@ -348,7 +380,7 @@ function ProfessionalActivityDetailPageContent() {
                   <dd className="mt-1 text-sm text-gray-900">
                     {activity.project ? (
                       <Link
-                        href={`/projects/${activity.project._id}`}
+                        href={`/projects/${normalizeId(activity.project._id)}`}
                         className="text-blue-600 hover:text-blue-800"
                       >
                         {activity.project.projectCode} - {activity.project.projectName}

@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo, memo } from 'react';
+import { useState, useEffect, useMemo, useRef, memo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { getNavigationForRole } from '@/lib/navigation-helpers';
@@ -173,6 +173,7 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
         <>
           <button
             onClick={handleToggle}
+            data-sidebar-active={isActive ? 'true' : undefined}
             className={`group relative w-full flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${colors.container} ${isActive ? 'shadow-sm' : 'hover:shadow-sm'}`}
           >
             <ActiveIndicator isActive={isActive} isParentActive={isParentActive} accentColor={colors.accent} />
@@ -220,6 +221,7 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
                   <Link
                     key={child.href}
                     href={child.href}
+                    data-sidebar-active={childActiveState.isActive ? 'true' : undefined}
                     className={`group relative flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${childColors.container} ${childActiveState.isActive ? 'shadow-sm font-semibold' : 'font-normal hover:shadow-sm hover:font-medium'}`}
                   >
                     <ActiveIndicator isActive={childActiveState.isActive} accentColor={childColors.accent} />
@@ -234,6 +236,7 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
       ) : (
         <Link
           href={section.href}
+          data-sidebar-active={isActive ? 'true' : undefined}
           className={`group relative flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${colors.container} ${isActive ? 'shadow-sm' : 'hover:shadow-sm'}`}
         >
           <ActiveIndicator isActive={isActive} accentColor={colors.accent} />
@@ -399,6 +402,40 @@ const SidebarContent = memo(function SidebarContent({
   pathname,
   navigationWithBadges,
 }) {
+  const scrollContainerRef = useRef(null);
+  const scrollStorageKey = useMemo(() => {
+    const userKey = user?._id || user?.id || user?.email || 'anonymous';
+    return `sidebar-scroll-position:${userKey}`;
+  }, [user]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || typeof window === 'undefined') return;
+
+    const savedPosition = window.sessionStorage.getItem(scrollStorageKey);
+    if (savedPosition !== null) {
+      const parsedPosition = Number.parseInt(savedPosition, 10);
+      container.scrollTop = Number.isNaN(parsedPosition) ? 0 : parsedPosition;
+      return;
+    }
+    const activeElement = container.querySelector('[data-sidebar-active="true"]');
+    if (activeElement) {
+      activeElement.scrollIntoView({ block: 'nearest' });
+    }
+  }, [pathname, scrollStorageKey]);
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container || typeof window === 'undefined') return;
+
+    const handleScroll = () => {
+      window.sessionStorage.setItem(scrollStorageKey, String(container.scrollTop));
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [scrollStorageKey]);
+
   return (
     <aside
       className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen ${
@@ -441,7 +478,10 @@ const SidebarContent = memo(function SidebarContent({
       </div>
 
       {/* Scrollable Middle Section */}
-      <div className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+      <div
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto overflow-x-hidden min-h-0 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400"
+      >
         {/* Secondary Sections */}
         <div className="flex-shrink-0">
           {/* Pending Actions */}

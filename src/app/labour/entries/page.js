@@ -11,17 +11,28 @@ import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable, LoadingSelect, LoadingSpinner } from '@/components/loading';
+import { LoadingTable, LoadingSelect, LoadingSpinner, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
 import { Plus, Search, Filter, Download, Edit, Trash2, CheckCircle, XCircle, Eye, Calendar, Clock, DollarSign, Users } from 'lucide-react';
 import { ConfirmationModal } from '@/components/modals';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { useProjectContext } from '@/contexts/ProjectContext';
+import { NoProjectsEmptyState } from '@/components/empty-states';
 
 function LabourEntriesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -36,14 +47,13 @@ function LabourEntriesPageContent() {
   const [approvingId, setApprovingId] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [entryToDelete, setEntryToDelete] = useState(null);
-  const [loadingProjects, setLoadingProjects] = useState(false);
   const [loadingPhases, setLoadingPhases] = useState(false);
   const [loadingWorkers, setLoadingWorkers] = useState(false);
   const [loadingWorkItems, setLoadingWorkItems] = useState(false);
 
   // Filters
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || '',
+    projectId: searchParams.get('projectId') || currentProjectId || '',
     phaseId: searchParams.get('phaseId') || '',
     floorId: searchParams.get('floorId') || '',
     workerId: searchParams.get('workerId') || '',
@@ -61,11 +71,17 @@ function LabourEntriesPageContent() {
     direction: searchParams.get('sortOrder') || 'desc',
   });
 
-  // Fetch projects and workers for filters
+  // Sync project list from context
   useEffect(() => {
-    fetchProjects();
+    setProjects(accessibleProjects || []);
     fetchWorkers();
-  }, []);
+  }, [accessibleProjects]);
+
+  useEffect(() => {
+    if (currentProjectId && currentProjectId !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: currentProjectId, phaseId: '', workItemId: '' }));
+    }
+  }, [currentProjectId, filters.projectId]);
 
   // Fetch phases when project changes
   useEffect(() => {
@@ -88,23 +104,21 @@ function LabourEntriesPageContent() {
 
   // Fetch entries when filters or pagination changes
   useEffect(() => {
-    fetchEntries();
-  }, [filters, pagination.page, pagination.limit, sortConfig]);
-
-  const fetchProjects = async () => {
-    setLoadingProjects(true);
-    try {
-      const response = await fetch('/api/projects/accessible');
-      const data = await response.json();
-      if (data.success) {
-        setProjects(data.data || []);
-      }
-    } catch (err) {
-      console.error('Error fetching projects:', err);
-    } finally {
-      setLoadingProjects(false);
+    if (isEmpty) {
+      setLoading(false);
+      setEntries([]);
+      setSummary({ totalHours: 0, totalCost: 0, entryCount: 0 });
+      return;
     }
-  };
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setEntries([]);
+      setSummary({ totalHours: 0, totalCost: 0, entryCount: 0 });
+      return;
+    }
+    fetchEntries();
+  }, [filters, pagination.page, pagination.limit, sortConfig, isEmpty, projectLoading]);
 
   const fetchPhases = async (projectId) => {
     if (!projectId) return;
@@ -213,13 +227,22 @@ function LabourEntriesPageContent() {
   };
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    let updatedFilters = { ...filters, [key]: value };
+    if (key === 'projectId') {
+      updatedFilters = { ...filters, projectId: value, phaseId: '', workItemId: '' };
+      if (value && value !== currentProjectId) {
+        switchProject(value).catch((err) => {
+          console.error('Error switching project:', err);
+        });
+      }
+    }
+    setFilters(updatedFilters);
     setPagination(prev => ({ ...prev, page: 1 }));
   };
 
   const handleClearFilters = () => {
     setFilters({
-      projectId: currentProject?._id || '',
+      projectId: currentProjectId || currentProject?._id || '',
       phaseId: '',
       floorId: '',
       workerId: '',
@@ -302,6 +325,20 @@ function LabourEntriesPageContent() {
   const canDelete = canAccess('delete_labour_entry');
   const canApprove = canAccess('approve_labour_entry');
 
+  if (isEmpty && !loading) {
+    return (
+      <AppLayout>
+        <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">Labour Entries</h1>
+            <p className="text-gray-600 mt-1">Track labour costs, hours, and approvals</p>
+          </div>
+          <NoProjectsEmptyState />
+        </div>
+      </AppLayout>
+    );
+  }
+
   if (loading && entries.length === 0) {
     return (
       <AppLayout>
@@ -315,6 +352,11 @@ function LabourEntriesPageContent() {
   return (
     <AppLayout>
       <div className="container mx-auto px-4 py-8">
+        <LoadingOverlay
+          isLoading={Boolean(deletingId)}
+          message="Deleting entry..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
@@ -329,6 +371,21 @@ function LabourEntriesPageContent() {
             New Entry
           </Link>
         </div>
+
+        <PrerequisiteGuide
+          title="Labour entries rely on workers and phases"
+          description="Track labour only after workers and project phases are set up."
+          prerequisites={[
+            'Workers are created',
+            'Project and phase are selected',
+          ]}
+          actions={[
+            { href: '/labour/workers/new', label: 'Add Worker' },
+            { href: '/phases', label: 'View Phases' },
+            { href: '/labour/entries/new', label: 'New Entry' },
+          ]}
+          tip="Use batch entry for multiple workers at once."
+        />
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -381,7 +438,7 @@ function LabourEntriesPageContent() {
                 <LoadingSelect
                   value={filters.projectId}
                   onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                  loading={loadingProjects}
+                  loading={projectLoading}
                   loadingText="Loading projects..."
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >

@@ -11,6 +11,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner } from '@/components/loading';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import {
   BarChart3,
   TrendingUp,
@@ -178,6 +179,22 @@ export default function LabourReportsPage() {
             Comprehensive labour analytics and reporting for your construction projects
           </p>
         </div>
+
+        <PrerequisiteGuide
+          title="Reports rely on labour entries"
+          description="Generate accurate reports after entries, workers, and phases are in place."
+          prerequisites={[
+            'Workers are added',
+            'Labour entries are logged',
+            'Project phases exist',
+          ]}
+          actions={[
+            { href: '/labour/workers', label: 'View Workers' },
+            { href: '/labour/entries', label: 'View Entries' },
+            { href: '/phases', label: 'View Phases' },
+          ]}
+          tip="Start with Cost Summary for a quick overview."
+        />
 
         {/* Report Categories */}
         <div className="space-y-8">

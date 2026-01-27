@@ -36,7 +36,7 @@ export async function GET(request) {
     const db = await getDatabase();
     
     // Build query - floors are now project-specific
-    const query = {};
+    const query = { deletedAt: null };
     if (projectId) {
       if (!ObjectId.isValid(projectId)) {
         return errorResponse('Invalid project ID', 400);
@@ -50,14 +50,30 @@ export async function GET(request) {
       .sort({ floorNumber: 1 })
       .toArray();
 
-    // Add usage count for each floor
+    // Add usage counts for each floor (materials, requests, POs)
     const floorsWithUsage = await Promise.all(
       floors.map(async (floor) => {
-        const usageCount = await db.collection('materials').countDocuments({
-          floor: floor._id,
-          deletedAt: null,
-        });
-        return { ...floor, usageCount };
+        const [materialsCount, requestsCount, purchaseOrdersCount] = await Promise.all([
+          db.collection('materials').countDocuments({
+            floor: floor._id,
+            deletedAt: null,
+          }),
+          db.collection('material_requests').countDocuments({
+            floorId: floor._id,
+            deletedAt: null,
+          }),
+          db.collection('purchase_orders').countDocuments({
+            floorId: floor._id,
+            deletedAt: null,
+          }),
+        ]);
+        return {
+          ...floor,
+          usageCount: materialsCount,
+          materialsCount,
+          requestsCount,
+          purchaseOrdersCount,
+        };
       })
     );
 

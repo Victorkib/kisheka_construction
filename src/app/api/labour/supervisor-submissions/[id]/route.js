@@ -68,8 +68,42 @@ export async function GET(request, { params }) {
       _id: submission.phaseId,
     });
 
+    // Fetch work items linked to submission or entries
+    const workItemIds = new Set();
+    if (submission.workItemId) {
+      workItemIds.add(submission.workItemId.toString());
+    }
+    (submission.labourEntries || []).forEach((entry) => {
+      if (entry.workItemId) {
+        workItemIds.add(entry.workItemId.toString());
+      }
+    });
+
+    const workItems = workItemIds.size > 0
+      ? await db.collection('work_items').find({
+        _id: { $in: Array.from(workItemIds).map((id) => new ObjectId(id)) },
+        deletedAt: null,
+      }).toArray()
+      : [];
+
+    const workItemMap = {};
+    workItems.forEach((item) => {
+      workItemMap[item._id.toString()] = {
+        workItemName: item.name,
+        workItemStatus: item.status,
+      };
+    });
+
+    const labourEntriesWithWorkItem = (submission.labourEntries || []).map((entry) => ({
+      ...entry,
+      workItemName: entry.workItemId
+        ? workItemMap[entry.workItemId.toString()]?.workItemName || null
+        : null,
+    }));
+
     const populatedSubmission = {
       ...submission,
+      labourEntries: labourEntriesWithWorkItem,
       totals,
       phase: phase
         ? {
@@ -77,6 +111,13 @@ export async function GET(request, { params }) {
             phaseCode: phase.phaseCode,
             budgetAllocation: phase.budgetAllocation,
             actualSpending: phase.actualSpending,
+          }
+        : null,
+      workItem: submission.workItemId
+        ? {
+            workItemId: submission.workItemId.toString(),
+            workItemName: workItemMap[submission.workItemId.toString()]?.workItemName || null,
+            workItemStatus: workItemMap[submission.workItemId.toString()]?.workItemStatus || null,
           }
         : null,
     };

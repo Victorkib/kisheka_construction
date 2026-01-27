@@ -38,10 +38,13 @@ export default function WorkItemDetailPage() {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     category: '',
+    categoryId: '',
     status: 'not_started',
     assignedTo: [], // Array of worker IDs
     estimatedHours: '',
@@ -56,7 +59,23 @@ export default function WorkItemDetailPage() {
 
   useEffect(() => {
     fetchWorkItem();
+    fetchCategories();
   }, [params.id]);
+
+  useEffect(() => {
+    if (categories.length === 0 || formData.categoryId || !formData.category) {
+      return;
+    }
+    const matched = categories.find(
+      (category) => category.name?.toLowerCase() === formData.category.toLowerCase()
+    );
+    if (matched) {
+      setFormData((prev) => ({
+        ...prev,
+        categoryId: matched._id?.toString() || '',
+      }));
+    }
+  }, [categories, formData.category, formData.categoryId]);
 
   useEffect(() => {
     if (user) {
@@ -95,6 +114,7 @@ export default function WorkItemDetailPage() {
         name: data.data.name || '',
         description: data.data.description || '',
         category: data.data.category || '',
+        categoryId: data.data.categoryId ? data.data.categoryId.toString() : '',
         status: data.data.status || 'not_started',
         assignedTo: assignedToArray,
         estimatedHours: data.data.estimatedHours || '',
@@ -138,6 +158,24 @@ export default function WorkItemDetailPage() {
       console.error('Fetch work item error:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      const response = await fetch('/api/categories?type=work_items');
+      const data = await response.json();
+      if (data.success) {
+        setCategories(data.data || []);
+      } else {
+        setCategories([]);
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      setCategories([]);
+    } finally {
+      setLoadingCategories(false);
     }
   };
 
@@ -216,6 +254,37 @@ export default function WorkItemDetailPage() {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const categoryOptions = categories.length > 0
+    ? categories.map((category) => ({
+        value: category._id?.toString(),
+        label: category.name,
+      }))
+    : WORK_ITEM_CATEGORIES.map((category) => ({
+        value: category,
+        label: category,
+      }));
+
+  const usesLegacyCategories = categories.length === 0;
+
+  const handleCategoryChange = (e) => {
+    const value = e.target.value;
+    if (usesLegacyCategories) {
+      setFormData((prev) => ({
+        ...prev,
+        category: value,
+        categoryId: '',
+      }));
+      return;
+    }
+
+    const selected = categories.find((category) => category._id?.toString() === value);
+    setFormData((prev) => ({
+      ...prev,
+      categoryId: value,
+      category: selected?.name || '',
+    }));
   };
 
   if (loading) {
@@ -438,6 +507,9 @@ export default function WorkItemDetailPage() {
               </svg>
               Assigned Workers ({workItem.assignedWorkers.length})
             </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Log labour using quick entry for a single worker, or bulk entry for multiple workers.
+            </p>
             <div className="flex flex-wrap gap-3">
               {workItem.assignedWorkers.map((worker) => (
                 <Link
@@ -459,16 +531,47 @@ export default function WorkItemDetailPage() {
               ))}
             </div>
             {canAccess('create_labour_entry') && (
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <Link
-                  href={`/labour/entries/new?workItemId=${workItem._id}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Create Entry for Assigned Workers
-                </Link>
+              <div className="mt-4 pt-4 border-t border-gray-200 flex flex-col gap-2">
+                {workItem.assignedWorkers.length > 1 ? (
+                  <>
+                    <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-purple-700">
+                      Multiple workers detected
+                      <span className="rounded-full bg-purple-100 px-2 py-0.5 text-purple-700">
+                        Bulk recommended
+                      </span>
+                    </div>
+                    <Link
+                      href={`/labour/batches/new?workItemId=${workItem._id}&workerIds=${workItem.assignedWorkers
+                        .map((worker) => worker._id?.toString() || worker.userId?.toString())
+                        .filter(Boolean)
+                        .join(',')}`}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      </svg>
+                      Start Bulk Entries (Prefilled)
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-green-700">
+                      Single worker assigned
+                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-700">
+                        Quick entry
+                      </span>
+                    </div>
+                    <Link
+                      href={`/labour/entries/new?workItemId=${workItem._id}&workerId=${workItem.assignedWorkers[0]?._id?.toString() || workItem.assignedWorkers[0]?.userId?.toString() || ''}`}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Create Quick Entry
+                    </Link>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -575,20 +678,31 @@ export default function WorkItemDetailPage() {
                       <label className="block text-sm font-semibold text-gray-900 mb-2">
                         Category <span className="text-red-600">*</span>
                       </label>
-                      <select
-                        name="category"
-                        value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        required
-                        className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
-                      >
-                        <option value="" className="text-gray-500">Select Category</option>
-                        {WORK_ITEM_CATEGORIES.map((category) => (
-                          <option key={category} value={category} className="text-gray-900">
-                            {category.replace(/\b\w/g, l => l.toUpperCase())}
-                          </option>
-                        ))}
-                      </select>
+                      {loadingCategories ? (
+                        <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                          Loading categories...
+                        </div>
+                      ) : (
+                        <select
+                          name={usesLegacyCategories ? 'category' : 'categoryId'}
+                          value={usesLegacyCategories ? formData.category : formData.categoryId}
+                          onChange={handleCategoryChange}
+                          required
+                          className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                        >
+                          <option value="" className="text-gray-500">Select Category</option>
+                          {categoryOptions.map((category) => (
+                            <option key={category.value} value={category.value} className="text-gray-900">
+                              {category.label.replace(/\b\w/g, (letter) => letter.toUpperCase())}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                      {usesLegacyCategories && !loadingCategories && (
+                        <p className="text-xs text-gray-600 mt-1.5">
+                          Using default categories. Create categories under Categories for a custom list.
+                        </p>
+                      )}
                     </div>
 
                     <div>

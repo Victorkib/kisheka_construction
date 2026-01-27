@@ -29,6 +29,8 @@ export default function NewWorkItemPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
   
   const projectIdFromUrl = searchParams.get('projectId');
   const phaseIdFromUrl = searchParams.get('phaseId');
@@ -40,6 +42,7 @@ export default function NewWorkItemPage() {
     name: '',
     description: '',
     category: '',
+    categoryId: '',
     status: 'not_started',
     assignedTo: [], // Array of worker IDs
     estimatedHours: '',
@@ -55,6 +58,7 @@ export default function NewWorkItemPage() {
 
   useEffect(() => {
     fetchProjects();
+    fetchCategories();
   }, []);
 
   useEffect(() => {
@@ -90,6 +94,24 @@ export default function NewWorkItemPage() {
       toast.showError('Error loading projects. Please try again.');
     } finally {
       setLoadingProjects(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      setLoadingCategories(true);
+      const response = await fetch('/api/categories?type=work_items');
+      const data = await response.json();
+      if (data.success) {
+        setCategories(data.data || []);
+      } else {
+        setCategories([]);
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      setCategories([]);
+    } finally {
+      setLoadingCategories(false);
     }
   };
 
@@ -158,6 +180,37 @@ export default function NewWorkItemPage() {
     setFormData((prev) => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const categoryOptions = categories.length > 0
+    ? categories.map((category) => ({
+        value: category._id?.toString(),
+        label: category.name,
+      }))
+    : WORK_ITEM_CATEGORIES.map((category) => ({
+        value: category,
+        label: category,
+      }));
+
+  const usesLegacyCategories = categories.length === 0;
+
+  const handleCategoryChange = (e) => {
+    const value = e.target.value;
+    if (usesLegacyCategories) {
+      setFormData((prev) => ({
+        ...prev,
+        category: value,
+        categoryId: '',
+      }));
+      return;
+    }
+
+    const selected = categories.find((category) => category._id?.toString() === value);
+    setFormData((prev) => ({
+      ...prev,
+      categoryId: value,
+      category: selected?.name || '',
     }));
   };
 
@@ -364,20 +417,31 @@ export default function NewWorkItemPage() {
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Category <span className="text-red-600">*</span>
                   </label>
-                  <select
-                    name="category"
-                    value={formData.category}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
-                  >
-                    <option value="" className="text-gray-500">Select Category</option>
-                    {WORK_ITEM_CATEGORIES.map((category) => (
-                      <option key={category} value={category} className="text-gray-900">
-                        {category.replace(/\b\w/g, l => l.toUpperCase())}
-                      </option>
-                    ))}
-                  </select>
+                  {loadingCategories ? (
+                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                      Loading categories...
+                    </div>
+                  ) : (
+                    <select
+                      name={usesLegacyCategories ? 'category' : 'categoryId'}
+                      value={usesLegacyCategories ? formData.category : formData.categoryId}
+                      onChange={handleCategoryChange}
+                      required
+                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                    >
+                      <option value="" className="text-gray-500">Select Category</option>
+                      {categoryOptions.map((category) => (
+                        <option key={category.value} value={category.value} className="text-gray-900">
+                          {category.label.replace(/\b\w/g, (letter) => letter.toUpperCase())}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {usesLegacyCategories && !loadingCategories && (
+                    <p className="text-xs text-gray-600 mt-1.5">
+                      Using default categories. Create categories under Categories for a custom list.
+                    </p>
+                  )}
                 </div>
 
                 <div>

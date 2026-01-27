@@ -16,20 +16,28 @@ import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState, NoDataEmptyState } from '@/components/empty-states';
 import { PhaseTimeline } from '@/components/phases/PhaseTimeline';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 
 function PhasesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentProject, isEmpty } = useProjectContext();
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const [phases, setPhases] = useState([]);
-  const [projects, setProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState(searchParams.get('projectId') || '');
+  const [selectedProjectId, setSelectedProjectId] = useState(
+    searchParams.get('projectId') || currentProjectId || ''
+  );
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || '');
   const [phaseTypeFilter, setPhaseTypeFilter] = useState(searchParams.get('phaseType') || '');
   const [sortBy, setSortBy] = useState(searchParams.get('sortBy') || 'sequence');
   const [sortOrder, setSortOrder] = useState(searchParams.get('sortOrder') || 'asc');
   const [loading, setLoading] = useState(true);
-  const [loadingProjects, setLoadingProjects] = useState(true);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
@@ -53,26 +61,6 @@ function PhasesPageContent() {
     }
   };
 
-  const fetchProjects = async () => {
-    try {
-      setLoadingProjects(true);
-      const response = await fetch('/api/projects');
-      const data = await response.json();
-      if (data.success) {
-        const projectsList = data.data || [];
-        setProjects(projectsList);
-        const map = {};
-        projectsList.forEach(p => {
-          map[p._id] = p;
-        });
-        setProjectMap(map);
-      }
-    } catch (err) {
-      console.error('Fetch projects error:', err);
-    } finally {
-      setLoadingProjects(false);
-    }
-  };
 
   const fetchPhases = useCallback(async () => {
     // Prevent concurrent fetches
@@ -149,20 +137,27 @@ function PhasesPageContent() {
 
   useEffect(() => {
     fetchUser();
-    fetchProjects();
   }, []);
+
+  useEffect(() => {
+    const projectsList = accessibleProjects || [];
+    const map = {};
+    projectsList.forEach((project) => {
+      map[project._id] = project;
+    });
+    setProjectMap(map);
+  }, [accessibleProjects]);
 
   // Update selectedProjectId when project context changes
   useEffect(() => {
-    const newProjectId = normalizeProjectId(currentProject?._id);
+    const newProjectId = normalizeProjectId(currentProject?._id) || currentProjectId || '';
     if (newProjectId && selectedProjectId !== newProjectId) {
       setSelectedProjectId(newProjectId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentProject?._id]);
+  }, [currentProject?._id, currentProjectId]);
 
   // Fetch phases when filters or project changes
-  // Only fetch after projects are loaded to avoid race conditions
   useEffect(() => {
     // Don't fetch if empty state
     if (isEmpty) {
@@ -170,13 +165,16 @@ function PhasesPageContent() {
       setPhases([]);
       return;
     }
-    
-    if (projects.length > 0) {
-      fetchPhases();
+    if (!selectedProjectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setPhases([]);
+      return;
     }
+    fetchPhases();
     // Only depend on the actual values, not fetchPhases itself to avoid infinite loops
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [projects.length, selectedProjectId, statusFilter, phaseTypeFilter, sortBy, sortOrder, isEmpty]);
+  }, [selectedProjectId, statusFilter, phaseTypeFilter, sortBy, sortOrder, isEmpty, projectLoading]);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-KE', {
@@ -207,7 +205,7 @@ function PhasesPageContent() {
     return labels[type] || type;
   };
 
-  if (loadingProjects) {
+  if (projectLoading) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -266,6 +264,21 @@ function PhasesPageContent() {
           </div>
         </div>
 
+        <PrerequisiteGuide
+          title="Phases depend on projects and budgets"
+          description="Create a project first, then define its phases and budgets so tracking stays accurate."
+          prerequisites={[
+            'Project exists',
+            'Phase budget or scope is defined',
+          ]}
+          actions={[
+            { href: '/projects/new', label: 'Create Project' },
+            { href: '/phases/new', label: 'Create Phase' },
+            { href: '/projects', label: 'Set Budgets' },
+          ]}
+          tip="Timeline view works best after start and end dates are set."
+        />
+
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
           <h3 className="text-sm font-medium text-gray-700 mb-4">Filters & Sorting</h3>
@@ -277,19 +290,25 @@ function PhasesPageContent() {
               <select
                 value={selectedProjectId}
                 onChange={(e) => {
-                  setSelectedProjectId(e.target.value);
+                  const nextProjectId = e.target.value;
+                  setSelectedProjectId(nextProjectId);
                   const params = new URLSearchParams();
-                  if (e.target.value) params.append('projectId', e.target.value);
+                  if (nextProjectId) params.append('projectId', nextProjectId);
                   if (statusFilter) params.append('status', statusFilter);
                   if (phaseTypeFilter) params.append('phaseType', phaseTypeFilter);
                   if (sortBy) params.append('sortBy', sortBy);
                   if (sortOrder) params.append('sortOrder', sortOrder);
                   router.push(`/phases?${params.toString()}`);
+                  if (nextProjectId && nextProjectId !== currentProjectId) {
+                    switchProject(nextProjectId).catch((err) => {
+                      console.error('Error switching project:', err);
+                    });
+                  }
                 }}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Projects</option>
-                {projects.map((project) => (
+                {accessibleProjects.map((project) => (
                   <option key={project._id} value={project._id}>
                     {project.projectName}
                   </option>

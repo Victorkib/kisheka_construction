@@ -17,9 +17,19 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ProfessionalServicesAssignmentForm } from '@/components/professional-services/professional-services-assignment-form';
 
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
+
 function EditProfessionalServicePageContent() {
   const router = useRouter();
   const params = useParams();
+  const assignmentId = normalizeId(params?.id);
   const { canAccess } = usePermissions();
   const toast = useToast();
   
@@ -32,10 +42,10 @@ function EditProfessionalServicePageContent() {
   const [phases, setPhases] = useState([]);
 
   useEffect(() => {
-    if (params.id) {
+    if (assignmentId) {
       fetchData();
     }
-  }, [params.id]);
+  }, [assignmentId]);
 
   const fetchData = async () => {
     try {
@@ -43,7 +53,7 @@ function EditProfessionalServicePageContent() {
       setError(null);
 
       // Fetch assignment
-      const assignmentResponse = await fetch(`/api/professional-services/${params.id}`);
+      const assignmentResponse = await fetch(`/api/professional-services/${assignmentId}`);
       const assignmentData = await assignmentResponse.json();
       if (!assignmentData.success) {
         throw new Error(assignmentData.error || 'Failed to fetch assignment');
@@ -83,7 +93,7 @@ function EditProfessionalServicePageContent() {
     setError(null);
 
     try {
-      const response = await fetch(`/api/professional-services/${params.id}`, {
+      const response = await fetch(`/api/professional-services/${assignmentId}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

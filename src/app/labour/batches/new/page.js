@@ -41,6 +41,7 @@ function BulkLabourEntryPageContent() {
   });
   const [budgetValidation, setBudgetValidation] = useState(null);
   const [preSelectedWorkerId, setPreSelectedWorkerId] = useState(null);
+  const [preSelectedWorkerIds, setPreSelectedWorkerIds] = useState([]);
 
   // Wizard data state
   const [wizardData, setWizardData] = useState({
@@ -71,6 +72,11 @@ function BulkLabourEntryPageContent() {
     const workItemIdFromUrl = searchParams.get('workItemId');
     const defaultPhaseIdFromUrl = searchParams.get('defaultPhaseId');
     const projectIdFromUrl = searchParams.get('projectId');
+    const workerIdsFromUrl = searchParams.get('workerIds');
+    if (workerIdsFromUrl) {
+      const parsedIds = workerIdsFromUrl.split(',').map((id) => id.trim()).filter(Boolean);
+      setPreSelectedWorkerIds(parsedIds);
+    }
 
     if (workItemIdFromUrl) {
       setWizardData((prev) => ({ ...prev, workItemId: workItemIdFromUrl }));
@@ -82,6 +88,11 @@ function BulkLabourEntryPageContent() {
           .then((data) => {
             if (data.success && data.data) {
               const workItem = data.data;
+              const assignedWorkers = workItem.assignedWorkers || [];
+              const assignedIds = assignedWorkers
+                .map((worker) => worker._id?.toString() || worker.userId?.toString())
+                .filter(Boolean);
+
               setWizardData((prev) => ({
                 ...prev,
                 projectId:
@@ -92,8 +103,13 @@ function BulkLabourEntryPageContent() {
                   defaultPhaseIdFromUrl ||
                   workItem.phaseId?.toString() ||
                   prev.defaultPhaseId,
+                defaultCategoryId: workItem.categoryId?.toString() || prev.defaultCategoryId,
                 workItemId: workItemIdFromUrl,
               }));
+
+              if (!workerIdsFromUrl && assignedIds.length > 0) {
+                setPreSelectedWorkerIds(assignedIds);
+              }
             }
           })
           .catch((err) => {
@@ -135,7 +151,9 @@ function BulkLabourEntryPageContent() {
       case 1:
         // Project and phase required
         const step1Valid = !!(
-          wizardData.projectId && wizardData.defaultPhaseId
+          wizardData.projectId &&
+          wizardData.defaultPhaseId &&
+          (wizardData.isIndirectLabour || wizardData.workItemId)
         );
         setStepValidation((prev) => ({ ...prev, 1: step1Valid }));
         return step1Valid;
@@ -150,6 +168,7 @@ function BulkLabourEntryPageContent() {
             const hasIndirectCategory = isIndirect
               ? entry.indirectCostCategory || wizardData.indirectCostCategory
               : true;
+            const hasWorkItem = isIndirect ? true : (entry.workItemId || wizardData.workItemId);
             return (
               entry.workerName &&
               entry.workerName.trim().length >= 2 &&
@@ -158,7 +177,8 @@ function BulkLabourEntryPageContent() {
               parseFloat(entry.hourlyRate) >= 0 &&
               entry.totalHours &&
               parseFloat(entry.totalHours) > 0 &&
-              hasIndirectCategory
+              hasIndirectCategory &&
+              hasWorkItem
             );
           });
         setStepValidation((prev) => ({ ...prev, 2: step2Valid }));
@@ -174,6 +194,7 @@ function BulkLabourEntryPageContent() {
             const hasIndirectCategory = isIndirect
               ? entry.indirectCostCategory || wizardData.indirectCostCategory
               : true;
+            const hasWorkItem = isIndirect ? true : (entry.workItemId || wizardData.workItemId);
             return (
               entry.workerName &&
               entry.skillType &&
@@ -181,7 +202,8 @@ function BulkLabourEntryPageContent() {
               parseFloat(entry.hourlyRate) >= 0 &&
               entry.totalHours &&
               parseFloat(entry.totalHours) > 0 &&
-              hasIndirectCategory
+              hasIndirectCategory &&
+              hasWorkItem
             );
           });
         setStepValidation((prev) => ({ ...prev, 3: step3Valid }));
@@ -355,11 +377,12 @@ function BulkLabourEntryPageContent() {
         );
       case 2:
         return (
-          <Step2AddWorkers
+        <Step2AddWorkers
             wizardData={wizardData}
             onUpdate={handleUpdate}
             onValidationChange={(isValid) => handleValidationChange(2, isValid)}
             preSelectedWorkerId={preSelectedWorkerId}
+          preSelectedWorkerIds={preSelectedWorkerIds}
           />
         );
       case 3:
@@ -569,7 +592,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch('/api/categories?type=work_items');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
@@ -692,7 +715,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Category (Optional)
+            Work Category (Optional)
           </label>
           <select
             name="defaultCategoryId"
@@ -773,7 +796,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
 
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Work Item (Optional)
+            Work Item {!wizardData.isIndirectLabour && <span className="text-red-600">*</span>}
           </label>
           <LoadingSelect
             name="workItemId"
@@ -784,7 +807,9 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
             disabled={!wizardData.defaultPhaseId}
             className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="">No Work Item (General Labour)</option>
+            <option value="">
+              {wizardData.isIndirectLabour ? 'No Work Item (Indirect Labour)' : 'Select Work Item'}
+            </option>
             {workItems.map((item) => (
               <option key={item._id} value={item._id}>
                 {item.name} ({item.category || 'Other'}) -{' '}
@@ -792,6 +817,11 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
               </option>
             ))}
           </LoadingSelect>
+          {!wizardData.isIndirectLabour && (
+            <p className="mt-1 text-xs text-gray-500">
+              Direct labour batches must be linked to a work item.
+            </p>
+          )}
           {wizardData.workItemId && selectedWorkItem && (
             <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="flex items-start gap-2">

@@ -15,6 +15,7 @@ import { LoadingSpinner, LoadingTable } from '@/components/loading';
 import { useToast } from '@/components/toast';
 import { usePermissions } from '@/hooks/use-permissions';
 import { NoDataEmptyState } from '@/components/empty-states';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { TEMPLATE_TYPES } from '@/lib/schemas/phase-template-schema';
 
 function PhaseTemplatesPageContent() {
@@ -163,6 +164,20 @@ function PhaseTemplatesPageContent() {
             </Link>
           )}
         </div>
+
+        <PrerequisiteGuide
+          title="Templates standardize phase setup"
+          description="Create templates to reuse phase structures across projects."
+          prerequisites={[
+            'Typical phase structure is defined',
+            'Project types are known',
+          ]}
+          actions={[
+            { href: '/phase-templates/new', label: 'Create Template' },
+            { href: '/phases/new', label: 'Create Phase' },
+          ]}
+          tip="Use templates to keep scheduling consistent."
+        />
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">

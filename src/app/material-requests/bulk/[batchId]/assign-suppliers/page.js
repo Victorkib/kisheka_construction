@@ -11,13 +11,30 @@ import { useState, useEffect, Suspense, useRef, useCallback } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable, LoadingButton } from '@/components/loading';
+import { LoadingTable, LoadingButton, LoadingOverlay } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { SingleSupplierAssignment } from '@/components/bulk-request/single-supplier-assignment';
 import { MultiSupplierAssignment } from '@/components/bulk-request/multi-supplier-assignment';
 import { PriceComparisonModal } from '@/components/bulk-request/price-comparison-modal';
 import { convertToSupplierGroups, validateSupplierAssignments } from '@/lib/helpers/supplier-grouping';
+
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
+
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('en-KE', {
+    style: 'currency',
+    currency: 'KES',
+    minimumFractionDigits: 0,
+  }).format(amount || 0);
+};
 
 function SupplierAssignmentPageContent() {
   const router = useRouter();
@@ -35,6 +52,9 @@ function SupplierAssignmentPageContent() {
   const [singleAssignment, setSingleAssignment] = useState(null);
   const [multipleAssignments, setMultipleAssignments] = useState([]);
   const [showPriceComparison, setShowPriceComparison] = useState(false);
+  const [projectFinances, setProjectFinances] = useState(null);
+  const [financeLoading, setFinanceLoading] = useState(false);
+  const [financeError, setFinanceError] = useState(null);
 
   // Draft storage key
   const DRAFT_STORAGE_KEY = `supplier_assignment_draft_${params.batchId}`;
@@ -46,6 +66,30 @@ function SupplierAssignmentPageContent() {
       restoreDraft();
     }
   }, [params.batchId]);
+
+  useEffect(() => {
+    const projectId = normalizeId(batch?.projectId);
+    if (!projectId) return;
+
+    const fetchFinances = async () => {
+      try {
+        setFinanceLoading(true);
+        setFinanceError(null);
+        const response = await fetch(`/api/project-finances?projectId=${projectId}`);
+        const data = await response.json();
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to fetch project finances');
+        }
+        setProjectFinances(data.data || null);
+      } catch (err) {
+        setFinanceError(err.message);
+      } finally {
+        setFinanceLoading(false);
+      }
+    };
+
+    fetchFinances();
+  }, [batch?.projectId]);
 
   // Check if returning from supplier creation
   // Use a ref to track if we've already handled the supplierCreated event
@@ -303,6 +347,13 @@ function SupplierAssignmentPageContent() {
   }
 
   const materialRequests = batch?.materialRequests || [];
+  const projectId = normalizeId(batch?.projectId);
+  const availableCapital = projectFinances?.availableCapital ?? null;
+  const estimatedBatchCost = batch?.totals?.totalEstimatedCost || 0;
+  const hasCapital = availableCapital === null ? true : availableCapital > 0;
+  const isCapitalShort = availableCapital !== null && availableCapital < estimatedBatchCost;
+  const returnTo = `/material-requests/bulk/${params.batchId}/assign-suppliers`;
+
   const canProceed =
     mode === 'single'
       ? singleAssignment?.supplierId && singleAssignment?.deliveryDate
@@ -311,6 +362,11 @@ function SupplierAssignmentPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <LoadingOverlay
+          isLoading={submitting}
+          message="Assigning suppliers..."
+          fullScreen
+        />
         {/* Header */}
         <div className="mb-8">
           <Link
@@ -324,7 +380,74 @@ function SupplierAssignmentPageContent() {
             Batch: <span className="font-medium">{batch?.batchNumber}</span>
             {batch?.batchName && ` - ${batch.batchName}`}
           </p>
+          {batch?.project && (
+            <p className="text-gray-600 mt-1">
+              Project: <span className="font-medium">{batch.project.projectName}</span>
+              {batch.project.projectCode && ` (${batch.project.projectCode})`}
+            </p>
+          )}
         </div>
+
+        {/* Capital Availability */}
+        {(financeLoading || projectFinances || financeError) && (
+          <div className={`mb-6 rounded-lg border px-4 py-3 ${
+            financeError
+              ? 'bg-red-50 border-red-200 text-red-700'
+              : !hasCapital
+                ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                : isCapitalShort
+                  ? 'bg-amber-50 border-amber-200 text-amber-800'
+                  : 'bg-green-50 border-green-200 text-green-800'
+          }`}>
+            {financeLoading ? (
+              <p className="text-sm">Checking project capital availability...</p>
+            ) : financeError ? (
+              <p className="text-sm">Capital check failed: {financeError}</p>
+            ) : (
+              <div className="text-sm">
+                <p className="font-semibold">Project capital check</p>
+                <p>
+                  Available: <span className="font-medium">{formatCurrency(availableCapital)}</span>
+                  {projectFinances?.committedCost !== undefined && (
+                    <> • Committed: <span className="font-medium">{formatCurrency(projectFinances.committedCost)}</span></>
+                  )}
+                  {projectFinances?.totalUsed !== undefined && (
+                    <> • Used: <span className="font-medium">{formatCurrency(projectFinances.totalUsed)}</span></>
+                  )}
+                </p>
+                <p className="text-xs mt-1">
+                  Batch estimated cost: {formatCurrency(estimatedBatchCost)}. Final PO totals may vary if overrides are applied.
+                </p>
+                {!hasCapital && (
+                  <p className="text-xs mt-2">
+                    Insufficient capital to create purchase orders for this project. Allocate funds to this project and try again.
+                  </p>
+                )}
+                {hasCapital && isCapitalShort && (
+                  <p className="text-xs mt-2">
+                    Available capital is below the batch estimate. Some POs may fail unless capital is increased.
+                  </p>
+                )}
+                {projectId && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link
+                      href={`/financing?projectId=${projectId}&returnTo=${encodeURIComponent(returnTo)}`}
+                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 bg-white text-amber-800 hover:bg-amber-100"
+                    >
+                      Open Financing
+                    </Link>
+                    <Link
+                      href={`/investors?projectId=${projectId}&returnTo=${encodeURIComponent(returnTo)}`}
+                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 bg-white text-amber-800 hover:bg-amber-100"
+                    >
+                      Allocate Funds (Investors)
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Error Message */}
         {error && (
@@ -512,12 +635,17 @@ function SupplierAssignmentPageContent() {
             onClick={handleSubmit}
             isLoading={submitting}
             loadingText="Creating Purchase Orders..."
-            disabled={!canProceed || submitting}
+            disabled={!canProceed || submitting || !hasCapital}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             Create Purchase Orders
           </LoadingButton>
         </div>
+        {!hasCapital && (
+          <p className="mt-3 text-xs text-yellow-700">
+            Purchase order creation is disabled until the project has available capital.
+          </p>
+        )}
       </div>
     </AppLayout>
   );

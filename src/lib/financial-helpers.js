@@ -12,6 +12,7 @@ import {
   EXPENSE_APPROVED_STATUSES,
   MATERIAL_APPROVED_STATUSES,
   INITIAL_EXPENSE_APPROVED_STATUSES,
+  LABOUR_APPROVED_STATUSES,
 } from '@/lib/status-constants';
 import {
   getBudgetTotal,
@@ -122,7 +123,7 @@ export async function calculateDCCSpending(projectId) {
     deletedAt: null,
     isIndirectLabour: { $ne: true },
     phaseId: { $ne: null }, // Only phase-linked labour
-    status: { $in: ['approved', 'paid'] },
+    status: { $in: LABOUR_APPROVED_STATUSES },
   }).toArray();
   
   const labourSpending = labourEntries.reduce((sum, entry) => {
@@ -522,7 +523,7 @@ export async function getCurrentTotalUsed(projectId) {
         $match: {
           projectId: new ObjectId(projectId),
           deletedAt: null,
-          status: { $in: ['approved', 'paid'] },
+          status: { $in: LABOUR_APPROVED_STATUSES },
         },
       },
       {
@@ -601,33 +602,99 @@ export async function calculateCommittedCost(projectId) {
 }
 
 /**
- * Calculate total estimated cost from approved material requests (not yet converted)
+ * Calculate total committed material cost from accepted purchase orders
  * @param {string} projectId - Project ID
- * @returns {Promise<number>} Total estimated cost
+ * @returns {Promise<number>} Total committed material cost
  */
-export async function calculateEstimatedCost(projectId) {
+export async function calculateMaterialsCommittedCost(projectId) {
   const db = await getDatabase();
-  
-  // Calculate estimated cost from approved material requests (not yet converted)
-  // Once converted to PO, it moves from estimatedCost to committedCost
-  const result = await db.collection('material_requests').aggregate([
+
+  const poResult = await db.collection('purchase_orders').aggregate([
     {
       $match: {
         projectId: new ObjectId(projectId),
-        status: 'approved', // Only 'approved', not 'converted_to_order'
+        status: { $in: ['order_accepted', 'ready_for_delivery'] },
         deletedAt: null,
-        estimatedCost: { $exists: true, $ne: null, $gt: 0 },
       },
     },
     {
       $group: {
         _id: null,
-        total: { $sum: '$estimatedCost' },
+        total: { $sum: '$totalCost' },
       },
     },
   ]).toArray();
-  
-  return result[0]?.total || 0;
+
+  return poResult[0]?.total || 0;
+}
+
+/**
+ * Calculate total estimated cost from approved material requests (not yet converted)
+ * @param {string} projectId - Project ID
+ * @returns {Promise<number>} Total estimated cost
+ */
+export async function calculateEstimatedCost(projectId) {
+  const estimated = await calculateMaterialsEstimatedBreakdown(projectId);
+  return estimated.totalEstimated;
+}
+
+/**
+ * Calculate estimated material costs with batch/request breakdown
+ * @param {string} projectId - Project ID
+ * @returns {Promise<{requestEstimated: number, batchEstimated: number, totalEstimated: number}>}
+ */
+export async function calculateMaterialsEstimatedBreakdown(projectId) {
+  const db = await getDatabase();
+  const projectObjectId = new ObjectId(projectId);
+
+  // Fetch active batches for this project
+  const batches = await db.collection('material_request_batches')
+    .find({
+      projectId: projectObjectId,
+      status: { $in: ['approved', 'partially_ordered', 'fully_ordered'] },
+      deletedAt: null,
+    })
+    .project({ materialRequestIds: 1, totalEstimatedCost: 1 })
+    .toArray();
+
+  const batchEstimated = batches.reduce((sum, batch) => sum + (batch.totalEstimatedCost || 0), 0);
+  const batchRequestIdStrings = new Set();
+  for (const batch of batches) {
+    const ids = Array.isArray(batch.materialRequestIds) ? batch.materialRequestIds : [];
+    ids.forEach((id) => {
+      if (id) {
+        batchRequestIdStrings.add(id.toString());
+      }
+    });
+  }
+
+  const batchRequestIds = Array.from(batchRequestIdStrings)
+    .filter((id) => ObjectId.isValid(id))
+    .map((id) => new ObjectId(id));
+
+  // Calculate estimated cost from approved requests not in active batches
+  const requestMatch = {
+    projectId: projectObjectId,
+    status: 'approved',
+    deletedAt: null,
+    estimatedCost: { $exists: true, $ne: null, $gt: 0 },
+  };
+
+  if (batchRequestIds.length > 0) {
+    requestMatch._id = { $nin: batchRequestIds };
+  }
+
+  const requestResult = await db.collection('material_requests').aggregate([
+    { $match: requestMatch },
+    { $group: { _id: null, total: { $sum: '$estimatedCost' } } },
+  ]).toArray();
+
+  const requestEstimated = requestResult[0]?.total || 0;
+  return {
+    requestEstimated,
+    batchEstimated,
+    totalEstimated: requestEstimated + batchEstimated,
+  };
 }
 
 /**
@@ -691,7 +758,7 @@ export async function calculateMaterialsBreakdown(projectId) {
     _id: new ObjectId(projectId),
   });
   
-  const budget = project?.budget?.materials || 0;
+  const budget = getMaterialsBudget(project?.budget || {});
   
   // Actual from approved materials
   // Include materials with costStatus 'actual' or 'estimated', or materials without costStatus (backward compatibility)
@@ -712,31 +779,14 @@ export async function calculateMaterialsBreakdown(projectId) {
   
   const actual = actualResult[0]?.total || 0;
   
-  // Committed from accepted purchase orders
-  const committed = await calculateCommittedCost(projectId);
+  // Committed from accepted purchase orders (materials only)
+  const committed = await calculateMaterialsCommittedCost(projectId);
   
-  // Estimated from approved requests (including bulk requests)
-  const estimated = await calculateEstimatedCost(projectId);
-  
-  // Include bulk order estimates from batches
-  const batchEstimates = await db.collection('material_request_batches').aggregate([
-    {
-      $match: {
-        projectId: new ObjectId(projectId),
-        status: { $in: ['approved', 'partially_ordered', 'fully_ordered'] },
-        deletedAt: null,
-      },
-    },
-    {
-      $group: {
-        _id: null,
-        total: { $sum: '$totalEstimatedCost' },
-      },
-    },
-  ]).toArray();
-  
-  const batchEstimated = batchEstimates[0]?.total || 0;
-  const totalEstimated = estimated + batchEstimated;
+  // Estimated from approved requests + batch estimates (avoid double counting)
+  const estimatedBreakdown = await calculateMaterialsEstimatedBreakdown(projectId);
+  const totalEstimated = estimatedBreakdown.totalEstimated;
+  const batchEstimated = estimatedBreakdown.batchEstimated;
+  const requestEstimated = estimatedBreakdown.requestEstimated;
   
   return {
     budget,
@@ -744,6 +794,7 @@ export async function calculateMaterialsBreakdown(projectId) {
     committed,
     estimated: totalEstimated,
     batchEstimated,
+    requestEstimated,
     remaining: Math.max(0, budget - actual - committed),
     variance: actual - budget,
   };
@@ -975,10 +1026,12 @@ export async function recalculateProjectFinances(projectId) {
   // Calculate materials breakdown
   const materialsBreakdown = await calculateMaterialsBreakdown(projectId);
 
-  // Calculate balances
+  // Calculate balances (guard against divide-by-zero and inconsistent data)
   const capitalBalance = totalInvested - totalUsed;
-  const loanBalance = totalLoans - (totalUsed * (totalLoans / totalInvested || 0));
-  const equityBalance = totalEquity - (totalUsed * (totalEquity / totalInvested || 0));
+  const loanRatio = totalInvested > 0 ? (totalLoans / totalInvested) : 0;
+  const equityRatio = totalInvested > 0 ? (totalEquity / totalInvested) : 0;
+  const loanBalance = totalLoans - (totalUsed * loanRatio);
+  const equityBalance = totalEquity - (totalUsed * equityRatio);
 
   // Get investor count for this project
   const projectAllocations = await db
@@ -1110,11 +1163,13 @@ export async function getFinancialOverview(projectId) {
   const finances = await getProjectFinances(projectId);
   const committedCost = finances?.committedCost || 0;
   const estimatedCost = finances?.estimatedCost || 0;
-  const availableCapital = finances?.availableCapital || (totalInvested - totalUsed - committedCost);
+  const availableCapital = finances?.availableCapital ?? (totalInvested - totalUsed - committedCost);
   const materialsBreakdown = finances?.materialsBreakdown || await calculateMaterialsBreakdown(projectId);
 
-  // Calculate balances
+  // Calculate balances (guard against divide-by-zero and inconsistent data)
   const capitalBalance = totalInvested - totalUsed;
+  const loanRatio = totalInvested > 0 ? (totalLoans / totalInvested) : 0;
+  const equityRatio = totalInvested > 0 ? (totalEquity / totalInvested) : 0;
   const budgetRemaining = budgetWithLegacy.total - totalUsed;
 
   // Calculate unallocated DCC budget (DCC not allocated to phases)
@@ -1187,7 +1242,7 @@ export async function getFinancialOverview(projectId) {
         $match: {
           projectId: new ObjectId(projectId),
           deletedAt: null,
-          status: { $in: ['approved', 'paid'] },
+          status: { $in: LABOUR_APPROVED_STATUSES },
         },
       },
       { $group: { _id: null, total: { $sum: '$totalCost' } } },
@@ -1221,10 +1276,11 @@ export async function getFinancialOverview(projectId) {
     });
   }
   if (availableCapital < totalInvested * 0.1 && availableCapital > 0) {
+    const capitalRemainingPercent = totalInvested > 0 ? (availableCapital / totalInvested) * 100 : 0;
     warnings.push({
       type: 'low_capital',
       severity: 'warning',
-      message: `Low available capital: ${availableCapital.toLocaleString()} remaining (${((availableCapital / totalInvested) * 100).toFixed(1)}%)`,
+      message: `Low available capital: ${availableCapital.toLocaleString()} remaining (${capitalRemainingPercent.toFixed(1)}%)`,
     });
   }
   if (availableCapital < 0) {
@@ -1313,8 +1369,8 @@ export async function getFinancialOverview(projectId) {
       estimatedCost,
       availableCapital,
       capitalBalance,
-      loanBalance: totalLoans - (totalUsed * (totalLoans / totalInvested || 0)),
-      equityBalance: totalEquity - (totalUsed * (totalEquity / totalInvested || 0)),
+      loanBalance: totalLoans - (totalUsed * loanRatio),
+      equityBalance: totalEquity - (totalUsed * equityRatio),
     },
     materialsBreakdown,
     actual: breakdown,

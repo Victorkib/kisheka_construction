@@ -737,13 +737,13 @@ export default function MaterialRequestDetailPage() {
           isLoading={isApproving}
         >
           <div className="mt-4">
-            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Approval Notes (Optional)</label>
+            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal text-black">Approval Notes (Optional)</label>
             <textarea
               value={approvalNotes}
               onChange={(e) => setApprovalNotes(e.target.value)}
               rows={3}
               disabled={isApproving}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-black"
               placeholder="Add any notes about this approval..."
             />
           </div>
@@ -766,14 +766,14 @@ export default function MaterialRequestDetailPage() {
           isLoading={isRejecting}
         >
           <div className="mt-4">
-            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Rejection Reason *</label>
+            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal text-black">Rejection Reason *</label>
             <textarea
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               rows={3}
               required
               disabled={isRejecting}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed text-black"
               placeholder="Explain why this request is being rejected..."
             />
           </div>

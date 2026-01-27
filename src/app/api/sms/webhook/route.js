@@ -1156,11 +1156,21 @@ export async function POST(request) {
  */
 export async function GET(request) {
   console.log('[SMS Webhook] Health check called');
+  const explicitWebhookUrl = process.env.AFRICASTALKING_WEBHOOK_URL || null;
+  const ngrokUrl = process.env.NGROK_URL || null;
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || null;
+  const expectedBaseUrl = explicitWebhookUrl || ngrokUrl || appUrl;
+  const expectedWebhookUrl = expectedBaseUrl
+    ? `${expectedBaseUrl.replace(/\/$/, '')}/api/sms/webhook`
+    : null;
+
   return NextResponse.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     message: 'SMS webhook endpoint is accessible',
     webhookUrl: '/api/sms/webhook',
-    method: 'POST'
-  });
+    method: 'POST',
+    configuredWebhookUrl: explicitWebhookUrl,
+    expectedWebhookUrl,
+  }, { headers: { 'Cache-Control': 'no-store' } });
 }

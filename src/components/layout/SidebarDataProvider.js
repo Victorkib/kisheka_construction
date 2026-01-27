@@ -16,11 +16,14 @@ const SidebarDataContext = createContext(null);
  * Extract project ID from pathname or search params
  */
 function getProjectId(pathname, searchParams) {
+  const objectIdPattern = /^[a-f\d]{24}$/i;
   const projectMatch = pathname.match(/^\/projects\/([^/]+)/);
   if (projectMatch) {
-    return projectMatch[1];
+    const candidate = projectMatch[1];
+    return objectIdPattern.test(candidate) ? candidate : null;
   }
-  return searchParams.get('projectId');
+  const queryProjectId = searchParams.get('projectId');
+  return objectIdPattern.test(queryProjectId || '') ? queryProjectId : null;
 }
 
 /**

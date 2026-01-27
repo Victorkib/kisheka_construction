@@ -13,7 +13,6 @@ import AppLayout from '@/components/layout/AppLayout';
 import LoadingCard from '@/components/ui/LoadingCard';
 import { useToast } from '@/components/ui/Toast';
 import { createClient } from '@/lib/supabase/client';
-import { getUserProfile } from '@/lib/auth-helpers';
 
 // Import chart components
 import {
@@ -56,7 +55,7 @@ const RejectionAnalyticsDashboard = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedSupplier, setSelectedSupplier] = useState('all');
   const [refreshing, setRefreshing] = useState(false);
-  const { toast } = useToast();
+  const toast = useToast();
   const router = useRouter();
 
   // Fetch rejection analytics data
@@ -70,8 +69,13 @@ const RejectionAnalyticsDashboard = () => {
         return;
       }
 
-      const userProfile = await getUserProfile(user.id);
-      if (!userProfile) {
+      const profileResponse = await fetch('/api/auth/me');
+      if (!profileResponse.ok) {
+        router.push('/login');
+        return;
+      }
+      const profileResult = await profileResponse.json();
+      if (!profileResult.success || !profileResult.data) {
         router.push('/login');
         return;
       }
@@ -101,10 +105,10 @@ const RejectionAnalyticsDashboard = () => {
     } catch (err) {
       console.error('Error fetching analytics:', err);
       setError(err.message);
-      toast({
+      toast.addToast({
         title: 'Error',
         message: 'Failed to load rejection analytics',
-        type: 'error'
+        variant: 'error'
       });
     } finally {
       setLoading(false);
@@ -147,17 +151,17 @@ const RejectionAnalyticsDashboard = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
 
-      toast({
+      toast.addToast({
         title: 'Success',
         message: 'Analytics data exported successfully',
-        type: 'success'
+        variant: 'success'
       });
     } catch (err) {
       console.error('Export error:', err);
-      toast({
+      toast.addToast({
         title: 'Error',
         message: 'Failed to export analytics data',
-        type: 'error'
+        variant: 'error'
       });
     }
   };

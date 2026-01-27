@@ -7,16 +7,16 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingButton } from '@/components/loading';
+import { LoadingButton, LoadingSpinner } from '@/components/loading';
 import { useToast } from '@/components/toast';
 import { usePermissions } from '@/hooks/use-permissions';
 import { SUBCONTRACTOR_TYPES, SUBCONTRACTOR_STATUSES, CONTRACT_TYPES, getSubcontractorTypeLabel, getContractTypeLabel } from '@/lib/constants/subcontractor-constants';
 
-export default function NewSubcontractorPage() {
+function NewSubcontractorPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
@@ -672,6 +672,22 @@ export default function NewSubcontractorPage() {
         </div>
       </div>
     </AppLayout>
+  );
+}
+
+export default function NewSubcontractorPage() {
+  return (
+    <Suspense
+      fallback={
+        <AppLayout>
+          <div className="flex items-center justify-center min-h-[400px]">
+            <LoadingSpinner size="lg" text="Loading form..." />
+          </div>
+        </AppLayout>
+      }
+    >
+      <NewSubcontractorPageContent />
+    </Suspense>
   );
 }
 

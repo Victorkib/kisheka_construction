@@ -23,46 +23,39 @@ function SubcontractorsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
-  const { currentProject, isEmpty } = useProjectContext();
+  const {
+    currentProject,
+    currentProjectId,
+    accessibleProjects,
+    loading: projectLoading,
+    isEmpty,
+    switchProject,
+  } = useProjectContext();
   const [subcontractors, setSubcontractors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
-  const [projects, setProjects] = useState([]);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   
   // Get projectId from context (prioritize current project over URL param)
-  const projectIdFromContext = normalizeProjectId(currentProject?._id);
+  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
   const activeProjectId = projectIdFromContext || projectIdFromUrl || '';
   
   // Filters
   const [filters, setFilters] = useState({
-    projectId: activeProjectId,
+    projectId: activeProjectId || '',
     phaseId: searchParams.get('phaseId') || '',
     status: searchParams.get('status') || '',
     subcontractorType: searchParams.get('subcontractorType') || '',
     search: searchParams.get('search') || '',
   });
 
-  const fetchProjects = async () => {
-    try {
-      // Use /api/projects/accessible to respect project-based organization and user memberships
-      const response = await fetch('/api/projects/accessible');
-      const data = await response.json();
-      if (data.success) {
-        // API returns projects array directly in data.data
-        const projectsList = Array.isArray(data.data) ? data.data : [];
-        setProjects(projectsList);
-      } else {
-        console.error('Failed to fetch accessible projects:', data.error);
-        setProjects([]);
-      }
-    } catch (err) {
-      console.error('Error fetching accessible projects:', err);
-      setProjects([]);
+  useEffect(() => {
+    if (projectIdFromContext && projectIdFromContext !== filters.projectId) {
+      setFilters((prev) => ({ ...prev, projectId: projectIdFromContext, phaseId: '' }));
     }
-  };
+  }, [projectIdFromContext, filters.projectId]);
 
   const fetchSubcontractors = useCallback(async () => {
     try {
@@ -103,20 +96,31 @@ function SubcontractorsPageContent() {
       setSubcontractors([]);
       return;
     }
+    if (!filters.projectId) {
+      if (projectLoading) return;
+      setLoading(false);
+      setSubcontractors([]);
+      return;
+    }
     
     fetchSubcontractors();
-  }, [fetchSubcontractors, isEmpty]);
-
-  useEffect(() => {
-    fetchProjects();
-  }, []);
+  }, [fetchSubcontractors, isEmpty, projectLoading, filters.projectId]);
 
   const handleFilterChange = (key, value) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
+    let updatedFilters = { ...filters, [key]: value };
+    if (key === 'projectId') {
+      updatedFilters = { ...filters, projectId: value, phaseId: '' };
+      if (value && value !== currentProjectId) {
+        switchProject(value).catch((err) => {
+          console.error('Error switching project:', err);
+        });
+      }
+    }
+    setFilters(updatedFilters);
     setPagination((prev) => ({ ...prev, page: 1 }));
     
     const params = new URLSearchParams();
-    Object.entries({ ...filters, [key]: value }).forEach(([k, v]) => {
+    Object.entries(updatedFilters).forEach(([k, v]) => {
       if (v) params.set(k, v);
     });
     router.push(`/subcontractors?${params.toString()}`, { scroll: false });
@@ -168,7 +172,7 @@ function SubcontractorsPageContent() {
             <p className="text-gray-600 mt-1">Manage subcontractor assignments and contracts</p>
           </div>
           <Link
-            href={`/subcontractors/new${activeProjectId ? `?projectId=${activeProjectId}` : ''}`}
+            href={`/subcontractors/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}`}
             className="bg-gradient-to-r from-purple-600 to-purple-700 text-white px-6 py-2.5 rounded-lg hover:from-purple-700 hover:to-purple-800 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -275,7 +279,7 @@ function SubcontractorsPageContent() {
                 className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
               >
                 <option value="" className="text-gray-500">All Projects</option>
-                {projects.map((project) => (
+                {accessibleProjects.map((project) => (
                   <option key={project._id} value={project._id} className="text-gray-900">
                     {project.projectName || project.projectCode || 'Unnamed Project'}
                   </option>
@@ -283,7 +287,7 @@ function SubcontractorsPageContent() {
               </select>
             </div>
             <PhaseFilter
-              projectId={activeProjectId}
+              projectId={filters.projectId}
               value={filters.phaseId}
               onChange={(value) => handleFilterChange('phaseId', value)}
             />
@@ -342,7 +346,7 @@ function SubcontractorsPageContent() {
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12 text-center">
             <p className="text-gray-700 mb-4 font-semibold text-lg">No subcontractors found</p>
             <Link
-              href={`/subcontractors/new${activeProjectId ? `?projectId=${activeProjectId}` : ''}`}
+              href={`/subcontractors/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}`}
               className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
             >
               Add First Subcontractor

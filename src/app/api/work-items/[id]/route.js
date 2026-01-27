@@ -19,6 +19,37 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateWorkItem, WORK_ITEM_STATUSES, WORK_ITEM_PRIORITIES } from '@/lib/schemas/work-item-schema';
 import { validateWorkItemDependencies, calculatePhaseCompletionFromWorkItems, canWorkItemStart } from '@/lib/work-item-helpers';
+import { CATEGORY_TYPES } from '@/lib/constants/category-constants';
+
+const resolveWorkItemCategory = async (db, { categoryId, category }) => {
+  let resolvedCategoryId = null;
+  let resolvedCategory = category?.trim() || '';
+
+  if (categoryId && ObjectId.isValid(categoryId)) {
+    const categoryDoc = await db.collection('categories').findOne({
+      _id: new ObjectId(categoryId),
+      type: CATEGORY_TYPES.WORK_ITEMS,
+    });
+    if (categoryDoc) {
+      resolvedCategoryId = categoryDoc._id;
+      resolvedCategory = categoryDoc.name;
+      return { resolvedCategoryId, resolvedCategory };
+    }
+  }
+
+  if (resolvedCategory) {
+    const categoryDoc = await db.collection('categories').findOne({
+      name: { $regex: new RegExp(`^${resolvedCategory}$`, 'i') },
+      type: CATEGORY_TYPES.WORK_ITEMS,
+    });
+    if (categoryDoc) {
+      resolvedCategoryId = categoryDoc._id;
+      resolvedCategory = categoryDoc.name;
+    }
+  }
+
+  return { resolvedCategoryId, resolvedCategory };
+};
 
 /**
  * GET /api/work-items/[id]
@@ -232,11 +263,16 @@ export async function PATCH(request, { params }) {
       updateData.description = description?.trim() || '';
     }
 
-    if (category !== undefined) {
-      if (!category || category.trim().length === 0) {
+    if (category !== undefined || categoryId !== undefined) {
+      const { resolvedCategoryId, resolvedCategory } = await resolveWorkItemCategory(db, {
+        categoryId,
+        category,
+      });
+      if (!resolvedCategory || resolvedCategory.trim().length === 0) {
         return errorResponse('Category cannot be empty', 400);
       }
-      updateData.category = category.trim();
+      updateData.category = resolvedCategory.trim();
+      updateData.categoryId = resolvedCategoryId || null;
     }
 
     if (status !== undefined) {
@@ -376,7 +412,9 @@ export async function PATCH(request, { params }) {
     }
 
     if (categoryId !== undefined) {
-      updateData.categoryId = categoryId && ObjectId.isValid(categoryId) ? new ObjectId(categoryId) : null;
+      updateData.categoryId = categoryId && ObjectId.isValid(categoryId)
+        ? new ObjectId(categoryId)
+        : updateData.categoryId ?? null;
     }
 
     if (priority !== undefined) {

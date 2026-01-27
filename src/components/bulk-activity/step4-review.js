@@ -8,23 +8,34 @@
 import { useState, useEffect } from 'react';
 import { normalizeUserRole, isRole } from '@/lib/role-constants';
 
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
+
 export function Step4Review({ wizardData, user }) {
   const [project, setProject] = useState(null);
   const [professionalService, setProfessionalService] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (wizardData.projectId) {
-      fetchProject();
+    const projectId = normalizeId(wizardData.projectId);
+    if (projectId) {
+      fetchProject(projectId);
     }
-    if (wizardData.professionalServiceId) {
-      fetchProfessionalService();
+    const professionalServiceId = normalizeId(wizardData.professionalServiceId);
+    if (professionalServiceId) {
+      fetchProfessionalService(professionalServiceId);
     }
   }, [wizardData.projectId, wizardData.professionalServiceId]);
 
-  const fetchProject = async () => {
+  const fetchProject = async (projectId) => {
     try {
-      const response = await fetch(`/api/projects/${wizardData.projectId}`);
+      const response = await fetch(`/api/projects/${projectId}`);
       const data = await response.json();
       if (data.success) {
         setProject(data.data);
@@ -36,9 +47,9 @@ export function Step4Review({ wizardData, user }) {
     }
   };
 
-  const fetchProfessionalService = async () => {
+  const fetchProfessionalService = async (professionalServiceId) => {
     try {
-      const response = await fetch(`/api/professional-services/${wizardData.professionalServiceId}`);
+      const response = await fetch(`/api/professional-services/${professionalServiceId}`);
       const data = await response.json();
       if (data.success) {
         setProfessionalService(data.data);

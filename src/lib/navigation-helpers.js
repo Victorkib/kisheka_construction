@@ -253,6 +253,12 @@ export const NAVIGATION_SECTIONS = {
         roles: ['owner', 'pm', 'project_manager'],
         icon: 'message-square',
       },
+      {
+        label: 'Site Reports',
+        href: '/labour/site-reports',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'supervisor'],
+        icon: 'file-text',
+      },
     ],
   },
   professionalServices: {

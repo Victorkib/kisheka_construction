@@ -30,6 +30,33 @@ import {
   VISIT_FREQUENCIES,
 } from '@/lib/constants/professional-services-constants';
 
+const normalizeIdParam = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeIdParam(value[0]);
+  if (typeof value === 'string') {
+    const trimmed = decodeURIComponent(value).trim();
+    if (trimmed.startsWith('ObjectId(') && trimmed.endsWith(')')) {
+      return trimmed.slice(9, -1).replace(/['"]/g, '');
+    }
+    return trimmed;
+  }
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  return value.toString?.() || '';
+};
+
+const buildAssignmentIdQuery = (id) => {
+  const rawId = normalizeIdParam(id);
+  if (!rawId) return null;
+  if (ObjectId.isValid(rawId)) {
+    return { $or: [{ _id: new ObjectId(rawId) }, { _id: rawId }] };
+  }
+  return { _id: rawId };
+};
+
+const activeAssignmentFilter = {
+  $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
+};
+
 /**
  * GET /api/professional-services/[id]
  * Get single professional service assignment by ID
@@ -45,14 +72,15 @@ export async function GET(request, { params }) {
     }
 
     const { id } = await params;
-    if (!ObjectId.isValid(id)) {
+    const assignmentIdQuery = buildAssignmentIdQuery(id);
+    if (!assignmentIdQuery) {
       return errorResponse('Invalid professional service assignment ID', 400);
     }
 
     const db = await getDatabase();
     const assignment = await db.collection('professional_services').findOne({
-      _id: new ObjectId(id),
-      deletedAt: null,
+      ...assignmentIdQuery,
+      ...activeAssignmentFilter,
     });
 
     if (!assignment) {
@@ -86,9 +114,13 @@ export async function GET(request, { params }) {
       deletedAt: null,
     }).toArray();
 
-    const totalFees = fees.reduce((sum, fee) => sum + (fee.amount || 0), 0);
-    const paidFees = fees
-      .filter(fee => fee.paymentStatus === 'PAID')
+    const activeFees = fees.filter((fee) => !['REJECTED', 'ARCHIVED'].includes(fee.status));
+    const totalFees = activeFees.reduce((sum, fee) => sum + (fee.amount || 0), 0);
+    const paidFees = activeFees
+      .filter((fee) => fee.status === 'PAID')
+      .reduce((sum, fee) => sum + (fee.amount || 0), 0);
+    const pendingFees = activeFees
+      .filter((fee) => ['PENDING', 'APPROVED'].includes(fee.status))
       .reduce((sum, fee) => sum + (fee.amount || 0), 0);
 
     return successResponse({
@@ -125,7 +157,7 @@ export async function GET(request, { params }) {
         feesCount: fees.length,
         totalFees,
         paidFees,
-        pendingFees: totalFees - paidFees,
+        pendingFees,
       },
     });
   } catch (error) {
@@ -155,7 +187,8 @@ export async function PATCH(request, { params }) {
     }
 
     const { id } = await params;
-    if (!ObjectId.isValid(id)) {
+    const assignmentIdQuery = buildAssignmentIdQuery(id);
+    if (!assignmentIdQuery) {
       return errorResponse('Invalid professional service assignment ID', 400);
     }
 
@@ -169,8 +202,8 @@ export async function PATCH(request, { params }) {
 
     // Get existing assignment
     const existing = await db.collection('professional_services').findOne({
-      _id: new ObjectId(id),
-      deletedAt: null,
+      ...assignmentIdQuery,
+      ...activeAssignmentFilter,
     });
 
     if (!existing) {
@@ -192,6 +225,28 @@ export async function PATCH(request, { params }) {
     };
 
     const changes = {};
+
+    // Update service category
+    if (body.serviceCategory !== undefined) {
+      if (!['preconstruction', 'construction'].includes(body.serviceCategory)) {
+        return errorResponse('Service category must be either "preconstruction" or "construction"', 400);
+      }
+      updateData.serviceCategory = body.serviceCategory;
+      changes.serviceCategory = { oldValue: existing.serviceCategory, newValue: body.serviceCategory };
+    }
+
+    // Update assigned date
+    if (body.assignedDate !== undefined) {
+      if (!body.assignedDate) {
+        return errorResponse('Assigned date is required', 400);
+      }
+      const assignedDate = new Date(body.assignedDate);
+      if (Number.isNaN(assignedDate.getTime())) {
+        return errorResponse('Assigned date must be a valid date', 400);
+      }
+      updateData.assignedDate = assignedDate;
+      changes.assignedDate = { oldValue: existing.assignedDate, newValue: assignedDate };
+    }
 
     // Update contract type
     if (body.contractType !== undefined) {
@@ -232,13 +287,29 @@ export async function PATCH(request, { params }) {
 
     // Update contract dates
     if (body.contractStartDate !== undefined) {
-      updateData.contractStartDate = new Date(body.contractStartDate);
-      changes.contractStartDate = { oldValue: existing.contractStartDate, newValue: updateData.contractStartDate };
+      if (!body.contractStartDate) {
+        return errorResponse('Contract start date is required', 400);
+      }
+      const contractStartDate = new Date(body.contractStartDate);
+      if (Number.isNaN(contractStartDate.getTime())) {
+        return errorResponse('Contract start date must be a valid date', 400);
+      }
+      updateData.contractStartDate = contractStartDate;
+      changes.contractStartDate = { oldValue: existing.contractStartDate, newValue: contractStartDate };
     }
 
     if (body.contractEndDate !== undefined) {
-      updateData.contractEndDate = body.contractEndDate ? new Date(body.contractEndDate) : null;
-      changes.contractEndDate = { oldValue: existing.contractEndDate, newValue: updateData.contractEndDate };
+      if (!body.contractEndDate) {
+        updateData.contractEndDate = null;
+        changes.contractEndDate = { oldValue: existing.contractEndDate, newValue: null };
+      } else {
+        const contractEndDate = new Date(body.contractEndDate);
+        if (Number.isNaN(contractEndDate.getTime())) {
+          return errorResponse('Contract end date must be a valid date', 400);
+        }
+        updateData.contractEndDate = contractEndDate;
+        changes.contractEndDate = { oldValue: existing.contractEndDate, newValue: contractEndDate };
+      }
     }
 
     // Validate end date is after start date
@@ -335,44 +406,40 @@ export async function PATCH(request, { params }) {
       updateData.status = body.status;
       updateData.isActive = body.status === 'active';
       changes.status = { oldValue: existing.status, newValue: body.status };
-      
-      // Handle committed cost changes when status changes
-      // If changing from active to non-active: remove remaining commitment
-      // If changing from non-active to active: add remaining commitment
-      if (existing.contractValue && existing.contractValue > 0) {
-        const contractValue = existing.contractValue || 0;
-        const totalFees = existing.totalFees || 0;
-        const remainingCommitment = Math.max(0, contractValue - totalFees);
-        
-        if (existing.status === 'active' && body.status !== 'active') {
-          // Was active, now not active - remove commitment
-          if (remainingCommitment > 0) {
-            try {
-              const { updateCommittedCost } = await import('@/lib/financial-helpers');
-              await updateCommittedCost(
-                existing.projectId.toString(),
-                remainingCommitment,
-                'subtract'
-              );
-            } catch (financialError) {
-              console.error('Error updating committed cost after status change:', financialError);
-            }
+    }
+
+    // Update committed cost when status or contract value changes
+    if (existing.contractValue && existing.contractValue > 0) {
+      const currentStatus = existing.status;
+      const nextStatus = updateData.status ?? existing.status;
+      const currentContractValue = existing.contractValue || 0;
+      const nextContractValue = updateData.contractValue !== undefined ? updateData.contractValue : currentContractValue;
+      const totalFees = existing.totalFees || 0;
+      const currentRemaining = Math.max(0, currentContractValue - totalFees);
+      const nextRemaining = Math.max(0, nextContractValue - totalFees);
+
+      try {
+        const { updateCommittedCost } = await import('@/lib/financial-helpers');
+        if (currentStatus === 'active' && nextStatus !== 'active') {
+          if (currentRemaining > 0) {
+            await updateCommittedCost(existing.projectId.toString(), currentRemaining, 'subtract');
           }
-        } else if (existing.status !== 'active' && body.status === 'active') {
-          // Was not active, now active - add commitment
-          if (remainingCommitment > 0) {
-            try {
-              const { updateCommittedCost } = await import('@/lib/financial-helpers');
-              await updateCommittedCost(
-                existing.projectId.toString(),
-                remainingCommitment,
-                'add'
-              );
-            } catch (financialError) {
-              console.error('Error updating committed cost after status change:', financialError);
-            }
+        } else if (currentStatus !== 'active' && nextStatus === 'active') {
+          if (nextRemaining > 0) {
+            await updateCommittedCost(existing.projectId.toString(), nextRemaining, 'add');
+          }
+        } else if (currentStatus === 'active' && nextStatus === 'active' && updateData.contractValue !== undefined) {
+          const delta = nextRemaining - currentRemaining;
+          if (delta !== 0) {
+            await updateCommittedCost(
+              existing.projectId.toString(),
+              Math.abs(delta),
+              delta > 0 ? 'add' : 'subtract'
+            );
           }
         }
+      } catch (financialError) {
+        console.error('Error updating committed cost after assignment change:', financialError);
       }
     }
 
@@ -386,7 +453,7 @@ export async function PATCH(request, { params }) {
 
     // Update
     const result = await db.collection('professional_services').findOneAndUpdate(
-      { _id: new ObjectId(id) },
+      assignmentIdQuery,
       { $set: updateData },
       { returnDocument: 'after' }
     );
@@ -434,7 +501,8 @@ export async function DELETE(request, { params }) {
     }
 
     const { id } = await params;
-    if (!ObjectId.isValid(id)) {
+    const assignmentIdQuery = buildAssignmentIdQuery(id);
+    if (!assignmentIdQuery) {
       return errorResponse('Invalid professional service assignment ID', 400);
     }
 
@@ -447,8 +515,8 @@ export async function DELETE(request, { params }) {
 
     // Check if assignment exists
     const existing = await db.collection('professional_services').findOne({
-      _id: new ObjectId(id),
-      deletedAt: null,
+      ...assignmentIdQuery,
+      ...activeAssignmentFilter,
     });
 
     if (!existing) {
@@ -458,7 +526,7 @@ export async function DELETE(request, { params }) {
     // Check if there are pending fees
     const pendingFees = await db.collection('professional_fees').countDocuments({
       professionalServiceId: new ObjectId(id),
-      paymentStatus: { $in: ['PENDING', 'APPROVED'] },
+      status: { $in: ['PENDING', 'APPROVED'] },
       deletedAt: null,
     });
 
@@ -488,7 +556,7 @@ export async function DELETE(request, { params }) {
     }
 
     const result = await db.collection('professional_services').findOneAndUpdate(
-      { _id: new ObjectId(id) },
+      assignmentIdQuery,
       { 
         $set: { 
           status: 'terminated',

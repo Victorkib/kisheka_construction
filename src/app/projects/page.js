@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingTable, LoadingSpinner } from '@/components/loading';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 
 function ProjectsPageContent() {
   const router = useRouter();
@@ -133,20 +134,44 @@ function ProjectsPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-6 flex justify-between items-center">
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Projects</h1>
             <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage construction projects</p>
           </div>
-          {canCreate && (
+          <div className="flex flex-wrap gap-3">
             <Link
-              href="/projects/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              href="/projects/archive"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
             >
-              + Create Project
+              <span className="text-base">🗂️</span>
+              Archived Projects
             </Link>
-          )}
+            {canCreate && (
+              <Link
+                href="/projects/new"
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              >
+                + Create Project
+              </Link>
+            )}
+          </div>
         </div>
+
+        <PrerequisiteGuide
+          title="Projects are the foundation"
+          description="Create a project first, then add phases, budgets, and teams."
+          prerequisites={[
+            'Project scope and timeline are known',
+            'Budget categories are planned',
+          ]}
+          actions={[
+            { href: '/projects/new', label: 'Create Project' },
+            { href: '/phases/new', label: 'Create Phase' },
+            { href: '/projects', label: 'Set Budgets' },
+          ]}
+          tip="Add phases early to unlock assignments and reports."
+        />
 
         {/* Summary Stats - Moved to top for quick reference */}
         {!loading && projects.length > 0 && (

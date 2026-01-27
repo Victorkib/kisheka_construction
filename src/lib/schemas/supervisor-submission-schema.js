@@ -15,6 +15,7 @@ import { ObjectId } from 'mongodb';
  * @property {ObjectId} projectId - Project ID (required)
  * @property {ObjectId} phaseId - Phase ID (required)
  * @property {ObjectId} [floorId] - Floor ID (optional)
+ * @property {ObjectId} [workItemId] - Work item ID (optional)
  * @property {Date} entryDate - Entry date (required)
  * @property {Array<Object>} labourEntries - Array of parsed worker data
  * @property {string} status - 'draft' | 'pending_review' | 'approved' | 'rejected' | 'processed'
@@ -47,6 +48,7 @@ export const SUPERVISOR_SUBMISSION_SCHEMA = {
   phaseId: 'ObjectId', // Required
   floorId: 'ObjectId', // Optional
   categoryId: 'ObjectId', // Optional
+  workItemId: 'ObjectId', // Optional
   entryDate: Date, // Required
   labourEntries: [
     {
@@ -57,6 +59,7 @@ export const SUPERVISOR_SUBMISSION_SCHEMA = {
       taskDescription: String,
       workerType: String,
       workerRole: String,
+      workItemId: 'ObjectId', // Optional: link entry to work item
       // Additional fields as needed
     },
   ],
@@ -150,6 +153,10 @@ export function validateSupervisorSubmission(data) {
     errors.push('Valid phaseId is required');
   }
 
+  if (data.workItemId && !ObjectId.isValid(data.workItemId)) {
+    errors.push('workItemId must be a valid ObjectId');
+  }
+
   if (!data.entryDate) {
     errors.push('entryDate is required');
   }
@@ -176,6 +183,9 @@ export function validateSupervisorSubmission(data) {
       }
       if (entry.hourlyRate === undefined || entry.hourlyRate === null || isNaN(entry.hourlyRate) || entry.hourlyRate < 0) {
         errors.push(`Entry ${index + 1}: hourlyRate is required and must be >= 0`);
+      }
+      if (entry.workItemId && !ObjectId.isValid(entry.workItemId)) {
+        errors.push(`Entry ${index + 1}: workItemId must be a valid ObjectId`);
       }
     });
   }
@@ -259,6 +269,7 @@ export function createSupervisorSubmission(input) {
     phaseId: ObjectId.isValid(phaseId) ? new ObjectId(phaseId) : phaseId,
     floorId: floorId && ObjectId.isValid(floorId) ? new ObjectId(floorId) : null,
     categoryId: categoryId && ObjectId.isValid(categoryId) ? new ObjectId(categoryId) : null,
+  workItemId: workItemId && ObjectId.isValid(workItemId) ? new ObjectId(workItemId) : null,
     entryDate: entryDate ? new Date(entryDate) : new Date(),
     labourEntries: Array.isArray(labourEntries)
       ? labourEntries.map((entry) => ({

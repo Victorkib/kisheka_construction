@@ -24,6 +24,7 @@ import { DocumentsTab } from '@/components/phases/tabs/DocumentsTab';
 import { ReportsTab } from '@/components/phases/tabs/ReportsTab';
 import { QualityTab } from '@/components/phases/tabs/QualityTab';
 import { WorkItemsTab } from '@/components/phases/tabs/WorkItemsTab';
+import { FloorsTab } from '@/components/phases/tabs/FloorsTab';
 
 export default function PhaseDetailPage() {
   const router = useRouter();
@@ -389,6 +390,7 @@ export default function PhaseDetailPage() {
     { id: 'financials', label: 'Financials', icon: '💰' },
     { id: 'materials', label: 'Materials', icon: '📦', badge: materials.length },
     { id: 'expenses', label: 'Expenses', icon: '💳', badge: expenses.length },
+    { id: 'floors', label: 'Floors', icon: '🏢' },
     { id: 'work-items', label: 'Work Items', icon: '✅' },
     { id: 'resources', label: 'Resources', icon: '👥' },
     { id: 'milestones', label: 'Milestones', icon: '🎯', badge: phase.milestones?.length || 0 },
@@ -420,6 +422,8 @@ export default function PhaseDetailPage() {
         return <MaterialsTab phase={phase} formatCurrency={formatCurrency} formatDate={formatDate} />;
       case 'expenses':
         return <ExpensesTab phase={phase} formatCurrency={formatCurrency} formatDate={formatDate} />;
+      case 'floors':
+        return <FloorsTab phase={phase} formatCurrency={formatCurrency} />;
       case 'work-items':
         return <WorkItemsTab phase={phase} canEdit={canEdit} formatCurrency={formatCurrency} formatDate={formatDate} />;
       case 'resources':
