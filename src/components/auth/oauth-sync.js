@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
@@ -12,6 +12,8 @@ import { createClient } from '@/lib/supabase/client';
 export function OAuthSync() {
   const router = useRouter();
   const pathname = usePathname();
+  const syncInProgressRef = useRef(false);
+  const synced = useRef(false);
 
   useEffect(() => {
     const supabase = createClient();
@@ -19,6 +21,17 @@ export function OAuthSync() {
 
     // Check current user and sync if needed
     async function syncUser() {
+      // Don't sync if already synced or sync in progress
+      if (synced.current || syncInProgressRef.current) return;
+
+      // Don't sync if already on protected page (likely already synced)
+      if (pathname?.startsWith('/dashboard')) {
+        synced.current = true;
+        return;
+      }
+
+      syncInProgressRef.current = true;
+
       try {
         const { data: { user }, error } = await supabase.auth.getUser();
 
@@ -39,8 +52,11 @@ export function OAuthSync() {
 
           if (!response.ok) {
             console.error('Failed to sync user:', await response.text());
+            syncInProgressRef.current = false;
             return;
           }
+
+          synced.current = true;
 
           // If user is logged in and NOT on dashboard, redirect to dashboard
           // This handles both:
@@ -52,11 +68,12 @@ export function OAuthSync() {
         }
       } catch (error) {
         console.error('OAuth sync error:', error);
+        syncInProgressRef.current = false;
         // Don't throw - this is a background sync
       }
     }
 
-    // Run sync on mount
+    // Run sync on mount (only once)
     syncUser();
 
     // Also listen for auth state changes
@@ -64,8 +81,14 @@ export function OAuthSync() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        // User just signed in, sync immediately and redirect
+        // Reset sync flag on new sign in and sync immediately
+        synced.current = false;
+        syncInProgressRef.current = false;
         syncUser();
+      } else if (event === 'SIGNED_OUT') {
+        // Reset on sign out
+        synced.current = false;
+        syncInProgressRef.current = false;
       }
     });
 
