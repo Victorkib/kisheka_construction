@@ -12,7 +12,8 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 
 export async function POST(request) {
   try {
-    const { email, password, firstName, lastName, invitationToken } = await request.json();
+    const { email, password, firstName, lastName, invitationToken } =
+      await request.json();
 
     if (!email || !password) {
       return errorResponse('Email and password required', 400);
@@ -25,7 +26,7 @@ export async function POST(request) {
     const db = await getDatabase();
     const normalizedEmail = email.toLowerCase().trim();
     let invitation = null;
-    let assignedRole = 'site_clerk'; // Default role
+    let assignedRole = 'owner'; // Default role
 
     // If invitation token is provided, verify it
     if (invitationToken) {
@@ -41,19 +42,23 @@ export async function POST(request) {
 
       // Check if invitation has expired
       if (new Date() > new Date(invitation.expiresAt)) {
-        await db.collection('invitations').updateOne(
-          { _id: invitation._id },
-          { $set: { status: 'expired', updatedAt: new Date() } }
-        );
+        await db
+          .collection('invitations')
+          .updateOne(
+            { _id: invitation._id },
+            { $set: { status: 'expired', updatedAt: new Date() } },
+          );
         return errorResponse('This invitation has expired', 410);
       }
 
       // Use role from invitation
-      assignedRole = invitation.role || 'site_clerk';
+      assignedRole = invitation.role || 'owner';
     }
 
     // Check if user already exists
-    const existingUser = await db.collection('users').findOne({ email: normalizedEmail });
+    const existingUser = await db
+      .collection('users')
+      .findOne({ email: normalizedEmail });
     if (existingUser) {
       return errorResponse('User with this email already exists', 409);
     }
@@ -96,11 +101,13 @@ export async function POST(request) {
             acceptedBy: data.user.id,
             updatedAt: new Date(),
           },
-        }
+        },
       );
 
       // Log role assignment from invitation
-      const userProfile = await db.collection('users').findOne({ supabaseId: data.user.id });
+      const userProfile = await db
+        .collection('users')
+        .findOne({ supabaseId: data.user.id });
       if (userProfile) {
         await db.collection('role_changes').insertOne({
           userId: userProfile._id,
@@ -118,11 +125,10 @@ export async function POST(request) {
       invitation
         ? 'Account created successfully. You can now log in.'
         : 'Account created. Check your email to confirm.',
-      201
+      201,
     );
   } catch (error) {
     console.error('Register error:', error);
     return errorResponse('Internal server error', 500);
   }
 }
-
