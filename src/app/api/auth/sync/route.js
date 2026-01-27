@@ -30,7 +30,7 @@ export async function POST(request) {
         email: email.toLowerCase().trim(),
         firstName: firstName || '',
         lastName: lastName || '',
-        role: 'site_clerk', // Default role for OAuth users
+        role: 'owner', // Default role for OAuth users
         status: 'active',
         createdAt: new Date(),
         updatedAt: new Date(),
