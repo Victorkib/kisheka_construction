@@ -1,14 +1,17 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 /**
  * OAuth Sync Component
  * Automatically syncs OAuth users to MongoDB when they authenticate
- * This runs on app load and whenever auth state changes
+ * and redirects to dashboard after successful login
  */
 export function OAuthSync() {
+  const router = useRouter();
+
   useEffect(() => {
     const supabase = createClient();
 
@@ -32,6 +35,16 @@ export function OAuthSync() {
 
           if (!response.ok) {
             console.error('Failed to sync user:', await response.text());
+            return;
+          }
+
+          // Check if we're on an auth page (login/register)
+          const currentPath = window.location.pathname;
+          const isAuthPage = currentPath?.includes('/auth/');
+
+          // If on auth page, redirect to dashboard
+          if (isAuthPage) {
+            router.push('/dashboard');
           }
         }
       } catch (error) {
@@ -48,7 +61,7 @@ export function OAuthSync() {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
-        // User just signed in, sync immediately
+        // User just signed in, sync immediately and redirect
         syncUser();
       }
     });
@@ -56,7 +69,8 @@ export function OAuthSync() {
     return () => {
       subscription?.unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   return null; // This component doesn't render anything
 }
+
