@@ -250,9 +250,7 @@ export async function DELETE(request, { params }) {
     const hasAccess = await hasPermission(user.id, 'delete_worker_profile');
     if (!hasAccess) {
       return errorResponse('Insufficient permissions. You do not have permission to delete worker profiles.', 403);
-    }
-
-    const { id } = await params;    if (!id || !ObjectId.isValid(id)) {
+    }    const { id } = await params;    if (!id || !ObjectId.isValid(id)) {
       return errorResponse('Valid worker ID is required', 400);
     }    const db = await getDatabase();    // Get existing worker
     const existingWorker = await db.collection('worker_profiles').findOne({

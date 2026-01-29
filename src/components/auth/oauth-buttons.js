@@ -19,10 +19,12 @@ export function OAuthButtons({ mode = 'login' }) {
     setError(null);
 
     try {
-      // For Netlify/production, redirect directly back to origin
-      // Let Supabase handle the callback internally
-      const redirectUrl = window.location.origin;
-      
+      // Use the server-side callback so the server can exchange the code
+      // and sync the user to MongoDB before redirecting to the app
+      const redirectUrl = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(
+        window.location.pathname || '/dashboard'
+      )}`;
+
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
