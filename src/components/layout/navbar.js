@@ -10,6 +10,7 @@ import { useState } from 'react';
 import { Sidebar } from './sidebar';
 import { MobileNav } from './mobile-nav';
 import { Header } from './header';
+import { clearUserCache } from '@/hooks/use-permissions';
 
 /**
  * Navbar Component - Integrated Navigation System
@@ -100,10 +101,35 @@ export function LegacyNavbar() {
 
   const handleLogout = async () => {
     try {
+      // Clear client-side caches
+      clearUserCache();
+      
+      // Clear service worker cache
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(name => caches.delete(name)));
+        }
+      }
+      
+      // Clear sessionStorage and localStorage of any app data
+      try {
+        sessionStorage.clear();
+        localStorage.removeItem('currentProjectId');
+      } catch (e) {
+        // Storage might not be available
+      }
+      
+      // Call logout API
       await fetch('/api/auth/logout', { method: 'POST' });
+      
+      // Redirect to login
       router.push('/auth/login');
     } catch (err) {
       console.error('Logout error:', err);
+      // Still redirect even if there's an error
+      router.push('/auth/login');
     }
   };
 

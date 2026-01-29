@@ -1,6 +1,6 @@
 /**
  * Logout API Route
- * Signs out user from Supabase session
+ * Signs out user from Supabase session and clears caches
  * POST /api/auth/logout
  */
 
@@ -20,7 +20,15 @@ export async function POST(request) {
       return errorResponse('Logout failed', 500);
     }
 
-    return successResponse(null, 'Logged out successfully');
+    // Return response with cache-control headers to prevent caching
+    const response = successResponse(null, 'Logged out successfully');
+    
+    // Add no-cache headers to prevent HTTP caching
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    
+    return response;
   } catch (error) {
     console.error('Logout error:', error);
     return errorResponse('Logout failed', 500);

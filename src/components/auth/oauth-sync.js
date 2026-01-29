@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
+import { clearUserCache } from '@/hooks/use-permissions';
 
 /**
  * OAuth Sync Component
@@ -86,7 +87,21 @@ export function OAuthSync() {
         syncInProgressRef.current = false;
         syncUser();
       } else if (event === 'SIGNED_OUT') {
-        // Reset on sign out
+        // Clear all caches on sign out
+        clearUserCache();
+        
+        // Clear service worker cache
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.getRegistrations().then((registrations) => {
+            for (const registration of registrations) {
+              caches.keys().then((cacheNames) => {
+                cacheNames.forEach(name => caches.delete(name));
+              });
+            }
+          });
+        }
+        
+        // Reset sync flags
         synced.current = false;
         syncInProgressRef.current = false;
       }

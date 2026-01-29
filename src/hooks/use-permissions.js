@@ -13,7 +13,23 @@ import { normalizeRole } from '@/lib/role-normalizer';
 let cachedUser = null;
 let cacheTimestamp = null;
 let fetchPromise = null;
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 1 * 60 * 1000; // 1 minute (reduced from 5 to improve data freshness)
+
+/**
+ * Global function to clear user cache
+ * Called on logout and when auth state changes
+ */
+export function clearUserCache() {
+  cachedUser = null;
+  cacheTimestamp = null;
+  fetchPromise = null;
+  // Also clear from sessionStorage if stored
+  try {
+    sessionStorage.removeItem('kisheka_user_cache');
+  } catch (e) {
+    // Ignore errors (sessionStorage might not be available)
+  }
+}
 
 /**
  * Custom hook to check user permissions and role
@@ -84,15 +100,17 @@ export function usePermissions() {
   }, []);
 
   const refetch = async () => {
-    // Clear cache and refetch
-    cachedUser = null;
-    cacheTimestamp = null;
-    fetchPromise = null;
+    // Clear cache and refetch with no-cache
+    clearUserCache();
     
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch('/api/auth/me');
+      // Force fresh fetch from server, bypass browser cache
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+      });
       const data = await response.json();
 
       if (data.success) {

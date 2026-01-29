@@ -9,6 +9,9 @@ import { createClient } from '@/lib/supabase/server';
 import { getUserProfile } from '@/lib/auth-helpers';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
+// Disable caching for this route - user data must always be fresh
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();
@@ -33,12 +36,19 @@ export async function GET(request) {
     // Return user data (exclude sensitive fields if needed)
     const { _id, ...profileData } = userProfile;
 
-    return successResponse({
+    const response = successResponse({
       id: user.id,
       _id: _id?.toString(),
       email: user.email,
       ...profileData,
     });
+    
+    // Add no-cache headers to prevent HTTP caching
+    response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    
+    return response;
   } catch (error) {
     console.error('Get user error:', error);
     return errorResponse('Internal server error', 500);

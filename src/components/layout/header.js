@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { usePermissions } from '@/hooks/use-permissions';
+import { usePermissions, clearUserCache } from '@/hooks/use-permissions';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { ProjectSwitcher } from '@/components/project-switcher/ProjectSwitcher';
 
@@ -86,10 +86,35 @@ export function Header({ onMenuClick }) {
   /* Logout */
   const handleLogout = async () => {
     try {
+      // Clear client-side caches
+      clearUserCache();
+      
+      // Clear service worker cache
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const registration of registrations) {
+          const cacheNames = await caches.keys();
+          await Promise.all(cacheNames.map(name => caches.delete(name)));
+        }
+      }
+      
+      // Clear sessionStorage and localStorage of any app data
+      try {
+        sessionStorage.clear();
+        localStorage.removeItem('currentProjectId');
+      } catch (e) {
+        // Storage might not be available
+      }
+      
+      // Call logout API
       await fetch('/api/auth/logout', { method: 'POST' });
+      
+      // Redirect to login
       router.push('/auth/login');
     } catch (err) {
       console.error('Logout error:', err);
+      // Still redirect even if there's an error
+      router.push('/auth/login');
     }
   };
 
