@@ -235,9 +235,7 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();    if (authError || !user) {
       return errorResponse('Unauthorized', 401);
     }
 

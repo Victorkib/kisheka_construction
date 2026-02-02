@@ -1,7 +1,7 @@
 /**
  * Labour Dashboard Page
  * Main dashboard for labour tracking
- * 
+ *
  * Route: /labour
  */
 
@@ -13,7 +13,15 @@ import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner } from '@/components/loading';
 import { useToast } from '@/components/toast/toast-container';
-import { Plus, Clock, DollarSign, Users, AlertTriangle, CheckCircle, FileText } from 'lucide-react';
+import {
+  Plus,
+  Clock,
+  DollarSign,
+  Users,
+  AlertTriangle,
+  CheckCircle,
+  FileText,
+} from 'lucide-react';
 
 export default function LabourDashboardPage() {
   const router = useRouter();
@@ -39,7 +47,7 @@ export default function LabourDashboardPage() {
 
       // Fetch today's entries
       const entriesResponse = await fetch(
-        `/api/labour/entries?dateFrom=${todayStart.toISOString()}&dateTo=${todayEnd.toISOString()}&limit=50`
+        `/api/labour/entries?dateFrom=${todayStart.toISOString()}&dateTo=${todayEnd.toISOString()}&limit=50`,
       );
       const entriesData = await entriesResponse.json();
 
@@ -56,7 +64,8 @@ export default function LabourDashboardPage() {
 
         setSummary({
           today: todaySummary,
-          workersActive: new Set(entries.map((e) => e.workerId || e.workerName)).size,
+          workersActive: new Set(entries.map((e) => e.workerId || e.workerName))
+            .size,
         });
       }
 
@@ -88,7 +97,9 @@ export default function LabourDashboardPage() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900">Labour Dashboard</h1>
-          <p className="text-gray-600 mt-1">Track and manage all labour activities</p>
+          <p className="text-gray-600 mt-1">
+            Track and manage all labour activities
+          </p>
         </div>
 
         {/* Quick Actions */}
@@ -111,7 +122,9 @@ export default function LabourDashboardPage() {
             <Users className="w-6 h-6" />
             <div>
               <div className="font-semibold">Bulk Entry</div>
-              <div className="text-sm text-green-100">Create multiple entries</div>
+              <div className="text-sm text-green-100">
+                Create multiple entries
+              </div>
             </div>
           </Link>
 
@@ -152,12 +165,16 @@ export default function LabourDashboardPage() {
         {/* Today's Summary */}
         {summary && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Today's Summary</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+              Today's Summary
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="p-4 bg-blue-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Clock className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-700">Total Hours</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Total Hours
+                  </span>
                 </div>
                 <div className="text-2xl font-bold text-blue-600">
                   {summary.today.totalHours.toFixed(1)} hrs
@@ -167,7 +184,9 @@ export default function LabourDashboardPage() {
               <div className="p-4 bg-green-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <DollarSign className="w-5 h-5 text-green-600" />
-                  <span className="text-sm font-medium text-gray-700">Total Cost</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Total Cost
+                  </span>
                 </div>
                 <div className="text-2xl font-bold text-green-600">
                   {summary.today.totalCost.toLocaleString()} KES
@@ -177,7 +196,9 @@ export default function LabourDashboardPage() {
               <div className="p-4 bg-purple-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="w-5 h-5 text-purple-600" />
-                  <span className="text-sm font-medium text-gray-700">Active Workers</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Active Workers
+                  </span>
                 </div>
                 <div className="text-2xl font-bold text-purple-600">
                   {summary.workersActive}
@@ -187,7 +208,9 @@ export default function LabourDashboardPage() {
               <div className="p-4 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="w-5 h-5 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-700">Entries</span>
+                  <span className="text-sm font-medium text-gray-700">
+                    Entries
+                  </span>
                 </div>
                 <div className="text-2xl font-bold text-gray-600">
                   {summary.today.entryCount}
@@ -217,7 +240,9 @@ export default function LabourDashboardPage() {
         {/* Recent Entries */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">Recent Entries</h2>
+            <h2 className="text-xl font-semibold text-gray-900">
+              Recent Entries
+            </h2>
             <Link
               href="/labour/entries"
               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -282,8 +307,8 @@ export default function LabourDashboardPage() {
                             entry.status === 'approved'
                               ? 'bg-green-100 text-green-800'
                               : entry.status === 'paid'
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-yellow-100 text-yellow-800'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
                           {entry.status}
@@ -303,4 +328,3 @@ export default function LabourDashboardPage() {
     </AppLayout>
   );
 }
-

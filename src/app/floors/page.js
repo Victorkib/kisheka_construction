@@ -1,7 +1,7 @@
 /**
  * Floors List Page
  * Displays floors with project filtering, view for all, create/edit for PM/OWNER
- * 
+ *
  * Route: /floors?projectId=xxx
  */
 
@@ -12,7 +12,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { FloorVisualization } from '@/components/floors/FloorVisualization';
-import { groupFloorsByType, getFloorDisplayName, getFloorColorClass } from '@/lib/floor-helpers';
+import {
+  groupFloorsByType,
+  getFloorDisplayName,
+  getFloorColorClass,
+} from '@/lib/floor-helpers';
 import { LoadingTable } from '@/components/loading';
 import { BaseModal, ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
@@ -32,7 +36,7 @@ function FloorsPageContent() {
   } = useProjectContext();
   const [floors, setFloors] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(
-    searchParams.get('projectId') || currentProjectId || ''
+    searchParams.get('projectId') || currentProjectId || '',
   );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -109,10 +113,10 @@ function FloorsPageContent() {
       setLoading(true);
       setError(null);
 
-      const url = selectedProjectId 
+      const url = selectedProjectId
         ? `/api/floors?projectId=${selectedProjectId}`
         : '/api/floors';
-      
+
       const response = await fetch(url);
       const data = await response.json();
 
@@ -170,7 +174,9 @@ function FloorsPageContent() {
   const getProjectName = (projectId) => {
     if (!projectId) return 'N/A';
     const project = projectMap[projectId];
-    return project ? `${project.projectCode} - ${project.projectName}` : 'Unknown Project';
+    return project
+      ? `${project.projectCode} - ${project.projectName}`
+      : 'Unknown Project';
   };
 
   const openFloorInitModal = () => {
@@ -178,7 +184,8 @@ function FloorsPageContent() {
     setFloorInitForm((prev) => ({
       floorCount: typeof prev.floorCount === 'number' ? prev.floorCount : 10,
       includeBasements: !!prev.includeBasements,
-      basementCount: typeof prev.basementCount === 'number' ? prev.basementCount : 0,
+      basementCount:
+        typeof prev.basementCount === 'number' ? prev.basementCount : 0,
     }));
     setShowFloorInitModal(true);
   };
@@ -206,7 +213,10 @@ function FloorsPageContent() {
       return;
     }
 
-    if (includeBasements && (isNaN(basementCount) || basementCount < 0 || basementCount > 10)) {
+    if (
+      includeBasements &&
+      (isNaN(basementCount) || basementCount < 0 || basementCount > 10)
+    ) {
       setFloorInitError('Basement count must be a number between 0 and 10.');
       return;
     }
@@ -218,15 +228,18 @@ function FloorsPageContent() {
 
     try {
       setInitializingFloors(true);
-      const response = await fetch(`/api/projects/${selectedProjectId}/floors/initialize`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          floorCount,
-          includeBasements,
-          basementCount: includeBasements ? basementCount : 0,
-        }),
-      });
+      const response = await fetch(
+        `/api/projects/${selectedProjectId}/floors/initialize`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            floorCount,
+            includeBasements,
+            basementCount: includeBasements ? basementCount : 0,
+          }),
+        },
+      );
       const data = await response.json();
 
       if (!data.success) {
@@ -257,7 +270,9 @@ function FloorsPageContent() {
     setDeleting(true);
     setDeleteError(null);
     try {
-      const response = await fetch(`/api/floors/${deleteTarget._id}`, { method: 'DELETE' });
+      const response = await fetch(`/api/floors/${deleteTarget._id}`, {
+        method: 'DELETE',
+      });
       const data = await response.json();
       if (!data.success) {
         throw new Error(data.error || 'Failed to delete floor');
@@ -330,8 +345,12 @@ function FloorsPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Floors</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage building floors and their status</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              Floors
+            </h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+              Manage building floors and their status
+            </p>
           </div>
           <NoProjectsEmptyState />
         </div>
@@ -345,9 +364,11 @@ function FloorsPageContent() {
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Floors</h1>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              Floors
+            </h1>
             <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
-              {selectedProjectId 
+              {selectedProjectId
                 ? `Floors for ${getProjectName(selectedProjectId)}`
                 : 'Manage building floors and their status'}
             </p>
@@ -364,7 +385,11 @@ function FloorsPageContent() {
                 </Link>
               )}
               <Link
-                href={selectedProjectId ? `/floors/new?projectId=${selectedProjectId}` : '/floors/new'}
+                href={
+                  selectedProjectId
+                    ? `/floors/new?projectId=${selectedProjectId}`
+                    : '/floors/new'
+                }
                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
               >
                 + Create Floor
@@ -411,7 +436,9 @@ function FloorsPageContent() {
         ) : floors.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
             <div className="text-6xl mb-4">🏢</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No floors found</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              No floors found
+            </h3>
             {selectedProjectId ? (
               <>
                 <p className="text-gray-600 mb-6">
@@ -524,10 +551,16 @@ function FloorsPageContent() {
                             className="text-sm font-medium text-blue-600 hover:text-blue-900"
                           >
                             <div>
-                              <div>{getFloorDisplayName(floor.floorNumber, floor.name)}</div>
+                              <div>
+                                {getFloorDisplayName(
+                                  floor.floorNumber,
+                                  floor.name,
+                                )}
+                              </div>
                               {floor.usageCount !== undefined && (
                                 <div className="text-xs text-gray-500 mt-1">
-                                  Used by {floor.usageCount} material{floor.usageCount !== 1 ? 's' : ''}
+                                  Used by {floor.usageCount} material
+                                  {floor.usageCount !== 1 ? 's' : ''}
                                 </div>
                               )}
                             </div>
@@ -536,7 +569,7 @@ function FloorsPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                              floor.status
+                              floor.status,
                             )}`}
                           >
                             {floor.status || 'NOT_STARTED'}
@@ -630,10 +663,16 @@ function FloorsPageContent() {
                             className="text-sm font-medium text-blue-600 hover:text-blue-900"
                           >
                             <div>
-                              <div>{getFloorDisplayName(floor.floorNumber, floor.name)}</div>
+                              <div>
+                                {getFloorDisplayName(
+                                  floor.floorNumber,
+                                  floor.name,
+                                )}
+                              </div>
                               {floor.usageCount !== undefined && (
                                 <div className="text-xs text-gray-500 mt-1">
-                                  Used by {floor.usageCount} material{floor.usageCount !== 1 ? 's' : ''}
+                                  Used by {floor.usageCount} material
+                                  {floor.usageCount !== 1 ? 's' : ''}
                                 </div>
                               )}
                             </div>
@@ -642,7 +681,7 @@ function FloorsPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                              floor.status
+                              floor.status,
                             )}`}
                           >
                             {floor.status || 'NOT_STARTED'}
@@ -736,10 +775,16 @@ function FloorsPageContent() {
                             className="text-sm font-medium text-blue-600 hover:text-blue-900"
                           >
                             <div>
-                              <div>{getFloorDisplayName(floor.floorNumber, floor.name)}</div>
+                              <div>
+                                {getFloorDisplayName(
+                                  floor.floorNumber,
+                                  floor.name,
+                                )}
+                              </div>
                               {floor.usageCount !== undefined && (
                                 <div className="text-xs text-gray-500 mt-1">
-                                  Used by {floor.usageCount} material{floor.usageCount !== 1 ? 's' : ''}
+                                  Used by {floor.usageCount} material
+                                  {floor.usageCount !== 1 ? 's' : ''}
                                 </div>
                               )}
                             </div>
@@ -748,7 +793,7 @@ function FloorsPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                              floor.status
+                              floor.status,
                             )}`}
                           >
                             {floor.status || 'NOT_STARTED'}
@@ -798,7 +843,9 @@ function FloorsPageContent() {
           <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="bg-white rounded-lg shadow p-4">
               <p className="text-sm text-gray-600">Total Floors</p>
-              <p className="text-2xl font-bold text-gray-900">{floors.length}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {floors.length}
+              </p>
             </div>
             <div className="bg-white rounded-lg shadow p-4">
               <p className="text-sm text-gray-600">In Progress</p>
@@ -815,7 +862,9 @@ function FloorsPageContent() {
             <div className="bg-white rounded-lg shadow p-4">
               <p className="text-sm text-gray-600">Total Budget</p>
               <p className="text-2xl font-bold text-gray-900">
-                {formatCurrency(floors.reduce((sum, f) => sum + (f.totalBudget || 0), 0))}
+                {formatCurrency(
+                  floors.reduce((sum, f) => sum + (f.totalBudget || 0), 0),
+                )}
               </p>
             </div>
           </div>
@@ -835,13 +884,27 @@ function FloorsPageContent() {
           <div className="px-8 py-6 border-b border-gray-200/50">
             <div className="flex items-center gap-3">
               <div className="bg-indigo-600/90 text-white rounded-xl p-3 shadow-lg shadow-indigo-500/30">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                  />
                 </svg>
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">Auto-create Floors</h3>
-                <p className="text-sm text-gray-600">Generate a default floor stack for this project.</p>
+                <h3 className="text-2xl font-bold text-gray-900">
+                  Auto-create Floors
+                </h3>
+                <p className="text-sm text-gray-600">
+                  Generate a default floor stack for this project.
+                </p>
               </div>
             </div>
           </div>
@@ -863,22 +926,35 @@ function FloorsPageContent() {
                   min="0"
                   max="50"
                   value={floorInitForm.floorCount}
-                  onChange={(e) => handleFloorInitChange('floorCount', e.target.value)}
+                  onChange={(e) =>
+                    handleFloorInitChange('floorCount', e.target.value)
+                  }
                   className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-black"
                 />
-                <p className="text-xs text-gray-500 mt-2">Includes ground floor. Range: 0-50.</p>
+                <p className="text-xs text-gray-500 mt-2">
+                  Includes ground floor. Range: 0-50.
+                </p>
               </div>
 
               <div className="bg-gradient-to-br from-indigo-50/70 to-blue-50/70 border border-indigo-200/50 rounded-xl p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">Include Basements</p>
-                    <p className="text-xs text-gray-600">Optional underground floors</p>
+                    <p className="text-sm font-semibold text-gray-800">
+                      Include Basements
+                    </p>
+                    <p className="text-xs text-gray-600">
+                      Optional underground floors
+                    </p>
                   </div>
                   <input
                     type="checkbox"
                     checked={floorInitForm.includeBasements}
-                    onChange={(e) => handleFloorInitChange('includeBasements', e.target.checked)}
+                    onChange={(e) =>
+                      handleFloorInitChange(
+                        'includeBasements',
+                        e.target.checked,
+                      )
+                    }
                     className="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
                   />
                 </div>
@@ -892,7 +968,9 @@ function FloorsPageContent() {
                       min="0"
                       max="10"
                       value={floorInitForm.basementCount}
-                      onChange={(e) => handleFloorInitChange('basementCount', e.target.value)}
+                      onChange={(e) =>
+                        handleFloorInitChange('basementCount', e.target.value)
+                      }
                       className="w-full px-4 py-2.5 bg-white/90 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-black"
                     />
                     <p className="text-xs text-gray-500 mt-2">Range: 0-10.</p>
@@ -938,12 +1016,20 @@ function FloorsPageContent() {
             message={
               <div>
                 <p className="mb-2">
-                  Are you sure you want to delete <strong>{deleteTarget?.name || `Floor ${deleteTarget?.floorNumber}`}</strong>?
+                  Are you sure you want to delete{' '}
+                  <strong>
+                    {deleteTarget?.name || `Floor ${deleteTarget?.floorNumber}`}
+                  </strong>
+                  ?
                 </p>
                 <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mt-3">
-                  <p className="text-sm text-yellow-800 font-semibold mb-1">Dependencies:</p>
+                  <p className="text-sm text-yellow-800 font-semibold mb-1">
+                    Dependencies:
+                  </p>
                   <p className="text-sm text-yellow-700">
-                    {deleteTarget.materialsCount || 0} material(s), {deleteTarget.requestsCount || 0} request(s), {deleteTarget.purchaseOrdersCount || 0} purchase order(s).
+                    {deleteTarget.materialsCount || 0} material(s),{' '}
+                    {deleteTarget.requestsCount || 0} request(s),{' '}
+                    {deleteTarget.purchaseOrdersCount || 0} purchase order(s).
                   </p>
                 </div>
                 {deleteError && (
@@ -951,7 +1037,9 @@ function FloorsPageContent() {
                     <p className="text-sm text-red-800">{deleteError}</p>
                   </div>
                 )}
-                <p className="text-sm text-gray-600 mt-3">This action cannot be undone.</p>
+                <p className="text-sm text-gray-600 mt-3">
+                  This action cannot be undone.
+                </p>
               </div>
             }
             confirmText="Delete Floor"
@@ -983,4 +1071,3 @@ export default function FloorsPage() {
     </Suspense>
   );
 }
-

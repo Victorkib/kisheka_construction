@@ -5,7 +5,7 @@
  * Route: /material-library
  */
 
-'use client';
+ 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';

@@ -5,7 +5,7 @@
  * Route: /purchase-orders
  */
 
-'use client';
+ 'use client';
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';

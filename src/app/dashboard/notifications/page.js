@@ -5,6 +5,8 @@
  * Auth: All authenticated users
  */
 
+export const revalidate = 60;
+
 import { Suspense } from 'react';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner } from '@/components/loading';

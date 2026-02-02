@@ -5,7 +5,7 @@
  * Route: /work-items
  */
 
-'use client';
+ 'use client';
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -21,7 +21,7 @@ import { useToast } from '@/components/toast';
 function WorkItemsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { currentProject, currentProjectId, loading: projectLoading, isEmpty, switchProject } = useProjectContext();
+  const { currentProject, isEmpty } = useProjectContext();
   const toast = useToast();
 
   const [workItems, setWorkItems] = useState([]);
@@ -33,7 +33,7 @@ function WorkItemsPageContent() {
   const [canEdit, setCanEdit] = useState(false);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
   const [filters, setFilters] = useState({
-    projectId: searchParams.get('projectId') || currentProjectId || '',
+    projectId: searchParams.get('projectId') || '',
     phaseId: searchParams.get('phaseId') || '',
     status: searchParams.get('status') || '',
     category: searchParams.get('category') || '',
@@ -109,11 +109,10 @@ function WorkItemsPageContent() {
   }, []);
 
   useEffect(() => {
-    const nextProjectId = normalizeProjectId(currentProject?._id) || currentProjectId || '';
-    if (nextProjectId && nextProjectId !== filters.projectId) {
-      setFilters((prev) => ({ ...prev, projectId: nextProjectId, phaseId: '' }));
+    if (currentProject && !filters.projectId) {
+      setFilters(prev => ({ ...prev, projectId: normalizeProjectId(currentProject._id) }));
     }
-  }, [currentProject?._id, currentProjectId, filters.projectId]);
+  }, [currentProject, filters.projectId]);
 
   useEffect(() => {
     if (filters.projectId) {
@@ -145,9 +144,7 @@ function WorkItemsPageContent() {
 
   const handleFilterChange = (key, value) => {
     setFilters(prev => {
-      const updatedFilters = key === 'projectId'
-        ? { ...prev, projectId: value, phaseId: '' }
-        : { ...prev, [key]: value };
+      const updatedFilters = { ...prev, [key]: value };
       
       // Update URL params
       const params = new URLSearchParams();
@@ -164,12 +161,6 @@ function WorkItemsPageContent() {
       
       return updatedFilters;
     });
-
-    if (key === 'projectId' && value && value !== currentProjectId) {
-      switchProject(value).catch((err) => {
-        console.error('Error switching project:', err);
-      });
-    }
   };
 
   const getStatusColor = (status) => {
@@ -634,32 +625,21 @@ function WorkItemsPageContent() {
                                 View Entries →
                               </Link>
                               {canEdit && (
-                                <div className="flex flex-col gap-1 mt-1">
-                                  <span className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">
-                                    Log labour
-                                  </span>
-                                  <div className="flex gap-2">
-                                    {item.assignedWorkers && item.assignedWorkers.length > 1 ? (
-                                      <Link
-                                        href={`/labour/batches/new?workItemId=${item._id}&workerIds=${item.assignedWorkers
-                                          .map((worker) => worker._id?.toString() || worker.userId?.toString())
-                                          .filter(Boolean)
-                                          .join(',')}`}
-                                        className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 font-medium"
-                                        title="Bulk Entry (Prefilled)"
-                                      >
-                                        Bulk
-                                      </Link>
-                                    ) : (
-                                      <Link
-                                        href={`/labour/entries/new?workItemId=${item._id}&workerId=${item.assignedWorkers?.[0]?._id?.toString() || item.assignedWorkers?.[0]?.userId?.toString() || ''}`}
-                                        className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200 font-medium"
-                                        title="Quick Entry"
-                                      >
-                                        Quick
-                                      </Link>
-                                    )}
-                                  </div>
+                                <div className="flex gap-2 mt-1">
+                                  <Link
+                                    href={`/labour/entries/new?workItemId=${item._id}`}
+                                    className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200 font-medium"
+                                    title="Add Entry"
+                                  >
+                                    + Entry
+                                  </Link>
+                                  <Link
+                                    href={`/labour/batches/new?workItemId=${item._id}`}
+                                    className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 font-medium"
+                                    title="Bulk Entry"
+                                  >
+                                    Bulk
+                                  </Link>
                                 </div>
                               )}
                             </div>

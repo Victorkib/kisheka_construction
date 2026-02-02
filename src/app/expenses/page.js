@@ -1,7 +1,7 @@
 /**
  * Expenses List Page
  * Displays all expenses with filtering, sorting, and pagination
- * 
+ *
  * Route: /expenses
  */
 
@@ -22,17 +22,28 @@ function ExpensesPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
-  const { currentProject, currentProjectId, loading: projectLoading, isEmpty } = useProjectContext();
+  const {
+    currentProject,
+    currentProjectId,
+    loading: projectLoading,
+    isEmpty,
+  } = useProjectContext();
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
-  
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    pages: 0,
+  });
+
   // Get projectId from context (prioritize current project over URL param)
-  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
+  const projectIdFromContext =
+    normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
   const activeProjectId = projectIdFromContext || projectIdFromUrl || '';
-  
+
   // Filters
   const [filters, setFilters] = useState({
     projectId: activeProjectId,
@@ -52,7 +63,7 @@ function ExpensesPageContent() {
   // Update filters when project changes (only if different)
   useEffect(() => {
     if (projectIdFromContext && projectIdFromContext !== activeProjectId) {
-      setFilters(prev => {
+      setFilters((prev) => {
         if (prev.projectId === projectIdFromContext) {
           return prev; // No change needed, return same reference
         }
@@ -86,7 +97,7 @@ function ExpensesPageContent() {
 
     // Prevent duplicate calls
     if (fetchingRef.current) return;
-    
+
     const fetchData = async () => {
       fetchingRef.current = true;
       try {
@@ -105,7 +116,9 @@ function ExpensesPageContent() {
           ...(filters.search && { search: filters.search }),
           ...(filters.startDate && { startDate: filters.startDate }),
           ...(filters.endDate && { endDate: filters.endDate }),
-          ...(filters.isIndirectCost && { isIndirectCost: filters.isIndirectCost }),
+          ...(filters.isIndirectCost && {
+            isIndirectCost: filters.isIndirectCost,
+          }),
         });
 
         const response = await fetch(`/api/expenses?${queryParams}`);
@@ -116,13 +129,15 @@ function ExpensesPageContent() {
         }
 
         setExpenses(data.data.expenses || []);
-        setPagination(prev => {
+        setPagination((prev) => {
           const newPagination = data.data.pagination || prev;
           // Only update if values actually changed
-          if (prev.page === newPagination.page && 
-              prev.limit === newPagination.limit && 
-              prev.total === newPagination.total && 
-              prev.pages === newPagination.pages) {
+          if (
+            prev.page === newPagination.page &&
+            prev.limit === newPagination.limit &&
+            prev.total === newPagination.total &&
+            prev.pages === newPagination.pages
+          ) {
             return prev; // Return same reference to prevent re-render
           }
           return newPagination;
@@ -137,7 +152,21 @@ function ExpensesPageContent() {
     };
 
     fetchData();
-  }, [isEmpty, projectLoading, filters.projectId, filters.category, filters.phaseId, filters.status, filters.vendor, filters.search, filters.startDate, filters.endDate, filters.isIndirectCost, pagination.page, pagination.limit]);
+  }, [
+    isEmpty,
+    projectLoading,
+    filters.projectId,
+    filters.category,
+    filters.phaseId,
+    filters.status,
+    filters.vendor,
+    filters.search,
+    filters.startDate,
+    filters.endDate,
+    filters.isIndirectCost,
+    pagination.page,
+    pagination.limit,
+  ]);
 
   const fetchAllPhases = async (projectId) => {
     if (!projectId) {
@@ -212,8 +241,12 @@ function ExpensesPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expenses</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage project expenses</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              Expenses
+            </h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+              Track and manage project expenses
+            </p>
           </div>
           <NoProjectsEmptyState
             canCreate={canAccess('create_project')}
@@ -230,8 +263,12 @@ function ExpensesPageContent() {
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expenses</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage project expenses</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              Expenses
+            </h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+              Track and manage project expenses
+            </p>
           </div>
           {canAccess('create_expense') && (
             <Link
@@ -246,10 +283,7 @@ function ExpensesPageContent() {
         <PrerequisiteGuide
           title="Expenses track services and overhead"
           description="Record expenses after projects and budgets are set."
-          prerequisites={[
-            'Project exists',
-            'Budget categories are defined',
-          ]}
+          prerequisites={['Project exists', 'Budget categories are defined']}
           actions={[
             { href: '/projects/new', label: 'Create Project' },
             { href: '/projects', label: 'Set Budgets' },
@@ -267,10 +301,14 @@ function ExpensesPageContent() {
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl md:text-2xl font-semibold mb-4 leading-tight text-gray-900">Filters</h2>
+          <h2 className="text-xl md:text-2xl font-semibold mb-4 leading-tight text-gray-900">
+            Filters
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Search</label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Search
+              </label>
               <input
                 type="text"
                 placeholder="Search expenses..."
@@ -281,7 +319,9 @@ function ExpensesPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Category</label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Category
+              </label>
               <select
                 value={filters.category}
                 onChange={(e) => handleFilterChange('category', e.target.value)}
@@ -290,14 +330,18 @@ function ExpensesPageContent() {
                 <option value="">All Categories</option>
                 {expenseCategories.map((cat) => (
                   <option key={cat} value={cat}>
-                    {cat.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
+                    {cat
+                      .replace('_', ' ')
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
                   </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Phase</label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Phase
+              </label>
               <select
                 value={filters.phaseId}
                 onChange={(e) => handleFilterChange('phaseId', e.target.value)}
@@ -318,7 +362,9 @@ function ExpensesPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Status</label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Status
+              </label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
@@ -333,10 +379,14 @@ function ExpensesPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Cost Type</label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Cost Type
+              </label>
               <select
                 value={filters.isIndirectCost}
-                onChange={(e) => handleFilterChange('isIndirectCost', e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange('isIndirectCost', e.target.value)
+                }
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
               >
                 <option value="">All Costs</option>
@@ -346,7 +396,9 @@ function ExpensesPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Vendor</label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Vendor
+              </label>
               <input
                 type="text"
                 placeholder="Filter by vendor..."
@@ -357,17 +409,23 @@ function ExpensesPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Start Date</label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Start Date
+              </label>
               <input
                 type="date"
                 value={filters.startDate}
-                onChange={(e) => handleFilterChange('startDate', e.target.value)}
+                onChange={(e) =>
+                  handleFilterChange('startDate', e.target.value)
+                }
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
               />
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">End Date</label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                End Date
+              </label>
               <input
                 type="date"
                 value={filters.endDate}
@@ -437,9 +495,15 @@ function ExpensesPageContent() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-base leading-normal text-gray-500">
                           <div className="flex items-center gap-2">
-                            {expense.category?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
+                            {expense.category
+                              ?.replace('_', ' ')
+                              .replace(/\b\w/g, (l) => l.toUpperCase()) ||
+                              'N/A'}
                             {expense.isIndirectCost && (
-                              <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-100 text-purple-800" title="Indirect Cost">
+                              <span
+                                className="px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-100 text-purple-800"
+                                title="Indirect Cost"
+                              >
                                 Indirect
                               </span>
                             )}
@@ -457,7 +521,7 @@ function ExpensesPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span
                             className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                              expense.status
+                              expense.status,
                             )}`}
                           >
                             {expense.status}
@@ -481,12 +545,21 @@ function ExpensesPageContent() {
               {pagination.pages > 1 && (
                 <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
                   <div className="text-sm text-gray-700">
-                    Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
-                    {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} expenses
+                    Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.total,
+                    )}{' '}
+                    of {pagination.total} expenses
                   </div>
                   <div className="flex gap-2">
                     <button
-                      onClick={() => setPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                      onClick={() =>
+                        setPagination((prev) => ({
+                          ...prev,
+                          page: Math.max(1, prev.page - 1),
+                        }))
+                      }
                       disabled={pagination.page === 1}
                       className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                     >
@@ -496,7 +569,12 @@ function ExpensesPageContent() {
                       Page {pagination.page} of {pagination.pages}
                     </span>
                     <button
-                      onClick={() => setPagination((prev) => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
+                      onClick={() =>
+                        setPagination((prev) => ({
+                          ...prev,
+                          page: Math.min(prev.pages, prev.page + 1),
+                        }))
+                      }
                       disabled={pagination.page === pagination.pages}
                       className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                     >
@@ -515,16 +593,18 @@ function ExpensesPageContent() {
 
 export default function ExpensesPage() {
   return (
-    <Suspense fallback={
-      <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading expenses...</p>
+    <Suspense
+      fallback={
+        <AppLayout>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading expenses...</p>
+            </div>
           </div>
-        </div>
-      </AppLayout>
-    }>
+        </AppLayout>
+      }
+    >
       <ExpensesPageContent />
     </Suspense>
   );

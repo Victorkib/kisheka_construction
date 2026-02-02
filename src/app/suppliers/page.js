@@ -5,7 +5,7 @@
  * Route: /suppliers
  */
 
-'use client';
+ 'use client';
 
 import { useState, useEffect, Suspense, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';

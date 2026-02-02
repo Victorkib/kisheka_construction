@@ -5,7 +5,7 @@
  * Auth: All authenticated users
  */
 
-'use client';
+ 'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';

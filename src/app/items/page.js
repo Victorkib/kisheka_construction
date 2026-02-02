@@ -1,7 +1,7 @@
 /**
  * Items/Materials List Page
  * Displays all materials with filtering, sorting, and pagination
- * 
+ *
  * Route: /items
  */
 
@@ -17,7 +17,10 @@ import { ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
-import { NoProjectsEmptyState, NoDataEmptyState } from '@/components/empty-states';
+import {
+  NoProjectsEmptyState,
+  NoDataEmptyState,
+} from '@/components/empty-states';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 
 function ItemsPageContent() {
@@ -36,7 +39,12 @@ function ItemsPageContent() {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    pages: 0,
+  });
   const [sortConfig, setSortConfig] = useState({
     key: null,
     direction: 'asc',
@@ -50,7 +58,7 @@ function ItemsPageContent() {
   const [submitMaterialId, setSubmitMaterialId] = useState(null);
   const [approvalNotes, setApprovalNotes] = useState('');
   const [rejectReason, setRejectReason] = useState('');
-  
+
   // Filters
   const [filters, setFilters] = useState({
     projectId: searchParams.get('projectId') || currentProjectId || '',
@@ -122,7 +130,7 @@ function ItemsPageContent() {
       if (sortConfig.key) {
         materialsData = [...materialsData].sort((a, b) => {
           let aValue, bValue;
-          
+
           switch (sortConfig.key) {
             case 'name':
               aValue = (a.name || a.materialName || '').toLowerCase();
@@ -159,13 +167,15 @@ function ItemsPageContent() {
       }
 
       setMaterials(materialsData);
-      setPagination(prev => {
+      setPagination((prev) => {
         const newPagination = data.data.pagination || prev;
         // Only update if values actually changed
-        if (prev.page === newPagination.page && 
-            prev.limit === newPagination.limit && 
-            prev.total === newPagination.total && 
-            prev.pages === newPagination.pages) {
+        if (
+          prev.page === newPagination.page &&
+          prev.limit === newPagination.limit &&
+          prev.total === newPagination.total &&
+          prev.pages === newPagination.pages
+        ) {
           return prev; // Return same reference to prevent re-render
         }
         return newPagination;
@@ -193,7 +203,8 @@ function ItemsPageContent() {
 
   // Update filters when project changes
   useEffect(() => {
-    const newProjectId = normalizeProjectId(currentProject?._id) || currentProjectId || '';
+    const newProjectId =
+      normalizeProjectId(currentProject?._id) || currentProjectId || '';
     if (newProjectId && filters.projectId !== newProjectId) {
       setFilters((prev) => ({ ...prev, projectId: newProjectId, phaseId: '' }));
       fetchPhases(newProjectId);
@@ -251,7 +262,7 @@ function ItemsPageContent() {
     setSelectedMaterials((prev) =>
       prev.includes(materialId)
         ? prev.filter((id) => id !== materialId)
-        : [...prev, materialId]
+        : [...prev, materialId],
     );
   };
 
@@ -407,7 +418,9 @@ function ItemsPageContent() {
 
       setSelectedMaterials([]);
       if (successCount > 0) {
-        toast.showSuccess(`Submitted ${successCount} material(s) successfully!`);
+        toast.showSuccess(
+          `Submitted ${successCount} material(s) successfully!`,
+        );
       }
       if (failCount > 0) {
         toast.showWarning(`${failCount} material(s) failed to submit`);
@@ -430,10 +443,13 @@ function ItemsPageContent() {
     setBulkActionLoading(true);
     setShowSubmitModal(false);
     try {
-      const response = await fetch(`/api/materials/${submitMaterialId}/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await fetch(
+        `/api/materials/${submitMaterialId}/submit`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+        },
+      );
 
       const data = await response.json();
       if (data.success) {
@@ -485,8 +501,12 @@ function ItemsPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Materials & Items</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage construction materials</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              Materials & Items
+            </h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+              Track and manage construction materials
+            </p>
           </div>
           <NoProjectsEmptyState
             canCreate={canAccess('create_project')}
@@ -501,8 +521,18 @@ function ItemsPageContent() {
     if (sortConfig.key !== columnKey) {
       return (
         <span className="ml-1 text-gray-400">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+            />
           </svg>
         </span>
       );
@@ -510,12 +540,32 @@ function ItemsPageContent() {
     return (
       <span className="ml-1 text-blue-600">
         {sortConfig.direction === 'asc' ? (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 15l7-7 7 7"
+            />
           </svg>
         ) : (
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 9l-7 7-7-7"
+            />
           </svg>
         )}
       </span>
@@ -533,8 +583,12 @@ function ItemsPageContent() {
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Materials & Items</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage construction materials</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              Materials & Items
+            </h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+              Track and manage construction materials
+            </p>
           </div>
           <div className="flex gap-2">
             {selectedMaterials.length > 0 && (
@@ -608,7 +662,9 @@ function ItemsPageContent() {
           <div className="space-y-4">
             {/* Search Bar */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Search Materials</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Search Materials
+              </label>
               <div className="relative">
                 <input
                   type="text"
@@ -623,7 +679,12 @@ function ItemsPageContent() {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
             </div>
@@ -631,70 +692,118 @@ function ItemsPageContent() {
             {/* Filter Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Project</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Project
+                </label>
                 <select
                   value={filters.projectId}
-                  onChange={(e) => handleFilterChange('projectId', e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange('projectId', e.target.value)
+                  }
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="" className="text-gray-900">All Projects</option>
+                  <option value="" className="text-gray-900">
+                    All Projects
+                  </option>
                   {accessibleProjects.map((project) => (
-                    <option key={project._id} value={project._id} className="text-gray-900">
-                      {project.projectName || project.projectCode || project._id}
+                    <option
+                      key={project._id}
+                      value={project._id}
+                      className="text-gray-900"
+                    >
+                      {project.projectName ||
+                        project.projectCode ||
+                        project._id}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Category
+                </label>
                 <input
                   type="text"
                   placeholder="Filter by category..."
                   value={filters.category}
-                  onChange={(e) => handleFilterChange('category', e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange('category', e.target.value)
+                  }
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Status
+                </label>
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="" className="text-gray-900">All Status</option>
-                  <option value="draft" className="text-gray-900">Draft</option>
-                  <option value="submitted" className="text-gray-900">Submitted</option>
-                  <option value="pending_approval" className="text-gray-900">Pending Approval</option>
-                  <option value="approved" className="text-gray-900">Approved</option>
-                  <option value="rejected" className="text-gray-900">Rejected</option>
-                  <option value="received" className="text-gray-900">Received</option>
+                  <option value="" className="text-gray-900">
+                    All Status
+                  </option>
+                  <option value="draft" className="text-gray-900">
+                    Draft
+                  </option>
+                  <option value="submitted" className="text-gray-900">
+                    Submitted
+                  </option>
+                  <option value="pending_approval" className="text-gray-900">
+                    Pending Approval
+                  </option>
+                  <option value="approved" className="text-gray-900">
+                    Approved
+                  </option>
+                  <option value="rejected" className="text-gray-900">
+                    Rejected
+                  </option>
+                  <option value="received" className="text-gray-900">
+                    Received
+                  </option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Entry Type</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Entry Type
+                </label>
                 <select
                   value={filters.entryType}
-                  onChange={(e) => handleFilterChange('entryType', e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange('entryType', e.target.value)
+                  }
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="" className="text-gray-900">All Entry Types</option>
-                  <option value="new_procurement" className="text-gray-900">New Procurement</option>
-                  <option value="retroactive_entry" className="text-gray-900">Retroactive Entry</option>
+                  <option value="" className="text-gray-900">
+                    All Entry Types
+                  </option>
+                  <option value="new_procurement" className="text-gray-900">
+                    New Procurement
+                  </option>
+                  <option value="retroactive_entry" className="text-gray-900">
+                    Retroactive Entry
+                  </option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Supplier</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Supplier
+                </label>
                 <input
                   type="text"
                   placeholder="Filter by supplier..."
                   value={filters.supplier}
-                  onChange={(e) => handleFilterChange('supplier', e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange('supplier', e.target.value)
+                  }
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Floor</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Floor
+                </label>
                 <input
                   type="text"
                   placeholder="Filter by floor..."
@@ -704,19 +813,29 @@ function ItemsPageContent() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Phase</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Phase
+                </label>
                 <select
                   value={filters.phaseId}
-                  onChange={(e) => handleFilterChange('phaseId', e.target.value)}
+                  onChange={(e) =>
+                    handleFilterChange('phaseId', e.target.value)
+                  }
                   disabled={loadingPhases}
                   className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                 >
-                  <option value="" className="text-gray-900">All Phases</option>
+                  <option value="" className="text-gray-900">
+                    All Phases
+                  </option>
                   {loadingPhases ? (
                     <option>Loading phases...</option>
                   ) : (
                     phases.map((phase) => (
-                      <option key={phase._id} value={phase._id} className="text-gray-900">
+                      <option
+                        key={phase._id}
+                        value={phase._id}
+                        className="text-gray-900"
+                      >
                         {phase.name}
                       </option>
                     ))
@@ -747,7 +866,9 @@ function ItemsPageContent() {
                     Object.entries(resetFilters).forEach(([k, v]) => {
                       if (v) params.set(k, v);
                     });
-                    router.push(`/items?${params.toString()}`, { scroll: false });
+                    router.push(`/items?${params.toString()}`, {
+                      scroll: false,
+                    });
                   }}
                   className="w-full px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 font-medium transition-colors"
                 >
@@ -770,12 +891,27 @@ function ItemsPageContent() {
           <LoadingTable rows={10} columns={8} showHeader={true} />
         ) : materials.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+              />
             </svg>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">No materials found</h3>
+            <h3 className="mt-4 text-lg font-medium text-gray-900">
+              No materials found
+            </h3>
             <p className="mt-2 text-sm text-gray-500">
-              {filters.search || filters.category || filters.status || filters.projectId
+              {filters.search ||
+              filters.category ||
+              filters.status ||
+              filters.projectId
                 ? 'Try adjusting your filters'
                 : 'Get started by adding your first material'}
             </p>
@@ -799,7 +935,10 @@ function ItemsPageContent() {
                       <th className="px-4 py-3 text-left">
                         <input
                           type="checkbox"
-                          checked={selectedMaterials.length === materials.length && materials.length > 0}
+                          checked={
+                            selectedMaterials.length === materials.length &&
+                            materials.length > 0
+                          }
                           onChange={toggleSelectAll}
                           className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                         />
@@ -871,7 +1010,10 @@ function ItemsPageContent() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {materials.map((material) => (
-                      <tr key={material._id} className="hover:bg-gray-50 transition-colors">
+                      <tr
+                        key={material._id}
+                        className="hover:bg-gray-50 transition-colors"
+                      >
                         <td className="px-4 py-4 whitespace-nowrap">
                           <input
                             type="checkbox"
@@ -910,44 +1052,55 @@ function ItemsPageContent() {
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <div className="space-y-1">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                              material.entryType === 'new_procurement'
-                                ? 'bg-blue-100 text-blue-800'
-                                : material.entryType === 'retroactive_entry'
-                                ? 'bg-gray-100 text-gray-800'
-                                : 'bg-gray-100 text-gray-600'
-                            }`}>
+                            <span
+                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                material.entryType === 'new_procurement'
+                                  ? 'bg-blue-100 text-blue-800'
+                                  : material.entryType === 'retroactive_entry'
+                                    ? 'bg-gray-100 text-gray-800'
+                                    : 'bg-gray-100 text-gray-600'
+                              }`}
+                            >
                               {material.entryType === 'new_procurement'
                                 ? 'New Procurement'
                                 : material.entryType === 'retroactive_entry'
-                                ? 'Retroactive Entry'
-                                : 'Legacy'}
+                                  ? 'Retroactive Entry'
+                                  : 'Legacy'}
                             </span>
-                            {material.entryType === 'retroactive_entry' && material.costStatus && (
-                              <div className="mt-1">
-                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                                  material.costStatus === 'actual'
-                                    ? 'bg-green-100 text-green-800'
-                                    : material.costStatus === 'estimated'
-                                    ? 'bg-yellow-100 text-yellow-800'
-                                    : 'bg-red-100 text-red-800'
-                                }`}>
-                                  Cost: {material.costStatus}
-                                </span>
-                              </div>
-                            )}
+                            {material.entryType === 'retroactive_entry' &&
+                              material.costStatus && (
+                                <div className="mt-1">
+                                  <span
+                                    className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                      material.costStatus === 'actual'
+                                        ? 'bg-green-100 text-green-800'
+                                        : material.costStatus === 'estimated'
+                                          ? 'bg-yellow-100 text-yellow-800'
+                                          : 'bg-red-100 text-red-800'
+                                    }`}
+                                  >
+                                    Cost: {material.costStatus}
+                                  </span>
+                                </div>
+                              )}
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">{material.category || 'N/A'}</span>
+                          <span className="text-sm text-gray-900">
+                            {material.category || 'N/A'}
+                          </span>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <div className="text-sm text-gray-900">
-                            {material.quantity || material.quantityPurchased || 0} {material.unit || ''}
+                            {material.quantity ||
+                              material.quantityPurchased ||
+                              0}{' '}
+                            {material.unit || ''}
                           </div>
                           {material.quantityRemaining !== undefined && (
                             <div className="text-xs text-gray-600">
-                              Remaining: {material.quantityRemaining} {material.unit || ''}
+                              Remaining: {material.quantityRemaining}{' '}
+                              {material.unit || ''}
                             </div>
                           )}
                         </td>
@@ -963,16 +1116,19 @@ function ItemsPageContent() {
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <span className="text-sm text-gray-900">
-                            {material.supplierName || material.supplier || 'N/A'}
+                            {material.supplierName ||
+                              material.supplier ||
+                              'N/A'}
                           </span>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <span
                             className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                              material.status
+                              material.status,
                             )}`}
                           >
-                            {material.status?.replace('_', ' ').toUpperCase() || 'DRAFT'}
+                            {material.status?.replace('_', ' ').toUpperCase() ||
+                              'DRAFT'}
                           </span>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">
@@ -992,7 +1148,9 @@ function ItemsPageContent() {
                                   Edit
                                 </Link>
                                 <button
-                                  onClick={() => handleSubmitClick(material._id)}
+                                  onClick={() =>
+                                    handleSubmitClick(material._id)
+                                  }
                                   className="text-left text-purple-600 hover:text-purple-900"
                                 >
                                   Submit
@@ -1011,7 +1169,10 @@ function ItemsPageContent() {
             {/* Mobile Card View */}
             <div className="lg:hidden space-y-4">
               {materials.map((material) => (
-                <div key={material._id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                <div
+                  key={material._id}
+                  className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                >
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -1029,28 +1190,33 @@ function ItemsPageContent() {
                         </Link>
                       </div>
                       {material.description && (
-                        <p className="text-sm text-gray-600 mb-2">{material.description}</p>
+                        <p className="text-sm text-gray-600 mb-2">
+                          {material.description}
+                        </p>
                       )}
                       <div className="flex gap-2 flex-wrap">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                            material.status
+                            material.status,
                           )}`}
                         >
-                          {material.status?.replace('_', ' ').toUpperCase() || 'DRAFT'}
+                          {material.status?.replace('_', ' ').toUpperCase() ||
+                            'DRAFT'}
                         </span>
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          material.entryType === 'new_procurement'
-                            ? 'bg-blue-100 text-blue-800'
-                            : material.entryType === 'retroactive_entry'
-                            ? 'bg-gray-100 text-gray-800'
-                            : 'bg-gray-100 text-gray-600'
-                        }`}>
+                        <span
+                          className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                            material.entryType === 'new_procurement'
+                              ? 'bg-blue-100 text-blue-800'
+                              : material.entryType === 'retroactive_entry'
+                                ? 'bg-gray-100 text-gray-800'
+                                : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
                           {material.entryType === 'new_procurement'
                             ? 'New Procurement'
                             : material.entryType === 'retroactive_entry'
-                            ? 'Retroactive Entry'
-                            : 'Legacy'}
+                              ? 'Retroactive Entry'
+                              : 'Legacy'}
                         </span>
                       </div>
                     </div>
@@ -1059,7 +1225,9 @@ function ItemsPageContent() {
                   <div className="grid grid-cols-2 gap-3 text-sm mb-3 pt-3 border-t border-gray-200">
                     <div>
                       <span className="text-gray-500">Category:</span>
-                      <span className="ml-1 text-gray-900 font-medium">{material.category || 'N/A'}</span>
+                      <span className="ml-1 text-gray-900 font-medium">
+                        {material.category || 'N/A'}
+                      </span>
                     </div>
                     <div>
                       <span className="text-gray-500">Supplier:</span>
@@ -1070,11 +1238,13 @@ function ItemsPageContent() {
                     <div>
                       <span className="text-gray-500">Quantity:</span>
                       <span className="ml-1 text-gray-900 font-medium">
-                        {material.quantity || material.quantityPurchased || 0} {material.unit || ''}
+                        {material.quantity || material.quantityPurchased || 0}{' '}
+                        {material.unit || ''}
                       </span>
                       {material.quantityRemaining !== undefined && (
                         <div className="text-xs text-gray-600 mt-0.5">
-                          Remaining: {material.quantityRemaining} {material.unit || ''}
+                          Remaining: {material.quantityRemaining}{' '}
+                          {material.unit || ''}
                         </div>
                       )}
                     </div>
@@ -1145,21 +1315,32 @@ function ItemsPageContent() {
               <div className="mt-6 bg-white rounded-lg shadow p-4">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-700">Items per page:</span>
+                    <span className="text-sm text-gray-700">
+                      Items per page:
+                    </span>
                     <select
                       value={pagination.limit}
                       onChange={(e) => handleLimitChange(e.target.value)}
                       className="px-3 py-1 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     >
-                      <option value="10" className="text-gray-900">10</option>
-                      <option value="20" className="text-gray-900">20</option>
-                      <option value="50" className="text-gray-900">50</option>
-                      <option value="100" className="text-gray-900">100</option>
+                      <option value="10" className="text-gray-900">
+                        10
+                      </option>
+                      <option value="20" className="text-gray-900">
+                        20
+                      </option>
+                      <option value="50" className="text-gray-900">
+                        50
+                      </option>
+                      <option value="100" className="text-gray-900">
+                        100
+                      </option>
                     </select>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-700">
-                      Page {pagination.page} of {pagination.pages} ({pagination.total} total)
+                      Page {pagination.page} of {pagination.pages} (
+                      {pagination.total} total)
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -1171,31 +1352,34 @@ function ItemsPageContent() {
                       Previous
                     </button>
                     <div className="flex gap-1">
-                      {Array.from({ length: Math.min(5, pagination.pages) }, (_, i) => {
-                        let pageNum;
-                        if (pagination.pages <= 5) {
-                          pageNum = i + 1;
-                        } else if (pagination.page <= 3) {
-                          pageNum = i + 1;
-                        } else if (pagination.page >= pagination.pages - 2) {
-                          pageNum = pagination.pages - 4 + i;
-                        } else {
-                          pageNum = pagination.page - 2 + i;
-                        }
-                        return (
-                          <button
-                            key={pageNum}
-                            onClick={() => handlePageChange(pageNum)}
-                            className={`px-3 py-2 rounded-lg text-sm font-medium ${
-                              pagination.page === pageNum
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                            }`}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
+                      {Array.from(
+                        { length: Math.min(5, pagination.pages) },
+                        (_, i) => {
+                          let pageNum;
+                          if (pagination.pages <= 5) {
+                            pageNum = i + 1;
+                          } else if (pagination.page <= 3) {
+                            pageNum = i + 1;
+                          } else if (pagination.page >= pagination.pages - 2) {
+                            pageNum = pagination.pages - 4 + i;
+                          } else {
+                            pageNum = pagination.page - 2 + i;
+                          }
+                          return (
+                            <button
+                              key={pageNum}
+                              onClick={() => handlePageChange(pageNum)}
+                              className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                                pagination.page === pageNum
+                                  ? 'bg-blue-600 text-white'
+                                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                              }`}
+                            >
+                              {pageNum}
+                            </button>
+                          );
+                        },
+                      )}
                     </div>
                     <button
                       onClick={() => handlePageChange(pagination.page + 1)}
@@ -1214,20 +1398,44 @@ function ItemsPageContent() {
 
       {/* Bulk Approve Modal with Notes */}
       {showBulkApproveModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !bulkActionLoading && setShowBulkApproveModal(false)} />
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto"
+          aria-labelledby="modal-title"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity"
+            onClick={() => !bulkActionLoading && setShowBulkApproveModal(false)}
+          />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="p-6">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
-                    <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <svg
+                      className="w-6 h-6 text-blue-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
                     </svg>
                   </div>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
+                  <h3
+                    className="text-lg font-semibold leading-6 text-gray-900 mb-2"
+                    id="modal-title"
+                  >
                     Approve Materials
                   </h3>
                   <div className="mt-2">
@@ -1273,20 +1481,44 @@ function ItemsPageContent() {
 
       {/* Bulk Reject Modal */}
       {showBulkRejectModal && (
-        <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !bulkActionLoading && setShowBulkRejectModal(false)} />
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto"
+          aria-labelledby="modal-title"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity"
+            onClick={() => !bulkActionLoading && setShowBulkRejectModal(false)}
+          />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
+            <div
+              className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all"
+              onClick={(e) => e.stopPropagation()}
+            >
               <div className="p-6">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
-                    <svg className="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <svg
+                      className="w-6 h-6 text-yellow-600"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                      />
                     </svg>
                   </div>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
+                  <h3
+                    className="text-lg font-semibold leading-6 text-gray-900 mb-2"
+                    id="modal-title"
+                  >
                     Reject Materials
                   </h3>
                   <div className="mt-2">
@@ -1361,16 +1593,18 @@ function ItemsPageContent() {
 
 export default function ItemsPage() {
   return (
-    <Suspense fallback={
-      <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading materials...</p>
+    <Suspense
+      fallback={
+        <AppLayout>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading materials...</p>
+            </div>
           </div>
-        </div>
-      </AppLayout>
-    }>
+        </AppLayout>
+      }
+    >
       <ItemsPageContent />
     </Suspense>
   );
