@@ -23,6 +23,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Get single supplier by ID
  * Auth: OWNER, PM only
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const { id } = await params;

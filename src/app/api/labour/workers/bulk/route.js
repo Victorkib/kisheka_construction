@@ -21,6 +21,10 @@ import { generateEmployeeId } from '@/lib/generators/employee-id-generator';
  * Auth: OWNER only
  * Body: { workers: Array<WorkerProfileData> }
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   const session = null; // We'll use transactions if needed
   let db = null;

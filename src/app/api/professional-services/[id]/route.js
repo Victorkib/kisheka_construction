@@ -30,6 +30,9 @@ import {
   VISIT_FREQUENCIES,
 } from '@/lib/constants/professional-services-constants';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 const normalizeIdParam = (value) => {
   if (!value) return '';
   if (Array.isArray(value)) return normalizeIdParam(value[0]);

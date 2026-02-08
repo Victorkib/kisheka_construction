@@ -23,6 +23,10 @@ import { normalizeUserRole, isRole } from '@/lib/role-constants';
  * Creates multiple professional activities in a batch
  * Auth: OWNER/PM/CLERK
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();

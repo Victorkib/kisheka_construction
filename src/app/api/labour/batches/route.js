@@ -24,6 +24,9 @@ import {
   createLabourEntry,
   validateLabourEntry,
 } from '@/lib/schemas/labour-entry-schema';
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 import {
   validatePhaseLabourBudget,
   updatePhaseLabourSpending,

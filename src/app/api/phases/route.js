@@ -19,6 +19,9 @@ import { getProjectContext, createProjectFilter } from '@/lib/middleware/project
 import { createPhase, validatePhase, DEFAULT_PHASES, PHASE_TYPES, PHASE_STATUSES } from '@/lib/schemas/phase-schema';
 import { validatePhaseDependencies, calculatePhaseStartDate } from '@/lib/phase-dependency-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/phases
  * Returns phases, optionally filtered by projectId

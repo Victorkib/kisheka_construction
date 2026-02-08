@@ -23,6 +23,10 @@ import { VALID_ROLES } from '@/lib/role-constants';
 /**
  * Generate secure invitation token
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 function generateInvitationToken() {
   return crypto.randomBytes(32).toString('hex');
 }

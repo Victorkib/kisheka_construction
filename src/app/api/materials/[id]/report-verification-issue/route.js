@@ -22,6 +22,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Report a verification issue with delivered materials
  * Auth: CLERK, SUPERVISOR, PM, OWNER
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const { id } = await params;

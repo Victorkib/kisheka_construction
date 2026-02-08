@@ -34,6 +34,9 @@ import {
   DOCUMENT_TYPES,
 } from '@/lib/constants/professional-activities-constants';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/professional-activities/[id]
  * Get single professional activity by ID

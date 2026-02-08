@@ -18,6 +18,9 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateAllocations } from '@/lib/investment-allocation';
 import { recalculateProjectFinances, validateCapitalRemoval } from '@/lib/financial-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 const normalizeId = (value) => {
   if (!value) return '';
   if (Array.isArray(value)) return normalizeId(value[0]);

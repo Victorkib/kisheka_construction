@@ -22,6 +22,10 @@ import { PAYMENT_METHODS } from '@/lib/constants/professional-fees-constants';
  * Record payment for a professional fee
  * Auth: PM, OWNER, ACCOUNTANT
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function PUT(request, { params }) {
   try {
     const { id } = await params;

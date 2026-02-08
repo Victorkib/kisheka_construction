@@ -13,6 +13,9 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { MATERIAL_APPROVED_STATUSES } from '@/lib/status-constants';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 const getFloorGroup = (floorNumber) => {
   if (floorNumber === undefined || floorNumber === null) return 'unknown';
   return floorNumber < 0 ? 'basement' : 'superstructure';

@@ -21,6 +21,9 @@ import {
 } from '@/lib/schemas/professional-fees-schema';
 import { FEE_STATUSES } from '@/lib/constants/professional-fees-constants';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/professional-fees
  * Returns professional fees with filtering, sorting, and pagination

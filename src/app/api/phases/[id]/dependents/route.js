@@ -16,6 +16,10 @@ import { getDependentPhases } from '@/lib/phase-dependency-helpers';
  * Returns all phases that depend on the given phase
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

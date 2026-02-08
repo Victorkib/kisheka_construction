@@ -22,6 +22,9 @@ import { isEnhancedBudget, createEnhancedBudget, validateBudget, getBudgetTotal,
 import { calculateTotalPhaseBudgets } from '@/lib/phase-helpers';
 import { supportsTransactions } from '@/lib/mongodb/transaction-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/projects/[id]
  * Returns a single project by ID with summary statistics

@@ -18,6 +18,10 @@ import { LABOUR_APPROVED_STATUSES } from '@/lib/status-constants';
  * Query params: projectId, startDate, endDate
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

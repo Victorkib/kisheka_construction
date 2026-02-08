@@ -17,6 +17,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * POST /api/user/project-preferences/recent
  * Adds a project to user's recent projects list (max 5)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();

@@ -18,6 +18,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Returns detailed report for a category with all items
  * Query params: projectId, startDate, endDate
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

@@ -162,15 +162,39 @@ export async function proxy(request) {
     } = await supabase.auth.getSession();
 
     // Handle session errors gracefully
+    // Only redirect on actual auth failures, not transient errors
     if (sessionError) {
       console.error('Session error in proxy:', sessionError);
-      // If there's a session error on a protected route, redirect to login
-      if (isProtectedRoute) {
+      
+      // Check if this is a critical auth error (not just a network/transient error)
+      const isCriticalError = sessionError.message?.includes('JWT') || 
+                              sessionError.message?.includes('token') ||
+                              sessionError.message?.includes('expired') ||
+                              sessionError.status === 401 ||
+                              sessionError.status === 403;
+      
+      // Only redirect on critical auth errors, not transient network issues
+      if (isCriticalError && isProtectedRoute) {
         const url = new URL('/auth/login', request.url);
         url.searchParams.set('redirect', pathname);
         url.searchParams.set('error', 'session_error');
         return NextResponse.redirect(url);
       }
+      
+      // For transient errors or non-critical errors, allow request to continue
+      // The page/API route will handle the error appropriately
+      if (isProtectedRoute && !session) {
+        // No session and critical error - redirect to login
+        if (isCriticalError) {
+          const url = new URL('/auth/login', request.url);
+          url.searchParams.set('redirect', pathname);
+          return NextResponse.redirect(url);
+        }
+        // Transient error but no session - be lenient, allow to continue
+        // The client-side will handle re-authentication if needed
+        return response;
+      }
+      
       // For auth routes, allow the request to continue
       return response;
     }
@@ -178,7 +202,7 @@ export async function proxy(request) {
     // Handle protected routes
     if (isProtectedRoute) {
       if (!session) {
-        // Redirect to login if not authenticated
+        // Redirect to login if not authenticated (only if we got a clean response with no session)
         const url = new URL('/auth/login', request.url);
         url.searchParams.set('redirect', pathname);
         return NextResponse.redirect(url);
@@ -195,15 +219,25 @@ export async function proxy(request) {
     // Log error but don't crash the application
     console.error('Proxy error:', error);
 
-    // For protected routes, redirect to login on error
-    if (isProtectedRoute) {
+    // Only redirect on critical errors, not transient network issues
+    // Most errors (network timeouts, connection issues) should allow the request to continue
+    // The client-side code will handle re-authentication if needed
+    const isCriticalError = error.message?.includes('ENOTFOUND') === false && 
+                            error.message?.includes('ECONNREFUSED') === false &&
+                            error.message?.includes('timeout') === false &&
+                            error.code !== 'ECONNREFUSED' &&
+                            error.code !== 'ETIMEDOUT';
+    
+    // For protected routes, only redirect on critical errors
+    if (isProtectedRoute && isCriticalError) {
       const url = new URL('/auth/login', request.url);
       url.searchParams.set('redirect', pathname);
       url.searchParams.set('error', 'proxy_error');
       return NextResponse.redirect(url);
     }
 
-    // For other routes, allow the request to continue
+    // For transient errors or other routes, allow the request to continue
+    // This prevents users from being kicked out during form filling due to network issues
     return response;
   }
 }

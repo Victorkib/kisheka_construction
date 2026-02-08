@@ -23,6 +23,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * GET /api/initial-expenses/[id]
  * Returns a single initial expense
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

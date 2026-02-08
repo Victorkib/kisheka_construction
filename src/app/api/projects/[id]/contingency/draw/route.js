@@ -21,6 +21,10 @@ import { createContingencyDraw, validateContingencyDraw } from '@/lib/contingenc
  * Creates a new contingency draw request
  * Auth: PM, OWNER
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

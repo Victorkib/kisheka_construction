@@ -14,6 +14,10 @@ import { redirect } from 'next/navigation';
  * GET /api/po/[shortCode]
  * Resolves short code to full response token and redirects
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const { shortCode } = await params;

@@ -18,6 +18,10 @@ import { getCombinedLabourSummary } from '@/lib/subcontractor-labour-helpers';
  * Query params: projectId, dateFrom, dateTo, groupBy (phase|worker|skill)
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

@@ -23,6 +23,9 @@ import {
   getBudgetTransferSummary,
 } from '@/lib/budget-transfer-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/projects/[id]/budget/transfer
  * Returns budget transfer history for a project

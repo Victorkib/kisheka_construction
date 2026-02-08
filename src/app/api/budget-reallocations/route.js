@@ -30,6 +30,10 @@ import { calculateAvailableBudget } from '@/lib/schemas/budget-reallocation-sche
  * Auth: All authenticated users
  * Query params: projectId, phaseId, status, page, limit
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

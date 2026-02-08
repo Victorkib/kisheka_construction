@@ -29,6 +29,9 @@ import {
   autoFillFromProfiles,
 } from '@/lib/labour-parsing-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/labour/supervisor-submissions
  * Returns supervisor submissions with filtering, sorting, and pagination

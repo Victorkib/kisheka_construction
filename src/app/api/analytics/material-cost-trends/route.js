@@ -19,6 +19,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Returns cost trends over time for materials
  * Query params: projectId, materialName, categoryId, startDate, endDate, groupBy
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

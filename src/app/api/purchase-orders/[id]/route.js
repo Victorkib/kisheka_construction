@@ -24,6 +24,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Get single purchase order by ID
  * Auth: PM, OWNER, SUPPLIER, ACCOUNTANT
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const { id } = await params;

@@ -26,6 +26,9 @@ import {
   VISIT_FREQUENCIES,
 } from '@/lib/constants/professional-services-constants';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/professional-services-library/[id]
  * Get single professional from library by ID

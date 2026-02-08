@@ -19,6 +19,10 @@ import { getFinancialOverview } from '@/lib/financial-helpers';
  * GET /api/projects/[id]/financial-overview
  * Returns unified financial overview showing budget, financing, and actual spending
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

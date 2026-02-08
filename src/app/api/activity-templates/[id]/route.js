@@ -24,6 +24,9 @@ import {
   TEMPLATE_PROFESSIONAL_TYPES,
 } from '@/lib/schemas/activity-template-schema';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/activity-templates/[id]
  * Get single activity template by ID

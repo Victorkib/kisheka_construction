@@ -20,6 +20,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * GET /api/suppliers/performance/top
  * Get top performing suppliers by category
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

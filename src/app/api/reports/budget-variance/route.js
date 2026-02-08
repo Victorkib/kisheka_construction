@@ -23,6 +23,10 @@ import { getBudgetTotal, getMaterialsBudget, getLabourBudget, getContingencyBudg
  * Returns budget vs actual comparison with variance calculations
  * Query params: projectId (required)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

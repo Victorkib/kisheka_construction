@@ -17,6 +17,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Query params: dateFrom, dateTo, projectId, phaseId, groupBy (day|week|month)
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

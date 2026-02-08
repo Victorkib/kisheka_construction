@@ -20,6 +20,10 @@ import { calculateProjectProfessionalServicesStats, getProjectProfessionalServic
  * Returns professional services activity and financial summary
  * Query params: projectId, startDate, endDate, type (architect|engineer|all)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

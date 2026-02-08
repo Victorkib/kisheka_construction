@@ -20,6 +20,9 @@ import {
   validateBudgetTransfer,
 } from '@/lib/budget-transfer-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/projects/[id]/budget/transfer/[transferId]/approve
  * Approves or rejects a budget transfer request

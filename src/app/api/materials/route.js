@@ -23,6 +23,9 @@ import { getProjectContext, createProjectFilter } from '@/lib/middleware/project
 import { normalizeUserRole, isRole } from '@/lib/role-constants';
 import { incrementLibraryUsage } from '@/lib/helpers/material-library-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/materials
  * Returns materials with filtering, sorting, and pagination

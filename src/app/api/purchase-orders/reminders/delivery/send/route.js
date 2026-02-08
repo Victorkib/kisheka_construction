@@ -18,6 +18,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Send delivery reminders for accepted purchase orders with upcoming delivery dates
  * Body: { projectId?: string, daysBeforeDelivery?: number, maxReminders?: number, dryRun?: boolean }
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();

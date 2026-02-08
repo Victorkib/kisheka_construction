@@ -18,6 +18,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Returns summary of discrepancies for a project
  * Query params: projectId (required)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

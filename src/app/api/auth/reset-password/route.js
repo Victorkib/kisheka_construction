@@ -11,6 +11,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const { token, password } = await request.json();

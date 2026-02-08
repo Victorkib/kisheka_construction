@@ -37,6 +37,10 @@ import { updateLabourCostSummary } from '@/lib/labour-financial-helpers';
  * Approve labour entry
  * Auth: OWNER only
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

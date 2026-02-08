@@ -22,6 +22,9 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/material-requests
  * Returns material requests with filtering, sorting, and pagination

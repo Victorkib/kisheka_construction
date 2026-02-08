@@ -23,6 +23,10 @@ import { calculateTotalPhaseBudgets } from '@/lib/phase-helpers';
  * Allocates budget to phase from project budget
  * Auth: PM, OWNER, ACCOUNTANT only
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

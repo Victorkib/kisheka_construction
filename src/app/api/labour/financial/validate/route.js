@@ -16,6 +16,10 @@ import { validatePhaseLabourBudget } from '@/lib/labour-financial-helpers';
  * Validate labour cost against phase budget
  * Query params: phaseId, labourCost
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

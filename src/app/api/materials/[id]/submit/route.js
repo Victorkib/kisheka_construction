@@ -22,6 +22,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Changes status from 'draft' to 'pending_approval'
  * Auth: CLERK, PM, OWNER
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

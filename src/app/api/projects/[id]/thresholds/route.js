@@ -20,6 +20,10 @@ import { DEFAULT_THRESHOLDS } from '@/lib/discrepancy-detection';
  * GET /api/projects/[id]/thresholds
  * Gets wastage thresholds for a project
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

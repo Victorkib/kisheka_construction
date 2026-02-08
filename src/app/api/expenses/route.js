@@ -18,6 +18,9 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
 import { recalculatePhaseSpending } from '@/lib/phase-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/expenses
  * Returns expenses with filtering, sorting, and pagination

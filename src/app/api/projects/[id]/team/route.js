@@ -23,6 +23,10 @@ import { validateProjectAccess } from '@/lib/middleware/project-context';
  * GET /api/projects/[id]/team
  * Returns all team members for a project
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

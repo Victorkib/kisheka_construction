@@ -17,6 +17,9 @@ import {
   getBudgetTotal,
 } from '@/lib/schemas/budget-schema';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/projects/[id]/dcc
  * Returns comprehensive DCC budget and spending

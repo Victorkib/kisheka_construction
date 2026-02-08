@@ -24,6 +24,10 @@ import { recalculateProjectFinances } from '@/lib/financial-helpers';
  * Returns a single investor
  * Auth: OWNER, ACCOUNTANT (all), INVESTOR (own data only)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

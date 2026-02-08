@@ -15,6 +15,9 @@ import { validateProjectAccess } from '@/lib/middleware/project-context';
 import { getProjectDependencyCounts } from '@/lib/project-dependencies';
 import { getCurrentTotalUsed } from '@/lib/financial-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

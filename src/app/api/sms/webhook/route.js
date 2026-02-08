@@ -22,6 +22,10 @@ import crypto from 'crypto';
 /**
  * Validate webhook signature (if Africa's Talking provides it)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 function validateWebhookSignature(body, signature, secret) {
   if (!secret || !signature) {
     return true; // Skip validation if not configured

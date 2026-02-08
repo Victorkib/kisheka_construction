@@ -25,6 +25,10 @@ import { updateIndirectCostsSpending, validateIndirectCostsBudget } from '@/lib/
  * Creates approval record and updates expense status
  * Auth: PM, OWNER, ACCOUNTANT
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

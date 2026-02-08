@@ -23,6 +23,10 @@ import { getDatabase } from '@/lib/mongodb/connection';
  * Parse data without creating submission (for preview)
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();

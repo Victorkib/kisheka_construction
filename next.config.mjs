@@ -109,8 +109,10 @@ const nextConfig = {
   // Compression for better SEO (Core Web Vitals)
   compress: true,
 
-  // Generate ETags for better caching
-  generateEtags: true,
+  // Disable ETag generation to prevent route handler caching
+  // API routes with dynamic data should use 'force-dynamic' export instead
+  // ETags can cause stale data issues in production
+  generateEtags: false,
 
   // Production source maps for error tracking
   productionBrowserSourceMaps: false,

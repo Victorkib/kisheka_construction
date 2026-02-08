@@ -21,6 +21,10 @@ import { withTransaction } from '@/lib/mongodb/transaction-helpers';
  * Confirm delivery for multiple purchase orders
  * Auth: OWNER, PM
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();

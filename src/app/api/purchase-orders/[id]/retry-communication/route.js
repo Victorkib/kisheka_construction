@@ -21,6 +21,10 @@ import { generateShortUrl } from '@/lib/generators/url-shortener';
  * POST /api/purchase-orders/[id]/retry-communication
  * Retry sending communication (email, SMS, or push) for a purchase order
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const { id } = await params;

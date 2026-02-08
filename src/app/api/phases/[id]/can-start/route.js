@@ -16,6 +16,10 @@ import { canPhaseStart } from '@/lib/phase-dependency-helpers';
  * Returns whether the phase can be started and the reason
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

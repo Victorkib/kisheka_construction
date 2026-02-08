@@ -16,6 +16,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Generates a signed upload signature for Cloudinary
  * Security: Signs requests with Cloudinary API secret
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();

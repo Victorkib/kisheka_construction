@@ -17,6 +17,9 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { createWorkerProfile, validateWorkerProfile } from '@/lib/schemas/worker-profile-schema';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/labour/workers
  * Returns worker profiles with filtering, sorting, and pagination

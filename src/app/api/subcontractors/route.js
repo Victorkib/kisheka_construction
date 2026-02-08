@@ -18,6 +18,9 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { createSubcontractor, validateSubcontractor, SUBCONTRACTOR_TYPES, SUBCONTRACTOR_STATUSES } from '@/lib/schemas/subcontractor-schema';
 import { recalculatePhaseSpending } from '@/lib/phase-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/subcontractors
  * Returns subcontractors, optionally filtered by projectId, phaseId, status, subcontractorType

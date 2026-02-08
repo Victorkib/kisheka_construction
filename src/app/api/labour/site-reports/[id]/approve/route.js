@@ -27,6 +27,9 @@ import {
   updateWorkItemStatusFromCompletion,
 } from '@/lib/work-item-labour-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

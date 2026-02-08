@@ -19,6 +19,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Clone a phase
  * Auth: PM, OWNER only
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

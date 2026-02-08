@@ -17,6 +17,10 @@ import { compareCategoryTrends } from '@/lib/trend-analysis-helpers';
  * Returns trend analysis for all cost categories
  * Auth: All authenticated users with project access
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

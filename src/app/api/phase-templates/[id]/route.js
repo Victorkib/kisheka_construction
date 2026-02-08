@@ -24,6 +24,10 @@ import { validatePhaseTemplate, TEMPLATE_TYPES } from '@/lib/schemas/phase-templ
  * Returns a single phase template
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

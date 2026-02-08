@@ -8,6 +8,10 @@ import { successResponse, errorResponse } from "@/lib/api-response"
  * GET /api/analytics/rejections
  * Get comprehensive rejection analytics dashboard data
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient()

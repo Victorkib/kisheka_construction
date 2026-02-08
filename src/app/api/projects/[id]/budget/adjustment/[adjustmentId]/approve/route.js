@@ -20,6 +20,9 @@ import {
   validateBudgetAdjustment,
 } from '@/lib/budget-adjustment-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * POST /api/projects/[id]/budget/adjustment/[adjustmentId]/approve
  * Approves or rejects a budget adjustment request

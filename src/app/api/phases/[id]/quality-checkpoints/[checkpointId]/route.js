@@ -24,6 +24,10 @@ import { validateQualityCheckpoint, QUALITY_CHECKPOINT_STATUSES } from '@/lib/qu
  * Returns a single quality checkpoint
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

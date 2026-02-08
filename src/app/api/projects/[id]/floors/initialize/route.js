@@ -18,6 +18,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Initializes default floors for a project
  * Auth: PM, OWNER only
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

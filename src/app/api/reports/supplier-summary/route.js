@@ -18,6 +18,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Returns summary of all suppliers with total spent, item count, etc.
  * Query params: projectId, startDate, endDate
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

@@ -16,6 +16,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * POST /api/uploads/verify
  * Verifies that a file exists on Cloudinary and updates material record
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();

@@ -27,6 +27,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * GET /api/suppliers/[id]/performance
  * Get detailed performance metrics for a specific supplier
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const { id } = await params;

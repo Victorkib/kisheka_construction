@@ -20,6 +20,9 @@ import { validateWorkItemDependencies } from '@/lib/work-item-helpers';
 import { calculatePhaseCompletionFromWorkItems } from '@/lib/work-item-helpers';
 import { CATEGORY_TYPES } from '@/lib/constants/category-constants';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 const resolveWorkItemCategory = async (db, { categoryId, category }) => {
   let resolvedCategoryId = null;
   let resolvedCategory = category?.trim() || '';

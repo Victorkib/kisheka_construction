@@ -27,6 +27,10 @@ import { validateIndirectCostsBudget } from '@/lib/indirect-costs-helpers';
  *   }
  * }
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

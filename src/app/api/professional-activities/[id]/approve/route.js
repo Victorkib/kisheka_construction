@@ -20,6 +20,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Approve a professional activity
  * Auth: PM, OWNER
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const { id } = await params;

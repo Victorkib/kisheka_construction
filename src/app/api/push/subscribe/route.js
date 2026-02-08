@@ -18,6 +18,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Register push notification subscription
  * Body: { subscription: { endpoint, keys }, userType: 'user'|'supplier', userId/supplierId, token? }
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const body = await request.json();

@@ -14,6 +14,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * GET /api/users/invitations/[token]
  * Verifies invitation token and returns invitation details
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const { token } = await params;

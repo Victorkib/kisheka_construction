@@ -23,6 +23,9 @@ import {
   getActivityTypesForProfessionalType,
 } from '@/lib/schemas/activity-template-schema';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/activity-templates
  * Returns activity templates with filtering, sorting, and pagination

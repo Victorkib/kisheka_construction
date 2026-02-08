@@ -18,6 +18,10 @@ import { CATEGORY_TYPES } from '@/lib/constants/category-constants';
  * Deletes a category (if not in use)
  * Auth: OWNER only
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function DELETE(request, { params }) {
   try {
     const supabase = await createClient();

@@ -20,6 +20,10 @@ import { createAuditLog } from '@/lib/audit-log';
  * GET /api/discrepancies/[materialId]
  * Gets discrepancy record for a material
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

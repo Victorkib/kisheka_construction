@@ -23,6 +23,9 @@ import {
   createLabourTemplate,
 } from '@/lib/schemas/labour-template-schema';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/labour/templates/[id]
  * Get single template

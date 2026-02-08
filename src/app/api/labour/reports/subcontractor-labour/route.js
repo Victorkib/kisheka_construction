@@ -22,6 +22,10 @@ import { ObjectId } from 'mongodb';
  * Query params: projectId, phaseId, subcontractorId, dateFrom, dateTo, breakdown (direct|subcontractor|combined)
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

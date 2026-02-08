@@ -26,6 +26,10 @@ import { normalizeUserRole, isRole } from '@/lib/role-constants';
  * Get batch details with all material requests populated
  * Auth: CLERK, PM, OWNER, SUPERVISOR, ACCOUNTANT
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

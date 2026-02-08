@@ -21,6 +21,9 @@ import {
 } from '@/lib/schemas/professional-services-schema';
 import { PROFESSIONAL_SERVICE_STATUSES } from '@/lib/constants/professional-services-constants';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/professional-services
  * Returns professional service assignments with filtering, sorting, and pagination

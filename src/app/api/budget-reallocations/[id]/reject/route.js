@@ -20,6 +20,10 @@ import { REALLOCATION_STATUSES } from '@/lib/schemas/budget-reallocation-schema'
  * Rejects a budget reallocation request
  * Auth: PM, OWNER, ACCOUNTANT
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

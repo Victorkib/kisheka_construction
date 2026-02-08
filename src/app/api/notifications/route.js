@@ -18,6 +18,9 @@ import {
 } from '@/lib/notifications';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/notifications
  * Returns user notifications

@@ -23,6 +23,10 @@ import { validateCapitalAvailability } from '@/lib/financial-helpers';
  * Approves a budget reallocation request and executes it
  * Auth: PM, OWNER, ACCOUNTANT
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

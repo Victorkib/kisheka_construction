@@ -25,6 +25,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Confirm delivery and create materials
  * Auth: OWNER, PM
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const { id } = await params;

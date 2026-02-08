@@ -16,6 +16,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Get purchase order details by response token
  * Auth: None (public, token-based)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const { token } = await params;

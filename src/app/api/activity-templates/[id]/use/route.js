@@ -20,6 +20,10 @@ import { generateActivityCode, validateProfessionalActivity } from '@/lib/schema
  * Use a template to create a professional activity
  * Auth: OWNER/PM/CLERK
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const { id } = await params;

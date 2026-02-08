@@ -23,6 +23,9 @@ import {
   getBudgetAdjustmentSummary,
 } from '@/lib/budget-adjustment-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/projects/[id]/budget/adjustment
  * Returns budget adjustment history for a project

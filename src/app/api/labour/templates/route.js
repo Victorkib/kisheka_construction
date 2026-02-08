@@ -22,6 +22,9 @@ import {
   TEMPLATE_STATUS,
 } from '@/lib/schemas/labour-template-schema';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/labour/templates
  * Returns templates with filtering, sorting, and pagination

@@ -28,6 +28,10 @@ import { normalizeRole } from '@/lib/role-normalizer';
  * Returns user details
  * Auth: OWNER only
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

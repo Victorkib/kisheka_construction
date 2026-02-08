@@ -22,6 +22,9 @@ import {
 } from '@/lib/schemas/professional-activities-schema';
 import { normalizeUserRole, isRole } from '@/lib/role-constants';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/professional-activities
  * Returns professional activities with filtering, sorting, and pagination

@@ -17,6 +17,10 @@ import { getRecommendationSummary } from '@/lib/recommendation-engine';
  * Returns actionable recommendations for the project
  * Auth: All authenticated users with project access
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

@@ -30,6 +30,10 @@ import { recalculatePhaseSpending } from '@/lib/phase-helpers';
  * Get single labour batch with all entries
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

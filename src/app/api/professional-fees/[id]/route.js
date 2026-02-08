@@ -28,6 +28,9 @@ import {
   CURRENCIES,
 } from '@/lib/constants/professional-fees-constants';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/professional-fees/[id]
  * Get single professional fee by ID

@@ -22,6 +22,10 @@ import { createMilestone } from '@/lib/milestone-helpers';
  * Apply template to a project
  * Auth: PM, OWNER only
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const db = await getDatabase();

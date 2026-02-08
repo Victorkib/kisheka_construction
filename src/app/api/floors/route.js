@@ -15,6 +15,9 @@ import { hasPermission } from '@/lib/role-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/floors
  * Returns floors, optionally filtered by projectId

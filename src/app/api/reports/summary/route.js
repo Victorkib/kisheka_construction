@@ -19,6 +19,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Returns executive summary with total expenses, category breakdown, floor breakdown, etc.
  * Query params: projectId, startDate, endDate
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

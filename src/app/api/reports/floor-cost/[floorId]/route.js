@@ -17,6 +17,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * GET /api/reports/floor-cost/[floorId]
  * Returns cost breakdown by category for a specific floor
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

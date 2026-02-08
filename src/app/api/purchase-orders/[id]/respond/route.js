@@ -21,6 +21,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Process supplier response (via secure link)
  * Body: { action: 'accept'|'reject'|'modify', token, ... }
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const { id } = await params;

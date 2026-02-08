@@ -23,6 +23,10 @@ import { calculateCommittedCost } from '@/lib/financial-helpers';
  * Auth: OWNER, INVESTOR (own data only)
  * Query params: startDate, endDate, format
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

@@ -23,6 +23,10 @@ import { createPhaseTemplate, validatePhaseTemplate, TEMPLATE_TYPES } from '@/li
  * Auth: All authenticated users
  * Query params: templateType (optional), search (optional)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

@@ -23,6 +23,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Automatically creates an expense record when approved
  * Auth: PM, OWNER, ACCOUNTANT
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const { id } = await params;

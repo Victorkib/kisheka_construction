@@ -10,6 +10,9 @@ import { getDatabase } from '@/lib/mongodb/connection';
 import { syncUserToMongoDB } from '@/lib/auth-helpers';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const { email, password, firstName, lastName, invitationToken } =

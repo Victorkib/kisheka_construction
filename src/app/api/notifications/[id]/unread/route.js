@@ -17,6 +17,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * PATCH /api/notifications/[id]/unread
  * Marks a notification as unread
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function PATCH(request, { params }) {
   try {
     const supabase = await createClient();

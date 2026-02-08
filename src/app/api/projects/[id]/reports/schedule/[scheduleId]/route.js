@@ -20,6 +20,9 @@ import {
   deleteScheduledReport,
 } from '@/lib/report-scheduling-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * PUT /api/projects/[id]/reports/schedule/[scheduleId]
  * Updates a scheduled report

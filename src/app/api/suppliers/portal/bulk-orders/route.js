@@ -19,6 +19,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Get bulk purchase orders for a supplier
  * Can be accessed via token (public) or supplier ID (authenticated)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);

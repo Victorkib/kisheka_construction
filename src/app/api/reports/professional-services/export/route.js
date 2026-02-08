@@ -19,6 +19,10 @@ import jsPDF from 'jspdf';
 /**
  * Format currency
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 function formatCurrency(amount) {
   return new Intl.NumberFormat('en-KE', {
     style: 'currency',

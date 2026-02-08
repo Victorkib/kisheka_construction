@@ -28,6 +28,9 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
 import crypto from 'crypto';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/purchase-orders
  * Returns purchase orders with filtering, sorting, and pagination

@@ -25,6 +25,10 @@ import { validateMaterialLibrary, VALID_UNITS } from '@/lib/schemas/material-lib
  * Get single library material by ID
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();

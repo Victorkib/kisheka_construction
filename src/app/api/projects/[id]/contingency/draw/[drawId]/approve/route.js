@@ -21,6 +21,10 @@ import { updateContingencyDrawStatus, validateContingencyDraw } from '@/lib/cont
  * Approves or rejects a contingency draw request
  * Auth: OWNER only (contingency requires owner approval)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

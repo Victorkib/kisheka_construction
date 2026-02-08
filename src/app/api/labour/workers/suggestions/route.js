@@ -17,6 +17,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Auth: All authenticated users
  * Query params: phaseId, projectId, skillType, limit
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

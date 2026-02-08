@@ -25,6 +25,9 @@ import {
 import { withTransaction } from '@/lib/mongodb/transaction-helpers';
 import { recalculatePhaseSpending } from '@/lib/phase-helpers';
 import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 import {
   updateWorkItemLabour,
   updateWorkItemStatusFromCompletion,

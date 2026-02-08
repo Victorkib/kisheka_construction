@@ -24,6 +24,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Retry a rejected purchase order with the same supplier
  * Body: { adjustments, notes, communicationChannels }
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const { id } = await params;

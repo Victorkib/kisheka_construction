@@ -27,6 +27,9 @@ import {
 } from '@/lib/financial-helpers';
 import { calculateTotalPhaseBudgets } from '@/lib/phase-helpers';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/project-finances
  * Returns project finances summary

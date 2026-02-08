@@ -23,6 +23,10 @@ import { PROFESSIONAL_TYPES } from '@/lib/constants/professional-services-consta
  * Query params: type, isCommon, isActive, search, page, limit, sortBy, sortOrder
  * Auth: All authenticated users
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

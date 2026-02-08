@@ -28,6 +28,10 @@ import { recalculateProjectFinances } from '@/lib/financial-helpers';
  * Auth: OWNER only
  * Query params: projectId (optional, if not provided updates all projects)
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();

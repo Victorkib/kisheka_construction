@@ -32,6 +32,10 @@ import { normalizeUserRole, isRole } from '@/lib/role-constants';
  * Creates a new bulk material request batch
  * Auth: CLERK, PM, OWNER, SUPERVISOR
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();

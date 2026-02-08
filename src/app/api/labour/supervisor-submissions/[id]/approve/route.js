@@ -40,6 +40,10 @@ import { updateLabourCostSummary } from '@/lib/labour-financial-helpers';
  * 
  * CRITICAL: All budget updates are atomic
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request, { params }) {
   try {
     const supabase = await createClient();

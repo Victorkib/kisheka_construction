@@ -16,6 +16,9 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { ObjectId } from 'mongodb';
 import { CATEGORY_TYPES } from '@/lib/constants/category-constants';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/categories
  * Returns all categories

@@ -19,6 +19,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Returns supplier performance metrics for bulk orders
  * Query params: projectId, startDate, endDate, supplierId
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const supabase = await createClient();

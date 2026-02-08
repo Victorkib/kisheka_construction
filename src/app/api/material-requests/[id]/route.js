@@ -24,6 +24,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Get single material request by ID
  * Auth: CLERK, PM, OWNER, SUPERVISOR, ACCOUNTANT
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function GET(request, { params }) {
   try {
     const { id } = await params;

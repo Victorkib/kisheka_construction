@@ -21,6 +21,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  * Query params: projectId (required)
  * Body: { thresholds?: { variancePercentage?, varianceAmount?, lossPercentage?, lossAmount?, wastagePercentage? } }
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();

@@ -32,6 +32,10 @@ import { successResponse, errorResponse } from '@/lib/api-response';
  *   preview: Boolean (optional, default: false) - If true, returns preview without creating batch
  * }
  */
+
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const supabase = await createClient();
