@@ -42,20 +42,84 @@ export async function GET(request) {
       return errorResponse('Unauthorized', 401);
     }
 
+    const userProfile = await getUserProfile(user.id);
+    if (!userProfile) {
+      return errorResponse('User profile not found', 404);
+    }
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
     const search = searchParams.get('search');
     const archived = searchParams.get('archived');
 
     const db = await getDatabase();
+    const userId = userProfile._id;
 
-    // Build query
-    const query = {};
+    // Get user's accessible projects (same logic as /api/projects/accessible)
+    const memberships = await db
+      .collection('project_memberships')
+      .find({
+        userId: userId,
+        status: 'active',
+      })
+      .toArray();
+
+    const projectIds = memberships.map((m) => m.projectId);
+    const userRole = userProfile.role?.toLowerCase();
+    const isGlobalAdmin = ['owner', 'admin'].includes(userRole);
+
+    let accessibleProjectIds = [];
+
+    if (isGlobalAdmin) {
+      // Global admins see all projects - get all project IDs
+      const allProjects = await db
+        .collection('projects')
+        .find({ deletedAt: null })
+        .project({ _id: 1 })
+        .toArray();
+      accessibleProjectIds = allProjects.map((p) => p._id);
+    } else if (projectIds.length > 0) {
+      accessibleProjectIds = projectIds;
+    } else if (userRole === 'investor') {
+      // Check investor allocations
+      const investor = await db.collection('investors').findOne({
+        userId: userId,
+        status: 'ACTIVE',
+      });
+
+      if (investor && investor.projectAllocations) {
+        accessibleProjectIds = investor.projectAllocations
+          .map((alloc) => {
+            if (alloc.projectId && ObjectId.isValid(alloc.projectId)) {
+              return new ObjectId(alloc.projectId);
+            }
+            return null;
+          })
+          .filter(Boolean);
+      }
+    }
+
+    // Build query - only include accessible projects
+    const query = {
+      deletedAt: null,
+    };
+
+    // Filter by accessible projects (unless user is admin/owner who sees all)
+    if (!isGlobalAdmin && accessibleProjectIds.length > 0) {
+      query._id = { $in: accessibleProjectIds };
+    } else if (!isGlobalAdmin && accessibleProjectIds.length === 0) {
+      // User has no accessible projects, return empty array
+      return successResponse([], 'No accessible projects');
+    }
 
     // Archive filter: if archived=true, show only archived; if archived=false or not set, exclude archived
+    // Only apply archive filter if explicitly requested, otherwise show all non-archived projects
     if (archived === 'true') {
       query.status = 'archived';
-    } else if (archived === 'false' || !archived) {
+    } else if (archived === 'false') {
+      query.status = { $ne: 'archived' };
+    } else {
+      // Default: exclude archived projects unless explicitly requested
       query.status = { $ne: 'archived' };
     }
 

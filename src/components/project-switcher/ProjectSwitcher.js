@@ -270,7 +270,7 @@ export function ProjectSwitcher() {
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <span>🏗️</span>
           <span className="truncate">
-            {currentProject?.projectName || 'Select Project'}
+            {currentProject?.projectName || (isEmpty ? 'No Projects' : 'Select Project')}
           </span>
         </div>
         <svg

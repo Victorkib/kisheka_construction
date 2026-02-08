@@ -1,4 +1,5 @@
 import { Geist, Geist_Mono } from 'next/font/google';
+import { Suspense } from 'react';
 import './globals.css';
 import { ToastProvider } from '@/components/toast';
 import { ServiceWorkerRegister } from '@/components/push-notifications/service-worker-register';
@@ -193,12 +194,14 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <ToastProvider>
-          <ProjectContextProvider>
-            <OAuthSync />
-            <ServiceWorkerRegister />
-            <NotificationPermissionRequest />
-            {children}
-          </ProjectContextProvider>
+          <Suspense fallback={<div>Loading...</div>}>
+            <ProjectContextProvider>
+              <OAuthSync />
+              <ServiceWorkerRegister />
+              <NotificationPermissionRequest />
+              {children}
+            </ProjectContextProvider>
+          </Suspense>
         </ToastProvider>
       </body>
     </html>

@@ -8,7 +8,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { projectIdsMatch } from '@/lib/utils/project-id-helpers';
 
 const ProjectContext = createContext(null);
@@ -20,27 +20,50 @@ export function ProjectContextProvider({ children }) {
   const [error, setError] = useState(null);
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   // Load project context on mount
   useEffect(() => {
     loadProjectContext();
   }, []);
 
-  // Sync with URL when on project routes
-  // Only sync when we have projects and a current project to avoid loops
+  // Sync with URL when on project routes or when projectId is in URL params
+  // Only sync when we have projects to avoid loops
   useEffect(() => {
-    // Don't sync if loading, no projects, or no current project
-    if (loading || accessibleProjects.length === 0 || !currentProject) {
+    // Don't sync if loading or no projects
+    if (loading || accessibleProjects.length === 0) {
       return;
     }
     
-    // Only sync if we're on a project route
+    // Sync if we're on a project detail route (/projects/[id])
     const projectMatch = pathname.match(/^\/projects\/([^/]+)/);
     if (projectMatch) {
       syncWithURL();
+      return;
+    }
+    
+    // Also sync if we're on /projects page and there's a projectId in URL params
+    // This handles cases where user navigates to /projects?projectId=xxx
+    if (pathname === '/projects' && searchParams) {
+      const projectIdFromUrl = searchParams.get('projectId');
+      if (projectIdFromUrl) {
+        const projectExists = accessibleProjects.some(
+          (p) => {
+            const pId = p._id?.toString() || p._id;
+            return projectIdsMatch(pId, projectIdFromUrl);
+          }
+        );
+        
+        if (projectExists) {
+          const currentProjectId = currentProject?._id?.toString() || currentProject?._id;
+          if (!currentProjectId || !projectIdsMatch(currentProjectId, projectIdFromUrl)) {
+            switchProject(projectIdFromUrl, true);
+          }
+        }
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname, loading, currentProject, accessibleProjects.length]);
+  }, [pathname, searchParams, loading, currentProject, accessibleProjects.length]);
 
   const loadProjectContext = async () => {
     try {
