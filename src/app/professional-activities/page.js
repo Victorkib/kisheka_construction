@@ -5,7 +5,7 @@
  * Route: /professional-activities
  */
 
- 'use client';
+'use client';
 
 import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';

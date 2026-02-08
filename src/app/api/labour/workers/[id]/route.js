@@ -237,9 +237,7 @@ export async function DELETE(request, { params }) {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();    if (authError || !user) {
       return errorResponse('Unauthorized', 401);
-    }
-
-    // Check permission
+    }    // Check permission
     const userProfile = await getUserProfile(user.id);
     if (!userProfile) {
       return errorResponse('User profile not found', 404);

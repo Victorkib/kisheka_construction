@@ -15,6 +15,7 @@ import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { normalizeRole } from '@/lib/role-normalizer';
 import { calculateProjectTotals } from '@/lib/investment-allocation';
 import { recalculateProjectFinances } from '@/lib/financial-helpers';
 import { 
@@ -343,6 +344,24 @@ export async function POST(request) {
     const result = await db.collection('projects').insertOne(project);
 
     const insertedProject = { ...project, _id: result.insertedId };
+
+    // Ensure creator has project membership for access (non-owners rely on this)
+    try {
+      const creatorRole = normalizeRole(userProfile.role) || 'pm';
+      await db.collection('project_memberships').insertOne({
+        userId: new ObjectId(userProfile._id),
+        projectId: result.insertedId,
+        role: creatorRole,
+        permissions: [],
+        joinedAt: new Date(),
+        removedAt: null,
+        status: 'active',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    } catch (membershipError) {
+      console.error('Error creating project membership for creator:', membershipError);
+    }
 
     // Auto-create floors (configurable)
     const defaultFloors = [];

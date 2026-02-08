@@ -1,7 +1,7 @@
 /**
  * Financing Dashboard Page
  * Displays project finances overview with charts and tables
- *
+ * 
  * Route: /financing
  * Auth: OWNER, INVESTOR, ACCOUNTANT
  */
@@ -47,10 +47,9 @@ function FinancingPageContent() {
   const [projectsLoading, setProjectsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
-
+  
   // Get projectId from context (prioritize current project over URL param)
-  const projectIdFromContext =
-    normalizeProjectId(currentProject?._id) || currentProjectId || '';
+  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
   const projectId = projectIdFromContext || projectIdFromUrl;
 
@@ -66,10 +65,8 @@ function FinancingPageContent() {
       const queryParams = new URLSearchParams();
       if (projectId) queryParams.append('projectId', projectId);
       if (forceRecalculate) queryParams.append('forceRecalculate', 'true');
-
-      const response = await fetch(
-        `/api/project-finances?${queryParams.toString()}`,
-      );
+      
+      const response = await fetch(`/api/project-finances?${queryParams.toString()}`);
       const data = await response.json();
 
       if (!data.success) {
@@ -92,9 +89,7 @@ function FinancingPageContent() {
         setInvestors([]);
         return;
       }
-      const response = await fetch(
-        `/api/investors?projectId=${projectId}&status=ACTIVE`,
-      );
+      const response = await fetch(`/api/investors?projectId=${projectId}&status=ACTIVE`);
       const data = await response.json();
 
       if (data.success) {
@@ -131,9 +126,7 @@ function FinancingPageContent() {
         projectsList.map(async (project) => {
           try {
             // Fetch project-specific finances to get actual used amount
-            const financesResponse = await fetch(
-              `/api/project-finances?projectId=${project._id}`,
-            );
+            const financesResponse = await fetch(`/api/project-finances?projectId=${project._id}`);
             const financesData = await financesResponse.json();
 
             if (financesData.success) {
@@ -147,13 +140,10 @@ function FinancingPageContent() {
             }
             return project;
           } catch (err) {
-            console.error(
-              `Error fetching finances for project ${project._id}:`,
-              err,
-            );
+            console.error(`Error fetching finances for project ${project._id}:`, err);
             return project;
           }
-        }),
+        })
       );
       setProjects(projectsWithFinances);
     } catch (err) {
@@ -169,14 +159,13 @@ function FinancingPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
-              Financing Dashboard
-            </h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
-              View and manage project finances
-            </p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Financing Dashboard</h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">View and manage project finances</p>
           </div>
-          <NoProjectsEmptyState canCreate={false} role="accountant" />
+          <NoProjectsEmptyState
+            canCreate={false}
+            role="accountant"
+          />
         </div>
       </AppLayout>
     );
@@ -226,9 +215,7 @@ function FinancingPageContent() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="text-sm">
                 <p className="font-semibold">Return to bulk material request</p>
-                <p className="text-xs">
-                  Fund the project, then return to supplier assignment.
-                </p>
+                <p className="text-xs">Fund the project, then return to supplier assignment.</p>
               </div>
               <div className="flex flex-wrap gap-2">
                 {projectId && (
@@ -251,9 +238,7 @@ function FinancingPageContent() {
         )}
         <div className="mb-6 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
-              Financing Dashboard
-            </h1>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Financing Dashboard</h1>
             <p className="mt-2 text-base md:text-lg text-gray-700 leading-relaxed">
               Overview of capital raised, used, and remaining balance
             </p>
@@ -281,50 +266,35 @@ function FinancingPageContent() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">
-              Capital Raised
-            </div>
+            <div className="text-base font-semibold text-gray-700 leading-normal">Capital Raised</div>
             <div className="text-2xl font-bold text-green-600 mt-1">
               {formatCurrency(finances?.totalInvested || 0)}
             </div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">
-              Capital Used
-            </div>
+            <div className="text-base font-semibold text-gray-700 leading-normal">Capital Used</div>
             <div className="text-2xl font-bold text-red-600 mt-1">
               {formatCurrency(finances?.totalUsed || 0)}
             </div>
             {finances?.totalInvested > 0 && (
               <div className="text-sm text-gray-700 mt-1">
-                {((finances.totalUsed / finances.totalInvested) * 100).toFixed(
-                  1,
-                )}
-                % utilized
+                {((finances.totalUsed / finances.totalInvested) * 100).toFixed(1)}% utilized
               </div>
             )}
           </div>
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">
-              Remaining Balance
-            </div>
+            <div className="text-base font-semibold text-gray-700 leading-normal">Remaining Balance</div>
             <div className="text-2xl font-bold text-blue-600 mt-1">
               {formatCurrency(finances?.capitalBalance || 0)}
             </div>
             {finances?.totalInvested > 0 && (
               <div className="text-sm text-gray-700 mt-1">
-                {(
-                  (finances.capitalBalance / finances.totalInvested) *
-                  100
-                ).toFixed(1)}
-                % remaining
+                {((finances.capitalBalance / finances.totalInvested) * 100).toFixed(1)}% remaining
               </div>
             )}
           </div>
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">
-              Investors
-            </div>
+            <div className="text-base font-semibold text-gray-700 leading-normal">Investors</div>
             <div className="text-2xl font-bold text-gray-900 mt-1">
               {finances?.investors?.count || 0}
             </div>
@@ -336,12 +306,9 @@ function FinancingPageContent() {
           <div className="mb-6 space-y-2">
             {(() => {
               const warnings = [];
-              const totalBudget = projects.reduce(
-                (sum, p) => sum + (p.budget?.total || 0),
-                0,
-              );
+              const totalBudget = projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0);
               const totalCapital = finances?.totalInvested || 0;
-
+              
               if (totalBudget > totalCapital && totalCapital > 0) {
                 warnings.push({
                   type: 'budget_exceeds_capital',
@@ -353,11 +320,7 @@ function FinancingPageContent() {
               const lowCapitalProjects = projects.filter((p) => {
                 const capitalBalance = p.statistics?.capitalBalance || 0;
                 const totalInvested = p.statistics?.totalInvested || 0;
-                return (
-                  totalInvested > 0 &&
-                  capitalBalance < totalInvested * 0.1 &&
-                  capitalBalance > 0
-                );
+                return totalInvested > 0 && capitalBalance < totalInvested * 0.1 && capitalBalance > 0;
               });
 
               if (lowCapitalProjects.length > 0) {
@@ -381,23 +344,21 @@ function FinancingPageContent() {
                 });
               }
 
-              return warnings.length > 0
-                ? warnings.map((warning, index) => (
-                    <div
-                      key={index}
-                      className={`p-4 rounded-lg border ${
-                        warning.severity === 'error'
-                          ? 'bg-red-50 border-red-200 text-red-800'
-                          : 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                      }`}
-                    >
-                      <p className="font-semibold">
-                        {warning.type.replace(/_/g, ' ').toUpperCase()}
-                      </p>
-                      <p className="text-sm">{warning.message}</p>
-                    </div>
-                  ))
-                : null;
+              return warnings.length > 0 ? (
+                warnings.map((warning, index) => (
+                  <div
+                    key={index}
+                    className={`p-4 rounded-lg border ${
+                      warning.severity === 'error'
+                        ? 'bg-red-50 border-red-200 text-red-800'
+                        : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                    }`}
+                  >
+                    <p className="font-semibold">{warning.type.replace(/_/g, ' ').toUpperCase()}</p>
+                    <p className="text-sm">{warning.message}</p>
+                  </div>
+                ))
+              ) : null;
             })()}
           </div>
         )}
@@ -406,9 +367,7 @@ function FinancingPageContent() {
         {!projectId && projects.length > 0 && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Budget vs Capital Comparison
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-900">Budget vs Capital Comparison</h2>
               <Link
                 href="/dashboard/budget"
                 className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -418,52 +377,31 @@ function FinancingPageContent() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <div className="text-sm text-gray-700 font-medium">
-                  Total Budget (Planning)
-                </div>
+                <div className="text-sm text-gray-700 font-medium">Total Budget (Planning)</div>
                 <div className="text-xl font-semibold text-gray-900 mt-1">
-                  {formatCurrency(
-                    projects.reduce(
-                      (sum, p) => sum + (p.budget?.total || 0),
-                      0,
-                    ),
-                  )}
+                  {formatCurrency(projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0))}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">
-                  Total Capital (Reality)
-                </div>
+                <div className="text-sm text-gray-700 font-medium">Total Capital (Reality)</div>
                 <div className="text-xl font-semibold text-blue-600 mt-1">
                   {formatCurrency(finances?.totalInvested || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">
-                  Difference
-                </div>
-                <div
-                  className={`text-xl font-semibold mt-1 ${
-                    projects.reduce(
-                      (sum, p) => sum + (p.budget?.total || 0),
-                      0,
-                    ) -
-                      (finances?.totalInvested || 0) >
-                    0
-                      ? 'text-yellow-600'
-                      : 'text-green-600'
-                  }`}
-                >
+                <div className="text-sm text-gray-700 font-medium">Difference</div>
+                <div className={`text-xl font-semibold mt-1 ${
+                  (projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0) - (finances?.totalInvested || 0)) > 0
+                    ? 'text-yellow-600'
+                    : 'text-green-600'
+                }`}>
                   {formatCurrency(
-                    projects.reduce(
-                      (sum, p) => sum + (p.budget?.total || 0),
-                      0,
-                    ) - (finances?.totalInvested || 0),
+                    projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0) - (finances?.totalInvested || 0)
                   )}
                 </div>
                 <div className="text-sm text-gray-700 mt-1">
                   {finances?.totalInvested > 0
-                    ? `${(((projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0) - (finances?.totalInvested || 0)) / (finances?.totalInvested || 1)) * 100).toFixed(1)}% ${projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0) - (finances?.totalInvested || 0) > 0 ? 'over' : 'under'} capital`
+                    ? `${(((projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0) - (finances?.totalInvested || 0)) / (finances?.totalInvested || 1)) * 100).toFixed(1)}% ${(projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0) - (finances?.totalInvested || 0)) > 0 ? 'over' : 'under'} capital`
                     : 'No capital'}
                 </div>
               </div>
@@ -475,9 +413,7 @@ function FinancingPageContent() {
         {!projectId && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Projects Overview
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-900">Projects Overview</h2>
               <Link
                 href="/projects"
                 className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -522,31 +458,23 @@ function FinancingPageContent() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {projects.map((project) => {
-                      const totalInvested =
-                        project.statistics?.totalInvested || 0;
+                      const totalInvested = project.statistics?.totalInvested || 0;
                       const totalUsed = project.finances?.totalUsed || 0;
-                      const capitalBalance =
-                        project.finances?.capitalBalance ??
-                        project.statistics?.capitalBalance ??
-                        totalInvested;
+                      const capitalBalance = project.finances?.capitalBalance ?? project.statistics?.capitalBalance ?? totalInvested;
                       const budget = project.budget?.total || 0;
-
+                      
                       // Calculate utilization
-                      const utilization =
-                        totalInvested > 0
-                          ? (totalUsed / totalInvested) * 100
-                          : 0;
-
+                      const utilization = totalInvested > 0 
+                        ? (totalUsed / totalInvested) * 100 
+                        : 0;
+                      
                       // Determine status
                       let status = 'healthy';
                       let statusColor = 'bg-green-100 text-green-800';
                       if (capitalBalance < 0) {
                         status = 'overspent';
                         statusColor = 'bg-red-100 text-red-800';
-                      } else if (
-                        capitalBalance < totalInvested * 0.1 &&
-                        totalInvested > 0
-                      ) {
+                      } else if (capitalBalance < totalInvested * 0.1 && totalInvested > 0) {
                         status = 'low_capital';
                         statusColor = 'bg-yellow-100 text-yellow-800';
                       } else if (budget > totalInvested && totalInvested > 0) {
@@ -564,9 +492,7 @@ function FinancingPageContent() {
                               >
                                 {project.projectCode}
                               </Link>
-                              <div className="text-sm text-gray-700">
-                                {project.projectName}
-                              </div>
+                              <div className="text-sm text-gray-700">{project.projectName}</div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -586,26 +512,16 @@ function FinancingPageContent() {
                               <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
                                 <div
                                   className={`h-2 rounded-full ${
-                                    utilization > 90
-                                      ? 'bg-red-600'
-                                      : utilization > 70
-                                        ? 'bg-yellow-600'
-                                        : 'bg-green-600'
+                                    utilization > 90 ? 'bg-red-600' : utilization > 70 ? 'bg-yellow-600' : 'bg-green-600'
                                   }`}
-                                  style={{
-                                    width: `${Math.min(utilization, 100)}%`,
-                                  }}
+                                  style={{ width: `${Math.min(utilization, 100)}%` }}
                                 ></div>
                               </div>
-                              <span className="text-sm text-gray-900">
-                                {utilization.toFixed(1)}%
-                              </span>
+                              <span className="text-sm text-gray-900">{utilization.toFixed(1)}%</span>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span
-                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}
-                            >
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${statusColor}`}>
                               {status.replace(/_/g, ' ')}
                             </span>
                           </td>
@@ -634,25 +550,18 @@ function FinancingPageContent() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Capital Utilization Chart */}
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                Capital Utilization
-              </h2>
+              <h2 className="text-lg font-semibold text-gray-900 mb-4">Capital Utilization</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
                     data={[
                       { name: 'Used', value: finances.totalUsed || 0 },
-                      {
-                        name: 'Remaining',
-                        value: finances.capitalBalance || 0,
-                      },
+                      { name: 'Remaining', value: finances.capitalBalance || 0 },
                     ]}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) =>
-                      `${name} ${(percent * 100).toFixed(0)}%`
-                    }
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="value"
@@ -668,26 +577,13 @@ function FinancingPageContent() {
             {/* Spending Breakdown Chart */}
             {finances.breakdown && (
               <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
-                  Spending Breakdown
-                </h2>
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Spending Breakdown</h2>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart
-                    data={[
-                      {
-                        name: 'Materials',
-                        value: finances.breakdown.materials || 0,
-                      },
-                      {
-                        name: 'Expenses',
-                        value: finances.breakdown.expenses || 0,
-                      },
-                      {
-                        name: 'Initial',
-                        value: finances.breakdown.initialExpenses || 0,
-                      },
-                    ]}
-                  >
+                  <BarChart data={[
+                    { name: 'Materials', value: finances.breakdown.materials || 0 },
+                    { name: 'Expenses', value: finances.breakdown.expenses || 0 },
+                    { name: 'Initial', value: finances.breakdown.initialExpenses || 0 },
+                  ]}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="name" />
                     <YAxis />
@@ -705,8 +601,7 @@ function FinancingPageContent() {
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-between">
               <p className="text-blue-800">
-                <strong>Viewing project-specific financing.</strong> For
-                portfolio overview,{' '}
+                <strong>Viewing project-specific financing.</strong> For portfolio overview,{' '}
                 <Link href="/financing" className="underline font-semibold">
                   view all projects
                 </Link>
@@ -725,30 +620,22 @@ function FinancingPageContent() {
         {/* Breakdown */}
         {finances?.breakdown && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Expense Breakdown
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Expense Breakdown</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <div className="text-sm text-gray-700 font-medium">
-                  Materials
-                </div>
+                <div className="text-sm text-gray-700 font-medium">Materials</div>
                 <div className="text-xl font-semibold text-gray-900">
                   {formatCurrency(finances.breakdown.materials || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">
-                  Expenses
-                </div>
+                <div className="text-sm text-gray-700 font-medium">Expenses</div>
                 <div className="text-xl font-semibold text-gray-900">
                   {formatCurrency(finances.breakdown.expenses || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">
-                  Initial Expenses
-                </div>
+                <div className="text-sm text-gray-700 font-medium">Initial Expenses</div>
                 <div className="text-xl font-semibold text-gray-900">
                   {formatCurrency(finances.breakdown.initialExpenses || 0)}
                 </div>
@@ -766,30 +653,22 @@ function FinancingPageContent() {
         {/* Investment Breakdown */}
         {finances?.investors && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Investment Breakdown
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Investment Breakdown</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <div className="text-sm text-gray-700 font-medium">
-                  Total Invested
-                </div>
+                <div className="text-sm text-gray-700 font-medium">Total Invested</div>
                 <div className="text-xl font-semibold text-gray-900">
                   {formatCurrency(finances.investors.totalInvested || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">
-                  Total Loans
-                </div>
+                <div className="text-sm text-gray-700 font-medium">Total Loans</div>
                 <div className="text-xl font-semibold text-purple-600">
                   {formatCurrency(finances.investors.totalLoans || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">
-                  Total Equity
-                </div>
+                <div className="text-sm text-gray-700 font-medium">Total Equity</div>
                 <div className="text-xl font-semibold text-blue-600">
                   {formatCurrency(finances.investors.totalEquity || 0)}
                 </div>
@@ -801,9 +680,7 @@ function FinancingPageContent() {
         {/* Top Investors */}
         {investors.length > 0 && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
-              Top Investors
-            </h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Investors</h2>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -824,18 +701,14 @@ function FinancingPageContent() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {investors
-                    .sort(
-                      (a, b) => (b.totalInvested || 0) - (a.totalInvested || 0),
-                    )
+                    .sort((a, b) => (b.totalInvested || 0) - (a.totalInvested || 0))
                     .slice(0, 10)
                     .map((investor) => (
                       <tr key={investor._id} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           {investor.name}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {investor.investmentType}
-                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{investor.investmentType}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold">
                           {formatCurrency(investor.totalInvested || 0)}
                         </td>
@@ -866,3 +739,4 @@ export default function FinancingPage() {
     </Suspense>
   );
 }
+

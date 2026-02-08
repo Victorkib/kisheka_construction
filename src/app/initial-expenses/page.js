@@ -1,7 +1,7 @@
 /**
  * Initial Expenses List Page
  * Displays all initial expenses with filtering, sorting, and pagination
- *
+ * 
  * Route: /initial-expenses
  */
 
@@ -33,19 +33,13 @@ function InitialExpensesPageContent() {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({
-    page: 1,
-    limit: 20,
-    total: 0,
-    pages: 0,
-  });
+  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
   const [totals, setTotals] = useState({ totalAmount: 0, approvedAmount: 0 });
-
+  
   // Get projectId from context (prioritize current project over URL param)
-  const projectIdFromContext =
-    normalizeProjectId(currentProject?._id) || currentProjectId || '';
+  const projectIdFromContext = normalizeProjectId(currentProject?._id) || currentProjectId || '';
   const projectIdFromUrl = searchParams.get('projectId');
-
+  
   // Filters
   const [filters, setFilters] = useState({
     projectId: projectIdFromContext || projectIdFromUrl || '',
@@ -87,26 +81,22 @@ function InitialExpensesPageContent() {
       }
 
       setExpenses(data.data.expenses || []);
-      setPagination((prev) => {
+      setPagination(prev => {
         const newPagination = data.data.pagination || prev;
         // Only update if values actually changed
-        if (
-          prev.page === newPagination.page &&
-          prev.limit === newPagination.limit &&
-          prev.total === newPagination.total &&
-          prev.pages === newPagination.pages
-        ) {
+        if (prev.page === newPagination.page && 
+            prev.limit === newPagination.limit && 
+            prev.total === newPagination.total && 
+            prev.pages === newPagination.pages) {
           return prev; // Return same reference to prevent re-render
         }
         return newPagination;
       });
-      setTotals((prev) => {
+      setTotals(prev => {
         const newTotals = data.data.totals || prev;
         // Only update if values actually changed
-        if (
-          prev.totalAmount === newTotals.totalAmount &&
-          prev.totalCost === newTotals.totalCost
-        ) {
+        if (prev.totalAmount === newTotals.totalAmount && 
+            prev.totalCost === newTotals.totalCost) {
           return prev; // Return same reference to prevent re-render
         }
         return newTotals;
@@ -117,16 +107,7 @@ function InitialExpensesPageContent() {
     } finally {
       setLoading(false);
     }
-  }, [
-    filters.projectId,
-    filters.category,
-    filters.status,
-    filters.search,
-    filters.startDate,
-    filters.endDate,
-    pagination.page,
-    pagination.limit,
-  ]);
+  }, [filters.projectId, filters.category, filters.status, filters.search, filters.startDate, filters.endDate, pagination.page, pagination.limit]);
 
   // Fetch expenses
   useEffect(() => {
@@ -214,12 +195,8 @@ function InitialExpensesPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
-              Initial Expenses
-            </h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
-              Track pre-construction expenses (land, permits, approvals, etc.)
-            </p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Initial Expenses</h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track pre-construction expenses (land, permits, approvals, etc.)</p>
           </div>
           <NoProjectsEmptyState
             canCreate={canAccess('create_project')}
@@ -236,12 +213,8 @@ function InitialExpensesPageContent() {
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
-              Initial Expenses
-            </h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
-              Track pre-construction expenses (land, permits, approvals, etc.)
-            </p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Initial Expenses</h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track pre-construction expenses (land, permits, approvals, etc.)</p>
           </div>
           {canAccess('create_initial_expense') && (
             <Link
@@ -256,7 +229,10 @@ function InitialExpensesPageContent() {
         <PrerequisiteGuide
           title="Initial expenses are tied to projects"
           description="Record pre-construction costs once the project is created."
-          prerequisites={['Project exists', 'Budget categories are defined']}
+          prerequisites={[
+            'Project exists',
+            'Budget categories are defined',
+          ]}
           actions={[
             { href: '/projects/new', label: 'Create Project' },
             { href: '/projects', label: 'Set Budgets' },
@@ -269,21 +245,15 @@ function InitialExpensesPageContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-sm text-gray-600 mb-1">Total Initial Expenses</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {formatCurrency(totals.totalAmount)}
-            </p>
+            <p className="text-2xl font-bold text-gray-900">{formatCurrency(totals.totalAmount)}</p>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-sm text-gray-600 mb-1">Approved Amount</p>
-            <p className="text-2xl font-bold text-green-600">
-              {formatCurrency(totals.approvedAmount)}
-            </p>
+            <p className="text-2xl font-bold text-green-600">{formatCurrency(totals.approvedAmount)}</p>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-sm text-gray-600 mb-1">Total Records</p>
-            <p className="text-2xl font-bold text-gray-900">
-              {pagination.total}
-            </p>
+            <p className="text-2xl font-bold text-gray-900">{pagination.total}</p>
           </div>
         </div>
 
@@ -299,14 +269,10 @@ function InitialExpensesPageContent() {
           <h2 className="text-lg font-semibold mb-4">Filters</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                Project
-              </label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Project</label>
               <select
                 value={filters.projectId}
-                onChange={(e) =>
-                  handleFilterChange('projectId', e.target.value)
-                }
+                onChange={(e) => handleFilterChange('projectId', e.target.value)}
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
               >
                 <option value="">All Projects</option>
@@ -318,9 +284,7 @@ function InitialExpensesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                Category
-              </label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Category</label>
               <select
                 value={filters.category}
                 onChange={(e) => handleFilterChange('category', e.target.value)}
@@ -335,9 +299,7 @@ function InitialExpensesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                Status
-              </label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Status</label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
@@ -351,22 +313,16 @@ function InitialExpensesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                Start Date
-              </label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Start Date</label>
               <input
                 type="date"
                 value={filters.startDate}
-                onChange={(e) =>
-                  handleFilterChange('startDate', e.target.value)
-                }
+                onChange={(e) => handleFilterChange('startDate', e.target.value)}
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
               />
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                End Date
-              </label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">End Date</label>
               <input
                 type="date"
                 value={filters.endDate}
@@ -375,9 +331,7 @@ function InitialExpensesPageContent() {
               />
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
-                Search
-              </label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Search</label>
               <input
                 type="text"
                 placeholder="Search..."
@@ -397,13 +351,7 @@ function InitialExpensesPageContent() {
             <div className="p-8 text-center text-gray-500">
               No initial expenses found.
               {canAccess('create_initial_expense') && (
-                <Link
-                  href="/initial-expenses/new"
-                  className="text-blue-600 hover:underline"
-                >
-                  {' '}
-                  Create one
-                </Link>
+                <Link href="/initial-expenses/new" className="text-blue-600 hover:underline"> Create one</Link>
               )}
             </div>
           ) : (
@@ -458,9 +406,7 @@ function InitialExpensesPageContent() {
                         {formatDate(expense.datePaid)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span
-                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeColor(expense.status)}`}
-                        >
+                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeColor(expense.status)}`}>
                           {expense.status.replace('_', ' ').toUpperCase()}
                         </span>
                       </td>
@@ -481,29 +427,18 @@ function InitialExpensesPageContent() {
               {pagination.pages > 1 && (
                 <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
                   <div className="text-sm text-gray-700">
-                    Showing page {pagination.page} of {pagination.pages} (
-                    {pagination.total} total)
+                    Showing page {pagination.page} of {pagination.pages} ({pagination.total} total)
                   </div>
                   <div className="flex gap-2">
                     <button
-                      onClick={() =>
-                        setPagination((prev) => ({
-                          ...prev,
-                          page: Math.max(1, prev.page - 1),
-                        }))
-                      }
+                      onClick={() => setPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                       disabled={pagination.page === 1}
                       className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                     >
                       Previous
                     </button>
                     <button
-                      onClick={() =>
-                        setPagination((prev) => ({
-                          ...prev,
-                          page: Math.min(pagination.pages, prev.page + 1),
-                        }))
-                      }
+                      onClick={() => setPagination((prev) => ({ ...prev, page: Math.min(pagination.pages, prev.page + 1) }))}
                       disabled={pagination.page === pagination.pages}
                       className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
                     >
@@ -522,19 +457,18 @@ function InitialExpensesPageContent() {
 
 export default function InitialExpensesPage() {
   return (
-    <Suspense
-      fallback={
-        <AppLayout>
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading initial expenses...</p>
-            </div>
+    <Suspense fallback={
+      <AppLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading initial expenses...</p>
           </div>
-        </AppLayout>
-      }
-    >
+        </div>
+      </AppLayout>
+    }>
       <InitialExpensesPageContent />
     </Suspense>
   );
 }
+
