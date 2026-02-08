@@ -7,8 +7,6 @@
 
 'use client';
 
-export const revalidate = 60;
-
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';

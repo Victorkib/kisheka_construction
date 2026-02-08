@@ -6,8 +6,6 @@
 
 'use client';
 
-export const revalidate = 60;
-
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';

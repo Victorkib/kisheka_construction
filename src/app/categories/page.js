@@ -7,8 +7,6 @@
 
 'use client';
 
-export const revalidate = 60;
-
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
