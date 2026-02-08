@@ -14,6 +14,9 @@ import { getUserProfile } from '@/lib/auth-helpers';
 import { getDatabase } from '@/lib/mongodb/connection';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/profile
  * Returns current user's full profile

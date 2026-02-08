@@ -25,6 +25,9 @@ import {
   validateBudget 
 } from '@/lib/schemas/budget-schema';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/projects
  * Returns all projects with optional filters

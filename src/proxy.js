@@ -57,6 +57,14 @@ const PUBLIC_ROUTES = [
 ];
 
 /**
+ * Routes that should bypass proxy entirely
+ * These are handled by their own route handlers
+ */
+const BYPASS_ROUTES = [
+  '/api/auth/callback', // OAuth callback handles its own auth
+];
+
+/**
  * Check if a pathname matches any of the given routes
  * @param {string} pathname - The pathname to check
  * @param {string[]} routes - Array of routes to match against
@@ -93,6 +101,11 @@ function isPublicApiRoute(pathname) {
  */
 export async function proxy(request) {
   const { pathname } = request.nextUrl;
+
+  // Skip proxy entirely for bypass routes
+  if (matchesRoute(pathname, BYPASS_ROUTES)) {
+    return NextResponse.next();
+  }
 
   // Skip proxy for public routes
   if (matchesRoute(pathname, PUBLIC_ROUTES)) {

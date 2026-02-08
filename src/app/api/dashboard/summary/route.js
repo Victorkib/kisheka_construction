@@ -14,6 +14,9 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { calculateProjectTotals } from '@/lib/investment-allocation';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/dashboard/summary
  * Returns dashboard summary with key metrics

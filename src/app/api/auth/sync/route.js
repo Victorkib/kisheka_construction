@@ -8,6 +8,9 @@ import { NextResponse } from 'next/server';
 import { getDatabase } from '@/lib/mongodb/connection';
 import { errorResponse, successResponse } from '@/lib/api-response';
 
+// Force dynamic rendering to prevent caching
+export const dynamic = 'force-dynamic';
+
 export async function POST(request) {
   try {
     const { supabaseId, email, firstName, lastName } = await request.json();
