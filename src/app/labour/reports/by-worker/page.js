@@ -16,7 +16,13 @@ export default function ByWorkerReportPage() {
   useEffect(() => {
     const fetchWorkers = async () => {
       try {
-        const response = await fetch('/api/labour/workers?status=active&limit=200');
+        const response = await fetch('/api/labour/workers?status=active&limit=200', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
         if (data.success) {
           const options = (data.data?.workers || []).map((worker) => ({

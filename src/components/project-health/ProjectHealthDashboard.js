@@ -30,15 +30,33 @@ export function ProjectHealthDashboard({ projectId }) {
       setError(null);
       
       // Fetch prerequisites
-      const prereqResponse = await fetch(`/api/projects/${projectId}/prerequisites`);
+      const prereqResponse = await fetch(`/api/projects/${projectId}/prerequisites`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const prereqData = await prereqResponse.json();
       
       // Fetch project finances
-      const financeResponse = await fetch(`/api/project-finances?projectId=${projectId}`);
+      const financeResponse = await fetch(`/api/project-finances?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const financeData = await financeResponse.json();
       
       // Fetch project details
-      const projectResponse = await fetch(`/api/projects/${projectId}`);
+      const projectResponse = await fetch(`/api/projects/${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const projectData = await projectResponse.json();
       
       if (prereqData.success && financeData.success && projectData.success) {

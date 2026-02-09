@@ -102,7 +102,13 @@ export function Step2AddWorkers({
       }
       params.append('limit', '10');
 
-      const response = await fetch(`/api/labour/workers/suggestions?${params}`);
+      const response = await fetch(`/api/labour/workers/suggestions?${params}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setSuggestedWorkers(data.data || []);
@@ -161,7 +167,13 @@ export function Step2AddWorkers({
   const fetchWorkers = async () => {
     setLoadingWorkers(true);
     try {
-      const response = await fetch('/api/labour/workers?status=active');
+      const response = await fetch('/api/labour/workers?status=active', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setAvailableWorkers(data.data?.workers || []);

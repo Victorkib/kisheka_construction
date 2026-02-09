@@ -28,8 +28,14 @@ export function ContingencyBudgetCard({ projectId }) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/projects/${projectId}/contingency`);
-      const result = await response.json();
+      const contingencyResponse = await fetch(`/api/projects/${projectId}/contingency`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      const result = await contingencyResponse.json();
 
       if (!result.success) {
         throw new Error(result.error || 'Failed to fetch contingency data');
@@ -306,8 +312,14 @@ function ContingencyDrawForm({ projectId, onClose }) {
     }
 
     try {
-      const response = await fetch(`/api/projects/${projectId}/contingency`);
-      const result = await response.json();
+      const validationResponse = await fetch(`/api/projects/${projectId}/contingency`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      const result = await validationResponse.json();
 
       if (result.success) {
         const summary = result.data;
@@ -349,16 +361,22 @@ function ContingencyDrawForm({ projectId, onClose }) {
     }
 
     try {
-      const response = await fetch(`/api/projects/${projectId}/contingency/draw`, {
+      const drawResponse = await fetch(`/api/projects/${projectId}/contingency/draw`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          ...formData,
+          drawType: formData.drawType,
           amount: parseFloat(formData.amount),
+          reason: formData.reason,
         }),
       });
 
-      const data = await response.json();
+      const data = await drawResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to create contingency draw request');

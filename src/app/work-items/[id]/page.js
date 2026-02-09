@@ -90,7 +90,13 @@ export default function WorkItemDetailPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/work-items/${params.id}`);
+      const response = await fetch(`/api/work-items/${params.id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -129,14 +135,26 @@ export default function WorkItemDetailPage() {
       
       // Fetch phase
       if (data.data.phaseId) {
-        const phaseResponse = await fetch(`/api/phases/${data.data.phaseId}`);
+        const phaseResponse = await fetch(`/api/phases/${data.data.phaseId}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const phaseData = await phaseResponse.json();
         if (phaseData.success) {
           setPhase(phaseData.data);
           
           // Fetch project
           if (phaseData.data.projectId) {
-            const projectResponse = await fetch(`/api/projects/${phaseData.data.projectId}`);
+            const projectResponse = await fetch(`/api/projects/${phaseData.data.projectId}`, {
+              cache: 'no-store',
+              headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+              },
+            });
             const projectData = await projectResponse.json();
             if (projectData.success) {
               setProject(projectData.data);
@@ -164,7 +182,13 @@ export default function WorkItemDetailPage() {
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
-      const response = await fetch('/api/categories?type=work_items');
+      const response = await fetch('/api/categories?type=work_items', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
@@ -185,9 +209,14 @@ export default function WorkItemDetailPage() {
     setError(null);
 
     try {
-      const response = await fetch(`/api/work-items/${params.id}`, {
+      const updateResponse = await fetch(`/api/work-items/${params.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           ...formData,
           assignedTo: Array.isArray(formData.assignedTo) ? formData.assignedTo : (formData.assignedTo ? [formData.assignedTo] : []),
@@ -198,7 +227,7 @@ export default function WorkItemDetailPage() {
         }),
       });
 
-      const data = await response.json();
+      const data = await updateResponse.json();
       if (!data.success) {
         throw new Error(data.error || 'Failed to update work item');
       }
@@ -218,11 +247,16 @@ export default function WorkItemDetailPage() {
   const handleDelete = async () => {
     setDeleting(true);
     try {
-      const response = await fetch(`/api/work-items/${params.id}`, {
+      const deleteResponse = await fetch(`/api/work-items/${params.id}`, {
         method: 'DELETE',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
       });
 
-      const data = await response.json();
+      const data = await deleteResponse.json();
       if (!data.success) {
         throw new Error(data.error || 'Failed to delete work item');
       }

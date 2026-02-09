@@ -23,7 +23,13 @@ export function SubcontractorSection({ phase, formatCurrency }) {
   const fetchSubcontractors = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/subcontractors?phaseId=${phase._id}`);
+      const response = await fetch(`/api/subcontractors?phaseId=${phase._id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setSubcontractors(data.data?.subcontractors || data.data || []);

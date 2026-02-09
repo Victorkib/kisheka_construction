@@ -48,7 +48,13 @@ function PhasesPageContent() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);

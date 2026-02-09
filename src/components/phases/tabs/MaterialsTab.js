@@ -52,7 +52,13 @@ export function MaterialsTab({ phase, formatCurrency, formatDate }) {
   const fetchMaterials = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/materials?phaseId=${phase._id}`);
+      const response = await fetch(`/api/materials?phaseId=${phase._id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setMaterials(data.data?.materials || data.data || []);

@@ -12,6 +12,7 @@ import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingCard, LoadingSpinner } from '@/components/loading';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { NoProjectsEmptyState, ErrorState } from '@/components/empty-states';
+import { fetchNoCache } from '@/lib/fetch-helpers';
 
 export default function AccountantDashboard() {
   const { isEmpty } = useProjectContext();
@@ -26,7 +27,7 @@ export default function AccountantDashboard() {
       // Always fetch user data first, even if empty state
       try {
         setUserError(null);
-        const userResponse = await fetch('/api/auth/me');
+        const userResponse = await fetchNoCache('/api/auth/me');
         const userData = await userResponse.json();
 
         if (!userData.success) {
@@ -43,7 +44,7 @@ export default function AccountantDashboard() {
           return;
         }
 
-        const summaryResponse = await fetch('/api/dashboard/summary');
+        const summaryResponse = await fetchNoCache('/api/dashboard/summary');
         const summaryData = await summaryResponse.json();
 
         if (summaryData.success) {

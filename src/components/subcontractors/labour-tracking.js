@@ -25,7 +25,13 @@ export function SubcontractorLabourTracking({ subcontractorId }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/subcontractors/${subcontractorId}/labour`);
+      const response = await fetch(`/api/subcontractors/${subcontractorId}/labour`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
 
       if (!result.success) {

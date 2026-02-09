@@ -91,7 +91,13 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch('/api/categories', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
@@ -103,7 +109,13 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
 
   const fetchFloors = async (projectId) => {
     try {
-      const response = await fetch(`/api/floors?projectId=${projectId}`);
+      const response = await fetch(`/api/floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setFloors(data.data || []);
@@ -115,7 +127,13 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
 
   const fetchPhases = async (projectId) => {
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);

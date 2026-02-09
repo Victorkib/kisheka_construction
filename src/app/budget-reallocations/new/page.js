@@ -49,7 +49,13 @@ function NewBudgetReallocationPageContent() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data?.projects || data.data || []);
@@ -62,7 +68,13 @@ function NewBudgetReallocationPageContent() {
   const fetchPhases = async (projectId) => {
     setLoadingPhases(true);
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -102,7 +114,13 @@ function NewBudgetReallocationPageContent() {
 
     // Pre-validation: Check if project has phases
     try {
-      const phasesResponse = await fetch(`/api/phases?projectId=${formData.projectId}`);
+      const response = await fetch(`/api/phases?projectId=${formData.projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const phasesData = await phasesResponse.json();
       if (phasesData.success) {
         const projectPhases = phasesData.data || [];

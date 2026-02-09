@@ -179,10 +179,13 @@ function NewSupplierPageContent() {
     }
 
     try {
-      const response = await fetch('/api/suppliers', {
+      const createResponse = await fetch('/api/suppliers', {
         method: 'POST',
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
         },
         body: JSON.stringify({
           ...formData,
@@ -190,7 +193,7 @@ function NewSupplierPageContent() {
         }),
       });
 
-      const data = await response.json();
+      const data = await createResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to create supplier');

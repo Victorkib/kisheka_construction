@@ -222,7 +222,13 @@ export function Step4Review({
   useEffect(() => {
     if (wizardData.workItemId) {
       setLoadingWorkItem(true);
-      fetch(`/api/work-items/${wizardData.workItemId}`)
+      fetch(`/api/work-items/${wizardData.workItemId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      })
         .then((res) => res.json())
         .then((data) => {
           if (data.success) {

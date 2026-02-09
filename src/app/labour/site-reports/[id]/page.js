@@ -39,7 +39,13 @@ export default function SiteReportDetailPage() {
   const fetchReport = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/labour/site-reports/${params.id}`);
+      const response = await fetch(`/api/labour/site-reports/${params.id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setReport(data.data);
@@ -63,12 +69,13 @@ export default function SiteReportDetailPage() {
     try {
       const response = await fetch(`/api/labour/site-reports/${params.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          summary: editedReport.summary,
-          notes: editedReport.notes,
-          labourEntries: editedReport.labourEntries,
-        }),
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify(editedReport),
       });
       const data = await response.json();
       if (!data.success) {
@@ -88,8 +95,11 @@ export default function SiteReportDetailPage() {
     setApproving(true);
     try {
       const response = await fetch(`/api/labour/site-reports/${params.id}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({}),
       });
       const data = await response.json();

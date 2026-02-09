@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { CATEGORY_TYPE_OPTIONS } from '@/lib/constants/category-constants';
+import { fetchNoCache } from '@/lib/fetch-helpers';
 
 function CategoriesPageContent() {
   const router = useRouter();
@@ -29,7 +30,7 @@ function CategoriesPageContent() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetchNoCache('/api/auth/me');
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -46,7 +47,7 @@ function CategoriesPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/categories?type=${encodeURIComponent(type)}`);
+      const response = await fetchNoCache(`/api/categories?type=${encodeURIComponent(type)}`);
       const data = await response.json();
 
       if (!data.success) {

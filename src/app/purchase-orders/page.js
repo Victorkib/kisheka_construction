@@ -79,7 +79,13 @@ function PurchaseOrdersPageContent() {
   const fetchSuppliers = async () => {
     try {
       // Updated to use suppliers collection instead of users
-      const response = await fetch('/api/suppliers?status=active&limit=100');
+      const response = await fetch('/api/suppliers?status=active&limit=100', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setSuppliers(data.data.suppliers || []);
@@ -105,7 +111,13 @@ function PurchaseOrdersPageContent() {
         ...(filters.search && { search: filters.search }),
       });
 
-      const response = await fetch(`/api/purchase-orders?${queryParams}`);
+      const response = await fetch(`/api/purchase-orders?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

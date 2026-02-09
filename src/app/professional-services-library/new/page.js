@@ -30,10 +30,11 @@ export default function NewProfessionalServicesLibraryPage() {
 
     try {
       const response = await fetch('/api/professional-services-library', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(formData),
       });
 

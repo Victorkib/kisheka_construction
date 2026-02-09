@@ -81,7 +81,13 @@ function FloorsPageContent() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -220,11 +226,16 @@ function FloorsPageContent() {
       setInitializingFloors(true);
       const response = await fetch(`/api/projects/${selectedProjectId}/floors/initialize`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          floorCount,
-          includeBasements,
-          basementCount: includeBasements ? basementCount : 0,
+          floorCount: parseInt(floorInitForm.floorCount, 10),
+          includeBasements: !!floorInitForm.includeBasements,
+          basementCount: parseInt(floorInitForm.basementCount, 10),
         }),
       });
       const data = await response.json();

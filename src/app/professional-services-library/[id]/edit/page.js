@@ -37,7 +37,13 @@ function EditProfessionalServicesLibraryPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/professional-services-library/${params.id}`);
+      const response = await fetch(`/api/professional-services-library/${params.id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -59,10 +65,11 @@ function EditProfessionalServicesLibraryPageContent() {
 
     try {
       const response = await fetch(`/api/professional-services-library/${params.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(formData),
       });
 

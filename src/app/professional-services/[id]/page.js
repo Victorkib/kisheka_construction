@@ -68,7 +68,13 @@ function ProfessionalServiceDetailPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/professional-services/${assignmentId}`);
+      const response = await fetch(`/api/professional-services/${assignmentId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -122,7 +128,11 @@ function ProfessionalServiceDetailPageContent() {
     setIsTerminating(true);
     try {
       const response = await fetch(`/api/professional-services/${assignmentId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

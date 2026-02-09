@@ -59,7 +59,13 @@ function WorkerDetailPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/labour/workers/${workerId}`);
+      const response = await fetch(`/api/labour/workers/${workerId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -90,7 +96,13 @@ function WorkerDetailPageContent() {
         limit: entriesPagination.limit.toString(),
       });
 
-      const response = await fetch(`/api/labour/entries?${queryParams}`);
+      const response = await fetch(`/api/labour/entries?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -121,7 +133,13 @@ function WorkerDetailPageContent() {
       
       if (!effectiveWorkerId) return;
       
-      const response = await fetch(`/api/work-items?assignedTo=${effectiveWorkerId}`);
+      const response = await fetch(`/api/work-items?assignedTo=${effectiveWorkerId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       
       if (data.success) {
@@ -138,7 +156,11 @@ function WorkerDetailPageContent() {
     setDeleting(true);
     try {
       const response = await fetch(`/api/labour/workers/${workerId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

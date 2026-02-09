@@ -51,7 +51,13 @@ function NewPhasePageContent() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -67,7 +73,13 @@ function NewPhasePageContent() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -130,10 +142,11 @@ function NewPhasePageContent() {
 
     try {
       const response = await fetch('/api/phases', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(formData),
       });
 

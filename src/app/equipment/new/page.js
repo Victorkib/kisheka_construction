@@ -70,7 +70,13 @@ function NewEquipmentPageContent() {
       setLoadingProjects(true);
       // Use /api/projects/accessible to respect project-based organization and user memberships
       // This ensures users only see projects they have access to
-      const response = await fetch('/api/projects/accessible');
+      const response = await fetch('/api/projects/accessible', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         // API returns projects array directly in data.data
@@ -97,7 +103,13 @@ function NewEquipmentPageContent() {
   const fetchPhases = async (projectId) => {
     try {
       setLoadingPhases(true);
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         // API returns phases array directly in data.data
@@ -122,7 +134,13 @@ function NewEquipmentPageContent() {
   const fetchSuppliers = async () => {
     try {
       setLoadingSuppliers(true);
-      const response = await fetch('/api/suppliers?status=active&limit=100');
+      const response = await fetch('/api/suppliers?status=active&limit=100', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setSuppliers(data.data.suppliers || []);
@@ -149,11 +167,13 @@ function NewEquipmentPageContent() {
     try {
       const response = await fetch('/api/equipment', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          phaseId: formData.equipmentScope === 'site_wide' ? null : formData.phaseId,
-        }),
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();

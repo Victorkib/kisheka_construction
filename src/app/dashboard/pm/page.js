@@ -28,7 +28,7 @@ export default function PMDashboard() {
       // Always fetch user data first, even if empty state
       try {
         setUserError(null);
-        const userResponse = await fetch('/api/auth/me');
+        const userResponse = await fetchNoCache('/api/auth/me');
         const userData = await userResponse.json();
 
         if (!userData.success) {
@@ -46,9 +46,9 @@ export default function PMDashboard() {
         }
 
         const [summaryResponse, wastageResponse, readyToOrderResponse] = await Promise.all([
-          fetch('/api/dashboard/summary'),
-          fetch('/api/discrepancies/widget-summary'),
-          fetch('/api/material-requests?status=ready_to_order&limit=0'),
+          fetchNoCache('/api/dashboard/summary'),
+          fetchNoCache('/api/discrepancies/widget-summary'),
+          fetchNoCache('/api/material-requests?status=ready_to_order&limit=0'),
         ]);
 
         const summaryData = await summaryResponse.json();

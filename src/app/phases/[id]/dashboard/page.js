@@ -34,8 +34,20 @@ export default function PhaseDashboardPage() {
       setLoading(true);
       setError(null);
       const [dashboardResponse, floorsResponse] = await Promise.all([
-        fetch(`/api/phases/${params.id}/dashboard`),
-        fetch(`/api/phases/${params.id}/floors`),
+        fetch(`/api/phases/${params.id}/dashboard`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
+        fetch(`/api/phases/${params.id}/floors`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
       ]);
 
       if (!dashboardResponse.ok) {

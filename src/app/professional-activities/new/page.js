@@ -39,28 +39,52 @@ export default function NewProfessionalActivityPage() {
       setLoadingData(true);
       
       // Fetch professional services (active assignments)
-      const servicesResponse = await fetch('/api/professional-services?status=active');
+      const response = await fetch('/api/professional-services?status=active', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const servicesData = await servicesResponse.json();
       if (servicesData.success) {
         setProfessionalServices(servicesData.data.assignments || []);
       }
 
       // Fetch projects
-      const projectsResponse = await fetch('/api/projects');
+      const projectsResponse = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const projectsData = await projectsResponse.json();
       if (projectsData.success) {
         setProjects(projectsData.data || []);
       }
 
       // Fetch phases
-      const phasesResponse = await fetch('/api/phases');
+      const phasesResponse = await fetch('/api/phases', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const phasesData = await phasesResponse.json();
       if (phasesData.success) {
         setPhases(phasesData.data || []);
       }
 
       // Fetch floors
-      const floorsResponse = await fetch('/api/floors');
+      const floorsResponse = await fetch('/api/floors', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const floorsData = await floorsResponse.json();
       if (floorsData.success) {
         setFloors(floorsData.data || []);
@@ -79,10 +103,11 @@ export default function NewProfessionalActivityPage() {
 
     try {
       const response = await fetch('/api/professional-activities', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(formData),
       });
 

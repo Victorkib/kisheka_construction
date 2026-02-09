@@ -75,7 +75,13 @@ function SupplierAssignmentPageContent() {
       try {
         setFinanceLoading(true);
         setFinanceError(null);
-        const response = await fetch(`/api/project-finances?projectId=${projectId}`);
+        const response = await fetch(`/api/project-finances?projectId=${projectId}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
         if (!data.success) {
           throw new Error(data.error || 'Failed to fetch project finances');
@@ -178,7 +184,13 @@ function SupplierAssignmentPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/material-requests/bulk/${params.batchId}`);
+      const response = await fetch(`/api/material-requests/bulk/${params.batchId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -201,7 +213,13 @@ function SupplierAssignmentPageContent() {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await fetch('/api/suppliers?status=active&limit=100');
+      const response = await fetch('/api/suppliers?status=active&limit=100', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setSuppliers(data.data.suppliers || []);
@@ -262,10 +280,15 @@ function SupplierAssignmentPageContent() {
       // Submit to API
       const response = await fetch('/api/purchase-orders/bulk', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           batchId: params.batchId,
-          assignments: assignments,
+          assignments,
         }),
       });
 

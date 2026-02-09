@@ -60,7 +60,13 @@ function BudgetDashboardContent() {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/reports/budget-variance?projectId=${selectedProjectId}`);
+      const response = await fetch(`/api/reports/budget-variance?projectId=${selectedProjectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
       if (result.success) {
         setData(result.data);
@@ -69,7 +75,13 @@ function BudgetDashboardContent() {
       }
       
       // Also fetch project budget for enhanced display
-      const projectResponse = await fetch(`/api/projects/${selectedProjectId}`);
+      const projectResponse = await fetch(`/api/projects/${selectedProjectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const projectResult = await projectResponse.json();
       if (projectResult.success) {
         setProjectBudget(projectResult.data.budget);

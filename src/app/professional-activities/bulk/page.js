@@ -110,13 +110,14 @@ function BulkActivityPageContent() {
 
       const response = await fetch('/api/professional-activities/bulk', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          projectId: wizardData.projectId,
-          professionalServiceId: wizardData.professionalServiceId,
-          defaultPhaseId: wizardData.defaultPhaseId || null,
-          defaultFloorId: wizardData.defaultFloorId || null,
-          activities: wizardData.activities,
+          ...wizardData,
           autoApprove,
         }),
       });

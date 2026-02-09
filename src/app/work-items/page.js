@@ -59,7 +59,13 @@ function WorkItemsPageContent() {
       if (filters.search) queryParams.set('search', filters.search);
       if (filters.unassigned) queryParams.set('unassigned', 'true');
 
-      const response = await fetch(`/api/work-items?${queryParams.toString()}`);
+      const response = await fetch(`/api/work-items?${queryParams.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -79,7 +85,13 @@ function WorkItemsPageContent() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -93,7 +105,13 @@ function WorkItemsPageContent() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects/accessible');
+      const response = await fetch('/api/projects/accessible', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -133,7 +151,13 @@ function WorkItemsPageContent() {
   const fetchPhases = async () => {
     if (!filters.projectId) return;
     try {
-      const response = await fetch(`/api/phases?projectId=${filters.projectId}`);
+      const response = await fetch(`/api/phases?projectId=${filters.projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);

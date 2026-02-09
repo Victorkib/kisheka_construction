@@ -42,8 +42,20 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
 
       // Fetch allocations and projects in parallel
       const [allocationsRes, projectsRes] = await Promise.all([
-        fetch(`/api/investors/${investorId}/allocations`),
-        fetch('/api/projects'),
+        fetch(`/api/investors/${investorId}/allocations`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
+        fetch('/api/projects', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
       ]);
 
       const allocationsData = await allocationsRes.json();
@@ -123,13 +135,18 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
           notes: alloc.notes || null,
         }));
 
-      const response = await fetch(`/api/investors/${investorId}/allocations`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const saveResponse = await fetch(`/api/investors/${investorId}/allocations`, {
+        method: 'PUT',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({ allocations: validAllocations }),
       });
 
-      const data = await response.json();
+      const data = await saveResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to save allocations');

@@ -28,7 +28,13 @@ export function BudgetTransferSection({ projectId }) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/projects/${projectId}/budget/transfer`);
+      const response = await fetch(`/api/projects/${projectId}/budget/transfer`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
 
       if (!result.success) {

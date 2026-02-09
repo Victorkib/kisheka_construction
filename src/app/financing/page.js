@@ -66,7 +66,13 @@ function FinancingPageContent() {
       if (projectId) queryParams.append('projectId', projectId);
       if (forceRecalculate) queryParams.append('forceRecalculate', 'true');
       
-      const response = await fetch(`/api/project-finances?${queryParams.toString()}`);
+      const response = await fetch(`/api/project-finances?${queryParams.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -89,7 +95,13 @@ function FinancingPageContent() {
         setInvestors([]);
         return;
       }
-      const response = await fetch(`/api/investors?projectId=${projectId}&status=ACTIVE`);
+      const response = await fetch(`/api/investors?projectId=${projectId}&status=ACTIVE`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -126,7 +138,13 @@ function FinancingPageContent() {
         projectsList.map(async (project) => {
           try {
             // Fetch project-specific finances to get actual used amount
-            const financesResponse = await fetch(`/api/project-finances?projectId=${project._id}`);
+            const response = await fetch(`/api/project-finances?projectId=${project._id}`, {
+              cache: 'no-store',
+              headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+              },
+            });
             const financesData = await financesResponse.json();
 
             if (financesData.success) {

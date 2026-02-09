@@ -40,16 +40,15 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
 
       const response = await fetch('/api/material-requests/bulk/import', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
+          batchId: batch._id,
           csvText: csvText,
-          projectId: batch?.projectId,
-          defaults: {
-            defaultUrgency: batch?.defaultUrgency || 'medium',
-            defaultReason: batch?.defaultReason || '',
-            defaultFloorId: batch?.defaultFloorId,
-            defaultCategoryId: batch?.defaultCategoryId,
-          },
         }),
       });
 

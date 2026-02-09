@@ -39,7 +39,13 @@ export function RegisterForm() {
   const fetchInvitation = async () => {
     try {
       setLoadingInvitation(true);
-      const response = await fetch(`/api/users/invitations/${invitationToken}`);
+      const response = await fetch(`/api/users/invitations/${invitationToken}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!response.ok) {

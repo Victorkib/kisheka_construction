@@ -183,7 +183,13 @@ function NewPurchaseOrderPageContent() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         // API returns projects array directly in data.data
@@ -207,7 +213,13 @@ function NewPurchaseOrderPageContent() {
   const fetchSuppliers = async () => {
     try {
       // Updated to use suppliers collection instead of users
-      const response = await fetch('/api/suppliers?status=active&limit=100');
+      const response = await fetch('/api/suppliers?status=active&limit=100', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         // API returns { suppliers: [...], pagination: {...}, ... }
@@ -226,8 +238,11 @@ function NewPurchaseOrderPageContent() {
     setCreatingSupplier(true);
     try {
       const response = await fetch('/api/suppliers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(supplierData),
       });
 
@@ -258,7 +273,13 @@ function NewPurchaseOrderPageContent() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch('/api/categories', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         // API returns categories array directly in data.data
@@ -280,7 +301,13 @@ function NewPurchaseOrderPageContent() {
         setFloors([]);
         return;
       }
-      const response = await fetch(`/api/floors?projectId=${projectId}`);
+      const response = await fetch(`/api/floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setFloors(data.data || []);
@@ -299,7 +326,13 @@ function NewPurchaseOrderPageContent() {
         return;
       }
       setLoadingPhases(true);
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -330,7 +363,13 @@ function NewPurchaseOrderPageContent() {
     try {
       setLoadingRequests(true);
       // Use ready_to_order filter to get approved/converted requests without purchase orders
-      const response = await fetch(`/api/material-requests?projectId=${projectId}&status=ready_to_order`);
+      const response = await fetch(`/api/material-requests?projectId=${projectId}&status=ready_to_order`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         let requests = data.data.requests || [];
@@ -338,7 +377,13 @@ function NewPurchaseOrderPageContent() {
         // If specific requestId provided and not in results, fetch it separately and add it
         if (specificRequestId && !requests.find(r => r._id === specificRequestId)) {
           try {
-            const specificResponse = await fetch(`/api/material-requests/${specificRequestId}`);
+            const response = await fetch(`/api/material-requests/${specificRequestId}`, {
+              cache: 'no-store',
+              headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+              },
+            });
             const specificData = await specificResponse.json();
             if (specificData.success && specificData.data) {
               const specificRequest = specificData.data;
@@ -371,7 +416,13 @@ function NewPurchaseOrderPageContent() {
 
   const fetchMaterialRequestDetails = async (requestId) => {
     try {
-      const response = await fetch(`/api/material-requests/${requestId}`);
+      const response = await fetch(`/api/material-requests/${requestId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       
       if (!data.success || !data.data) {
@@ -436,7 +487,13 @@ function NewPurchaseOrderPageContent() {
 
     try {
       setLoadingCapital(true);
-      const response = await fetch(`/api/project-finances?projectId=${projectId}`);
+      const response = await fetch(`/api/project-finances?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         const capital = data.data.availableCapital !== undefined 
@@ -599,8 +656,11 @@ function NewPurchaseOrderPageContent() {
       };
 
       const response = await fetch('/api/purchase-orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(payload),
       });
 

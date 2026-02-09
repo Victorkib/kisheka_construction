@@ -56,7 +56,13 @@ function PhaseReportsPageContent() {
       const queryParams = new URLSearchParams();
       if (selectedProjectId) queryParams.set('projectId', selectedProjectId);
 
-      const response = await fetch(`/api/phases?${queryParams.toString()}&includeFinancials=true`);
+      const response = await fetch(`/api/phases?${queryParams.toString()}&includeFinancials=true`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

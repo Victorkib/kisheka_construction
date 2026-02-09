@@ -31,7 +31,13 @@ export function NotificationPermissionRequest() {
     // Fetch current user to get userId
     const fetchUser = async () => {
       try {
-        const response = await fetch('/api/auth/me');
+        const response = await fetch('/api/auth/me', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
         if (data.success && data.data?._id) {
           setUserId(data.data._id);
@@ -128,7 +134,13 @@ export function NotificationPermissionRequest() {
       }
 
       if (!userId) {
-        const response = await fetch('/api/auth/me');
+        const response = await fetch('/api/auth/me', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
         if (data.success && data.data?._id) {
           setUserId(data.data._id);

@@ -67,7 +67,13 @@ export default function SiteReportsPage() {
 
   const fetchPhases = async (projectId) => {
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -85,7 +91,13 @@ export default function SiteReportsPage() {
       if (filters.phaseId) params.set('phaseId', filters.phaseId);
       if (filters.status && filters.status !== 'all') params.set('status', filters.status);
 
-      const response = await fetch(`/api/labour/site-reports?${params.toString()}`);
+      const response = await fetch(`/api/labour/site-reports?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setReports(data.data?.reports || []);

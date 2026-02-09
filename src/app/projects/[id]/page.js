@@ -46,7 +46,13 @@ function PhasesSection({ projectId, canEdit }) {
   const fetchPhases = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/phases?projectId=${projectId}&includeFinancials=true`);
+      const response = await fetch(`/api/phases?projectId=${projectId}&includeFinancials=true`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -63,7 +69,13 @@ function PhasesSection({ projectId, canEdit }) {
 
   const fetchProjectBudget = async () => {
     try {
-      const response = await fetch(`/api/projects/${projectId}`);
+      const response = await fetch(`/api/projects/${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success && data.data) {
         setProjectBudget(data.data.budget);
@@ -339,7 +351,13 @@ function BudgetVsActualSection({ projectId }) {
 
   const fetchBudgetVariance = async () => {
     try {
-      const response = await fetch(`/api/reports/budget-variance?projectId=${projectId}`);
+      const response = await fetch(`/api/reports/budget-variance?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setBudgetData(data.data);
@@ -527,7 +545,13 @@ function ExpensesSection({ projectId }) {
 
     try {
       // Fetch all expenses for the project, we'll filter approved/paid on client side for display
-      const response = await fetch(`/api/expenses?projectId=${projectId}&limit=10`);
+      const response = await fetch(`/api/expenses?projectId=${projectId}&limit=10`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         const allExpenses = data.data.expenses || [];
@@ -642,7 +666,13 @@ function InitialExpensesSection({ projectId }) {
 
   const fetchInitialExpenses = async () => {
     try {
-      const response = await fetch(`/api/initial-expenses?projectId=${projectId}&limit=5`);
+      const response = await fetch(`/api/initial-expenses?projectId=${projectId}&limit=5`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setInitialExpenses(data.data.expenses || []);
@@ -854,7 +884,13 @@ function ProgressSection({ projectId }) {
 
   const fetchProgress = async () => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/progress`);
+      const response = await fetch(`/api/projects/${projectId}/progress`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProgress(data.data);
@@ -962,7 +998,13 @@ export default function ProjectDetailPage() {
   // Track page view
   useTrackPageView('project', async (id) => {
     try {
-      const response = await fetch(`/api/projects/${id}`);
+      const response = await fetch(`/api/projects/${id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         return data.data;
@@ -992,7 +1034,13 @@ export default function ProjectDetailPage() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -1016,7 +1064,13 @@ export default function ProjectDetailPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/projects/${projectId}`);
+      const response = await fetch(`/api/projects/${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -1069,7 +1123,13 @@ export default function ProjectDetailPage() {
     }
     try {
       setFloorsLoading(true);
-      const response = await fetch(`/api/floors?projectId=${projectId}`);
+      const response = await fetch(`/api/floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setFloors(data.data || []);
@@ -1219,8 +1279,11 @@ export default function ProjectDetailPage() {
     try {
       const response = await fetch(`/api/projects/${projectId}`, {
         method: 'PATCH',
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
         },
         body: JSON.stringify({
           projectName: formData.projectName.trim(),
@@ -1259,7 +1322,13 @@ export default function ProjectDetailPage() {
       setFetchingFinancialData(true);
       setImpactLoaded(false);
 
-      const response = await fetch(`/api/projects/${projectId}/dependencies`);
+      const response = await fetch(`/api/projects/${projectId}/dependencies`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success && data.data) {
@@ -1334,11 +1403,16 @@ export default function ProjectDetailPage() {
       setInitializingFloors(true);
       const response = await fetch(`/api/projects/${projectId}/floors/initialize`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           floorCount,
           includeBasements,
-          basementCount: includeBasements ? basementCount : 0,
+          basementCount,
         }),
       });
       const data = await response.json();
@@ -1378,7 +1452,11 @@ export default function ProjectDetailPage() {
     setArchiving(true);
     try {
       const response = await fetch(`/api/projects/${projectId}/archive`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -1439,7 +1517,11 @@ export default function ProjectDetailPage() {
     setRestoring(true);
     try {
       const response = await fetch(`/api/projects/${projectId}/restore`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

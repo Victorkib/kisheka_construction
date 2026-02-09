@@ -86,7 +86,13 @@ export default function PhaseDetailPage() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -107,7 +113,13 @@ export default function PhaseDetailPage() {
       }
       setError(null);
 
-      const response = await fetch(`/api/phases/${params.id}?includeFinancials=true`);
+      const response = await fetch(`/api/phases/${params.id}?includeFinancials=true`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -130,7 +142,13 @@ export default function PhaseDetailPage() {
       
       // Fetch project
       if (data.data.projectId) {
-        const projectResponse = await fetch(`/api/projects/${data.data.projectId}`);
+        const response = await fetch(`/api/projects/${data.data.projectId}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const projectData = await projectResponse.json();
         if (projectData.success) {
           setProject(projectData.data);
@@ -200,8 +218,11 @@ export default function PhaseDetailPage() {
     setUpdatingStatus(true);
     try {
       const response = await fetch(`/api/phases/${params.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ status: newStatus }),
       });
 
@@ -226,8 +247,11 @@ export default function PhaseDetailPage() {
     setUpdatingCompletion(true);
     try {
       const response = await fetch(`/api/phases/${params.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ completionPercentage: newCompletion }),
       });
 
@@ -253,8 +277,11 @@ export default function PhaseDetailPage() {
 
     try {
       const response = await fetch(`/api/phases/${params.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(formData),
       });
 
@@ -285,7 +312,13 @@ export default function PhaseDetailPage() {
   const fetchMaterials = async () => {
     try {
       setLoadingMaterials(true);
-      const response = await fetch(`/api/materials?phaseId=${phase._id}`);
+      const response = await fetch(`/api/materials?phaseId=${phase._id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setMaterials(data.data?.materials || data.data || []);
@@ -300,7 +333,13 @@ export default function PhaseDetailPage() {
   const fetchExpenses = async () => {
     try {
       setLoadingExpenses(true);
-      const response = await fetch(`/api/expenses?phaseId=${phase._id}`);
+      const response = await fetch(`/api/expenses?phaseId=${phase._id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setExpenses(data.data?.expenses || data.data || []);
@@ -315,7 +354,13 @@ export default function PhaseDetailPage() {
   const checkAutoAdvanceStatus = async () => {
     try {
       setCheckingAutoAdvance(true);
-      const response = await fetch(`/api/phases/${params.id}/auto-advance`);
+      const response = await fetch(`/api/phases/${params.id}/auto-advance`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setAutoAdvanceStatus(data.data);
@@ -340,7 +385,11 @@ export default function PhaseDetailPage() {
     setAutoAdvancing(true);
     try {
       const response = await fetch(`/api/phases/${params.id}/auto-advance`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

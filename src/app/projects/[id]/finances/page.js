@@ -45,7 +45,13 @@ function FinancialOverviewContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/projects/${projectId}/financial-overview`);
+      const response = await fetch(`/api/projects/${projectId}/financial-overview`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
 
       if (!result.success) {

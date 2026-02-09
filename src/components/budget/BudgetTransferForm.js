@@ -57,27 +57,51 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
       
       if (formData.fromCategory === 'dcc') {
         // Use dedicated DCC endpoint for accurate available budget
-        const response = await fetch(`/api/projects/${projectId}/dcc`);
-        const result = await response.json();
+        const dccResponse = await fetch(`/api/projects/${projectId}/dcc`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
+        const result = await dccResponse.json();
         if (result.success) {
           // Available = remaining DCC budget (budget - spent)
           available = result.data.remaining || 0;
         }
       } else if (formData.fromCategory === 'preconstruction') {
-        const response = await fetch(`/api/projects/${projectId}/preconstruction`);
-        const result = await response.json();
+        const preconstructionResponse = await fetch(`/api/projects/${projectId}/preconstruction`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
+        const result = await preconstructionResponse.json();
         if (result.success) {
           available = result.data.remaining || 0;
         }
       } else if (formData.fromCategory === 'indirect') {
-        const response = await fetch(`/api/projects/${projectId}/indirect-costs`);
-        const result = await response.json();
+        const indirectResponse = await fetch(`/api/projects/${projectId}/indirect-costs`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
+        const result = await indirectResponse.json();
         if (result.success) {
           available = result.data.remaining || 0;
         }
       } else if (formData.fromCategory === 'contingency') {
-        const response = await fetch(`/api/projects/${projectId}/contingency`);
-        const result = await response.json();
+        const contingencyResponse = await fetch(`/api/projects/${projectId}/contingency`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
+        const result = await contingencyResponse.json();
         if (result.success) {
           available = result.data.remaining || 0;
         }
@@ -121,16 +145,23 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
     }
 
     try {
-      const response = await fetch(`/api/projects/${projectId}/budget/transfer`, {
+      const transferResponse = await fetch(`/api/projects/${projectId}/budget/transfer`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          ...formData,
+          fromCategory: formData.fromCategory,
+          toCategory: formData.toCategory,
           amount: parseFloat(formData.amount),
+          reason: formData.reason,
         }),
       });
 
-      const data = await response.json();
+      const data = await transferResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to create budget transfer request');

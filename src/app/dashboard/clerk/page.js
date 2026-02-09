@@ -12,6 +12,7 @@ import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingCard, LoadingSpinner } from '@/components/loading';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { NoProjectsEmptyState, ErrorState } from '@/components/empty-states';
+import { fetchNoCache } from '@/lib/fetch-helpers';
 
 export default function ClerkDashboard() {
   const { isEmpty } = useProjectContext();
@@ -24,7 +25,7 @@ export default function ClerkDashboard() {
     async function fetchData() {
       try {
         setUserError(null);
-        const response = await fetch('/api/auth/me');
+        const response = await fetchNoCache('/api/auth/me');
         const data = await response.json();
 
         if (!data.success) {

@@ -26,7 +26,13 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
   const fetchWorkItems = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/work-items?phaseId=${phase._id}`);
+      const response = await fetch(`/api/work-items?phaseId=${phase._id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setWorkItems(data.data?.workItems || data.data || []);

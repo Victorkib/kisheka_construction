@@ -106,7 +106,13 @@ function ProfessionalFeesPageContent() {
         sortOrder: filterValues.sortOrder,
       });
 
-      const response = await fetch(`/api/professional-fees?${queryParams}`);
+      const response = await fetch(`/api/professional-fees?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -153,7 +159,13 @@ function ProfessionalFeesPageContent() {
 
   const fetchAssignments = async () => {
     try {
-      const response = await fetch('/api/professional-services?status=active');
+      const response = await fetch('/api/professional-services?status=active', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setAssignments(data.data.assignments || []);
@@ -202,8 +214,11 @@ function ProfessionalFeesPageContent() {
     setShowApproveModal(false);
     try {
       const response = await fetch(`/api/professional-fees/${selectedFeeId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ approvalNotes }),
       });
 
@@ -232,8 +247,11 @@ function ProfessionalFeesPageContent() {
     setActionLoading(true);
     try {
       const response = await fetch(`/api/professional-fees/${targetId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ approvalNotes: 'Quick-approved from list' }),
       });
 
@@ -270,8 +288,11 @@ function ProfessionalFeesPageContent() {
     setShowRejectModal(false);
     try {
       const response = await fetch(`/api/professional-fees/${selectedFeeId}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ rejectionReason }),
       });
 
@@ -312,8 +333,11 @@ function ProfessionalFeesPageContent() {
     setShowPaymentModal(false);
     try {
       const response = await fetch(`/api/professional-fees/${selectedFeeId}/payment`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(paymentData),
       });
 

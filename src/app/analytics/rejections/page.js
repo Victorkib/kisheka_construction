@@ -69,7 +69,13 @@ const RejectionAnalyticsDashboard = () => {
         return;
       }
 
-      const profileResponse = await fetch('/api/auth/me');
+      const profileResponse = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       if (!profileResponse.ok) {
         router.push('/login');
         return;
@@ -87,9 +93,11 @@ const RejectionAnalyticsDashboard = () => {
       });
 
       const response = await fetch(`/api/analytics/rejections?${params}`, {
-        headers: {
-          'Authorization': `Bearer ${user.access_token}`
-        }
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       if (!response.ok) {
@@ -126,15 +134,11 @@ const RejectionAnalyticsDashboard = () => {
   const handleExport = async () => {
     try {
       const response = await fetch('/api/analytics/rejections/export', {
-        method: 'POST',
+        cache: 'no-store',
         headers: {
-          'Content-Type': 'application/json'
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
         },
-        body: JSON.stringify({
-          dateRange,
-          category: selectedCategory,
-          supplier: selectedSupplier
-        })
       });
 
       if (!response.ok) {

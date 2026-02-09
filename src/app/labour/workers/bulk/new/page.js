@@ -187,8 +187,11 @@ function BulkWorkerCreationPageContent() {
       }));
 
       const response = await fetch('/api/labour/workers/bulk', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ workers: workersData }),
       });
 

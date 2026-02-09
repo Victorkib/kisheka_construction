@@ -31,7 +31,13 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
         ...(phaseId ? { phaseId } : {}),
       });
 
-      const response = await fetch(`/api/labour/cost-summaries?${params}`);
+      const response = await fetch(`/api/labour/cost-summaries?${params}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
 
       if (!result.success) {
@@ -57,7 +63,13 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
         ...(phaseId ? { phaseId } : {}),
       });
 
-      const response = await fetch(`/api/labour/cost-summaries?${params}`);
+      const response = await fetch(`/api/labour/cost-summaries?${params}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
 
       if (!result.success) {

@@ -61,7 +61,13 @@ function SuppliersPageContent() {
         params.append('search', searchTerm.trim());
       }
 
-      const response = await fetch(`/api/suppliers?${params.toString()}`);
+      const response = await fetch(`/api/suppliers?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -134,7 +140,11 @@ function SuppliersPageContent() {
 
     try {
       const response = await fetch(`/api/suppliers/${supplierId}`, {
-        method: 'DELETE'
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

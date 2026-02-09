@@ -25,7 +25,13 @@ export function EquipmentOperatorTracking({ equipmentId }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/equipment/${equipmentId}/operators`);
+      const response = await fetch(`/api/equipment/${equipmentId}/operators`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
 
       if (!result.success) {

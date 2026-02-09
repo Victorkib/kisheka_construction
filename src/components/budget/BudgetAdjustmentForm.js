@@ -56,26 +56,50 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
       let currentBudget = 0;
       
       if (formData.category === 'dcc') {
-        const response = await fetch(`/api/projects/${projectId}/financial-overview`);
-        const result = await response.json();
+        const dccResponse = await fetch(`/api/projects/${projectId}/financial-overview`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
+        const result = await dccResponse.json();
         if (result.success) {
           currentBudget = result.data.budget?.directConstructionCosts || 0;
         }
       } else if (formData.category === 'preconstruction') {
-        const response = await fetch(`/api/projects/${projectId}/preconstruction`);
-        const result = await response.json();
+        const preconstructionResponse = await fetch(`/api/projects/${projectId}/preconstruction`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
+        const result = await preconstructionResponse.json();
         if (result.success) {
           currentBudget = result.data.budgeted || 0;
         }
       } else if (formData.category === 'indirect') {
-        const response = await fetch(`/api/projects/${projectId}/indirect-costs`);
-        const result = await response.json();
+        const indirectResponse = await fetch(`/api/projects/${projectId}/indirect-costs`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
+        const result = await indirectResponse.json();
         if (result.success) {
           currentBudget = result.data.budgeted || 0;
         }
       } else if (formData.category === 'contingency') {
-        const response = await fetch(`/api/projects/${projectId}/contingency`);
-        const result = await response.json();
+        const contingencyResponse = await fetch(`/api/projects/${projectId}/contingency`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
+        const result = await contingencyResponse.json();
         if (result.success) {
           currentBudget = result.data.budgeted || 0;
         }
@@ -116,16 +140,23 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
     }
 
     try {
-      const response = await fetch(`/api/projects/${projectId}/budget/adjustment`, {
+      const adjustmentResponse = await fetch(`/api/projects/${projectId}/budget/adjustment`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          ...formData,
+          category: formData.category,
+          adjustmentType: formData.adjustmentType,
           adjustmentAmount: parseFloat(formData.adjustmentAmount),
+          reason: formData.reason,
         }),
       });
 
-      const data = await response.json();
+      const data = await adjustmentResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to create budget adjustment request');

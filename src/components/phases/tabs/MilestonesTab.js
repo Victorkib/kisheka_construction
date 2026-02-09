@@ -36,7 +36,13 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
   const fetchMilestones = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/phases/${phase._id}/milestones`);
+      const response = await fetch(`/api/phases/${phase._id}/milestones`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         const updatedMilestones = updateMilestoneStatuses(data.data || []);
@@ -121,7 +127,11 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
 
     try {
       const response = await fetch(`/api/phases/${phase._id}/milestones/${milestone.milestoneId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

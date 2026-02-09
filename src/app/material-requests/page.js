@@ -20,6 +20,7 @@ import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState } from '@/components/empty-states';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { PhaseFilter } from '@/components/filters/PhaseFilter';
+import { fetchNoCache } from '@/lib/fetch-helpers';
 
 function MaterialRequestsPageContent() {
   const router = useRouter();
@@ -153,7 +154,7 @@ function MaterialRequestsPageContent() {
     setActionLoading(true);
     setShowApproveModal(false);
     try {
-      const response = await fetch(`/api/material-requests/${selectedRequestId}/approve`, {
+      const response = await fetchNoCache(`/api/material-requests/${selectedRequestId}/approve`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ approvalNotes }),
@@ -193,7 +194,7 @@ function MaterialRequestsPageContent() {
     setActionLoading(true);
     setShowRejectModal(false);
     try {
-      const response = await fetch(`/api/material-requests/${selectedRequestId}/reject`, {
+      const response = await fetchNoCache(`/api/material-requests/${selectedRequestId}/reject`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ rejectionReason }),

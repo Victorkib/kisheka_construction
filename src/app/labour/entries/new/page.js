@@ -156,7 +156,13 @@ function NewLabourEntryPageContent() {
     const workItemIdFromUrl = searchParams.get('workItemId');
     if (workItemIdFromUrl) {
       // Fetch work item to get projectId, phaseId, and assigned workers
-      fetch(`/api/work-items/${workItemIdFromUrl}`)
+      fetch(`/api/work-items/${workItemIdFromUrl}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      })
         .then((res) => res.json())
         .then((data) => {
           if (data.success && data.data) {
@@ -371,7 +377,13 @@ function NewLabourEntryPageContent() {
   const fetchProjects = async () => {
     setLoadingProjects(true);
     try {
-      const response = await fetch('/api/projects/accessible');
+      const response = await fetch('/api/projects/accessible', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -388,7 +400,13 @@ function NewLabourEntryPageContent() {
     if (!projectId) return;
     setLoadingPhases(true);
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -404,7 +422,13 @@ function NewLabourEntryPageContent() {
     if (!projectId) return;
     setLoadingFloors(true);
     try {
-      const response = await fetch(`/api/floors?projectId=${projectId}`);
+      const response = await fetch(`/api/floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setFloors(data.data || []);
@@ -418,7 +442,13 @@ function NewLabourEntryPageContent() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories?type=work_items');
+      const response = await fetch('/api/categories?type=work_items', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
@@ -430,7 +460,13 @@ function NewLabourEntryPageContent() {
 
   const fetchWorkers = async () => {
     try {
-      const response = await fetch('/api/labour/workers?status=active');
+      const response = await fetch('/api/labour/workers?status=active', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setWorkers(data.data?.workers || []);
@@ -532,17 +568,45 @@ function NewLabourEntryPageContent() {
 
       const response = await fetch('/api/labour/entries', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          ...formData,
+          projectId: formData.projectId,
+          phaseId: formData.isIndirectLabour ? null : formData.phaseId,
+          isIndirectLabour: formData.isIndirectLabour,
           indirectCostCategory: formData.isIndirectLabour ? formData.indirectCostCategory : null,
-          totalHours,
-          overtimeHours: overtimeHours > 0 ? overtimeHours : 0, // Schema will calculate if 0
-          hourlyRate,
-          breakDuration: breakDuration,
+          floorId: formData.floorId || null,
+          categoryId: formData.categoryId || null,
+          workItemId: formData.isIndirectLabour ? null : (formData.workItemId || null),
+          workerId: formData.workerId || null,
+          workerName: formData.workerName,
+          workerType: formData.workerType || 'internal',
+          workerRole: formData.workerRole || 'skilled',
+          skillType: formData.skillType || 'general_worker',
+          entryDate: formData.entryDate,
+          clockInTime: formData.clockInTime
+            ? new Date(
+                `${formData.entryDate}T${formData.clockInTime}`
+              ).toISOString()
+            : null,
+          clockOutTime: formData.clockOutTime
+            ? new Date(
+                `${formData.entryDate}T${formData.clockOutTime}`
+              ).toISOString()
+            : null,
+          breakDuration: parseFloat(formData.breakDuration) || 0,
+          totalHours: parseFloat(formData.totalHours) || 0,
+          overtimeHours: parseFloat(formData.overtimeHours) || 0,
+          hourlyRate: parseFloat(formData.hourlyRate) || 0,
+          taskDescription: formData.taskDescription || null,
           quantityCompleted: formData.quantityCompleted
             ? parseFloat(formData.quantityCompleted)
             : null,
+          unitOfMeasure: formData.unitOfMeasure || null,
           unitRate: formData.unitRate ? parseFloat(formData.unitRate) : null,
           dailyRate: formData.dailyRate ? parseFloat(formData.dailyRate) : null,
           serviceType: formData.serviceType || null,
@@ -568,17 +632,7 @@ function NewLabourEntryPageContent() {
             !isNaN(parseFloat(formData.productivityRating))
               ? parseFloat(formData.productivityRating)
               : null,
-          clockInTime: formData.clockInTime
-            ? new Date(
-                `${formData.entryDate}T${formData.clockInTime}`
-              ).toISOString()
-            : null,
-          clockOutTime: formData.clockOutTime
-            ? new Date(
-                `${formData.entryDate}T${formData.clockOutTime}`
-              ).toISOString()
-            : null,
-          entryDate: formData.entryDate,
+          notes: formData.notes || null,
         }),
       });
 

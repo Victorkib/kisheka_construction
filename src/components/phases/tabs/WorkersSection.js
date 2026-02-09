@@ -53,7 +53,13 @@ export function WorkersSection({ phase, formatCurrency }) {
       
       // Fetch labour entries for this phase to get worker statistics
       // Include all statuses except deleted/rejected to show all active workers
-      const response = await fetch(`/api/labour/entries?phaseId=${phaseId}&limit=1000`);
+      const response = await fetch(`/api/labour/entries?phaseId=${phaseId}&limit=1000`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       
       if (!data.success) {

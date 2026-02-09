@@ -88,7 +88,13 @@ export default function NewProjectPage() {
     try {
       setLoadingUsers(true);
       // Fetch users with PM role (site managers)
-      const response = await fetch('/api/users?role=pm&status=active&limit=100');
+      const response = await fetch('/api/users?role=pm&status=active&limit=100', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         // API returns { users: [...], pagination: {...}, ... }
@@ -106,7 +112,13 @@ export default function NewProjectPage() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -227,10 +239,11 @@ export default function NewProjectPage() {
       requestBody.autoInitializePhases = formData.autoInitializePhases !== false; // Default to true
 
       const response = await fetch('/api/projects', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(requestBody),
       });
 
@@ -502,7 +515,7 @@ export default function NewProjectPage() {
                         onChange={handleChange}
                         placeholder="e.g., DOSHAKI-001"
                         required
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-gray-900"
                       />
                     </div>
                     <p className="text-xs text-gray-500 mt-2">Unique identifier for this project</p>
@@ -526,29 +539,29 @@ export default function NewProjectPage() {
                         onChange={handleChange}
                         placeholder="e.g., 10-Storey Residential Building"
                         required
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all"
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-gray-900"
                       />
                     </div>
                   </div>
 
                   {/* Description */}
-<div className="md:col-span-2">
-  <div className="flex justify-between items-center mb-2">
-    <label className="block text-sm font-semibold text-gray-700">Description</label>
-    <span className={`text-xs font-medium ${formData.description.length > 450 ? 'text-orange-500' : 'text-gray-400'}`}>
-      {formData.description.length} / 500 characters
-    </span>
-  </div>
-  <textarea
-    name="description"
-    value={formData.description}
-    onChange={handleChange}
-    placeholder="Provide a detailed description of the project..."
-    rows={4}
-    maxLength={500}
-    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-400 transition-all resize-none"
-  />
-</div>
+                  <div className="md:col-span-2">
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="block text-sm font-semibold text-gray-700">Description</label>
+                      <span className={`text-xs font-medium ${formData.description.length > 450 ? 'text-orange-500' : 'text-gray-400'}`}>
+                        {formData.description.length} / 500 characters
+                      </span>
+                    </div>
+                    <textarea
+                      name="description"
+                      value={formData.description}
+                      onChange={handleChange}
+                      placeholder="Provide a detailed description of the project..."
+                      rows={4}
+                      maxLength={500}
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none text-gray-900"
+                    />
+                  </div>
 
                   {/* Location */}
                   <div className="md:col-span-1">
@@ -566,7 +579,7 @@ export default function NewProjectPage() {
                         value={formData.location}
                         onChange={handleChange}
                         placeholder="e.g., Nairobi, Kenya"
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-gray-900"
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-black"
                       />
                     </div>
                   </div>
@@ -586,7 +599,7 @@ export default function NewProjectPage() {
                         value={formData.client}
                         onChange={handleChange}
                         placeholder="Client name"
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-black"
+                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-gray-900"
                       />
                     </div>
                   </div>

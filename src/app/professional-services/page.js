@@ -99,7 +99,13 @@ function ProfessionalServicesPageContent() {
         sortOrder: filterValues.sortOrder,
       });
 
-      const response = await fetch(`/api/professional-services?${queryParams}`);
+      const response = await fetch(`/api/professional-services?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -183,7 +189,11 @@ function ProfessionalServicesPageContent() {
     setActionLoading(true);
     try {
       const response = await fetch(`/api/professional-services/${assignmentToTerminate.id}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

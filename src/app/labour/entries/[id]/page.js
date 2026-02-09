@@ -62,7 +62,13 @@ function LabourEntryDetailPageContent() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`/api/labour/entries/${entryId}`);
+      const response = await fetch(`/api/labour/entries/${entryId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -82,7 +88,13 @@ function LabourEntryDetailPageContent() {
   const fetchProject = async () => {
     if (!entry?.projectId) return;
     try {
-      const response = await fetch(`/api/projects/${entry.projectId}`);
+      const response = await fetch(`/api/projects/${entry.projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProject(data.data);
@@ -95,7 +107,13 @@ function LabourEntryDetailPageContent() {
   const fetchPhase = async () => {
     if (!entry?.phaseId) return;
     try {
-      const response = await fetch(`/api/phases/${entry.phaseId}`);
+      const response = await fetch(`/api/phases/${entry.phaseId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhase(data.data);
@@ -108,7 +126,13 @@ function LabourEntryDetailPageContent() {
   const fetchWorkItem = async () => {
     if (!entry?.workItemId) return;
     try {
-      const response = await fetch(`/api/work-items/${entry.workItemId}`);
+      const response = await fetch(`/api/work-items/${entry.workItemId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setWorkItem(data.data);
@@ -123,7 +147,11 @@ function LabourEntryDetailPageContent() {
     setIsApproving(true);
     try {
       const response = await fetch(`/api/labour/entries/${entryId}/approve`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -146,7 +174,11 @@ function LabourEntryDetailPageContent() {
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/labour/entries/${entryId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

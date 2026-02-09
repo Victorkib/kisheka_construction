@@ -105,12 +105,14 @@ export default function NewInvestorPage() {
     try {
       const response = await fetch('/api/investors', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          investmentType: formData.investmentType,
+          ...formData,
           totalInvested: parseFloat(formData.totalInvested),
           loanTerms:
             formData.investmentType === 'LOAN' || formData.investmentType === 'MIXED'

@@ -47,7 +47,13 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
   const fetchProjects = async () => {
     setLoadingProjects(true);
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -70,7 +76,13 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
     }
     setLoadingFloors(true);
     try {
-      const response = await fetch(`/api/floors?projectId=${projectId}`);
+      const response = await fetch(`/api/floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setFloors(data.data || []);
@@ -97,7 +109,13 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
     }
     setLoadingPhases(true);
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -120,7 +138,13 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
   const fetchCategories = async () => {
     setLoadingCategories(true);
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch('/api/categories', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);

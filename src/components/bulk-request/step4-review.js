@@ -21,7 +21,13 @@ export function Step4Review({ wizardData, user, onValidationChange }) {
   const fetchProject = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/projects/${wizardData.projectId}`);
+      const response = await fetch(`/api/projects/${wizardData.projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProject(data.data);

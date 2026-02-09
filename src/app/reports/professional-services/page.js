@@ -81,7 +81,13 @@ function ProfessionalServicesReportsContent() {
       if (filters.endDate) params.append('endDate', filters.endDate);
       if (filters.type) params.append('type', filters.type);
 
-      const response = await fetch(`/api/reports/professional-services?${params.toString()}`);
+      const response = await fetch(`/api/reports/professional-services?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       if (!response.ok) {
         throw new Error('Failed to fetch report data');
       }
@@ -137,7 +143,13 @@ function ProfessionalServicesReportsContent() {
       if (filters.type) params.append('type', filters.type);
       params.append('format', format);
 
-      const response = await fetch(`/api/reports/professional-services/export?${params.toString()}`);
+      const response = await fetch(`/api/reports/professional-services/export?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       if (!response.ok) {
         throw new Error('Export failed');
       }

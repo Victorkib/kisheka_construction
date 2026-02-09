@@ -29,11 +29,13 @@ export function QualityCheckpointCard({ checkpoint, canEdit, onEdit, onDelete, f
     try {
       const response = await fetch(`/api/phases/${checkpoint.phaseId}/quality-checkpoints/${checkpoint.checkpointId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          status: inspectionData.status,
-          notes: inspectionData.notes,
-          photos: inspectionData.photos,
           inspectedAt: new Date().toISOString()
         }),
       });

@@ -17,7 +17,13 @@ export default function ByCategoryReportPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch('/api/categories?type=work_items');
+        const response = await fetch('/api/categories?type=work_items', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
         if (data.success) {
           const options = (data.data || []).map((category) => ({

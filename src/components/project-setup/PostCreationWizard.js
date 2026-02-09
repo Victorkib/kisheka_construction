@@ -34,7 +34,13 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
   const fetchPrerequisites = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/projects/${projectId}/prerequisites`);
+      const response = await fetch(`/api/projects/${projectId}/prerequisites`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPrerequisites(data.data);

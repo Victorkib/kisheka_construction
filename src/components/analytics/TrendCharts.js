@@ -24,7 +24,13 @@ export function TrendCharts({ projectId }) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/projects/${projectId}/trends`);
+      const response = await fetch(`/api/projects/${projectId}/trends`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
 
       if (!result.success) {

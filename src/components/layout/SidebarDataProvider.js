@@ -64,7 +64,13 @@ export function SidebarDataProvider({ children }) {
       // Fetch current project if projectId exists
       if (projectId) {
         promises.push(
-          fetch(`/api/projects/${projectId}`)
+          fetch(`/api/projects/${projectId}`, {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          })
             .then(res => res.json())
             .then(data => ({ type: 'project', data }))
             .catch(err => ({ type: 'project', data: null, error: err }))
@@ -76,7 +82,13 @@ export function SidebarDataProvider({ children }) {
       // Fetch pending actions
       if (canAccess && canAccess('approve_material_request')) {
         promises.push(
-          fetch('/api/dashboard/summary')
+          fetch('/api/dashboard/summary', {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          })
             .then(res => res.json())
             .then(data => ({ type: 'approvals', data }))
             .catch(err => ({ type: 'approvals', data: null, error: err }))
@@ -88,7 +100,13 @@ export function SidebarDataProvider({ children }) {
       // Fetch ready to order count
       if (canAccess && (canAccess('create_purchase_order') || canAccess('view_material_requests'))) {
         promises.push(
-          fetch('/api/material-requests?status=ready_to_order&limit=0')
+          fetch('/api/material-requests?status=ready_to_order&limit=0', {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          })
             .then(res => res.json())
             .then(data => ({ type: 'readyToOrder', data }))
             .catch(err => ({ type: 'readyToOrder', data: null, error: err }))
@@ -100,7 +118,13 @@ export function SidebarDataProvider({ children }) {
       // Fetch pending purchase orders for suppliers
       if (user?.role?.toLowerCase() === 'supplier') {
         promises.push(
-          fetch('/api/purchase-orders?limit=0')
+          fetch('/api/purchase-orders?limit=0', {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          })
             .then(res => res.json())
             .then(data => ({ type: 'pendingOrders', data }))
             .catch(err => ({ type: 'pendingOrders', data: null, error: err }))
@@ -112,7 +136,13 @@ export function SidebarDataProvider({ children }) {
       // Fetch prerequisites for suggestions (if on project page)
       if (projectId && pathname.match(/^\/projects\/[^/]+$/)) {
         promises.push(
-          fetch(`/api/projects/${projectId}/prerequisites`)
+          fetch(`/api/projects/${projectId}/prerequisites`, {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          })
             .then(res => res.json())
             .then(data => ({ type: 'prerequisites', data }))
             .catch(err => ({ type: 'prerequisites', data: null, error: err }))
@@ -125,7 +155,13 @@ export function SidebarDataProvider({ children }) {
       if (pathname.match(/^\/material-requests\/[^/]+$/)) {
         const requestId = pathname.split('/')[2];
         promises.push(
-          fetch(`/api/material-requests/${requestId}`)
+          fetch(`/api/material-requests/${requestId}`, {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          })
             .then(res => res.json())
             .then(data => ({ type: 'materialRequest', data }))
             .catch(err => ({ type: 'materialRequest', data: null, error: err }))

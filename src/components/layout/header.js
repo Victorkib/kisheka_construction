@@ -72,7 +72,13 @@ export function Header({ onMenuClick }) {
         user.role?.toLowerCase()
       )
     ) {
-      fetch('/api/dashboard/summary')
+      fetch('/api/dashboard/summary', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      })
         .then((res) => res.json())
         .then((data) => {
           if (data?.success && data?.data?.summary?.totalPendingApprovals) {

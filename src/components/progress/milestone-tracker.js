@@ -163,16 +163,13 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
         (m) => (m._id?.toString() || m._id || m.tempId) === milestoneId
       );
 
-      const response = await fetch(`/api/projects/${projectId}/progress`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'delete',
-          milestone: { 
-            _id: milestoneId,
-            name: milestone?.name, // Include name as fallback
-          },
-        }),
+      const response = await fetch(`/api/projects/${projectId}/progress?milestoneId=${milestoneId}`, {
+        method: 'DELETE',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
       });
 
       const data = await response.json();

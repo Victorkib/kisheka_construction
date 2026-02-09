@@ -28,8 +28,20 @@ export function CostOverviewTab({ projectId }) {
       setError(null);
 
       const [overviewRes, dccRes] = await Promise.all([
-        fetch(`/api/projects/${projectId}/financial-overview`),
-        fetch(`/api/projects/${projectId}/dcc`).catch(() => null),
+        fetch(`/api/projects/${projectId}/financial-overview`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
+        fetch(`/api/projects/${projectId}/dcc`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
       ]);
 
       const overviewResult = await overviewRes.json();

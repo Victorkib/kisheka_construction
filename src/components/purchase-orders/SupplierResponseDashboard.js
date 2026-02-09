@@ -53,7 +53,13 @@ export function SupplierResponseDashboard({
     setLoading(true);
     try {
       // Load supplier response analytics
-      const response = await fetch(`/api/analytics/supplier-responses?timeFilter=${timeFilter}`);
+      const response = await fetch(`/api/analytics/supplier-responses?timeFilter=${timeFilter}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         setDashboardData(data);

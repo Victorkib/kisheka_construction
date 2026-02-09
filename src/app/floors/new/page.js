@@ -45,7 +45,13 @@ function NewFloorPageContent() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -65,7 +71,13 @@ function NewFloorPageContent() {
   const fetchProjects = async () => {
     try {
       setLoadingProjects(true);
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -113,7 +125,13 @@ function NewFloorPageContent() {
     if (isBasement && (isNaN(floorNumber) || floorNumber >= 0)) {
       // Find the lowest basement number for this project
       try {
-        const floorsResponse = await fetch(`/api/floors?projectId=${formData.projectId}`);
+        const response = await fetch(`/api/floors?projectId=${formData.projectId}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const floorsData = await floorsResponse.json();
         if (floorsData.success) {
           const existingFloors = floorsData.data || [];
@@ -145,12 +163,15 @@ function NewFloorPageContent() {
     try {
       const response = await fetch('/api/floors', {
         method: 'POST',
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
         },
         body: JSON.stringify({
           projectId: formData.projectId,
-          floorNumber: floorNumber,
+          floorNumber: parseInt(formData.floorNumber),
           name: formData.name.trim(),
           description: formData.description.trim(),
           status: formData.status,

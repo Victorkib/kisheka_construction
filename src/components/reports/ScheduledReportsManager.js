@@ -35,7 +35,13 @@ export function ScheduledReportsManager({ projectId }) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/projects/${projectId}/reports/schedule`);
+      const response = await fetch(`/api/projects/${projectId}/reports/schedule`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
 
       if (!result.success) {
@@ -61,25 +67,21 @@ export function ScheduledReportsManager({ projectId }) {
         .map(r => r.trim())
         .filter(r => r);
 
-      const response = await fetch(`/api/projects/${projectId}/reports/schedule`, {
+      const createResponse = await fetch(`/api/projects/${projectId}/reports/schedule`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          reportType: formData.reportType,
-          frequency: formData.frequency,
-          dayOfWeek: formData.frequency === 'weekly' ? formData.dayOfWeek : undefined,
-          dayOfMonth: formData.frequency === 'monthly' ? formData.dayOfMonth : undefined,
-          time: formData.time,
-          recipients,
-          options: {
-            includeForecast: formData.includeForecast,
-            includeTrends: formData.includeTrends,
-            includeRecommendations: formData.includeRecommendations,
-          },
+          ...formData,
+          recipients: recipients,
         }),
       });
 
-      const result = await response.json();
+      const result = await createResponse.json();
 
       if (!result.success) {
         throw new Error(result.error || 'Failed to create scheduled report');
@@ -106,13 +108,18 @@ export function ScheduledReportsManager({ projectId }) {
 
   const handleToggleActive = async (scheduleId, isActive) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/reports/schedule/${scheduleId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+      const toggleResponse = await fetch(`/api/projects/${projectId}/reports/schedule/${scheduleId}`, {
+        method: 'PATCH',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({ isActive: !isActive }),
       });
 
-      const result = await response.json();
+      const result = await toggleResponse.json();
 
       if (!result.success) {
         throw new Error(result.error || 'Failed to update scheduled report');
@@ -131,11 +138,16 @@ export function ScheduledReportsManager({ projectId }) {
     }
 
     try {
-      const response = await fetch(`/api/projects/${projectId}/reports/schedule/${scheduleId}`, {
+      const deleteResponse = await fetch(`/api/projects/${projectId}/reports/schedule/${scheduleId}`, {
         method: 'DELETE',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
       });
 
-      const result = await response.json();
+      const result = await deleteResponse.json();
 
       if (!result.success) {
         throw new Error(result.error || 'Failed to delete scheduled report');

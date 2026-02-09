@@ -130,7 +130,13 @@ function RejectionsDashboardContent() {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await fetch('/api/suppliers?status=active&limit=100');
+      const response = await fetch('/api/suppliers?status=active&limit=100', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setSuppliers(data.data.suppliers || []);
@@ -157,7 +163,13 @@ function RejectionsDashboardContent() {
         ...(filters.search && { search: filters.search }),
       });
 
-      const response = await fetch(`/api/purchase-orders?${queryParams}`);
+      const response = await fetch(`/api/purchase-orders?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -216,7 +228,13 @@ function RejectionsDashboardContent() {
         ...(filters.projectId && { projectId: filters.projectId }),
       });
 
-      const response = await fetch(`/api/purchase-orders/analytics/rejections?${queryParams}`);
+      const response = await fetch(`/api/purchase-orders/analytics/rejections?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -279,8 +297,11 @@ function RejectionsDashboardContent() {
       setReassigningOrderId(orderId);
       
       const response = await fetch(`/api/purchase-orders/${orderId}/auto-reassign`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ mode, limit: 5, autoCreate: false }) // Don't auto-create, just suggest
       });
 

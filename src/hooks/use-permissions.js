@@ -67,8 +67,14 @@ export function usePermissions() {
         setLoading(true);
         setError(null);
         
-        // Create a new fetch promise
-        fetchPromise = fetch('/api/auth/me')
+        // Create a new fetch promise with no-cache
+        fetchPromise = fetch('/api/auth/me', {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+        })
           .then((res) => res.json())
           .then((data) => {
             if (data.success) {
@@ -108,8 +114,11 @@ export function usePermissions() {
       setError(null);
       // Force fresh fetch from server, bypass browser cache
       const response = await fetch('/api/auth/me', {
-        cache: 'no-store',
-        headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
       const data = await response.json();
 

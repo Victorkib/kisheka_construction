@@ -72,7 +72,13 @@ export default function InvestorDetailPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/investors/${investorId}`);
+      const response = await fetch(`/api/investors/${investorId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -93,7 +99,13 @@ export default function InvestorDetailPage() {
 
     try {
       setFetchingContributions(true);
-      const response = await fetch(`/api/investors/${investorId}/contributions`);
+      const response = await fetch(`/api/investors/${investorId}/contributions`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -118,8 +130,11 @@ export default function InvestorDetailPage() {
 
     try {
       const response = await fetch(`/api/investors/${investorId}/contributions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(newContribution),
       });
 
@@ -169,7 +184,11 @@ export default function InvestorDetailPage() {
     setReconciling(true);
     try {
       const response = await fetch(`/api/investors/${investorId}/reconcile`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
       const data = await response.json();
 
@@ -197,7 +216,11 @@ export default function InvestorDetailPage() {
     setArchiving(true);
     try {
       const response = await fetch(`/api/investors/${investorId}/archive`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -226,7 +249,11 @@ export default function InvestorDetailPage() {
     setDeleting(true);
     try {
       const response = await fetch(`/api/investors/${investorId}?force=true`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -259,7 +286,11 @@ export default function InvestorDetailPage() {
     setRestoring(true);
     try {
       const response = await fetch(`/api/investors/${investorId}/restore`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

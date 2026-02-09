@@ -36,7 +36,13 @@ function ArchivedExpensesPageContent() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         const role = data.data.role?.toLowerCase();
@@ -52,7 +58,13 @@ function ArchivedExpensesPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/expenses?archived=true');
+      const response = await fetch('/api/expenses?archived=true', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -79,7 +91,11 @@ function ArchivedExpensesPageContent() {
     setRestoring(true);
     try {
       const response = await fetch(`/api/expenses/${selectedExpense._id}/restore`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -111,7 +127,11 @@ function ArchivedExpensesPageContent() {
     setDeleting(true);
     try {
       const response = await fetch(`/api/expenses/${selectedExpense._id}?force=true`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

@@ -40,7 +40,13 @@ function SupervisorSubmissionsPageContent() {
   const fetchSubmissions = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/labour/supervisor-submissions?limit=100');
+      const response = await fetch('/api/labour/supervisor-submissions?limit=100', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setSubmissions(data.data?.submissions || []);

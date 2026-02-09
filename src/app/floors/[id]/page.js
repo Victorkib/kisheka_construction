@@ -61,7 +61,13 @@ export default function FloorDetailPage() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -80,7 +86,13 @@ export default function FloorDetailPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/floors/${floorId}`);
+      const response = await fetch(`/api/floors/${floorId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -93,7 +105,13 @@ export default function FloorDetailPage() {
       // Fetch project if projectId exists
       if (floorData.projectId) {
         try {
-          const projectResponse = await fetch(`/api/projects/${floorData.projectId}`);
+          const response = await fetch(`/api/projects/${floorData.projectId}`, {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          });
           const projectData = await projectResponse.json();
           if (projectData.success) {
             setProject(projectData.data);
@@ -291,8 +309,20 @@ export default function FloorDetailPage() {
     try {
       // Check if floor has dependencies
       const [materialsRes, requestsRes] = await Promise.all([
-        fetch(`/api/materials?projectId=${projectId}&floor=${floorId}&limit=1`).catch(() => ({ json: () => ({ data: [] }) })),
-        fetch(`/api/material-requests?projectId=${projectId}&floorId=${floorId}&limit=1`).catch(() => ({ json: () => ({ data: { requests: [], pagination: { total: 0 } } }) })),
+        fetch(`/api/materials?projectId=${projectId}&floor=${floorId}&limit=1`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
+        fetch(`/api/material-requests?projectId=${projectId}&floorId=${floorId}&limit=1`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
       ]);
       
       const materialsData = await materialsRes.json();
@@ -327,15 +357,14 @@ export default function FloorDetailPage() {
     try {
       const response = await fetch(`/api/floors/${floorId}`, {
         method: 'PATCH',
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
         },
         body: JSON.stringify({
-          status: formData.status,
-          totalBudget: formData.totalBudget,
-          actualCost: formData.actualCost,
-          startDate: formData.startDate || null,
-          completionDate: formData.completionDate || null,
+          ...formData,
           description: formData.description.trim(),
         }),
       });
@@ -367,6 +396,11 @@ export default function FloorDetailPage() {
     try {
       const response = await fetch(`/api/floors/${floorId}`, {
         method: 'DELETE',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
       });
 
       const data = await response.json();
@@ -955,7 +989,13 @@ function FloorProgressSection({ floorId, canEdit }) {
 
   const fetchProgress = async () => {
     try {
-      const response = await fetch(`/api/floors/${floorId}/progress`);
+      const response = await fetch(`/api/floors/${floorId}/progress`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProgress(data.data);
@@ -974,7 +1014,12 @@ function FloorProgressSection({ floorId, canEdit }) {
     try {
       const response = await fetch(`/api/floors/${floorId}/progress`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           completionPercentage,
           milestoneNotes,
@@ -1009,13 +1054,16 @@ function FloorProgressSection({ floorId, canEdit }) {
     setUploadingPhoto(true);
     try {
       const response = await fetch(`/api/floors/${floorId}/progress`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          photo: {
-            url: photoUrl,
-            description: photoDescription.trim(),
-          },
+          photoUrl,
+          description: photoDescription.trim(),
         }),
       });
 

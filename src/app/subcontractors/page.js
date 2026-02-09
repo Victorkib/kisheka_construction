@@ -72,7 +72,13 @@ function SubcontractorsPageContent() {
         ...(filters.subcontractorType && { subcontractorType: filters.subcontractorType }),
       });
 
-      const response = await fetch(`/api/subcontractors?${queryParams}`);
+      const response = await fetch(`/api/subcontractors?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

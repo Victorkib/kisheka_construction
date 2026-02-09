@@ -22,9 +22,27 @@ export function DCCTab({ projectId }) {
       setError(null);
 
       const [projectRes, phasesRes, dccRes] = await Promise.all([
-        fetch(`/api/projects/${projectId}`),
-        fetch(`/api/phases?projectId=${projectId}&includeFinancials=true`),
-        fetch(`/api/projects/${projectId}/dcc`),
+        fetch(`/api/projects/${projectId}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
+        fetch(`/api/phases?projectId=${projectId}&includeFinancials=true`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
+        fetch(`/api/projects/${projectId}/dcc`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
       ]);
 
       const projectData = await projectRes.json();

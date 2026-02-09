@@ -73,7 +73,13 @@ function NewWorkItemPageContent() {
     try {
       setLoadingProjects(true);
       // Use /api/projects/accessible to respect project-based organization and user memberships
-      const response = await fetch('/api/projects/accessible');
+      const response = await fetch('/api/projects/accessible', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         // API returns projects array directly in data.data
@@ -100,7 +106,13 @@ function NewWorkItemPageContent() {
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
-      const response = await fetch('/api/categories?type=work_items');
+      const response = await fetch('/api/categories?type=work_items', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
@@ -118,7 +130,13 @@ function NewWorkItemPageContent() {
   const fetchPhases = async (projectId) => {
     try {
       setLoadingPhases(true);
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         // API returns phases array directly in data.data
@@ -146,9 +164,14 @@ function NewWorkItemPageContent() {
     setError(null);
 
     try {
-      const response = await fetch('/api/work-items', {
+      const createResponse = await fetch('/api/work-items', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           ...formData,
           assignedTo: Array.isArray(formData.assignedTo) ? formData.assignedTo : (formData.assignedTo ? [formData.assignedTo] : []),
@@ -159,7 +182,7 @@ function NewWorkItemPageContent() {
         }),
       });
 
-      const data = await response.json();
+      const data = await createResponse.json();
       if (!data.success) {
         throw new Error(data.error || 'Failed to create work item');
       }

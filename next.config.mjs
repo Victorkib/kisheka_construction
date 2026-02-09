@@ -58,18 +58,20 @@ const nextConfig = {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',
           },
-          // Performance Headers
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
           // Permissions Policy (formerly Feature Policy)
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
+          // Note: Cache-Control removed for dynamic pages
+          // Dynamic pages should use 'force-dynamic' export instead
+          // Static assets are handled separately below
         ],
       },
+      // Dynamic pages - no caching (exclude static assets and API routes)
+      // Note: Next.js automatically handles dynamic routes, but we ensure no caching headers
+      // Individual pages should use 'export const dynamic = force-dynamic' for server components
+      // Client components should use fetchNoCache helper for API calls
       // Static assets caching
       {
         source: '/static/:path*',

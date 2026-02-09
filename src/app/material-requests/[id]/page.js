@@ -43,7 +43,13 @@ export default function MaterialRequestDetailPage() {
   // Track page view
   useTrackPageView('material-request', async (id) => {
     try {
-      const response = await fetch(`/api/material-requests/${id}`);
+      const response = await fetch(`/api/material-requests/${id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         return data.data;
@@ -83,7 +89,13 @@ export default function MaterialRequestDetailPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/material-requests/${requestId}`);
+      const response = await fetch(`/api/material-requests/${requestId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -106,7 +118,13 @@ export default function MaterialRequestDetailPage() {
 
   const fetchAvailableCapital = async (projectId) => {
     try {
-      const response = await fetch(`/api/project-finances?projectId=${projectId}`);
+      const response = await fetch(`/api/project-finances?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjectFinances(data.data);
@@ -119,7 +137,13 @@ export default function MaterialRequestDetailPage() {
 
   const fetchPurchaseOrder = async (poId) => {
     try {
-      const response = await fetch(`/api/purchase-orders/${poId}`);
+      const response = await fetch(`/api/purchase-orders/${poId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setLinkedPurchaseOrder(data.data);
@@ -132,7 +156,13 @@ export default function MaterialRequestDetailPage() {
   const fetchLinkedMaterial = async (poId) => {
     try {
       // Find material linked to this purchase order
-      const response = await fetch(`/api/materials?purchaseOrderId=${poId}`);
+      const response = await fetch(`/api/materials?purchaseOrderId=${poId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success && data.data.materials?.length > 0) {
         setLinkedMaterial(data.data.materials[0]);
@@ -151,8 +181,11 @@ export default function MaterialRequestDetailPage() {
     setIsApproving(true);
     try {
       const response = await fetch(`/api/material-requests/${requestId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ approvalNotes: approvalNotes || 'Approved via UI' }),
       });
 
@@ -191,8 +224,11 @@ export default function MaterialRequestDetailPage() {
     setIsRejecting(true);
     try {
       const response = await fetch(`/api/material-requests/${requestId}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ rejectionReason: rejectionReason.trim() }),
       });
 
@@ -223,7 +259,11 @@ export default function MaterialRequestDetailPage() {
     try {
       // First mark as converted
       const convertResponse = await fetch(`/api/material-requests/${requestId}/convert-to-order`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const convertData = await convertResponse.json();

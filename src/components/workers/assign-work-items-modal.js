@@ -59,7 +59,13 @@ export function AssignWorkItemsModal({
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects/accessible');
+      const response = await fetch('/api/projects/accessible', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -71,7 +77,13 @@ export function AssignWorkItemsModal({
 
   const fetchPhases = async (projectId) => {
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -91,7 +103,13 @@ export function AssignWorkItemsModal({
       if (filters.search) queryParams.set('search', filters.search);
       if (filters.unassigned) queryParams.set('unassigned', 'true');
 
-      const response = await fetch(`/api/work-items?${queryParams.toString()}`);
+      const response = await fetch(`/api/work-items?${queryParams.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -131,16 +149,21 @@ export function AssignWorkItemsModal({
 
     try {
       setAssigning(true);
-      const response = await fetch('/api/work-items/assign', {
+      const assignResponse = await fetch('/api/work-items/assign', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           workItemIds: Array.from(selectedWorkItems),
           workerIds: [workerId]
-        })
+        }),
       });
 
-      const data = await response.json();
+      const data = await assignResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to assign work items');

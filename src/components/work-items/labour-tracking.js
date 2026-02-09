@@ -25,7 +25,13 @@ export function WorkItemLabourTracking({ workItemId }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/work-items/${workItemId}/labour`);
+      const response = await fetch(`/api/work-items/${workItemId}/labour`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
 
       if (!result.success) {

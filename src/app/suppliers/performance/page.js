@@ -71,7 +71,13 @@ function SupplierPerformanceDashboard() {
         setUser(authUser);
 
         // Get user profile
-        const profileResponse = await fetch('/api/auth/me');
+        const profileResponse = await fetch('/api/auth/me', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         if (!profileResponse.ok) {
           toast.showError('User profile not found');
           return;
@@ -86,18 +92,18 @@ function SupplierPerformanceDashboard() {
         setUserProfile(profileResult.data);
 
         // Check permissions
-        const response = await fetch('/api/auth/permissions', {
+        const permissionsResponse = await fetch('/api/auth/permissions', {
           headers: {
             'Authorization': `Bearer ${authUser.id}`
           }
         });
 
-        if (!response.ok) {
+        if (!permissionsResponse.ok) {
           toast.showError('Failed to verify permissions');
           return;
         }
 
-        const permissions = await response.json();
+        const permissions = await permissionsResponse.json();
         if (!permissions.data?.view_suppliers) {
           toast.showError('Insufficient permissions to view supplier performance');
           router.push('/dashboard');
@@ -128,7 +134,13 @@ function SupplierPerformanceDashboard() {
       setError(null);
 
       // Load dashboard data
-      const dashboardResponse = await fetch('/api/suppliers/performance/dashboard');
+      const dashboardResponse = await fetch('/api/suppliers/performance/dashboard', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       if (!dashboardResponse.ok) {
         throw new Error('Failed to load dashboard data');
       }

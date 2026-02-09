@@ -17,6 +17,7 @@ import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState } from '@/components/empty-states';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { fetchNoCache } from '@/lib/fetch-helpers';
 
 function ExpensesPageContent() {
   const router = useRouter();
@@ -108,7 +109,7 @@ function ExpensesPageContent() {
           ...(filters.isIndirectCost && { isIndirectCost: filters.isIndirectCost }),
         });
 
-        const response = await fetch(`/api/expenses?${queryParams}`);
+        const response = await fetchNoCache(`/api/expenses?${queryParams}`);
         const data = await response.json();
 
         if (!data.success) {
@@ -146,7 +147,7 @@ function ExpensesPageContent() {
     }
     setLoadingPhases(true);
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetchNoCache(`/api/phases?projectId=${projectId}`);
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);

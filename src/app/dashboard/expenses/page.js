@@ -36,7 +36,13 @@ export default function ExpensesPage() {
         ...(dateRange.endDate && { endDate: dateRange.endDate }),
       });
 
-      const response = await fetch(`/api/reports/summary?${queryParams}`);
+      const response = await fetch(`/api/reports/summary?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -62,7 +68,13 @@ export default function ExpensesPage() {
         ...(dateRange.endDate && { endDate: dateRange.endDate }),
       });
 
-      const response = await fetch(`/api/expenses?${queryParams}`);
+      const response = await fetch(`/api/expenses?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -80,7 +92,13 @@ export default function ExpensesPage() {
         ...(dateRange.endDate && { endDate: dateRange.endDate }),
       });
 
-      const response = await fetch(`/api/reports/supplier-summary?${queryParams}`);
+      const response = await fetch(`/api/reports/supplier-summary?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -346,7 +364,13 @@ function SupplierSummaryTable({ dateRange }) {
         ...(dateRange.endDate && { endDate: dateRange.endDate }),
       });
 
-      const response = await fetch(`/api/reports/supplier-summary?${queryParams}`);
+      const response = await fetch(`/api/reports/supplier-summary?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success) {

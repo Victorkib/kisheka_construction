@@ -36,7 +36,13 @@ function PhaseFinancialPageContent() {
       setError(null);
 
       // Fetch financial summary
-      const financialResponse = await fetch(`/api/phases/${phaseId}/financial`);
+      const response = await fetch(`/api/phases/${phaseId}/financial`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const financialResult = await financialResponse.json();
 
       if (!financialResult.success) {
@@ -48,7 +54,13 @@ function PhaseFinancialPageContent() {
 
       // Fetch project for context
       if (financialResult.data.phase?.projectId) {
-        const projectResponse = await fetch(`/api/projects/${financialResult.data.phase.projectId}`);
+        const response = await fetch(`/api/projects/${financialResult.data.phase.projectId}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const projectResult = await projectResponse.json();
         if (projectResult.success) {
           setProject(projectResult.data);

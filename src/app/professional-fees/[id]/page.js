@@ -74,7 +74,13 @@ function ProfessionalFeeDetailPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/professional-fees/${feeId}`);
+      const response = await fetch(`/api/professional-fees/${feeId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -99,8 +105,11 @@ function ProfessionalFeeDetailPageContent() {
     setIsApproving(true);
     try {
       const response = await fetch(`/api/professional-fees/${feeId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ approvalNotes: approvalNotes || 'Approved via UI' }),
       });
 
@@ -139,8 +148,11 @@ function ProfessionalFeeDetailPageContent() {
     setIsRejecting(true);
     try {
       const response = await fetch(`/api/professional-fees/${feeId}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ rejectionReason: rejectionReason.trim() }),
       });
 
@@ -186,8 +198,11 @@ function ProfessionalFeeDetailPageContent() {
     setIsRecordingPayment(true);
     try {
       const response = await fetch(`/api/professional-fees/${feeId}/payment`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(paymentData),
       });
 
@@ -222,7 +237,11 @@ function ProfessionalFeeDetailPageContent() {
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/professional-fees/${feeId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

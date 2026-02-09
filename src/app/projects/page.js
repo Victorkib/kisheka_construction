@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingTable, LoadingSpinner } from '@/components/loading';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { fetchNoCache } from '@/lib/fetch-helpers';
 
 function ProjectsPageContent() {
   const router = useRouter();
@@ -76,7 +77,7 @@ function ProjectsPageContent() {
       if (filters.status) queryParams.append('status', filters.status);
       if (filters.search) queryParams.append('search', filters.search);
 
-      const response = await fetch(`/api/projects?${queryParams}`);
+      const response = await fetchNoCache(`/api/projects?${queryParams}`);
       const data = await response.json();
 
       if (!data.success) {

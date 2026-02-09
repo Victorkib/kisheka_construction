@@ -70,7 +70,13 @@ function LabourBatchDetailPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/labour/batches/${batchId}`);
+      const response = await fetch(`/api/labour/batches/${batchId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -88,7 +94,13 @@ function LabourBatchDetailPageContent() {
 
   const fetchProject = async (projectId) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}`);
+      const response = await fetch(`/api/projects/${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProject(data.data);
@@ -100,7 +112,13 @@ function LabourBatchDetailPageContent() {
 
   const fetchWorkItem = async (workItemId) => {
     try {
-      const response = await fetch(`/api/work-items/${workItemId}`);
+      const response = await fetch(`/api/work-items/${workItemId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setWorkItem(data.data);
@@ -116,7 +134,11 @@ function LabourBatchDetailPageContent() {
       setActionLoading(true);
 
       const response = await fetch(`/api/labour/batches/${batchId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

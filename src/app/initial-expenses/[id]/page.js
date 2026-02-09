@@ -60,7 +60,13 @@ export default function InitialExpenseDetailPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/initial-expenses/${expenseId}`);
+      const response = await fetch(`/api/initial-expenses/${expenseId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -84,8 +90,11 @@ export default function InitialExpenseDetailPage() {
     setIsApproving(true);
     try {
       const response = await fetch(`/api/initial-expenses/${expenseId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ approved: true, notes: approvalNotes || 'Approved via UI' }),
       });
 
@@ -121,8 +130,11 @@ export default function InitialExpenseDetailPage() {
     setIsRejecting(true);
     try {
       const response = await fetch(`/api/initial-expenses/${expenseId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ approved: false, notes: rejectReason.trim() }),
       });
 
@@ -152,7 +164,11 @@ export default function InitialExpenseDetailPage() {
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/initial-expenses/${expenseId}?force=true`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -188,7 +204,11 @@ export default function InitialExpenseDetailPage() {
     setIsArchiving(true);
     try {
       const response = await fetch(`/api/initial-expenses/${expenseId}/archive`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -221,7 +241,11 @@ export default function InitialExpenseDetailPage() {
     setIsRestoring(true);
     try {
       const response = await fetch(`/api/initial-expenses/${expenseId}/restore`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

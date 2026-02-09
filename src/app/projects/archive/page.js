@@ -40,7 +40,13 @@ function ArchivedProjectsPageContent() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -57,7 +63,13 @@ function ArchivedProjectsPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/projects?archived=true');
+      const response = await fetch('/api/projects?archived=true', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -84,7 +96,11 @@ function ArchivedProjectsPageContent() {
     setRestoring(true);
     try {
       const response = await fetch(`/api/projects/${selectedProject._id}/restore`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -111,7 +127,13 @@ function ArchivedProjectsPageContent() {
     setImpactLoading(true);
 
     try {
-      const response = await fetch(`/api/projects/${project._id}/dependencies`);
+      const response = await fetch(`/api/projects/${project._id}/dependencies`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success && data.data) {
@@ -144,7 +166,11 @@ function ArchivedProjectsPageContent() {
     setDeleting(true);
     try {
       const response = await fetch(`/api/projects/${selectedProject._id}?force=true`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

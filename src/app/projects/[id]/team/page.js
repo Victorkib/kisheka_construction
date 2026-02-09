@@ -63,7 +63,13 @@ export default function ProjectTeamPage() {
   const fetchTeamMembers = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/projects/${projectId}/team`);
+      const response = await fetch(`/api/projects/${projectId}/team`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -81,7 +87,13 @@ export default function ProjectTeamPage() {
 
   const fetchAllUsers = async () => {
     try {
-      const response = await fetch('/api/users');
+      const response = await fetch('/api/users', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -100,13 +112,18 @@ export default function ProjectTeamPage() {
 
     try {
       setAddingMember(true);
-      const response = await fetch(`/api/projects/${projectId}/team`, {
+      const addResponse = await fetch(`/api/projects/${projectId}/team`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(newMember),
       });
 
-      const data = await response.json();
+      const data = await addResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to add team member');
@@ -131,14 +148,19 @@ export default function ProjectTeamPage() {
 
     try {
       setRemovingMemberId(selectedMembershipId);
-      const response = await fetch(
+      const removeResponse = await fetch(
         `/api/projects/${projectId}/team?membershipId=${selectedMembershipId}`,
         {
           method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         }
       );
 
-      const data = await response.json();
+      const data = await removeResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to remove team member');
@@ -158,16 +180,21 @@ export default function ProjectTeamPage() {
 
   const handleUpdateRole = async (membershipId, newRole) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/team`, {
+      const updateResponse = await fetch(`/api/projects/${projectId}/team`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           membershipId,
           role: newRole,
         }),
       });
 
-      const data = await response.json();
+      const data = await updateResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to update role');

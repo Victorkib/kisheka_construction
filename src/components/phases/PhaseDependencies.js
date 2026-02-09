@@ -32,9 +32,27 @@ export function PhaseDependencies({ phase, projectId }) {
 
       // Fetch prerequisites and dependents
       const [prereqResponse, dependentsResponse, canStartResponse] = await Promise.all([
-        fetch(`/api/phases/${phase._id}/prerequisites`).catch(() => ({ json: async () => ({ success: false, data: [] }) })),
-        fetch(`/api/phases/${phase._id}/dependents`).catch(() => ({ json: async () => ({ success: false, data: [] }) })),
-        fetch(`/api/phases/${phase._id}/can-start`).catch(() => ({ json: async () => ({ success: false, data: { canStart: true } }) }))
+        fetch(`/api/phases/${phase._id}/prerequisites`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
+        fetch(`/api/phases/${phase._id}/dependents`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
+        fetch(`/api/phases/${phase._id}/can-start`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
       ]);
 
       const prereqData = await prereqResponse.json();

@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner } from '@/components/loading';
+import { fetchNoCache } from '@/lib/fetch-helpers';
 
 /**
  * Dashboard Router
@@ -22,7 +23,7 @@ export default function DashboardPage() {
   useEffect(() => {
     async function redirectToRoleDashboard() {
       try {
-        const response = await fetch('/api/auth/me');
+        const response = await fetchNoCache('/api/auth/me');
         const data = await response.json();
 
         if (!data.success) {

@@ -78,7 +78,13 @@ export default function SubcontractorDetailPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/subcontractors/${params.id}`);
+      const response = await fetch(`/api/subcontractors/${params.id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -106,14 +112,26 @@ export default function SubcontractorDetailPage() {
       
       // Fetch phase
       if (data.data.phaseId) {
-        const phaseResponse = await fetch(`/api/phases/${data.data.phaseId}`);
+        const response = await fetch(`/api/phases/${data.data.phaseId}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const phaseData = await phaseResponse.json();
         if (phaseData.success) {
           setPhase(phaseData.data);
           
           // Fetch project
           if (phaseData.data.projectId) {
-            const projectResponse = await fetch(`/api/projects/${phaseData.data.projectId}`);
+            const response = await fetch(`/api/projects/${phaseData.data.projectId}`, {
+              cache: 'no-store',
+              headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+              },
+            });
             const projectData = await projectResponse.json();
             if (projectData.success) {
               setProject(projectData.data);
@@ -136,8 +154,11 @@ export default function SubcontractorDetailPage() {
 
     try {
       const response = await fetch(`/api/subcontractors/${params.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(formData),
       });
 
@@ -162,7 +183,11 @@ export default function SubcontractorDetailPage() {
     setDeleting(true);
     try {
       const response = await fetch(`/api/subcontractors/${params.id}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

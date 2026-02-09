@@ -40,7 +40,13 @@ function SupplierPerformancePageContent() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data.projects || []);
@@ -52,7 +58,13 @@ function SupplierPerformancePageContent() {
 
   const fetchSuppliers = async () => {
     try {
-      const response = await fetch('/api/suppliers?status=active&limit=100');
+      const response = await fetch('/api/suppliers?status=active&limit=100', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setSuppliers(data.data.suppliers || []);
@@ -74,7 +86,13 @@ function SupplierPerformancePageContent() {
         ...(filters.supplierId && { supplierId: filters.supplierId }),
       });
 
-      const response = await fetch(`/api/analytics/supplier-performance?${queryParams}`);
+      const response = await fetch(`/api/analytics/supplier-performance?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

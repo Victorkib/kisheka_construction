@@ -40,7 +40,13 @@ function UsersPageContent() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch('/api/auth/me');
+        const response = await fetch('/api/auth/me', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
         if (data.success) {
           setUser(data.data);
@@ -82,7 +88,13 @@ function UsersPageContent() {
         ...(filters.search && { search: filters.search }),
       });
 
-      const response = await fetch(`/api/users?${queryParams}`);
+      const response = await fetch(`/api/users?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

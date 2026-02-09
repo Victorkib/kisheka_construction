@@ -191,7 +191,13 @@ function PurchaseOrderDetailPageContent() {
       setLoading(true)
       setError(null)
 
-      const response = await fetch(`/api/purchase-orders/${orderId}`)
+      const response = await fetch(`/api/purchase-orders/${orderId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json()
 
       if (!data.success) {
@@ -256,7 +262,13 @@ function PurchaseOrderDetailPageContent() {
 
   const fetchMaterialRequest = async (requestId) => {
     try {
-      const response = await fetch(`/api/material-requests/${requestId}`)
+      const response = await fetch(`/api/material-requests/${requestId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json()
       if (data.success) {
         setLinkedRequest(data.data)
@@ -268,7 +280,13 @@ function PurchaseOrderDetailPageContent() {
 
   const fetchLinkedMaterial = async (materialId) => {
     try {
-      const response = await fetch(`/api/materials/${materialId}`)
+      const response = await fetch(`/api/materials/${materialId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json()
       if (data.success) {
         setLinkedMaterial(data.data)
@@ -282,7 +300,13 @@ function PurchaseOrderDetailPageContent() {
     if (!canAccess("view_financing")) return
 
     try {
-      const response = await fetch(`/api/project-finances?projectId=${projectId}`)
+      const response = await fetch(`/api/project-finances?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json()
       if (data.success) {
         const capital =
@@ -340,13 +364,18 @@ function PurchaseOrderDetailPageContent() {
       }
 
       // Capital validation happens on server, but show loading
-      const response = await fetch(`/api/purchase-orders/${orderId}/accept`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const acceptResponse = await fetch(`/api/purchase-orders/${orderId}/accept`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(payload),
       })
 
-      const data = await response.json()
+      const data = await acceptResponse.json()
 
       if (!data.success) {
         throw new Error(data.error || "Failed to accept purchase order")
@@ -376,13 +405,18 @@ function PurchaseOrderDetailPageContent() {
 
     setIsRejecting(true)
     try {
-      const response = await fetch(`/api/purchase-orders/${orderId}/reject`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const rejectResponse = await fetch(`/api/purchase-orders/${orderId}/reject`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({ supplierNotes: rejectData.supplierNotes.trim() }),
       })
 
-      const data = await response.json()
+      const data = await rejectResponse.json()
 
       if (!data.success) {
         throw new Error(data.error || "Failed to reject purchase order")
@@ -409,16 +443,18 @@ function PurchaseOrderDetailPageContent() {
       if (modifyData.unitCost) supplierModifications.unitCost = Number.parseFloat(modifyData.unitCost)
       if (modifyData.deliveryDate) supplierModifications.deliveryDate = modifyData.deliveryDate
 
-      const response = await fetch(`/api/purchase-orders/${orderId}/modify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          supplierModifications,
-          supplierNotes: modifyData.notes,
-        }),
+      const modifyResponse = await fetch(`/api/purchase-orders/${orderId}/modify`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify(supplierModifications),
       })
 
-      const data = await response.json()
+      const data = await modifyResponse.json()
 
       if (!data.success) {
         throw new Error(data.error || "Failed to modify purchase order")
@@ -455,13 +491,18 @@ function PurchaseOrderDetailPageContent() {
 
     setIsModifying(true) // Use existing loading state
     try {
-      const response = await fetch(`/api/purchase-orders/${orderId}/retry-supplier`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const retrySupplierResponse = await fetch(`/api/purchase-orders/${orderId}/retry-supplier`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(retryData),
       })
 
-      const data = await response.json()
+      const data = await retrySupplierResponse.json()
 
       if (!data.success) {
         throw new Error(data.error || "Failed to retry purchase order")
@@ -520,7 +561,13 @@ function PurchaseOrderDetailPageContent() {
         params.append("search", sanitizedQuery)
       }
 
-      const response = await fetch(`/api/purchase-orders/${orderId}/alternatives?${params.toString()}`)
+      const response = await fetch(`/api/purchase-orders/${orderId}/alternatives?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
 
       // Check if response is ok
       if (!response.ok) {
@@ -800,18 +847,22 @@ function PurchaseOrderDetailPageContent() {
 
       setIsModifying(true)
       try {
-        const response = await fetch(`/api/purchase-orders/${orderId}/alternatives`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const addAlternativeResponse = await fetch(`/api/purchase-orders/${orderId}/alternatives`, {
+          method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
           body: JSON.stringify({
+            ...alternativesData,
+            selectedSuppliers: selectedAlternativeSuppliers,
             materialAssignments: apiMaterialAssignments,
-            notes: alternativesData.notes,
-            communicationChannels: alternativesData.communicationChannels,
-            sendImmediately: alternativesData.sendImmediately,
           }),
         })
 
-        const data = await response.json()
+        const data = await addAlternativeResponse.json()
 
         if (!data.success) {
           throw new Error(data.error || "Failed to send alternative orders")
@@ -904,19 +955,21 @@ function PurchaseOrderDetailPageContent() {
 
       setIsModifying(true)
       try {
-        const response = await fetch(`/api/purchase-orders/${orderId}/alternatives`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+        const updateAlternativeResponse = await fetch(`/api/purchase-orders/${orderId}/alternatives`, {
+          method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
           body: JSON.stringify({
+            ...alternativesData,
             selectedSuppliers: selectedAlternativeSuppliers,
-            adjustments: alternativesData.adjustments,
-            notes: alternativesData.notes,
-            communicationChannels: alternativesData.communicationChannels,
-            sendImmediately: alternativesData.sendImmediately,
           }),
         })
 
-        const data = await response.json()
+        const data = await updateAlternativeResponse.json()
 
         if (!data.success) {
           throw new Error(data.error || "Failed to send alternative orders")
@@ -961,9 +1014,14 @@ function PurchaseOrderDetailPageContent() {
 
     setIsFulfilling(true)
     try {
-      const response = await fetch(`/api/purchase-orders/${orderId}/fulfill`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const fulfillResponse = await fetch(`/api/purchase-orders/${orderId}/fulfill`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           deliveryNoteFileUrl: fulfillData.deliveryNoteFileUrl.trim(),
           actualQuantityDelivered: fulfillData.actualQuantityDelivered
@@ -973,7 +1031,7 @@ function PurchaseOrderDetailPageContent() {
         }),
       })
 
-      const data = await response.json()
+      const data = await fulfillResponse.json()
 
       if (!data.success) {
         throw new Error(data.error || "Failed to fulfill purchase order")
@@ -994,16 +1052,21 @@ function PurchaseOrderDetailPageContent() {
   const handleApproveModification = async () => {
     setIsApprovingModification(true)
     try {
-      const response = await fetch(`/api/purchase-orders/${orderId}/approve-modification`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const approveModificationResponse = await fetch(`/api/purchase-orders/${orderId}/approve-modification`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           approvalNotes: modificationApprovalData.approvalNotes,
           autoCommit: modificationApprovalData.autoCommit,
         }),
       })
 
-      const data = await response.json()
+      const data = await approveModificationResponse.json()
 
       if (!data.success) {
         throw new Error(data.error || "Failed to approve modifications")
@@ -1029,16 +1092,21 @@ function PurchaseOrderDetailPageContent() {
 
     setIsRejectingModification(true)
     try {
-      const response = await fetch(`/api/purchase-orders/${orderId}/reject-modification`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const rejectModificationResponse = await fetch(`/api/purchase-orders/${orderId}/reject-modification`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           rejectionReason: modificationRejectionData.rejectionReason.trim(),
           revertToOriginal: modificationRejectionData.revertToOriginal,
         }),
       })
 
-      const data = await response.json()
+      const data = await rejectModificationResponse.json()
 
       if (!data.success) {
         throw new Error(data.error || "Failed to reject modifications")
@@ -1059,11 +1127,16 @@ function PurchaseOrderDetailPageContent() {
   const handleCreateMaterial = async () => {
     setIsCreatingMaterial(true)
     try {
-      const response = await fetch(`/api/purchase-orders/${orderId}/create-material`, {
-        method: "POST",
+      const createMaterialResponse = await fetch(`/api/purchase-orders/${orderId}/create-material`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
       })
 
-      const data = await response.json()
+      const data = await createMaterialResponse.json()
 
       if (!data.success) {
         throw new Error(data.error || "Failed to create material from purchase order")
@@ -1313,9 +1386,14 @@ function PurchaseOrderDetailPageContent() {
           }))
       }
 
-      const response = await fetch(`/api/purchase-orders/${orderId}/confirm-delivery`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const confirmDeliveryResponse = await fetch(`/api/purchase-orders/${orderId}/confirm-delivery`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           deliveryNoteFileUrl: confirmDeliveryData.deliveryNoteFileUrl.trim(),
           actualQuantityDelivered: confirmDeliveryData.actualQuantityDelivered
@@ -1330,7 +1408,7 @@ function PurchaseOrderDetailPageContent() {
         }),
       })
 
-      const data = await response.json()
+      const data = await confirmDeliveryResponse.json()
 
       if (!data.success) {
         throw new Error(data.error || "Failed to confirm delivery")
@@ -1371,13 +1449,18 @@ function PurchaseOrderDetailPageContent() {
       throw new Error("Order ID and channel are required")
     }
 
-    const response = await fetch(`/api/purchase-orders/${orderId}/retry-communication`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const retryCommunicationResponse = await fetch(`/api/purchase-orders/${orderId}/retry-communication`, {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
       body: JSON.stringify({ channel }),
     })
 
-    const data = await response.json()
+    const data = await retryCommunicationResponse.json()
 
     if (!data.success) {
       throw new Error(data.error || `Failed to retry ${channel} communication`)

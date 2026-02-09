@@ -66,7 +66,13 @@ function EditSupplierPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/suppliers/${supplierId}`);
+      const response = await fetch(`/api/suppliers/${supplierId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -159,10 +165,13 @@ function EditSupplierPageContent() {
     }
 
     try {
-      const response = await fetch(`/api/suppliers/${supplierId}`, {
+      const updateResponse = await fetch(`/api/suppliers/${supplierId}`, {
         method: 'PATCH',
+        cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
         },
         body: JSON.stringify({
           ...formData,
@@ -170,7 +179,7 @@ function EditSupplierPageContent() {
         }),
       });
 
-      const data = await response.json();
+      const data = await updateResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to update supplier');

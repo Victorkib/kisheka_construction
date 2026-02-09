@@ -68,7 +68,13 @@ function ProfessionalServicesLibraryPageContent() {
         sortOrder: filterValues.sortOrder,
       });
 
-      const response = await fetch(`/api/professional-services-library?${queryParams}`);
+      const response = await fetch(`/api/professional-services-library?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -133,7 +139,11 @@ function ProfessionalServicesLibraryPageContent() {
     setActionLoading(true);
     try {
       const response = await fetch(`/api/professional-services-library/${professionalToDelete.id}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -156,8 +166,11 @@ function ProfessionalServicesLibraryPageContent() {
   const handleToggleCommon = async (professionalId, currentValue) => {
     try {
       const response = await fetch(`/api/professional-services-library/${professionalId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ isCommon: !currentValue }),
       });
 
@@ -179,8 +192,11 @@ function ProfessionalServicesLibraryPageContent() {
   const handleToggleActive = async (professionalId, currentValue) => {
     try {
       const response = await fetch(`/api/professional-services-library/${professionalId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ isActive: !currentValue }),
       });
 

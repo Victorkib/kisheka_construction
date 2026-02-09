@@ -44,7 +44,13 @@ export default function NewInitialExpensePage() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -115,7 +121,13 @@ export default function NewInitialExpensePage() {
       const subCategory = categoryToSubCategory[formDataToUse.category] || 'sitePreparation';
 
       // Fetch preconstruction summary
-      const summaryResponse = await fetch(`/api/projects/${formDataToUse.projectId}/preconstruction`);
+      const response = await fetch(`/api/projects/${formDataToUse.projectId}/preconstruction`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const summaryResult = await summaryResponse.json();
 
       if (!summaryResult.success) {
@@ -205,7 +217,12 @@ export default function NewInitialExpensePage() {
     try {
       const response = await fetch('/api/initial-expenses', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           ...formData,
           amount: parseFloat(formData.amount),

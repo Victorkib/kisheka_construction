@@ -91,7 +91,13 @@ export default function ItemDetailPage() {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`/api/materials/${materialId}`);
+      const response = await fetch(`/api/materials/${materialId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -109,7 +115,13 @@ export default function ItemDetailPage() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -123,7 +135,13 @@ export default function ItemDetailPage() {
     if (!material?._id) return;
     setLoadingDiscrepancy(true);
     try {
-      const response = await fetch(`/api/discrepancies/${material._id}`);
+      const response = await fetch(`/api/discrepancies/${material._id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success && data.data.discrepancy) {
         setDiscrepancyRecord(data.data.discrepancy);
@@ -141,7 +159,13 @@ export default function ItemDetailPage() {
   const fetchProjectThresholds = async () => {
     if (!material?.projectId) return;
     try {
-      const response = await fetch(`/api/projects/${material.projectId}/thresholds`);
+      const response = await fetch(`/api/projects/${material.projectId}/thresholds`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjectThresholds(data.data);
@@ -161,8 +185,11 @@ export default function ItemDetailPage() {
     
     try {
       const response = await fetch(`/api/materials/${materialId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ approvalNotes: approvalNotes || 'Approved via UI' }),
       });
 
@@ -203,8 +230,11 @@ export default function ItemDetailPage() {
 
     try {
       const response = await fetch(`/api/materials/${materialId}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ reason: rejectReason }),
       });
 
@@ -241,7 +271,12 @@ export default function ItemDetailPage() {
     try {
       const response = await fetch(`/api/materials/${materialId}/verify-receipt`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           actualQuantityReceived: verifyReceiptData.actualQuantityReceived ? parseFloat(verifyReceiptData.actualQuantityReceived) : undefined,
           notes: verifyReceiptData.notes?.trim() || '',
@@ -275,8 +310,11 @@ export default function ItemDetailPage() {
     setIsSubmitting(true);
     try {
       const response = await fetch(`/api/materials/${materialId}/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -314,7 +352,11 @@ export default function ItemDetailPage() {
     setIsArchiving(true);
     try {
       const response = await fetch(`/api/materials/${materialId}/archive`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -348,7 +390,11 @@ export default function ItemDetailPage() {
     setIsRestoring(true);
     try {
       const response = await fetch(`/api/materials/${materialId}/restore`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -373,7 +419,11 @@ export default function ItemDetailPage() {
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/materials/${materialId}?force=true`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -446,7 +496,12 @@ export default function ItemDetailPage() {
 
       const response = await fetch(`/api/materials/${materialId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(updateData),
       });
 

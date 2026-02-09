@@ -46,7 +46,13 @@ function PhaseBudgetPageContent() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -63,7 +69,13 @@ function PhaseBudgetPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/phases/${phaseId}?includeFinancials=true`);
+      const response = await fetch(`/api/phases/${phaseId}?includeFinancials=true`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -85,7 +97,13 @@ function PhaseBudgetPageContent() {
 
       // Fetch project for context
       if (phaseData.projectId) {
-        const projectResponse = await fetch(`/api/projects/${phaseData.projectId}`);
+        const response = await fetch(`/api/projects/${phaseData.projectId}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const projectData = await projectResponse.json();
         if (projectData.success) {
           setProject(projectData.data);
@@ -127,10 +145,11 @@ function PhaseBudgetPageContent() {
 
     try {
       const response = await fetch(`/api/phases/${phaseId}/budget`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(formData),
       });
 

@@ -53,7 +53,13 @@ function EditProfessionalServicePageContent() {
       setError(null);
 
       // Fetch assignment
-      const assignmentResponse = await fetch(`/api/professional-services/${assignmentId}`);
+      const response = await fetch(`/api/professional-services/${assignmentId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const assignmentData = await assignmentResponse.json();
       if (!assignmentData.success) {
         throw new Error(assignmentData.error || 'Failed to fetch assignment');
@@ -61,21 +67,39 @@ function EditProfessionalServicePageContent() {
       setAssignment(assignmentData.data);
 
       // Fetch professionals
-      const professionalsResponse = await fetch('/api/professional-services-library?isActive=true');
+      const professionalsResponse = await fetch('/api/professional-services-library?isActive=true', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const professionalsData = await professionalsResponse.json();
       if (professionalsData.success) {
         setProfessionals(professionalsData.data.professionals || []);
       }
 
       // Fetch projects
-      const projectsResponse = await fetch('/api/projects');
+      const projectsResponse = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const projectsData = await projectsResponse.json();
       if (projectsData.success) {
         setProjects(projectsData.data || []);
       }
 
       // Fetch phases
-      const phasesResponse = await fetch('/api/phases');
+      const phasesResponse = await fetch('/api/phases', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const phasesData = await phasesResponse.json();
       if (phasesData.success) {
         setPhases(phasesData.data || []);
@@ -94,10 +118,11 @@ function EditProfessionalServicePageContent() {
 
     try {
       const response = await fetch(`/api/professional-services/${assignmentId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(formData),
       });
 

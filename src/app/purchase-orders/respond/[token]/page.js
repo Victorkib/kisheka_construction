@@ -57,7 +57,13 @@ function PurchaseOrderResponsePageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/purchase-orders/respond/${token}`);
+      const response = await fetch(`/api/purchase-orders/respond/${token}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -145,19 +151,27 @@ function PurchaseOrderResponsePageContent() {
         return;
       }
 
-      const response = await fetch(`/api/purchase-orders/${purchaseOrder._id}/respond`, {
+      const respondResponse = await fetch(`/api/purchase-orders/${purchaseOrder._id}/respond`, {
         method: 'POST',
+        cache: 'no-store',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
         },
         body: JSON.stringify({
           action,
-          token,
-          ...formData
-        })
+          finalUnitCost: formData.finalUnitCost ? parseFloat(formData.finalUnitCost) : null,
+          quantityOrdered: formData.quantityOrdered ? parseFloat(formData.quantityOrdered) : null,
+          deliveryDate: formData.deliveryDate || null,
+          supplierNotes: formData.supplierNotes || null,
+          notes: formData.notes || null,
+          rejectionReason: formData.rejectionReason || null,
+          rejectionSubcategory: formData.rejectionSubcategory || null,
+        }),
       });
 
-      const data = await response.json();
+      const data = await respondResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to process response');
@@ -197,7 +211,13 @@ function PurchaseOrderResponsePageContent() {
     setError(null);
 
     try {
-      const response = await fetch(`/api/purchase-orders/${purchaseOrder._id}/download?token=${token}`);
+      const response = await fetch(`/api/purchase-orders/${purchaseOrder._id}/download?token=${token}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
@@ -568,15 +588,18 @@ function PurchaseOrderResponsePageContent() {
                   setSubmitting(true);
                   setError(null);
 
-                  const response = await fetch(`/api/purchase-orders/${purchaseOrder._id}/respond`, {
+                  const bulkRespondResponse = await fetch(`/api/purchase-orders/${purchaseOrder._id}/respond`, {
                     method: 'POST',
+                    cache: 'no-store',
                     headers: {
-                      'Content-Type': 'application/json'
+                      'Content-Type': 'application/json',
+                      'Cache-Control': 'no-cache, no-store, must-revalidate',
+                      'Pragma': 'no-cache',
                     },
                     body: JSON.stringify(payload)
                   });
 
-                  const data = await response.json();
+                  const data = await bulkRespondResponse.json();
 
                   if (!data.success) {
                     throw new Error(data.error || 'Failed to process response');

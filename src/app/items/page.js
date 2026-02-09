@@ -78,7 +78,13 @@ function ItemsPageContent() {
     }
     setLoadingPhases(true);
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -109,7 +115,13 @@ function ItemsPageContent() {
         ...(filters.search && { search: filters.search }),
       });
 
-      const response = await fetch(`/api/materials?${queryParams}`);
+      const response = await fetch(`/api/materials?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -282,8 +294,11 @@ function ItemsPageContent() {
       for (const materialId of selectedMaterials) {
         try {
           const response = await fetch(`/api/materials/${materialId}/approve`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+              cache: 'no-store',
+              headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+              },
             body: JSON.stringify({ notes: approvalNotes }),
           });
 
@@ -338,8 +353,11 @@ function ItemsPageContent() {
       for (const materialId of selectedMaterials) {
         try {
           const response = await fetch(`/api/materials/${materialId}/reject`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+              cache: 'no-store',
+              headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+              },
             body: JSON.stringify({ reason: rejectReason }),
           });
 
@@ -389,8 +407,11 @@ function ItemsPageContent() {
       for (const materialId of selectedMaterials) {
         try {
           const response = await fetch(`/api/materials/${materialId}/submit`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+              cache: 'no-store',
+              headers: {
+                'Cache-Control': 'no-cache, no-store, must-revalidate',
+                'Pragma': 'no-cache',
+              },
           });
 
           const data = await response.json();
@@ -431,8 +452,11 @@ function ItemsPageContent() {
     setShowSubmitModal(false);
     try {
       const response = await fetch(`/api/materials/${submitMaterialId}/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

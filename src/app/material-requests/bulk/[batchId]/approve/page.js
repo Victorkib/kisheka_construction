@@ -48,7 +48,13 @@ function BatchApprovalPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/material-requests/bulk/${params.batchId}`);
+      const response = await fetch(`/api/material-requests/bulk/${params.batchId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -66,7 +72,13 @@ function BatchApprovalPageContent() {
 
   const fetchAvailableCapital = async (projectId) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}/financial-overview`);
+      const response = await fetch(`/api/projects/${projectId}/financial-overview`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success && data.data) {
         setAvailableCapital(data.data.capitalBalance || 0);
@@ -81,8 +93,11 @@ function BatchApprovalPageContent() {
       setActionLoading(true);
 
       const response = await fetch(`/api/material-requests/${requestId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ approvalNotes: notes }),
       });
 
@@ -106,8 +121,11 @@ function BatchApprovalPageContent() {
       setActionLoading(true);
 
       const response = await fetch(`/api/material-requests/${requestId}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ rejectionReason: reason }),
       });
 
@@ -130,17 +148,18 @@ function BatchApprovalPageContent() {
     try {
       setActionLoading(true);
 
-      const response = await fetch(`/api/material-requests/bulk/${params.batchId}/approve`, {
+      const approveResponse = await fetch(`/api/material-requests/bulk/${params.batchId}/approve`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          approveAll: false,
-          materialRequestIds: requestIds,
-          approvalNotes: notes,
-        }),
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({ requestIds, notes }),
       });
 
-      const data = await response.json();
+      const data = await approveResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to approve requests');
@@ -169,17 +188,18 @@ function BatchApprovalPageContent() {
     try {
       setActionLoading(true);
 
-      const response = await fetch(`/api/material-requests/bulk/${params.batchId}/reject`, {
+      const rejectResponse = await fetch(`/api/material-requests/bulk/${params.batchId}/reject`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rejectAll: false,
-          materialRequestIds: requestIds,
-          rejectionReason: reason,
-        }),
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({ requestIds, reason }),
       });
 
-      const data = await response.json();
+      const data = await rejectResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to reject requests');

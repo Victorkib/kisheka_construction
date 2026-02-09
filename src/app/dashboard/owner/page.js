@@ -13,6 +13,7 @@ import { LoadingSpinner, LoadingCard } from '@/components/loading';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState, ErrorState } from '@/components/empty-states';
+import { fetchNoCache } from '@/lib/fetch-helpers';
 
 export default function OwnerDashboard() {
   const { currentProject, accessibleProjects, switchProject, isEmpty } =
@@ -35,7 +36,7 @@ export default function OwnerDashboard() {
       // This ensures user is available for empty state display
       try {
         setUserError(null);
-        const userResponse = await fetch('/api/auth/me');
+        const userResponse = await fetchNoCache('/api/auth/me');
         const userData = await userResponse.json();
 
         if (!userData.success) {
@@ -57,9 +58,9 @@ export default function OwnerDashboard() {
 
         const [summaryResponse, wastageResponse, readyToOrderResponse] =
           await Promise.all([
-            fetch(`/api/dashboard/summary${projectIdParam}`),
-            fetch(`/api/discrepancies/widget-summary${projectIdParam}`),
-            fetch(
+            fetchNoCache(`/api/dashboard/summary${projectIdParam}`),
+            fetchNoCache(`/api/discrepancies/widget-summary${projectIdParam}`),
+            fetchNoCache(
               `/api/material-requests?status=ready_to_order&limit=0${projectId ? `&projectId=${projectId}` : ''}`,
             ),
           ]);
@@ -106,7 +107,7 @@ export default function OwnerDashboard() {
   const fetchPhaseOverview = async (projectId) => {
     setLoadingPhaseOverview(true);
     try {
-      const response = await fetch(
+      const response = await fetchNoCache(
         `/api/projects/${projectId}/phase-financial-overview`,
       );
       const data = await response.json();

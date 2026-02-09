@@ -53,7 +53,13 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
   const fetchExpenses = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/expenses?phaseId=${phase._id}`);
+      const response = await fetch(`/api/expenses?phaseId=${phase._id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setExpenses(data.data?.expenses || data.data || []);

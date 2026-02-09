@@ -16,6 +16,7 @@ import { LoadingSpinner, LoadingCard, LoadingButton } from '@/components/loading
 import { StatementGenerator } from '@/components/investors/statement-generator';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { NoProjectsEmptyState, NoDataEmptyState } from '@/components/empty-states';
+import { fetchNoCache } from '@/lib/fetch-helpers';
 
 export default function InvestorDashboardPage() {
   const router = useRouter();
@@ -46,7 +47,7 @@ export default function InvestorDashboardPage() {
       setError(null);
       
       // Fetch investor data - API will automatically filter by userId for INVESTOR role
-      const response = await fetch('/api/investors?status=ACTIVE');
+      const response = await fetchNoCache('/api/investors?status=ACTIVE');
       const data = await response.json();
 
       if (data.success && data.data.length > 0) {
@@ -71,7 +72,7 @@ export default function InvestorDashboardPage() {
       setFinancesLoading(true);
       
       // Fetch aggregate finances for total view
-      const response = await fetch('/api/project-finances');
+      const response = await fetchNoCache('/api/project-finances');
       const data = await response.json();
 
       if (data.success) {
@@ -88,7 +89,7 @@ export default function InvestorDashboardPage() {
           if (allocation.projectId) {
             try {
               // Get project-specific finances (real-time)
-              const projectFinancesResponse = await fetch(`/api/project-finances?projectId=${allocation.projectId}`);
+              const projectFinancesResponse = await fetchNoCache(`/api/project-finances?projectId=${allocation.projectId}`);
               const projectFinancesData = await projectFinancesResponse.json();
 
               if (projectFinancesData.success) {
@@ -104,7 +105,7 @@ export default function InvestorDashboardPage() {
                   totalUsed += projectCapitalUsed;
 
                   // Get project name
-                  const projectResponse = await fetch(`/api/projects/${allocation.projectId}`);
+                  const projectResponse = await fetchNoCache(`/api/projects/${allocation.projectId}`);
                   const projectData = await projectResponse.json();
                   const projectName = projectData.success ? projectData.data.projectName : 'Unknown Project';
 

@@ -39,7 +39,13 @@ function BulkOrderAnalyticsPageContent() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data.projects || []);
@@ -61,7 +67,13 @@ function BulkOrderAnalyticsPageContent() {
         groupBy: filters.groupBy,
       });
 
-      const response = await fetch(`/api/analytics/bulk-orders?${queryParams}`);
+      const response = await fetch(`/api/analytics/bulk-orders?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

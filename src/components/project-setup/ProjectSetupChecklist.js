@@ -35,7 +35,13 @@ export function ProjectSetupChecklist({ projectId }) {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(`/api/projects/${projectId}/prerequisites`);
+      const response = await fetch(`/api/projects/${projectId}/prerequisites`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
       
       if (result.success) {
@@ -98,11 +104,16 @@ export function ProjectSetupChecklist({ projectId }) {
       setInitializingFloors(true);
       const response = await fetch(`/api/projects/${projectId}/floors/initialize`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          floorCount,
-          includeBasements,
-          basementCount: includeBasements ? basementCount : 0,
+          floorCount: floorInitForm.floorCount,
+          includeBasements: floorInitForm.includeBasements,
+          basementCount: floorInitForm.basementCount,
         }),
       });
       const result = await response.json();

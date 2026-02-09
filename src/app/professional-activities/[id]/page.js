@@ -65,7 +65,13 @@ function ProfessionalActivityDetailPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/professional-activities/${activityId}`);
+      const response = await fetch(`/api/professional-activities/${activityId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -90,8 +96,11 @@ function ProfessionalActivityDetailPageContent() {
     setIsApproving(true);
     try {
       const response = await fetch(`/api/professional-activities/${activityId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ approvalNotes: approvalNotes || 'Approved via UI' }),
       });
 
@@ -127,8 +136,11 @@ function ProfessionalActivityDetailPageContent() {
     setIsRejecting(true);
     try {
       const response = await fetch(`/api/professional-activities/${activityId}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ rejectionReason: rejectionReason.trim() }),
       });
 
@@ -158,7 +170,11 @@ function ProfessionalActivityDetailPageContent() {
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/professional-activities/${activityId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

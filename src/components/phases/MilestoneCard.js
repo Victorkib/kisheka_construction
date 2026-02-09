@@ -35,15 +35,26 @@ export function MilestoneCard({ milestone, canEdit, onEdit, onDelete, formatDate
 
     try {
       // Get current user ID
-      const userResponse = await fetch('/api/auth/me');
+      const userResponse = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const userData = await userResponse.json();
       if (!userData.success || !userData.data?._id) {
         throw new Error('Unable to get current user');
       }
 
-      const response = await fetch(`/api/phases/${milestone.phaseId}/milestones/${milestone.milestoneId}`, {
+      const signOffResponse = await fetch(`/api/phases/${milestone.phaseId}/milestones/${milestone.milestoneId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           actualDate: new Date().toISOString(),
           signOffBy: userData.data._id,
@@ -52,7 +63,7 @@ export function MilestoneCard({ milestone, canEdit, onEdit, onDelete, formatDate
         }),
       });
 
-      const data = await response.json();
+      const data = await signOffResponse.json();
       if (!data.success) {
         throw new Error(data.error || 'Failed to sign off milestone');
       }

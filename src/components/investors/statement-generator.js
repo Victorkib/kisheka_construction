@@ -53,7 +53,13 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
         ...(endDate && { endDate }),
       });
 
-      const response = await fetch(`/api/investors/${investorId}/statements?${queryParams}`);
+      const response = await fetch(`/api/investors/${investorId}/statements?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -81,7 +87,13 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
         ...(endDate && { endDate }),
       });
 
-      const response = await fetch(`/api/investors/${investorId}/statements?${queryParams}`);
+      const response = await fetch(`/api/investors/${investorId}/statements?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));

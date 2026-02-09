@@ -32,7 +32,13 @@ export function FloorsTab({ phase, formatCurrency }) {
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/phases/${phase._id}/floors`);
+        const response = await fetch(`/api/phases/${phase._id}/floors`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const result = await response.json();
         if (!result.success) {
           throw new Error(result.error || 'Failed to fetch floor breakdown');

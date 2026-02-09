@@ -99,7 +99,13 @@ function ProfessionalActivitiesPageContent() {
         sortOrder: filterValues.sortOrder,
       });
 
-      const response = await fetch(`/api/professional-activities?${queryParams}`);
+      const response = await fetch(`/api/professional-activities?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -146,7 +152,13 @@ function ProfessionalActivitiesPageContent() {
 
   const fetchAssignments = async () => {
     try {
-      const response = await fetch('/api/professional-services?status=active');
+      const response = await fetch('/api/professional-services?status=active', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setAssignments(data.data.assignments || []);
@@ -195,8 +207,11 @@ function ProfessionalActivitiesPageContent() {
     setShowApproveModal(false);
     try {
       const response = await fetch(`/api/professional-activities/${selectedActivityId}/approve`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ approvalNotes }),
       });
 
@@ -232,8 +247,11 @@ function ProfessionalActivitiesPageContent() {
     setShowRejectModal(false);
     try {
       const response = await fetch(`/api/professional-activities/${selectedActivityId}/reject`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify({ rejectionReason }),
       });
 

@@ -33,7 +33,13 @@ export default function FinancialReportPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/phases/${params.id}/reports/financial`);
+      const response = await fetch(`/api/phases/${params.id}/reports/financial`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

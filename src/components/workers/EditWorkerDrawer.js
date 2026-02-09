@@ -99,7 +99,13 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/labour/workers/${workerId}`);
+      const response = await fetch(`/api/labour/workers/${workerId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -157,9 +163,14 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
     setError(null);
 
     try {
-      const response = await fetch(`/api/labour/workers/${workerId}`, {
+      const updateResponse = await fetch(`/api/labour/workers/${workerId}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           ...formData,
           defaultHourlyRate: parseFloat(formData.defaultHourlyRate) || 0,
@@ -167,7 +178,7 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
         }),
       });
 
-      const data = await response.json();
+      const data = await updateResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to update worker');

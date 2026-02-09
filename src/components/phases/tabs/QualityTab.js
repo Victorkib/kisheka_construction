@@ -33,7 +33,13 @@ export function QualityTab({ phase, canEdit, formatDate }) {
   const fetchCheckpoints = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/phases/${phase._id}/quality-checkpoints`);
+      const response = await fetch(`/api/phases/${phase._id}/quality-checkpoints`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setCheckpoints(data.data || []);
@@ -109,7 +115,11 @@ export function QualityTab({ phase, canEdit, formatDate }) {
 
     try {
       const response = await fetch(`/api/phases/${phase._id}/quality-checkpoints/${checkpoint.checkpointId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

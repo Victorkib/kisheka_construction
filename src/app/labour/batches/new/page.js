@@ -83,7 +83,13 @@ function BulkLabourEntryPageContent() {
 
       // If projectId and phaseId not provided, fetch work item to get them
       if (!projectIdFromUrl || !defaultPhaseIdFromUrl) {
-        fetch(`/api/work-items/${workItemIdFromUrl}`)
+        fetch(`/api/work-items/${workItemIdFromUrl}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        })
           .then((res) => res.json())
           .then((data) => {
             if (data.success && data.data) {
@@ -269,18 +275,22 @@ function BulkLabourEntryPageContent() {
     try {
       const response = await fetch('/api/labour/batches', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           projectId: wizardData.projectId,
-          batchName: wizardData.batchName || null,
-          defaultPhaseId: wizardData.defaultPhaseId || null,
-          defaultFloorId: wizardData.defaultFloorId || null,
-          defaultCategoryId: wizardData.defaultCategoryId || null,
+          batchName: wizardData.batchName,
+          defaultPhaseId: wizardData.defaultPhaseId,
+          defaultFloorId: wizardData.defaultFloorId,
+          defaultCategoryId: wizardData.defaultCategoryId,
           defaultDate: wizardData.defaultDate,
-          entryType: wizardData.entryType,
           defaultWorkerRole: wizardData.defaultWorkerRole,
-          isIndirectLabour: wizardData.isIndirectLabour || false,
-          indirectCostCategory: wizardData.indirectCostCategory || null,
+          isIndirectLabour: wizardData.isIndirectLabour,
+          indirectCostCategory: wizardData.indirectCostCategory || 'siteOverhead',
           labourEntries: wizardData.labourEntries.map((entry) => {
             // Remove calculated fields - let schema calculate them
             const {
@@ -548,7 +558,13 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
   const fetchProjects = async () => {
     setLoadingProjects(true);
     try {
-      const response = await fetch('/api/projects/accessible');
+      const response = await fetch('/api/projects/accessible', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -563,7 +579,13 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
   const fetchPhases = async (projectId) => {
     setLoadingPhases(true);
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -578,7 +600,13 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
   const fetchFloors = async (projectId) => {
     setLoadingFloors(true);
     try {
-      const response = await fetch(`/api/floors?projectId=${projectId}`);
+      const response = await fetch(`/api/floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setFloors(data.data || []);
@@ -592,7 +620,13 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories?type=work_items');
+      const response = await fetch('/api/categories?type=work_items', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);

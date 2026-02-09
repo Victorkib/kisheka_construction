@@ -32,7 +32,13 @@ export default function InviteUserPage() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch('/api/auth/me');
+        const response = await fetch('/api/auth/me', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
         if (data.success) {
           setUser(data.data);
@@ -81,13 +87,13 @@ export default function InviteUserPage() {
     try {
       const response = await fetch('/api/users/invite', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          role: formData.role,
-          firstName: formData.firstName || undefined,
-          lastName: formData.lastName || undefined,
-        }),
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();

@@ -71,7 +71,13 @@ function NewSubcontractorPageContent() {
     try {
       setLoadingProjects(true);
       // Use /api/projects/accessible to respect project-based organization and user memberships
-      const response = await fetch('/api/projects/accessible');
+      const response = await fetch('/api/projects/accessible', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         // API returns projects array directly in data.data
@@ -98,7 +104,13 @@ function NewSubcontractorPageContent() {
   const fetchPhases = async (projectId) => {
     try {
       setLoadingPhases(true);
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         // API returns phases array directly in data.data
@@ -181,8 +193,11 @@ function NewSubcontractorPageContent() {
       }
 
       const response = await fetch('/api/subcontractors', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(formData),
       });
 

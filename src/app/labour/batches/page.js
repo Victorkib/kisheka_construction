@@ -83,7 +83,13 @@ function LabourBatchesPageContent() {
       params.append('page', pagination.page.toString());
       params.append('limit', pagination.limit.toString());
 
-      const response = await fetch(`/api/labour/batches?${params.toString()}`);
+      const response = await fetch(`/api/labour/batches?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

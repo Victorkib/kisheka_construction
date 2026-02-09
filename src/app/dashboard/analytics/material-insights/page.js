@@ -41,7 +41,13 @@ function MaterialInsightsPageContent() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data.projects || []);
@@ -65,7 +71,13 @@ function MaterialInsightsPageContent() {
           groupBy: filters.groupBy,
         });
 
-        const response = await fetch(`/api/analytics/material-cost-trends?${queryParams}`);
+        const response = await fetch(`/api/analytics/material-cost-trends?${queryParams}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
 
         if (!data.success) {
@@ -80,7 +92,13 @@ function MaterialInsightsPageContent() {
           ...(filters.endDate && { endDate: filters.endDate }),
         });
 
-        const response = await fetch(`/api/analytics/material-usage-patterns?${queryParams}`);
+        const response = await fetch(`/api/analytics/material-usage-patterns?${queryParams}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
 
         if (!data.success) {

@@ -23,7 +23,13 @@ export function ForecastDisplay({ projectId }) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/projects/${projectId}/forecast`);
+      const response = await fetch(`/api/projects/${projectId}/forecast`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const result = await response.json();
 
       if (!result.success) {

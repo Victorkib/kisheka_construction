@@ -100,7 +100,13 @@ function SupervisorSubmissionReviewPageContent() {
   const fetchSubmission = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/labour/supervisor-submissions/${params.id}`);
+      const response = await fetch(`/api/labour/supervisor-submissions/${params.id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setSubmission(data.data);
@@ -125,7 +131,13 @@ function SupervisorSubmissionReviewPageContent() {
       if (phaseId) {
         params.set('phaseId', phaseId.toString());
       }
-      const response = await fetch(`/api/work-items?${params.toString()}`);
+      const response = await fetch(`/api/work-items?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setWorkItems(data.data?.workItems || []);
@@ -164,16 +176,24 @@ function SupervisorSubmissionReviewPageContent() {
 
   const handleSaveEdits = async () => {
     try {
-      const response = await fetch(`/api/labour/supervisor-submissions/${params.id}`, {
+      const saveResponse = await fetch(`/api/labour/supervisor-submissions/${params.id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          labourEntries: editedEntries,
-          workItemId: selectedWorkItemId || null,
+          labourEntries: editedEntries.map(entry => ({
+            ...entry,
+            hours: parseFloat(entry.hours || entry.totalHours) || 0,
+            hourlyRate: parseFloat(entry.hourlyRate) || 0,
+          })),
         }),
       });
 
-      const data = await response.json();
+      const data = await saveResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to save edits');
@@ -194,15 +214,18 @@ function SupervisorSubmissionReviewPageContent() {
 
     setApproving(true);
     try {
-      const response = await fetch(`/api/labour/supervisor-submissions/${params.id}/approve`, {
+      const approveResponse = await fetch(`/api/labour/supervisor-submissions/${params.id}/approve`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          notes: 'Approved from supervisor submission',
-        }),
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({}),
       });
 
-      const data = await response.json();
+      const data = await approveResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to approve submission');
@@ -229,15 +252,18 @@ function SupervisorSubmissionReviewPageContent() {
 
     setRejecting(true);
     try {
-      const response = await fetch(`/api/labour/supervisor-submissions/${params.id}/reject`, {
+      const rejectResponse = await fetch(`/api/labour/supervisor-submissions/${params.id}/reject`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rejectionReason: rejectionReason.trim(),
-        }),
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({ rejectionReason: rejectionReason.trim() }),
       });
 
-      const data = await response.json();
+      const data = await rejectResponse.json();
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to reject submission');

@@ -157,7 +157,13 @@ function NewMaterialRequestPageContent() {
   const fetchProjects = async () => {
     setLoadingProjects(true);
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -184,7 +190,13 @@ function NewMaterialRequestPageContent() {
     }
     setLoadingFloors(true);
     try {
-      const response = await fetch(`/api/floors?projectId=${projectId}`);
+      const response = await fetch(`/api/floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setFloors(data.data || []);
@@ -206,7 +218,13 @@ function NewMaterialRequestPageContent() {
     }
     setLoadingPhases(true);
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -233,7 +251,13 @@ function NewMaterialRequestPageContent() {
   const fetchCategories = async () => {
     setLoadingCategories(true);
     try {
-      const response = await fetch('/api/categories');
+      const response = await fetch('/api/categories', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
@@ -250,7 +274,13 @@ function NewMaterialRequestPageContent() {
 
   const fetchMaterialDetails = async (materialId) => {
     try {
-      const response = await fetch(`/api/materials/${materialId}`);
+      const response = await fetch(`/api/materials/${materialId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success && data.data) {
         const material = data.data;
@@ -289,7 +319,13 @@ function NewMaterialRequestPageContent() {
 
     try {
       setLoadingCapital(true);
-      const response = await fetch(`/api/project-finances?projectId=${projectId}`);
+      const response = await fetch(`/api/project-finances?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setAvailableCapital(data.data.availableCapital || data.data.capitalBalance || 0);
@@ -309,7 +345,13 @@ function NewMaterialRequestPageContent() {
 
     try {
       setLoadingPrerequisites(true);
-      const response = await fetch(`/api/projects/${projectId}/prerequisites`);
+      const response = await fetch(`/api/projects/${projectId}/prerequisites`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPrerequisites(data.data);
@@ -450,8 +492,11 @@ function NewMaterialRequestPageContent() {
       };
 
       const response = await fetch('/api/material-requests', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(payload),
       });
 

@@ -36,7 +36,13 @@ function ArchivedMaterialsPageContent() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me');
+      const response = await fetch('/api/auth/me', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         const role = data.data.role?.toLowerCase();
@@ -52,7 +58,13 @@ function ArchivedMaterialsPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch('/api/materials?archived=true');
+      const response = await fetch('/api/materials?archived=true', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -79,7 +91,11 @@ function ArchivedMaterialsPageContent() {
     setRestoring(true);
     try {
       const response = await fetch(`/api/materials/${selectedMaterial._id}/restore`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -111,7 +127,11 @@ function ArchivedMaterialsPageContent() {
     setDeleting(true);
     try {
       const response = await fetch(`/api/materials/${selectedMaterial._id}?force=true`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

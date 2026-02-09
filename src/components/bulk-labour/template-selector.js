@@ -21,7 +21,13 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
   const fetchTemplates = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/labour/templates?limit=50');
+      const response = await fetch('/api/labour/templates?limit=50', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setTemplates(data.data?.templates || []);
@@ -40,13 +46,16 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
       // Apply template with current project/phase context
       const response = await fetch(`/api/labour/templates/${template._id}/apply`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          overrides: {
-            projectId: currentProjectId,
-            phaseId: currentPhaseId,
-            entryDate: new Date().toISOString().split('T')[0],
-          },
+          projectId: currentProjectId,
+          phaseId: currentPhaseId,
+          entryDate: new Date().toISOString().split('T')[0],
           workerMap: {}, // Will be filled by user if needed
         }),
       });

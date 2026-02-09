@@ -78,7 +78,13 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
       }
       setError(null);
 
-      const response = await fetch(`/api/labour/workers/${workerId}`);
+      const response = await fetch(`/api/labour/workers/${workerId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

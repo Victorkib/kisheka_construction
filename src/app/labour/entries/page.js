@@ -124,7 +124,13 @@ function LabourEntriesPageContent() {
     if (!projectId) return;
     setLoadingPhases(true);
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -139,7 +145,13 @@ function LabourEntriesPageContent() {
   const fetchWorkers = async () => {
     setLoadingWorkers(true);
     try {
-      const response = await fetch('/api/labour/workers?status=active&limit=100');
+      const response = await fetch('/api/labour/workers?status=active&limit=100', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setWorkers(data.data?.workers || []);
@@ -155,7 +167,13 @@ function LabourEntriesPageContent() {
     if (!projectId || !phaseId) return;
     setLoadingWorkItems(true);
     try {
-      const response = await fetch(`/api/work-items?projectId=${projectId}&phaseId=${phaseId}`);
+      const response = await fetch(`/api/work-items?projectId=${projectId}&phaseId=${phaseId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setWorkItems(data.data?.workItems || data.data || []);
@@ -191,7 +209,13 @@ function LabourEntriesPageContent() {
         ...(filters.search && { search: filters.search }),
       });
 
-      const response = await fetch(`/api/labour/entries?${queryParams}`);
+      const response = await fetch(`/api/labour/entries?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -260,7 +284,11 @@ function LabourEntriesPageContent() {
     setDeletingId(entryId);
     try {
       const response = await fetch(`/api/labour/entries/${entryId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -285,7 +313,11 @@ function LabourEntriesPageContent() {
     setApprovingId(entryId);
     try {
       const response = await fetch(`/api/labour/entries/${entryId}/approve`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

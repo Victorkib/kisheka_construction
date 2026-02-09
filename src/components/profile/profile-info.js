@@ -61,7 +61,12 @@ export function ProfileInfo({ user, onUpdate }) {
     try {
       const response = await fetch('/api/profile', {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),

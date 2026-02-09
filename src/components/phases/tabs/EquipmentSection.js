@@ -22,7 +22,13 @@ export function EquipmentSection({ phase, formatCurrency }) {
   const fetchEquipment = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/equipment?phaseId=${phase._id}`);
+      const response = await fetch(`/api/equipment?phaseId=${phase._id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setEquipment(data.data?.equipment || data.data || []);

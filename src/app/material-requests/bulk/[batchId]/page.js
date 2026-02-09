@@ -53,7 +53,13 @@ function BatchDetailPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/material-requests/bulk/${params.batchId}`);
+      const response = await fetch(`/api/material-requests/bulk/${params.batchId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -71,7 +77,13 @@ function BatchDetailPageContent() {
 
   const fetchProject = async (projectId) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}`);
+      const response = await fetch(`/api/projects/${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProject(data.data);
@@ -85,7 +97,13 @@ function BatchDetailPageContent() {
     try {
       setFinanceLoading(true);
       setFinanceError(null);
-      const response = await fetch(`/api/project-finances?projectId=${projectId}`);
+      const response = await fetch(`/api/project-finances?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (!data.success) {
         throw new Error(data.error || 'Failed to fetch project finances');
@@ -103,7 +121,11 @@ function BatchDetailPageContent() {
       setActionLoading(true);
 
       const response = await fetch(`/api/material-requests/bulk/${params.batchId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

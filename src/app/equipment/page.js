@@ -18,6 +18,7 @@ import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState } from '@/components/empty-states';
 import { PhaseFilter } from '@/components/filters/PhaseFilter';
 import { EQUIPMENT_TYPES, EQUIPMENT_STATUSES, ACQUISITION_TYPES } from '@/lib/constants/equipment-constants';
+import { fetchNoCache } from '@/lib/fetch-helpers';
 
 function EquipmentPageContent() {
   const router = useRouter();
@@ -74,7 +75,7 @@ function EquipmentPageContent() {
         ...(filters.acquisitionType && { acquisitionType: filters.acquisitionType }),
       });
 
-      const response = await fetch(`/api/equipment?${queryParams}`);
+      const response = await fetchNoCache(`/api/equipment?${queryParams}`);
       const data = await response.json();
 
       if (!data.success) {

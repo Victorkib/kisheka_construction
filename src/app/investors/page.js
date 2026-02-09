@@ -68,7 +68,13 @@ function InvestorsPageContent() {
         ...(filters.search && { search: filters.search }),
       });
 
-      const response = await fetch(`/api/investors?${queryParams}`);
+      const response = await fetch(`/api/investors?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

@@ -76,7 +76,13 @@ export function MobileNav({ isOpen, onClose }) {
   // Fetch pending approvals count
   useEffect(() => {
     if (user && ['owner', 'pm', 'project_manager', 'accountant'].includes(user.role?.toLowerCase())) {
-      fetch('/api/dashboard/summary')
+      fetch('/api/dashboard/summary', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      })
         .then((res) => res.json())
         .then((data) => {
           if (data.success && data.data?.summary?.totalPendingApprovals) {

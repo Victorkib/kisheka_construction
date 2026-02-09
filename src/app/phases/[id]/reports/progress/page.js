@@ -33,7 +33,13 @@ export default function ProgressReportPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/phases/${params.id}/reports/progress`);
+      const response = await fetch(`/api/phases/${params.id}/reports/progress`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

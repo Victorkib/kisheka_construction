@@ -54,7 +54,13 @@ export function DocumentsTab({ phase, canEdit }) {
     
     try {
       setLoading(true);
-      const response = await fetch(`/api/phases/${phase._id}/documents`);
+      const response = await fetch(`/api/phases/${phase._id}/documents`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       
       if (data.success) {
@@ -175,8 +181,11 @@ export function DocumentsTab({ phase, canEdit }) {
 
   const addDocumentToPhase = async (documentData) => {
     const response = await fetch(`/api/phases/${phase._id}/documents`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
       body: JSON.stringify(documentData)
     });
 
@@ -265,7 +274,11 @@ export function DocumentsTab({ phase, canEdit }) {
 
     try {
       const response = await fetch(`/api/phases/${phase._id}/documents/${documentId}`, {
-        method: 'DELETE'
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -284,8 +297,11 @@ export function DocumentsTab({ phase, canEdit }) {
   const handleUpdate = async (documentId, updates) => {
     try {
       const response = await fetch(`/api/phases/${phase._id}/documents/${documentId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(updates)
       });
 

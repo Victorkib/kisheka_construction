@@ -41,7 +41,13 @@ export function MultiWorkerSelector({
         queryParams.append('projectId', projectId);
       }
       
-      const response = await fetch(`/api/labour/workers?${queryParams}`);
+      const response = await fetch(`/api/labour/workers?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       
       if (data.success) {

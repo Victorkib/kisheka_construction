@@ -44,7 +44,13 @@ function EditProfessionalFeePageContent() {
       setError(null);
 
       // Fetch fee
-      const feeResponse = await fetch(`/api/professional-fees/${params.id}`);
+      const response = await fetch(`/api/professional-fees/${params.id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const feeData = await feeResponse.json();
       if (!feeData.success) {
         throw new Error(feeData.error || 'Failed to fetch fee');
@@ -52,28 +58,52 @@ function EditProfessionalFeePageContent() {
       setFee(feeData.data);
 
       // Fetch professional services
-      const servicesResponse = await fetch('/api/professional-services?status=active');
+      const servicesResponse = await fetch('/api/professional-services?status=active', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const servicesData = await servicesResponse.json();
       if (servicesData.success) {
         setProfessionalServices(servicesData.data.assignments || []);
       }
 
       // Fetch projects
-      const projectsResponse = await fetch('/api/projects');
+      const projectsResponse = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const projectsData = await projectsResponse.json();
       if (projectsData.success) {
         setProjects(projectsData.data || []);
       }
 
       // Fetch phases
-      const phasesResponse = await fetch('/api/phases');
+      const phasesResponse = await fetch('/api/phases', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const phasesData = await phasesResponse.json();
       if (phasesData.success) {
         setPhases(phasesData.data || []);
       }
 
       // Fetch activities
-      const activitiesResponse = await fetch('/api/professional-activities?status=approved');
+      const activitiesResponse = await fetch('/api/professional-activities?status=approved', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const activitiesData = await activitiesResponse.json();
       if (activitiesData.success) {
         setActivities(activitiesData.data.activities || []);
@@ -92,10 +122,11 @@ function EditProfessionalFeePageContent() {
 
     try {
       const response = await fetch(`/api/professional-fees/${params.id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(formData),
       });
 

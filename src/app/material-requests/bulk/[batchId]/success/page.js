@@ -32,7 +32,13 @@ function SuccessPageContent() {
       setError(null);
 
       // Fetch batch
-      const batchResponse = await fetch(`/api/material-requests/bulk/${params.batchId}`);
+      const response = await fetch(`/api/material-requests/bulk/${params.batchId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const batchData = await batchResponse.json();
 
       if (!batchData.success) {
@@ -44,7 +50,13 @@ function SuccessPageContent() {
       // Fetch purchase orders if batch has PO IDs
       if (batchData.data.purchaseOrderIds && batchData.data.purchaseOrderIds.length > 0) {
         const poPromises = batchData.data.purchaseOrderIds.map((poId) =>
-          fetch(`/api/purchase-orders/${poId}`).then((res) => res.json())
+          fetch(`/api/purchase-orders/${poId}`, {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          }).then(res => res.json())
         );
 
         const poResults = await Promise.all(poPromises);

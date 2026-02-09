@@ -43,7 +43,13 @@ export function NotificationBell() {
 
   const fetchNotifications = async () => {
     try {
-      const response = await fetch('/api/notifications?limit=10');
+      const response = await fetch('/api/notifications?limit=10', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       
       if (data.success) {
@@ -60,7 +66,11 @@ export function NotificationBell() {
   const handleMarkAsRead = async (notificationId) => {
     try {
       const response = await fetch(`/api/notifications/${notificationId}/read`, {
-        method: 'PATCH',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
       
       if (response.ok) {
@@ -80,8 +90,11 @@ export function NotificationBell() {
   const handleMarkAllAsRead = async () => {
     try {
       const response = await fetch('/api/notifications', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
       
       if (response.ok) {

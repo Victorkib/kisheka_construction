@@ -46,7 +46,13 @@ export default function NotificationsPageClient() {
         }
         params.append('limit', '500');
 
-        const response = await fetch(`/api/notifications?${params.toString()}`);
+        const response = await fetch(`/api/notifications?${params.toString()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
 
         if (!data.success) {
@@ -149,7 +155,11 @@ export default function NotificationsPageClient() {
   const handleMarkRead = async (notificationId) => {
     try {
       const response = await fetch(`/api/notifications/${notificationId}/read`, {
-        method: 'PATCH',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       if (response.ok) {
@@ -175,7 +185,11 @@ export default function NotificationsPageClient() {
   const handleMarkUnread = async (notificationId) => {
     try {
       const response = await fetch(`/api/notifications/${notificationId}/unread`, {
-        method: 'PATCH',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       if (response.ok) {
@@ -201,7 +215,11 @@ export default function NotificationsPageClient() {
   const handleDelete = async (notificationId) => {
     try {
       const response = await fetch(`/api/notifications/${notificationId}`, {
-        method: 'DELETE',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       if (response.ok) {
@@ -231,8 +249,11 @@ export default function NotificationsPageClient() {
   const handleMarkAllAsRead = async () => {
     try {
       const response = await fetch('/api/notifications', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       if (response.ok) {

@@ -69,7 +69,13 @@ function NewExpensePageContent() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -92,7 +98,13 @@ function NewExpensePageContent() {
     setLoadingPhases(true);
     setPhaseError(null);
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         const phasesList = data.data || [];
@@ -192,7 +204,13 @@ function NewExpensePageContent() {
 
     try {
       // Fetch indirect costs summary
-      const summaryResponse = await fetch(`/api/projects/${formDataToUse.projectId}/indirect-costs`);
+      const response = await fetch(`/api/projects/${formDataToUse.projectId}/indirect-costs`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const summaryResult = await summaryResponse.json();
 
       if (!summaryResult.success) {
@@ -260,7 +278,12 @@ function NewExpensePageContent() {
     try {
       const response = await fetch('/api/expenses', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           ...formData,
           amount: parseFloat(formData.amount),

@@ -47,7 +47,13 @@ export default function UserDetailPage() {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await fetch('/api/auth/me');
+        const response = await fetch('/api/auth/me', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await response.json();
         if (data.success) {
           setCurrentUser(data.data);
@@ -81,7 +87,13 @@ export default function UserDetailPage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/users/${params.id}`);
+      const response = await fetch(`/api/users/${params.id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -106,7 +118,13 @@ export default function UserDetailPage() {
 
   const fetchRoleHistory = async () => {
     try {
-      const response = await fetch(`/api/users/${params.id}/history`);
+      const response = await fetch(`/api/users/${params.id}/history`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -120,7 +138,13 @@ export default function UserDetailPage() {
   const fetchUserActivity = async () => {
     try {
       setLoadingActivity(true);
-      const response = await fetch(`/api/users/${params.id}/activity`);
+      const response = await fetch(`/api/users/${params.id}/activity`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (data.success) {
@@ -214,8 +238,11 @@ export default function UserDetailPage() {
       }
 
       const response = await fetch(`/api/users/${params.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
         body: JSON.stringify(updateData),
       });
 
@@ -247,7 +274,11 @@ export default function UserDetailPage() {
 
     try {
       const response = await fetch(`/api/users/${params.id}/activate`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();
@@ -274,7 +305,11 @@ export default function UserDetailPage() {
 
     try {
       const response = await fetch(`/api/users/${params.id}/deactivate`, {
-        method: 'POST',
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

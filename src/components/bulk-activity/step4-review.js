@@ -35,7 +35,13 @@ export function Step4Review({ wizardData, user }) {
 
   const fetchProject = async (projectId) => {
     try {
-      const response = await fetch(`/api/projects/${projectId}`);
+      const response = await fetch(`/api/projects/${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProject(data.data);
@@ -49,7 +55,13 @@ export function Step4Review({ wizardData, user }) {
 
   const fetchProfessionalService = async (professionalServiceId) => {
     try {
-      const response = await fetch(`/api/professional-services/${professionalServiceId}`);
+      const response = await fetch(`/api/professional-services/${professionalServiceId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProfessionalService(data.data);

@@ -42,7 +42,13 @@ function ProjectProgressPageContent() {
 
   const fetchProject = async () => {
     try {
-      const response = await fetch(`/api/projects/${projectId}`);
+      const response = await fetch(`/api/projects/${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProject(data.data);
@@ -55,7 +61,13 @@ function ProjectProgressPageContent() {
   const fetchProgress = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/projects/${projectId}/progress`);
+      const response = await fetch(`/api/projects/${projectId}/progress`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProgress(data.data);
@@ -88,18 +100,20 @@ function ProjectProgressPageContent() {
 
     setSubmittingUpdate(true);
     try {
-      const response = await fetch(`/api/projects/${projectId}/progress`, {
+      const updateResponse = await fetch(`/api/projects/${projectId}/progress`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          type: 'dailyUpdate',
-          dailyUpdate: {
-            notes: dailyUpdateText.trim(),
-          },
+          notes: dailyUpdateText.trim(),
         }),
       });
 
-      const data = await response.json();
+      const data = await updateResponse.json();
       if (!data.success) {
         throw new Error(data.error || 'Failed to add daily update');
       }

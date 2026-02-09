@@ -73,7 +73,13 @@ function InitialExpensesPageContent() {
         ...(filters.endDate && { endDate: filters.endDate }),
       });
 
-      const response = await fetch(`/api/initial-expenses?${queryParams}`);
+      const response = await fetch(`/api/initial-expenses?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {

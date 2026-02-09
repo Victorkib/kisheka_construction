@@ -45,7 +45,13 @@ function SupplierDetailPageContent() {
       setLoading(true);
       setError(null);
 
-      const response = await fetch(`/api/suppliers/${supplierId}`);
+      const response = await fetch(`/api/suppliers/${supplierId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -70,7 +76,11 @@ function SupplierDetailPageContent() {
 
     try {
       const response = await fetch(`/api/suppliers/${supplierId}`, {
-        method: 'DELETE'
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
       });
 
       const data = await response.json();

@@ -26,8 +26,20 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
       setError(null);
 
       const [indirectCostsRes, labourCostsRes] = await Promise.all([
-        fetch(`/api/projects/${projectId}/indirect-costs`),
-        fetch(`/api/labour/indirect-costs?projectId=${projectId}`)
+        fetch(`/api/projects/${projectId}/indirect-costs`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
+        fetch(`/api/labour/indirect-costs?projectId=${projectId}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }),
       ]);
 
       const indirectCostsData = await indirectCostsRes.json();

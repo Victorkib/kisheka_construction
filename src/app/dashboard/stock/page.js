@@ -74,12 +74,13 @@ export default function StockPage() {
       setAutoReorderLoading(true);
       const response = await fetch('/api/material-requests/auto-reorder', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          projectId: selectedProjectId,
-          threshold: 20,
-          preview: true,
-        }),
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({ projectId: selectedProjectId, preview: true }),
       });
 
       const data = await response.json();
@@ -107,16 +108,13 @@ export default function StockPage() {
       setAutoReorderLoading(true);
       const response = await fetch('/api/material-requests/auto-reorder', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          projectId: selectedProjectId,
-          threshold: 20,
-          settings: {
-            urgency: 'medium',
-            reason: 'Low stock - automated reorder',
-          },
-          preview: false,
-        }),
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({ projectId: selectedProjectId }),
       });
 
       const data = await response.json();
@@ -161,7 +159,13 @@ export default function StockPage() {
         ...(selectedProjectId && { projectId: selectedProjectId }),
       });
 
-      const response = await fetch(`/api/materials?${queryParams}`);
+      const response = await fetch(`/api/materials?${queryParams}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
 
       if (!data.success) {
@@ -280,7 +284,13 @@ export default function StockPage() {
 
   const fetchMaterialRequests = async () => {
     try {
-      const response = await fetch('/api/material-requests?limit=1000');
+      const response = await fetch('/api/material-requests?limit=1000', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setMaterialRequests(data.data.requests || []);

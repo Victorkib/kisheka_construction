@@ -77,7 +77,13 @@ export default function NewSiteReportPage() {
 
   const fetchProjects = async () => {
     try {
-      const response = await fetch('/api/projects');
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setProjects(data.data || []);
@@ -89,7 +95,13 @@ export default function NewSiteReportPage() {
 
   const fetchPhases = async (projectId) => {
     try {
-      const response = await fetch(`/api/phases?projectId=${projectId}`);
+      const response = await fetch(`/api/phases?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
@@ -101,7 +113,13 @@ export default function NewSiteReportPage() {
 
   const fetchFloors = async (projectId) => {
     try {
-      const response = await fetch(`/api/floors?projectId=${projectId}`);
+      const response = await fetch(`/api/floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setFloors(data.data || []);
@@ -117,7 +135,13 @@ export default function NewSiteReportPage() {
       if (phaseId) {
         params.set('phaseId', phaseId);
       }
-      const response = await fetch(`/api/work-items?${params.toString()}`);
+      const response = await fetch(`/api/work-items?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setWorkItems(data.data?.workItems || []);
@@ -129,7 +153,13 @@ export default function NewSiteReportPage() {
 
   const fetchWorkers = async () => {
     try {
-      const response = await fetch('/api/labour/workers?status=active&limit=200');
+      const response = await fetch('/api/labour/workers?status=active&limit=200', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await response.json();
       if (data.success) {
         setWorkers(data.data?.workers || []);
@@ -286,10 +316,19 @@ export default function NewSiteReportPage() {
     try {
       const response = await fetch('/api/labour/site-reports', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
           ...formData,
-          attachments,
+          attachments: attachments.map((att) => ({
+            fileName: att.fileName,
+            fileUrl: att.fileUrl,
+            fileType: att.fileType,
+          })),
         }),
       });
 

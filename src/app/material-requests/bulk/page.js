@@ -179,16 +179,14 @@ function BulkRequestPageContent() {
 
       const response = await fetch('/api/material-requests/bulk', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({
-          projectId: wizardData.projectId,
-          batchName: wizardData.batchName || null,
-          defaultFloorId: wizardData.defaultFloorId || null,
-          defaultPhaseId: wizardData.defaultPhaseId || null,
-          defaultCategoryId: wizardData.defaultCategoryId || null,
-          defaultUrgency: wizardData.defaultUrgency,
-          defaultReason: wizardData.defaultReason || null,
-          materials: wizardData.materials,
+          ...wizardData,
           autoApprove,
         }),
       });
