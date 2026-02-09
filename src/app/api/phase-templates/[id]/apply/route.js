@@ -81,8 +81,13 @@ export async function POST(request, { params }) {
     // Get project budget
     const totalBudget = getBudgetTotal(project.budget || {});
 
+    // OPTIONAL BUDGET: Allow applying template even when budget is 0
+    // Phases will be created with zero allocations, budget can be allocated later
     if (totalBudget <= 0) {
-      return errorResponse('Project must have a budget before applying template', 400);
+      console.info(
+        `[Phase Template Apply] Applying template to project ${projectId} with zero budget. ` +
+        `Phases will be created with zero allocations. Budget can be allocated later.`
+      );
     }
 
     // Check if project already has phases

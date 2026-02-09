@@ -148,55 +148,65 @@ export async function initializeDefaultPhases(projectId, project = null) {
     dccBudget = Math.max(0, totalBudget - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
   }
   
-  // Validate DCC budget exists and is positive
-  if (dccBudget <= 0) {
-    throw new Error(
-      'Cannot initialize phases: Direct Construction Costs (DCC) is zero or not set. ' +
-      'Please set a project budget with Direct Construction Costs before initializing phases, or initialize phases manually after setting the budget.'
-    );
-  }
-  
-  // Calculate phase allocations based on typical construction percentages
-  // ONLY allocate DCC to phases (pre-construction tracked separately via initial_expenses)
-  // Percentages sum to 100% of DCC
-  const phaseAllocations = {
-    basement: dccBudget * 0.15,            // 15% of DCC for basement
-    superstructure: dccBudget * 0.65,      // 65% of DCC for superstructure
-    finishing: dccBudget * 0.15,           // 15% of DCC for finishing
-    finalSystems: dccBudget * 0.05         // 5% of DCC for final systems
-    // Total: 100% of DCC
+  // Allow phases with zero budget - budget can be allocated later
+  // Spending will still be tracked even without budget allocations
+  let phaseAllocations = {
+    basement: 0,
+    superstructure: 0,
+    finishing: 0,
+    finalSystems: 0
   };
   
-  // Validate that phase allocations sum correctly (should be 100% = dccBudget)
-  const totalPhaseAllocations = Object.values(phaseAllocations).reduce((sum, val) => sum + val, 0);
-  const allocationTolerance = 0.01; // Allow 1 cent tolerance for floating point errors
-  
-  if (Math.abs(totalPhaseAllocations - dccBudget) > allocationTolerance) {
-    // Adjust allocations proportionally to ensure they sum to exactly dccBudget
-    const adjustmentFactor = dccBudget / totalPhaseAllocations;
-    Object.keys(phaseAllocations).forEach(key => {
-      phaseAllocations[key] = phaseAllocations[key] * adjustmentFactor;
-    });
+  if (dccBudget > 0) {
+    // Calculate phase allocations based on typical construction percentages
+    // ONLY allocate DCC to phases (pre-construction tracked separately via initial_expenses)
+    // Percentages sum to 100% of DCC
+    phaseAllocations = {
+      basement: dccBudget * 0.15,            // 15% of DCC for basement
+      superstructure: dccBudget * 0.65,      // 65% of DCC for superstructure
+      finishing: dccBudget * 0.15,           // 15% of DCC for finishing
+      finalSystems: dccBudget * 0.05         // 5% of DCC for final systems
+      // Total: 100% of DCC
+    };
     
-    // Recalculate to verify
-    const recalculatedTotal = Object.values(phaseAllocations).reduce((sum, val) => sum + val, 0);
-    if (Math.abs(recalculatedTotal - dccBudget) > allocationTolerance) {
-      throw new Error(
-        `Phase budget allocation error: Total phase allocations (${recalculatedTotal.toLocaleString()}) ` +
-        `do not match Direct Construction Costs (DCC) (${dccBudget.toLocaleString()}). ` +
-        `Difference: ${Math.abs(recalculatedTotal - dccBudget).toLocaleString()}`
-      );
+    // Validate that phase allocations sum correctly (should be 100% = dccBudget)
+    const totalPhaseAllocations = Object.values(phaseAllocations).reduce((sum, val) => sum + val, 0);
+    const allocationTolerance = 0.01; // Allow 1 cent tolerance for floating point errors
+    
+    if (Math.abs(totalPhaseAllocations - dccBudget) > allocationTolerance) {
+      // Adjust allocations proportionally to ensure they sum to exactly dccBudget
+      const adjustmentFactor = dccBudget / totalPhaseAllocations;
+      Object.keys(phaseAllocations).forEach(key => {
+        phaseAllocations[key] = phaseAllocations[key] * adjustmentFactor;
+      });
+      
+      // Recalculate to verify
+      const recalculatedTotal = Object.values(phaseAllocations).reduce((sum, val) => sum + val, 0);
+      if (Math.abs(recalculatedTotal - dccBudget) > allocationTolerance) {
+        throw new Error(
+          `Phase budget allocation error: Total phase allocations (${recalculatedTotal.toLocaleString()}) ` +
+          `do not match Direct Construction Costs (DCC) (${dccBudget.toLocaleString()}). ` +
+          `Difference: ${Math.abs(recalculatedTotal - dccBudget).toLocaleString()}`
+        );
+      }
     }
-  }
-  
-  // Validate that no single phase allocation exceeds DCC budget
-  for (const [phaseName, allocation] of Object.entries(phaseAllocations)) {
-    if (allocation > dccBudget) {
-      throw new Error(
-        `Phase budget validation failed: ${phaseName} allocation (${allocation.toLocaleString()}) ` +
-        `exceeds Direct Construction Costs (DCC) (${dccBudget.toLocaleString()})`
-      );
+    
+    // Validate that no single phase allocation exceeds DCC budget
+    for (const [phaseName, allocation] of Object.entries(phaseAllocations)) {
+      if (allocation > dccBudget) {
+        throw new Error(
+          `Phase budget validation failed: ${phaseName} allocation (${allocation.toLocaleString()}) ` +
+          `exceeds Direct Construction Costs (DCC) (${dccBudget.toLocaleString()})`
+        );
+      }
     }
+  } else {
+    // Zero budget: Initialize phases with zero allocations
+    // Spending will still be tracked via actualSpending fields
+    console.info(
+      `[initializeDefaultPhases] Initializing phases with zero budget allocation for project ${projectId}. ` +
+      `Budget can be allocated later. Spending will be tracked regardless.`
+    );
   }
   
   // Create phases from templates
@@ -246,13 +256,23 @@ export async function initializeDefaultPhases(projectId, project = null) {
   }
   
   // Final validation: Verify total phase budgets match DCC budget (not total project budget)
-  const totalCreatedPhaseBudgets = createdPhases.reduce((sum, p) => sum + (p.budgetAllocation?.total || 0), 0);
-  if (Math.abs(totalCreatedPhaseBudgets - dccBudget) > allocationTolerance) {
-    // Log warning but don't fail - phases are already created
-    console.warn(
-      `Phase budget validation warning: Total created phase budgets (${totalCreatedPhaseBudgets.toLocaleString()}) ` +
-      `do not exactly match Direct Construction Costs (DCC) (${dccBudget.toLocaleString()}). ` +
-      `Difference: ${Math.abs(totalCreatedPhaseBudgets - dccBudget).toLocaleString()}`
+  // Only validate if budget was allocated (dccBudget > 0)
+  if (dccBudget > 0) {
+    const totalCreatedPhaseBudgets = createdPhases.reduce((sum, p) => sum + (p.budgetAllocation?.total || 0), 0);
+    const allocationTolerance = 0.01; // Allow 1 cent tolerance for floating point errors
+    if (Math.abs(totalCreatedPhaseBudgets - dccBudget) > allocationTolerance) {
+      // Log warning but don't fail - phases are already created
+      console.warn(
+        `Phase budget validation warning: Total created phase budgets (${totalCreatedPhaseBudgets.toLocaleString()}) ` +
+        `do not exactly match Direct Construction Costs (DCC) (${dccBudget.toLocaleString()}). ` +
+        `Difference: ${Math.abs(totalCreatedPhaseBudgets - dccBudget).toLocaleString()}`
+      );
+    }
+  } else {
+    // Zero budget case: Log info message
+    console.info(
+      `[initializeDefaultPhases] Phases initialized with zero budget allocations. ` +
+      `Total phases created: ${createdPhases.length}. Budget can be allocated later.`
     );
   }
   
@@ -772,6 +792,21 @@ export async function validatePhaseMaterialBudget(phaseId, estimatedCost, exclud
   
   // Get material budget allocation for this phase
   const materialBudget = phase.budgetAllocation?.materials || 0;
+  
+  // OPTIONAL BUDGET: If budget is zero, allow operation and track spending
+  if (materialBudget === 0) {
+    return {
+      isValid: true,
+      available: 0,
+      required: estimatedCost,
+      shortfall: 0,
+      materialBudget: 0,
+      totalUsed: 0,
+      actualMaterialSpending: 0,
+      message: 'No budget set for this phase. Operation allowed - spending will be tracked. Set budget later to enable budget validation.',
+      budgetNotSet: true
+    };
+  }
   
   // Calculate current material spending (actual + committed)
   const actualMaterialSpending = phase.actualSpending?.materials || 0;

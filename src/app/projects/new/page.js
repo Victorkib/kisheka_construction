@@ -184,28 +184,21 @@ export default function NewProjectPage() {
       return;
     }
 
-    // Budget validation
+    // Budget validation - allow zero budget (optional budgeting)
     const budgetTotal = parseFloat(formData.budget?.total || 0);
     if (isNaN(budgetTotal) || budgetTotal < 0) {
-      setError('Project budget must be a valid positive number');
+      setError('Project budget must be a valid non-negative number (zero is allowed)');
       setLoading(false);
       return;
     }
 
-    // Phase initialization validation - warn if budget is zero
+    // Phase initialization - allow even with zero budget
+    // Phases will be created with zero allocations, budget can be allocated later
+    // No blocking - just informational
     if (formData.autoInitializePhases && (budgetTotal === 0 || isNaN(budgetTotal))) {
-      const proceed = window.confirm(
-        'You have selected to auto-initialize phases, but the project budget is zero. ' +
-        'Phases cannot be initialized without a budget. Would you like to:\n\n' +
-        '• Click OK to proceed without auto-initializing phases (you can initialize them later)\n' +
-        '• Click Cancel to go back and set a budget'
-      );
-      if (!proceed) {
-        setLoading(false);
-        return;
-      }
-      // User chose to proceed - disable phase initialization
-      formData.autoInitializePhases = false;
+      // Optional: Show info message (non-blocking)
+      // User can proceed - phases will be initialized with zero budget allocations
+      console.info('Phases will be initialized with zero budget allocations. Budget can be allocated later.');
     }
 
     try {
@@ -730,8 +723,9 @@ export default function NewProjectPage() {
                           Zero Budget Warning
                         </p>
                         <p className="text-sm text-yellow-700 mt-1">
-                          Project budget is zero. You won't be able to create material requests or purchase orders until a budget is set.
-                          {formData.autoInitializePhases && ' Phase initialization will also be skipped.'}
+                          Project budget is zero. You can still use the system - all operations will be allowed and spending will be tracked. 
+                          Set a budget later to enable budget validation and better financial control.
+                          {formData.autoInitializePhases && ' Phases will be initialized with zero budget allocations (can be allocated later).'}
                         </p>
                       </div>
                     </div>
@@ -1083,10 +1077,10 @@ export default function NewProjectPage() {
                             </svg>
                             <div>
                               <p className="text-sm font-medium text-yellow-800">
-                                Budget Required for Phase Initialization
+                                Phases Will Be Initialized Without Budget Allocation
                               </p>
                               <p className="text-sm text-yellow-700 mt-1">
-                                Phases cannot be initialized with a zero budget. Please set a project budget above, or phases will need to be initialized manually after setting the budget.
+                                Phases will be created with zero budget allocations. You can allocate budget to phases later. All spending will still be tracked regardless of budget.
                               </p>
                             </div>
                           </div>

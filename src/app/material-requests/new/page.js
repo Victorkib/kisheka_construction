@@ -639,7 +639,7 @@ function NewMaterialRequestPageContent() {
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Project <span className="text-red-500">*</span>
                 <HelpIcon 
-                  content="Select the project for which you're requesting materials. The project must have a budget and capital allocated."
+                  content="Select the project for which you're requesting materials. The project must have capital allocated. Budget is optional - spending will be tracked even without a budget set."
                   position="right"
                 />
               </label>

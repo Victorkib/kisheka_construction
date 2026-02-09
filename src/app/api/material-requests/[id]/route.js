@@ -232,7 +232,9 @@ export async function PATCH(request, { params }) {
       const { validatePhaseMaterialBudget } = await import('@/lib/phase-helpers');
       const budgetValidation = await validatePhaseMaterialBudget(phaseId.toString(), newEstimatedCost, id);
       
-      if (!budgetValidation.isValid) {
+      // Only block if budget is set AND exceeded
+      // If budget is not set (budgetNotSet = true), allow the operation
+      if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
         return errorResponse(
           `Phase material budget exceeded. ${budgetValidation.message}. ` +
           `Phase material budget: ${budgetValidation.materialBudget.toLocaleString()}, ` +
@@ -241,6 +243,8 @@ export async function PATCH(request, { params }) {
           400
         );
       }
+      // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
+      // Spending will still be tracked regardless
     }
 
     // Update request

@@ -221,12 +221,16 @@ export async function PATCH(request, { params }) {
         null // Not a batch update
       );
 
-      if (!budgetValidation.isValid) {
+      // Only block if budget is set AND exceeded
+      // If budget is not set (budgetNotSet = true), allow the operation
+      if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
         return errorResponse(
           `Budget validation failed: ${budgetValidation.message}`,
           400
         );
       }
+      // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
+      // Spending will still be tracked regardless
     }
 
     console.log('[PATCH /api/labour/entries/[id]] Starting transaction for atomic update');

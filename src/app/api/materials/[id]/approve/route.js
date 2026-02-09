@@ -119,23 +119,28 @@ export async function POST(request, { params }) {
       if (phase) {
         const materialAmount = existingMaterial.totalCost || 0;
         const phaseBudget = phase.budgetAllocation?.total || 0;
-        const phaseActual = phase.actualSpending?.total || 0;
-        const phaseCommitted = phase.financialStates?.committed || 0;
-        const phaseAvailable = Math.max(0, phaseBudget - phaseActual - phaseCommitted);
+        
+        // OPTIONAL BUDGET: If phase budget is 0, allow approval (spending will still be tracked)
+        if (phaseBudget > 0) {
+          const phaseActual = phase.actualSpending?.total || 0;
+          const phaseCommitted = phase.financialStates?.committed || 0;
+          const phaseAvailable = Math.max(0, phaseBudget - phaseActual - phaseCommitted);
 
-        if (materialAmount > phaseAvailable) {
-          // Allow PM/OWNER to override with warning
-          const userRole = userProfile?.role?.toLowerCase();
-          const isOwnerOrPM = ['owner', 'pm', 'project_manager'].includes(userRole);
+          if (materialAmount > phaseAvailable) {
+            // Allow PM/OWNER to override with warning
+            const userRole = userProfile?.role?.toLowerCase();
+            const isOwnerOrPM = ['owner', 'pm', 'project_manager'].includes(userRole);
 
-          if (!isOwnerOrPM) {
-            return errorResponse(
-              `Cannot approve material: Exceeds phase budget. Phase budget: ${phaseBudget.toLocaleString()}, Available: ${phaseAvailable.toLocaleString()}, Required: ${materialAmount.toLocaleString()}`,
-              400
-            );
+            if (!isOwnerOrPM) {
+              return errorResponse(
+                `Cannot approve material: Exceeds phase budget. Phase budget: ${phaseBudget.toLocaleString()}, Available: ${phaseAvailable.toLocaleString()}, Required: ${materialAmount.toLocaleString()}`,
+                400
+              );
+            }
+            // For PM/OWNER, continue but this will be logged in audit
           }
-          // For PM/OWNER, continue but this will be logged in audit
         }
+        // If phaseBudget is 0, allow approval - spending will still be tracked
       }
     }
 

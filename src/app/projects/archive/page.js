@@ -180,11 +180,28 @@ function ArchivedProjectsPageContent() {
       }
 
       toast.showSuccess(data.message || 'Project permanently deleted successfully!');
-    setShowDeleteModal(false);
+      setShowDeleteModal(false);
       setSelectedProject(null);
-    setDependencies(null);
-    setFinancialData(null);
+      setDependencies(null);
+      setFinancialData(null);
+      
+      // CRITICAL: Clean up stale data and handle navigation
+      // Note: Archive page doesn't have ProjectContext, so we handle it differently
+      try {
+        // Clear localStorage if it points to deleted project
+        const storedProjectId = localStorage.getItem('currentProjectId');
+        if (storedProjectId === selectedProject._id?.toString() || storedProjectId === selectedProject._id) {
+          localStorage.removeItem('currentProjectId');
+        }
+      } catch (storageError) {
+        console.error('Error clearing localStorage:', storageError);
+      }
+      
+      // Refresh projects list
       await fetchProjects();
+      
+      // If we're on the archive page and no projects remain, stay on archive page
+      // The empty state will be handled by the page itself
     } catch (err) {
       toast.showError(err.message || 'Failed to delete project');
       console.error('Delete project error:', err);

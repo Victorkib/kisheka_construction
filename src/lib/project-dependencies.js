@@ -32,6 +32,7 @@ export async function getProjectDependencyCounts(db, projectId) {
     projectTeams,
     notifications,
     auditLogs,
+    scheduledReports, // CRITICAL: Added missing scheduled_reports dependency
   ] = await Promise.all([
     db.collection('materials').countDocuments({ projectId: projectObjectId, deletedAt: null }),
     db.collection('expenses').countDocuments({ projectId: projectObjectId, deletedAt: null }),
@@ -61,6 +62,7 @@ export async function getProjectDependencyCounts(db, projectId) {
     db.collection('project_teams').countDocuments({ projectId: projectObjectId }),
     db.collection('notifications').countDocuments({ projectId: projectObjectId }),
     db.collection('audit_logs').countDocuments({ projectId: projectObjectId }),
+    db.collection('scheduled_reports').countDocuments({ projectId: projectObjectId, deletedAt: null }), // CRITICAL FIX: Added missing dependency
   ]);
 
   return {
@@ -92,5 +94,6 @@ export async function getProjectDependencyCounts(db, projectId) {
     projectTeams,
     notifications,
     auditLogs,
+    scheduledReports, // CRITICAL: Added missing dependency
   };
 }

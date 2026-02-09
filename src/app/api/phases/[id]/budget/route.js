@@ -93,7 +93,8 @@ export async function POST(request, { params }) {
       return errorResponse('Project not found', 404);
     }
 
-    // CRITICAL FIX: Validate against Direct Construction Costs (DCC) only, not total budget
+    // OPTIONAL BUDGET: Allow phase budget allocation even when project budget is 0
+    // Validate against Direct Construction Costs (DCC) only, not total budget
     // Pre-construction, indirect costs, and contingency are NOT available for phase allocation
     const projectBudget = project.budget || {};
     let dccBudget = 0;
@@ -112,31 +113,42 @@ export async function POST(request, { params }) {
     
     const currentPhaseTotal = phase.budgetAllocation?.total || 0;
     
-    // Calculate total phase budgets using helper function
-    const totalPhaseBudgets = await calculateTotalPhaseBudgets(phase.projectId.toString());
-    const allocatedToOtherPhases = totalPhaseBudgets - currentPhaseTotal;
-    const availableDCC = dccBudget - allocatedToOtherPhases;
-    const requestedAllocation = total;
-
-    // Validate: requested allocation must not exceed available DCC
-    if (requestedAllocation > availableDCC + currentPhaseTotal) {
-      return errorResponse(
-        `Insufficient Direct Construction Costs (DCC) budget. Available DCC: ${availableDCC.toLocaleString()} KES, ` +
-        `Requested: ${requestedAllocation.toLocaleString()} KES, Current phase budget: ${currentPhaseTotal.toLocaleString()} KES. ` +
-        `Note: Only Direct Construction Costs are allocated to phases. Pre-construction, indirect costs, and contingency are tracked separately.`,
-        400
+    // OPTIONAL BUDGET: If project budget is 0, allow phase budget allocation without validation
+    if (dccBudget === 0) {
+      // Allow phase budget allocation even when project budget is 0
+      // This enables users to allocate budget to phases before setting project budget
+      console.info(
+        `[Phase Budget API] Allowing phase budget allocation for phase ${id} even though project DCC budget is 0. ` +
+        `This enables budget allocation before project budget is set.`
       );
-    }
+    } else {
+      // Project has budget - validate against DCC budget
+      // Calculate total phase budgets using helper function
+      const totalPhaseBudgets = await calculateTotalPhaseBudgets(phase.projectId.toString());
+      const allocatedToOtherPhases = totalPhaseBudgets - currentPhaseTotal;
+      const availableDCC = dccBudget - allocatedToOtherPhases;
+      const requestedAllocation = total;
 
-    // Validate: total phase budgets (after update) must not exceed DCC budget
-    const newTotalPhaseBudgets = allocatedToOtherPhases + requestedAllocation;
-    if (newTotalPhaseBudgets > dccBudget) {
-      return errorResponse(
-        `Phase budget allocation would exceed Direct Construction Costs (DCC). DCC budget: ${dccBudget.toLocaleString()} KES, ` +
-        `Total phase budgets after update: ${newTotalPhaseBudgets.toLocaleString()} KES. ` +
-        `Note: Only Direct Construction Costs are allocated to phases.`,
-        400
-      );
+      // Validate: requested allocation must not exceed available DCC
+      if (requestedAllocation > availableDCC + currentPhaseTotal) {
+        return errorResponse(
+          `Insufficient Direct Construction Costs (DCC) budget. Available DCC: ${availableDCC.toLocaleString()} KES, ` +
+          `Requested: ${requestedAllocation.toLocaleString()} KES, Current phase budget: ${currentPhaseTotal.toLocaleString()} KES. ` +
+          `Note: Only Direct Construction Costs are allocated to phases. Pre-construction, indirect costs, and contingency are tracked separately.`,
+          400
+        );
+      }
+
+      // Validate: total phase budgets (after update) must not exceed DCC budget
+      const newTotalPhaseBudgets = allocatedToOtherPhases + requestedAllocation;
+      if (newTotalPhaseBudgets > dccBudget) {
+        return errorResponse(
+          `Phase budget allocation would exceed Direct Construction Costs (DCC). DCC budget: ${dccBudget.toLocaleString()} KES, ` +
+          `Total phase budgets after update: ${newTotalPhaseBudgets.toLocaleString()} KES. ` +
+          `Note: Only Direct Construction Costs are allocated to phases.`,
+          400
+        );
+      }
     }
 
     // Update phase budget allocation

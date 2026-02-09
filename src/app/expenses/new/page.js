@@ -219,20 +219,25 @@ function NewExpensePageContent() {
 
       const summary = summaryResult.data;
       const available = summary.remaining || 0;
-      const isValid = amount <= available;
-      const usageAfter = summary.budgeted > 0 
-        ? ((summary.spent + amount) / summary.budgeted) * 100 
+      const budgeted = summary.budgeted || 0;
+      
+      // OPTIONAL BUDGET: If budget is 0, allow operation (spending will still be tracked)
+      const budgetNotSet = budgeted === 0;
+      const isValid = budgetNotSet ? true : (amount <= available);
+      const usageAfter = budgeted > 0 
+        ? ((summary.spent + amount) / budgeted) * 100 
         : 0;
 
       setBudgetInfo({
-        budgeted: summary.budgeted,
+        budgeted,
         spent: summary.spent,
         available,
         isValid,
-        shortfall: Math.max(0, amount - available),
+        shortfall: budgetNotSet ? 0 : Math.max(0, amount - available),
         usageAfter,
         warning: usageAfter >= 80 && usageAfter < 100,
-        exceeded: amount > available,
+        exceeded: budgetNotSet ? false : (amount > available), // Don't mark as exceeded if budget not set
+        budgetNotSet, // Add flag to indicate budget is not set
       });
     } catch (err) {
       console.error('Budget validation error:', err);
@@ -269,7 +274,9 @@ function NewExpensePageContent() {
     }
 
     // Check indirect costs budget validation before submitting (only if marked as indirect)
-    if (formData.isIndirectCost && formData.indirectCostCategory && budgetInfo && budgetInfo.exceeded) {
+    // OPTIONAL BUDGET: Only block if budget is set AND exceeded
+    // If budget is not set, allow the operation (spending will still be tracked)
+    if (formData.isIndirectCost && formData.indirectCostCategory && budgetInfo && budgetInfo.exceeded && !budgetInfo.budgetNotSet) {
       setError(`Cannot create expense: Insufficient indirect costs budget. Available: ${new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.available)}, Required: ${new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(parseFloat(formData.amount))}`);
       setLoading(false);
       return;
@@ -435,38 +442,46 @@ function NewExpensePageContent() {
 
                   {budgetInfo && !budgetLoading && (
                     <div className={`mt-2 p-3 rounded-lg border ${
-                      budgetInfo.exceeded 
-                        ? 'bg-red-50 border-red-200' 
-                        : budgetInfo.warning 
-                          ? 'bg-yellow-50 border-yellow-200' 
-                          : 'bg-green-50 border-green-200'
+                      budgetInfo.budgetNotSet
+                        ? 'bg-blue-50 border-blue-200'
+                        : budgetInfo.exceeded 
+                          ? 'bg-red-50 border-red-200' 
+                          : budgetInfo.warning 
+                            ? 'bg-yellow-50 border-yellow-200' 
+                            : 'bg-green-50 border-green-200'
                     }`}>
                       <div className="flex items-start justify-between mb-2">
                         <div>
                           <p className={`text-sm font-semibold ${
-                            budgetInfo.exceeded 
-                              ? 'text-red-800' 
-                              : budgetInfo.warning 
-                                ? 'text-yellow-800' 
-                                : 'text-green-800'
+                            budgetInfo.budgetNotSet
+                              ? 'text-blue-800'
+                              : budgetInfo.exceeded 
+                                ? 'text-red-800' 
+                                : budgetInfo.warning 
+                                  ? 'text-yellow-800' 
+                                  : 'text-green-800'
                           }`}>
-                            {budgetInfo.exceeded 
-                              ? '⚠️ Insufficient Indirect Costs Budget' 
-                              : budgetInfo.warning 
-                                ? '⚠️ Budget Warning' 
-                                : '✓ Budget Available'}
+                            {budgetInfo.budgetNotSet
+                              ? 'ℹ️ No Budget Set'
+                              : budgetInfo.exceeded 
+                                ? '⚠️ Insufficient Indirect Costs Budget' 
+                                : budgetInfo.warning 
+                                  ? '⚠️ Budget Warning' 
+                                  : '✓ Budget Available'}
                           </p>
                           <p className="text-xs text-gray-600 mt-1">
-                            Available: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.available)}
+                            {budgetInfo.budgetNotSet
+                              ? 'Operation allowed - spending will be tracked. Set budget later to enable budget validation.'
+                              : `Available: ${new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.available)}`}
                           </p>
                         </div>
-                        {budgetInfo.exceeded && (
+                        {budgetInfo.exceeded && !budgetInfo.budgetNotSet && (
                           <p className="text-sm font-semibold text-red-800">
                             Shortfall: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.shortfall)}
                           </p>
                         )}
                       </div>
-                      {budgetInfo.warning && !budgetInfo.exceeded && (
+                      {budgetInfo.warning && !budgetInfo.exceeded && !budgetInfo.budgetNotSet && (
                         <p className="text-xs text-yellow-700">
                           Indirect costs budget usage will be {budgetInfo.usageAfter.toFixed(1)}% after this expense
                         </p>

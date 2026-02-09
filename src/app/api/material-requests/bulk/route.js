@@ -186,12 +186,16 @@ export async function POST(request) {
       const { validateBulkMaterialRequestBudget } = await import('@/lib/phase-helpers');
       const budgetValidation = await validateBulkMaterialRequestBudget(materialsWithCosts, defaultPhaseId);
       
+      // Only block if budget is set AND exceeded
+      // If budget is not set, operation is allowed (isValid = true)
       if (!budgetValidation.isValid) {
         return errorResponse(
           `Budget validation failed: ${budgetValidation.errors.join('; ')}`,
           400
         );
       }
+      // Note: If budget is not set, budgetValidation.isValid will be true
+      // and spending will still be tracked regardless
     }
 
     // Determine initial status

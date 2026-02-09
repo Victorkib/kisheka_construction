@@ -26,6 +26,7 @@ import { HierarchicalBudgetDisplay } from '@/components/budget/HierarchicalBudge
 import { CostManagementSummary } from '@/components/budget/CostManagementSummary';
 import { EnhancedBudgetInput } from '@/components/budget/EnhancedBudgetInput';
 import { BudgetVisualization } from '@/components/budget/BudgetVisualization';
+import { useProjectContext } from '@/contexts/ProjectContext';
 
 // Phases Section Component
 function PhasesSection({ projectId, canEdit }) {
@@ -949,6 +950,13 @@ export default function ProjectDetailPage() {
   const projectId = params?.id;
   const toast = useToast();
   const { canAccess } = usePermissions();
+  const { 
+    accessibleProjects, 
+    refreshAccessibleProjects, 
+    clearProject, 
+    switchProject,
+    isEmpty: hasNoProjects 
+  } = useProjectContext();
 
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -1074,6 +1082,42 @@ export default function ProjectDetailPage() {
       const data = await response.json();
 
       if (!data.success) {
+        // If project not found (404), it might have been deleted
+        // Clear stale data and redirect to projects list
+        if (data.error?.includes('not found') || response.status === 404) {
+          clearProject();
+          try {
+            localStorage.removeItem('currentProjectId');
+          } catch (storageError) {
+            console.error('Error clearing localStorage:', storageError);
+          }
+          // Refresh accessible projects and navigate
+          await refreshAccessibleProjects();
+          const freshProjectsResponse = await fetch('/api/projects/accessible', {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          });
+          const freshProjectsData = await freshProjectsResponse.json();
+          const availableProjects = freshProjectsData.success ? (freshProjectsData.data || []) : [];
+          
+          if (availableProjects.length > 0) {
+            // Switch to first available project
+            const nextProject = availableProjects[0];
+            const nextProjectId = nextProject._id?.toString() || nextProject._id;
+            try {
+              await switchProject(nextProjectId, true);
+              router.push(`/projects/${nextProjectId}`);
+            } catch (switchError) {
+              router.push('/projects');
+            }
+          } else {
+            router.push('/projects');
+          }
+          return;
+        }
         throw new Error(data.error || 'Failed to fetch project');
       }
 
@@ -1497,10 +1541,55 @@ export default function ProjectDetailPage() {
 
       toast.showSuccess(data.message || 'Project permanently deleted successfully!');
       setShowDeleteModal(false);
-      // Redirect to projects list
-      setTimeout(() => {
+      
+      // CRITICAL: Clean up stale data and handle navigation
+      // 1. Clear current project from context (if it's the deleted one)
+      clearProject();
+      
+      // 2. Clear localStorage
+      try {
+        localStorage.removeItem('currentProjectId');
+      } catch (storageError) {
+        console.error('Error clearing localStorage:', storageError);
+      }
+      
+      // 3. Refresh accessible projects list
+      await refreshAccessibleProjects();
+      
+      // 4. Wait a moment for context to update
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // 5. Handle navigation based on available projects
+      // Get fresh accessible projects after refresh
+      const freshProjectsResponse = await fetch('/api/projects/accessible', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      const freshProjectsData = await freshProjectsResponse.json();
+      const availableProjects = freshProjectsData.success ? (freshProjectsData.data || []) : [];
+      
+      if (availableProjects.length === 0) {
+        // No projects available - navigate to projects list (empty state)
         router.push('/projects');
-      }, 500);
+      } else {
+        // Select next available project
+        const nextProject = availableProjects[0]; // Use first available project
+        const nextProjectId = nextProject._id?.toString() || nextProject._id;
+        
+        try {
+          // Switch to next project
+          await switchProject(nextProjectId, true);
+          // Navigate to the new project's detail page
+          router.push(`/projects/${nextProjectId}`);
+        } catch (switchError) {
+          console.error('Error switching to next project:', switchError);
+          // If switch fails, just go to projects list
+          router.push('/projects');
+        }
+      }
     } catch (err) {
       toast.showError(err.message || 'Failed to delete project');
       console.error('Delete project error:', err);

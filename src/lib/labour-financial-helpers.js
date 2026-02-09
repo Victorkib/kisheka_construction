@@ -64,6 +64,22 @@ export async function validatePhaseLabourBudget(phaseId, labourCost, excludeBatc
   // Get labour budget allocation for this phase
   const labourBudget = phase.budgetAllocation?.labour || 0;
 
+  // OPTIONAL BUDGET: If budget is zero, allow operation and track spending
+  if (labourBudget === 0) {
+    return {
+      isValid: true,
+      available: 0,
+      required: labourCost,
+      shortfall: 0,
+      message: 'No budget set for this phase. Operation allowed - spending will be tracked. Set budget later to enable budget validation.',
+      budget: 0,
+      currentSpending: phase.actualSpending?.labour || 0,
+      committed: 0,
+      totalSpent: phase.actualSpending?.labour || 0,
+      budgetNotSet: true
+    };
+  }
+
   // Calculate current labour spending (actual + committed)
   const actualLabourSpending = phase.actualSpending?.labour || 0;
 

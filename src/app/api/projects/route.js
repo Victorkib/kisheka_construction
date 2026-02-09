@@ -317,7 +317,7 @@ export async function POST(request) {
         }
       } else if (budgetTotal === 0) {
         budgetWarning = {
-          message: 'Project created with zero budget. Please set budget before creating materials.',
+          message: 'Project created with zero budget. You can use the system - all operations will be allowed and spending will be tracked. Set a budget later to enable budget validation.',
           type: 'zero_budget',
         };
       }
@@ -328,7 +328,7 @@ export async function POST(request) {
       }
       
       budgetWarning = {
-        message: 'Project created with zero budget. Please set budget before creating materials.',
+        message: 'Project created with zero budget. You can use the system - all operations will be allowed and spending will be tracked. Set a budget later to enable budget validation.',
         type: 'zero_budget',
       };
       

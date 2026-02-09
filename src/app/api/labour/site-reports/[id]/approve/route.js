@@ -130,9 +130,13 @@ export async function POST(request, { params }) {
       totalCost
     );
 
-    if (!budgetValidation.isValid) {
+    // Only block if budget is set AND exceeded
+    // If budget is not set (budgetNotSet = true), allow the operation
+    if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
       return errorResponse(`Budget validation failed: ${budgetValidation.message}`, 400);
     }
+    // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
+    // Spending will still be tracked regardless
 
     const batchNumber = await generateBatchNumber(new Date(report.entryDate));
     const batchData = {

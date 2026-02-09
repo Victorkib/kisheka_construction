@@ -389,13 +389,15 @@ export async function validateIndirectCostsBudget(projectId, amount, category = 
   // Get indirect costs budget
   const indirectBudget = await getIndirectCostsBudget(projectId);
   
+  // OPTIONAL BUDGET: If budget is zero, allow operation and track spending
   if (indirectBudget <= 0) {
     return {
-      isValid: false,
+      isValid: true,
       available: 0,
       required: amount,
-      shortfall: amount,
-      message: 'Indirect costs budget not set. Please set a project budget with indirect costs first.',
+      shortfall: 0,
+      message: 'No indirect costs budget set. Operation allowed - spending will be tracked. Set budget later to enable budget validation.',
+      budgetNotSet: true
     };
   }
 

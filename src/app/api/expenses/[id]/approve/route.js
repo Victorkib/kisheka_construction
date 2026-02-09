@@ -130,13 +130,16 @@ export async function POST(request, { params }) {
             existingExpense.indirectCostCategory
           );
 
-          // If budget validation fails, return error (unless it's just a warning)
-          if (!budgetValidation.isValid) {
+          // Only block if budget is set AND exceeded
+          // If budget is not set (budgetNotSet = true), allow the operation
+          if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
             return errorResponse(
               `Cannot approve expense: ${budgetValidation.message}`,
               400
             );
           }
+          // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
+          // Spending will still be tracked regardless
 
           // If budget validation shows a warning, log it but allow approval
           if (budgetValidation.warning) {
@@ -165,7 +168,8 @@ export async function POST(request, { params }) {
         const phaseCommitted = phase.financialStates?.committed || 0;
         const phaseAvailable = Math.max(0, phaseBudget - phaseActual - phaseCommitted);
 
-        if (expenseAmount > phaseAvailable) {
+        // OPTIONAL BUDGET: If phase budget is 0, allow approval (spending will still be tracked)
+        if (phaseBudget > 0 && expenseAmount > phaseAvailable) {
           // Allow PM/OWNER to override with warning
           const userRole = userProfile?.role?.toLowerCase();
           const isOwnerOrPM = ['owner', 'pm', 'project_manager'].includes(userRole);
@@ -178,6 +182,7 @@ export async function POST(request, { params }) {
           }
           // For PM/OWNER, continue but this will be logged in audit
         }
+        // If phaseBudget is 0, allow approval - spending will still be tracked
       }
     }
     
@@ -187,7 +192,10 @@ export async function POST(request, { params }) {
       const indirectRemaining = await getIndirectCostsRemaining(existingExpense.projectId.toString());
       const expenseAmount = existingExpense.amount || 0;
       
-      if (expenseAmount > indirectRemaining) {
+      // OPTIONAL BUDGET: If indirect costs budget is 0 or negative, allow approval (spending will still be tracked)
+      // getIndirectCostsRemaining returns 0 or negative when budget is not set or exceeded
+      // We only validate if there's a positive remaining budget
+      if (indirectRemaining > 0 && expenseAmount > indirectRemaining) {
         const userRole = userProfile?.role?.toLowerCase();
         const isOwnerOrPM = ['owner', 'pm', 'project_manager'].includes(userRole);
         
@@ -199,6 +207,8 @@ export async function POST(request, { params }) {
         }
         // For PM/OWNER, continue but this will be logged in audit
       }
+      // If indirectRemaining is 0 or negative (budget not set or already exceeded), allow approval
+      // Spending will still be tracked regardless
     }
 
     // Create approval entry

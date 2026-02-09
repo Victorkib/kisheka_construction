@@ -108,7 +108,9 @@ export async function GET(request, { params }) {
     const categoriesCount = categories;
 
     // Determine readiness
-    const readyForMaterials = hasBudget && hasCapital && hasFloors && hasPhases; // Phases now required
+    // OPTIONAL BUDGET: Budget is no longer required for materials/purchase orders
+    // Spending will be tracked regardless of budget
+    const readyForMaterials = hasCapital && hasFloors && hasPhases; // Budget no longer required
     const readyForPurchaseOrders = readyForMaterials && hasSuppliers;
     const overallReadiness = {
       readyForMaterials,
@@ -142,12 +144,13 @@ export async function GET(request, { params }) {
       },
       budget: {
         completed: hasBudget,
-        required: true,
-        status: hasBudget ? 'complete' : 'missing',
+        required: false, // OPTIONAL BUDGET: Budget is now optional, recommended but not required
+        recommended: true, // Mark as recommended for better financial control
+        status: hasBudget ? 'complete' : 'recommended',
         message: hasBudget 
           ? `Budget set: ${budgetTotal.toLocaleString()} KES` 
-          : 'No budget set',
-        warning: budgetWarning,
+          : 'No budget set (optional - spending will still be tracked)',
+        warning: budgetWarning || (hasBudget ? null : 'Budget is optional. You can use the system without a budget, and all spending will be tracked. Set a budget later to enable budget validation.'),
         details: {
           total: budgetTotal,
           materials: budgetMaterials,
@@ -242,8 +245,9 @@ export async function GET(request, { params }) {
  * Calculate completion percentage
  */
 function calculateCompletionPercentage({ hasBudget, hasCapital, hasFloors, hasPhases, hasSuppliers, hasCategories }) {
-  const required = [hasBudget, hasCapital, hasFloors, hasPhases]; // Phases now required
-  const optional = [hasSuppliers, hasCategories];
+  // OPTIONAL BUDGET: Budget is now optional (recommended but not required)
+  const required = [hasCapital, hasFloors, hasPhases]; // Budget no longer required
+  const optional = [hasBudget, hasSuppliers, hasCategories]; // Budget moved to optional
   
   const requiredCompleted = required.filter(Boolean).length;
   const optionalCompleted = optional.filter(Boolean).length;

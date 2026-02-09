@@ -466,7 +466,7 @@ export async function DELETE(request, { params }) {
     const capitalBalance = totalInvested - totalUsed;
     const hasSpending = totalUsed > 0;
 
-    // Check dependencies
+    // Check dependencies - COMPREHENSIVE: All project-related collections
     const projectObjectId = new ObjectId(id);
     const [
       materialsCount,
@@ -497,6 +497,7 @@ export async function DELETE(request, { params }) {
       teamLinksCount,
       notificationsCount,
       auditLogsCount,
+      scheduledReportsCount, // CRITICAL: Added missing scheduled_reports dependency
     ] = await Promise.all([
       db.collection('materials').countDocuments({ projectId: projectObjectId, deletedAt: null }),
       db.collection('expenses').countDocuments({ projectId: projectObjectId, deletedAt: null }),
@@ -526,6 +527,7 @@ export async function DELETE(request, { params }) {
       db.collection('project_teams').countDocuments({ projectId: projectObjectId }),
       db.collection('notifications').countDocuments({ projectId: projectObjectId }),
       db.collection('audit_logs').countDocuments({ projectId: projectObjectId }),
+      db.collection('scheduled_reports').countDocuments({ projectId: projectObjectId, deletedAt: null }), // CRITICAL FIX: Added missing dependency
     ]);
 
     // Get investors with allocations to this project
@@ -569,6 +571,7 @@ export async function DELETE(request, { params }) {
       projectTeams: teamLinksCount,
       notifications: notificationsCount,
       auditLogs: auditLogsCount,
+      scheduledReports: scheduledReportsCount, // CRITICAL: Added missing dependency
       investorAllocations: allocationsCount,
       totalUsed,
       totalInvested,
@@ -874,6 +877,14 @@ export async function DELETE(request, { params }) {
       await db.collection('contingency_draws').deleteMany({
         projectId: projectObjectId,
       });
+    }
+
+    // CRITICAL FIX: Delete scheduled reports to prevent background job errors
+    if (scheduledReportsCount > 0) {
+      await db.collection('scheduled_reports').deleteMany({
+        projectId: projectObjectId,
+      });
+      console.log(`🗑️ Deleted ${scheduledReportsCount} scheduled report(s) for project ${id}`);
     }
 
     if (approvalsCount > 0) {

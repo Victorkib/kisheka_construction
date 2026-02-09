@@ -411,12 +411,16 @@ export async function POST(request) {
           phaseCost
         );
 
-        if (!budgetValidation.isValid) {
+        // Only block if budget is set AND exceeded
+        // If budget is not set (budgetNotSet = true), allow the operation
+        if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
           return errorResponse(
             `Direct labour budget validation failed for phase: ${budgetValidation.message}`,
             400
           );
         }
+        // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
+        // Spending will still be tracked regardless
       }
     }
 
@@ -441,12 +445,16 @@ export async function POST(request) {
           category
         );
 
-        if (!budgetValidation.isValid) {
+        // Only block if budget is set AND exceeded
+        // If budget is not set (budgetNotSet = true), allow the operation
+        if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
           return errorResponse(
             `Indirect labour budget validation failed (${category}): ${budgetValidation.message}`,
             400
           );
         }
+        // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
+        // Spending will still be tracked regardless
       }
     }
 
