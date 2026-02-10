@@ -1,0 +1,8 @@
+/* Fallback globals.css for production
+ *
+ * Next.js app-wide styles are compiled from `src/app/globals.css`.
+ * This empty file exists only to satisfy any legacy or external
+ * requests to `/globals.css` (e.g. from preloaded links or crawlers),
+ * preventing noisy 404s in production.
+ */
+
