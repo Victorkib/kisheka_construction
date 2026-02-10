@@ -20,7 +20,19 @@ import { fetchNoCache } from '@/lib/fetch-helpers';
 
 export default function InvestorDashboardPage() {
   const router = useRouter();
-  const { isEmpty } = useProjectContext();
+  const { isEmpty, loading: contextLoading, refreshAccessibleProjects } = useProjectContext();
+  const [hasRefreshed, setHasRefreshed] = useState(false);
+
+  // CRITICAL FIX: Refresh ProjectContext when dashboard loads if it's empty
+  useEffect(() => {
+    if (!contextLoading && isEmpty && !hasRefreshed && refreshAccessibleProjects) {
+      console.log('Investor Dashboard: ProjectContext appears empty, refreshing...');
+      setHasRefreshed(true);
+      refreshAccessibleProjects().catch((err) => {
+        console.error('Error refreshing accessible projects:', err);
+      });
+    }
+  }, [contextLoading, isEmpty, hasRefreshed, refreshAccessibleProjects]);
   const [investor, setInvestor] = useState(null);
   const [finances, setFinances] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -155,7 +167,10 @@ export default function InvestorDashboardPage() {
     }).format(amount);
   };
 
-  if (loading) {
+  // CRITICAL FIX: Wait for ProjectContext to finish loading before showing empty state
+  const isActuallyEmpty = isEmpty && !contextLoading && hasRefreshed;
+
+  if (loading || contextLoading) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -171,8 +186,8 @@ export default function InvestorDashboardPage() {
     );
   }
 
-  // Check empty state - no projects
-  if (isEmpty && !error && investor) {
+  // Check empty state - no projects (but only if context has finished loading and we've attempted refresh)
+  if (isActuallyEmpty && !error && investor) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

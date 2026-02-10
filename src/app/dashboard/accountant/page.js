@@ -15,12 +15,24 @@ import { NoProjectsEmptyState, ErrorState } from '@/components/empty-states';
 import { fetchNoCache } from '@/lib/fetch-helpers';
 
 export default function AccountantDashboard() {
-  const { isEmpty } = useProjectContext();
+  const { isEmpty, loading: contextLoading, refreshAccessibleProjects } = useProjectContext();
   const [user, setUser] = useState(null);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userError, setUserError] = useState(null);
+  const [hasRefreshed, setHasRefreshed] = useState(false);
   const router = useRouter();
+
+  // CRITICAL FIX: Refresh ProjectContext when dashboard loads if it's empty
+  useEffect(() => {
+    if (!contextLoading && isEmpty && !hasRefreshed && refreshAccessibleProjects) {
+      console.log('Accountant Dashboard: ProjectContext appears empty, refreshing...');
+      setHasRefreshed(true);
+      refreshAccessibleProjects().catch((err) => {
+        console.error('Error refreshing accessible projects:', err);
+      });
+    }
+  }, [contextLoading, isEmpty, hasRefreshed, refreshAccessibleProjects]);
 
   useEffect(() => {
     async function fetchData() {
@@ -61,7 +73,10 @@ export default function AccountantDashboard() {
     fetchData();
   }, [router, isEmpty]);
 
-  if (loading) {
+  // CRITICAL FIX: Wait for ProjectContext to finish loading before showing empty state
+  const isActuallyEmpty = isEmpty && !contextLoading && hasRefreshed;
+
+  if (loading || contextLoading) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -77,8 +92,8 @@ export default function AccountantDashboard() {
     );
   }
 
-  // Check empty state FIRST - this is critical to prevent dark screen
-  if (isEmpty) {
+  // Check empty state FIRST - but only if context has finished loading and we've attempted refresh
+  if (isActuallyEmpty) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

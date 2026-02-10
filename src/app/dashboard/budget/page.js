@@ -32,7 +32,19 @@ import { HierarchicalBudgetDisplay } from '@/components/budget/HierarchicalBudge
 import { BudgetVisualization } from '@/components/budget/BudgetVisualization';
 
 function BudgetDashboardContent() {
-  const { currentProject, accessibleProjects, switchProject, isEmpty } = useProjectContext();
+  const { currentProject, accessibleProjects, switchProject, isEmpty, loading: contextLoading, refreshAccessibleProjects } = useProjectContext();
+  const [hasRefreshed, setHasRefreshed] = useState(false);
+
+  // CRITICAL FIX: Refresh ProjectContext when dashboard loads if it's empty
+  useEffect(() => {
+    if (!contextLoading && isEmpty && !hasRefreshed && refreshAccessibleProjects) {
+      console.log('Budget Dashboard: ProjectContext appears empty, refreshing...');
+      setHasRefreshed(true);
+      refreshAccessibleProjects().catch((err) => {
+        console.error('Error refreshing accessible projects:', err);
+      });
+    }
+  }, [contextLoading, isEmpty, hasRefreshed, refreshAccessibleProjects]);
   const searchParams = useSearchParams();
   const router = useRouter();
   

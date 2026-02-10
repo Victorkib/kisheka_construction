@@ -7,7 +7,7 @@
 
 'use client';
 
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { projectIdsMatch } from '@/lib/utils/project-id-helpers';
 
@@ -21,11 +21,46 @@ export function ProjectContextProvider({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const dashboardRefreshAttempted = useRef(false);
 
   // Load project context on mount
   useEffect(() => {
     loadProjectContext();
   }, []);
+
+  // CRITICAL FIX: Refresh project context when navigating to dashboard routes
+  // This ensures data is fresh when user navigates to dashboard
+  // Note: This effect runs after refreshAccessibleProjects is defined (later in component)
+  useEffect(() => {
+    // Check if we're on a dashboard route
+    const isDashboardRoute = pathname?.startsWith('/dashboard');
+    
+    // Reset refresh attempt flag when pathname changes away from dashboard
+    if (!isDashboardRoute) {
+      dashboardRefreshAttempted.current = false;
+      return;
+    }
+    
+    // If on dashboard and context is empty (but not loading), refresh
+    // This handles cases where user navigates to dashboard but context hasn't loaded yet
+    if (isDashboardRoute && !loading && accessibleProjects.length === 0 && !currentProject && !dashboardRefreshAttempted.current) {
+      // Only refresh if we're not on a "new" route
+      if (pathname !== '/projects/new' && !pathname?.includes('/new')) {
+        console.log('Dashboard route detected with empty context, refreshing...');
+        dashboardRefreshAttempted.current = true;
+        
+        // Use a small delay to ensure refreshAccessibleProjects is available
+        // (it's defined later in the component, but will be available by the time this runs)
+        setTimeout(() => {
+          loadProjectContext().catch((err) => {
+            console.error('Error refreshing projects on dashboard navigation:', err);
+            dashboardRefreshAttempted.current = false; // Allow retry on error
+          });
+        }, 100);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname, loading, accessibleProjects.length, currentProject]);
 
   // Sync with URL when on project routes or when projectId is in URL params
   // Only sync when we have projects to avoid loops
@@ -155,7 +190,9 @@ export function ProjectContextProvider({ children }) {
     }
   };
 
-  const loadAccessibleProjects = async () => {
+  const loadAccessibleProjects = async (retryCount = 0) => {
+    const MAX_RETRIES = 2;
+    
     try {
       // Primary source: dedicated accessible-projects API
       const response = await fetch('/api/projects/accessible', {
@@ -170,6 +207,17 @@ export function ProjectContextProvider({ children }) {
       if (data.success && Array.isArray(data.data) && data.data.length > 0) {
         setAccessibleProjects(data.data);
         return data.data;
+      }
+
+      // If we got an empty array but no error, it might be a timing issue
+      // Retry once before falling back
+      if (data.success && Array.isArray(data.data) && data.data.length === 0 && retryCount < MAX_RETRIES) {
+        console.warn(
+          `Accessible projects API returned empty array (retry ${retryCount + 1}/${MAX_RETRIES}). Retrying...`,
+        );
+        // Wait a bit before retry
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return loadAccessibleProjects(retryCount + 1);
       }
 
       console.warn(
@@ -190,8 +238,16 @@ export function ProjectContextProvider({ children }) {
       const fallbackData = await fallbackResponse.json();
 
       if (fallbackData.success && Array.isArray(fallbackData.data)) {
-        setAccessibleProjects(fallbackData.data);
-        return fallbackData.data;
+        // Only set if we got projects, otherwise might be truly empty
+        if (fallbackData.data.length > 0) {
+          setAccessibleProjects(fallbackData.data);
+          return fallbackData.data;
+        } else {
+          // Both APIs returned empty - might be truly no projects
+          console.warn('Both /api/projects/accessible and /api/projects returned empty arrays');
+          setAccessibleProjects([]);
+          return [];
+        }
       }
 
       console.error(
@@ -202,6 +258,14 @@ export function ProjectContextProvider({ children }) {
       return [];
     } catch (error) {
       console.error('Error loading accessible projects:', error);
+      
+      // Retry on network errors
+      if (retryCount < MAX_RETRIES) {
+        console.warn(`Network error, retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        return loadAccessibleProjects(retryCount + 1);
+      }
+      
       setAccessibleProjects([]);
       return [];
     }
