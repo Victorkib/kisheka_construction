@@ -257,9 +257,14 @@ export default function NewProjectPage() {
       const previousProjectCount = accessibleProjects.length;
 
       // Handle project creation with ProjectContext
+      // IMPORTANT:
+      // - For the very first project, we want it to become the active project.
+      // - For additional projects, it's usually more intuitive to also treat
+      //   the newly created one as the "current" context.
+      //   Therefore we do NOT preserve the previous selection here.
       const selectionResult = await handleProjectCreated(newProjectId, {
         autoSelectIfOnly: true,
-        preserveCurrent: true,
+        preserveCurrent: false,
       });
 
       // Show budget warning if present
