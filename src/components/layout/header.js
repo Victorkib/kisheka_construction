@@ -167,7 +167,10 @@ export function Header({ onMenuClick }) {
 
       {/* Center: Logo & Project Switcher */}
       <div className="flex items-center gap-4">
-        <Link href="/" className="flex items-center gap-2 hover:opacity-90">
+        {/* IMPORTANT: On authenticated pages, linking to `/` can trigger the server redirect-to-dashboard flow.
+            In production, prefetch/redirect interactions can look like "random redirect to dashboard".
+            Use `/dashboard` explicitly here and disable prefetch for maximum stability. */}
+        <Link href="/dashboard" prefetch={false} className="flex items-center gap-2 hover:opacity-90">
           <img
             src="/logo.png"
             alt="Doshaki Construction Logo"

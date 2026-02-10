@@ -1,69 +1,23 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { clearUserCache } from '@/hooks/use-permissions';
 
 /**
- * Protected routes that authenticated users can access
- * Users on these routes should NOT be redirected
- */
-const PROTECTED_ROUTES = [
-  '/dashboard',
-  '/projects',
-  '/reports',
-  '/admin',
-  '/items',
-  '/labour',
-  '/expenses',
-  '/categories',
-  '/floors',
-  '/investors',
-  '/financing',
-  '/initial-expenses',
-  '/profile',
-  '/material-requests',
-  '/purchase-orders',
-  '/suppliers',
-  '/phases',
-  '/work-items',
-  '/equipment',
-  '/analytics',
-  '/professional-services',
-  '/professional-fees',
-  '/professional-activities',
-];
-
-/**
- * Pages that should redirect to dashboard after authentication
- * Only redirect from these specific pages, not from all pages
- */
-const REDIRECT_FROM_PAGES = [
-  '/', // Landing page
-  '/auth/login',
-  '/auth/register',
-  '/auth/forgot-password',
-  '/auth/reset-password',
-];
-
-/**
  * OAuth Sync Component
  * Automatically syncs OAuth users to MongoDB when they authenticate
- * Only redirects from specific pages (landing/auth pages), not from protected routes
+ * CRITICAL: This component does NOT redirect - it only syncs users silently
+ * Redirects should ONLY happen from login form or auth callback
  */
 export function OAuthSync() {
-  const router = useRouter();
-  const pathname = usePathname();
   const syncInProgressRef = useRef(false);
   const synced = useRef(false);
   const lastSyncedUserIdRef = useRef(null);
 
-  // Check if current pathname is a protected route
-  const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname?.startsWith(route));
-  
-  // Check if current pathname should trigger redirect after sync
-  const shouldRedirectAfterSync = REDIRECT_FROM_PAGES.includes(pathname || '/');
+  // REMOVED: All redirect logic from OAuthSync
+  // OAuthSync should ONLY sync users to MongoDB silently
+  // Redirects should ONLY happen from login form or auth callback, NOT from sync
 
   useEffect(() => {
     const supabase = createClient();
@@ -74,18 +28,18 @@ export function OAuthSync() {
     const sessionUserIdKey = 'oauth_sync_user_id';
 
     // Check current user and sync if needed
+    // CRITICAL: This function ONLY syncs users to MongoDB - NO REDIRECTS
+    // Redirects should ONLY happen from login form or auth callback
     async function syncUser() {
       // Don't sync if already synced or sync in progress
       if (synced.current || syncInProgressRef.current) return;
 
-      // If already on protected route and synced in this session, skip
-      if (isProtectedRoute) {
-        const syncedUserId = sessionStorage.getItem(sessionUserIdKey);
-        if (syncedUserId && sessionStorage.getItem(sessionSyncKey) === 'true') {
-          synced.current = true;
-          lastSyncedUserIdRef.current = syncedUserId;
-          return;
-        }
+      // If already synced in this session, skip
+      const syncedUserId = sessionStorage.getItem(sessionUserIdKey);
+      if (syncedUserId && sessionStorage.getItem(sessionSyncKey) === 'true') {
+        synced.current = true;
+        lastSyncedUserIdRef.current = syncedUserId;
+        return;
       }
 
       syncInProgressRef.current = true;
@@ -101,15 +55,11 @@ export function OAuthSync() {
           if (lastSyncedUserId === user.id && sessionStorage.getItem(sessionSyncKey) === 'true') {
             synced.current = true;
             syncInProgressRef.current = false;
-            
-            // Only redirect if on a redirect-from page and not already on protected route
-            if (shouldRedirectAfterSync && !isProtectedRoute) {
-              router.push('/dashboard');
-            }
-            return;
+            return; // Already synced, no redirect
           }
 
-          // User is authenticated, sync to MongoDB
+          // User is authenticated, sync to MongoDB silently
+          // NO REDIRECTS - let the user stay where they are
           const response = await fetch('/api/auth/sync', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -133,12 +83,7 @@ export function OAuthSync() {
           sessionStorage.setItem(sessionSyncKey, 'true');
           sessionStorage.setItem(sessionUserIdKey, user.id);
 
-          // Only redirect if:
-          // 1. User is on a page that should redirect (landing/auth pages)
-          // 2. User is NOT already on a protected route
-          if (shouldRedirectAfterSync && !isProtectedRoute) {
-            router.push('/dashboard');
-          }
+          // NO REDIRECT - sync is complete, user stays where they are
         }
       } catch (error) {
         console.error('OAuth sync error:', error);
@@ -151,6 +96,7 @@ export function OAuthSync() {
     syncUser();
 
     // Also listen for auth state changes
+    // CRITICAL: NO REDIRECTS - just sync silently
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
@@ -165,6 +111,8 @@ export function OAuthSync() {
           syncInProgressRef.current = false;
           sessionStorage.removeItem(sessionSyncKey);
           sessionStorage.removeItem(sessionUserIdKey);
+          
+          // Sync silently - NO REDIRECTS
           syncUser();
         }
         // If same user, don't re-sync - they're already synced
@@ -198,7 +146,7 @@ export function OAuthSync() {
       isMounted = false;
       subscription?.unsubscribe();
     };
-  }, [router, pathname, isProtectedRoute, shouldRedirectAfterSync]);
+  }, []); // Empty deps - sync only runs once on mount and on auth state changes
 
   return null; // This component doesn't render anything
 }

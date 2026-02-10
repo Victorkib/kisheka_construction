@@ -128,6 +128,23 @@ export async function proxy(request) {
 
   // Create response object for cookie setting
   let response = NextResponse.next();
+  // Track cookies Supabase wants to set during this request so we can attach them
+  // to BOTH normal responses and redirect responses (critical to avoid auth flapping/loops).
+  let cookiesToSetForResponse = [];
+
+  const applyCookiesToResponse = (res) => {
+    try {
+      if (cookiesToSetForResponse?.length) {
+        cookiesToSetForResponse.forEach(({ name, value, options }) => {
+          res.cookies.set(name, value, options);
+        });
+      }
+    } catch (e) {
+      // Don't crash proxy if cookie APIs differ in certain runtimes
+      console.error('Failed to apply cookies to response:', e);
+    }
+    return res;
+  };
 
   try {
     // Validate environment variables
@@ -148,6 +165,8 @@ export async function proxy(request) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
+          // Persist these so redirects also include them
+          cookiesToSetForResponse = cookiesToSet;
           cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options);
           });
@@ -178,7 +197,7 @@ export async function proxy(request) {
         const url = new URL('/auth/login', request.url);
         url.searchParams.set('redirect', pathname);
         url.searchParams.set('error', 'session_error');
-        return NextResponse.redirect(url);
+        return applyCookiesToResponse(NextResponse.redirect(url));
       }
       
       // For transient errors or non-critical errors, allow request to continue
@@ -188,7 +207,7 @@ export async function proxy(request) {
         if (isCriticalError) {
           const url = new URL('/auth/login', request.url);
           url.searchParams.set('redirect', pathname);
-          return NextResponse.redirect(url);
+          return applyCookiesToResponse(NextResponse.redirect(url));
         }
         // Transient error but no session - be lenient, allow to continue
         // The client-side will handle re-authentication if needed
@@ -205,16 +224,16 @@ export async function proxy(request) {
         // Redirect to login if not authenticated (only if we got a clean response with no session)
         const url = new URL('/auth/login', request.url);
         url.searchParams.set('redirect', pathname);
-        return NextResponse.redirect(url);
+        return applyCookiesToResponse(NextResponse.redirect(url));
       }
     }
 
     // Handle auth routes (redirect to dashboard if already logged in)
     if (isAuthRoute && session) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      return applyCookiesToResponse(NextResponse.redirect(new URL('/dashboard', request.url)));
     }
 
-    return response;
+    return applyCookiesToResponse(response);
   } catch (error) {
     // Log error but don't crash the application
     console.error('Proxy error:', error);
@@ -233,12 +252,12 @@ export async function proxy(request) {
       const url = new URL('/auth/login', request.url);
       url.searchParams.set('redirect', pathname);
       url.searchParams.set('error', 'proxy_error');
-      return NextResponse.redirect(url);
+      return applyCookiesToResponse(NextResponse.redirect(url));
     }
 
     // For transient errors or other routes, allow the request to continue
     // This prevents users from being kicked out during form filling due to network issues
-    return response;
+    return applyCookiesToResponse(response);
   }
 }
 

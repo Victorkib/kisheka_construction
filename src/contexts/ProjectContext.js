@@ -29,8 +29,15 @@ export function ProjectContextProvider({ children }) {
 
   // Sync with URL when on project routes or when projectId is in URL params
   // Only sync when we have projects to avoid loops
+  // CRITICAL: Never sync on project creation routes (/projects/new) or other "new" routes
   useEffect(() => {
-    // Don't sync if loading or no projects
+    // CRITICAL FIX: ALWAYS check for "new" routes FIRST - before any other logic
+    // These routes should be accessible even with 0 projects and should NEVER trigger redirects
+    if (pathname === '/projects/new' || pathname?.includes('/new')) {
+      return; // Don't interfere with project creation or other "new" routes - NEVER redirect from these
+    }
+    
+    // Don't sync if loading or no projects (but only AFTER checking for "new" routes)
     if (loading || accessibleProjects.length === 0) {
       return;
     }
@@ -70,14 +77,24 @@ export function ProjectContextProvider({ children }) {
       setLoading(true);
       setError(null);
 
+      // CRITICAL: Check if we're on a "new" route BEFORE loading projects
+      // If on "new" route, we should allow it even with 0 projects
+      const currentPath = typeof window !== 'undefined' ? window.location.pathname : pathname;
+      const isOnNewRoute = currentPath === '/projects/new' || currentPath?.includes('/new');
+      
       // Load accessible projects first - use returned value to avoid race condition
       const projects = await loadAccessibleProjects();
 
       // If no projects exist, show empty state and stop loading
+      // BUT: If we're on a "new" route, this is OK - don't do anything that might redirect
       if (!projects || projects.length === 0) {
         setCurrentProject(null);
         setAccessibleProjects([]);
         setLoading(false);
+        // If on "new" route, we're done - don't try to switch projects
+        if (isOnNewRoute) {
+          return;
+        }
         return;
       }
 
