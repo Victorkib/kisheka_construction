@@ -1,37 +1,79 @@
+'use client';
+
 /**
  * Root Landing Page
  *
- * This page serves as the entry point for the application:
- * - If user is authenticated: Redirects to /dashboard
- * - If user is not authenticated: Shows the public landing page
+ * This page serves as the public entry point for the application.
+ * - In production, we previously used a server-side redirect here for
+ *   authenticated users (`redirect('/dashboard')`).
+ * - However, that SSR redirect can be triggered by RSC prefetch requests
+ *   (e.g. `/?_rsc=...`) while the user is on other pages like
+ *   `/projects/new`, which caused unexpected client-side navigation back
+ *   to `/dashboard` in production.
  *
- * This is a Server Component that checks authentication server-side
- * for optimal performance and SEO.
+ * To avoid production-only redirect glitches while keeping behaviour
+ * intuitive, we now:
+ * - Render the marketing/landing content by default.
+ * - Perform an optional *client-side* check to see if the user is
+ *   authenticated, and if so, navigate them to `/dashboard`.
  *
- * SEO Optimizations:
- * - Server-side rendering for better SEO crawlability
- * - Comprehensive metadata in root layout
- * - Structured data for Organization and Software Application
- * - Semantic HTML structure
- * - Mobile-optimized responsive design
+ * This ensures that:
+ * - Background RSC prefetches to `/` never cause hard redirects.
+ * - Users visiting `/` directly after login can still be taken to
+ *   their dashboard.
  */
 
-import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import LandingPageContent from '@/components/landing/landing-page-content';
 
-export default async function Home() {
-  // Check if user is authenticated
-  const supabase = await createClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+export default function Home() {
+  const router = useRouter();
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
-  // If authenticated, redirect to dashboard
-  if (session) {
-    redirect('/dashboard');
-  }
+  useEffect(() => {
+    let isMounted = true;
 
-  // If not authenticated, show landing page
+    const checkAuth = async () => {
+      try {
+        // Lightweight client-side auth check
+        const response = await fetch('/api/auth/me', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            Pragma: 'no-cache',
+          },
+        });
+
+        if (!isMounted) return;
+
+        if (response.ok) {
+          const data = await response.json();
+          if (data?.success && data.data) {
+            // Authenticated – send to dashboard
+            router.replace('/dashboard');
+            return;
+          }
+        }
+      } catch (error) {
+        // Fail open: if auth check fails, just show landing page
+        console.error('Home auth check failed:', error);
+      } finally {
+        if (isMounted) {
+          setCheckingAuth(false);
+        }
+      }
+    };
+
+    checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [router]);
+
+  // While checking auth, we can still show the landing page;
+  // the router.replace will take over for authenticated users.
   return <LandingPageContent />;
 }
+
