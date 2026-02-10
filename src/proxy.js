@@ -92,9 +92,10 @@ function isPublicApiRoute(pathname) {
 }
 
 /**
- * Next.js Proxy Function
+ * Next.js Proxy Function (Middleware)
  *
  * Handles authentication and route protection for the application.
+ * Next.js automatically recognizes proxy.js as middleware when exported as 'proxy'
  *
  * @param {import('next/server').NextRequest} request - The incoming request
  * @returns {Promise<import('next/server').NextResponse>} Response with appropriate redirects or continuation
