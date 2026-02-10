@@ -955,7 +955,9 @@ export async function validateBulkMaterialRequestBudget(materials, defaultPhaseI
         ...budgetValidation
       });
 
-      if (!budgetValidation.isValid) {
+      // OPTIONAL BUDGET: Only treat as error if budget is set AND exceeded
+      // If budget is not set (budgetNotSet = true), isValid will be true and we should allow
+      if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
         isValid = false;
         errors.push(
           `Phase budget exceeded for phase "${phaseName}": ` +
@@ -964,6 +966,7 @@ export async function validateBulkMaterialRequestBudget(materials, defaultPhaseI
           `Shortfall: ${budgetValidation.shortfall.toLocaleString()}`
         );
       }
+      // If budgetNotSet is true, isValid will be true and operation is allowed
     }
   }
 
