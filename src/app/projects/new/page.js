@@ -232,11 +232,13 @@ export default function NewProjectPage() {
       requestBody.autoInitializePhases = formData.autoInitializePhases !== false; // Default to true
 
       const response = await fetch('/api/projects', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+        },
         body: JSON.stringify(requestBody),
       });
 
