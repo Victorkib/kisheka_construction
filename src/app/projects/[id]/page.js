@@ -27,6 +27,11 @@ import { CostManagementSummary } from '@/components/budget/CostManagementSummary
 import { EnhancedBudgetInput } from '@/components/budget/EnhancedBudgetInput';
 import { BudgetVisualization } from '@/components/budget/BudgetVisualization';
 import { useProjectContext } from '@/contexts/ProjectContext';
+import { DomainTile } from '@/components/projects/DomainTile';
+import { CoreKPICard } from '@/components/projects/CoreKPICard';
+import { ProjectHealthStrip } from '@/components/projects/ProjectHealthStrip';
+import { CollapsibleFinancialSnapshot } from '@/components/projects/CollapsibleFinancialSnapshot';
+import { useProjectDomainSummaries } from '@/hooks/use-project-domain-summaries';
 
 // Phases Section Component
 function PhasesSection({ projectId, canEdit }) {
@@ -987,6 +992,9 @@ export default function ProjectDetailPage() {
     basementCount: 0,
   });
 
+  // Domain summaries for tiles
+  const { summaries: domainSummaries, loading: summariesLoading } = useProjectDomainSummaries(projectId);
+
   const [formData, setFormData] = useState({
     projectName: '',
     description: '',
@@ -1693,6 +1701,63 @@ export default function ProjectDetailPage() {
 
   const statistics = project.statistics || {};
 
+  // Calculate health statuses for health strip
+  const totalInvested = statistics.totalInvested || 0;
+  const capitalBalance = statistics.capitalBalance || 0;
+  const availableCapital = capitalBalance;
+  const totalUsed = totalInvested - capitalBalance;
+  const usagePercentage = totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
+  
+  // Budget utilization
+  const budgetTotal = project.budget?.total || 0;
+  const actualSpent = statistics.totalMaterialsSpent || 0;
+  const budgetUtilization = budgetTotal > 0 ? (actualSpent / budgetTotal) * 100 : 0;
+  
+  // Determine health statuses
+  const getBudgetStatus = () => {
+    if (budgetUtilization > 100) return 'over_budget';
+    if (budgetUtilization > 80) return 'at_risk';
+    return 'on_budget';
+  };
+  
+  const getCapitalStatus = () => {
+    if (totalInvested === 0) return 'insufficient';
+    if (availableCapital < 0) return 'negative';
+    if (usagePercentage > 80) return 'low';
+    return 'sufficient';
+  };
+  
+  const getScheduleStatus = () => {
+    // Simple check - can be enhanced with actual dates vs progress
+    return 'on_track'; // Placeholder
+  };
+  
+  // Calculate overall completion from phases (if available)
+  const overallCompletion = 0; // Will be calculated from phases if needed
+  
+  // Health summary text
+  const healthSummary = (() => {
+    const parts = [];
+    if (domainSummaries.phases.atRisk > 0) {
+      parts.push(`${domainSummaries.phases.atRisk} phase${domainSummaries.phases.atRisk > 1 ? 's' : ''} at risk`);
+    }
+    if (usagePercentage > 80) {
+      parts.push(`Capital utilization at ${usagePercentage.toFixed(0)}%`);
+    }
+    if (budgetUtilization > 80) {
+      parts.push(`Budget utilization at ${budgetUtilization.toFixed(0)}%`);
+    }
+    if (parts.length === 0) {
+      return 'All systems operational';
+    }
+    return parts.join(' • ');
+  })();
+
+  // Calculate budget variance percentage
+  const budgetVariance = budgetTotal > 0 
+    ? ((budgetTotal - actualSpent) / budgetTotal) * 100 
+    : 0;
+
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
@@ -1701,26 +1766,27 @@ export default function ProjectDetailPage() {
           message={isSaving ? "Saving project..." : "Loading financial data..."} 
           fullScreen={false} 
         />
-        {/* Header */}
-        <div className="mb-8">
+        
+        {/* Breadcrumbs */}
+        <div className="mb-6">
           <Breadcrumbs 
             items={[
               { label: 'Projects', href: '/projects' },
               { label: project.projectName || 'Project', href: `/projects/${projectId}`, current: true },
             ]}
           />
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="flex items-center gap-3 flex-wrap">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">{project.projectName}</h1>
+        </div>
+
+        {/* Header Band */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 flex-wrap mb-2">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                  {project.projectName}
+                </h1>
                 {project.status === 'archived' && <ArchiveBadge />}
                 {statistics && (() => {
-                  const totalInvested = statistics.totalInvested || 0;
-                  const capitalBalance = statistics.capitalBalance || 0;
-                  const availableCapital = capitalBalance;
-                  const totalUsed = totalInvested - capitalBalance;
-                  const usagePercentage = totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
-                  
                   let statusColor = 'bg-green-100 text-green-800';
                   let statusText = 'Capital OK';
                   
@@ -1736,7 +1802,10 @@ export default function ProjectDetailPage() {
                   }
                   
                   return (
-                    <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${statusColor}`} title={`Capital: ${formatCurrency(totalInvested)}, Available: ${formatCurrency(availableCapital)}`}>
+                    <span 
+                      className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${statusColor}`} 
+                      title={`Capital: ${formatCurrency(totalInvested)}, Available: ${formatCurrency(availableCapital)}`}
+                    >
                       💰 {statusText}
                     </span>
                   );
@@ -1744,68 +1813,76 @@ export default function ProjectDetailPage() {
               </div>
               <p className="text-gray-600 mt-1">
                 {project.projectCode} {project.location && `• ${project.location}`}
+                {project.client && ` • ${project.client}`}
               </p>
+              {(project.startDate || project.plannedEndDate) && (
+                <p className="text-sm text-gray-500 mt-1">
+                  {project.startDate && formatDate(project.startDate)}
+                  {project.startDate && project.plannedEndDate && ' - '}
+                  {project.plannedEndDate && formatDate(project.plannedEndDate)}
+                </p>
+              )}
             </div>
-            {canEdit && project.status !== 'archived' && (
-              <div className="flex gap-2">
-                <button
-                  onClick={handleEditClick}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  Edit Project
-                </button>
-                {canDelete && (
-                  <>
-                    <button
-                      onClick={handleArchiveClick}
-                      className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
-                    >
-                      Archive
-                    </button>
-                    <button
-                      onClick={handleDeleteClick}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-                    >
-                      Delete
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-            {canDelete && project.status === 'archived' && (
-              <div className="flex gap-2">
-                <button
-                  onClick={handleRestoreClick}
-                  disabled={restoring}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
-                >
-                  {restoring ? 'Restoring...' : 'Restore Project'}
-                </button>
-                <button
-                  onClick={handleDeleteClick}
-                  disabled={deleting}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50"
-                >
-                  {deleting ? 'Deleting...' : 'Delete Permanently'}
-                </button>
-              </div>
-            )}
-            {!canEdit && canDelete && project.status !== 'archived' && (
-              <div className="flex gap-2">
-                <button
-                  onClick={handleArchiveClick}
-                  className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
-                >
-                  Archive
-                </button>
-                <button
-                  onClick={handleDeleteClick}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
-                >
-                  Delete
-                </button>
-              </div>
-            )}
+            
+            {/* Actions */}
+            <div className="flex flex-wrap gap-2">
+              {canEdit && project.status !== 'archived' && (
+                <>
+                  <button
+                    onClick={handleEditClick}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                  >
+                    Edit Project
+                  </button>
+                  <Link
+                    href={`/projects/${projectId}/costs`}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                  >
+                    Cost Management
+                  </Link>
+                  <Link
+                    href={`/projects/${projectId}/finances`}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                  >
+                    Financial Overview
+                  </Link>
+                </>
+              )}
+              {canDelete && project.status !== 'archived' && (
+                <>
+                  <button
+                    onClick={handleArchiveClick}
+                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm font-medium"
+                  >
+                    Archive
+                  </button>
+                  <button
+                    onClick={handleDeleteClick}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium"
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
+              {canDelete && project.status === 'archived' && (
+                <>
+                  <button
+                    onClick={handleRestoreClick}
+                    disabled={restoring}
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 text-sm font-medium"
+                  >
+                    {restoring ? 'Restoring...' : 'Restore'}
+                  </button>
+                  <button
+                    onClick={handleDeleteClick}
+                    disabled={deleting}
+                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 text-sm font-medium"
+                  >
+                    {deleting ? 'Deleting...' : 'Delete Permanently'}
+                  </button>
+                </>
+              )}
+            </div>
           </div>
         </div>
 
@@ -1816,39 +1893,156 @@ export default function ProjectDetailPage() {
           </div>
         )}
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600">Total Budget</p>
-            <p className="text-2xl font-bold text-gray-900 mt-2">
-              {formatCurrency(project.budget?.total || 0)}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600">Materials Count</p>
-            <p className="text-2xl font-bold text-blue-600 mt-2">
-              {statistics.materialsCount || 0}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600">Expenses Count</p>
-            <p className="text-2xl font-bold text-green-600 mt-2">
-              {statistics.expensesCount || 0}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600">Budget Remaining</p>
-            <p className="text-2xl font-bold text-purple-600 mt-2">
-              {formatCurrency(statistics.budgetRemaining || project.budget?.total || 0)}
-            </p>
-          </div>
+        {/* Core KPIs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+          <CoreKPICard
+            title="Budget"
+            primaryValue={formatCurrency(budgetTotal)}
+            secondaryValue={`Remaining: ${formatCurrency(statistics.budgetRemaining || budgetTotal)}`}
+            progress={budgetUtilization}
+            progressColor={budgetUtilization > 100 ? 'red' : budgetUtilization > 80 ? 'yellow' : 'green'}
+            icon="💰"
+          />
+          <CoreKPICard
+            title="Capital"
+            primaryValue={formatCurrency(totalInvested)}
+            secondaryValue={`Balance: ${formatCurrency(capitalBalance)}`}
+            progress={usagePercentage}
+            progressColor={usagePercentage > 90 ? 'red' : usagePercentage > 80 ? 'yellow' : 'green'}
+            icon="💵"
+          />
+          <CoreKPICard
+            title="Progress"
+            primaryValue={`${overallCompletion}%`}
+            secondaryValue="Overall completion"
+            progress={overallCompletion}
+            icon="📊"
+          />
+          <CoreKPICard
+            title="Scope"
+            primaryValue={`${domainSummaries.phases.count} phases`}
+            secondaryValue={`${domainSummaries.floors.count} floors`}
+            icon="🏗️"
+          />
         </div>
 
-        {/* Project Information */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Project Information</h2>
+        {/* Project Health Strip */}
+        <div className="mb-6">
+          <ProjectHealthStrip
+            statuses={[
+              { label: 'Budget', status: getBudgetStatus() },
+              { label: 'Capital', status: getCapitalStatus() },
+              { label: 'Schedule', status: getScheduleStatus() },
+            ]}
+            summary={healthSummary}
+            link={`/projects/${projectId}/health`}
+            projectId={projectId}
+          />
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Domain Tiles Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <DomainTile
+            icon="🏗️"
+            title="Phases"
+            metrics={[
+              { label: 'Total', value: `${domainSummaries.phases.count} phases` },
+              { label: 'At Risk', value: `${domainSummaries.phases.atRisk} phases` },
+              { label: 'Allocated', value: formatCurrency(domainSummaries.phases.allocated) },
+            ]}
+            link={`/phases?projectId=${projectId}`}
+          />
+          
+          <DomainTile
+            icon="🏢"
+            title="Floors"
+            metrics={[
+              { label: 'Total', value: `${domainSummaries.floors.count} floors` },
+              { label: 'Completed', value: `${domainSummaries.floors.completed} floors` },
+              { label: 'In Progress', value: `${domainSummaries.floors.inProgress} floors` },
+            ]}
+            link={`/floors?projectId=${projectId}`}
+          />
+          
+          <DomainTile
+            icon="💰"
+            title="Costs"
+            metrics={[
+              { label: 'Budget Variance', value: `${budgetVariance >= 0 ? '+' : ''}${budgetVariance.toFixed(1)}%` },
+              { label: 'Budget Utilization', value: `${budgetUtilization.toFixed(1)}%` },
+            ]}
+            link={`/projects/${projectId}/costs`}
+          />
+          
+          <DomainTile
+            icon="📊"
+            title="Finances"
+            metrics={[
+              { label: 'Capital Raised', value: formatCurrency(totalInvested) },
+              { label: 'Capital Used', value: formatCurrency(totalUsed) },
+              { label: 'Balance', value: formatCurrency(capitalBalance) },
+            ]}
+            link={`/projects/${projectId}/finances`}
+          />
+          
+          <DomainTile
+            icon="📦"
+            title="Materials"
+            metrics={[
+              { label: 'Items', value: `${domainSummaries.materials.count} items` },
+              { label: 'Top Category', value: domainSummaries.materials.topCategory || 'N/A' },
+              { label: 'Total Cost', value: formatCurrency(domainSummaries.materials.totalCost) },
+            ]}
+            link={`/items?projectId=${projectId}`}
+          />
+          
+          <DomainTile
+            icon="👷"
+            title="Labour"
+            metrics={[
+              { label: 'Entries', value: `${domainSummaries.labour.count} entries` },
+              { label: 'Total Hours', value: `${domainSummaries.labour.totalHours.toFixed(0)} hrs` },
+              { label: 'Total Cost', value: formatCurrency(domainSummaries.labour.totalCost) },
+            ]}
+            link={`/labour/entries?projectId=${projectId}`}
+          />
+          
+          <DomainTile
+            icon="💳"
+            title="Expenses"
+            metrics={[
+              { label: 'Entries', value: `${domainSummaries.expenses.count} entries` },
+              { label: 'Approved/Paid', value: formatCurrency(domainSummaries.expenses.approved) },
+            ]}
+            link={`/expenses?projectId=${projectId}`}
+          />
+          
+          <DomainTile
+            icon="📸"
+            title="Progress"
+            metrics={[
+              { label: 'Photos', value: `${domainSummaries.progress.photos} photos` },
+              { label: 'Milestones', value: `${domainSummaries.progress.milestones} milestones` },
+              { label: 'Updates', value: `${domainSummaries.progress.updates} updates` },
+            ]}
+            link={`/projects/${projectId}/progress`}
+          />
+        </div>
+
+        {/* Optional: Collapsible Financial Snapshot */}
+        <div className="mb-6">
+          <CollapsibleFinancialSnapshot 
+            projectId={projectId}
+            budget={project.budget}
+          />
+        </div>
+
+        {/* Setup & Administration (moved to bottom) */}
+        <div className="space-y-6 mt-8">
+          {/* Project Information (compact) */}
+          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">Project Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600">Project Code</p>
                 <p className="text-base font-medium text-gray-900 mt-1">{project.projectCode}</p>
@@ -1863,24 +2057,6 @@ export default function ProjectDetailPage() {
                   {project.status || 'planning'}
                 </span>
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Location</p>
-                <p className="text-base font-medium text-gray-900 mt-1">{project.location || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Client</p>
-                <p className="text-base font-medium text-gray-900 mt-1">{project.client || 'N/A'}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Start Date</p>
-                <p className="text-base font-medium text-gray-900 mt-1">{formatDate(project.startDate)}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Planned End Date</p>
-                <p className="text-base font-medium text-gray-900 mt-1">
-                  {formatDate(project.plannedEndDate)}
-                </p>
-              </div>
               {project.description && (
                 <div className="md:col-span-2">
                   <p className="text-sm text-gray-600">Description</p>
@@ -1888,257 +2064,52 @@ export default function ProjectDetailPage() {
                 </div>
               )}
             </div>
-        </div>
+          </div>
 
-        {/* Budget Breakdown */}
-        <div className="mb-6">
-          <HierarchicalBudgetDisplay budget={project.budget} />
-        </div>
+          {/* Project Setup Checklist */}
+          <ProjectSetupChecklist projectId={projectId} />
 
-        {/* Cost Management Summary */}
-        <div className="mb-6">
-          <CostManagementSummary projectId={projectId} />
-        </div>
+          {/* Post-Creation Setup Wizard */}
+          {project && (
+            <PostCreationWizard
+              projectId={projectId}
+              projectData={project}
+              onComplete={() => {
+                fetchProject();
+              }}
+              onDismiss={() => {
+                // Wizard dismissed, continue normally
+              }}
+            />
+          )}
 
-        {/* Budget Visualization */}
-        {project.budget && (
-          <div className="mb-6">
-            <BudgetVisualization budget={project.budget} />
-            {statistics.totalMaterialsSpent !== undefined && (
-              <div className="mt-4 pt-4 border-t">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Total Spent (Materials)</span>
-                  <span className="text-lg font-bold text-orange-600">
-                    {formatCurrency(statistics.totalMaterialsSpent)}
-                  </span>
-                </div>
-                <div className="mt-2">
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full"
-                      style={{
-                        width: `${
-                          project.budget?.total > 0
-                            ? Math.min(100, (statistics.totalMaterialsSpent / project.budget.total) * 100)
-                            : 0
-                        }%`,
-                      }}
-                    ></div>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1 leading-normal">
-                    {project.budget?.total > 0
-                      ? `${((statistics.totalMaterialsSpent / project.budget.total) * 100).toFixed(1)}% of budget used`
-                      : 'No budget set'}
+          {/* Floors Setup (if no floors) */}
+          {!floorsLoading && floors.length === 0 && (
+            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Floors</h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    No floors have been created for this project yet.
                   </p>
                 </div>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Construction Phases Section */}
-        <PhasesSection projectId={projectId} canEdit={canEdit} />
-
-        {/* Project Health Dashboard */}
-        <ProjectHealthDashboard projectId={projectId} />
-
-        {/* Post-Creation Setup Wizard */}
-        {project && (
-          <PostCreationWizard
-            projectId={projectId}
-            projectData={project}
-            onComplete={() => {
-              // Refresh project data
-              fetchProject();
-            }}
-            onDismiss={() => {
-              // Wizard dismissed, continue normally
-            }}
-          />
-        )}
-
-        {/* Project Setup Checklist */}
-        <ProjectSetupChecklist projectId={projectId} />
-
-        {/* Floors Setup */}
-        {!floorsLoading && floors.length === 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-semibold text-gray-900">Floors</h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  No floors have been created for this project yet.
-                </p>
+                {canEdit && (
+                  <button
+                    onClick={handleInitializeFloors}
+                    disabled={initializingFloors}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium"
+                  >
+                    {initializingFloors ? 'Creating Floors...' : 'Auto-create Floors'}
+                  </button>
+                )}
               </div>
               {canEdit && (
-                <button
-                  onClick={handleInitializeFloors}
-                  disabled={initializingFloors}
-                  className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium"
-                >
-                  {initializingFloors ? 'Creating Floors...' : 'Auto-create Floors'}
-                </button>
+                <p className="text-xs text-gray-500 mt-3">
+                  This will create a ground floor and the number of upper floors you specify. Basements are optional.
+                </p>
               )}
             </div>
-            {canEdit && (
-              <p className="text-xs text-gray-500 mt-3">
-                This will create a ground floor and the number of upper floors you specify. Basements are optional.
-              </p>
-            )}
-          </div>
-        )}
-
-        {/* Floor Visualization */}
-        {floors.length > 0 && (
-          <FloorVisualization
-            floors={floors}
-            projectId={projectId}
-            compact={false}
-          />
-        )}
-
-        {/* Budget vs Actual Section */}
-        <BudgetVsActualSection projectId={projectId} />
-
-        {/* Initial Expenses Section */}
-        <InitialExpensesSection projectId={projectId} />
-
-        {/* Expenses Section */}
-        <ExpensesSection projectId={projectId} />
-
-        {/* Project Finances Section */}
-        <ProjectFinancesSection projectId={projectId} />
-
-        {/* Progress Documentation Section */}
-        <ProgressSection projectId={projectId} />
-
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          {canAccess && canAccess('create_bulk_material_request') && (
-            <Link
-              href={`/material-requests/bulk?projectId=${projectId}`}
-              className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-3 rounded-lg transition text-center"
-            >
-              📦 Bulk Material Request
-            </Link>
           )}
-          {canEdit && (
-            <Link
-              href={`/floors/new?projectId=${projectId}&basement=true`}
-              className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-3 rounded-lg transition text-center flex items-center justify-center gap-2"
-              title="Add a basement floor to this project"
-            >
-              <span>🏢</span> Add Basement
-            </Link>
-          )}
-          {canEdit && (
-            <Link
-              href={`/floors/new?projectId=${projectId}`}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition text-center"
-            >
-              + Add Floor
-            </Link>
-          )}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Link
-            href={`/projects/${projectId}/finances`}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">📊</div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Financial Overview</h3>
-                <p className="text-sm text-gray-600">Budget, Capital & Actual</p>
-              </div>
-            </div>
-          </Link>
-          <Link
-            href={`/items?projectId=${projectId}`}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">📦</div>
-              <div>
-                <h3 className="font-semibold text-gray-900">View Materials</h3>
-                <p className="text-sm text-gray-600">{statistics.materialsCount || 0} items</p>
-              </div>
-            </div>
-          </Link>
-          <Link
-            href={`/floors?projectId=${projectId}`}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">🏢</div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Manage Floors</h3>
-                <p className="text-sm text-gray-600">View and edit project floors</p>
-              </div>
-            </div>
-          </Link>
-          {canAccess && canAccess('manage_project_team') && (
-            <Link
-              href={`/projects/${projectId}/team`}
-              className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
-            >
-              <div className="flex items-center gap-3">
-                <div className="text-3xl">👥</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Team Management</h3>
-                  <p className="text-sm text-gray-600">Manage project team</p>
-                </div>
-              </div>
-            </Link>
-          )}
-          <Link
-            href={`/phases?projectId=${projectId}`}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">🏗️</div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Manage Phases</h3>
-                <p className="text-sm text-gray-600">View and edit construction phases</p>
-              </div>
-            </div>
-          </Link>
-          <Link
-            href={`/expenses?projectId=${projectId}`}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">💰</div>
-              <div>
-                <h3 className="font-semibold text-gray-900">View Expenses</h3>
-                <p className="text-sm text-gray-600">{statistics.expensesCount || 0} entries</p>
-              </div>
-            </div>
-          </Link>
-          <Link
-            href={`/labour/entries?projectId=${projectId}`}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">👷</div>
-              <div>
-                <h3 className="font-semibold text-gray-900">View Labour</h3>
-                <p className="text-sm text-gray-600">Labour entries & workers</p>
-              </div>
-            </div>
-          </Link>
-          <Link
-            href={`/items/new?projectId=${projectId}`}
-            className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
-          >
-            <div className="flex items-center gap-3">
-              <div className="text-3xl">➕</div>
-              <div>
-                <h3 className="font-semibold text-gray-900">Add Material</h3>
-                <p className="text-sm text-gray-600">Create new entry</p>
-              </div>
-            </div>
-          </Link>
         </div>
       </div>
 

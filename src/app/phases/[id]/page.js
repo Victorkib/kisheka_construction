@@ -25,6 +25,7 @@ import { ReportsTab } from '@/components/phases/tabs/ReportsTab';
 import { QualityTab } from '@/components/phases/tabs/QualityTab';
 import { WorkItemsTab } from '@/components/phases/tabs/WorkItemsTab';
 import { FloorsTab } from '@/components/phases/tabs/FloorsTab';
+import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 
 export default function PhaseDetailPage() {
   const router = useRouter();
@@ -493,13 +494,22 @@ export default function PhaseDetailPage() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Breadcrumbs */}
+        <div className="mb-6">
+          <Breadcrumbs
+            items={[
+              { label: 'Projects', href: '/projects' },
+              { label: project?.projectName || 'Project', href: project ? `/projects/${project._id}` : '/projects' },
+              { label: 'Phases', href: project ? `/phases?projectId=${project._id}` : '/phases' },
+              { label: phase.phaseName || 'Phase', href: null, current: true },
+            ]}
+          />
+        </div>
+
         {/* Header */}
         <div className="mb-6">
-          <Link href="/phases" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
-            ← Back to Phases
-          </Link>
-          <div className="flex justify-between items-start">
-            <div>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+            <div className="flex-1">
               <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{phase.phaseName}</h1>
               <p className="text-gray-600 mt-1">{phase.description || 'No description'}</p>
               {project && (
@@ -507,7 +517,7 @@ export default function PhaseDetailPage() {
                   href={`/projects/${project._id}`}
                   className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block"
                 >
-                  Project: {project.projectName}
+                  Project: {project.projectName} →
                 </Link>
               )}
             </div>

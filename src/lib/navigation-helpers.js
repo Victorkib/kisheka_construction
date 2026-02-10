@@ -58,6 +58,13 @@ export const NAVIGATION_SECTIONS = {
         roles: ['owner', 'pm', 'project_manager'],
         icon: 'file-text',
       },
+      {
+        label: 'Floors',
+        href: '/floors',
+        roles: ['owner', 'pm', 'project_manager', 'site_clerk', 'accountant', 'supervisor'],
+        icon: 'building',
+      },
+  
     ],
   },
   financial: {
@@ -327,11 +334,6 @@ export const NAVIGATION_SECTIONS = {
       {
         label: 'Categories',
         href: '/categories',
-        roles: ['owner', 'pm', 'project_manager', 'accountant'],
-      },
-      {
-        label: 'Floors',
-        href: '/floors',
         roles: ['owner', 'pm', 'project_manager', 'accountant'],
       },
     ],

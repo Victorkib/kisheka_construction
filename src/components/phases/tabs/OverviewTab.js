@@ -5,10 +5,89 @@
 
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { PhaseDependencies } from '../PhaseDependencies';
 
 export function OverviewTab({ phase, project, canEdit, onStatusChange, onCompletionChange, updatingStatus, updatingCompletion, formatDate, formatCurrency, getStatusColor }) {
+  const [resourceCounts, setResourceCounts] = useState({
+    materials: 0,
+    labour: 0,
+    equipment: 0,
+    workItems: 0,
+    loading: true,
+  });
+  const [floors, setFloors] = useState([]);
+  const [floorsLoading, setFloorsLoading] = useState(true);
+
+  useEffect(() => {
+    if (phase?._id) {
+      fetchResourceCounts();
+      fetchFloors();
+    }
+  }, [phase?._id]);
+
+  const fetchResourceCounts = async () => {
+    try {
+      setResourceCounts(prev => ({ ...prev, loading: true }));
+      const [materialsRes, labourRes, equipmentRes, workItemsRes] = await Promise.all([
+        fetch(`/api/materials?phaseId=${phase._id}&limit=1`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' },
+        }).catch(() => ({ json: async () => ({ success: false, data: { total: 0 } }) })),
+        fetch(`/api/labour/entries?phaseId=${phase._id}&limit=1`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' },
+        }).catch(() => ({ json: async () => ({ success: false, data: { total: 0 } }) })),
+        fetch(`/api/equipment?phaseId=${phase._id}&limit=1`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' },
+        }).catch(() => ({ json: async () => ({ success: false, data: { total: 0 } }) })),
+        fetch(`/api/work-items?phaseId=${phase._id}&limit=1`, {
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache' },
+        }).catch(() => ({ json: async () => ({ success: false, data: { total: 0 } }) })),
+      ]);
+
+      const [materialsData, labourData, equipmentData, workItemsData] = await Promise.all([
+        materialsRes.json(),
+        labourRes.json(),
+        equipmentRes.json(),
+        workItemsRes.json(),
+      ]);
+
+      setResourceCounts({
+        materials: materialsData.success ? (materialsData.data?.total || materialsData.data?.materials?.length || 0) : 0,
+        labour: labourData.success ? (labourData.data?.total || labourData.data?.entries?.length || 0) : 0,
+        equipment: equipmentData.success ? (equipmentData.data?.total || equipmentData.data?.equipment?.length || 0) : 0,
+        workItems: workItemsData.success ? (workItemsData.data?.total || workItemsData.data?.workItems?.length || 0) : 0,
+        loading: false,
+      });
+    } catch (err) {
+      console.error('Error fetching resource counts:', err);
+      setResourceCounts(prev => ({ ...prev, loading: false }));
+    }
+  };
+
+  const fetchFloors = async () => {
+    try {
+      setFloorsLoading(true);
+      const response = await fetch(`/api/phases/${phase._id}/floors`, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache' },
+      });
+      const data = await response.json();
+      if (data.success) {
+        const floorList = Object.values(data.data || {}).filter(f => f.floorId !== 'unassigned');
+        setFloors(floorList.slice(0, 5)); // Show top 5
+      }
+    } catch (err) {
+      console.error('Error fetching floors:', err);
+    } finally {
+      setFloorsLoading(false);
+    }
+  };
+
   const financialSummary = phase.financialSummary || {
     budgetTotal: phase.budgetAllocation?.total || 0,
     actualTotal: phase.actualSpending?.total || 0,
@@ -17,6 +96,52 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
     variancePercentage: 0,
     utilizationPercentage: 0
   };
+
+  // Calculate risks
+  const risks = [];
+  if (financialSummary.utilizationPercentage > 100) {
+    risks.push({
+      type: 'budget',
+      severity: 'high',
+      message: `Budget overrun: ${financialSummary.utilizationPercentage.toFixed(1)}% utilized`,
+      icon: '💰',
+    });
+  } else if (financialSummary.utilizationPercentage > 80) {
+    risks.push({
+      type: 'budget',
+      severity: 'medium',
+      message: `Budget at risk: ${financialSummary.utilizationPercentage.toFixed(1)}% utilized`,
+      icon: '💰',
+    });
+  }
+  
+  if (phase.completionPercentage < 50 && phase.status === 'in_progress' && phase.plannedEndDate) {
+    const daysRemaining = Math.ceil((new Date(phase.plannedEndDate) - new Date()) / (1000 * 60 * 60 * 24));
+    if (daysRemaining < 0) {
+      risks.push({
+        type: 'schedule',
+        severity: 'high',
+        message: `Phase is ${Math.abs(daysRemaining)} days overdue`,
+        icon: '📅',
+      });
+    } else if (daysRemaining < 7) {
+      risks.push({
+        type: 'schedule',
+        severity: 'medium',
+        message: `Only ${daysRemaining} days remaining`,
+        icon: '📅',
+      });
+    }
+  }
+  
+  if (phase.status === 'on_hold') {
+    risks.push({
+      type: 'status',
+      severity: 'medium',
+      message: 'Phase is currently on hold',
+      icon: '⏸️',
+    });
+  }
 
   return (
     <div className="space-y-6">
@@ -230,6 +355,110 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
           </div>
         </div>
       </div>
+
+      {/* Resource Counts */}
+      <div className="bg-white rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Resource Summary</h3>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <Link
+            href={`/phases/${phase._id}?tab=materials`}
+            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <p className="text-sm text-gray-600">Materials</p>
+            <p className="text-2xl font-bold text-gray-900 mt-1">
+              {resourceCounts.loading ? '...' : resourceCounts.materials}
+            </p>
+          </Link>
+          <Link
+            href={`/phases/${phase._id}?tab=resources`}
+            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <p className="text-sm text-gray-600">Labour</p>
+            <p className="text-2xl font-bold text-gray-900 mt-1">
+              {resourceCounts.loading ? '...' : resourceCounts.labour}
+            </p>
+          </Link>
+          <Link
+            href={`/phases/${phase._id}?tab=resources`}
+            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <p className="text-sm text-gray-600">Equipment</p>
+            <p className="text-2xl font-bold text-gray-900 mt-1">
+              {resourceCounts.loading ? '...' : resourceCounts.equipment}
+            </p>
+          </Link>
+          <Link
+            href={`/phases/${phase._id}?tab=work-items`}
+            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <p className="text-sm text-gray-600">Work Items</p>
+            <p className="text-2xl font-bold text-gray-900 mt-1">
+              {resourceCounts.loading ? '...' : resourceCounts.workItems}
+            </p>
+          </Link>
+        </div>
+      </div>
+
+      {/* Key Risks & Alerts */}
+      {risks.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Risks & Alerts</h3>
+          <div className="space-y-2">
+            {risks.map((risk, index) => (
+              <div
+                key={index}
+                className={`p-3 rounded-lg border ${
+                  risk.severity === 'high'
+                    ? 'bg-red-50 border-red-200'
+                    : 'bg-yellow-50 border-yellow-200'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{risk.icon}</span>
+                  <p className={`text-sm font-medium ${
+                    risk.severity === 'high' ? 'text-red-800' : 'text-yellow-800'
+                  }`}>
+                    {risk.message}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Floors in This Phase */}
+      {!floorsLoading && floors.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Floors in This Phase</h3>
+            <Link
+              href={`/phases/${phase._id}?tab=floors`}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              View All →
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {floors.map((floor) => (
+              <div
+                key={floor.floorId}
+                className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                <Link
+                  href={`/floors/${floor.floorId}`}
+                  className="font-medium text-gray-900 hover:text-blue-600"
+                >
+                  {floor.floorName}
+                </Link>
+                <div className="mt-1 text-xs text-gray-500">
+                  {floor.counts.materials} materials • {floor.counts.workItems} work items
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Project Link */}
       {project && (
