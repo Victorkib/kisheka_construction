@@ -6,8 +6,8 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState, useRef } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner } from '@/components/loading';
 import { fetchNoCache } from '@/lib/fetch-helpers';
@@ -15,14 +15,39 @@ import { fetchNoCache } from '@/lib/fetch-helpers';
 /**
  * Dashboard Router
  * Redirects users to their role-specific dashboard
+ * CRITICAL FIX: Prevents redirect loops by checking current pathname
  */
 export default function DashboardPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const [error, setError] = useState(null);
+  const hasRedirected = useRef(false);
 
   useEffect(() => {
+    // CRITICAL FIX: Check if we're already on a role-specific dashboard
+    // This prevents redirect loops when user clicks dashboard link while already on dashboard
+    const currentPath = pathname || window.location.pathname;
+    const isAlreadyOnRoleDashboard = currentPath.match(/^\/dashboard\/(owner|investor|pm|clerk|accountant|supervisor|supplier)$/);
+    
+    if (isAlreadyOnRoleDashboard) {
+      // Already on a role dashboard, don't redirect
+      return;
+    }
+
+    // CRITICAL FIX: Only redirect once per mount
+    if (hasRedirected.current) {
+      return;
+    }
+
     async function redirectToRoleDashboard() {
       try {
+        // CRITICAL FIX: Double-check we're still on /dashboard before redirecting
+        const currentPath = window.location.pathname;
+        if (currentPath !== '/dashboard' && !currentPath.startsWith('/dashboard/')) {
+          // User navigated away, don't redirect
+          return;
+        }
+
         const response = await fetchNoCache('/api/auth/me');
         const data = await response.json();
 
@@ -33,6 +58,9 @@ export default function DashboardPage() {
 
         const user = data.data;
         const role = user.role?.toLowerCase();
+
+        // CRITICAL FIX: Mark as redirected before actually redirecting
+        hasRedirected.current = true;
 
         // Route to role-specific dashboard
         switch (role) {
@@ -73,7 +101,7 @@ export default function DashboardPage() {
     }
 
     redirectToRoleDashboard();
-  }, [router]);
+  }, [router, pathname]);
 
   if (error) {
     return (

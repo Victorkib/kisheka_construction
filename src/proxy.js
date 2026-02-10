@@ -180,8 +180,9 @@ export async function proxy(request) {
       error: sessionError,
     } = await supabase.auth.getSession();
 
-    // Handle session errors gracefully
-    // Only redirect on actual auth failures, not transient errors
+    // CRITICAL FIX: Handle session errors gracefully
+    // In production, session checks can flap due to cookie timing issues
+    // We should be very lenient and only redirect on clear auth failures
     if (sessionError) {
       console.error('Session error in proxy:', sessionError);
       
@@ -191,6 +192,14 @@ export async function proxy(request) {
                               sessionError.message?.includes('expired') ||
                               sessionError.status === 401 ||
                               sessionError.status === 403;
+      
+      // CRITICAL FIX: For dashboard routes, be extra lenient
+      // Allow dashboard routes to continue even with session errors
+      // Client-side will handle auth and redirect if truly needed
+      if (pathname.startsWith('/dashboard')) {
+        console.warn('Dashboard route with session error, allowing client-side handling:', sessionError.message);
+        return applyCookiesToResponse(response);
+      }
       
       // Only redirect on critical auth errors, not transient network issues
       if (isCriticalError && isProtectedRoute) {
@@ -211,16 +220,26 @@ export async function proxy(request) {
         }
         // Transient error but no session - be lenient, allow to continue
         // The client-side will handle re-authentication if needed
-        return response;
+        return applyCookiesToResponse(response);
       }
       
       // For auth routes, allow the request to continue
-      return response;
+      return applyCookiesToResponse(response);
     }
 
     // Handle protected routes
     if (isProtectedRoute) {
       if (!session) {
+        // CRITICAL FIX: Don't redirect if we're already on a dashboard route and session check failed
+        // This prevents redirect loops when session is temporarily unavailable
+        // The client-side code will handle re-authentication
+        if (pathname.startsWith('/dashboard/')) {
+          // Allow dashboard routes to continue even without session
+          // Client-side will handle auth check and redirect if needed
+          console.warn('Dashboard route accessed without session, allowing client-side handling');
+          return applyCookiesToResponse(response);
+        }
+        
         // Redirect to login if not authenticated (only if we got a clean response with no session)
         const url = new URL('/auth/login', request.url);
         url.searchParams.set('redirect', pathname);
