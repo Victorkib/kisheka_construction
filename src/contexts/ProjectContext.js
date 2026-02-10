@@ -157,16 +157,49 @@ export function ProjectContextProvider({ children }) {
 
   const loadAccessibleProjects = async () => {
     try {
-      const response = await fetch('/api/projects/accessible');
+      // Primary source: dedicated accessible-projects API
+      const response = await fetch('/api/projects/accessible', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+        },
+      });
       const data = await response.json();
-      if (data.success) {
-        setAccessibleProjects(data.data || []);
-        return data.data || [];
-      } else {
-        console.error('Failed to load accessible projects:', data.error);
-        setAccessibleProjects([]);
-        return [];
+
+      if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+        setAccessibleProjects(data.data);
+        return data.data;
       }
+
+      console.warn(
+        'Accessible projects API returned no projects or failed. Falling back to /api/projects.',
+        data.error || null,
+      );
+
+      // Fallback: use /api/projects (used by Projects page), which is known
+      // to work even in production. This ensures the selector and context
+      // stay in sync with what the user actually sees.
+      const fallbackResponse = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          Pragma: 'no-cache',
+        },
+      });
+      const fallbackData = await fallbackResponse.json();
+
+      if (fallbackData.success && Array.isArray(fallbackData.data)) {
+        setAccessibleProjects(fallbackData.data);
+        return fallbackData.data;
+      }
+
+      console.error(
+        'Fallback /api/projects also failed to return projects:',
+        fallbackData.error || null,
+      );
+      setAccessibleProjects([]);
+      return [];
     } catch (error) {
       console.error('Error loading accessible projects:', error);
       setAccessibleProjects([]);
