@@ -187,8 +187,6 @@ export default function RootLayout({ children }) {
         />
         <meta name="apple-mobile-web-app-title" content="Kisheka" />
 
-        {/* Preload critical resources */}
-        <link rel="preload" as="style" href="/globals.css" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
