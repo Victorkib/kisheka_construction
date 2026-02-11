@@ -71,10 +71,11 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
               onChange={(e) => onStatusChange(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="NOT_STARTED">Not Started</option>
-              <option value="IN_PROGRESS">In Progress</option>
-              <option value="COMPLETED">Completed</option>
-              <option value="ON_HOLD">On Hold</option>
+              <option value="NOT_STARTED" className="text-gray-900">Not Started</option>
+              <option value="IN_PROGRESS" className="text-gray-900">In Progress</option>
+              <option value="COMPLETED" className="text-gray-900">Completed</option>
+              <option value="ON_HOLD" className="text-gray-900">On Hold</option>
+              <option value="CANCELLED" className="text-gray-900">Cancelled</option>
             </select>
           ) : (
             <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(floor.status)}`}>
