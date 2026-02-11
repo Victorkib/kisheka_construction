@@ -25,8 +25,9 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
   }, [phase?._id]);
 
   useEffect(() => {
-    // Apply filters
-    let filtered = [...expenses];
+    // Apply filters - ensure expenses is an array
+    const expensesArray = Array.isArray(expenses) ? expenses : [];
+    let filtered = [...expensesArray];
 
     if (filters.status) {
       filtered = filtered.filter(e => e.status === filters.status);
@@ -62,7 +63,11 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
       });
       const data = await response.json();
       if (data.success) {
-        setExpenses(data.data?.expenses || data.data || []);
+        // Ensure we always set an array
+        const expensesData = data.data?.expenses || data.data;
+        setExpenses(Array.isArray(expensesData) ? expensesData : []);
+      } else {
+        setExpenses([]);
       }
     } catch (err) {
       console.error('Fetch expenses error:', err);
@@ -71,16 +76,17 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
     }
   };
 
-  // Calculate statistics
+  // Calculate statistics - ensure expenses is an array
+  const expensesArray = Array.isArray(expenses) ? expenses : [];
   const stats = {
-    total: expenses.length,
-    totalCost: expenses.reduce((sum, e) => sum + (e.amount || 0), 0),
-    byStatus: expenses.reduce((acc, e) => {
+    total: expensesArray.length,
+    totalCost: expensesArray.reduce((sum, e) => sum + (e.amount || 0), 0),
+    byStatus: expensesArray.reduce((acc, e) => {
       const status = e.status || 'UNKNOWN';
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, {}),
-    byCategory: expenses.reduce((acc, e) => {
+    byCategory: expensesArray.reduce((acc, e) => {
       const category = e.category || 'Uncategorized';
       acc[category] = (acc[category] || 0) + 1;
       return acc;

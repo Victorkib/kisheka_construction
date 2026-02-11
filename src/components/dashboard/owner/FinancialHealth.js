@@ -6,6 +6,7 @@
 'use client';
 
 import Link from 'next/link';
+import { getCapitalStatus, getBudgetStatus, formatPercentage, safePercentage } from '@/lib/financial-status-helpers';
 
 export function FinancialHealth({ data, formatCurrency }) {
   if (!data) return null;
@@ -18,10 +19,16 @@ export function FinancialHealth({ data, formatCurrency }) {
     actualSpent,
     costBreakdown,
     budgetVariance,
+    committedCost,
   } = data;
 
-  const utilization = totalRaised > 0 ? ((totalUsed / totalRaised) * 100).toFixed(1) : 0;
-  const budgetUtilization = budgetTotal > 0 ? ((actualSpent / budgetTotal) * 100).toFixed(1) : 0;
+  // Use financial status helpers for accurate status determination
+  const capitalStatus = getCapitalStatus(totalRaised, totalUsed, available, committedCost || 0);
+  const budgetStatus = getBudgetStatus(budgetTotal, actualSpent);
+
+  // Use safe percentage calculations
+  const utilization = capitalStatus.utilization !== null ? capitalStatus.utilization.toFixed(1) : 'N/A';
+  const budgetUtilization = budgetStatus.utilization !== null ? budgetStatus.utilization.toFixed(1) : 'N/A';
 
   // Calculate percentages for cost breakdown
   const totalCost = costBreakdown.materials + costBreakdown.labour + costBreakdown.expenses;
@@ -76,31 +83,58 @@ export function FinancialHealth({ data, formatCurrency }) {
       <div className="mb-6">
         <div className="flex justify-between text-sm text-gray-600 mb-2">
           <span>Capital Utilization</span>
-          <span>{utilization}%</span>
+          <span>{capitalStatus.isOptional ? 'Not Set' : `${utilization}%`}</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-4">
-          <div
-            className={`h-4 rounded-full transition-all ${
-              utilization > 90
-                ? 'bg-red-500'
-                : utilization > 75
-                ? 'bg-yellow-500'
-                : 'bg-green-500'
-            }`}
-            style={{ width: `${Math.min(100, utilization)}%` }}
-          />
-        </div>
+        {capitalStatus.isOptional ? (
+          <div className="w-full bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <p className="text-sm text-blue-800">{capitalStatus.message}</p>
+          </div>
+        ) : (
+          <div className="w-full bg-gray-200 rounded-full h-4">
+            <div
+              className={`h-4 rounded-full transition-all ${
+                capitalStatus.status === 'overspent'
+                  ? 'bg-red-500'
+                  : capitalStatus.status === 'low'
+                  ? 'bg-yellow-500'
+                  : 'bg-green-500'
+              }`}
+              style={{ width: `${Math.min(100, capitalStatus.utilization || 0)}%` }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Budget vs Actual */}
-      {budgetTotal > 0 && (
+      {budgetStatus.isOptional ? (
+        <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-blue-900">Budget Status</h3>
+            <span className="text-sm font-medium text-blue-700">Not Set</span>
+          </div>
+          <p className="text-sm text-blue-800 mb-3">{budgetStatus.message}</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs text-blue-600 mb-1">Current Spending</p>
+              <p className="text-lg font-bold text-blue-900">{formatCurrency(actualSpent)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-blue-600 mb-1">Budget</p>
+              <p className="text-lg font-bold text-blue-700">Not Set</p>
+            </div>
+          </div>
+        </div>
+      ) : (
         <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-gray-900">Budget vs Actual</h3>
             <span className={`text-sm font-bold ${
-              budgetVariance > 0 ? 'text-red-600' : 'text-green-600'
+              budgetStatus.status === 'over_budget' ? 'text-red-600' : 
+              budgetStatus.status === 'at_risk' ? 'text-yellow-600' : 
+              'text-green-600'
             }`}>
-              {budgetVariance > 0 ? '+' : ''}{budgetVariance.toFixed(1)}% variance
+              {budgetStatus.variance !== null && budgetStatus.variance < 0 ? '+' : ''}
+              {budgetStatus.variance !== null ? formatPercentage(budgetStatus.variance, 'N/A') : 'N/A'} variance
             </span>
           </div>
           <div className="grid grid-cols-2 gap-4 mb-4">
@@ -116,13 +150,13 @@ export function FinancialHealth({ data, formatCurrency }) {
           <div className="w-full bg-gray-200 rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all ${
-                budgetUtilization > 100
+                budgetStatus.status === 'over_budget'
                   ? 'bg-red-500'
-                  : budgetUtilization > 80
+                  : budgetStatus.status === 'at_risk'
                   ? 'bg-yellow-500'
                   : 'bg-green-500'
               }`}
-              style={{ width: `${Math.min(100, budgetUtilization)}%` }}
+              style={{ width: `${Math.min(100, budgetStatus.utilization || 0)}%` }}
             />
           </div>
         </div>

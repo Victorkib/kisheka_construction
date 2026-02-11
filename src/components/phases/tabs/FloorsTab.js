@@ -68,11 +68,12 @@ export function FloorsTab({ phase, formatCurrency }) {
 
   const maxTotal = useMemo(() => {
     return floors.reduce((max, floor) => {
-      const total = (floor.totals.materials || 0)
-        + (floor.totals.materialRequests || 0)
-        + (floor.totals.purchaseOrders || 0)
-        + (floor.totals.labour || 0)
-        + (floor.totals.workItems || 0);
+      const totals = floor.totals || {};
+      const total = (totals.materials || 0)
+        + (totals.materialRequests || 0)
+        + (totals.purchaseOrders || 0)
+        + (totals.labour || 0)
+        + (totals.workItems || 0);
       return Math.max(max, total);
     }, 0);
   }, [floors]);
@@ -86,11 +87,12 @@ export function FloorsTab({ phase, formatCurrency }) {
       workItems: 0,
     };
     floors.forEach((floor) => {
-      totals.materials += floor.totals.materials || 0;
-      totals.materialRequests += floor.totals.materialRequests || 0;
-      totals.purchaseOrders += floor.totals.purchaseOrders || 0;
-      totals.labour += floor.totals.labour || 0;
-      totals.workItems += floor.totals.workItems || 0;
+      const floorTotals = floor.totals || {};
+      totals.materials += floorTotals.materials || 0;
+      totals.materialRequests += floorTotals.materialRequests || 0;
+      totals.purchaseOrders += floorTotals.purchaseOrders || 0;
+      totals.labour += floorTotals.labour || 0;
+      totals.workItems += floorTotals.workItems || 0;
     });
     return totals;
   }, [floors]);
@@ -176,11 +178,12 @@ export function FloorsTab({ phase, formatCurrency }) {
             </div>
           )}
           {floors.map((floor) => {
-            const total = (floor.totals.materials || 0)
-              + (floor.totals.materialRequests || 0)
-              + (floor.totals.purchaseOrders || 0)
-              + (floor.totals.labour || 0)
-              + (floor.totals.workItems || 0);
+            const floorTotals = floor.totals || {};
+            const total = (floorTotals.materials || 0)
+              + (floorTotals.materialRequests || 0)
+              + (floorTotals.purchaseOrders || 0)
+              + (floorTotals.labour || 0)
+              + (floorTotals.workItems || 0);
             const intensity = maxTotal > 0 ? Math.min(0.9, Math.max(0.15, total / maxTotal)) : 0.15;
             const bgColor = `rgba(37, 99, 235, ${intensity})`;
             return (
@@ -228,11 +231,12 @@ export function FloorsTab({ phase, formatCurrency }) {
                 </tr>
               )}
               {floors.map((floor) => {
-                const total = (floor.totals.materials || 0)
-                  + (floor.totals.materialRequests || 0)
-                  + (floor.totals.purchaseOrders || 0)
-                  + (floor.totals.labour || 0)
-                  + (floor.totals.workItems || 0);
+                const floorTotals = floor.totals || {};
+                const total = (floorTotals.materials || 0)
+                  + (floorTotals.materialRequests || 0)
+                  + (floorTotals.purchaseOrders || 0)
+                  + (floorTotals.labour || 0)
+                  + (floorTotals.workItems || 0);
                 const totalPercent = maxTotal > 0 ? Math.round((total / maxTotal) * 100) : 0;
                 const projectId = phase?.projectId;
                 const phaseId = phase?._id;
@@ -254,11 +258,11 @@ export function FloorsTab({ phase, formatCurrency }) {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floor.totals.materials)}</td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floor.totals.materialRequests)}</td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floor.totals.purchaseOrders)}</td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floor.totals.labour)}</td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floor.totals.workItems)}</td>
+                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floorTotals.materials || 0)}</td>
+                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floorTotals.materialRequests || 0)}</td>
+                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floorTotals.purchaseOrders || 0)}</td>
+                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floorTotals.labour || 0)}</td>
+                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floorTotals.workItems || 0)}</td>
                     <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">{formatCurrency(total)}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">
                       <div className="flex flex-col gap-1">

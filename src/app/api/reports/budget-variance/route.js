@@ -17,6 +17,14 @@ import { calculateMaterialsBreakdown } from '@/lib/financial-helpers';
 import { MATERIAL_APPROVED_STATUSES, EXPENSE_APPROVED_STATUSES, INITIAL_EXPENSE_APPROVED_STATUSES } from '@/lib/status-constants';
 import { calculatePhaseFinancialSummary } from '@/lib/schemas/phase-schema';
 import { getBudgetTotal, getMaterialsBudget, getLabourBudget, getContingencyBudget } from '@/lib/schemas/budget-schema';
+import {
+  getBudgetStatus,
+  getCapitalStatus,
+  getVariance,
+  getOptionalState,
+  getPhaseBudgetStatus,
+  safePercentage,
+} from '@/lib/financial-status-helpers';
 
 /**
  * GET /api/reports/budget-variance
@@ -182,41 +190,35 @@ export async function GET(request) {
     // Note: Materials budget is separate, expenses and initial expenses typically come from contingency
     const totalActual = materialsActualCost + actualExpensesCost + actualInitialExpensesCost + labourActual;
 
-    // Calculate variance
-    const materialsVariance = materialsBudget - materialsActualCost;
-    const materialsVariancePercentage = materialsBudget > 0 
-      ? ((materialsVariance / materialsBudget) * 100).toFixed(2)
-      : 0;
-    
-    // NEW: Calculate committed and estimated variances
-    const materialsCommittedVariance = materialsBudget - materialsCommitted;
-    const materialsCommittedVariancePercentage = materialsBudget > 0
-      ? ((materialsCommittedVariance / materialsBudget) * 100).toFixed(2)
-      : 0;
-    
-    const materialsEstimatedVariance = materialsBudget - materialsEstimated;
-    const materialsEstimatedVariancePercentage = materialsBudget > 0
-      ? ((materialsEstimatedVariance / materialsBudget) * 100).toFixed(2)
-      : 0;
-
-    // Labour variance (labourActual already calculated above)
-    const labourVariance = budget.labour - labourActual;
-    const labourVariancePercentage = budget.labour > 0
-      ? ((labourVariance / budget.labour) * 100).toFixed(2)
-      : 0;
-
-    // Contingency variance (expenses + initial expenses typically come from contingency)
+    // Use financial status helpers for variance calculations
+    const materialsVarianceObj = getVariance(materialsBudget, materialsActualCost, materialsCommitted, materialsEstimated);
+    const labourVarianceObj = getVariance(budget.labour, labourActual);
     const contingencyUsed = actualExpensesCost + actualInitialExpensesCost;
-    const contingencyVariance = budget.contingency - contingencyUsed;
-    const contingencyVariancePercentage = budget.contingency > 0
-      ? ((contingencyVariance / budget.contingency) * 100).toFixed(2)
-      : 0;
+    const contingencyVarianceObj = getVariance(budget.contingency, contingencyUsed);
+    const totalVarianceObj = getVariance(budget.total, totalActual);
 
-    // Total variance
-    const totalVariance = budget.total - totalActual;
-    const totalVariancePercentage = budget.total > 0
-      ? ((totalVariance / budget.total) * 100).toFixed(2)
-      : 0;
+    // Helper function to safely format percentage
+    const safeFormatPercentage = (value) => {
+      if (value === null || value === undefined || isNaN(value)) return null;
+      return parseFloat(Number(value).toFixed(2));
+    };
+
+    // Extract values (handle null for optional budgets)
+    const materialsVariance = materialsVarianceObj.amount ?? (materialsBudget - materialsActualCost);
+    const materialsVariancePercentage = safeFormatPercentage(materialsVarianceObj.percentage);
+    const materialsCommittedVariance = materialsVarianceObj.committedAmount ?? (materialsBudget - materialsCommitted);
+    const materialsCommittedVariancePercentage = safeFormatPercentage(materialsVarianceObj.committedPercentage);
+    const materialsEstimatedVariance = materialsVarianceObj.estimatedAmount ?? (materialsBudget - materialsEstimated);
+    const materialsEstimatedVariancePercentage = safeFormatPercentage(materialsVarianceObj.estimatedPercentage);
+
+    const labourVariance = labourVarianceObj.amount ?? (budget.labour - labourActual);
+    const labourVariancePercentage = safeFormatPercentage(labourVarianceObj.percentage);
+
+    const contingencyVariance = contingencyVarianceObj.amount ?? (budget.contingency - contingencyUsed);
+    const contingencyVariancePercentage = safeFormatPercentage(contingencyVarianceObj.percentage);
+
+    const totalVariance = totalVarianceObj.amount ?? (budget.total - totalActual);
+    const totalVariancePercentage = safeFormatPercentage(totalVarianceObj.percentage);
 
     // Category-wise breakdown (materials only, as expenses/initial expenses are typically contingency)
     const categoryBreakdown = await db
@@ -277,8 +279,8 @@ export async function GET(request) {
       const floorActual = floor.actual || 0;
       const floorVariance = floorBudget - floorActual;
       const floorVariancePercentage = floorBudget > 0
-        ? ((floorVariance / floorBudget) * 100).toFixed(2)
-        : 0;
+        ? safeFormatPercentage((floorVariance / floorBudget) * 100)
+        : null;
 
       return {
         floorId: floor._id?.toString() || null,
@@ -287,7 +289,7 @@ export async function GET(request) {
         budget: floorBudget,
         actual: floorActual,
         variance: floorVariance,
-        variancePercentage: parseFloat(floorVariancePercentage),
+        variancePercentage: floorVariancePercentage !== null ? parseFloat(floorVariancePercentage) : null,
         count: floor.count || 0,
       };
     });
@@ -335,20 +337,23 @@ export async function GET(request) {
         const phaseCommitted = phaseFinancialSummary.committedCost || 0;
         const phaseEstimated = phaseFinancialSummary.estimatedCost || 0;
         
-        const phaseVariance = phaseBudget - phaseActual;
-        const phaseVariancePercentage = phaseBudget > 0
-          ? ((phaseVariance / phaseBudget) * 100).toFixed(2)
-          : 0;
+        // Use phase budget status helper
+        const phaseStatus = getPhaseBudgetStatus(
+          phase,
+          phaseFinancialSummary.actualSpending || {},
+          {
+            committed: phaseCommitted,
+            estimated: phaseEstimated,
+          }
+        );
 
-        const phaseCommittedVariance = phaseBudget - phaseCommitted;
-        const phaseCommittedVariancePercentage = phaseBudget > 0
-          ? ((phaseCommittedVariance / phaseBudget) * 100).toFixed(2)
-          : 0;
+        const phaseVarianceObj = getVariance(phaseBudget, phaseActual, phaseCommitted, phaseEstimated);
 
-        const phaseEstimatedVariance = phaseBudget - phaseEstimated;
-        const phaseEstimatedVariancePercentage = phaseBudget > 0
-          ? ((phaseEstimatedVariance / phaseBudget) * 100).toFixed(2)
-          : 0;
+        // Helper function to safely format percentage
+        const safeFormatPercentage = (value) => {
+          if (value === null || value === undefined || isNaN(value)) return null;
+          return parseFloat(Number(value).toFixed(2));
+        };
 
         return {
           phaseId: phase._id.toString(),
@@ -361,20 +366,15 @@ export async function GET(request) {
           actual: phaseActual,
           committed: phaseCommitted,
           estimated: phaseEstimated,
-          variance: phaseVariance,
-          variancePercentage: parseFloat(phaseVariancePercentage),
-          committedVariance: phaseCommittedVariance,
-          committedVariancePercentage: parseFloat(phaseCommittedVariancePercentage),
-          estimatedVariance: phaseEstimatedVariance,
-          estimatedVariancePercentage: parseFloat(phaseEstimatedVariancePercentage),
-          remaining: Math.max(0, phaseBudget - phaseActual - phaseCommitted),
-          statusIndicator: (() => {
-            if (phaseActual > phaseBudget) return 'over_budget';
-            if (phaseCommitted > phaseBudget) return 'committed_over_budget';
-            if (phaseEstimated > phaseBudget) return 'estimated_over_budget';
-            if (phaseActual > phaseBudget * 0.9) return 'approaching_budget';
-            return 'within_budget';
-          })(),
+          variance: phaseVarianceObj.amount ?? (phaseBudget - phaseActual),
+          variancePercentage: safeFormatPercentage(phaseVarianceObj.percentage),
+          committedVariance: phaseVarianceObj.committedAmount ?? (phaseBudget - phaseCommitted),
+          committedVariancePercentage: safeFormatPercentage(phaseVarianceObj.committedPercentage),
+          estimatedVariance: phaseVarianceObj.estimatedAmount ?? (phaseBudget - phaseEstimated),
+          estimatedVariancePercentage: safeFormatPercentage(phaseVarianceObj.estimatedPercentage),
+          remaining: phaseStatus.remaining !== null && phaseStatus.remaining !== undefined ? Math.max(0, phaseStatus.remaining) : null,
+          statusIndicator: phaseStatus.status === 'not_set' ? 'not_set' : phaseStatus.status === 'over_budget' ? 'over_budget' : phaseStatus.status === 'at_risk' ? 'approaching_budget' : 'within_budget',
+          budgetStatus: phaseStatus, // Include full status object
         };
       })
     );
@@ -384,32 +384,73 @@ export async function GET(request) {
     const totalInvested = projectTotals.totalInvested || 0;
     const totalLoans = projectTotals.totalLoans || 0;
     const totalEquity = projectTotals.totalEquity || 0;
+    
+    // Get finances for committed cost
+    const { getProjectFinances } = await import('@/lib/financial-helpers');
+    const finances = await getProjectFinances(projectId);
+    const committedCost = finances?.committedCost || 0;
+    const availableCapital = finances?.availableCapital ?? (totalInvested - totalActual - committedCost);
     const capitalBalance = totalInvested - totalActual;
 
     // Get spending limit (capital, not budget)
     const spendingLimit = totalInvested; // Capital is the actual limit
 
-    // Determine warnings
+    // Get budget and capital status
+    const budgetStatus = getBudgetStatus(budget.total, totalActual, committedCost, materialsEstimated);
+    const capitalStatus = getCapitalStatus(totalInvested, totalActual, availableCapital, committedCost);
+    const optionalState = getOptionalState(project, finances);
+
+    // Determine warnings (suppress when budget/capital is optional unless critical)
     const warnings = [];
-    if (budget.total > totalInvested && totalInvested > 0) {
+    
+    // Only warn if both budget and capital are set
+    if (budget.total > 0 && totalInvested > 0 && budget.total > totalInvested) {
       warnings.push({
         type: 'budget_exceeds_capital',
         severity: 'warning',
         message: `Budget (${budget.total.toLocaleString()}) exceeds available capital (${totalInvested.toLocaleString()}) by ${(budget.total - totalInvested).toLocaleString()}. Actual spending limit is based on capital, not budget.`,
       });
     }
-    if (capitalBalance < totalInvested * 0.1 && capitalBalance > 0) {
+    
+    // Only warn about low capital if capital is set
+    if (totalInvested > 0 && capitalBalance < totalInvested * 0.1 && capitalBalance > 0) {
+      const capitalPercent = ((capitalBalance / totalInvested) * 100);
       warnings.push({
         type: 'low_capital',
         severity: 'warning',
-        message: `Low capital balance: ${capitalBalance.toLocaleString()} remaining (${((capitalBalance / totalInvested) * 100).toFixed(1)}%)`,
+        message: `Low capital balance: ${capitalBalance.toLocaleString()} remaining (${!isNaN(capitalPercent) ? capitalPercent.toFixed(1) : 'N/A'}%)`,
       });
     }
+    
+    // Always warn about overspending (critical)
     if (capitalBalance < 0) {
       warnings.push({
         type: 'overspent',
         severity: 'error',
         message: `Overspent by ${Math.abs(capitalBalance).toLocaleString()}`,
+      });
+    }
+
+    // Add informational messages about optional state
+    if (optionalState.budgetNotSet) {
+      warnings.push({
+        type: 'budget_not_set',
+        severity: 'info',
+        message: 'Budget not set. All spending is being tracked. Set a budget to enable budget validation.',
+        actionable: true,
+        actionUrl: `/projects/${projectId}/finances`,
+        actionLabel: 'Set Budget',
+      });
+    }
+
+    if (optionalState.capitalNotSet) {
+      warnings.push({
+        type: 'capital_not_set',
+        severity: 'info',
+        message: 'No capital invested. Spending is being tracked. Add capital to enable capital validation.',
+        actionable: true,
+        actionUrl: '/financing',
+        actionLabel: 'Add Capital',
       });
     }
 
@@ -424,6 +465,7 @@ export async function GET(request) {
         materials: budget.materials,
         labour: budget.labour,
         contingency: budget.contingency,
+        isOptional: budget.total === 0, // Flag indicating if budget is optional
       },
       actual: {
         total: totalActual,
@@ -435,25 +477,25 @@ export async function GET(request) {
       },
       variance: {
         total: totalVariance,
-        totalPercentage: parseFloat(totalVariancePercentage),
+        totalPercentage: safeFormatPercentage(totalVariancePercentage),
         materials: {
           actual: {
             amount: materialsVariance,
-            percentage: parseFloat(materialsVariancePercentage),
+            percentage: safeFormatPercentage(materialsVariancePercentage),
           },
           committed: {
             amount: materialsCommittedVariance,
-            percentage: parseFloat(materialsCommittedVariancePercentage),
+            percentage: safeFormatPercentage(materialsCommittedVariancePercentage),
           },
           estimated: {
             amount: materialsEstimatedVariance,
-            percentage: parseFloat(materialsEstimatedVariancePercentage),
+            percentage: safeFormatPercentage(materialsEstimatedVariancePercentage),
           },
         },
         labour: labourVariance,
-        labourPercentage: parseFloat(labourVariancePercentage),
+        labourPercentage: safeFormatPercentage(labourVariancePercentage),
         contingency: contingencyVariance,
-        contingencyPercentage: parseFloat(contingencyVariancePercentage),
+        contingencyPercentage: safeFormatPercentage(contingencyVariancePercentage),
       },
       // NEW: Committed and estimated costs
       committed: {
@@ -492,11 +534,13 @@ export async function GET(request) {
       phaseBreakdown: phaseBreakdown,
       monthlyTrend: monthlyTrendFormatted,
       status: {
-        // Determine overall status based on variance
-        overall: totalVariance >= 0 ? 'on_budget' : totalVariancePercentage < -10 ? 'over_budget' : 'at_risk',
-        materials: materialsVariance >= 0 ? 'on_budget' : materialsVariancePercentage < -10 ? 'over_budget' : 'at_risk',
-        labour: labourVariance >= 0 ? 'on_budget' : labourVariancePercentage < -10 ? 'over_budget' : 'at_risk',
-        contingency: contingencyVariance >= 0 ? 'on_budget' : contingencyVariancePercentage < -10 ? 'over_budget' : 'at_risk',
+        // Use status from helpers
+        overall: budgetStatus.status,
+        materials: getBudgetStatus(budget.materials, materialsActualCost, materialsCommitted, materialsEstimated).status,
+        labour: getBudgetStatus(budget.labour, labourActual).status,
+        contingency: getBudgetStatus(budget.contingency, contingencyUsed).status,
+        budgetStatusDetails: budgetStatus,
+        capitalStatusDetails: capitalStatus,
       },
       financing: {
         totalInvested,
@@ -504,9 +548,11 @@ export async function GET(request) {
         totalEquity,
         totalUsed: totalActual,
         capitalBalance,
+        availableCapital,
         spendingLimit, // Capital is the actual limit
-        capitalUtilization: totalInvested > 0 ? ((totalActual / totalInvested) * 100).toFixed(2) : 0,
+        capitalUtilization: safeFormatPercentage(capitalStatus.utilization),
       },
+      optionalState,
       warnings,
     });
   } catch (error) {

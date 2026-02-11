@@ -32,6 +32,7 @@ import { CoreKPICard } from '@/components/projects/CoreKPICard';
 import { ProjectHealthStrip } from '@/components/projects/ProjectHealthStrip';
 import { CollapsibleFinancialSnapshot } from '@/components/projects/CollapsibleFinancialSnapshot';
 import { useProjectDomainSummaries } from '@/hooks/use-project-domain-summaries';
+import { getBudgetStatus as getBudgetStatusHelper, getCapitalStatus as getCapitalStatusHelper } from '@/lib/financial-status-helpers';
 
 // Phases Section Component
 function PhasesSection({ projectId, canEdit }) {
@@ -504,28 +505,46 @@ function BudgetVsActualSection({ projectId }) {
 
       {/* Visual Progress Bar */}
       <div className="mt-4 pt-4 border-t">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-sm text-gray-600">Budget Utilization</span>
-          <span className={`text-sm font-medium ${getVarianceColor(budgetData.variance.totalPercentage)}`}>
-            {budgetData.budget.total > 0
-              ? `${((budgetData.actual.total / budgetData.budget.total) * 100).toFixed(1)}% used`
-              : 'N/A'}
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
-          <div
-            className={`h-3 rounded-full transition-all ${
-              budgetData.variance.totalPercentage >= 0
-                ? 'bg-green-500'
-                : budgetData.variance.totalPercentage < -10
-                ? 'bg-red-500'
-                : 'bg-yellow-500'
-            }`}
-            style={{
-              width: `${Math.min(100, Math.max(0, (budgetData.actual.total / budgetData.budget.total) * 100))}%`,
-            }}
-          ></div>
-        </div>
+        {(() => {
+          const { getBudgetStatus, formatPercentage, safePercentage } = require('@/lib/financial-status-helpers');
+          const totalStatus = getBudgetStatus(budgetData.budget.total, budgetData.actual.total);
+          const utilizationPercent = safePercentage(budgetData.actual.total, budgetData.budget.total);
+          
+          if (totalStatus.isOptional) {
+            return (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p className="text-sm text-blue-800 font-medium mb-1">Budget Not Set</p>
+                <p className="text-xs text-blue-700">{totalStatus.message}</p>
+                <p className="text-xs text-blue-600 mt-2">Current Spending: {formatCurrency(budgetData.actual.total)}</p>
+              </div>
+            );
+          }
+          
+          return (
+            <>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm text-gray-600">Budget Utilization</span>
+                <span className={`text-sm font-medium ${getVarianceColor(budgetData.variance.totalPercentage !== null ? budgetData.variance.totalPercentage : 0)}`}>
+                  {formatPercentage(utilizationPercent, 'N/A')} used
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div
+                  className={`h-3 rounded-full transition-all ${
+                    totalStatus.status === 'over_budget'
+                      ? 'bg-red-500'
+                      : totalStatus.status === 'at_risk'
+                      ? 'bg-yellow-500'
+                      : 'bg-green-500'
+                  }`}
+                  style={{
+                    width: `${utilizationPercent !== null ? Math.min(100, Math.max(0, utilizationPercent)) : 0}%`,
+                  }}
+                ></div>
+              </div>
+            </>
+          );
+        })()}
       </div>
     </div>
   );
@@ -1818,25 +1837,25 @@ export default function ProjectDetailPage() {
   const capitalBalance = statistics.capitalBalance || 0;
   const availableCapital = capitalBalance;
   const totalUsed = totalInvested - capitalBalance;
-  const usagePercentage = totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
   
   // Budget utilization
   const budgetTotal = project.budget?.total || 0;
   const actualSpent = statistics.totalMaterialsSpent || 0;
-  const budgetUtilization = budgetTotal > 0 ? (actualSpent / budgetTotal) * 100 : 0;
   
-  // Determine health statuses
+  // Use financial status helpers for accurate status determination
+  const budgetStatusObj = getBudgetStatusHelper(budgetTotal, actualSpent);
+  const capitalStatusObj = getCapitalStatusHelper(totalInvested, totalUsed, availableCapital);
+  
+  const usagePercentage = capitalStatusObj.utilization !== null ? capitalStatusObj.utilization : 0;
+  const budgetUtilization = budgetStatusObj.utilization !== null ? budgetStatusObj.utilization : 0;
+  
+  // Determine health statuses (using helper results)
   const getBudgetStatus = () => {
-    if (budgetUtilization > 100) return 'over_budget';
-    if (budgetUtilization > 80) return 'at_risk';
-    return 'on_budget';
+    return budgetStatusObj.status;
   };
   
   const getCapitalStatus = () => {
-    if (totalInvested === 0) return 'insufficient';
-    if (availableCapital < 0) return 'negative';
-    if (usagePercentage > 80) return 'low';
-    return 'sufficient';
+    return capitalStatusObj.status;
   };
   
   const getScheduleStatus = () => {
@@ -1896,13 +1915,14 @@ export default function ProjectDetailPage() {
                   let statusColor = 'bg-green-100 text-green-800';
                   let statusText = 'Capital OK';
                   
-                  if (totalInvested === 0) {
+                  // Use capital status helper for accurate status
+                  if (capitalStatusObj.status === 'not_set') {
+                    statusColor = 'bg-blue-100 text-blue-800';
+                    statusText = 'Capital Not Set';
+                  } else if (capitalStatusObj.status === 'overspent') {
                     statusColor = 'bg-red-100 text-red-800';
-                    statusText = 'No Capital';
-                  } else if (availableCapital < 0) {
-                    statusColor = 'bg-red-100 text-red-800';
-                    statusText = 'Negative';
-                  } else if (usagePercentage > 80) {
+                    statusText = 'Overspent';
+                  } else if (capitalStatusObj.status === 'low') {
                     statusColor = 'bg-yellow-100 text-yellow-800';
                     statusText = 'Low Capital';
                   }

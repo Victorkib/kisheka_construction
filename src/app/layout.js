@@ -6,6 +6,8 @@ import { ServiceWorkerRegister } from '@/components/push-notifications/service-w
 import { NotificationPermissionRequest } from '@/components/push-notifications/notification-permission-request';
 import { ProjectContextProvider } from '@/contexts/ProjectContext';
 import { OAuthSync } from '@/components/auth/oauth-sync';
+import ErrorBoundary from '@/components/error-boundary/ErrorBoundary';
+import { GlobalErrorHandler } from '@/components/error-boundary/GlobalErrorHandler';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -191,16 +193,19 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ToastProvider>
-          <Suspense fallback={<div>Loading...</div>}>
-            <ProjectContextProvider>
-              <OAuthSync />
-              <ServiceWorkerRegister />
-              <NotificationPermissionRequest />
-              {children}
-            </ProjectContextProvider>
-          </Suspense>
-        </ToastProvider>
+        <ErrorBoundary>
+          <ToastProvider>
+            <Suspense fallback={<div>Loading...</div>}>
+              <GlobalErrorHandler />
+              <ProjectContextProvider>
+                <OAuthSync />
+                <ServiceWorkerRegister />
+                <NotificationPermissionRequest />
+                {children}
+              </ProjectContextProvider>
+            </Suspense>
+          </ToastProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

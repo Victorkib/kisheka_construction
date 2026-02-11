@@ -1283,9 +1283,37 @@ export async function getFinancialOverview(projectId) {
     console.error('Error fetching contingency summary:', err);
   }
 
-  // Determine warnings
+  // Import financial status helpers
+  const {
+    getBudgetStatus,
+    getCapitalStatus,
+    getOptionalState,
+  } = await import('@/lib/financial-status-helpers');
+
+  // Get budget status with optional awareness
+  const budgetStatus = getBudgetStatus(
+    budgetWithLegacy.total,
+    totalUsed,
+    committedCost,
+    estimatedCost
+  );
+
+  // Get capital status with optional awareness
+  const capitalStatus = getCapitalStatus(
+    totalInvested,
+    totalUsed,
+    availableCapital,
+    committedCost
+  );
+
+  // Get optional state information
+  const optionalState = getOptionalState(project, finances);
+
+  // Determine warnings (suppress when budget/capital is optional unless critical)
   const warnings = [];
-  if (budgetWithLegacy.total > totalInvested) {
+  
+  // Only warn about budget exceeding capital if both are set
+  if (budgetWithLegacy.total > 0 && totalInvested > 0 && budgetWithLegacy.total > totalInvested) {
     warnings.push({
       type: 'budget_exceeds_capital',
       severity: 'warning',
@@ -1320,7 +1348,8 @@ export async function getFinancialOverview(projectId) {
       });
     }
   }
-  if (committedCost > 0 && availableCapital < committedCost) {
+  // Only warn about high commitment if capital is set
+  if (totalInvested > 0 && committedCost > 0 && availableCapital < committedCost) {
     warnings.push({
       type: 'high_commitment',
       severity: 'warning',
@@ -1328,9 +1357,33 @@ export async function getFinancialOverview(projectId) {
     });
   }
 
+  // Add informational messages about optional state
+  if (optionalState.budgetNotSet) {
+    warnings.push({
+      type: 'budget_not_set',
+      severity: 'info',
+      message: 'Budget not set. All spending is being tracked. Set a budget to enable budget validation and better financial control.',
+      actionable: true,
+      actionUrl: `/projects/${projectId}/finances`,
+      actionLabel: 'Set Budget',
+    });
+  }
+
+  if (optionalState.capitalNotSet) {
+    warnings.push({
+      type: 'capital_not_set',
+      severity: 'info',
+      message: 'No capital invested. Spending is being tracked. Add capital to enable capital validation and track available funds.',
+      actionable: true,
+      actionUrl: '/financing',
+      actionLabel: 'Add Capital',
+    });
+  }
+
   // Check if budget is exceeded and suggest contingency
+  // Only if budget is set (not optional)
   // Note: budgetRemaining is already calculated above at line 1004
-  if (budgetRemaining < 0 && contingencySummary && contingencySummary.remaining > 0) {
+  if (budgetWithLegacy.total > 0 && budgetRemaining < 0 && contingencySummary && contingencySummary.remaining > 0) {
     const budgetOverspend = Math.abs(budgetRemaining);
     const suggestedAmount = Math.min(budgetOverspend, contingencySummary.remaining);
     warnings.push({
@@ -1399,10 +1452,21 @@ export async function getFinancialOverview(projectId) {
       remaining: contingencySummary.remaining,
     } : null,
     status: {
-      budgetStatus: budgetRemaining >= 0 ? 'on_budget' : 'over_budget',
-      capitalStatus: capitalBalance >= 0 ? 'sufficient' : 'insufficient',
-      overall: capitalBalance >= 0 && budgetRemaining >= 0 ? 'healthy' : capitalBalance < 0 ? 'critical' : 'at_risk',
+      budgetStatus: budgetStatus.status,
+      budgetStatusDetails: budgetStatus,
+      capitalStatus: capitalStatus.status,
+      capitalStatusDetails: capitalStatus,
+      overall: (() => {
+        // Determine overall status
+        if (capitalStatus.status === 'overspent') return 'critical';
+        if (capitalStatus.status === 'low' || budgetStatus.status === 'over_budget') return 'at_risk';
+        if (budgetStatus.status === 'at_risk' || capitalStatus.status === 'low') return 'at_risk';
+        if (budgetStatus.isOptional && capitalStatus.isOptional) return 'tracking'; // Both optional - just tracking
+        if (budgetStatus.status === 'on_budget' && capitalStatus.status === 'sufficient') return 'healthy';
+        return 'at_risk';
+      })(),
     },
+    optionalState,
   };
 }
 

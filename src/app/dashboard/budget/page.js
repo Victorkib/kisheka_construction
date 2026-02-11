@@ -30,10 +30,27 @@ import {
 } from 'recharts';
 import { HierarchicalBudgetDisplay } from '@/components/budget/HierarchicalBudgetDisplay';
 import { BudgetVisualization } from '@/components/budget/BudgetVisualization';
+import { getBudgetStatus, safePercentage, formatPercentage } from '@/lib/financial-status-helpers';
 
 function BudgetDashboardContent() {
   const { currentProject, accessibleProjects, switchProject, isEmpty, loading: contextLoading, refreshAccessibleProjects } = useProjectContext();
   const [hasRefreshed, setHasRefreshed] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [projectBudget, setProjectBudget] = useState(null);
+  const [projectIdFromUrl, setProjectIdFromUrl] = useState(null);
+  const [urlProjectSwitched, setUrlProjectSwitched] = useState(false);
+
+  // Get projectId from URL query params
+  useEffect(() => {
+    const urlProjectId = searchParams.get('projectId');
+    if (urlProjectId) {
+      setProjectIdFromUrl(urlProjectId);
+    }
+  }, [searchParams]);
 
   // CRITICAL FIX: Refresh ProjectContext when dashboard loads if it's empty
   useEffect(() => {
@@ -45,27 +62,59 @@ function BudgetDashboardContent() {
       });
     }
   }, [contextLoading, isEmpty, hasRefreshed, refreshAccessibleProjects]);
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [projectBudget, setProjectBudget] = useState(null);
 
-  const selectedProjectId = normalizeProjectId(currentProject?._id) || null;
+  // CRITICAL FIX: If projectId is in URL but not in context, switch to it
+  useEffect(() => {
+    if (projectIdFromUrl && !contextLoading && accessibleProjects.length > 0 && !urlProjectSwitched) {
+      const normalizedUrlId = normalizeProjectId(projectIdFromUrl);
+      const currentProjectId = normalizeProjectId(currentProject?._id);
+      
+      // If URL projectId is different from current project, switch to it
+      if (normalizedUrlId && normalizedUrlId !== currentProjectId) {
+        const projectToSwitch = accessibleProjects.find(p => normalizeProjectId(p._id) === normalizedUrlId);
+        if (projectToSwitch && switchProject) {
+          console.log('Budget Dashboard: Switching to project from URL:', normalizedUrlId);
+          switchProject(normalizedUrlId);
+          setUrlProjectSwitched(true);
+        }
+      } else if (normalizedUrlId === currentProjectId) {
+        // Already on the correct project
+        setUrlProjectSwitched(true);
+      }
+    }
+  }, [projectIdFromUrl, currentProject, accessibleProjects, contextLoading, urlProjectSwitched, switchProject]);
+
+  // Determine which projectId to use (URL param takes precedence, then currentProject)
+  const selectedProjectId = projectIdFromUrl 
+    ? normalizeProjectId(projectIdFromUrl) 
+    : (normalizeProjectId(currentProject?._id) || null);
 
   useEffect(() => {
+    // Wait for context to load and URL project to be switched (if needed)
+    if (contextLoading || (projectIdFromUrl && !urlProjectSwitched)) {
+      setLoading(true);
+      return;
+    }
+
     if (selectedProjectId) {
       fetchBudgetVariance();
-    } else if (!isEmpty) {
-      // If no project selected but projects exist, wait for context to load
-      setLoading(true);
+    } else if (!isEmpty && accessibleProjects.length > 0) {
+      // If no project selected but projects exist, try to use first project
+      const firstProjectId = normalizeProjectId(accessibleProjects[0]?._id);
+      if (firstProjectId && switchProject) {
+        switchProject(firstProjectId);
+        // Update URL to match
+        router.replace(`/dashboard/budget?projectId=${firstProjectId}`, { scroll: false });
+      } else {
+        setData(null);
+        setLoading(false);
+      }
     } else {
       setData(null);
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedProjectId, isEmpty]);
+  }, [selectedProjectId, isEmpty, contextLoading, projectIdFromUrl, urlProjectSwitched, accessibleProjects]);
 
   const fetchBudgetVariance = async () => {
     if (!selectedProjectId) return;
@@ -147,7 +196,8 @@ function BudgetDashboardContent() {
     return 'text-yellow-600';
   };
 
-  if (loading) {
+  // Show loading state while context is loading or project is being switched
+  if (loading || contextLoading || (projectIdFromUrl && !urlProjectSwitched)) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -160,7 +210,8 @@ function BudgetDashboardContent() {
     );
   }
 
-  if (!data) {
+  // Show empty state only if we're sure there's no project and no data
+  if (!data && !selectedProjectId && !contextLoading) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -179,7 +230,54 @@ function BudgetDashboardContent() {
             </div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-base text-gray-700 leading-normal">Please select a project to view budget variance.</p>
+            {accessibleProjects.length > 0 ? (
+              <div>
+                <p className="text-base text-gray-700 leading-normal mb-4">Please select a project to view budget variance.</p>
+                <div className="mt-4">
+                  <select
+                    value={selectedProjectId || ''}
+                    onChange={(e) => {
+                      if (e.target.value) {
+                        switchProject(e.target.value);
+                        router.push(`/dashboard/budget?projectId=${e.target.value}`);
+                      }
+                    }}
+                    className="px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="">Select Project</option>
+                    {accessibleProjects.map((project) => (
+                      <option key={project._id} value={normalizeProjectId(project._id)}>
+                        {project.projectCode} - {project.projectName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-base text-gray-700 leading-normal mb-4">No projects available. Create a project to view budget variance.</p>
+                <Link
+                  href="/projects/new"
+                  className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                >
+                  Create Project
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  // If we have a selectedProjectId but no data yet, keep loading
+  if (selectedProjectId && !data && !loading) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading budget variance data for project...</p>
           </div>
         </div>
       </AppLayout>
@@ -422,34 +520,66 @@ function BudgetDashboardContent() {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm text-gray-700 font-medium">Financial Progression</span>
                   <span className="text-sm text-gray-700 font-medium">
-                    {data.materials.budget > 0 ? ((data.materials.actual / data.materials.budget) * 100).toFixed(1) : 0}% Actual
+                    {(() => {
+                      const materialsStatus = getBudgetStatus(
+                        data.materials.budget || 0,
+                        data.materials.actual || 0,
+                        data.materials.committed || 0,
+                        data.materials.estimated || 0
+                      );
+                      return materialsStatus.isOptional ? 'Budget Not Set' : formatPercentage(materialsStatus.utilization, 'N/A') + ' Actual';
+                    })()}
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-4 relative overflow-hidden">
-                  {/* Budget baseline */}
-                  <div className="absolute left-0 top-0 h-full w-full border-r-2 border-purple-500" style={{ width: '100%' }}></div>
-                  {/* Estimated */}
-                  {data.materials.estimated > 0 && data.materials.budget > 0 && (
-                    <div 
-                      className="absolute left-0 top-0 h-full bg-orange-300 opacity-60"
-                      style={{ width: `${Math.min(100, (data.materials.estimated / data.materials.budget) * 100)}%` }}
-                    ></div>
-                  )}
-                  {/* Committed */}
-                  {data.materials.committed > 0 && data.materials.budget > 0 && (
-                    <div 
-                      className="absolute left-0 top-0 h-full bg-amber-400 opacity-80"
-                      style={{ width: `${Math.min(100, (data.materials.committed / data.materials.budget) * 100)}%` }}
-                    ></div>
-                  )}
-                  {/* Actual */}
-                  {data.materials.actual > 0 && data.materials.budget > 0 && (
-                    <div 
-                      className="absolute left-0 top-0 h-full bg-green-500"
-                      style={{ width: `${Math.min(100, (data.materials.actual / data.materials.budget) * 100)}%` }}
-                    ></div>
-                  )}
-                </div>
+                {(() => {
+                  const materialsStatus = getBudgetStatus(
+                    data.materials.budget || 0,
+                    data.materials.actual || 0,
+                    data.materials.committed || 0,
+                    data.materials.estimated || 0
+                  );
+                  
+                  if (materialsStatus.isOptional) {
+                    return (
+                      <div className="w-full bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p className="text-sm text-blue-800">{materialsStatus.message}</p>
+                        <p className="text-xs text-blue-600 mt-1">Current Spending: {formatCurrency(data.materials.actual || 0)}</p>
+                      </div>
+                    );
+                  }
+                  
+                  const estimatedPercent = safePercentage(data.materials.estimated || 0, data.materials.budget);
+                  const committedPercent = safePercentage(data.materials.committed || 0, data.materials.budget);
+                  const actualPercent = safePercentage(data.materials.actual || 0, data.materials.budget);
+                  
+                  return (
+                    <div className="w-full bg-gray-200 rounded-full h-4 relative overflow-hidden">
+                      {/* Budget baseline */}
+                      <div className="absolute left-0 top-0 h-full w-full border-r-2 border-purple-500" style={{ width: '100%' }}></div>
+                      {/* Estimated */}
+                      {estimatedPercent !== null && estimatedPercent > 0 && (
+                        <div 
+                          className="absolute left-0 top-0 h-full bg-orange-300 opacity-60"
+                          style={{ width: `${Math.min(100, estimatedPercent)}%` }}
+                        ></div>
+                      )}
+                      {/* Committed */}
+                      {committedPercent !== null && committedPercent > 0 && (
+                        <div 
+                          className="absolute left-0 top-0 h-full bg-amber-400 opacity-80"
+                          style={{ width: `${Math.min(100, committedPercent)}%` }}
+                        ></div>
+                      )}
+                      {/* Actual */}
+                      {actualPercent !== null && actualPercent > 0 && (
+                        <div 
+                          className="absolute left-0 top-0 h-full bg-green-500"
+                          style={{ width: `${Math.min(100, actualPercent)}%` }}
+                        ></div>
+                      )}
+                    </div>
+                  );
+                })()}
                 <div className="flex items-center justify-between mt-2 text-sm">
                   <span className="text-purple-600 font-medium">Budget</span>
                   {data.materials.estimated > 0 && <span className="text-orange-600 font-medium">Estimated</span>}
@@ -458,20 +588,42 @@ function BudgetDashboardContent() {
                 </div>
               </div>
               {/* Warnings */}
-              {(data.materials.committed > data.materials.budget || data.materials.estimated > data.materials.budget) && (
-                <div className="mt-4 pt-4 border-t border-purple-200">
-                  {data.materials.committed > data.materials.budget && (
-                    <p className="text-sm text-red-700 font-semibold mb-1">
-                      ⚠️ Committed costs ({formatCurrency(data.materials.committed)}) exceed budget ({formatCurrency(data.materials.budget)}) by {formatCurrency(data.materials.committed - data.materials.budget)}
-                    </p>
-                  )}
-                  {data.materials.estimated > data.materials.budget && (
-                    <p className="text-sm text-orange-700 font-semibold">
-                      ⚠️ Estimated costs ({formatCurrency(data.materials.estimated)}) exceed budget ({formatCurrency(data.materials.budget)}) by {formatCurrency(data.materials.estimated - data.materials.budget)}
-                    </p>
-                  )}
-                </div>
-              )}
+              {(() => {
+                const materialsStatus = getBudgetStatus(
+                  data.materials.budget || 0,
+                  data.materials.actual || 0,
+                  data.materials.committed || 0,
+                  data.materials.estimated || 0
+                );
+                
+                if (materialsStatus.isOptional) {
+                  return null; // Don't show warnings when budget is not set
+                }
+                
+                if (materialsStatus.status === 'over_budget' || materialsStatus.committedUtilization > 100 || materialsStatus.estimatedUtilization > 100) {
+                  return (
+                    <div className="mt-4 pt-4 border-t border-purple-200">
+                      {materialsStatus.committedUtilization > 100 && (
+                        <p className="text-sm text-red-700 font-semibold mb-1">
+                          ⚠️ Committed costs ({formatCurrency(data.materials.committed || 0)}) exceed budget ({formatCurrency(data.materials.budget || 0)}) by {formatCurrency((data.materials.committed || 0) - (data.materials.budget || 0))}
+                        </p>
+                      )}
+                      {materialsStatus.estimatedUtilization > 100 && (
+                        <p className="text-sm text-orange-700 font-semibold">
+                          ⚠️ Estimated costs ({formatCurrency(data.materials.estimated || 0)}) exceed budget ({formatCurrency(data.materials.budget || 0)}) by {formatCurrency((data.materials.estimated || 0) - (data.materials.budget || 0))}
+                        </p>
+                      )}
+                      {materialsStatus.status === 'over_budget' && materialsStatus.committedUtilization <= 100 && materialsStatus.estimatedUtilization <= 100 && (
+                        <p className="text-sm text-red-700 font-semibold">
+                          ⚠️ Actual spending ({formatCurrency(data.materials.actual || 0)}) exceeds budget ({formatCurrency(data.materials.budget || 0)})
+                        </p>
+                      )}
+                    </div>
+                  );
+                }
+                
+                return null;
+              })()}
             </div>
           )}
 

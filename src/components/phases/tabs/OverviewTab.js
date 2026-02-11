@@ -452,7 +452,7 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
                   {floor.floorName}
                 </Link>
                 <div className="mt-1 text-xs text-gray-500">
-                  {floor.counts.materials} materials • {floor.counts.workItems} work items
+                  {floor.counts?.materials || 0} materials • {floor.counts?.workItems || 0} work items
                 </div>
               </div>
             ))}
