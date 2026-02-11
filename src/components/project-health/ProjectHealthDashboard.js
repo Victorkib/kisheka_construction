@@ -108,6 +108,7 @@ export function ProjectHealthDashboard({ projectId }) {
           availableCapital,
           totalInvested,
           healthStatus,
+          projectId,
         });
         
         setHealthData({
@@ -370,7 +371,7 @@ function calculateHealthScore({ prerequisites, budgetUtilization, capitalUtiliza
 /**
  * Generate recommendations
  */
-function generateRecommendations({ prerequisites, budgetUtilization, capitalUtilization, availableCapital, totalInvested, healthStatus }) {
+function generateRecommendations({ prerequisites, budgetUtilization, capitalUtilization, availableCapital, totalInvested, healthStatus, projectId }) {
   const recommendations = [];
   
   // Prerequisites recommendations
@@ -399,7 +400,7 @@ function generateRecommendations({ prerequisites, budgetUtilization, capitalUtil
       icon: '💰',
       title: 'Budget Overutilization',
       message: `Budget utilization is at ${budgetUtilization.toFixed(1)}%. Consider reviewing expenses or increasing budget.`,
-      actionUrl: `/projects/${prerequisites?.projectId}/finances`,
+      actionUrl: `/projects/${projectId}/finances`,
       actionLabel: 'View Finances',
     });
   } else if (budgetUtilization > 75) {
@@ -408,7 +409,7 @@ function generateRecommendations({ prerequisites, budgetUtilization, capitalUtil
       icon: '💰',
       title: 'Budget Warning',
       message: `Budget utilization is at ${budgetUtilization.toFixed(1)}%. Monitor spending closely.`,
-      actionUrl: `/projects/${prerequisites?.projectId}/finances`,
+      actionUrl: `/projects/${projectId}/finances`,
       actionLabel: 'View Finances',
     });
   }
@@ -450,7 +451,7 @@ function generateRecommendations({ prerequisites, budgetUtilization, capitalUtil
       icon: '📊',
       title: 'High Capital Utilization',
       message: `Capital utilization is at ${capitalUtilization.toFixed(1)}%. Consider allocating more capital or reviewing committed costs.`,
-      actionUrl: `/projects/${prerequisites?.projectId}/finances`,
+      actionUrl: `/projects/${projectId}/finances`,
       actionLabel: 'View Finances',
     });
   }

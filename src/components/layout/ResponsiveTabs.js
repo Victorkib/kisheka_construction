@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 /**
  * ResponsiveTabs Component
@@ -11,49 +11,123 @@ import { useState } from 'react';
  */
 export function ResponsiveTabs({ tabs, activeTab, onTabChange }) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const tabListRef = useRef(null);
 
   const activeTabData = tabs.find((tab) => tab.id === activeTab);
 
+  const updateScrollButtons = () => {
+    const el = tabListRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    setCanScrollLeft(scrollLeft > 4);
+    setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 4);
+  };
+
+  const handleScroll = () => {
+    updateScrollButtons();
+  };
+
+  const scrollTabs = (direction) => {
+    const el = tabListRef.current;
+    if (!el) return;
+    const amount = direction === 'left' ? -200 : 200;
+    el.scrollBy({ left: amount, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    updateScrollButtons();
+  }, [tabs, activeTab]);
+
   return (
     <div className="mb-4 sm:mb-6 border-b border-gray-200">
-      {/* Desktop/Tablet View - Tab Navigation */}
-      <nav
-        className="hidden sm:flex -mb-px space-x-1 md:space-x-2 lg:space-x-4 overflow-x-auto scrollbar-hide"
-        aria-label="Tabs"
-        style={{ WebkitOverflowScrolling: 'touch' }}
-      >
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => {
-              onTabChange(tab.id);
-              setIsDropdownOpen(false);
-            }}
-            className={`
-              group relative py-3 lg:py-4 px-2 lg:px-3 border-b-2 font-medium text-sm lg:text-base transition
-              flex items-center gap-1 lg:gap-2 flex-shrink-0
-              ${
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
-              }
-            `}
-            title={tab.label}
-          >
-            <span className="text-base lg:text-lg flex-shrink-0">
-              {tab.icon}
-            </span>
-            {/* Full label on large screens */}
-            <span className="hidden lg:inline whitespace-nowrap">
-              {tab.label}
-            </span>
-            {/* Abbreviated label on medium screens */}
-            <span className="lg:hidden whitespace-nowrap text-xs lg:text-sm">
-              {tab.abbr || tab.label}
-            </span>
-          </button>
-        ))}
-      </nav>
+      {/* Desktop/Tablet View - Tab Navigation with side scroll controls */}
+      <div className="relative hidden sm:block">
+        {/* Left gradient + button */}
+        {canScrollLeft && (
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-white via-white/80 to-transparent z-10" />
+        )}
+        <button
+          type="button"
+          onClick={() => scrollTabs('left')}
+          disabled={!canScrollLeft}
+          className={`
+            hidden sm:flex items-center justify-center
+            absolute inset-y-0 left-0 w-7 sm:w-8 z-20
+            text-gray-500 hover:text-gray-800
+            transition
+            ${canScrollLeft ? 'cursor-pointer' : 'cursor-default opacity-0'}
+          `}
+          aria-label="Scroll tabs left"
+        >
+          <span className="inline-flex items-center justify-center rounded-full bg-white/80 shadow-sm border border-gray-200 w-6 h-6">
+            ‹
+          </span>
+        </button>
+
+        {/* Right gradient + button */}
+        {canScrollRight && (
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white via-white/80 to-transparent z-10" />
+        )}
+        <button
+          type="button"
+          onClick={() => scrollTabs('right')}
+          disabled={!canScrollRight}
+          className={`
+            hidden sm:flex items-center justify-center
+            absolute inset-y-0 right-0 w-7 sm:w-8 z-20
+            text-gray-500 hover:text-gray-800
+            transition
+            ${canScrollRight ? 'cursor-pointer' : 'cursor-default opacity-0'}
+          `}
+          aria-label="Scroll tabs right"
+        >
+          <span className="inline-flex items-center justify-center rounded-full bg-white/80 shadow-sm border border-gray-200 w-6 h-6">
+            ›
+          </span>
+        </button>
+
+        <nav
+          ref={tabListRef}
+          className="flex -mb-px space-x-1 md:space-x-2 lg:space-x-4 overflow-x-auto scrollbar-hide pr-6 pl-6"
+          aria-label="Tabs"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+          onScroll={handleScroll}
+        >
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                onTabChange(tab.id);
+                setIsDropdownOpen(false);
+              }}
+              className={`
+                group relative py-3 lg:py-4 px-2 lg:px-3 border-b-2 font-medium text-sm lg:text-base transition
+                flex items-center gap-1 lg:gap-2 flex-shrink-0
+                ${
+                  activeTab === tab.id
+                    ? 'border-blue-500 text-blue-600'
+                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                }
+              `}
+              title={tab.label}
+            >
+              <span className="text-base lg:text-lg flex-shrink-0">
+                {tab.icon}
+              </span>
+              {/* Full label on large screens */}
+              <span className="hidden lg:inline whitespace-nowrap">
+                {tab.label}
+              </span>
+              {/* Abbreviated label on medium screens */}
+              <span className="lg:hidden whitespace-nowrap text-xs lg:text-sm">
+                {tab.abbr || tab.label}
+              </span>
+            </button>
+          ))}
+        </nav>
+      </div>
 
       {/* Mobile View - Dropdown */}
       <div className="sm:hidden">

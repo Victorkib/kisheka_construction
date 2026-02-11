@@ -1,13 +1,12 @@
 /**
- * Seed Categories Script
- * Populates the categories collection with default construction categories
- * Safe for fresh installs - only seeds if collection is empty
- * For existing databases, use update-categories.mjs instead
+ * Update Categories Script
+ * Adds missing categories to existing database without deleting or modifying existing ones
+ * Safe to run multiple times - only adds categories that don't already exist
  * 
- * Run with: node scripts/seed-categories.mjs
+ * Run with: node scripts/update-categories.mjs
  */
 
-import { MongoClient, ObjectId } from 'mongodb';
+import { MongoClient } from 'mongodb';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -26,12 +25,13 @@ if (!MONGODB_URI) {
   process.exit(1);
 }
 
-// Category type constants
+// Import category constants to ensure type is set correctly
 const CATEGORY_TYPES = {
   MATERIALS: 'materials',
   WORK_ITEMS: 'work_items',
 };
 
+// Same categories as seed-categories.mjs - keep in sync!
 const defaultCategories = [
   {
     name: 'Structural Materials',
@@ -39,8 +39,6 @@ const defaultCategories = [
     subcategories: ['Cement', 'Steel Bars', 'Concrete', 'Aggregates', 'Reinforcement', 'Formwork'],
     icon: '🏗️',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Substructure & Foundations',
@@ -48,8 +46,6 @@ const defaultCategories = [
     subcategories: ['Excavation', 'Blinding', 'Footings', 'Foundation Walls', 'Backfilling'],
     icon: '🕳️',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Masonry',
@@ -57,8 +53,6 @@ const defaultCategories = [
     subcategories: ['Blocks', 'Bricks', 'Precast Elements', 'Lintels', 'Mortar'],
     icon: '🧱',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Roofing',
@@ -66,8 +60,6 @@ const defaultCategories = [
     subcategories: ['Roof Trusses', 'Roof Sheets & Tiles', 'Waterproofing', 'Gutters & Downpipes', 'Roof Accessories'],
     icon: '🏠',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Electrical Works',
@@ -75,8 +67,6 @@ const defaultCategories = [
     subcategories: ['Wires & Cables', 'Switches & Sockets', 'Lighting Fixtures', 'Electrical Panels', 'Conduits'],
     icon: '⚡',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Plumbing Works',
@@ -84,8 +74,6 @@ const defaultCategories = [
     subcategories: ['Pipes', 'Fittings', 'Fixtures', 'Water Heaters', 'Pumps'],
     icon: '🚿',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Mechanical & HVAC',
@@ -93,8 +81,6 @@ const defaultCategories = [
     subcategories: ['Ducting', 'AC Units', 'Fans & Ventilation', 'Chillers', 'Controls & Accessories'],
     icon: '🌬️',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Joinery/Carpentry',
@@ -102,8 +88,6 @@ const defaultCategories = [
     subcategories: ['Doors', 'Windows', 'Frames', 'Timber', 'Hardware', 'Ceilings'],
     icon: '🪵',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Metalwork & Fabrication',
@@ -111,8 +95,6 @@ const defaultCategories = [
     subcategories: ['Balustrades', 'Grills', 'Handrails', 'Gates', 'Custom Fabrication'],
     icon: '🛠️',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Paintwork & Wall Finishes',
@@ -120,8 +102,6 @@ const defaultCategories = [
     subcategories: ['Interior Paint', 'Exterior Paint', 'Primer', 'Plaster & Skim', 'Special Finishes'],
     icon: '🎨',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Floor & Wall Tiling',
@@ -129,8 +109,6 @@ const defaultCategories = [
     subcategories: ['Floor Tiles', 'Wall Tiles', 'Adhesives', 'Grout', 'Terrazzo'],
     icon: '🧱',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Ceilings & Partitions',
@@ -138,8 +116,6 @@ const defaultCategories = [
     subcategories: ['Gypsum Boards', 'Suspension Systems', 'Acoustic Panels', 'Metal Studs', 'Accessories'],
     icon: '🧩',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'External Works & Landscaping',
@@ -147,8 +123,6 @@ const defaultCategories = [
     subcategories: ['Paving Blocks', 'Kerbs', 'Fencing', 'Driveways', 'Soft Landscaping'],
     icon: '🌳',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Lift Installation',
@@ -156,8 +130,6 @@ const defaultCategories = [
     subcategories: ['Lift Car', 'Motor & Controls', 'Cables', 'Installation Materials'],
     icon: '🛗',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Safety & Site Logistics',
@@ -165,8 +137,6 @@ const defaultCategories = [
     subcategories: ['PPE', 'Safety Signage', 'Scaffolding', 'Barricades', 'Temporary Works'],
     icon: '⚠️',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
   {
     name: 'Fixtures & Fittings',
@@ -174,12 +144,10 @@ const defaultCategories = [
     subcategories: ['Sanitary Ware', 'Ironmongery', 'Kitchen Fittings', 'Wardrobe Fittings', 'Accessories'],
     icon: '🚽',
     type: CATEGORY_TYPES.MATERIALS,
-    createdAt: new Date(),
-    updatedAt: new Date(),
   },
 ];
 
-async function seedCategories() {
+async function updateCategories() {
   let client;
   
   try {
@@ -189,32 +157,99 @@ async function seedCategories() {
     const db = client.db(DB_NAME);
     
     console.log(`📦 Using database: ${DB_NAME}\n`);
-    console.log('🌱 Seeding categories...\n');
+    console.log('🔄 Updating categories (adding missing ones only)...\n');
     
     const categoriesCollection = db.collection('categories');
     
-    // Check if categories already exist
-    const existingCount = await categoriesCollection.countDocuments();
-    if (existingCount > 0) {
-      console.log(`⚠️  Categories collection already has ${existingCount} categories.`);
-      console.log('   This script is for fresh installs only.');
-      console.log('   To add missing categories to existing database, use:');
-      console.log('   node scripts/update-categories.mjs\n');
+    // Get existing categories by name and type
+    const existingCategories = await categoriesCollection.find({}).toArray();
+    const existingMap = new Map();
+    existingCategories.forEach((cat) => {
+      const key = `${cat.name.toLowerCase().trim()}_${cat.type || CATEGORY_TYPES.MATERIALS}`;
+      existingMap.set(key, cat);
+    });
+    
+    console.log(`📊 Found ${existingCategories.length} existing categories\n`);
+    
+    // Find missing categories
+    const categoriesToAdd = [];
+    const skipped = [];
+    
+    for (const category of defaultCategories) {
+      const key = `${category.name.toLowerCase().trim()}_${category.type}`;
+      if (existingMap.has(key)) {
+        skipped.push(category.name);
+      } else {
+        categoriesToAdd.push({
+          ...category,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+    }
+    
+    if (skipped.length > 0) {
+      console.log(`⏭️  Skipping ${skipped.length} existing categories:`);
+      skipped.forEach((name) => {
+        console.log(`   - ${name}`);
+      });
+      console.log('');
+    }
+    
+    if (categoriesToAdd.length === 0) {
+      console.log('✅ All categories already exist. Nothing to add.\n');
       return;
     }
     
-    // Insert categories
-    const result = await categoriesCollection.insertMany(defaultCategories);
+    console.log(`➕ Adding ${categoriesToAdd.length} new categories:\n`);
     
-    console.log(`✅ Successfully seeded ${result.insertedCount} categories:\n`);
-    defaultCategories.forEach((cat, index) => {
-      console.log(`   ${index + 1}. ${cat.icon} ${cat.name}`);
-    });
+    // Insert missing categories one by one (to handle potential duplicates gracefully)
+    let addedCount = 0;
+    let errorCount = 0;
     
-    console.log('\n🎉 Categories seeding completed successfully!');
+    for (const category of categoriesToAdd) {
+      try {
+        // Double-check it doesn't exist (case-insensitive name + type check)
+        const existing = await categoriesCollection.findOne({
+          name: { $regex: new RegExp(`^${category.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') },
+          $or: [
+            { type: category.type },
+            { type: { $exists: false } }, // Handle legacy categories without type
+          ],
+        });
+        
+        if (existing) {
+          console.log(`   ⚠️  "${category.name}" already exists (skipping)`);
+          continue;
+        }
+        
+        await categoriesCollection.insertOne(category);
+        console.log(`   ✅ ${category.icon} ${category.name}`);
+        addedCount++;
+      } catch (error) {
+        if (error.code === 11000) {
+          // Duplicate key error (unique index violation)
+          console.log(`   ⚠️  "${category.name}" already exists (duplicate key, skipping)`);
+        } else {
+          console.error(`   ❌ Error adding "${category.name}":`, error.message);
+          errorCount++;
+        }
+      }
+    }
+    
+    console.log(`\n📈 Summary:`);
+    console.log(`   ✅ Added: ${addedCount} categories`);
+    if (skipped.length > 0) {
+      console.log(`   ⏭️  Skipped: ${skipped.length} existing categories`);
+    }
+    if (errorCount > 0) {
+      console.log(`   ❌ Errors: ${errorCount} categories`);
+    }
+    
+    console.log('\n🎉 Category update completed!');
     
   } catch (error) {
-    console.error('❌ Categories seeding error:', error);
+    console.error('❌ Category update error:', error);
     throw error;
   } finally {
     if (client) {
@@ -224,14 +259,13 @@ async function seedCategories() {
   }
 }
 
-// Run the seed
-seedCategories()
+// Run the update
+updateCategories()
   .then(() => {
-    console.log('\n✅ Seed script completed');
+    console.log('\n✅ Update script completed');
     process.exit(0);
   })
   .catch((error) => {
-    console.error('\n❌ Seed script failed:', error);
+    console.error('\n❌ Update script failed:', error);
     process.exit(1);
   });
-

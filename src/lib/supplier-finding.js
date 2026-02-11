@@ -833,18 +833,4 @@ export async function getSupplierAlternatives(categoryId, excludeSupplierId, lim
   }
 }
 
-export {
-  findSimpleAlternativeSuppliers,
-  calculateSupplierDataQuality,
-  selectRecommendedMode,
-  findAlternativeSuppliers,
-  getSmartSupplierSuggestions,
-  scoreSuppliers,
-  calculateMaterialCompatibilityScore,
-  calculatePriceCompetitivenessScore,
-  calculateDeliveryCapabilityScore,
-  calculateReliabilityScore,
-  estimateDeliveryTime,
-  estimatePricing,
-  getSupplierAlternatives
-};
+// All public functions in this module are exported individually above using named exports.

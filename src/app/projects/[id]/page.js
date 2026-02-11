@@ -1670,10 +1670,122 @@ export default function ProjectDetailPage() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading project...</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-xl border border-slate-700/60 overflow-hidden">
+            {/* Top bar with icon and text */}
+            <div className="px-6 sm:px-8 py-5 border-b border-slate-700/60 flex items-center gap-4">
+              <div className="relative">
+                <div className="h-11 w-11 rounded-xl bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/40">
+                  {/* Hard hat icon */}
+                  <svg
+                    className="h-6 w-6 text-slate-900"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 15v2a2 2 0 002 2h12a2 2 0 002-2v-2M4 15a8 8 0 0116 0M4 15h16"
+                    />
+                  </svg>
+                </div>
+                {/* Small pulsing dot */}
+                <span className="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-emerald-400 animate-ping" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-amber-300 tracking-wide uppercase">
+                  Preparing Project Site
+                </p>
+                <p className="text-xs sm:text-sm text-slate-200/80 mt-1">
+                  Loading project dashboard, finances, phases and progress — setting up your construction control room.
+                </p>
+              </div>
+            </div>
+
+            {/* Main skeleton content */}
+            <div className="px-6 sm:px-8 py-6 space-y-6">
+              {/* Simulated header (project title, meta) */}
+              <div className="space-y-3">
+                <div className="h-6 sm:h-7 w-2/3 bg-slate-700/60 rounded-md animate-pulse" />
+                <div className="h-4 w-1/2 bg-slate-700/50 rounded-md animate-pulse" />
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <div className="h-5 w-24 bg-slate-700/60 rounded-full animate-pulse" />
+                  <div className="h-5 w-20 bg-slate-700/40 rounded-full animate-pulse" />
+                  <div className="h-5 w-28 bg-slate-700/40 rounded-full animate-pulse" />
+                </div>
+              </div>
+
+              {/* Three-column construction tiles (Budget, Capital, Phases) */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                      Budget
+                    </span>
+                    <span className="h-2 w-8 rounded-full bg-emerald-500/70 animate-pulse" />
+                  </div>
+                  <div className="h-5 w-3/4 bg-slate-700/60 rounded-md animate-pulse" />
+                  <div className="mt-1 h-2 w-full rounded-full bg-slate-800 overflow-hidden">
+                    <div className="h-2 w-1/2 bg-emerald-500 animate-pulse" />
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Aligning budget structure and allocations…
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                      Capital
+                    </span>
+                    <span className="h-2 w-8 rounded-full bg-sky-500/70 animate-pulse" />
+                  </div>
+                  <div className="h-5 w-2/3 bg-slate-700/60 rounded-md animate-pulse" />
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="h-2 w-1/3 bg-slate-800 rounded-full animate-pulse" />
+                    <div className="h-2 w-1/4 bg-slate-800 rounded-full animate-pulse" />
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Reconciling capital raised, used and remaining…
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-slate-700/60 bg-slate-900/40 p-4 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+                      Phases & Floors
+                    </span>
+                    <span className="h-2 w-8 rounded-full bg-amber-400/80 animate-pulse" />
+                  </div>
+                  <div className="space-y-2">
+                    <div className="h-3 w-full bg-slate-800 rounded-md animate-pulse" />
+                    <div className="h-3 w-5/6 bg-slate-800 rounded-md animate-pulse" />
+                    <div className="h-3 w-2/3 bg-slate-800 rounded-md animate-pulse" />
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Loading construction phases and floor stack overview…
+                  </p>
+                </div>
+              </div>
+
+              {/* Bottom progress bar like a construction timeline */}
+              <div className="pt-2 border-t border-slate-700/60">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-medium text-slate-300">
+                    Preparing project workspace
+                  </span>
+                  <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    Almost there…
+                  </span>
+                </div>
+                <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
+                  <div className="h-1.5 w-1/3 bg-gradient-to-r from-amber-400 via-emerald-400 to-sky-400 animate-pulse" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </AppLayout>
@@ -1761,12 +1873,6 @@ export default function ProjectDetailPage() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
-        <LoadingOverlay 
-          isLoading={isSaving || fetchingFinancialData} 
-          message={isSaving ? "Saving project..." : "Loading financial data..."} 
-          fullScreen={false} 
-        />
-        
         {/* Breadcrumbs */}
         <div className="mb-6">
           <Breadcrumbs 

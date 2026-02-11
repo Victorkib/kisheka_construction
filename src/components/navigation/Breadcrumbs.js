@@ -50,7 +50,7 @@ export function Breadcrumbs({ items, showHome = true }) {
           {items.map((item, index) => {
             const isLast = index === items.length - 1;
             return (
-              <li key={item.href || index} className="flex items-center">
+              <li key={`${item.href}-${index}`} className="flex items-center">
                 {isLast || item.current ? (
                   <span className="text-gray-900 font-medium">{item.label}</span>
                 ) : (
@@ -111,7 +111,7 @@ export function Breadcrumbs({ items, showHome = true }) {
         {breadcrumbItems.map((item, index) => {
           const isLast = index === breadcrumbItems.length - 1;
           return (
-            <li key={item.href || index} className="flex items-center">
+            <li key={`${item.href}-${index}`} className="flex items-center">
               {isLast || item.current ? (
                 <span className="text-gray-900 font-medium">{item.label}</span>
               ) : (

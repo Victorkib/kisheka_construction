@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -51,6 +51,11 @@ export default function FloorDetailPage() {
   const [ledgerItems, setLedgerItems] = useState([]);
   const [phaseBreakdown, setPhaseBreakdown] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // Progress changes tracking
+  const [progressChanges, setProgressChanges] = useState(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const progressSectionRef = useRef(null);
 
   const [formData, setFormData] = useState({
     status: 'NOT_STARTED',
@@ -119,7 +124,7 @@ export default function FloorDetailPage() {
               'Pragma': 'no-cache',
             },
           });
-          const projectData = await projectResponse.json();
+          const projectData = await response.json();
           if (projectData.success) {
             setProject(projectData.data);
           }
@@ -362,29 +367,60 @@ export default function FloorDetailPage() {
     setError(null);
 
     try {
-      const response = await fetch(`/api/floors/${floorId}`, {
-        method: 'PATCH',
-        cache: 'no-store',
-        headers: {
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-        },
-        body: JSON.stringify({
-          ...formData,
-          description: formData.description.trim(),
-        }),
-      });
+      // Save floor data if in edit mode
+      if (editMode) {
+        const response = await fetch(`/api/floors/${floorId}`, {
+          method: 'PATCH',
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+          body: JSON.stringify({
+            ...formData,
+            description: formData.description.trim(),
+          }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to update floor');
+        if (!data.success) {
+          throw new Error(data.error || 'Failed to update floor');
+        }
+
+        setFloor(data.data);
+        setEditMode(false);
       }
 
-      setFloor(data.data);
-      setEditMode(false);
-      toast.showSuccess('Floor updated successfully');
+      // Save progress changes if any
+      if (progressChanges) {
+        const progressResponse = await fetch(`/api/floors/${floorId}/progress`, {
+          method: 'PATCH',
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+          body: JSON.stringify(progressChanges),
+        });
+
+        const progressData = await progressResponse.json();
+
+        if (!progressData.success) {
+          throw new Error(progressData.error || 'Failed to update progress');
+        }
+      }
+
+      // Clear progress changes and reset progress section originals
+      if (progressSectionRef.current) {
+        progressSectionRef.current.resetOriginals();
+      }
+      setProgressChanges(null);
+      setHasUnsavedChanges(false);
+      
+      toast.showSuccess('Changes saved successfully');
       // Refresh to get updated data
       fetchFloor();
     } catch (err) {
@@ -393,6 +429,15 @@ export default function FloorDetailPage() {
       console.error('Update floor error:', err);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleProgressChange = (changes) => {
+    setProgressChanges(changes);
+    setHasUnsavedChanges(true);
+    // Auto-enable edit mode if not already enabled
+    if (!editMode) {
+      setEditMode(true);
     }
   };
 
@@ -542,7 +587,15 @@ export default function FloorDetailPage() {
           />
         );
       case 'progress':
-        return <FloorProgressSection floorId={floorId} canEdit={canEdit} />;
+        return (
+          <FloorProgressSection 
+            ref={progressSectionRef}
+            floorId={floorId} 
+            canEdit={canEdit} 
+            projectId={floor?.projectId}
+            onProgressChange={handleProgressChange}
+          />
+        );
       default:
         return null;
     }
@@ -592,37 +645,54 @@ export default function FloorDetailPage() {
             </div>
             {canEdit && (
               <div className="flex gap-2">
-                {editMode ? (
+                {editMode || hasUnsavedChanges ? (
                   <>
                     <button
                       onClick={() => {
                         setEditMode(false);
+                        setProgressChanges(null);
+                        setHasUnsavedChanges(false);
                         fetchFloor(); // Reset form
                       }}
-                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-md hover:shadow-lg"
                     >
-                      {saving ? 'Saving...' : 'Save Changes'}
+                      {saving ? (
+                        <span className="flex items-center gap-2">
+                          <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Saving...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Save Changes
+                        </span>
+                      )}
                     </button>
                   </>
                 ) : (
                   <>
                     <button
                       onClick={() => setEditMode(true)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       Edit Floor
                     </button>
                     {canDelete && (
                       <button
                         onClick={() => setShowDeleteModal(true)}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                       >
                         Delete Floor
                       </button>
@@ -652,6 +722,39 @@ export default function FloorDetailPage() {
         <div className="mb-6">
           {renderTabContent()}
         </div>
+
+        {/* Floating Save Button - Shows when there are unsaved progress changes */}
+        {hasUnsavedChanges && !saving && (
+          <>
+            <style jsx>{`
+              @keyframes slide-up {
+                from {
+                  transform: translateY(100px);
+                  opacity: 0;
+                }
+                to {
+                  transform: translateY(0);
+                  opacity: 1;
+                }
+              }
+              .animate-slide-up {
+                animation: slide-up 0.3s ease-out;
+              }
+            `}</style>
+            <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
+              <button
+                onClick={handleSave}
+                disabled={saving}
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-6 py-4 rounded-xl shadow-2xl hover:shadow-3xl transition-all duration-200 transform hover:-translate-y-1 flex items-center gap-3 min-w-[180px] justify-center"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Save Changes</span>
+              </button>
+            </div>
+          </>
+        )}
 
         {/* Edit Mode Form (shown when editMode is true) */}
         {editMode && (

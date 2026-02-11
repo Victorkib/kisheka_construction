@@ -10,6 +10,7 @@
     "setup:db": "node scripts/setup-database.mjs",
     "cleanup:db": "node scripts/cleanup-database.mjs",
     "seed:categories": "node scripts/seed-categories.mjs",
+    "update:categories": "node scripts/update-categories.mjs",
     "seed:floors": "node scripts/seed-floors.mjs",
     "seed:project": "node scripts/seed-default-project.mjs",
     "seed:material-library": "node scripts/seed-material-library.mjs",

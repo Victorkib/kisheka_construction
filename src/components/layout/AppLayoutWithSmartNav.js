@@ -1,14 +1,14 @@
 /**
- * App Layout Component
- * Wraps authenticated pages with sidebar and header
- * Use this component to wrap pages that need the full navigation
+ * App Layout with Smart Navigation
+ * Optional wrapper that uses SmartSidebar instead of regular Sidebar
+ * Can be enabled via feature flag or environment variable
  */
 
 'use client';
 
 import { useState } from 'react';
-import { Sidebar } from './sidebar';
 import { SmartSidebar } from './SmartSidebar';
+import { Sidebar } from './sidebar';
 import { MobileNav } from './mobile-nav';
 import { SmartMobileNav } from '@/components/navigation/SmartMobileNav';
 import { Header } from './header';
@@ -16,7 +16,10 @@ import { LoadingSpinner } from '@/components/loading';
 
 /**
  * Check if smart navigation should be used
- * Can be enabled via localStorage or environment variable
+ * Can be controlled via:
+ * 1. Environment variable: NEXT_PUBLIC_USE_SMART_NAV=true
+ * 2. localStorage: 'use-smart-nav' = 'true'
+ * 3. Default: false (use regular sidebar)
  */
 function shouldUseSmartNav() {
   if (typeof window === 'undefined') {
@@ -33,17 +36,17 @@ function shouldUseSmartNav() {
   return process.env.NEXT_PUBLIC_USE_SMART_NAV === 'true';
 }
 
-export function AppLayout({ children, forceSmartNav = null }) {
+export function AppLayoutWithSmartNav({ children, forceSmartNav = null }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   
-  // Determine which navigation to use
+  // Determine which sidebar to use
   const useSmartNav = forceSmartNav !== null ? forceSmartNav : shouldUseSmartNav();
   const SidebarComponent = useSmartNav ? SmartSidebar : Sidebar;
   const MobileNavComponent = useSmartNav ? SmartMobileNav : MobileNav;
 
   return (
-    <div className="h-screen bg-gray-50 flex overflow-hidden">
+    <div className="min-h-screen bg-gray-50 flex">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <SidebarComponent
@@ -73,5 +76,4 @@ export function AppLayout({ children, forceSmartNav = null }) {
   );
 }
 
-export default AppLayout;
-
+export default AppLayoutWithSmartNav;

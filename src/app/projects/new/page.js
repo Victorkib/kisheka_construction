@@ -24,6 +24,8 @@ export default function NewProjectPage() {
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
   const [canCreate, setCanCreate] = useState(false);
+  // Controls whether user sets up budget now or skips for later
+  const [budgetMode, setBudgetMode] = useState('later'); // 'now' | 'later'
 
   const [formData, setFormData] = useState({
     projectCode: '',
@@ -710,63 +712,157 @@ export default function NewProjectPage() {
                 </div>
               </div>
               <div className="p-6">
-                <EnhancedBudgetInput
-                  value={formData.budget}
-                  onChange={handleBudgetChange}
-                  showAdvanced={true}
-                />
-            {/* Budget validation warning and phase preview */}
-            {(() => {
-              const budgetTotal = parseFloat(formData.budget?.total || 0);
-              if (budgetTotal === 0 || isNaN(budgetTotal)) {
-                return (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
-                    <div className="flex items-start gap-2">
-                      <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                {/* Budget mode selector */}
+                <div className="mb-4">
+                  <p className="text-sm font-semibold text-gray-800 mb-2">
+                    How do you want to handle the project budget right now?
+                  </p>
+                  <div className="flex flex-col md:flex-row gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setBudgetMode('later')}
+                      className={`flex-1 rounded-lg border px-4 py-3 text-left transition-all ${
+                        budgetMode === 'later'
+                          ? 'border-blue-600 bg-blue-50 shadow-sm'
+                          : 'border-gray-200 bg-white hover:border-blue-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold ${
+                          budgetMode === 'later' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+                        }`}>
+                          1
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          Skip for now (set budget later)
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600">
+                        Recommended if you are still confirming financing. You can still track all spending and add a detailed budget later.
+                      </p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setBudgetMode('now')}
+                      className={`flex-1 rounded-lg border px-4 py-3 text-left transition-all ${
+                        budgetMode === 'now'
+                          ? 'border-emerald-600 bg-emerald-50 shadow-sm'
+                          : 'border-gray-200 bg-white hover:border-emerald-300'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold ${
+                          budgetMode === 'now' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700'
+                        }`}>
+                          2
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900">
+                          Set initial budget now (recommended for control)
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600">
+                        Ideal if you already have a clear budget. Enables budget validation, phase allocations, and richer financial analytics from day one.
+                      </p>
+                    </button>
+                  </div>
+                </div>
+
+                {budgetMode === 'later' ? (
+                  <div className="mt-2 rounded-lg border border-blue-100 bg-blue-50 p-4">
+                    <div className="flex items-start gap-3">
+                      <svg
+                        className="h-5 w-5 flex-shrink-0 text-blue-500 mt-0.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 8c-1.657 0-3 .895-3 2m6 0c0-1.105-1.343-2-3-2m0 0V7m0 3v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
-                      <div>
-                        <p className="text-sm font-medium text-yellow-800">
-                          Zero Budget Warning
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-blue-900">
+                          No budget for now – you can still create and operate the project
                         </p>
-                        <p className="text-sm text-yellow-700 mt-1">
-                          Project budget is zero. You can still use the system - all operations will be allowed and spending will be tracked. 
-                          Set a budget later to enable budget validation and better financial control.
-                          {formData.autoInitializePhases && ' Phases will be initialized with zero budget allocations (can be allocated later).'}
+                        <p className="mt-1 text-sm text-blue-800">
+                          The project will start with a zero budget. All material requests, labour, and expenses will still be tracked normally.
+                          When you are ready, you can:
                         </p>
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-blue-900">
+                          <li>Set the overall project budget from the <strong>Project Finances</strong> page.</li>
+                          <li>Allocate Direct Construction Costs (DCC) to phases from the <strong>Phases</strong> pages.</li>
+                          <li>Capture pre-construction costs as <strong>Initial Expenses</strong> for better separation.</li>
+                        </ul>
+                        {formData.autoInitializePhases && (
+                          <p className="mt-2 text-xs text-blue-900">
+                            Phases will be created with zero budgets. You can allocate DCC to each phase later; all spending will be visible even before budgets are set.
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
-                );
-              }
-              // Show phase budget preview if budget is set and phases will be initialized
-              // CRITICAL: Only allocate DCC to phases (not total budget)
-              if (budgetTotal > 0 && formData.autoInitializePhases) {
-                // Get DCC from budget (enhanced structure) or estimate from legacy
-                const budget = formData.budget || {};
-                const isEnhanced = budget.directCosts !== undefined;
-                let dccBudget = 0;
-                
-                if (isEnhanced) {
-                  dccBudget = budget.directConstructionCosts || 0;
-                } else {
-                  // Legacy: Estimate DCC (total - estimated pre-construction - indirect - contingency)
-                  const estimatedPreConstruction = budgetTotal * 0.05;
-                  const estimatedIndirect = budgetTotal * 0.05;
-                  const estimatedContingency = budget.contingency || (budgetTotal * 0.05);
-                  dccBudget = Math.max(0, budgetTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
-                }
-                
-                // Phase allocations based on DCC only (pre-construction tracked separately via initial_expenses)
-                const phaseAllocations = {
-                  basement: dccBudget * 0.15,            // 15% of DCC
-                  superstructure: dccBudget * 0.65,      // 65% of DCC
-                  finishing: dccBudget * 0.15,           // 15% of DCC
-                  finalSystems: dccBudget * 0.05         // 5% of DCC
-                  // Total: 100% of DCC (not total budget)
-                };
-                const totalPhaseBudgets = Object.values(phaseAllocations).reduce((sum, val) => sum + val, 0);
-               return (
+                ) : (
+                  <>
+                    <EnhancedBudgetInput
+                      value={formData.budget}
+                      onChange={handleBudgetChange}
+                      showAdvanced={true}
+                    />
+                    {/* Budget validation warning and phase preview */}
+                    {(() => {
+                      const budgetTotal = parseFloat(formData.budget?.total || 0);
+                      if (budgetTotal === 0 || isNaN(budgetTotal)) {
+                        return (
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
+                            <div className="flex items-start gap-2">
+                              <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                              </svg>
+                              <div>
+                                <p className="text-sm font-medium text-yellow-800">
+                                  Zero Budget Warning
+                                </p>
+                                <p className="text-sm text-yellow-700 mt-1">
+                                  Project budget is zero. You can still use the system – all operations will be allowed and spending will be tracked. 
+                                  Set a budget later to enable budget validation and better financial control.
+                                  {formData.autoInitializePhases && ' Phases will be initialized with zero budget allocations (can be allocated later).'}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      }
+                      // Show phase budget preview if budget is set and phases will be initialized
+                      // CRITICAL: Only allocate DCC to phases (not total budget)
+                      if (budgetTotal > 0 && formData.autoInitializePhases) {
+                        // Get DCC from budget (enhanced structure) or estimate from legacy
+                        const budget = formData.budget || {};
+                        const isEnhanced = budget.directCosts !== undefined;
+                        let dccBudget = 0;
+                        
+                        if (isEnhanced) {
+                          dccBudget = budget.directConstructionCosts || 0;
+                        } else {
+                          // Legacy: Estimate DCC (total - estimated pre-construction - indirect - contingency)
+                          const estimatedPreConstruction = budgetTotal * 0.05;
+                          const estimatedIndirect = budgetTotal * 0.05;
+                          const estimatedContingency = budget.contingency || (budgetTotal * 0.05);
+                          dccBudget = Math.max(0, budgetTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+                        }
+                        
+                        // Phase allocations based on DCC only (pre-construction tracked separately via initial_expenses)
+                        const phaseAllocations = {
+                          basement: dccBudget * 0.15,            // 15% of DCC
+                          superstructure: dccBudget * 0.65,      // 65% of DCC
+                          finishing: dccBudget * 0.15,           // 15% of DCC
+                          finalSystems: dccBudget * 0.05         // 5% of DCC
+                          // Total: 100% of DCC (not total budget)
+                        };
+                        const totalPhaseBudgets = Object.values(phaseAllocations).reduce((sum, val) => sum + val, 0);
+                        return (
   <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-blue-500/30 rounded-xl p-6 mt-4 shadow-xl">
     {/* Header */}
     <div className="flex items-start justify-between mb-4">
@@ -884,9 +980,11 @@ export default function NewProjectPage() {
     </div>
   </div>
 );
-              }
-              return null;
-            })()}
+                      }
+                      return null;
+                    })()}
+                  </>
+                )}
               </div>
             </div>
 

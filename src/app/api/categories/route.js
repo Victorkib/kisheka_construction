@@ -21,8 +21,18 @@ export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/categories
- * Returns all categories
+ * Returns categories
  * Auth: All authenticated users
+ *
+ * Optional query params for pagination (non-breaking):
+ * - page: page number (1-based)
+ * - pageSize: items per page
+ *
+ * If page/pageSize are NOT provided:
+ *   - Returns full array of categories (existing behavior)
+ *
+ * If page/pageSize ARE provided:
+ *   - Returns an object with { items, total, page, pageSize, totalPages }
  */
 const DEFAULT_CATEGORY_TYPE = CATEGORY_TYPES.MATERIALS;
 
@@ -37,18 +47,18 @@ const normalizeCategoryType = (type) => {
 const getUsageSourcesByType = (type) => {
   if (type === CATEGORY_TYPES.WORK_ITEMS) {
     return [
-      { collection: 'work_items', field: 'categoryId', filter: { deletedAt: null } },
-      { collection: 'labour_entries', field: 'categoryId', filter: { deletedAt: null } },
-      { collection: 'labour_batches', field: 'defaultCategoryId', filter: { deletedAt: null } },
-      { collection: 'supervisor_submissions', field: 'categoryId', filter: { deletedAt: null } },
+      { collection: 'work_items', field: 'categoryId', filter: { deletedAt: null }, label: 'Work Items' },
+      { collection: 'labour_entries', field: 'categoryId', filter: { deletedAt: null }, label: 'Labour Entries' },
+      { collection: 'labour_batches', field: 'defaultCategoryId', filter: { deletedAt: null }, label: 'Labour Batches' },
+      { collection: 'supervisor_submissions', field: 'categoryId', filter: { deletedAt: null }, label: 'Supervisor Submissions' },
     ];
   }
 
   return [
-    { collection: 'materials', field: 'categoryId', filter: { deletedAt: null } },
-    { collection: 'material_library', field: 'categoryId', filter: { deletedAt: null } },
-    { collection: 'material_requests', field: 'categoryId', filter: { deletedAt: null } },
-    { collection: 'purchase_orders', field: 'categoryId', filter: {} },
+    { collection: 'materials', field: 'categoryId', filter: { deletedAt: null }, label: 'Materials' },
+    { collection: 'material_library', field: 'categoryId', filter: { deletedAt: null }, label: 'Material Library' },
+    { collection: 'material_requests', field: 'categoryId', filter: { deletedAt: null }, label: 'Material Requests' },
+    { collection: 'purchase_orders', field: 'categoryId', filter: {}, label: 'Purchase Orders' },
   ];
 };
 
@@ -63,6 +73,33 @@ const countCategoryUsage = async (db, categoryId, type) => {
     )
   );
   return counts.reduce((sum, value) => sum + value, 0);
+};
+
+const getDetailedCategoryUsage = async (db, categoryId, type) => {
+  const sources = getUsageSourcesByType(type);
+  const usageDetails = await Promise.all(
+    sources.map(async (source) => {
+      const count = await db.collection(source.collection).countDocuments({
+        ...source.filter,
+        [source.field]: categoryId,
+      });
+      return {
+        collection: source.collection,
+        label: source.label,
+        count,
+      };
+    })
+  );
+  
+  // Filter out zero counts for cleaner display
+  const nonZeroUsage = usageDetails.filter((item) => item.count > 0);
+  const totalCount = usageDetails.reduce((sum, item) => sum + item.count, 0);
+  
+  return {
+    total: totalCount,
+    breakdown: nonZeroUsage,
+    allBreakdown: usageDetails, // Include all for completeness
+  };
 };
 
 export async function GET(request) {
@@ -93,22 +130,82 @@ export async function GET(request) {
       : {};
 
     const db = await getDatabase();
-    const categories = await db
-      .collection('categories')
-      .find(query)
-      .sort({ name: 1 })
-      .toArray();
 
-    // Add usage count for each category (type-aware)
+    // Optional pagination
+    const pageParam = searchParams.get('page');
+    const pageSizeParam = searchParams.get('pageSize');
+
+    const hasPaginationParams = pageParam !== null || pageSizeParam !== null;
+
+    let page = parseInt(pageParam || '1', 10);
+    let pageSize = parseInt(pageSizeParam || '20', 10);
+
+    if (Number.isNaN(page) || page < 1) page = 1;
+    if (Number.isNaN(pageSize) || pageSize < 1) pageSize = 20;
+    // Hard clamp pageSize to something reasonable
+    if (pageSize > 100) pageSize = 100;
+
+    let categories;
+    let total = null;
+
+    if (hasPaginationParams) {
+      total = await db.collection('categories').countDocuments(query);
+
+      const skip = (page - 1) * pageSize;
+      // If skip is beyond total, just return empty array
+      if (skip >= total && total > 0) {
+        categories = [];
+      } else {
+        categories = await db
+          .collection('categories')
+          .find(query)
+          .sort({ name: 1 })
+          .skip(skip)
+          .limit(pageSize)
+          .toArray();
+      }
+    } else {
+      // Existing behavior: return all categories without pagination metadata
+      categories = await db
+        .collection('categories')
+        .find(query)
+        .sort({ name: 1 })
+        .toArray();
+    }
+
+    // Add detailed usage information for each category (type-aware)
     const categoriesWithUsage = await Promise.all(
       categories.map(async (category) => {
         const categoryType = category.type || DEFAULT_CATEGORY_TYPE;
         const usageCount = await countCategoryUsage(db, category._id, categoryType);
-        return { ...category, type: categoryType, usageCount };
+        const usageDetails = await getDetailedCategoryUsage(db, category._id, categoryType);
+        return { 
+          ...category, 
+          type: categoryType, 
+          usageCount,
+          usageDetails: usageDetails.breakdown, // Only send non-zero breakdown for efficiency
+          usageTotal: usageDetails.total,
+        };
       })
     );
 
-    return successResponse(categoriesWithUsage, 'Categories retrieved successfully');
+    if (!hasPaginationParams) {
+      // Backwards-compatible response: plain array
+      return successResponse(categoriesWithUsage, 'Categories retrieved successfully');
+    }
+
+    const totalPages = total === 0 ? 1 : Math.ceil(total / pageSize);
+
+    return successResponse(
+      {
+        items: categoriesWithUsage,
+        total,
+        page,
+        pageSize,
+        totalPages,
+      },
+      'Categories retrieved successfully'
+    );
   } catch (error) {
     console.error('Get categories error:', error);
     return errorResponse('Failed to retrieve categories', 500);

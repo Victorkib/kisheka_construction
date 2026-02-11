@@ -17,8 +17,10 @@
 import Link from 'next/link';
 
 export function DomainTile({ icon, title, metrics = [], link, onClick, children }) {
+  const isClickable = link || onClick;
+  
   const content = (
-    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-6 border border-gray-200 h-full flex flex-col group">
+    <div className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-6 border border-gray-200 h-full flex flex-col group ${isClickable ? 'cursor-pointer' : ''}`}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         {icon && <span className="text-2xl flex-shrink-0">{icon}</span>}
@@ -44,14 +46,20 @@ export function DomainTile({ icon, title, metrics = [], link, onClick, children 
       {/* Custom Content */}
       {children && <div className="mb-4 flex-grow">{children}</div>}
       
-      {/* Action Link/Button */}
-      <div className="mt-auto pt-4 border-t border-gray-100">
-        {link ? (
-          <Link
-            href={link}
-            className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors group-hover:underline"
-          >
-            Open {title}
+      {/* Action Link/Button - Only show if tile itself is not clickable */}
+      {!isClickable && (
+        <div className="mt-auto pt-4 border-t border-gray-100">
+          <span className="inline-flex items-center text-sm font-medium text-gray-500">
+            No action available
+          </span>
+        </div>
+      )}
+      
+      {/* Clickable indicator when tile is clickable */}
+      {isClickable && (
+        <div className="mt-auto pt-4 border-t border-gray-100">
+          <span className="inline-flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-800 transition-colors">
+            View {title}
             <svg 
               className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" 
               fill="none" 
@@ -60,24 +68,9 @@ export function DomainTile({ icon, title, metrics = [], link, onClick, children 
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-          </Link>
-        ) : onClick ? (
-          <button
-            onClick={onClick}
-            className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors group-hover:underline"
-          >
-            Open {title}
-            <svg 
-              className="w-4 h-4 ml-1 transition-transform group-hover:translate-x-1" 
-              fill="none" 
-              stroke="currentColor" 
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        ) : null}
-      </div>
+          </span>
+        </div>
+      )}
     </div>
   );
 

@@ -96,9 +96,9 @@ export function ProjectHealthStrip({ statuses = [], summary, link, projectId }) 
         )}
         
         {/* Link to Detailed Dashboard */}
-        {link && projectId && (
+        {link && (
           <Link
-            href={link.replace('[id]', projectId)}
+            href={link.includes('[id]') ? link.replace('[id]', projectId || '') : link}
             className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors whitespace-nowrap flex items-center gap-1"
           >
             View Detailed Health Dashboard

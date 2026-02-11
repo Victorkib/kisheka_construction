@@ -3,10 +3,12 @@
  * GET: Get floor progress (photos, completion percentage)
  * POST: Add floor photo
  * PATCH: Update completion percentage or milestone notes
+ * DELETE: Delete a floor photo
  * 
  * GET /api/floors/[id]/progress
  * POST /api/floors/[id]/progress
  * PATCH /api/floors/[id]/progress
+ * DELETE /api/floors/[id]/progress?photoIndex=0
  */
 
 import { NextResponse } from 'next/server';
@@ -17,28 +19,27 @@ import { createAuditLog } from '@/lib/audit-log';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
+// Force dynamic rendering to prevent caching stale data
+export const dynamic = 'force-dynamic';
+
 /**
  * GET /api/floors/[id]/progress
  * Returns floor progress data (photos, completion percentage, milestone notes)
  * Auth: All authenticated users
  */
-
-// Force dynamic rendering to prevent caching stale data
-export const dynamic = 'force-dynamic';
-
 export async function GET(request, { params }) {
   try {
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return errorResponse('Unauthorized', 401);
+      return errorResponse('Unauthorized. Please log in to view floor progress.', 401);
     }
 
     const { id } = await params;
 
     if (!ObjectId.isValid(id)) {
-      return errorResponse('Invalid floor ID', 400);
+      return errorResponse('Invalid floor ID format', 400);
     }
 
     const db = await getDatabase();
@@ -60,7 +61,7 @@ export async function GET(request, { params }) {
     return successResponse(progress, 'Floor progress retrieved successfully');
   } catch (error) {
     console.error('Get floor progress error:', error);
-    return errorResponse('Failed to retrieve floor progress', 500);
+    return errorResponse('Failed to retrieve floor progress. Please try again.', 500);
   }
 }
 
@@ -75,25 +76,25 @@ export async function POST(request, { params }) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return errorResponse('Unauthorized', 401);
+      return errorResponse('Unauthorized. Please log in to add photos.', 401);
     }
 
     const userProfile = await getUserProfile(user.id);
     if (!userProfile) {
-      return errorResponse('User profile not found', 404);
+      return errorResponse('User profile not found. Please contact support.', 404);
     }
 
     const { id } = await params;
 
     if (!ObjectId.isValid(id)) {
-      return errorResponse('Invalid floor ID', 400);
+      return errorResponse('Invalid floor ID format', 400);
     }
 
     const body = await request.json();
     const { photo } = body;
 
     if (!photo || !photo.url) {
-      return errorResponse('Photo URL is required', 400);
+      return errorResponse('Photo URL is required. Please upload a photo first.', 400);
     }
 
     const db = await getDatabase();
@@ -104,7 +105,7 @@ export async function POST(request, { params }) {
     });
 
     if (!floor) {
-      return errorResponse('Floor not found', 404);
+      return errorResponse('Floor not found. The floor may have been deleted.', 404);
     }
 
     // Initialize progress if it doesn't exist
@@ -144,19 +145,36 @@ export async function POST(request, { params }) {
       { returnDocument: 'after' }
     );
 
+    if (!result || !result.value) {
+      return errorResponse('Failed to add photo. The floor may have been deleted.', 500);
+    }
+
     // Create audit log
-    await createAuditLog({
-      userId: userProfile._id.toString(),
-      action: 'FLOOR_PHOTO_ADDED',
-      entityType: 'FLOOR',
-      entityId: id,
-      changes: { photo: newPhoto },
-    });
+    try {
+      await createAuditLog({
+        userId: userProfile._id.toString(),
+        action: 'FLOOR_PHOTO_ADDED',
+        entityType: 'FLOOR',
+        entityId: id,
+        changes: { photo: newPhoto },
+      });
+    } catch (auditError) {
+      console.error('Audit log error:', auditError);
+    }
 
     return successResponse(result.value.progress, 'Photo added successfully');
   } catch (error) {
     console.error('Add floor photo error:', error);
-    return errorResponse('Failed to add floor photo', 500);
+    
+    if (error.name === 'MongoInvalidArgumentError' || error.message?.includes('atomic operators')) {
+      return errorResponse('Database update error. Please contact support if this issue persists.', 500);
+    }
+    
+    if (error.name === 'MongoServerError') {
+      return errorResponse(`Database error: ${error.message || 'Failed to add photo'}`, 500);
+    }
+    
+    return errorResponse(error.message || 'Failed to add floor photo. Please try again.', 500);
   }
 }
 
@@ -171,12 +189,12 @@ export async function PATCH(request, { params }) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return errorResponse('Unauthorized', 401);
+      return errorResponse('Unauthorized. Please log in to update progress.', 401);
     }
 
     const userProfile = await getUserProfile(user.id);
     if (!userProfile) {
-      return errorResponse('User profile not found', 404);
+      return errorResponse('User profile not found. Please contact support.', 404);
     }
 
     // Check permission - PM and OWNER can update floor progress
@@ -189,7 +207,7 @@ export async function PATCH(request, { params }) {
     const { id } = await params;
 
     if (!ObjectId.isValid(id)) {
-      return errorResponse('Invalid floor ID', 400);
+      return errorResponse('Invalid floor ID format', 400);
     }
 
     const body = await request.json();
@@ -198,12 +216,12 @@ export async function PATCH(request, { params }) {
     const db = await getDatabase();
 
     // Verify floor exists
-    const floor = await db.collection('floors').findOne({
+    let floor = await db.collection('floors').findOne({
       _id: new ObjectId(id),
     });
 
     if (!floor) {
-      return errorResponse('Floor not found', 404);
+      return errorResponse('Floor not found. The floor may have been deleted.', 404);
     }
 
     // Initialize progress if it doesn't exist
@@ -220,19 +238,24 @@ export async function PATCH(request, { params }) {
           },
         }
       );
+      // Re-fetch to get updated progress
+      const updatedFloor = await db.collection('floors').findOne({
+        _id: new ObjectId(id),
+      });
+      if (updatedFloor) {
+        floor = updatedFloor;
+      }
     }
 
-    const updateData = {
+    // Build update object with $set operator - CORRECT MongoDB syntax
+    const updateFields = {
       updatedAt: new Date(),
     };
     const changes = {};
 
     if (completionPercentage !== undefined) {
       const percentage = Math.max(0, Math.min(100, parseFloat(completionPercentage) || 0));
-      updateData.$set = {
-        ...(updateData.$set || {}),
-        'progress.completionPercentage': percentage,
-      };
+      updateFields['progress.completionPercentage'] = percentage;
       changes.completionPercentage = {
         oldValue: floor.progress?.completionPercentage || 0,
         newValue: percentage,
@@ -240,10 +263,7 @@ export async function PATCH(request, { params }) {
     }
 
     if (milestoneNotes !== undefined) {
-      updateData.$set = {
-        ...(updateData.$set || {}),
-        'progress.milestoneNotes': milestoneNotes.trim(),
-      };
+      updateFields['progress.milestoneNotes'] = milestoneNotes.trim();
       changes.milestoneNotes = {
         oldValue: floor.progress?.milestoneNotes || '',
         newValue: milestoneNotes.trim(),
@@ -251,8 +271,15 @@ export async function PATCH(request, { params }) {
     }
 
     if (Object.keys(changes).length === 0) {
-      return errorResponse('No valid fields to update', 400);
+      return errorResponse('No valid fields to update. Please provide completionPercentage or milestoneNotes', 400);
     }
+
+    // Convert updateFields to MongoDB $set format
+    const updateData = {
+      $set: {
+        ...updateFields,
+      },
+    };
 
     // Update floor
     const result = await db.collection('floors').findOneAndUpdate(
@@ -261,21 +288,38 @@ export async function PATCH(request, { params }) {
       { returnDocument: 'after' }
     );
 
+    if (!result || !result.value) {
+      return errorResponse('Failed to update floor progress. The floor may have been deleted.', 500);
+    }
+
     // Create audit log
     if (Object.keys(changes).length > 0) {
-      await createAuditLog({
-        userId: userProfile._id.toString(),
-        action: 'FLOOR_PROGRESS_UPDATED',
-        entityType: 'FLOOR',
-        entityId: id,
-        changes,
-      });
+      try {
+        await createAuditLog({
+          userId: userProfile._id.toString(),
+          action: 'FLOOR_PROGRESS_UPDATED',
+          entityType: 'FLOOR',
+          entityId: id,
+          changes,
+        });
+      } catch (auditError) {
+        console.error('Audit log error:', auditError);
+      }
     }
 
     return successResponse(result.value.progress, 'Floor progress updated successfully');
   } catch (error) {
     console.error('Update floor progress error:', error);
-    return errorResponse('Failed to update floor progress', 500);
+    
+    if (error.name === 'MongoInvalidArgumentError' || error.message?.includes('atomic operators')) {
+      return errorResponse('Database update error. Please contact support if this issue persists.', 500);
+    }
+    
+    if (error.name === 'MongoServerError') {
+      return errorResponse(`Database error: ${error.message || 'Failed to update progress'}`, 500);
+    }
+    
+    return errorResponse(error.message || 'Failed to update floor progress. Please try again.', 500);
   }
 }
 
@@ -290,12 +334,12 @@ export async function DELETE(request, { params }) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      return errorResponse('Unauthorized', 401);
+      return errorResponse('Unauthorized. Please log in to delete photos.', 401);
     }
 
     const userProfile = await getUserProfile(user.id);
     if (!userProfile) {
-      return errorResponse('User profile not found', 404);
+      return errorResponse('User profile not found. Please contact support.', 404);
     }
 
     // Check permission - PM and OWNER can delete photos
@@ -308,14 +352,14 @@ export async function DELETE(request, { params }) {
     const { id } = await params;
 
     if (!ObjectId.isValid(id)) {
-      return errorResponse('Invalid floor ID', 400);
+      return errorResponse('Invalid floor ID format', 400);
     }
 
     const { searchParams } = new URL(request.url);
     const photoIndex = searchParams.get('photoIndex');
 
     if (photoIndex === null || isNaN(parseInt(photoIndex))) {
-      return errorResponse('Photo index is required', 400);
+      return errorResponse('Photo index is required. Please provide a valid photo index.', 400);
     }
 
     const db = await getDatabase();
@@ -326,14 +370,14 @@ export async function DELETE(request, { params }) {
     });
 
     if (!floor) {
-      return errorResponse('Floor not found', 404);
+      return errorResponse('Floor not found. The floor may have been deleted.', 404);
     }
 
     const photos = floor.progress?.photos || [];
     const index = parseInt(photoIndex);
 
     if (index < 0 || index >= photos.length) {
-      return errorResponse('Invalid photo index', 400);
+      return errorResponse('Invalid photo index. The photo may have been deleted.', 400);
     }
 
     const photoToDelete = photos[index];
@@ -352,6 +396,10 @@ export async function DELETE(request, { params }) {
       { returnDocument: 'after' }
     );
 
+    if (!result || !result.value) {
+      return errorResponse('Failed to delete photo. The floor may have been deleted.', 500);
+    }
+
     // Clean up the array (remove null entries)
     const updatedPhotos = (result.value.progress?.photos || []).filter(p => p !== null);
     await db.collection('floors').updateOne(
@@ -364,13 +412,17 @@ export async function DELETE(request, { params }) {
     );
 
     // Create audit log
-    await createAuditLog({
-      userId: userProfile._id.toString(),
-      action: 'FLOOR_PHOTO_DELETED',
-      entityType: 'FLOOR',
-      entityId: id,
-      changes: { deletedPhoto: photoToDelete },
-    });
+    try {
+      await createAuditLog({
+        userId: userProfile._id.toString(),
+        action: 'FLOOR_PHOTO_DELETED',
+        entityType: 'FLOOR',
+        entityId: id,
+        changes: { deletedPhoto: photoToDelete },
+      });
+    } catch (auditError) {
+      console.error('Audit log error:', auditError);
+    }
 
     // Get updated progress
     const updatedFloor = await db.collection('floors').findOne({
@@ -380,6 +432,15 @@ export async function DELETE(request, { params }) {
     return successResponse(updatedFloor.progress, 'Photo deleted successfully');
   } catch (error) {
     console.error('Delete floor photo error:', error);
-    return errorResponse('Failed to delete floor photo', 500);
+    
+    if (error.name === 'MongoInvalidArgumentError' || error.message?.includes('atomic operators')) {
+      return errorResponse('Database update error. Please contact support if this issue persists.', 500);
+    }
+    
+    if (error.name === 'MongoServerError') {
+      return errorResponse(`Database error: ${error.message || 'Failed to delete photo'}`, 500);
+    }
+    
+    return errorResponse(error.message || 'Failed to delete floor photo. Please try again.', 500);
   }
 }

@@ -25,6 +25,7 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
   });
   const [originalFormData, setOriginalFormData] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteMilestoneId, setDeleteMilestoneId] = useState(null);

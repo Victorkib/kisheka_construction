@@ -32,15 +32,41 @@ test('getProjectDependencyCounts returns expected counts', async () => {
     projectTeams: 26,
     notifications: 27,
     auditLogs: 28,
+    scheduledReports: 29,
   };
 
   const db = {
     collection(name) {
-      if (!(name in counts)) {
+      // Map Mongo collection names to our counts keys where they differ
+      const keyMap = {
+        initial_expenses: 'initialExpenses',
+        work_items: 'workItems',
+        labour_entries: 'labourEntries',
+        labour_batches: 'labourBatches',
+        labour_cost_summaries: 'labourCostSummaries',
+        material_requests: 'materialRequests',
+        material_request_batches: 'materialRequestBatches',
+        purchase_orders: 'purchaseOrders',
+        professional_services: 'professionalServices',
+        professional_fees: 'professionalFees',
+        professional_activities: 'professionalActivities',
+        site_reports: 'siteReports',
+        supervisor_submissions: 'supervisorSubmissions',
+        budget_reallocations: 'budgetReallocations',
+        budget_adjustments: 'budgetAdjustments',
+        budget_transfers: 'budgetTransfers',
+        contingency_draws: 'contingencyDraws',
+        project_memberships: 'projectMemberships',
+        project_teams: 'projectTeams',
+        audit_logs: 'auditLogs',
+        scheduled_reports: 'scheduledReports',
+      };
+      const mappedName = keyMap[name] || name;
+      if (!(mappedName in counts)) {
         throw new Error(`Unexpected collection: ${name}`);
       }
       return {
-        countDocuments: async () => counts[name],
+        countDocuments: async () => counts[mappedName],
       };
     },
   };
