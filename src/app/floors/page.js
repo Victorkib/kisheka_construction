@@ -322,7 +322,7 @@ function FloorsPageContent() {
         href={`/floors/${floor._id}`}
         className="text-blue-600 hover:text-blue-900"
       >
-        {canEdit ? 'Edit' : 'View'}
+        {canEdit ? 'Edit/View' : 'View'}
       </Link>
       {canDelete && (
         <button
