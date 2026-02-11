@@ -15,7 +15,7 @@ import { getUserProfile } from '@/lib/auth-helpers';
 import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotifications } from '@/lib/notifications';
-import { recalculateProjectFinances } from '@/lib/financial-helpers';
+import { recalculateProjectFinances, validateCapitalAvailability } from '@/lib/financial-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateMaterialRequestBatch } from '@/lib/schemas/material-request-batch-schema';
@@ -190,12 +190,48 @@ export async function POST(request) {
       // If budget is not set, operation is allowed (isValid = true)
       if (!budgetValidation.isValid) {
         return errorResponse(
-          `Budget validation failed: ${budgetValidation.errors.join('; ')}`,
+          `Phase material budget (not capital) validation failed: ${budgetValidation.errors.join('; ')}`,
           400
         );
       }
       // Note: If budget is not set, budgetValidation.isValid will be true
       // and spending will still be tracked regardless
+    }
+
+    // Check capital availability (warning only, don't block request creation)
+    let capitalWarning = null;
+    try {
+      const totalEstimatedCost = materialsWithCosts.reduce((sum, m) => {
+        const cost = m.estimatedCost || (m.estimatedUnitCost && m.quantityNeeded ? m.estimatedUnitCost * m.quantityNeeded : 0);
+        return sum + cost;
+      }, 0);
+      
+      if (totalEstimatedCost > 0) {
+        const capitalCheck = await validateCapitalAvailability(projectId, totalEstimatedCost);
+        
+        if (!capitalCheck.isValid && !capitalCheck.capitalNotSet) {
+          capitalWarning = {
+            message: `Insufficient capital (not budget). Available capital: ${capitalCheck.available.toLocaleString()}, Required: ${totalEstimatedCost.toLocaleString()}, Shortfall: ${(totalEstimatedCost - capitalCheck.available).toLocaleString()}`,
+            available: capitalCheck.available,
+            required: totalEstimatedCost,
+            shortfall: totalEstimatedCost - capitalCheck.available,
+          };
+        } else if (capitalCheck.capitalNotSet) {
+          capitalWarning = {
+            message: 'No capital invested. Capital validation will occur when converting to purchase order.',
+            type: 'info',
+          };
+        }
+      } else if (materialsWithCosts.length === 0) {
+        // If no estimated costs provided, show info message
+        capitalWarning = {
+          message: 'No estimated costs provided. Capital validation will occur when converting to purchase order.',
+          type: 'info',
+        };
+      }
+    } catch (capitalError) {
+      // Don't fail request creation if capital check fails
+      console.error('Capital check error during bulk material request creation:', capitalError);
     }
 
     // Determine initial status
@@ -334,6 +370,7 @@ export async function POST(request) {
         requiresApproval,
         totalMaterials: createdBatch.totalMaterials,
         totalEstimatedCost: createdBatch.totalEstimatedCost,
+        ...(capitalWarning && { capitalWarning }),
       },
       'Bulk material request created successfully',
       201

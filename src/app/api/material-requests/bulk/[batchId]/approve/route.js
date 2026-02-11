@@ -114,12 +114,16 @@ export async function POST(request, { params }) {
         totalCost
       );
       
-      if (!aggregateCapitalCheck.isValid) {
+      // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+      // If capital is not set (capitalNotSet = true), allow the operation
+      if (!aggregateCapitalCheck.isValid && !aggregateCapitalCheck.capitalNotSet) {
         return errorResponse(
-          `Cannot approve requests: Total cost (${totalCost.toLocaleString()} KES) exceeds available capital (${aggregateCapitalCheck.available.toLocaleString()} KES). Shortfall: ${(totalCost - aggregateCapitalCheck.available).toLocaleString()} KES.`,
+          `Cannot approve requests: Insufficient capital (not budget). Total cost (${totalCost.toLocaleString()} KES) exceeds available capital (${aggregateCapitalCheck.available.toLocaleString()} KES). Shortfall: ${(totalCost - aggregateCapitalCheck.available).toLocaleString()} KES. Add capital to the project to proceed.`,
           400
         );
       }
+      // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+      // Spending will still be tracked regardless
     }
 
     // Collect financial warnings for individual requests (for reporting)
@@ -130,13 +134,23 @@ export async function POST(request, { params }) {
           request.estimatedCost
         );
 
-        if (!capitalCheck.isValid) {
+        if (!capitalCheck.isValid && !capitalCheck.capitalNotSet) {
           financialWarnings.push({
             requestId: request._id.toString(),
             message: `Estimated cost (${request.estimatedCost.toLocaleString()}) exceeds available capital (${capitalCheck.available.toLocaleString()})`,
             available: capitalCheck.available,
             required: request.estimatedCost,
             shortfall: request.estimatedCost - capitalCheck.available,
+            type: 'warning',
+          });
+        } else if (capitalCheck.capitalNotSet) {
+          financialWarnings.push({
+            requestId: request._id.toString(),
+            message: `No capital invested. Estimated cost: ${request.estimatedCost.toLocaleString()}. Spending will be tracked.`,
+            available: 0,
+            required: request.estimatedCost,
+            shortfall: 0,
+            type: 'info',
           });
         }
       }

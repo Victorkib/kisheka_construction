@@ -370,12 +370,17 @@ export async function POST(request) {
           requestAmount
         );
         
-        if (!capitalCheck.isValid) {
+        if (!capitalCheck.isValid && !capitalCheck.capitalNotSet) {
           capitalWarning = {
-            message: `Insufficient capital. Available: ${capitalCheck.available.toLocaleString()}, Required: ${requestAmount.toLocaleString()}, Shortfall: ${(requestAmount - capitalCheck.available).toLocaleString()}`,
+            message: `Insufficient capital (not budget). Available capital: ${capitalCheck.available.toLocaleString()}, Required: ${requestAmount.toLocaleString()}, Shortfall: ${(requestAmount - capitalCheck.available).toLocaleString()}`,
             available: capitalCheck.available,
             required: requestAmount,
             shortfall: requestAmount - capitalCheck.available,
+          };
+        } else if (capitalCheck.capitalNotSet) {
+          capitalWarning = {
+            message: 'No capital invested. Capital validation will occur when converting to purchase order.',
+            type: 'info',
           };
         }
       } else if (estimatedCost === undefined || estimatedCost === null) {

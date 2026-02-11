@@ -539,23 +539,32 @@ export async function POST(request) {
           materialAmount
         );
         
-        if (!capitalCheck.isValid) {
+        if (!capitalCheck.isValid && !capitalCheck.capitalNotSet) {
           capitalWarning = {
-            message: `Insufficient capital. Available: ${capitalCheck.available.toLocaleString()}, Required: ${materialAmount.toLocaleString()}, Shortfall: ${(materialAmount - capitalCheck.available).toLocaleString()}`,
+            message: `Insufficient capital (not budget). Available capital: ${capitalCheck.available.toLocaleString()}, Required: ${materialAmount.toLocaleString()}, Shortfall: ${(materialAmount - capitalCheck.available).toLocaleString()}`,
             available: capitalCheck.available,
             required: materialAmount,
             shortfall: materialAmount - capitalCheck.available,
           };
           
           // Optional: Block material creation if no capital (configurable)
+          // Note: This only applies when capital is set but insufficient, not when capital is not set
           if (process.env.BLOCK_MATERIAL_CREATION_NO_CAPITAL === 'true') {
-            if (capitalWarning.available === 0) {
+            if (capitalWarning.available === 0 && !capitalCheck.capitalNotSet) {
               return errorResponse(
-                'Cannot create material: Project has no capital allocated. Please allocate capital first.',
+                'Cannot create material: Project has insufficient capital. Please add capital first.',
                 400
               );
             }
           }
+        } else if (capitalCheck.capitalNotSet) {
+          capitalWarning = {
+            message: `No capital invested. Material cost: ${materialAmount.toLocaleString()}. Spending will be tracked. Add capital later to enable capital validation.`,
+            available: 0,
+            required: materialAmount,
+            shortfall: 0,
+            type: 'info',
+          };
         }
       }
     } catch (capitalError) {

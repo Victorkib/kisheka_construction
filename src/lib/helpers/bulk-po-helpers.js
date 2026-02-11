@@ -237,11 +237,15 @@ export async function createPOFromSupplierGroup(supplierGroup, batchId, userProf
     throw new Error('Capital validation failed: Invalid validation response');
   }
   
-  if (!capitalValidation.isValid) {
+  // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+  // If capital is not set (capitalNotSet = true), allow the operation
+  if (!capitalValidation.isValid && !capitalValidation.capitalNotSet) {
     throw new Error(
-      capitalValidation.message || `Insufficient capital available for this purchase order. Available: ${capitalValidation.available?.toLocaleString() || 0}, Required: ${totalCost.toLocaleString()}`
+      capitalValidation.message || `Insufficient capital (not budget) available for this purchase order. Available capital: ${capitalValidation.available?.toLocaleString() || 0}, Required: ${totalCost.toLocaleString()}. Add capital to the project to proceed.`
     );
   }
+  // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+  // Spending will still be tracked regardless
 
   // Generate PO number (with session support for transaction)
   const purchaseOrderNumber = await generatePurchaseOrderNumber({

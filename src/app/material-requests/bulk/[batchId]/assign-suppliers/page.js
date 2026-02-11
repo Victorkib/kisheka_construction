@@ -372,9 +372,14 @@ function SupplierAssignmentPageContent() {
   const materialRequests = batch?.materialRequests || [];
   const projectId = normalizeId(batch?.projectId);
   const availableCapital = projectFinances?.availableCapital ?? null;
+  const totalInvested = projectFinances?.totalInvested ?? null;
   const estimatedBatchCost = batch?.totals?.totalEstimatedCost || 0;
-  const hasCapital = availableCapital === null ? true : availableCapital > 0;
-  const isCapitalShort = availableCapital !== null && availableCapital < estimatedBatchCost;
+  
+  // OPTIONAL CAPITAL: Determine capital status
+  const capitalNotSet = totalInvested === null || totalInvested === 0;
+  const hasCapital = availableCapital !== null && availableCapital > 0;
+  const isCapitalShort = !capitalNotSet && availableCapital !== null && availableCapital < estimatedBatchCost;
+  
   const returnTo = `/material-requests/bulk/${params.batchId}/assign-suppliers`;
 
   const canProceed =
@@ -416,11 +421,13 @@ function SupplierAssignmentPageContent() {
           <div className={`mb-6 rounded-lg border px-4 py-3 ${
             financeError
               ? 'bg-red-50 border-red-200 text-red-700'
-              : !hasCapital
-                ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                : isCapitalShort
+              : capitalNotSet
+                ? 'bg-blue-50 border-blue-200 text-blue-800'
+                : !hasCapital
                   ? 'bg-amber-50 border-amber-200 text-amber-800'
-                  : 'bg-green-50 border-green-200 text-green-800'
+                  : isCapitalShort
+                    ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                    : 'bg-green-50 border-green-200 text-green-800'
           }`}>
             {financeLoading ? (
               <p className="text-sm">Checking project capital availability...</p>
@@ -428,40 +435,61 @@ function SupplierAssignmentPageContent() {
               <p className="text-sm">Capital check failed: {financeError}</p>
             ) : (
               <div className="text-sm">
-                <p className="font-semibold">Project capital check</p>
-                <p>
-                  Available: <span className="font-medium">{formatCurrency(availableCapital)}</span>
-                  {projectFinances?.committedCost !== undefined && (
-                    <> • Committed: <span className="font-medium">{formatCurrency(projectFinances.committedCost)}</span></>
-                  )}
-                  {projectFinances?.totalUsed !== undefined && (
-                    <> • Used: <span className="font-medium">{formatCurrency(projectFinances.totalUsed)}</span></>
-                  )}
+                <p className="font-semibold">
+                  {capitalNotSet
+                    ? 'ℹ️ No Capital Invested'
+                    : !hasCapital
+                      ? '⚠️ Insufficient Capital'
+                      : isCapitalShort
+                        ? '⚠️ Capital Warning'
+                        : '✓ Capital Available'}
                 </p>
-                <p className="text-xs mt-1">
-                  Batch estimated cost: {formatCurrency(estimatedBatchCost)}. Final PO totals may vary if overrides are applied.
-                </p>
-                {!hasCapital && (
-                  <p className="text-xs mt-2">
-                    Insufficient capital to create purchase orders for this project. Allocate funds to this project and try again.
-                  </p>
-                )}
-                {hasCapital && isCapitalShort && (
-                  <p className="text-xs mt-2">
-                    Available capital is below the batch estimate. Some POs may fail unless capital is increased.
-                  </p>
+                {capitalNotSet ? (
+                  <>
+                    <p className="mt-1">
+                      No capital has been invested in this project. You can still create purchase orders - all spending will be tracked. Add capital later to enable capital validation.
+                    </p>
+                    <p className="text-xs mt-2">
+                      Batch estimated cost: {formatCurrency(estimatedBatchCost)}. Final PO totals may vary if overrides are applied.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="mt-1">
+                      Available: <span className="font-medium">{formatCurrency(availableCapital)}</span>
+                      {projectFinances?.committedCost !== undefined && (
+                        <> • Committed: <span className="font-medium">{formatCurrency(projectFinances.committedCost)}</span></>
+                      )}
+                      {projectFinances?.totalUsed !== undefined && (
+                        <> • Used: <span className="font-medium">{formatCurrency(projectFinances.totalUsed)}</span></>
+                      )}
+                    </p>
+                    <p className="text-xs mt-1">
+                      Batch estimated cost: {formatCurrency(estimatedBatchCost)}. Final PO totals may vary if overrides are applied.
+                    </p>
+                    {!hasCapital && (
+                      <p className="text-xs mt-2">
+                        ⚠️ Insufficient capital available. Purchase orders will be created but capital validation will occur. Add capital to ensure sufficient funds.
+                      </p>
+                    )}
+                    {hasCapital && isCapitalShort && (
+                      <p className="text-xs mt-2">
+                        ⚠️ Available capital is below the batch estimate. Some purchase orders may fail capital validation unless capital is increased.
+                      </p>
+                    )}
+                  </>
                 )}
                 {projectId && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Link
                       href={`/financing?projectId=${projectId}&returnTo=${encodeURIComponent(returnTo)}`}
-                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 bg-white text-amber-800 hover:bg-amber-100"
+                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
                     >
                       Open Financing
                     </Link>
                     <Link
                       href={`/investors?projectId=${projectId}&returnTo=${encodeURIComponent(returnTo)}`}
-                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 bg-white text-amber-800 hover:bg-amber-100"
+                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
                     >
                       Allocate Funds (Investors)
                     </Link>
@@ -658,15 +686,20 @@ function SupplierAssignmentPageContent() {
             onClick={handleSubmit}
             isLoading={submitting}
             loadingText="Creating Purchase Orders..."
-            disabled={!canProceed || submitting || !hasCapital}
+            disabled={!canProceed || submitting}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             Create Purchase Orders
           </LoadingButton>
         </div>
-        {!hasCapital && (
-          <p className="mt-3 text-xs text-yellow-700">
-            Purchase order creation is disabled until the project has available capital.
+        {capitalNotSet && (
+          <p className="mt-3 text-xs text-blue-700">
+            ℹ️ No capital invested. Purchase orders will be created and spending will be tracked. Add capital later to enable capital validation.
+          </p>
+        )}
+        {!capitalNotSet && !hasCapital && (
+          <p className="mt-3 text-xs text-amber-700">
+            ⚠️ Insufficient capital. Purchase orders will be created but may fail capital validation. Add capital to ensure sufficient funds.
           </p>
         )}
       </div>

@@ -171,12 +171,16 @@ export async function POST(request, { params }) {
         finalTotalCost
       );
 
-      if (!capitalValidation.isValid) {
+      // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+      // If capital is not set (capitalNotSet = true), allow the operation
+      if (!capitalValidation.isValid && !capitalValidation.capitalNotSet) {
         return errorResponse(
-          `Insufficient capital. Available: ${capitalValidation.available.toLocaleString()}, Required: ${finalTotalCost.toLocaleString()}`,
+          `Insufficient capital (not budget). Available capital: ${capitalValidation.available.toLocaleString()}, Required: ${finalTotalCost.toLocaleString()}. Add capital to the project to proceed.`,
           400
         );
       }
+      // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+      // Spending will still be tracked regardless
 
       // CRITICAL FIX: Update materials array for single orders ONLY
       // This handler should never process bulk orders (they're handled above)
@@ -762,12 +766,16 @@ async function handlePartialResponse({ db, purchaseOrder, id, token, materialRes
         totalAcceptedCost
       );
 
-      if (!capitalValidation.isValid) {
+      // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+      // If capital is not set (capitalNotSet = true), allow the operation
+      if (!capitalValidation.isValid && !capitalValidation.capitalNotSet) {
         return errorResponse(
-          `Insufficient capital for accepted materials. Available: ${capitalValidation.available.toLocaleString()}, Required: ${totalAcceptedCost.toLocaleString()}`,
+          `Insufficient capital (not budget) for accepted materials. Available capital: ${capitalValidation.available.toLocaleString()}, Required: ${totalAcceptedCost.toLocaleString()}. Add capital to the project to proceed.`,
           400
         );
       }
+      // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+      // Spending will still be tracked regardless
 
       // Increase committedCost
       await updateCommittedCost(

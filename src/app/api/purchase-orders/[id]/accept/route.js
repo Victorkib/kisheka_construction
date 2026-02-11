@@ -111,12 +111,16 @@ export async function POST(request, { params }) {
       finalTotalCost
     );
 
-    if (!capitalValidation.isValid) {
+    // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+    // If capital is not set (capitalNotSet = true), allow the operation
+    if (!capitalValidation.isValid && !capitalValidation.capitalNotSet) {
       return errorResponse(
-        `Cannot accept order: Insufficient capital. Available: ${capitalValidation.available.toLocaleString()}, Required: ${finalTotalCost.toLocaleString()}, Shortfall: ${(finalTotalCost - capitalValidation.available).toLocaleString()}`,
+        `Cannot accept order: Insufficient capital (not budget). Available capital: ${capitalValidation.available.toLocaleString()}, Required: ${finalTotalCost.toLocaleString()}, Shortfall: ${(finalTotalCost - capitalValidation.available).toLocaleString()}. Add capital to the project to proceed.`,
         400
       );
     }
+    // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+    // Spending will still be tracked regardless
 
     // CRITICAL: Wrap critical operations in transaction for atomicity
     // This ensures PO status update and financial update happen together or not at all

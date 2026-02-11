@@ -409,12 +409,16 @@ export async function POST(request) {
       totalCost
     );
 
-    if (!capitalValidation.isValid) {
+    // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+    // If capital is not set (capitalNotSet = true), allow the operation
+    if (!capitalValidation.isValid && !capitalValidation.capitalNotSet) {
       return errorResponse(
-        `Insufficient capital. Available: ${capitalValidation.available.toLocaleString()}, Required: ${totalCost.toLocaleString()}, Shortfall: ${(totalCost - capitalValidation.available).toLocaleString()}`,
+        `Insufficient capital (not budget) available. Available capital: ${capitalValidation.available.toLocaleString()}, Required: ${totalCost.toLocaleString()}, Shortfall: ${(totalCost - capitalValidation.available).toLocaleString()}. Add capital to the project to proceed.`,
         400
       );
     }
+    // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+    // Spending will still be tracked regardless
 
     // CRITICAL: Generate idempotency key to prevent duplicate POs on retry
     // This ensures that if the request fails after transaction commit (e.g., 404),

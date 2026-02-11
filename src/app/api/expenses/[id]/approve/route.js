@@ -90,7 +90,9 @@ export async function POST(request, { params }) {
           expenseAmount
         );
 
-        if (!capitalValidation.isValid) {
+        // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+        // If capital is not set (capitalNotSet = true), allow the operation
+        if (!capitalValidation.isValid && !capitalValidation.capitalNotSet) {
           const availableFormatted = capitalValidation.available.toLocaleString('en-KE', {
             style: 'currency',
             currency: 'KES',
@@ -104,15 +106,17 @@ export async function POST(request, { params }) {
           
           return errorResponse(
             {
-              message: `Cannot approve expense: ${capitalValidation.message}`,
+              message: `Cannot approve expense: Insufficient capital (not budget). ${capitalValidation.message}`,
               available: capitalValidation.available,
               required: capitalValidation.required,
               shortfall: capitalValidation.required - capitalValidation.available,
             },
-            `Cannot approve expense: ${capitalValidation.message}. Available capital: ${availableFormatted}, Required: ${requiredFormatted}. Shortfall: ${(capitalValidation.required - capitalValidation.available).toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}`,
+            `Cannot approve expense: Insufficient capital (not budget). ${capitalValidation.message}. Available capital: ${availableFormatted}, Required: ${requiredFormatted}. Shortfall: ${(capitalValidation.required - capitalValidation.available).toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}. Add capital to the project to proceed.`,
             400
           );
         }
+        // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+        // Spending will still be tracked regardless
       } catch (validationError) {
         console.error('Capital validation error:', validationError);
         return errorResponse(

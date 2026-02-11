@@ -105,7 +105,7 @@ export async function POST(request, { params }) {
       fee.amount
     );
 
-    if (!capitalCheck.isValid) {
+    if (!capitalCheck.isValid && !capitalCheck.capitalNotSet) {
       financialWarning = {
         message: `Fee amount (${fee.amount.toLocaleString()}) exceeds available capital (${capitalCheck.available.toLocaleString()}).`,
         available: capitalCheck.available,
@@ -114,6 +114,14 @@ export async function POST(request, { params }) {
         type: 'capital_warning',
       };
       // Don't block approval - just warn
+    } else if (capitalCheck.capitalNotSet) {
+      financialWarning = {
+        message: `No capital invested. Fee amount: ${fee.amount.toLocaleString()}. Spending will be tracked. Add capital later to enable capital validation.`,
+        available: 0,
+        required: fee.amount,
+        shortfall: 0,
+        type: 'info',
+      };
     }
 
     // Create expense record automatically

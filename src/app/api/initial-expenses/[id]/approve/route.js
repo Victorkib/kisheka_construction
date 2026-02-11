@@ -92,12 +92,16 @@ export async function POST(request, { params }) {
         expenseAmount
       );
 
-      if (!capitalValidation.isValid) {
+      // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+      // If capital is not set (capitalNotSet = true), allow the operation
+      if (!capitalValidation.isValid && !capitalValidation.capitalNotSet) {
         return errorResponse(
-          `Cannot approve initial expense: ${capitalValidation.message}. Available capital: ${capitalValidation.available.toLocaleString()}, Required: ${capitalValidation.required.toLocaleString()}`,
+          `Cannot approve initial expense: Insufficient capital (not budget). ${capitalValidation.message}. Available capital: ${capitalValidation.available.toLocaleString()}, Required: ${capitalValidation.required.toLocaleString()}. Add capital to the project to proceed.`,
           400
         );
       }
+      // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+      // Spending will still be tracked regardless
 
       // Validate pre-construction budget
       const budgetSource = existingExpense.budgetSource;

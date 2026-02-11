@@ -83,7 +83,7 @@ export async function POST(request, { params }) {
         materialRequest.estimatedCost
       );
 
-      if (!capitalCheck.isValid) {
+      if (!capitalCheck.isValid && !capitalCheck.capitalNotSet) {
         financialWarning = {
           message: `Estimated cost (${materialRequest.estimatedCost.toLocaleString()}) exceeds available capital (${capitalCheck.available.toLocaleString()}). Note: This is an estimate and won't spend capital until converted to a purchase order.`,
           available: capitalCheck.available,
@@ -92,6 +92,14 @@ export async function POST(request, { params }) {
           type: 'estimate_warning' // Indicates this is informational, not blocking
         };
         // Don't block approval - it's just an estimate
+      } else if (capitalCheck.capitalNotSet) {
+        financialWarning = {
+          message: `No capital invested. Estimated cost: ${materialRequest.estimatedCost.toLocaleString()}. Capital validation will occur when converting to purchase order.`,
+          available: 0,
+          required: materialRequest.estimatedCost,
+          shortfall: 0,
+          type: 'info',
+        };
       }
     }
 

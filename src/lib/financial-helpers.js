@@ -895,6 +895,21 @@ export async function validateCapitalAvailability(projectId, amount) {
   const totalUsed = finances.totalUsed || 0;
   const committedCost = finances.committedCost || 0;
   
+  // OPTIONAL CAPITAL: If no capital invested, allow operation and track spending
+  if (totalInvested === 0) {
+    return {
+      isValid: true,
+      available: 0,
+      required: amount,
+      totalInvested: 0,
+      totalUsed: totalUsed || 0,
+      committedCost: committedCost || 0,
+      remaining: 0,
+      message: 'No capital invested. Operation allowed - spending will be tracked. Add capital later to enable capital validation.',
+      capitalNotSet: true
+    };
+  }
+  
   // Calculate available capital (including committed)
   const available = Math.max(0, totalInvested - totalUsed - committedCost);
   

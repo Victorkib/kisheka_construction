@@ -104,12 +104,16 @@ export async function POST(request, { params }) {
         newTotalCost
       );
 
-      if (!capitalValidation.isValid) {
+      // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+      // If capital is not set (capitalNotSet = true), allow the operation
+      if (!capitalValidation.isValid && !capitalValidation.capitalNotSet) {
         return errorResponse(
-          `Insufficient capital for auto-commit. Available: ${capitalValidation.available.toLocaleString()}, Required: ${newTotalCost.toLocaleString()}`,
+          `Insufficient capital (not budget) for auto-commit. Available capital: ${capitalValidation.available.toLocaleString()}, Required: ${newTotalCost.toLocaleString()}. Add capital to the project to proceed.`,
           400
         );
       }
+      // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+      // Spending will still be tracked regardless
     }
 
     // CRITICAL FIX: For bulk orders, update materials array with approved modifications

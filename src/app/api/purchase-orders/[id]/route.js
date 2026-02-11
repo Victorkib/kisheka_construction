@@ -329,12 +329,16 @@ export async function PATCH(request, { params }) {
           newTotalCost - existingOrder.totalCost // Only the difference
         );
 
-        if (!capitalValidation.isValid) {
+        // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+        // If capital is not set (capitalNotSet = true), allow the operation
+        if (!capitalValidation.isValid && !capitalValidation.capitalNotSet) {
           return errorResponse(
-            `Insufficient capital for cost increase. Available: ${capitalValidation.available.toLocaleString()}, Additional Required: ${(newTotalCost - existingOrder.totalCost).toLocaleString()}`,
+            `Insufficient capital (not budget) for cost increase. Available capital: ${capitalValidation.available.toLocaleString()}, Additional Required: ${(newTotalCost - existingOrder.totalCost).toLocaleString()}. Add capital to the project to proceed.`,
             400
           );
         }
+        // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+        // Spending will still be tracked regardless
       } else {
         // If not committed yet, validate total cost
         const capitalValidation = await validateCapitalAvailability(
@@ -342,12 +346,16 @@ export async function PATCH(request, { params }) {
           newTotalCost
         );
 
-        if (!capitalValidation.isValid) {
+        // OPTIONAL CAPITAL: Only block if capital is set AND insufficient
+        // If capital is not set (capitalNotSet = true), allow the operation
+        if (!capitalValidation.isValid && !capitalValidation.capitalNotSet) {
           return errorResponse(
-            `Insufficient capital. Available: ${capitalValidation.available.toLocaleString()}, Required: ${newTotalCost.toLocaleString()}`,
+            `Insufficient capital (not budget). Available capital: ${capitalValidation.available.toLocaleString()}, Required: ${newTotalCost.toLocaleString()}. Add capital to the project to proceed.`,
             400
           );
         }
+        // If capital is not set, operation is allowed (isValid = true, capitalNotSet = true)
+        // Spending will still be tracked regardless
       }
     }
 
