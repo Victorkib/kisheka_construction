@@ -143,7 +143,7 @@ export default function PhaseDetailPage() {
       
       // Fetch project
       if (data.data.projectId) {
-        const response = await fetch(`/api/projects/${data.data.projectId}`, {
+        const projectResponse = await fetch(`/api/projects/${data.data.projectId}`, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -219,11 +219,13 @@ export default function PhaseDetailPage() {
     setUpdatingStatus(true);
     try {
       const response = await fetch(`/api/phases/${params.id}`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'PATCH',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({ status: newStatus }),
       });
 
@@ -248,11 +250,13 @@ export default function PhaseDetailPage() {
     setUpdatingCompletion(true);
     try {
       const response = await fetch(`/api/phases/${params.id}`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'PATCH',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({ completionPercentage: newCompletion }),
       });
 
@@ -278,11 +282,13 @@ export default function PhaseDetailPage() {
 
     try {
       const response = await fetch(`/api/phases/${params.id}`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'PATCH',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(formData),
       });
 

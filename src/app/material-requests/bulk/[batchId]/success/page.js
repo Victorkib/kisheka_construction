@@ -39,7 +39,7 @@ function SuccessPageContent() {
           'Pragma': 'no-cache',
         },
       });
-      const batchData = await batchResponse.json();
+      const batchData = await response.json();
 
       if (!batchData.success) {
         throw new Error(batchData.error || 'Failed to fetch batch');
