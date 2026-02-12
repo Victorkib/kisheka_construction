@@ -48,44 +48,84 @@ export async function GET(request) {
       if (data.user && data.session) {
         // FIXED: Only check type parameter for email verification
         // OAuth always has provider in app_metadata, email verification doesn't
-        // The original logic was: type === 'signup' || (!data.user.app_metadata?.provider && data.user.email_confirmed_at)
-        // This incorrectly identified OAuth as email verification when provider was missing
         const isEmailVerification = type === 'signup';
         
-        // CRITICAL FIX: Check if this is a new user (OAuth user without MongoDB profile)
-        // For new OAuth users, we MUST wait for MongoDB profile creation before redirecting
-        // Otherwise, dashboard will redirect to login because profile doesn't exist yet
+        // CRITICAL FIX: For OAuth users, ALWAYS ensure MongoDB profile exists
+        // OAuth works for both registration (new users) and login (existing users)
         const isOAuthUser = !!data.user.app_metadata?.provider;
-        let isNewUser = false;
         
         if (isOAuthUser) {
+          console.log('[OAuth Callback] OAuth user detected:', {
+            userId: data.user.id,
+            email: data.user.email,
+            provider: data.user.app_metadata.provider
+          });
+          
           // Check if user already exists in MongoDB
           const { getUserProfile } = await import('@/lib/auth-helpers');
-          const existingProfile = await getUserProfile(data.user.id);
-          isNewUser = !existingProfile;
-        }
-        
-        // For NEW OAuth users, wait for MongoDB sync to complete
-        // For existing users, sync can happen in background (non-blocking)
-        if (isNewUser) {
+          let existingProfile = null;
+          
           try {
-            // Wait for sync to complete - this ensures profile exists before redirect
-            await syncUserToMongoDB(data.user, {
+            existingProfile = await getUserProfile(data.user.id);
+            console.log('[OAuth Callback] MongoDB profile check:', {
+              exists: !!existingProfile,
+              userId: data.user.id
+            });
+          } catch (profileError) {
+            console.error('[OAuth Callback] Error checking MongoDB profile:', profileError);
+          }
+          
+          const isNewUser = !existingProfile;
+          
+          // CRITICAL: For ALL OAuth users (new or existing), ensure MongoDB sync completes
+          // This ensures profile exists before redirecting to dashboard
+          try {
+            console.log('[OAuth Callback] Syncing user to MongoDB...', {
+              isNewUser,
+              userId: data.user.id,
+              email: data.user.email
+            });
+            
+            const syncedProfile = await syncUserToMongoDB(data.user, {
               isVerified: data.user.email_confirmed_at ? true : false,
             });
-            console.log('New OAuth user synced to MongoDB successfully');
+            
+            console.log('[OAuth Callback] MongoDB sync successful:', {
+              userId: data.user.id,
+              mongoId: syncedProfile._id?.toString(),
+              role: syncedProfile.role,
+              isNewUser
+            });
+            
+            // Verify the profile was actually created/updated
+            const verifyProfile = await getUserProfile(data.user.id);
+            if (!verifyProfile) {
+              console.error('[OAuth Callback] CRITICAL: Profile not found after sync!');
+              throw new Error('Profile not found after sync');
+            }
+            
+            console.log('[OAuth Callback] Profile verified in MongoDB:', {
+              userId: data.user.id,
+              mongoId: verifyProfile._id?.toString()
+            });
           } catch (syncError) {
-            console.error('MongoDB sync error for new user (critical):', syncError);
-            // For new users, if sync fails, we should still redirect
+            console.error('[OAuth Callback] CRITICAL MongoDB sync error:', {
+              error: syncError.message,
+              stack: syncError.stack,
+              userId: data.user.id,
+              email: data.user.email
+            });
+            
+            // For OAuth, if sync fails, we still redirect but log the error
             // /api/auth/me will retry the sync
+            // Don't block the user from accessing the app
           }
         } else {
-          // Existing user - sync can happen in background (non-blocking)
+          // Non-OAuth user (email/password) - sync in background
           syncUserToMongoDB(data.user, {
             isVerified: data.user.email_confirmed_at ? true : false,
           }).catch(syncError => {
             console.error('MongoDB sync error (non-fatal):', syncError);
-            // Continue even if sync fails - user can still log in
           });
         }
 

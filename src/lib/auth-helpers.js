@@ -58,11 +58,23 @@ export async function getUserProfile(supabaseId) {
  */
 export async function syncUserToMongoDB(supabaseUser, additionalData = {}) {
   try {
+    console.log('[MongoDB Sync] Starting sync for user:', {
+      supabaseId: supabaseUser.id,
+      email: supabaseUser.email,
+      provider: supabaseUser.app_metadata?.provider
+    });
+    
     const db = await getDatabase();
+    console.log('[MongoDB Sync] Database connection established');
 
     // Check if user already exists
     const existingUser = await db.collection('users').findOne({
       supabaseId: supabaseUser.id,
+    });
+    
+    console.log('[MongoDB Sync] Existing user check:', {
+      exists: !!existingUser,
+      supabaseId: supabaseUser.id
     });
 
     // Extract name from various OAuth provider formats
@@ -89,6 +101,12 @@ export async function syncUserToMongoDB(supabaseUser, additionalData = {}) {
     lastName = lastName || supabaseUser.user_metadata?.last_name || 
                supabaseUser.user_metadata?.family_name || '';
 
+    console.log('[MongoDB Sync] Extracted user data:', {
+      firstName,
+      lastName,
+      email: supabaseUser.email
+    });
+
     // Prepare user data - preserve existing role for existing users
     const userData = {
       supabaseId: supabaseUser.id,
@@ -102,6 +120,11 @@ export async function syncUserToMongoDB(supabaseUser, additionalData = {}) {
 
     // Only set default role for NEW users, preserve existing role for existing users
     if (existingUser) {
+      console.log('[MongoDB Sync] Updating existing user:', {
+        mongoId: existingUser._id?.toString(),
+        currentRole: existingUser.role
+      });
+      
       // For existing users: preserve current role unless explicitly provided in additionalData
       if (additionalData.hasOwnProperty('role') && additionalData.role !== undefined) {
         userData.role = additionalData.role; // Use provided role
@@ -110,7 +133,7 @@ export async function syncUserToMongoDB(supabaseUser, additionalData = {}) {
       }
       
       // Update existing user
-      await db.collection('users').updateOne(
+      const updateResult = await db.collection('users').updateOne(
         { supabaseId: supabaseUser.id },
         {
           $set: {
@@ -119,8 +142,31 @@ export async function syncUserToMongoDB(supabaseUser, additionalData = {}) {
           },
         }
       );
-      return { ...existingUser, ...userData, lastLogin: new Date() };
+      
+      console.log('[MongoDB Sync] User updated:', {
+        matchedCount: updateResult.matchedCount,
+        modifiedCount: updateResult.modifiedCount,
+        supabaseId: supabaseUser.id
+      });
+      
+      // Verify the update
+      const updatedUser = await db.collection('users').findOne({
+        supabaseId: supabaseUser.id,
+      });
+      
+      if (!updatedUser) {
+        throw new Error('User not found after update');
+      }
+      
+      console.log('[MongoDB Sync] Update verified:', {
+        mongoId: updatedUser._id?.toString(),
+        role: updatedUser.role
+      });
+      
+      return { ...updatedUser };
     } else {
+      console.log('[MongoDB Sync] Creating new user');
+      
       // Create new user - set default role only for new users
       const newUser = {
         ...userData,
@@ -140,11 +186,46 @@ export async function syncUserToMongoDB(supabaseUser, additionalData = {}) {
         },
       };
 
+      console.log('[MongoDB Sync] Inserting new user:', {
+        supabaseId: newUser.supabaseId,
+        email: newUser.email,
+        role: newUser.role
+      });
+
       const result = await db.collection('users').insertOne(newUser);
-      return { ...newUser, _id: result.insertedId };
+      
+      console.log('[MongoDB Sync] User inserted:', {
+        insertedId: result.insertedId?.toString(),
+        acknowledged: result.acknowledged
+      });
+      
+      // Verify the insert
+      const insertedUser = await db.collection('users').findOne({
+        _id: result.insertedId,
+      });
+      
+      if (!insertedUser) {
+        throw new Error('User not found after insert');
+      }
+      
+      console.log('[MongoDB Sync] Insert verified:', {
+        mongoId: insertedUser._id?.toString(),
+        supabaseId: insertedUser.supabaseId,
+        email: insertedUser.email,
+        role: insertedUser.role
+      });
+      
+      return { ...insertedUser };
     }
   } catch (error) {
-    console.error('Error syncing user to MongoDB:', error);
+    console.error('[MongoDB Sync] CRITICAL ERROR:', {
+      message: error.message,
+      stack: error.stack,
+      supabaseId: supabaseUser?.id,
+      email: supabaseUser?.email,
+      errorName: error.name,
+      errorCode: error.code
+    });
     throw error;
   }
 }
