@@ -19,11 +19,19 @@ export function OAuthButtons({ mode = 'login' }) {
     setError(null);
 
     try {
-      // Use the server-side callback so the server can exchange the code
-      // and sync the user to MongoDB before redirecting to the app
-      const redirectUrl = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(
-        window.location.pathname || '/dashboard'
-      )}`;
+      // CRITICAL FIX: Always redirect to dashboard after OAuth
+      // Don't use current pathname because:
+      // 1. If user is on landing page (/), we'd redirect back to landing page
+      // 2. If user is on auth pages, we should go to dashboard after login
+      // 3. OAuth should always end at dashboard, which then routes to role-specific dashboard
+      const currentPath = window.location.pathname;
+      const isPublicRoute = currentPath === '/' || currentPath.startsWith('/auth/');
+      
+      // Only preserve pathname if user is on a protected route (not public/auth routes)
+      // Otherwise, always redirect to dashboard
+      const nextPath = isPublicRoute ? '/dashboard' : (currentPath || '/dashboard');
+      
+      const redirectUrl = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(nextPath)}`;
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider,

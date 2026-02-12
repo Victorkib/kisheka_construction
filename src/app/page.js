@@ -33,8 +33,18 @@ export default function Home() {
 
   useEffect(() => {
     let isMounted = true;
+    let retryCount = 0;
+    const maxRetries = 3;
+    const retryDelays = [500, 1000, 2000]; // Exponential backoff
 
-    const checkAuth = async () => {
+    const checkAuth = async (retryDelay = 0) => {
+      // Add delay for retries to allow session cookies to propagate
+      if (retryDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, retryDelay));
+      }
+
+      if (!isMounted) return;
+
       try {
         // Lightweight client-side auth check
         const response = await fetch('/api/auth/me', {
@@ -55,17 +65,35 @@ export default function Home() {
             return;
           }
         }
+
+        // CRITICAL FIX: Retry auth check if it fails
+        // This handles race conditions where session cookies aren't set yet
+        // Common after OAuth callback, especially on mobile devices
+        if (retryCount < maxRetries && response.status !== 401) {
+          retryCount++;
+          const delay = retryDelays[retryCount - 1] || 2000;
+          checkAuth(delay);
+          return;
+        }
       } catch (error) {
-        // Fail open: if auth check fails, just show landing page
-        console.error('Home auth check failed:', error);
+        // Retry on network errors
+        if (retryCount < maxRetries) {
+          retryCount++;
+          const delay = retryDelays[retryCount - 1] || 2000;
+          checkAuth(delay);
+          return;
+        }
+        // Fail open: if auth check fails after retries, just show landing page
+        console.error('Home auth check failed after retries:', error);
       } finally {
-        if (isMounted) {
+        if (isMounted && retryCount >= maxRetries) {
           setCheckingAuth(false);
         }
       }
     };
 
-    checkAuth();
+    // Initial check with no delay
+    checkAuth(0);
 
     return () => {
       isMounted = false;

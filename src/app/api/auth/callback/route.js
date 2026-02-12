@@ -19,9 +19,16 @@ export async function GET(request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
   const type = requestUrl.searchParams.get('type'); // 'signup' for email verification
-  const next = requestUrl.searchParams.get('next') || '/dashboard';
+  let next = requestUrl.searchParams.get('next') || '/dashboard';
 
-  // If there's a code, exchange it (for email verification links)
+  // CRITICAL FIX: Always redirect to dashboard for OAuth flows
+  // Don't allow redirecting to landing page (/) or auth pages after OAuth
+  // This prevents users from being stuck on landing page after successful OAuth
+  if (next === '/' || next.startsWith('/auth/')) {
+    next = '/dashboard';
+  }
+
+  // If there's a code, exchange it (for email verification links and OAuth)
   if (code) {
     const supabase = await createClient();
 
@@ -53,6 +60,8 @@ export async function GET(request) {
         }
 
         // Create redirect response
+        // CRITICAL FIX: For OAuth flows, always redirect to dashboard (not landing page)
+        // Only email verification should redirect to login page
         const redirectUrl = isEmailVerification 
           ? new URL('/auth/login?verified=true', request.url)
           : new URL(next, request.url);
@@ -80,14 +89,16 @@ export async function GET(request) {
   }
 
   // If no code, check if there's an existing session
-  // This handles cases where Supabase redirects without a code
+  // This handles cases where Supabase redirects without a code (modern flow)
   try {
     const supabase = await createClient();
     const { data: { session } } = await supabase.auth.getSession();
     
     if (session) {
-      // User has a session, redirect to dashboard
-      const response = NextResponse.redirect(new URL(next, request.url));
+      // CRITICAL FIX: Always redirect to dashboard if session exists
+      // Don't redirect to landing page or auth pages
+      const finalNext = (next === '/' || next.startsWith('/auth/')) ? '/dashboard' : next;
+      const response = NextResponse.redirect(new URL(finalNext, request.url));
       response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
       return response;
     }
