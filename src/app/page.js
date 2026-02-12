@@ -32,6 +32,27 @@ export default function Home() {
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   useEffect(() => {
+    // CRITICAL FIX: Handle OAuth callback codes that land on root URL
+    // This happens in production when Supabase redirects to domain root instead of /api/auth/callback
+    const urlParams = new URLSearchParams(window.location.search);
+    const oauthCode = urlParams.get('code');
+    const oauthError = urlParams.get('error');
+    
+    if (oauthCode) {
+      // OAuth code detected on landing page - redirect to callback route
+      console.log('[Landing Page] OAuth code detected, redirecting to callback route');
+      const next = urlParams.get('next') || '/dashboard';
+      router.replace(`/api/auth/callback?code=${oauthCode}&next=${encodeURIComponent(next)}`);
+      return;
+    }
+    
+    if (oauthError) {
+      // OAuth error - redirect to login with error
+      console.error('[Landing Page] OAuth error detected:', oauthError);
+      router.replace(`/auth/login?error=${encodeURIComponent(oauthError)}`);
+      return;
+    }
+
     let isMounted = true;
     let retryCount = 0;
     const maxRetries = 3;

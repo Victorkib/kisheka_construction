@@ -28,7 +28,12 @@ export function OAuthButtons({ mode = 'login' }) {
       // Otherwise, always redirect to dashboard
       const nextPath = isPublicRoute ? '/dashboard' : (currentPath || '/dashboard');
       
-      const redirectUrl = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(nextPath)}`;
+      // CRITICAL FIX: Use environment variable for production, fallback to window.location.origin
+      // This ensures correct redirect URL in production (Netlify)
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+      const redirectUrl = `${baseUrl}/api/auth/callback?next=${encodeURIComponent(nextPath)}`;
+      
+      console.log('[OAuth] Redirect URL:', redirectUrl);
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider,
