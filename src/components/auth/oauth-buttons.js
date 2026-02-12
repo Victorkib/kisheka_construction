@@ -19,11 +19,8 @@ export function OAuthButtons({ mode = 'login' }) {
     setError(null);
 
     try {
-      // CRITICAL FIX: Always redirect to dashboard after OAuth
-      // Don't use current pathname because:
-      // 1. If user is on landing page (/), we'd redirect back to landing page
-      // 2. If user is on auth pages, we should go to dashboard after login
-      // 3. OAuth should always end at dashboard, which then routes to role-specific dashboard
+      // Use the server-side callback so the server can exchange the code
+      // and sync the user to MongoDB before redirecting to the app
       const currentPath = window.location.pathname;
       const isPublicRoute = currentPath === '/' || currentPath.startsWith('/auth/');
       

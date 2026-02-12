@@ -19,13 +19,14 @@ export async function GET(request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
   const type = requestUrl.searchParams.get('type'); // 'signup' for email verification
-  let next = requestUrl.searchParams.get('next') || '/dashboard';
+  const next = requestUrl.searchParams.get('next') || '/dashboard';
 
   // CRITICAL FIX: Always redirect to dashboard for OAuth flows
   // Don't allow redirecting to landing page (/) or auth pages after OAuth
   // This prevents users from being stuck on landing page after successful OAuth
+  let finalNext = next;
   if (next === '/' || next.startsWith('/auth/')) {
-    next = '/dashboard';
+    finalNext = '/dashboard';
   }
 
   // If there's a code, exchange it (for email verification links and OAuth)
@@ -45,26 +46,27 @@ export async function GET(request) {
       }
 
       if (data.user && data.session) {
-        // Determine if this is email verification or OAuth
-        const isEmailVerification = type === 'signup' || 
-                                     (!data.user.app_metadata?.provider && data.user.email_confirmed_at);
+        // FIXED: Only check type parameter for email verification
+        // OAuth always has provider in app_metadata, email verification doesn't
+        // The original logic was: type === 'signup' || (!data.user.app_metadata?.provider && data.user.email_confirmed_at)
+        // This incorrectly identified OAuth as email verification when provider was missing
+        const isEmailVerification = type === 'signup';
         
-        // Sync user to MongoDB
-        try {
-          await syncUserToMongoDB(data.user, {
-            isVerified: data.user.email_confirmed_at ? true : false,
-          });
-        } catch (syncError) {
+        // Sync user to MongoDB (non-blocking - doesn't delay redirect)
+        // Fire and forget - sync happens in background
+        syncUserToMongoDB(data.user, {
+          isVerified: data.user.email_confirmed_at ? true : false,
+        }).catch(syncError => {
           console.error('MongoDB sync error (non-fatal):', syncError);
           // Continue even if sync fails - user can still log in
-        }
+        });
 
         // Create redirect response
-        // CRITICAL FIX: For OAuth flows, always redirect to dashboard (not landing page)
+        // For OAuth flows, always redirect to dashboard (not landing page)
         // Only email verification should redirect to login page
         const redirectUrl = isEmailVerification 
           ? new URL('/auth/login?verified=true', request.url)
-          : new URL(next, request.url);
+          : new URL(finalNext, request.url);
 
         const response = NextResponse.redirect(redirectUrl);
         
@@ -95,9 +97,7 @@ export async function GET(request) {
     const { data: { session } } = await supabase.auth.getSession();
     
     if (session) {
-      // CRITICAL FIX: Always redirect to dashboard if session exists
-      // Don't redirect to landing page or auth pages
-      const finalNext = (next === '/' || next.startsWith('/auth/')) ? '/dashboard' : next;
+      // User has a session, redirect to dashboard
       const response = NextResponse.redirect(new URL(finalNext, request.url));
       response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
       return response;
