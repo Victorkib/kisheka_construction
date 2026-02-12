@@ -230,7 +230,7 @@ Important: This invitation expires on ${expiresDate}. Please accept it before th
 
 If you didn't expect this invitation, you can safely ignore this email.
 
-This is an automated message from Kisheka Construction System.
+This is an automated message from Doshaki Construction System.
   `.trim();
 
   return sendEmail({
@@ -338,7 +338,7 @@ ${reason ? `- Reason: ${reason}` : ''}
 
 Note: You may need to log out and log back in to see your new permissions take effect.
 
-This is an automated notification from Kisheka Construction System.
+This is an automated notification from Doshaki Construction System.
   `.trim();
 
   return sendEmail({

@@ -82,6 +82,10 @@ export async function validatePhaseLabourBudget(phaseId, labourCost, excludeBatc
 
   // Calculate current labour spending (actual + committed)
   const actualLabourSpending = phase.actualSpending?.labour || 0;
+  
+  // LATE ACTIVATION: Use effective spending (current - baseline) for validation
+  const { getEffectivePhaseSpending } = await import('@/lib/activation-helpers');
+  const effectiveLabourSpending = getEffectivePhaseSpending(phase, actualLabourSpending, 'labour');
 
   // Calculate committed labour costs (from approved batches not yet paid)
   const committedBatches = await db.collection('labour_batches').find({
@@ -108,8 +112,9 @@ export async function validatePhaseLabourBudget(phaseId, labourCost, excludeBatc
     }
   }
 
-  // Calculate available budget
-  const totalSpent = actualLabourSpending + committedLabourCost;
+  // Calculate available budget using effective spending
+  // LATE ACTIVATION: Use effective spending (current - baseline) for validation
+  const totalSpent = effectiveLabourSpending + committedLabourCost;
   const available = Math.max(0, labourBudget - totalSpent);
   const required = labourCost;
   const shortfall = Math.max(0, required - available);
@@ -128,6 +133,7 @@ export async function validatePhaseLabourBudget(phaseId, labourCost, excludeBatc
       : `Insufficient phase labour budget. Available: ${available.toLocaleString()} KES, Required: ${required.toLocaleString()} KES, Shortfall: ${shortfall.toLocaleString()} KES`,
     budget: labourBudget,
     currentSpending: actualLabourSpending,
+    effectiveSpending: effectiveLabourSpending, // Include effective spending in response
     committed: committedLabourCost,
     totalSpent,
   };

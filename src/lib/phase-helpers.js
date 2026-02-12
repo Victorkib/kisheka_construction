@@ -811,6 +811,10 @@ export async function validatePhaseMaterialBudget(phaseId, estimatedCost, exclud
   // Calculate current material spending (actual + committed)
   const actualMaterialSpending = phase.actualSpending?.materials || 0;
   
+  // LATE ACTIVATION: Use effective spending (current - baseline) for validation
+  const { getEffectivePhaseSpending } = await import('@/lib/activation-helpers');
+  const effectiveMaterialSpending = getEffectivePhaseSpending(phase, actualMaterialSpending, 'materials');
+  
   // Calculate committed material costs (from POs that are accepted but not fulfilled)
   const committedPOs = await db.collection('purchase_orders').find({
     phaseId: new ObjectId(phaseId),
@@ -858,8 +862,9 @@ export async function validatePhaseMaterialBudget(phaseId, estimatedCost, exclud
     }
   }
   
-  // Calculate available material budget
-  const totalUsed = actualMaterialSpending + committedMaterialCost + estimatedMaterialCost;
+  // Calculate available material budget using effective spending
+  // LATE ACTIVATION: Use effective spending (current - baseline) for validation
+  const totalUsed = effectiveMaterialSpending + committedMaterialCost + estimatedMaterialCost;
   const available = Math.max(0, materialBudget - totalUsed);
   
   // Check if new request would exceed budget
@@ -875,6 +880,7 @@ export async function validatePhaseMaterialBudget(phaseId, estimatedCost, exclud
     materialBudget,
     totalUsed,
     actualMaterialSpending,
+    effectiveMaterialSpending, // Include effective spending in response
     committedMaterialCost,
     estimatedMaterialCost,
     message: isValid
@@ -923,7 +929,9 @@ export async function validateBulkMaterialRequestBudget(materials, defaultPhaseI
     if (estimatedCost > 0) {
       materialsByPhase.get(phaseId).push({
         materialName: material.name || material.materialName || 'Unknown',
-        estimatedCost
+        estimatedCost,
+        floorId: material.floorId, // Phase 4: Include floorId for floor budget validation
+        originalMaterial: material, // Keep reference to original material
       });
     }
   }
@@ -967,6 +975,57 @@ export async function validateBulkMaterialRequestBudget(materials, defaultPhaseI
         );
       }
       // If budgetNotSet is true, isValid will be true and operation is allowed
+
+      // Phase 4: Floor Budget Validation (optional, secondary check)
+      // Group materials by floorId and validate floor budgets
+      const materialsByFloor = new Map();
+      for (const material of phaseMaterials) {
+        const floorId = material.floorId || material.originalMaterial?.floorId;
+        
+        if (floorId && ObjectId.isValid(floorId)) {
+          const floorIdStr = floorId.toString ? floorId.toString() : floorId;
+          if (!materialsByFloor.has(floorIdStr)) {
+            materialsByFloor.set(floorIdStr, []);
+          }
+          materialsByFloor.get(floorIdStr).push(material);
+        }
+      }
+
+      // Validate floor budgets for each floor
+      for (const [floorIdStr, floorMaterials] of materialsByFloor.entries()) {
+        const floorCost = floorMaterials.reduce((sum, m) => sum + m.estimatedCost, 0);
+
+        if (floorCost > 0) {
+          try {
+            const { validateFloorBudget } = await import('@/lib/floor-financial-helpers');
+            const floorBudgetValidation = await validateFloorBudget(floorIdStr, floorCost, 'materials');
+            
+            // Only treat as error if floor budget is set AND exceeded
+            // If floor budget is not set (budgetNotSet = true), isValid will be true and we should allow
+            if (!floorBudgetValidation.isValid && !floorBudgetValidation.budgetNotSet) {
+              isValid = false;
+              
+              // Get floor name for better error messages
+              const floor = await db.collection('floors').findOne({
+                _id: new ObjectId(floorIdStr),
+                deletedAt: null
+              });
+              const floorName = floor?.name || `Floor ${floor?.floorNumber || floorIdStr}`;
+              
+              errors.push(
+                `Floor budget exceeded for "${floorName}": ` +
+                `Available: ${floorBudgetValidation.available.toLocaleString()}, ` +
+                `Required: ${floorBudgetValidation.required.toLocaleString()}, ` +
+                `Shortfall: ${floorBudgetValidation.shortfall.toLocaleString()}`
+              );
+            }
+            // If floor budgetNotSet is true, isValid will be true and operation is allowed
+          } catch (floorValidationError) {
+            // Don't block if floor validation fails - log and continue
+            console.error(`Floor budget validation error for floor ${floorIdStr} (non-blocking):`, floorValidationError);
+          }
+        }
+      }
     }
   }
 
@@ -1077,4 +1136,137 @@ export async function updatePhaseCompletion(phaseId) {
   );
   
   return workItemCompletion;
+}
+
+/**
+ * Phase 2: Rescale phase budgets proportionally when project DCC changes
+ * @param {string} projectId - Project ID
+ * @param {number} oldDcc - Previous Direct Construction Costs budget
+ * @param {number} newDcc - New Direct Construction Costs budget
+ * @param {string} userId - User ID performing the operation (for audit log)
+ * @returns {Promise<Object>} Summary of rescaled phases
+ */
+export async function rescalePhaseBudgetsForProject(projectId, oldDcc, newDcc, userId) {
+  const db = await getDatabase();
+  const { createAuditLog } = await import('@/lib/audit-log');
+  
+  if (!projectId || !ObjectId.isValid(projectId)) {
+    throw new Error('Invalid project ID');
+  }
+  
+  if (oldDcc <= 0 || newDcc <= 0) {
+    throw new Error('Both oldDcc and newDcc must be greater than 0 to rescale phase budgets');
+  }
+  
+  // Fetch all phases for the project
+  const phases = await db.collection('phases').find({
+    projectId: new ObjectId(projectId),
+    deletedAt: null
+  }).toArray();
+  
+  if (phases.length === 0) {
+    return {
+      rescaled: 0,
+      skipped: 0,
+      phases: []
+    };
+  }
+  
+  // Calculate scaling factor
+  const scaleFactor = newDcc / oldDcc;
+  
+  const rescaledPhases = [];
+  const skippedPhases = [];
+  
+  // Rescale each phase budget
+  for (const phase of phases) {
+    const currentBudget = phase.budgetAllocation || {};
+    const currentTotal = currentBudget.total || 0;
+    
+    // Skip phases with no budget allocation
+    if (currentTotal === 0) {
+      skippedPhases.push({
+        phaseId: phase._id.toString(),
+        phaseName: phase.phaseName || phase.phaseCode,
+        reason: 'No budget allocated'
+      });
+      continue;
+    }
+    
+    // Calculate new budget values
+    const newTotal = Math.round(currentTotal * scaleFactor);
+    const newMaterials = currentBudget.materials ? Math.round(currentBudget.materials * scaleFactor) : 0;
+    const newLabour = currentBudget.labour ? Math.round(currentBudget.labour * scaleFactor) : 0;
+    const newEquipment = currentBudget.equipment ? Math.round(currentBudget.equipment * scaleFactor) : 0;
+    const newSubcontractors = currentBudget.subcontractors ? Math.round(currentBudget.subcontractors * scaleFactor) : 0;
+    
+    // Calculate new remaining budget
+    const currentActual = phase.actualSpending?.total || 0;
+    const currentCommitted = phase.financialStates?.committed || 0;
+    const newRemaining = Math.max(0, newTotal - currentActual - currentCommitted);
+    
+    // Build new budget allocation
+    const newBudgetAllocation = {
+      total: newTotal,
+      materials: newMaterials,
+      labour: newLabour,
+      equipment: newEquipment,
+      subcontractors: newSubcontractors
+    };
+    
+    // Update phase
+    await db.collection('phases').updateOne(
+      { _id: phase._id },
+      {
+        $set: {
+          budgetAllocation: newBudgetAllocation,
+          'financialStates.remaining': newRemaining,
+          updatedAt: new Date()
+        }
+      }
+    );
+    
+    rescaledPhases.push({
+      phaseId: phase._id.toString(),
+      phaseName: phase.phaseName || phase.phaseCode,
+      oldTotal: currentTotal,
+      newTotal: newTotal,
+      scaleFactor: scaleFactor.toFixed(4)
+    });
+    
+    // Create audit log for each phase
+    try {
+      await createAuditLog({
+        userId: userId,
+        action: 'BUDGET_RESCALED',
+        entityType: 'PHASE',
+        entityId: phase._id.toString(),
+        projectId: projectId,
+        changes: {
+          reason: 'Project DCC budget changed',
+          oldDcc: oldDcc,
+          newDcc: newDcc,
+          scaleFactor: scaleFactor,
+          oldBudget: currentBudget,
+          newBudget: newBudgetAllocation
+        }
+      });
+    } catch (auditError) {
+      console.error(`Error creating audit log for phase ${phase._id}:`, auditError);
+      // Don't fail the operation if audit log fails
+    }
+  }
+  
+  // Log summary
+  console.log(`[Phase Budget Rescale] Rescaled ${rescaledPhases.length} phases for project ${projectId}. Old DCC: ${oldDcc.toLocaleString()}, New DCC: ${newDcc.toLocaleString()}, Scale Factor: ${scaleFactor.toFixed(4)}`);
+  
+  return {
+    rescaled: rescaledPhases.length,
+    skipped: skippedPhases.length,
+    phases: rescaledPhases,
+    skipped: skippedPhases,
+    scaleFactor: scaleFactor,
+    oldDcc: oldDcc,
+    newDcc: newDcc
+  };
 }

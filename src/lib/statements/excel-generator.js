@@ -50,7 +50,7 @@ export async function generateExcelStatement(statementData) {
   ];
 
   // Header Row
-  const headerRow = worksheet.addRow(['Kisheka Construction - Investment Statement']);
+  const headerRow = worksheet.addRow(['Doshaki Construction - Investment Statement']);
   headerRow.font = { size: 16, bold: true, color: { argb: 'FFFFFFFF' } };
   headerRow.fill = {
     type: 'pattern',

@@ -182,6 +182,18 @@ export async function POST(request, { params }) {
       return errorResponse('Failed to update phase budget', 500);
     }
 
+    // LATE ACTIVATION: Capture phase budget activation if budget is being set for the first time
+    const { needsPhaseBudgetActivation, capturePhaseBudgetActivation } = await import('@/lib/activation-helpers');
+    if (needsPhaseBudgetActivation(phase, requestedAllocation)) {
+      try {
+        await capturePhaseBudgetActivation(id);
+        console.log(`[Phase Budget] Budget activation captured for phase ${id}`);
+      } catch (activationError) {
+        console.error('Error capturing phase budget activation:', activationError);
+        // Don't fail budget allocation if activation capture fails
+      }
+    }
+
     // Create audit log
     await createAuditLog({
       userId: userProfile._id.toString(),
@@ -361,6 +373,18 @@ export async function PATCH(request, { params }) {
 
     if (!updateResult) {
       return errorResponse('Failed to update phase budget', 500);
+    }
+
+    // LATE ACTIVATION: Capture phase budget activation if budget is being set for the first time
+    const { needsPhaseBudgetActivation, capturePhaseBudgetActivation } = await import('@/lib/activation-helpers');
+    if (needsPhaseBudgetActivation(phase, updatedAllocation.total)) {
+      try {
+        await capturePhaseBudgetActivation(id);
+        console.log(`[Phase Budget Update] Budget activation captured for phase ${id}`);
+      } catch (activationError) {
+        console.error('Error capturing phase budget activation:', activationError);
+        // Don't fail budget update if activation capture fails
+      }
     }
 
     // Create audit log

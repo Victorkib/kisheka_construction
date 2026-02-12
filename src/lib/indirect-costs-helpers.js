@@ -403,7 +403,17 @@ export async function validateIndirectCostsBudget(projectId, amount, category = 
 
   // Get current spending
   const spending = await calculateIndirectCostsSpending(projectId);
-  const available = Math.max(0, indirectBudget - spending);
+  
+  // LATE ACTIVATION: Use effective spending (current - baseline) for validation
+  const { getEffectiveProjectSpending, getPreBudgetBaseline } = await import('@/lib/activation-helpers');
+  const effectiveSpending = getEffectiveProjectSpending(project, spending);
+  const baseline = getPreBudgetBaseline(project);
+  
+  // For indirect costs, use the indirect specific baseline if available
+  const indirectBaseline = project.budgetActivation?.preBudgetSpending?.indirect || 0;
+  const effectiveIndirectSpending = Math.max(0, spending - indirectBaseline);
+  
+  const available = Math.max(0, indirectBudget - effectiveIndirectSpending);
 
   // If category is provided, also check category-level spending
   if (category) {

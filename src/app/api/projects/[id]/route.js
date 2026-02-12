@@ -19,7 +19,7 @@ import { getProjectSpendingLimit, recalculateProjectFinances, getCurrentTotalUse
 import { returnCapitalToInvestors } from '@/lib/financial-rollback';
 import { calculateProjectTotals } from '@/lib/investment-allocation';
 import { isEnhancedBudget, createEnhancedBudget, validateBudget, getBudgetTotal, convertLegacyToEnhanced } from '@/lib/schemas/budget-schema';
-import { calculateTotalPhaseBudgets } from '@/lib/phase-helpers';
+import { calculateTotalPhaseBudgets, rescalePhaseBudgetsForProject } from '@/lib/phase-helpers';
 import { supportsTransactions } from '@/lib/mongodb/transaction-helpers';
 
 // Force dynamic rendering to prevent caching stale data
@@ -211,6 +211,7 @@ export async function PATCH(request, { params }) {
       budget,
       siteManager,
       teamMembers,
+      reallocatePhases, // Phase 2: Flag to rescale phase budgets when DCC changes
     } = body;
 
     const db = await getDatabase();
@@ -355,6 +356,70 @@ export async function PATCH(request, { params }) {
       { returnDocument: 'after' }
     );
 
+    // LATE ACTIVATION: Capture budget activation if budget is being set for the first time
+    if (budget && result.value) {
+      const { needsBudgetActivation, captureProjectBudgetActivation } = await import('@/lib/activation-helpers');
+      if (needsBudgetActivation(existingProject, updateData.budget)) {
+        try {
+          await captureProjectBudgetActivation(id);
+          console.log(`[Project Update] Budget activation captured for project ${id}`);
+        } catch (activationError) {
+          console.error('Error capturing budget activation during project update:', activationError);
+          // Don't fail project update if activation capture fails
+        }
+      }
+    }
+
+    // PHASE 2: Rescale phase budgets if DCC changed and reallocatePhases flag is set
+    let phaseRescaleResult = null;
+    if (budget && reallocatePhases === true && result.value) {
+      try {
+        // Get old and new DCC values
+        const existingBudget = existingProject.budget || {};
+        const newBudget = updateData.budget || {};
+        
+        let oldDcc = 0;
+        let newDcc = 0;
+        
+        if (isEnhancedBudget(existingBudget)) {
+          oldDcc = existingBudget.directConstructionCosts || 0;
+        } else {
+          // Legacy budget - estimate DCC
+          const oldTotal = getBudgetTotal(existingBudget);
+          const estimatedPreConstruction = oldTotal * 0.05;
+          const estimatedIndirect = oldTotal * 0.05;
+          const estimatedContingency = existingBudget.contingency || (oldTotal * 0.05);
+          oldDcc = Math.max(0, oldTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+        }
+        
+        if (isEnhancedBudget(newBudget)) {
+          newDcc = newBudget.directConstructionCosts || 0;
+        } else {
+          // Legacy budget - estimate DCC
+          const newTotal = getBudgetTotal(newBudget);
+          const estimatedPreConstruction = newTotal * 0.05;
+          const estimatedIndirect = newTotal * 0.05;
+          const estimatedContingency = newBudget.contingency || (newTotal * 0.05);
+          newDcc = Math.max(0, newTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+        }
+        
+        // Only rescale if DCC actually changed and both values are > 0
+        if (oldDcc > 0 && newDcc > 0 && oldDcc !== newDcc) {
+          phaseRescaleResult = await rescalePhaseBudgetsForProject(
+            id,
+            oldDcc,
+            newDcc,
+            userProfile._id.toString()
+          );
+          console.log(`[Project Update] Phase budgets rescaled for project ${id}. Rescaled ${phaseRescaleResult.rescaled} phases.`);
+        }
+      } catch (rescaleError) {
+        console.error('Error rescaling phase budgets during project update:', rescaleError);
+        // Don't fail project update if rescale fails, but log it
+        // The user can manually adjust phase budgets if needed
+      }
+    }
+
     // Create audit log
     if (Object.keys(changes).length > 0) {
       await createAuditLog({
@@ -384,8 +449,19 @@ export async function PATCH(request, { params }) {
     if (warning) {
       responseData._warning = warning;
     }
+    if (phaseRescaleResult) {
+      responseData._phaseRescale = phaseRescaleResult;
+    }
 
-    return successResponse(responseData, warning ? `Project updated successfully. Warning: ${warning}` : 'Project updated successfully');
+    let successMessage = 'Project updated successfully';
+    if (warning) {
+      successMessage += `. Warning: ${warning}`;
+    }
+    if (phaseRescaleResult && phaseRescaleResult.rescaled > 0) {
+      successMessage += `. Phase budgets rescaled: ${phaseRescaleResult.rescaled} phases updated.`;
+    }
+
+    return successResponse(responseData, successMessage);
   } catch (error) {
     console.error('Update project error:', error);
     return errorResponse('Failed to update project', 500);

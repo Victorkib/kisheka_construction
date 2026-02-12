@@ -351,7 +351,17 @@ export async function validatePreConstructionBudget(projectId, amount, category 
   // Get current spending
   const spending = await getPreConstructionSpending(projectId);
   const currentSpending = spending.total || 0;
-  const available = Math.max(0, preConstructionBudget - currentSpending);
+  
+  // LATE ACTIVATION: Use effective spending (current - baseline) for validation
+  const { getEffectiveProjectSpending, getPreBudgetBaseline } = await import('@/lib/activation-helpers');
+  const effectiveSpending = getEffectiveProjectSpending(project, currentSpending);
+  const baseline = getPreBudgetBaseline(project);
+  
+  // For pre-construction, use the pre-construction specific baseline if available
+  const preConstructionBaseline = project.budgetActivation?.preBudgetSpending?.preConstruction || 0;
+  const effectivePreConstructionSpending = Math.max(0, currentSpending - preConstructionBaseline);
+  
+  const available = Math.max(0, preConstructionBudget - effectivePreConstructionSpending);
 
   // If category is provided, also check category-level budget
   if (category) {
@@ -384,8 +394,8 @@ export async function validatePreConstructionBudget(projectId, amount, category 
     };
   }
 
-  // Check if approaching budget limit (80% threshold)
-  const usagePercentage = ((currentSpending + amount) / preConstructionBudget) * 100;
+  // Check if approaching budget limit (80% threshold) - use effective spending
+  const usagePercentage = ((effectivePreConstructionSpending + amount) / preConstructionBudget) * 100;
   if (usagePercentage >= 80 && usagePercentage < 100) {
     return {
       isValid: true,
@@ -1088,6 +1098,32 @@ export async function recalculateProjectFinances(projectId) {
     .collection('project_finances')
     .findOne({ projectId: new ObjectId(projectId) });
 
+  // LATE ACTIVATION: Check if capital activation is needed (capital going from 0 → non-zero)
+  // Only check if we have an existing record (to compare old vs new totalInvested)
+  if (totalInvested > 0 && existing) {
+    const { needsCapitalActivation, captureCapitalActivation } = await import('@/lib/activation-helpers');
+    if (needsCapitalActivation(existing, totalInvested)) {
+      try {
+        await captureCapitalActivation(projectId);
+        console.log(`[Project Finances] Capital activation captured for project ${projectId}`);
+        // Re-fetch existing to get updated activation data
+        const updatedExisting = await db
+          .collection('project_finances')
+          .findOne({ projectId: new ObjectId(projectId) });
+        if (updatedExisting?.capitalActivation) {
+          // Merge activation data into updateData (it's already captured, but ensure it's in the update)
+          updateData.capitalActivation = updatedExisting.capitalActivation;
+        }
+      } catch (activationError) {
+        console.error('Error capturing capital activation during finance recalculation:', activationError);
+        // Don't fail recalculation if activation capture fails
+      }
+    } else if (existing.capitalActivation) {
+      // Preserve existing activation data
+      updateData.capitalActivation = existing.capitalActivation;
+    }
+  }
+
   const updateData = {
     totalInvested,
     totalLoans,
@@ -1106,6 +1142,11 @@ export async function recalculateProjectFinances(projectId) {
   };
 
   if (existing) {
+    // Preserve existing capitalActivation if it exists and wasn't just created
+    if (existing.capitalActivation && !updateData.capitalActivation) {
+      updateData.capitalActivation = existing.capitalActivation;
+    }
+    
     await db
       .collection('project_finances')
       .updateOne(
@@ -1115,7 +1156,21 @@ export async function recalculateProjectFinances(projectId) {
   } else {
     updateData.projectId = new ObjectId(projectId);
     updateData.createdAt = new Date();
+    
+    // Create the record first
     await db.collection('project_finances').insertOne(updateData);
+    
+    // LATE ACTIVATION: If creating new record and capital is non-zero, capture activation
+    if (totalInvested > 0) {
+      try {
+        const { captureCapitalActivation } = await import('@/lib/activation-helpers');
+        await captureCapitalActivation(projectId);
+        console.log(`[Project Finances] Capital activation captured for new project ${projectId}`);
+      } catch (activationError) {
+        console.error('Error capturing capital activation for new project finances:', activationError);
+        // Activation failed, but record is already created - that's okay
+      }
+    }
   }
 
   // Return updated record
@@ -1309,6 +1364,11 @@ export async function getFinancialOverview(projectId) {
   // Get optional state information
   const optionalState = getOptionalState(project, finances);
 
+  // LATE ACTIVATION: Get activation baseline information
+  const { getPreBudgetBaseline, getPreCapitalBaseline } = await import('@/lib/activation-helpers');
+  const budgetBaseline = getPreBudgetBaseline(project);
+  const capitalBaseline = getPreCapitalBaseline(finances || {});
+
   // Determine warnings (suppress when budget/capital is optional unless critical)
   const warnings = [];
   
@@ -1417,6 +1477,17 @@ export async function getFinancialOverview(projectId) {
         byCategory: preConstructionSpending.byCategory || {}
       },
       indirectCosts: indirectCostsSummary, // NEW: Indirect costs summary
+      // LATE ACTIVATION: Include activation information
+      activation: budgetBaseline.hasBaseline ? {
+        activatedAt: budgetBaseline.activatedAt,
+        preBudgetSpending: budgetBaseline.preBudgetSpending,
+        effectiveSpending: {
+          total: Math.max(0, totalUsed - (budgetBaseline.preBudgetSpending.total || 0)),
+          dcc: Math.max(0, (totalUsed - (preConstructionSpending.total || 0) - (indirectCostsSummary?.spent || 0)) - (budgetBaseline.preBudgetSpending.dcc || 0)),
+          preConstruction: Math.max(0, (preConstructionSpending.total || 0) - (budgetBaseline.preBudgetSpending.preConstruction || 0)),
+          indirect: Math.max(0, (indirectCostsSummary?.spent || 0) - (budgetBaseline.preBudgetSpending.indirect || 0)),
+        }
+      } : null,
       // Include enhanced structure if available
       ...(isEnhancedBudget(budget) ? {
         enhanced: {
@@ -1441,6 +1512,15 @@ export async function getFinancialOverview(projectId) {
       capitalBalance,
       loanBalance: totalLoans - (totalUsed * loanRatio),
       equityBalance: totalEquity - (totalUsed * equityRatio),
+      // LATE ACTIVATION: Include capital activation information
+      activation: capitalBaseline.hasBaseline ? {
+        activatedAt: capitalBaseline.activatedAt,
+        preCapitalUsed: capitalBaseline.preCapitalUsed,
+        preCapitalCommitted: capitalBaseline.preCapitalCommitted,
+        // Show true overall state (capital doesn't use offset like budget)
+        spendingBeforeCapital: capitalBaseline.preCapitalUsed,
+        committedBeforeCapital: capitalBaseline.preCapitalCommitted,
+      } : null,
     },
     materialsBreakdown,
     actual: breakdown,

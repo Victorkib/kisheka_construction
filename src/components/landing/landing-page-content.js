@@ -25,10 +25,10 @@ export default function LandingPageContent() {
       mainEntity: [
         {
           '@type': 'Question',
-          name: 'What is Kisheka Construction System?',
+          name: 'What is Doshaki Construction System?',
           acceptedAnswer: {
             '@type': 'Answer',
-            text: 'Kisheka Construction Accountability System is a comprehensive project management platform designed for construction companies to track materials, expenses, labour, and project budgets in real-time.',
+            text: 'Doshaki Construction Accountability System is a comprehensive project management platform designed for construction companies to track materials, expenses, labour, and project budgets in real-time.',
           },
         },
         {
@@ -58,7 +58,7 @@ export default function LandingPageContent() {
       <section className="container mx-auto px-4 py-16 md:py-24 text-center">
         <div className="max-w-4xl mx-auto space-y-6">
           <h1 className="text-5xl md:text-6xl font-extrabold text-gray-900 leading-tight">
-            Kisheka Construction
+            Doshaki Construction
             <span className="block text-blue-600 mt-2">
               Accountability System
             </span>
@@ -74,7 +74,7 @@ export default function LandingPageContent() {
             <Link
               href="/auth/login"
               className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
-              aria-label="Sign in to Kisheka Construction"
+              aria-label="Sign in to Doshaki Construction"
             >
               Sign In
             </Link>
@@ -200,7 +200,7 @@ export default function LandingPageContent() {
             Ready to Transform Your Construction Management?
           </h2>
           <p className="text-xl mb-8 text-blue-100">
-            Join the Kisheka system today and experience seamless project
+            Join the Doshaki system today and experience seamless project
             accountability.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -229,7 +229,7 @@ export default function LandingPageContent() {
       >
         <div className="max-w-6xl mx-auto text-center text-gray-600">
           <p className="text-sm">
-            © {new Date().getFullYear()} Kisheka Construction Accountability
+            © {new Date().getFullYear()} Doshaki Construction Accountability
             System. All rights reserved.
           </p>
           <nav className="mt-4 space-x-6 text-sm" aria-label="Footer links">

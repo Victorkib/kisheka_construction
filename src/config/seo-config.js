@@ -122,12 +122,12 @@ export const siteMetadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    siteName: 'Kisheka Construction',
+    siteName: 'Doshaki Construction',
     image: {
       url: 'https://doshaki.netlify.app/og-image.png',
       width: 1200,
       height: 630,
-      alt: 'Kisheka Construction Accountability System',
+      alt: 'Doshaki Construction Accountability System',
     },
   },
 
@@ -160,7 +160,7 @@ export const siteMetadata = {
 // Page-specific metadata templates
 export const pageTemplates = {
   landing: {
-    title: 'Construction Project Management Software | Kisheka',
+    title: 'Construction Project Management Software | Doshaki',
     description:
       'Professional construction management system for material tracking, expense management, and project accountability. Start free today.',
     keywords: [
@@ -171,7 +171,7 @@ export const pageTemplates = {
     ],
   },
   auth: {
-    title: 'Login to Kisheka Construction System',
+    title: 'Login to Doshaki Construction System',
     description:
       'Sign in to manage your construction projects, materials, and finances.',
     robots: 'noindex, nofollow',

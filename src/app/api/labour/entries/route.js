@@ -469,6 +469,32 @@ export async function POST(request) {
       }
       // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
       // Spending will still be tracked regardless
+
+      // Phase 4: Floor Budget Validation (optional, secondary check)
+      // Only validate if floorId is provided AND floor budget is set
+      if (floorId && labourEntry.totalCost > 0 && ObjectId.isValid(floorId)) {
+        try {
+          const { validateFloorBudget } = await import('@/lib/floor-financial-helpers');
+          const floorBudgetValidation = await validateFloorBudget(floorId, labourEntry.totalCost, 'labour');
+          
+          // Only block if floor budget is set AND exceeded
+          // If floor budget is not set (budgetNotSet = true), allow the operation
+          if (!floorBudgetValidation.isValid && !floorBudgetValidation.budgetNotSet) {
+            return errorResponse(
+              `Floor labour budget exceeded. ${floorBudgetValidation.message}. ` +
+              `Floor budget: ${floorBudgetValidation.floorBudget.toLocaleString()}, ` +
+              `Available: ${floorBudgetValidation.available.toLocaleString()}, ` +
+              `Required: ${floorBudgetValidation.required.toLocaleString()}`,
+              400
+            );
+          }
+          // If floor budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
+          // Spending will still be tracked regardless
+        } catch (floorValidationError) {
+          // Don't block if floor validation fails - log and continue
+          console.error('Floor budget validation error (non-blocking):', floorValidationError);
+        }
+      }
     }
 
     const db = await getDatabase();

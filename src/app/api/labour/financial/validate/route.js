@@ -31,6 +31,7 @@ export async function GET(request) {
 
     const { searchParams } = new URL(request.url);
     const phaseId = searchParams.get('phaseId');
+    const floorId = searchParams.get('floorId');
     const labourCost = parseFloat(searchParams.get('labourCost') || '0');
 
     if (!phaseId) {
@@ -39,7 +40,22 @@ export async function GET(request) {
 
     const validation = await validatePhaseLabourBudget(phaseId, labourCost);
 
-    return successResponse(validation, 'Budget validation completed');
+    // Phase 4: Floor Budget Validation (optional, secondary check)
+    let floorValidation = null;
+    if (floorId && labourCost > 0) {
+      try {
+        const { validateFloorBudget } = await import('@/lib/floor-financial-helpers');
+        floorValidation = await validateFloorBudget(floorId, labourCost, 'labour');
+      } catch (floorValidationError) {
+        console.error('Floor budget validation error (non-blocking):', floorValidationError);
+        // Don't fail if floor validation fails
+      }
+    }
+
+    return successResponse({
+      ...validation,
+      floorValidation: floorValidation, // Include floor validation if available
+    }, 'Budget validation completed');
   } catch (error) {
     console.error('GET /api/labour/financial/validate error:', error);
     return errorResponse('Failed to validate budget', 500);

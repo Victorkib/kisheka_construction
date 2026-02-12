@@ -59,7 +59,7 @@ export function LoadingOverlay({
               </div>
               <div>
                 <p className="text-sm font-semibold tracking-wide text-blue-900 uppercase">
-                  Kisheka Construction
+                  Doshaki Construction
                 </p>
                 <p className="text-xs text-gray-600">
                   Aligning your project data and finances

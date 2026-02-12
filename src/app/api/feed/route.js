@@ -10,24 +10,24 @@ export async function GET() {
   const rss = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
-    <title>Kisheka Construction Accountability System</title>
+    <title>Doshaki Construction Accountability System</title>
     <link>${baseUrl}</link>
     <description>Construction project management platform for material tracking, expense management, and labour accountability</description>
     <language>en-us</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <image>
       <url>${baseUrl}/logo.png</url>
-      <title>Kisheka Construction</title>
+      <title>Doshaki Construction</title>
       <link>${baseUrl}</link>
     </image>
     <item>
-      <title>Kisheka Construction - Your Accountability Partner</title>
+      <title>Doshaki Construction - Your Accountability Partner</title>
       <link>${baseUrl}</link>
       <guid>${baseUrl}/</guid>
       <pubDate>${new Date().toUTCString()}</pubDate>
       <description>Professional construction project management system with comprehensive material tracking, expense management, labour tracking, and financial analytics.</description>
       <content:encoded><![CDATA[
-        <p>Kisheka Construction Accountability System streamlines your construction operations with:</p>
+        <p>Doshaki Construction Accountability System streamlines your construction operations with:</p>
         <ul>
           <li>Real-time material tracking and inventory management</li>
           <li>Comprehensive expense and budget tracking</li>

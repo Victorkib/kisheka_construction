@@ -412,6 +412,18 @@ export async function POST(request) {
 
     const insertedProject = { ...project, _id: result.insertedId };
 
+    // LATE ACTIVATION: Capture budget activation if budget is non-zero
+    const { needsBudgetActivation, captureProjectBudgetActivation } = await import('@/lib/activation-helpers');
+    if (needsBudgetActivation(insertedProject, finalBudget)) {
+      try {
+        await captureProjectBudgetActivation(result.insertedId.toString());
+        console.log(`[Project Creation] Budget activation captured for project ${result.insertedId}`);
+      } catch (activationError) {
+        console.error('Error capturing budget activation during project creation:', activationError);
+        // Don't fail project creation if activation capture fails
+      }
+    }
+
     // Ensure creator has project membership for access (non-owners rely on this)
     try {
       const creatorRole = normalizeRole(userProfile.role) || 'pm';

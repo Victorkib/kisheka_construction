@@ -281,9 +281,11 @@ function NewLabourEntryPageContent() {
         const totalCost =
           finalRegularHours * hourlyRate + finalOvertimeHours * overtimeRate;
 
-        const response = await fetch(
-          `/api/labour/financial/validate?phaseId=${formData.phaseId}&labourCost=${totalCost}`
-        );
+        // Include floorId if provided for floor budget validation
+        const validateUrl = `/api/labour/financial/validate?phaseId=${formData.phaseId}&labourCost=${totalCost}` +
+          (formData.floorId ? `&floorId=${formData.floorId}` : '');
+        
+        const response = await fetch(validateUrl);
         const data = await response.json();
         if (data.success) {
           setBudgetInfo(data.data);
@@ -296,7 +298,7 @@ function NewLabourEntryPageContent() {
         setValidatingBudget(false);
       }
     }
-  }, [formData.isIndirectLabour, formData.projectId, formData.phaseId, formData.totalHours, formData.hourlyRate, formData.overtimeHours, formData.indirectCostCategory]);
+  }, [formData.isIndirectLabour, formData.projectId, formData.phaseId, formData.floorId, formData.totalHours, formData.hourlyRate, formData.overtimeHours, formData.indirectCostCategory]);
 
   // Auto-calculate overtimeHours when totalHours changes (using schema logic)
   useEffect(() => {
@@ -1311,6 +1313,46 @@ function NewLabourEntryPageContent() {
                       <p className="text-xs text-orange-700 mt-2 font-medium">
                         ⚠️ {budgetInfo.message}
                       </p>
+                    )}
+                  </div>
+                )}
+                {/* Phase 4: Floor Budget Validation Display */}
+                {budgetInfo?.floorValidation && !validatingBudget && (
+                  <div
+                    className={`mt-3 p-4 rounded ${
+                      budgetInfo.floorValidation.isValid
+                        ? 'bg-blue-50 border border-blue-200'
+                        : 'bg-red-50 border border-red-200'
+                    }`}
+                  >
+                    <h4 className={`text-sm font-semibold mb-2 ${
+                      budgetInfo.floorValidation.isValid ? 'text-blue-900' : 'text-red-900'
+                    }`}>
+                      Floor Labour Budget
+                    </h4>
+                    <p
+                      className={`text-sm font-medium ${
+                        budgetInfo.floorValidation.isValid ? 'text-blue-800' : 'text-red-800'
+                      }`}
+                    >
+                      {budgetInfo.floorValidation.isValid ? '✅' : '⚠️'} {budgetInfo.floorValidation.message}
+                    </p>
+                    {budgetInfo.floorValidation.available !== undefined && (
+                      <div className="text-xs text-gray-700 mt-2 space-y-1">
+                        <p>Available: {budgetInfo.floorValidation.available.toLocaleString()} KES</p>
+                        {budgetInfo.floorValidation.required !== undefined && (
+                          <p>This Entry: {budgetInfo.floorValidation.required.toLocaleString()} KES</p>
+                        )}
+                        {budgetInfo.floorValidation.available >= 0 && budgetInfo.floorValidation.required !== undefined && (
+                          <p className={`font-medium ${
+                            budgetInfo.floorValidation.available - budgetInfo.floorValidation.required >= 0
+                              ? 'text-green-700'
+                              : 'text-red-700'
+                          }`}>
+                            Remaining After: {(budgetInfo.floorValidation.available - budgetInfo.floorValidation.required).toLocaleString()} KES
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}

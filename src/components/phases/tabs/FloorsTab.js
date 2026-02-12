@@ -123,6 +123,12 @@ export function FloorsTab({ phase, formatCurrency }) {
               Floors can appear in multiple phases. Use the filter to focus on basement or superstructure.
             </p>
           </div>
+          <Link
+            href={`/phases/${phase._id}/floors/budget`}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+          >
+            Manage Floor Budgets
+          </Link>
           <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
             {['auto', 'basement', 'superstructure', 'all'].map((group) => (
               <button

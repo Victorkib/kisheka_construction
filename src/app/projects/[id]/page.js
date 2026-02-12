@@ -854,6 +854,13 @@ function ProjectFinancesSection({ projectId }) {
           </button>
           <span className="text-gray-300">|</span>
           <Link
+            href={`/projects/${projectId}/budget`}
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          >
+            Budget Management →
+          </Link>
+          <span className="text-gray-300">|</span>
+          <Link
             href={`/projects/${projectId}/finances`}
             className="text-blue-600 hover:text-blue-800 text-sm font-medium"
           >
@@ -877,6 +884,12 @@ function ProjectFinancesSection({ projectId }) {
             <p className="text-xl font-bold text-green-600 mt-1">
               {formatCurrency(finances.totalInvested || 0)}
             </p>
+            <Link
+              href={`/investors?projectId=${projectId}`}
+              className="mt-2 inline-block text-xs text-blue-600 hover:text-blue-800 font-medium"
+            >
+              Manage Capital →
+            </Link>
           </div>
           <div>
             <p className="text-sm text-gray-600">Capital Used</p>
@@ -1028,6 +1041,7 @@ export default function ProjectDetailPage() {
       labour: 0,
       contingency: 0,
     },
+    reallocatePhases: false, // Phase 2: Flag to rescale phase budgets when DCC changes
   });
 
   // Track page view
@@ -1257,6 +1271,7 @@ export default function ProjectDetailPage() {
           labour: 0,
           contingency: 0,
         },
+        reallocatePhases: false, // Phase 2: Flag to rescale phase budgets when DCC changes
       };
       setFormData(initialFormData);
       setOriginalFormData(initialFormData);
@@ -1365,6 +1380,7 @@ export default function ProjectDetailPage() {
           startDate: formData.startDate || null,
           plannedEndDate: formData.plannedEndDate || null,
           budget: formData.budget,
+          reallocatePhases: formData.reallocatePhases || false, // Phase 2: Include reallocation flag
         }),
       });
 
@@ -1967,6 +1983,12 @@ export default function ProjectDetailPage() {
                     Cost Management
                   </Link>
                   <Link
+                    href={`/projects/${projectId}/budget`}
+                    className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition text-sm font-medium"
+                  >
+                    Budget Management
+                  </Link>
+                  <Link
                     href={`/projects/${projectId}/finances`}
                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
                   >
@@ -2350,6 +2372,33 @@ export default function ProjectDetailPage() {
                 onChange={handleBudgetChange}
                 showAdvanced={true}
               />
+              {/* Phase 2: Option to rescale phase budgets when DCC changes */}
+              {hasBudgetChange() && (
+                <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <label className="flex items-start cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.reallocatePhases || false}
+                      onChange={(e) => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          reallocatePhases: e.target.checked,
+                        }));
+                      }}
+                      className="mt-1 mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <div className="flex-1">
+                      <span className="text-sm font-medium text-gray-900">
+                        Also reallocate phase budgets proportionally to match new DCC
+                      </span>
+                      <p className="text-xs text-gray-600 mt-1">
+                        When enabled, all phase budgets will be scaled proportionally based on the change in Direct Construction Costs (DCC). 
+                        This ensures phase budgets remain proportional to the new project budget.
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              )}
             </div>
           </div>
         </form>

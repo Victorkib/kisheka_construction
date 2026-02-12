@@ -213,6 +213,12 @@ function FinancialOverviewContent() {
             </div>
             <div className="flex gap-2">
               <Link
+                href={`/projects/${projectId}/budget`}
+                className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition"
+              >
+                Budget Management
+              </Link>
+              <Link
                 href={`/dashboard/budget?projectId=${projectId}`}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
               >
@@ -286,6 +292,14 @@ function FinancialOverviewContent() {
             <div className="mt-4 pt-4 border-t">
               <p className="text-sm text-gray-700">Available Capital</p>
               <p className="text-xl font-semibold text-blue-600">{formatCurrency(data.financing.capitalBalance)}</p>
+            </div>
+            <div className="mt-4">
+              <Link
+                href={`/investors?projectId=${projectId}`}
+                className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition"
+              >
+                Manage Capital Allocations →
+              </Link>
             </div>
           </div>
 

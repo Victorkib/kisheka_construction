@@ -250,26 +250,48 @@ function ProfessionalServicesPageContent() {
           fullScreen
         />
         {/* Header */}
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
+        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        {/* Left Section: Heading and Description */}
+          <div className="flex-1">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
               Assignments
             </h1>
             <p className="text-gray-600 mt-2">
               Manage architect and engineer assignments to projects
             </p>
-          </div>
-          {canAccess('assign_professional_service') && (
-            <Link
-              href="/professional-services/new"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Assign Professional
-            </Link>
-          )}
+        </div>
+
+        {/* Right Section: Action Buttons */}
+        <div className="flex flex-row items-center gap-3">
+            {canAccess('assign_professional_service') && (
+              <Link
+                href="/professional-services-library"
+                className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors whitespace-nowrap"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" 
+                  />
+                </svg>
+                Library
+              </Link>
+            )}
+
+            {canAccess('assign_professional_service') && (
+              <Link
+                href="/professional-services/new"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                Assign Professional
+              </Link>
+            )}
+        </div>
         </div>
 
         <PrerequisiteGuide

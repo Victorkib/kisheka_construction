@@ -1,6 +1,6 @@
 /**
  * Custom 404 Not Found Page
- * Designed for Kisheka Construction System
+ * Designed for Doshaki Construction System
  * Provides helpful navigation and matches system design
  */
 

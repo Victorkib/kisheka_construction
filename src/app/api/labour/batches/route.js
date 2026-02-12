@@ -421,6 +421,49 @@ export async function POST(request) {
         }
         // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
         // Spending will still be tracked regardless
+
+        // Phase 4: Floor Budget Validation (optional, secondary check)
+        // Group entries by floorId and validate floor budgets
+        const entriesByFloor = {};
+        phaseEntries.forEach((entry) => {
+          if (entry.floorId && ObjectId.isValid(entry.floorId)) {
+            const floorId = entry.floorId.toString();
+            if (!entriesByFloor[floorId]) {
+              entriesByFloor[floorId] = [];
+            }
+            entriesByFloor[floorId].push(entry);
+          }
+        });
+
+        // Validate floor budgets for each floor
+        for (const [floorId, floorEntries] of Object.entries(entriesByFloor)) {
+          const floorCost = floorEntries.reduce(
+            (sum, entry) => sum + entry.totalCost,
+            0
+          );
+
+          try {
+            const { validateFloorBudget } = await import('@/lib/floor-financial-helpers');
+            const floorBudgetValidation = await validateFloorBudget(floorId, floorCost, 'labour');
+            
+            // Only block if floor budget is set AND exceeded
+            // If floor budget is not set (budgetNotSet = true), allow the operation
+            if (!floorBudgetValidation.isValid && !floorBudgetValidation.budgetNotSet) {
+              return errorResponse(
+                `Floor labour budget exceeded. ${floorBudgetValidation.message}. ` +
+                `Floor budget: ${floorBudgetValidation.floorBudget.toLocaleString()}, ` +
+                `Available: ${floorBudgetValidation.available.toLocaleString()}, ` +
+                `Required: ${floorBudgetValidation.required.toLocaleString()}`,
+                400
+              );
+            }
+            // If floor budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
+            // Spending will still be tracked regardless
+          } catch (floorValidationError) {
+            // Don't block if floor validation fails - log and continue
+            console.error(`Floor budget validation error for floor ${floorId} (non-blocking):`, floorValidationError);
+          }
+        }
       }
     }
 

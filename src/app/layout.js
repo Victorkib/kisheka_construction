@@ -140,7 +140,7 @@ export default function RootLayout({ children }) {
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'Organization',
-              name: 'Kisheka Construction',
+              name: 'Doshaki Construction',
               url: 'https://doshaki.netlify.app',
               logo: 'https://doshaki.netlify.app/logo.png',
               description:
@@ -160,7 +160,7 @@ export default function RootLayout({ children }) {
             __html: JSON.stringify({
               '@context': 'https://schema.org',
               '@type': 'SoftwareApplication',
-              name: 'Kisheka Construction Accountability System',
+              name: 'Doshaki Construction Accountability System',
               description:
                 'Comprehensive construction project management system with material tracking, expense management, and labour tracking',
               url: 'https://doshaki.netlify.app',
@@ -187,7 +187,7 @@ export default function RootLayout({ children }) {
           name="apple-mobile-web-app-status-bar-style"
           content="black-translucent"
         />
-        <meta name="apple-mobile-web-app-title" content="Kisheka" />
+        <meta name="apple-mobile-web-app-title" content="Doshaki" />
 
       </head>
       <body

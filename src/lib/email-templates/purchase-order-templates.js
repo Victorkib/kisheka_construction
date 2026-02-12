@@ -279,7 +279,7 @@ Email: ${process.env.COMPANY_EMAIL || 'info@kisheka.com'}
 ${process.env.COMPANY_PHONE ? `Phone: ${process.env.COMPANY_PHONE}` : ''}
 ${process.env.COMPANY_ADDRESS ? `Address: ${process.env.COMPANY_ADDRESS}` : ''}
 
-This is an automated message from Kisheka Construction System.
+This is an automated message from Doshaki Construction System.
   `.trim();
 
   return sendEmail({
@@ -370,7 +370,7 @@ Order Summary:
 
 Please respond by visiting: ${responseUrl}
 
-This is an automated reminder from Kisheka Construction System.
+This is an automated reminder from Doshaki Construction System.
   `.trim();
 
   return sendEmail({

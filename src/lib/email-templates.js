@@ -156,7 +156,7 @@ Recommended Actions:
 
 View in Dashboard: ${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/dashboard/analytics/wastage
 
-This is an automated alert from the Kisheka Construction Accountability System.
+This is an automated alert from the Doshaki Construction Accountability System.
 Please do not reply to this email.
   `;
 

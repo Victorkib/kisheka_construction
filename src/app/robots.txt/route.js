@@ -8,7 +8,7 @@ export async function GET() {
   const baseUrl =
     process.env.NEXT_PUBLIC_SITE_URL || 'https://doshaki.netlify.app';
 
-  const robots = `# Robots.txt for Kisheka Construction Accountability System
+  const robots = `# Robots.txt for Doshaki Construction Accountability System
 # Last updated: ${new Date().toISOString()}
 
 # Default rules for all bots
