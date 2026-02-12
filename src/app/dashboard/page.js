@@ -39,7 +39,7 @@ export default function DashboardPage() {
       return;
     }
 
-    async function redirectToRoleDashboard() {
+    async function redirectToRoleDashboard(retryCount = 0) {
       try {
         // CRITICAL FIX: Double-check we're still on /dashboard before redirecting
         const currentPath = window.location.pathname;
@@ -50,6 +50,16 @@ export default function DashboardPage() {
 
         const response = await fetchNoCache('/api/auth/me');
         const data = await response.json();
+
+        // CRITICAL FIX: If profile not found (404), it might be MongoDB sync race condition
+        // Retry a few times with delays for OAuth users
+        if (!data.success && data.error === 'User profile not found' && retryCount < 3) {
+          console.log(`User profile not found, retrying... (attempt ${retryCount + 1}/3)`);
+          // Wait before retry: 500ms, 1s, 2s
+          const delay = [500, 1000, 2000][retryCount] || 2000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return redirectToRoleDashboard(retryCount + 1);
+        }
 
         if (!data.success) {
           router.push('/auth/login');
@@ -93,10 +103,18 @@ export default function DashboardPage() {
         }
       } catch (error) {
         console.error('Error fetching user:', error);
-        setError('Failed to load dashboard. Redirecting to login...');
-        setTimeout(() => {
-          router.push('/auth/login');
-        }, 2000);
+        // Only redirect to login if we've exhausted retries
+        if (retryCount >= 3) {
+          setError('Failed to load dashboard. Redirecting to login...');
+          setTimeout(() => {
+            router.push('/auth/login');
+          }, 2000);
+        } else {
+          // Retry on network errors
+          const delay = [500, 1000, 2000][retryCount] || 2000;
+          await new Promise(resolve => setTimeout(resolve, delay));
+          return redirectToRoleDashboard(retryCount + 1);
+        }
       }
     }
 
