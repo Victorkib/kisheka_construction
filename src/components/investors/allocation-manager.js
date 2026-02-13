@@ -136,7 +136,7 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
         }));
 
       const saveResponse = await fetch(`/api/investors/${investorId}/allocations`, {
-        method: 'PUT',
+        method: 'POST',
         cache: 'no-store',
         headers: {
           'Content-Type': 'application/json',
@@ -146,13 +146,56 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
         body: JSON.stringify({ allocations: validAllocations }),
       });
 
-      const data = await saveResponse.json();
+      // Check if response is OK before parsing JSON
+      if (!saveResponse.ok) {
+        // Try to parse error response
+        let errorMessage = 'Failed to save allocations';
+        try {
+          const errorData = await saveResponse.json();
+          errorMessage = errorData.error || errorData.message || errorMessage;
+        } catch (parseError) {
+          // If JSON parsing fails, use status text
+          errorMessage = saveResponse.statusText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Parse JSON response
+      let data;
+      try {
+        const responseText = await saveResponse.text();
+        if (!responseText) {
+          throw new Error('Empty response from server');
+        }
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        throw new Error('Invalid response from server. Please try again.');
+      }
 
       if (!data.success) {
         throw new Error(data.error || 'Failed to save allocations');
       }
 
       setSuccess(true);
+      setError(null);
+      
+      // Display warnings if any
+      if (data.data?.warnings && data.data.warnings.length > 0) {
+        const warningsText = data.data.warnings.join('\n');
+        console.warn('Allocation warnings:', warningsText);
+        // Show warnings as a less severe error (info style)
+        setError(warningsText);
+        setTimeout(() => setError(null), 10000); // Clear after 10 seconds
+      }
+      
+      // Display info messages if any
+      if (data.data?.info && data.data.info.length > 0) {
+        const infoText = data.data.info.join('\n');
+        console.info('Allocation info:', infoText);
+        // Info messages are shown in success state
+      }
+      
       const updatedAllocations = (data.data.allocations || []).map((alloc) => ({
         ...alloc,
         projectId: normalizeId(alloc.projectId),
@@ -240,11 +283,15 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
         </div>
       </div>
 
-      {/* Error Message */}
+      {/* Error/Warning Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-          <p className="font-medium">Error</p>
-          <p className="text-sm mt-1">{error}</p>
+        <div className={`border px-4 py-3 rounded ${
+          error.includes('Warning:') || error.includes('warning')
+            ? 'bg-yellow-50 border-yellow-200 text-yellow-700'
+            : 'bg-red-50 border-red-200 text-red-700'
+        }`}>
+          <p className="font-medium">{error.includes('Warning:') || error.includes('warning') ? 'Warning' : 'Error'}</p>
+          <div className="text-sm mt-1 whitespace-pre-line">{error}</div>
         </div>
       )}
 

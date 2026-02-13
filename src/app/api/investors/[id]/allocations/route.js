@@ -195,8 +195,10 @@ export async function POST(request, { params }) {
       }
     });
 
-    // Find removed or reduced allocations
+    // Find removed or reduced allocations and validate capital removal
     const capitalRemovalWarnings = [];
+    const capitalAdditionInfo = [];
+    
     for (const [projectIdStr, currentAmount] of currentAllocationsMap.entries()) {
       const newAmount = newAllocationsMap.get(projectIdStr) || 0;
       const amountRemoved = currentAmount - newAmount;
@@ -225,6 +227,73 @@ export async function POST(request, { params }) {
             amountRemoved,
             availableAfterRemoval: removalValidation.availableAfterRemoval,
           });
+        }
+      }
+    }
+
+    // Check for new or increased allocations - validate against existing spending
+    for (const [projectIdStr, newAmount] of newAllocationsMap.entries()) {
+      const currentAmount = currentAllocationsMap.get(projectIdStr) || 0;
+      const amountAdded = newAmount - currentAmount;
+      
+      if (amountAdded > 0) {
+        // Capital is being added to this project
+        // Check if project has existing spending
+        const { getProjectFinances, getCurrentTotalUsed } = await import('@/lib/financial-helpers');
+        
+        try {
+          const finances = await getProjectFinances(projectIdStr);
+          const totalUsed = finances?.totalUsed || await getCurrentTotalUsed(projectIdStr);
+          const committedCost = finances?.committedCost || 0;
+          const currentTotalInvested = finances?.totalInvested || currentAmount;
+          
+          // If project has spending but no capital was allocated before, warn user
+          if (totalUsed > 0 && currentAmount === 0) {
+            const project = await db.collection('projects').findOne({
+              _id: new ObjectId(projectIdStr),
+            });
+            const projectName = project?.projectName || projectIdStr;
+            
+            capitalAdditionInfo.push({
+              projectId: projectIdStr,
+              projectName,
+              amountAdded,
+              existingSpending: totalUsed,
+              committedCost,
+              totalObligations: totalUsed + committedCost,
+              message: `Project "${projectName}" has existing spending of ${totalUsed.toLocaleString()} KES (plus ${committedCost.toLocaleString()} KES committed). Capital allocation will cover this spending.`,
+            });
+          }
+          
+          // Calculate available capital after allocation
+          const newTotalInvested = currentTotalInvested - currentAmount + newAmount;
+          const availableAfterAllocation = Math.max(0, newTotalInvested - totalUsed - committedCost);
+          
+          // Warn if allocated capital is less than existing obligations
+          if (newTotalInvested < (totalUsed + committedCost)) {
+            const shortfall = (totalUsed + committedCost) - newTotalInvested;
+            const project = await db.collection('projects').findOne({
+              _id: new ObjectId(projectIdStr),
+            });
+            const projectName = project?.projectName || projectIdStr;
+            
+            capitalAdditionInfo.push({
+              projectId: projectIdStr,
+              projectName,
+              amountAdded,
+              existingSpending: totalUsed,
+              committedCost,
+              totalObligations: totalUsed + committedCost,
+              newTotalInvested,
+              availableAfterAllocation,
+              shortfall,
+              warning: true,
+              message: `Warning: Allocated capital (${newTotalInvested.toLocaleString()} KES) is less than existing obligations (${(totalUsed + committedCost).toLocaleString()} KES). Shortfall: ${shortfall.toLocaleString()} KES.`,
+            });
+          }
+        } catch (error) {
+          // Don't fail allocation if we can't check spending - just log
+          console.error(`Error checking spending for project ${projectIdStr}:`, error);
         }
       }
     }
@@ -306,19 +375,43 @@ export async function POST(request, { params }) {
       unallocated: validation.unallocated,
     };
 
+    // Include warnings and info messages
+    const messages = [];
+    
     if (recalculationErrors.length > 0) {
       responseData.warnings = recalculationErrors.map(
         (err) => `Failed to update finances for project ${err.projectId}: ${err.error}`
       );
+      messages.push('Some finance updates failed. Please refresh the project finances page.');
       console.warn('⚠️ Allocations saved but some finance recalculations failed:', recalculationErrors);
     }
+    
+    if (capitalRemovalWarnings.length > 0) {
+      if (!responseData.warnings) responseData.warnings = [];
+      capitalRemovalWarnings.forEach(warning => {
+        responseData.warnings.push(
+          `Capital removal from project reduces available capital significantly. Available after removal: ${warning.availableAfterRemoval.toLocaleString()} KES.`
+        );
+      });
+    }
+    
+    if (capitalAdditionInfo.length > 0) {
+      if (!responseData.info) responseData.info = [];
+      capitalAdditionInfo.forEach(info => {
+        if (info.warning) {
+          if (!responseData.warnings) responseData.warnings = [];
+          responseData.warnings.push(info.message);
+        } else {
+          responseData.info.push(info.message);
+        }
+      });
+    }
 
-    return successResponse(
-      responseData,
-      recalculationErrors.length > 0
-        ? 'Allocations updated successfully, but some finance updates failed. Please refresh the project finances page.'
-        : 'Allocations updated successfully'
-    );
+    const successMessage = messages.length > 0
+      ? `Allocations updated successfully. ${messages.join(' ')}`
+      : 'Allocations updated successfully';
+
+    return successResponse(responseData, successMessage);
   } catch (error) {
     console.error('Update allocations error:', error);
     return errorResponse('Failed to update allocations', 500);

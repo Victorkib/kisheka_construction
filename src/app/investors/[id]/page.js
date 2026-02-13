@@ -14,7 +14,7 @@ import { AppLayout } from '@/components/layout/app-layout';
 import { ImagePreview } from '@/components/uploads/image-preview';
 import { LoadingButton, LoadingCard, LoadingSpinner, LoadingOverlay } from '@/components/loading';
 import { StatementGenerator } from '@/components/investors/statement-generator';
-import { AllocationManager } from '@/components/investors/allocation-manager';
+import { EnhancedAllocationManager } from '@/components/investors/enhanced-allocation-manager';
 import { usePermissions } from '@/hooks/use-permissions';
 import { ConfirmationModal, RestoreModal } from '@/components/modals';
 import { ArchiveBadge } from '@/components/badges';
@@ -495,7 +495,7 @@ export default function InvestorDetailPage() {
 
         {/* Investment Allocations */}
         <div className="mb-6">
-          <AllocationManager
+          <EnhancedAllocationManager
             investorId={investor._id}
             totalInvested={investor.totalInvested || 0}
             onUpdate={() => {
