@@ -14,6 +14,8 @@ import { AppLayout } from '@/components/layout/app-layout';
 import { EnhancedBudgetInput } from '@/components/budget/EnhancedBudgetInput';
 import { BudgetAdjustmentForm } from '@/components/budget/BudgetAdjustmentForm';
 import { BudgetTransferForm } from '@/components/budget/BudgetTransferForm';
+import { PreBudgetSpendingSummary } from '@/components/budget/PreBudgetSpendingSummary';
+import { AllocationPreview } from '@/components/budget/AllocationPreview';
 import { useToast } from '@/components/toast';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import {
@@ -48,7 +50,11 @@ function BudgetManagementContent() {
   const [isSaving, setIsSaving] = useState(false);
   const [budgetData, setBudgetData] = useState(null);
   const [reallocatePhases, setReallocatePhases] = useState(false); // Phase 2: Flag to rescale phase budgets when DCC changes
+  const [autoAllocatePhases, setAutoAllocatePhases] = useState(true); // Phase 1: Flag to auto-allocate budgets to existing phases (default: true)
   const [originalBudgetData, setOriginalBudgetData] = useState(null);
+  const [showAllocationPreview, setShowAllocationPreview] = useState(false);
+  const [budgetValidationWarnings, setBudgetValidationWarnings] = useState([]);
+  const [preBudgetSummary, setPreBudgetSummary] = useState(null);
 
   useEffect(() => {
     if (projectId) {
@@ -102,6 +108,29 @@ function BudgetManagementContent() {
       if (phasesResult.success) {
         setPhases(phasesResult.data || []);
       }
+
+      // Fetch pre-budget summary if budget is zero
+      const currentBudget = projectResult.data.budget || {};
+      const currentBudgetTotal = currentBudget.total || currentBudget.directConstructionCosts || 0;
+      
+      if (currentBudgetTotal === 0) {
+        try {
+          const summaryResponse = await fetch(`/api/projects/${projectId}/pre-budget-summary`, {
+            cache: 'no-store',
+            headers: {
+              'Cache-Control': 'no-cache, no-store, must-revalidate',
+              'Pragma': 'no-cache',
+            },
+          });
+          const summaryResult = await summaryResponse.json();
+          if (summaryResult.success) {
+            setPreBudgetSummary(summaryResult.data);
+          }
+        } catch (summaryError) {
+          console.error('Error fetching pre-budget summary:', summaryError);
+          // Don't fail the page load if summary fails
+        }
+      }
     } catch (err) {
       console.error('Fetch budget data error:', err);
       setError(err.message || 'Failed to load budget data');
@@ -112,9 +141,91 @@ function BudgetManagementContent() {
 
   const handleBudgetChange = (newBudget) => {
     setBudgetData(newBudget);
+    setBudgetValidationWarnings([]);
+    
+    // Real-time validation against spending
+    if (preBudgetSummary && newBudget) {
+      const warnings = [];
+      const dcc = newBudget.directConstructionCosts || 0;
+      const preConstruction = newBudget.preConstructionCosts || 0;
+      const indirect = newBudget.indirectCosts || 0;
+      const contingency = newBudget.contingencyReserve || 0;
+      
+      // DCC validation
+      if (dcc > 0 && dcc < preBudgetSummary.totalSpending.dcc) {
+        warnings.push({
+          category: 'DCC',
+          message: `DCC budget (${dcc.toLocaleString()}) is less than DCC spending (${preBudgetSummary.totalSpending.dcc.toLocaleString()})`,
+          recommended: preBudgetSummary.recommendations.dcc
+        });
+      } else if (dcc > 0 && dcc < preBudgetSummary.recommendations.dcc * 0.95) {
+        warnings.push({
+          category: 'DCC',
+          message: `DCC budget is close to spending. Recommended: ${preBudgetSummary.recommendations.dcc.toLocaleString()}`,
+          recommended: preBudgetSummary.recommendations.dcc
+        });
+      }
+      
+      // Pre-construction validation
+      if (preConstruction > 0 && preConstruction < preBudgetSummary.totalSpending.preConstruction) {
+        warnings.push({
+          category: 'Pre-Construction',
+          message: `Pre-construction budget (${preConstruction.toLocaleString()}) is less than spending (${preBudgetSummary.totalSpending.preConstruction.toLocaleString()})`,
+          recommended: preBudgetSummary.recommendations.preConstruction
+        });
+      }
+      
+      // Indirect validation
+      if (indirect > 0 && indirect < preBudgetSummary.totalSpending.indirect) {
+        warnings.push({
+          category: 'Indirect',
+          message: `Indirect costs budget (${indirect.toLocaleString()}) is less than spending (${preBudgetSummary.totalSpending.indirect.toLocaleString()})`,
+          recommended: preBudgetSummary.recommendations.indirect
+        });
+      }
+      
+      setBudgetValidationWarnings(warnings);
+    }
+  };
+
+  const handleUseRecommendedBudget = (recommendations) => {
+    if (recommendations) {
+      const recommendedBudget = {
+        directConstructionCosts: recommendations.dcc || 0,
+        preConstructionCosts: recommendations.preConstruction || 0,
+        indirectCosts: recommendations.indirect || 0,
+        contingencyReserve: recommendations.contingency || 0,
+        total: recommendations.total || 0
+      };
+      setBudgetData(recommendedBudget);
+      setBudgetValidationWarnings([]);
+      toast.showSuccess('Recommended budget applied');
+    }
   };
 
   const handleSaveBudget = async () => {
+    if (!budgetData) {
+      toast.showError('No budget data to save');
+      return;
+    }
+
+    // Check if this is zero-to-non-zero transition and show preview
+    const currentBudget = project?.budget || {};
+    const currentBudgetTotal = currentBudget.total || currentBudget.directConstructionCosts || 0;
+    const newBudgetTotal = budgetData.total || budgetData.directConstructionCosts || 0;
+    const isZeroToNonZero = currentBudgetTotal <= 0 && newBudgetTotal > 0;
+    
+    if (isZeroToNonZero && autoAllocatePhases && !showAllocationPreview) {
+      // Show preview before saving
+      setShowAllocationPreview(true);
+      return;
+    }
+
+    // Proceed with save
+    await performSaveBudget();
+  };
+
+  const performSaveBudget = async () => {
     if (!budgetData) {
       toast.showError('No budget data to save');
       return;
@@ -133,6 +244,7 @@ function BudgetManagementContent() {
         body: JSON.stringify({
           budget: budgetData,
           reallocatePhases: reallocatePhases || false, // Phase 2: Include reallocation flag
+          autoAllocatePhases: autoAllocatePhases !== false, // Phase 1: Auto-allocate to existing phases (default: true)
         }),
       });
 
@@ -141,14 +253,53 @@ function BudgetManagementContent() {
         throw new Error(result.error || 'Failed to update budget');
       }
 
-      // Show success message with phase rescale info if applicable
+      // Show success message with phase allocation/rescale info if applicable
       let successMessage = 'Budget updated successfully!';
+      let hasWarnings = false;
+      
+      if (result.data?._phaseAllocation && result.data._phaseAllocation.allocated > 0) {
+        successMessage += ` Budgets auto-allocated to ${result.data._phaseAllocation.allocated} phase(s).`;
+        
+        // Show warnings if any
+        if (result.data._phaseAllocation.warnings && result.data._phaseAllocation.warnings.length > 0) {
+          hasWarnings = true;
+          const warningCount = result.data._phaseAllocation.warnings.length;
+          successMessage += ` ${warningCount} warning(s) generated.`;
+          
+          // Show detailed warnings in console for debugging
+          console.warn('Phase allocation warnings:', result.data._phaseAllocation.warnings);
+          
+          // Show first warning as toast for visibility
+          const firstWarning = result.data._phaseAllocation.warnings[0];
+          if (firstWarning.message) {
+            toast.showWarning(firstWarning.message);
+          }
+        }
+      }
+      
       if (result.data?._phaseRescale && result.data._phaseRescale.rescaled > 0) {
         successMessage += ` Phase budgets rescaled: ${result.data._phaseRescale.rescaled} phases updated.`;
+        if (result.data._phaseRescale.floorRescale && result.data._phaseRescale.floorRescale.rescaled > 0) {
+          successMessage += ` Floor budgets rescaled: ${result.data._phaseRescale.floorRescale.rescaled} floors updated.`;
+        }
       }
-      toast.showSuccess(successMessage);
+      
+      // Show validation warnings if any
+      if (result.data?._budgetValidationWarnings && result.data._budgetValidationWarnings.length > 0) {
+        result.data._budgetValidationWarnings.forEach(warning => {
+          toast.showWarning(warning);
+        });
+      }
+      
+      if (hasWarnings) {
+        toast.showWarning(successMessage);
+      } else {
+        toast.showSuccess(successMessage);
+      }
       setShowEditBudget(false);
+      setShowAllocationPreview(false);
       setReallocatePhases(false);
+      setAutoAllocatePhases(true); // Reset to default
       await fetchData(); // Refresh data
     } catch (err) {
       toast.showError(err.message || 'Failed to update budget');
@@ -307,6 +458,54 @@ function BudgetManagementContent() {
             </div>
           </div>
         </div>
+
+        {/* Pre-Budget Spending Summary (shown when budget is zero) */}
+        {budgetTotal === 0 && preBudgetSummary && (
+          <div className="mb-6">
+            <PreBudgetSpendingSummary 
+              projectId={projectId}
+              onRecommendationClick={handleUseRecommendedBudget}
+            />
+          </div>
+        )}
+
+        {/* Budget Validation Warnings */}
+        {budgetValidationWarnings.length > 0 && (
+          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="flex items-start">
+              <svg className="w-5 h-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-yellow-900 mb-2">Budget Validation Warnings</h3>
+                <ul className="list-disc list-inside text-sm text-yellow-800 space-y-1">
+                  {budgetValidationWarnings.map((warning, index) => (
+                    <li key={index}>
+                      {warning.message}
+                      {warning.recommended && (
+                        <button
+                          onClick={() => {
+                            if (warning.category === 'DCC') {
+                              setBudgetData(prev => ({ ...prev, directConstructionCosts: warning.recommended }));
+                            } else if (warning.category === 'Pre-Construction') {
+                              setBudgetData(prev => ({ ...prev, preConstructionCosts: warning.recommended }));
+                            } else if (warning.category === 'Indirect') {
+                              setBudgetData(prev => ({ ...prev, indirectCosts: warning.recommended }));
+                            }
+                            setBudgetValidationWarnings([]);
+                          }}
+                          className="ml-2 text-yellow-600 hover:text-yellow-800 underline text-xs"
+                        >
+                          Use Recommended
+                        </button>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Activation Banner */}
         {budgetActivation?.activatedAt && (
@@ -496,8 +695,26 @@ function BudgetManagementContent() {
             </Link>
           </div>
 
+          {/* Allocation Preview */}
+          {showAllocationPreview && (
+            <div className="mt-6 border-t border-gray-200 pt-6">
+              <AllocationPreview
+                projectId={projectId}
+                proposedBudget={budgetData}
+                phases={phases}
+                onConfirm={async () => {
+                  setShowAllocationPreview(false);
+                  await performSaveBudget();
+                }}
+                onCancel={() => {
+                  setShowAllocationPreview(false);
+                }}
+              />
+            </div>
+          )}
+
           {/* Edit Budget Form */}
-          {showEditBudget && (
+          {showEditBudget && !showAllocationPreview && (
             <div className="mt-6 border-t border-gray-200 pt-6">
               <h3 className="text-md font-semibold text-gray-900 mb-4">Edit Budget</h3>
               <EnhancedBudgetInput
@@ -505,6 +722,41 @@ function BudgetManagementContent() {
                 onChange={handleBudgetChange}
                 showAdvanced={true}
               />
+              {/* Phase 1: Option to auto-allocate budgets to existing phases (zero-to-non-zero transition) */}
+              {originalBudgetData && budgetData && (() => {
+                const oldDcc = originalBudgetData.directConstructionCosts || 0;
+                const newDcc = budgetData.directConstructionCosts || 0;
+                const isZeroToNonZero = oldDcc <= 0 && newDcc > 0;
+                
+                // Check if phases have zero budgets
+                const phasesWithZeroBudgets = phases.filter(phase => {
+                  const phaseBudget = phase.budgetAllocation?.total || 0;
+                  return phaseBudget === 0;
+                });
+                
+                return isZeroToNonZero && phasesWithZeroBudgets.length > 0 ? (
+                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <label className="flex items-start cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={autoAllocatePhases}
+                        onChange={(e) => setAutoAllocatePhases(e.target.checked)}
+                        className="mt-1 mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                      />
+                      <div className="flex-1">
+                        <span className="text-sm font-medium text-gray-900">
+                          Automatically allocate budgets to {phasesWithZeroBudgets.length} phase(s) with zero budgets
+                        </span>
+                        <p className="text-xs text-gray-600 mt-1">
+                          When enabled, budgets will be automatically allocated to existing phases based on standard percentages:
+                          Basement (15%), Superstructure (65%), Finishing (15%), Final Systems (5%). 
+                          You can opt-out by unchecking this box.
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                ) : null;
+              })()}
               {/* Phase 2: Option to rescale phase budgets when DCC changes */}
               {originalBudgetData && budgetData && (() => {
                 const oldDcc = originalBudgetData.directConstructionCosts || 0;
@@ -546,6 +798,7 @@ function BudgetManagementContent() {
                     setBudgetData(project.budget);
                     setOriginalBudgetData(project.budget);
                     setReallocatePhases(false);
+                    setAutoAllocatePhases(true); // Reset to default
                   }}
                   className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium"
                 >

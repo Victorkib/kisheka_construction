@@ -280,6 +280,304 @@ export async function initializeDefaultPhases(projectId, project = null) {
 }
 
 /**
+ * Allocate budgets to existing phases when project budget is added later
+ * This function handles the zero-to-non-zero budget transition scenario
+ * @param {string} projectId - Project ID
+ * @param {Object} project - Project object (optional, will fetch if not provided)
+ * @param {string} userId - User ID performing the operation (for audit log)
+ * @returns {Promise<Object>} Summary of allocated phases
+ */
+export async function allocateBudgetsToExistingPhases(projectId, project = null, userId = null) {
+  const db = await getDatabase();
+  const { createAuditLog } = await import('@/lib/audit-log');
+  
+  // Get project if not provided
+  if (!project) {
+    project = await db.collection('projects').findOne({
+      _id: new ObjectId(projectId),
+      deletedAt: null
+    });
+  }
+  
+  if (!project) {
+    throw new Error('Project not found');
+  }
+  
+  // Get project budget for allocation
+  const projectBudget = project.budget || {};
+  
+  // Calculate DCC budget
+  let dccBudget = 0;
+  
+  if (isEnhancedBudget(projectBudget)) {
+    dccBudget = projectBudget.directConstructionCosts || 0;
+  } else {
+    const totalBudget = getBudgetTotal(projectBudget);
+    const estimatedPreConstruction = totalBudget * 0.05;
+    const estimatedIndirect = totalBudget * 0.05;
+    const estimatedContingency = projectBudget.contingency || (totalBudget * 0.05);
+    dccBudget = Math.max(0, totalBudget - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+  }
+  
+  if (dccBudget <= 0) {
+    return {
+      allocated: 0,
+      skipped: 0,
+      phases: [],
+      message: 'Project has no Direct Construction Costs (DCC) budget to allocate'
+    };
+  }
+  
+  // Get existing phases
+  const phases = await db.collection('phases').find({
+    projectId: new ObjectId(projectId),
+    deletedAt: null
+  }).sort({ sequence: 1 }).toArray();
+  
+  if (phases.length === 0) {
+    return {
+      allocated: 0,
+      skipped: 0,
+      phases: [],
+      message: 'No phases found for this project'
+    };
+  }
+  
+  // Filter phases that need allocation (zero budgets)
+  const phasesNeedingAllocation = phases.filter(phase => {
+    const currentBudget = phase.budgetAllocation?.total || 0;
+    return currentBudget === 0;
+  });
+  
+  if (phasesNeedingAllocation.length === 0) {
+    return {
+      allocated: 0,
+      skipped: phases.length,
+      phases: [],
+      message: 'All phases already have budget allocations'
+    };
+  }
+  
+  // Calculate phase allocations based on typical construction percentages
+  const phaseAllocations = {
+    basement: dccBudget * 0.15,            // 15% of DCC
+    superstructure: dccBudget * 0.65,      // 65% of DCC
+    finishing: dccBudget * 0.15,           // 15% of DCC
+    finalSystems: dccBudget * 0.05         // 5% of DCC
+  };
+  
+  // Map phase codes to allocations
+  const phaseCodeToAllocation = {
+    'PHASE-01': phaseAllocations.basement,
+    'PHASE-02': phaseAllocations.superstructure,
+    'PHASE-03': phaseAllocations.finishing,
+    'PHASE-04': phaseAllocations.finalSystems
+  };
+  
+  const allocatedPhases = [];
+  const skippedPhases = [];
+  const warnings = [];
+  
+  // Allocate budgets to phases
+  for (const phase of phasesNeedingAllocation) {
+    const allocation = phaseCodeToAllocation[phase.phaseCode] || 0;
+    
+    if (allocation <= 0) {
+      skippedPhases.push({
+        phaseId: phase._id.toString(),
+        phaseName: phase.phaseName || phase.phaseCode,
+        reason: 'No allocation defined for this phase code'
+      });
+      continue;
+    }
+    
+    // CRITICAL FIX: Calculate actual spending and committed costs before allocation
+    let actualSpending = { total: 0, materials: 0, expenses: 0, labour: 0, equipment: 0, subcontractors: 0 };
+    let committedCost = 0;
+    
+    try {
+      // Calculate materials spending
+      const materialsSpending = await db.collection('materials').aggregate([
+        {
+          $match: {
+            phaseId: phase._id,
+            deletedAt: null,
+            status: { $in: MATERIAL_APPROVED_STATUSES }
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$totalCost' }
+          }
+        }
+      ]).toArray();
+      
+      actualSpending.materials = materialsSpending[0]?.total || 0;
+      
+      // Calculate expenses spending
+      const { EXPENSE_APPROVED_STATUSES } = await import('@/lib/status-constants');
+      const expensesSpending = await db.collection('expenses').aggregate([
+        {
+          $match: {
+            phaseId: phase._id,
+            deletedAt: null,
+            status: { $in: EXPENSE_APPROVED_STATUSES },
+            $or: [
+              { isIndirectCost: { $exists: false } },
+              { isIndirectCost: false }
+            ]
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            total: { $sum: '$amount' }
+          }
+        }
+      ]).toArray();
+      
+      actualSpending.expenses = expensesSpending[0]?.total || 0;
+      
+      // Calculate labour spending (recalculate for accuracy)
+      const { recalculatePhaseLabourSpending } = await import('@/lib/labour-financial-helpers');
+      try {
+        actualSpending.labour = await recalculatePhaseLabourSpending(phase._id.toString());
+      } catch (labourError) {
+        console.error(`Error recalculating labour spending for phase ${phase._id}:`, labourError);
+        actualSpending.labour = phase.actualSpending?.labour || 0;
+      }
+      
+      // Calculate equipment spending
+      const { calculatePhaseEquipmentCost } = await import('@/lib/equipment-helpers');
+      actualSpending.equipment = await calculatePhaseEquipmentCost(phase._id.toString());
+      
+      // Calculate subcontractor spending
+      const { calculatePhaseSubcontractorCost } = await import('@/lib/subcontractor-helpers');
+      actualSpending.subcontractors = await calculatePhaseSubcontractorCost(phase._id.toString());
+      
+      // Calculate total actual spending
+      actualSpending.total = actualSpending.materials + actualSpending.expenses + 
+                             actualSpending.labour + actualSpending.equipment + 
+                             actualSpending.subcontractors;
+      
+      // Calculate committed costs
+      committedCost = await calculatePhaseCommittedCost(phase._id.toString());
+      
+    } catch (spendingError) {
+      console.error(`Error calculating spending for phase ${phase._id}:`, spendingError);
+      // Continue with allocation but log warning
+      warnings.push({
+        phaseId: phase._id.toString(),
+        phaseName: phase.phaseName || phase.phaseCode,
+        message: 'Could not calculate actual spending. Proceeding with allocation.'
+      });
+    }
+    
+    // Calculate minimum required budget
+    const minimumRequired = actualSpending.total + committedCost;
+    
+    // Validate allocation against minimum required
+    let finalAllocation = allocation;
+    let allocationAdjusted = false;
+    
+    if (allocation < minimumRequired) {
+      // Allocate minimum required instead of proposed amount
+      finalAllocation = minimumRequired;
+      allocationAdjusted = true;
+      
+      warnings.push({
+        phaseId: phase._id.toString(),
+        phaseName: phase.phaseName || phase.phaseCode,
+        message: `Proposed allocation (${allocation.toLocaleString()}) was less than required minimum (${minimumRequired.toLocaleString()}). Allocated minimum required instead.`,
+        actualSpending: actualSpending.total,
+        committedCost: committedCost,
+        minimumRequired: minimumRequired,
+        proposedAllocation: allocation
+      });
+    }
+    
+    // Build new budget allocation
+    const newBudgetAllocation = {
+      total: Math.round(finalAllocation * 100) / 100,
+      materials: Math.round(finalAllocation * 0.65 * 100) / 100,
+      labour: Math.round(finalAllocation * 0.25 * 100) / 100,
+      equipment: Math.round(finalAllocation * 0.05 * 100) / 100,
+      subcontractors: Math.round(finalAllocation * 0.03 * 100) / 100,
+      contingency: 0
+    };
+    
+    // Calculate remaining budget
+    const remaining = Math.max(0, newBudgetAllocation.total - actualSpending.total - committedCost);
+    
+    // Update phase with budget allocation and financial states
+    await db.collection('phases').updateOne(
+      { _id: phase._id },
+      {
+        $set: {
+          budgetAllocation: newBudgetAllocation,
+          'financialStates.remaining': remaining,
+          'financialStates.actual': actualSpending.total,
+          'financialStates.committed': committedCost,
+          updatedAt: new Date()
+        }
+      }
+    );
+    
+    allocatedPhases.push({
+      phaseId: phase._id.toString(),
+      phaseName: phase.phaseName || phase.phaseCode,
+      oldTotal: 0,
+      newTotal: newBudgetAllocation.total,
+      actualSpending: actualSpending.total,
+      committedCost: committedCost,
+      minimumRequired: minimumRequired,
+      allocationAdjusted: allocationAdjusted
+    });
+    
+    // Create audit log
+    if (userId) {
+      try {
+        await createAuditLog({
+          userId: userId,
+          action: 'update',
+          entityType: 'phase',
+          entityId: phase._id.toString(),
+          changes: {
+            budgetAllocation: {
+              oldValue: { total: 0 },
+              newValue: newBudgetAllocation
+            },
+            actualSpending: {
+              oldValue: phase.actualSpending?.total || 0,
+              newValue: actualSpending.total
+            }
+          },
+          description: `Budget allocated to phase: ${phase.phaseName || phase.phaseCode}. Total: ${newBudgetAllocation.total.toLocaleString()}${allocationAdjusted ? ' (adjusted to meet minimum requirement)' : ''}`
+        });
+      } catch (auditError) {
+        console.error(`Failed to create audit log for phase ${phase._id}:`, auditError);
+      }
+    }
+  }
+  
+  // Build result message
+  let message = `Successfully allocated budgets to ${allocatedPhases.length} phase(s)`;
+  if (warnings.length > 0) {
+    message += `. ${warnings.length} warning(s) generated.`;
+  }
+  
+  return {
+    allocated: allocatedPhases.length,
+    skipped: skippedPhases.length + (phases.length - phasesNeedingAllocation.length),
+    phases: allocatedPhases,
+    skippedPhases: skippedPhases,
+    warnings: warnings,
+    message: message
+  };
+}
+
+/**
  * Get phases for a project with financial summaries
  * @param {string} projectId - Project ID
  * @param {boolean} includeFinancials - Include financial summaries
@@ -1234,6 +1532,38 @@ export async function rescalePhaseBudgetsForProject(projectId, oldDcc, newDcc, u
       scaleFactor: scaleFactor.toFixed(4)
     });
     
+    // After rescaling phases, also rescale floor budgets for Superstructure phase
+    let floorRescaleResult = null;
+    const superstructurePhase = rescaledPhases.find(p => {
+      const phase = phases.find(ph => ph._id.toString() === p.phaseId);
+      return phase?.phaseCode === 'PHASE-02';
+    });
+    
+    if (superstructurePhase) {
+      try {
+        const { rescaleFloorBudgetsForPhase } = await import('@/lib/floor-financial-helpers');
+        const superstructurePhaseObj = phases.find(ph => ph._id.toString() === superstructurePhase.phaseId);
+        const oldPhaseBudget = superstructurePhase.oldTotal;
+        const newPhaseBudget = superstructurePhase.newTotal;
+        
+        if (oldPhaseBudget > 0 && newPhaseBudget > 0) {
+          floorRescaleResult = await rescaleFloorBudgetsForPhase(
+            superstructurePhase.phaseId,
+            oldPhaseBudget,
+            newPhaseBudget,
+            userId
+          );
+          
+          if (floorRescaleResult.rescaled > 0) {
+            console.log(`[Rescale Phase Budgets] Floor budgets rescaled for Superstructure phase. Rescaled ${floorRescaleResult.rescaled} floors.`);
+          }
+        }
+      } catch (floorRescaleError) {
+        console.error('Error rescaling floor budgets during phase budget rescale:', floorRescaleError);
+        // Don't fail phase rescale if floor rescale fails, but log it
+      }
+    }
+    
     // Create audit log for each phase
     try {
       await createAuditLog({
@@ -1257,6 +1587,38 @@ export async function rescalePhaseBudgetsForProject(projectId, oldDcc, newDcc, u
     }
   }
   
+  // After rescaling phases, also rescale floor budgets for Superstructure phase
+  let floorRescaleResult = null;
+  const superstructurePhase = rescaledPhases.find(p => {
+    const phase = phases.find(ph => ph._id.toString() === p.phaseId);
+    return phase?.phaseCode === 'PHASE-02';
+  });
+  
+  if (superstructurePhase) {
+    try {
+      const { rescaleFloorBudgetsForPhase } = await import('@/lib/floor-financial-helpers');
+      const superstructurePhaseObj = phases.find(ph => ph._id.toString() === superstructurePhase.phaseId);
+      const oldPhaseBudget = superstructurePhase.oldTotal;
+      const newPhaseBudget = superstructurePhase.newTotal;
+      
+      if (oldPhaseBudget > 0 && newPhaseBudget > 0) {
+        floorRescaleResult = await rescaleFloorBudgetsForPhase(
+          superstructurePhase.phaseId,
+          oldPhaseBudget,
+          newPhaseBudget,
+          userId
+        );
+        
+        if (floorRescaleResult.rescaled > 0) {
+          console.log(`[Rescale Phase Budgets] Floor budgets rescaled for Superstructure phase. Rescaled ${floorRescaleResult.rescaled} floors.`);
+        }
+      }
+    } catch (floorRescaleError) {
+      console.error('Error rescaling floor budgets during phase budget rescale:', floorRescaleError);
+      // Don't fail phase rescale if floor rescale fails, but log it
+    }
+  }
+  
   // Log summary
   console.log(`[Phase Budget Rescale] Rescaled ${rescaledPhases.length} phases for project ${projectId}. Old DCC: ${oldDcc.toLocaleString()}, New DCC: ${newDcc.toLocaleString()}, Scale Factor: ${scaleFactor.toFixed(4)}`);
   
@@ -1267,6 +1629,7 @@ export async function rescalePhaseBudgetsForProject(projectId, oldDcc, newDcc, u
     skipped: skippedPhases,
     scaleFactor: scaleFactor,
     oldDcc: oldDcc,
-    newDcc: newDcc
+    newDcc: newDcc,
+    floorRescale: floorRescaleResult || null
   };
 }

@@ -526,3 +526,437 @@ export async function getWeightedDistributionFloorBudgets(phaseId, weights = {})
     suggestedBudget: Math.round(floor.weight * budgetPerWeightUnit),
   }));
 }
+
+/**
+ * Allocate Superstructure phase budget to floors automatically
+ * Supports both even and weighted distribution strategies
+ * @param {string} phaseId - Phase ID (should be Superstructure phase)
+ * @param {string} strategy - 'even' | 'weighted' (default: 'weighted')
+ * @param {string} userId - User ID performing the operation (for audit log)
+ * @param {Object} weights - Optional weights for weighted strategy: { basement: 1.2, typical: 1.0, penthouse: 1.3 }
+ * @returns {Promise<Object>} Summary of allocated floors
+ */
+export async function allocateSuperstructureBudgetToFloors(phaseId, strategy = 'weighted', userId = null, weights = {}) {
+  const db = await getDatabase();
+  const { createAuditLog } = await import('@/lib/audit-log');
+  
+  if (!phaseId || !ObjectId.isValid(phaseId)) {
+    throw new Error('Invalid phase ID');
+  }
+  
+  // Get phase
+  const phase = await db.collection('phases').findOne({
+    _id: new ObjectId(phaseId),
+    deletedAt: null,
+  });
+  
+  if (!phase) {
+    throw new Error('Phase not found');
+  }
+  
+  // Verify this is Superstructure phase
+  if (phase.phaseCode !== 'PHASE-02') {
+    throw new Error('Floor budget allocation is only available for Superstructure phase (PHASE-02)');
+  }
+  
+  const projectId = phase.projectId;
+  const phaseBudget = phase.budgetAllocation?.total || 0;
+  
+  if (phaseBudget <= 0) {
+    return {
+      allocated: 0,
+      skipped: 0,
+      floors: [],
+      message: 'Phase has no budget allocated. Allocate phase budget first.'
+    };
+  }
+  
+  // Get all floors for the project
+  const floors = await db.collection('floors').find({
+    projectId: new ObjectId(projectId),
+    deletedAt: null,
+  }).sort({ floorNumber: 1 }).toArray();
+  
+  if (floors.length === 0) {
+    return {
+      allocated: 0,
+      skipped: 0,
+      floors: [],
+      message: 'No floors found for this project'
+    };
+  }
+  
+  // Filter floors that need allocation (zero budgets)
+  const floorsNeedingAllocation = floors.filter(floor => {
+    const currentBudget = floor.budgetAllocation?.total || floor.totalBudget || 0;
+    return currentBudget === 0;
+  });
+  
+  if (floorsNeedingAllocation.length === 0) {
+    return {
+      allocated: 0,
+      skipped: floors.length,
+      floors: [],
+      message: 'All floors already have budget allocations'
+    };
+  }
+  
+  // Calculate floor allocations based on strategy
+  let floorAllocations = [];
+  
+  if (strategy === 'even') {
+    // Even distribution: divide phase budget equally among floors
+    const budgetPerFloor = Math.floor(phaseBudget / floorsNeedingAllocation.length);
+    const remainder = phaseBudget - (budgetPerFloor * floorsNeedingAllocation.length);
+    
+    floorAllocations = floorsNeedingAllocation.map((floor, index) => ({
+      floorId: floor._id.toString(),
+      floorNumber: floor.floorNumber,
+      floorName: floor.name,
+      suggestedBudget: budgetPerFloor + (index === floorsNeedingAllocation.length - 1 ? remainder : 0),
+    }));
+  } else {
+    // Weighted distribution (default)
+    const defaultWeights = {
+      basement: weights.basement || 1.2,
+      typical: weights.typical || 1.0,
+      penthouse: weights.penthouse || 1.3,
+    };
+    
+    // Determine floor type and assign weight
+    const floorsWithWeights = floorsNeedingAllocation.map((floor) => {
+      let floorType = 'typical';
+      let weight = defaultWeights.typical;
+      
+      if (floor.floorNumber < 0) {
+        floorType = 'basement';
+        weight = defaultWeights.basement;
+      } else if (floor.floorNumber >= 10) { // Assuming top floor/penthouse is floor 10+
+        floorType = 'penthouse';
+        weight = defaultWeights.penthouse;
+      }
+      
+      return {
+        floorId: floor._id.toString(),
+        floorNumber: floor.floorNumber,
+        floorName: floor.name,
+        floorType,
+        weight,
+      };
+    });
+    
+    // Calculate total weight
+    const totalWeight = floorsWithWeights.reduce((sum, f) => sum + f.weight, 0);
+    
+    // Calculate budget per weight unit
+    const budgetPerWeightUnit = phaseBudget / totalWeight;
+    
+    // Assign budgets based on weights
+    floorAllocations = floorsWithWeights.map((floor) => ({
+      ...floor,
+      suggestedBudget: Math.round(floor.weight * budgetPerWeightUnit),
+    }));
+  }
+  
+  const allocatedFloors = [];
+  const skippedFloors = [];
+  const warnings = [];
+  
+  // Allocate budgets to floors
+  for (const allocation of floorAllocations) {
+    const floor = floorsNeedingAllocation.find(f => f._id.toString() === allocation.floorId);
+    if (!floor) {
+      skippedFloors.push({
+        floorId: allocation.floorId,
+        floorName: allocation.floorName,
+        reason: 'Floor not found'
+      });
+      continue;
+    }
+    
+    const suggestedBudget = allocation.suggestedBudget || 0;
+    
+    if (suggestedBudget <= 0) {
+      skippedFloors.push({
+        floorId: allocation.floorId,
+        floorName: allocation.floorName,
+        reason: 'Suggested budget is zero or negative'
+      });
+      continue;
+    }
+    
+    // CRITICAL FIX: Calculate actual spending and committed costs before allocation
+    let actualSpending = { total: 0, materials: 0, labour: 0, equipment: 0, subcontractors: 0 };
+    let committedCosts = { total: 0 };
+    
+    try {
+      // Calculate actual spending
+      actualSpending = await calculateFloorActualSpending(floor._id.toString());
+      
+      // Calculate committed costs
+      committedCosts = await calculateFloorCommittedCosts(floor._id.toString());
+      
+    } catch (spendingError) {
+      console.error(`Error calculating spending for floor ${floor._id}:`, spendingError);
+      // Continue with allocation but log warning
+      warnings.push({
+        floorId: floor._id.toString(),
+        floorName: floor.name || `Floor ${floor.floorNumber}`,
+        message: 'Could not calculate actual spending. Proceeding with allocation.'
+      });
+    }
+    
+    // Calculate minimum required budget
+    const minimumRequired = actualSpending.total + committedCosts.total;
+    
+    // Validate allocation against minimum required
+    let finalBudget = suggestedBudget;
+    let allocationAdjusted = false;
+    
+    if (suggestedBudget < minimumRequired) {
+      // Allocate minimum required instead of suggested amount
+      finalBudget = minimumRequired;
+      allocationAdjusted = true;
+      
+      warnings.push({
+        floorId: floor._id.toString(),
+        floorName: floor.name || `Floor ${floor.floorNumber}`,
+        message: `Suggested allocation (${suggestedBudget.toLocaleString()}) was less than required minimum (${minimumRequired.toLocaleString()}). Allocated minimum required instead.`,
+        actualSpending: actualSpending.total,
+        committedCosts: committedCosts.total,
+        minimumRequired: minimumRequired,
+        suggestedBudget: suggestedBudget
+      });
+    }
+    
+    // Build new budget allocation
+    const newBudgetAllocation = {
+      total: Math.round(finalBudget * 100) / 100,
+      materials: Math.round(finalBudget * 0.65 * 100) / 100,
+      labour: Math.round(finalBudget * 0.25 * 100) / 100,
+      equipment: Math.round(finalBudget * 0.05 * 100) / 100,
+      subcontractors: Math.round(finalBudget * 0.03 * 100) / 100,
+      contingency: 0
+    };
+    
+    // Calculate remaining budget
+    const remaining = Math.max(0, newBudgetAllocation.total - actualSpending.total - committedCosts.total);
+    
+    // Update floor with budget allocation and financial states
+    await db.collection('floors').updateOne(
+      { _id: floor._id },
+      {
+        $set: {
+          budgetAllocation: newBudgetAllocation,
+          totalBudget: newBudgetAllocation.total, // Maintain legacy field
+          'financialStates.remaining': remaining,
+          'financialStates.actual': actualSpending.total,
+          'financialStates.committed': committedCosts.total,
+          updatedAt: new Date()
+        }
+      }
+    );
+    
+    allocatedFloors.push({
+      floorId: floor._id.toString(),
+      floorNumber: floor.floorNumber,
+      floorName: floor.name,
+      oldTotal: 0,
+      newTotal: newBudgetAllocation.total,
+      actualSpending: actualSpending.total,
+      committedCosts: committedCosts.total,
+      minimumRequired: minimumRequired,
+      allocationAdjusted: allocationAdjusted,
+      strategy: strategy
+    });
+    
+    // Create audit log
+    if (userId) {
+      try {
+        await createAuditLog({
+          userId: userId,
+          action: 'update',
+          entityType: 'floor',
+          entityId: floor._id.toString(),
+          changes: {
+            budgetAllocation: {
+              oldValue: { total: 0 },
+              newValue: newBudgetAllocation
+            },
+            actualSpending: {
+              oldValue: 0,
+              newValue: actualSpending.total
+            }
+          },
+          description: `Budget allocated to floor: ${floor.name || `Floor ${floor.floorNumber}`}. Total: ${newBudgetAllocation.total.toLocaleString()} (Strategy: ${strategy}${allocationAdjusted ? ', adjusted to meet minimum requirement' : ''})`
+        });
+      } catch (auditError) {
+        console.error(`Failed to create audit log for floor ${floor._id}:`, auditError);
+      }
+    }
+  }
+  
+  // Build result message
+  let message = `Successfully allocated budgets to ${allocatedFloors.length} floor(s) using ${strategy} distribution`;
+  if (warnings.length > 0) {
+    message += `. ${warnings.length} warning(s) generated.`;
+  }
+  
+  return {
+    allocated: allocatedFloors.length,
+    skipped: skippedFloors.length + (floors.length - floorsNeedingAllocation.length),
+    floors: allocatedFloors,
+    skippedFloors: skippedFloors,
+    warnings: warnings,
+    strategy: strategy,
+    message: message
+  };
+}
+
+/**
+ * Rescale floor budgets proportionally when phase budget changes
+ * @param {string} phaseId - Phase ID
+ * @param {number} oldBudget - Previous phase budget
+ * @param {number} newBudget - New phase budget
+ * @param {string} userId - User ID performing the operation (for audit log)
+ * @returns {Promise<Object>} Summary of rescaled floors
+ */
+export async function rescaleFloorBudgetsForPhase(phaseId, oldBudget, newBudget, userId) {
+  const db = await getDatabase();
+  const { createAuditLog } = await import('@/lib/audit-log');
+  
+  if (!phaseId || !ObjectId.isValid(phaseId)) {
+    throw new Error('Invalid phase ID');
+  }
+  
+  if (oldBudget <= 0 || newBudget <= 0) {
+    throw new Error('Both oldBudget and newBudget must be greater than 0 to rescale floor budgets');
+  }
+  
+  // Get phase
+  const phase = await db.collection('phases').findOne({
+    _id: new ObjectId(phaseId),
+    deletedAt: null,
+  });
+  
+  if (!phase) {
+    throw new Error('Phase not found');
+  }
+  
+  // Verify this is Superstructure phase
+  if (phase.phaseCode !== 'PHASE-02') {
+    return {
+      rescaled: 0,
+      skipped: 0,
+      floors: [],
+      message: 'Floor budget rescaling is only available for Superstructure phase (PHASE-02)'
+    };
+  }
+  
+  const projectId = phase.projectId;
+  
+  // Get all floors for the project
+  const floors = await db.collection('floors').find({
+    projectId: new ObjectId(projectId),
+    deletedAt: null,
+  }).sort({ floorNumber: 1 }).toArray();
+  
+  if (floors.length === 0) {
+    return {
+      rescaled: 0,
+      skipped: 0,
+      floors: [],
+      message: 'No floors found for this project'
+    };
+  }
+  
+  // Calculate scaling factor
+  const scaleFactor = newBudget / oldBudget;
+  
+  const rescaledFloors = [];
+  const skippedFloors = [];
+  
+  // Rescale each floor budget
+  for (const floor of floors) {
+    const currentBudget = floor.budgetAllocation || { total: floor.totalBudget || 0 };
+    const currentTotal = currentBudget.total || 0;
+    
+    // Skip floors with no budget allocation
+    if (currentTotal === 0) {
+      skippedFloors.push({
+        floorId: floor._id.toString(),
+        floorNumber: floor.floorNumber,
+        floorName: floor.name,
+        reason: 'No budget allocated'
+      });
+      continue;
+    }
+    
+    // Calculate new budget values
+    const newTotal = Math.round(currentTotal * scaleFactor * 100) / 100;
+    const newMaterials = currentBudget.materials ? Math.round(currentBudget.materials * scaleFactor * 100) / 100 : 0;
+    const newLabour = currentBudget.labour ? Math.round(currentBudget.labour * scaleFactor * 100) / 100 : 0;
+    const newEquipment = currentBudget.equipment ? Math.round(currentBudget.equipment * scaleFactor * 100) / 100 : 0;
+    const newSubcontractors = currentBudget.subcontractors ? Math.round(currentBudget.subcontractors * scaleFactor * 100) / 100 : 0;
+    
+    // Build new budget allocation
+    const newBudgetAllocation = {
+      total: newTotal,
+      materials: newMaterials,
+      labour: newLabour,
+      equipment: newEquipment,
+      subcontractors: newSubcontractors,
+      contingency: 0
+    };
+    
+    // Update floor
+    await db.collection('floors').updateOne(
+      { _id: floor._id },
+      {
+        $set: {
+          budgetAllocation: newBudgetAllocation,
+          totalBudget: newTotal, // Maintain legacy field
+          updatedAt: new Date()
+        }
+      }
+    );
+    
+    rescaledFloors.push({
+      floorId: floor._id.toString(),
+      floorNumber: floor.floorNumber,
+      floorName: floor.name,
+      oldTotal: currentTotal,
+      newTotal: newTotal,
+      scaleFactor: scaleFactor.toFixed(4)
+    });
+    
+    // Create audit log
+    if (userId) {
+      try {
+        await createAuditLog({
+          userId: userId,
+          action: 'update',
+          entityType: 'floor',
+          entityId: floor._id.toString(),
+          changes: {
+            budgetAllocation: {
+              oldValue: currentBudget,
+              newValue: newBudgetAllocation
+            }
+          },
+          description: `Floor budget rescaled: ${floor.name || `Floor ${floor.floorNumber}`}. Old: ${currentTotal.toLocaleString()}, New: ${newTotal.toLocaleString()} (Scale: ${scaleFactor.toFixed(4)})`
+        });
+      } catch (auditError) {
+        console.error(`Failed to create audit log for floor ${floor._id}:`, auditError);
+      }
+    }
+  }
+  
+  return {
+    rescaled: rescaledFloors.length,
+    skipped: skippedFloors.length,
+    floors: rescaledFloors,
+    skippedFloors: skippedFloors,
+    message: `Successfully rescaled budgets for ${rescaledFloors.length} floor(s)`
+  };
+}

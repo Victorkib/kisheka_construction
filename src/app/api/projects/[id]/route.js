@@ -19,7 +19,10 @@ import { getProjectSpendingLimit, recalculateProjectFinances, getCurrentTotalUse
 import { returnCapitalToInvestors } from '@/lib/financial-rollback';
 import { calculateProjectTotals } from '@/lib/investment-allocation';
 import { isEnhancedBudget, createEnhancedBudget, validateBudget, getBudgetTotal, convertLegacyToEnhanced } from '@/lib/schemas/budget-schema';
-import { calculateTotalPhaseBudgets, rescalePhaseBudgetsForProject } from '@/lib/phase-helpers';
+import { calculateTotalPhaseBudgets, rescalePhaseBudgetsForProject, allocateBudgetsToExistingPhases } from '@/lib/phase-helpers';
+import { calculateDCCSpending, getPreConstructionSpending } from '@/lib/financial-helpers';
+import { calculateIndirectCostsSpending } from '@/lib/indirect-costs-helpers';
+import { calculateContingencyUsage } from '@/lib/contingency-helpers';
 import { supportsTransactions } from '@/lib/mongodb/transaction-helpers';
 
 // Force dynamic rendering to prevent caching stale data
@@ -199,7 +202,7 @@ export async function PATCH(request, { params }) {
     }
 
     const body = await request.json();
-    const {
+      const {
       projectName,
       description,
       location,
@@ -212,6 +215,7 @@ export async function PATCH(request, { params }) {
       siteManager,
       teamMembers,
       reallocatePhases, // Phase 2: Flag to rescale phase budgets when DCC changes
+      autoAllocatePhases, // Flag to auto-allocate budgets to existing phases (default: true, can opt-out)
     } = body;
 
     const db = await getDatabase();
@@ -322,6 +326,126 @@ export async function PATCH(request, { params }) {
         contingency: enhancedBudget.contingency?.total || enhancedBudget.contingencyReserve || existingProject.budget?.contingency || 0,
       };
 
+      // CRITICAL: Validate budget against existing spending
+      // Check if this is a zero-to-non-zero transition or budget update
+      const existingBudget = existingProject.budget || {};
+      const existingBudgetTotal = getBudgetTotal(existingBudget);
+      const newBudgetTotal = getBudgetTotal(updateData.budget);
+      const isZeroToNonZero = existingBudgetTotal <= 0 && newBudgetTotal > 0;
+      const isBudgetUpdate = existingBudgetTotal > 0 && newBudgetTotal > 0;
+      
+      // Only validate against spending if budget is being set/updated (not if reducing to zero)
+      if (newBudgetTotal > 0) {
+        try {
+          // Calculate current spending by category
+          const [
+            dccSpending,
+            preConstructionSpending,
+            indirectSpending,
+            contingencyUsage
+          ] = await Promise.all([
+            calculateDCCSpending(id),
+            getPreConstructionSpending(id),
+            calculateIndirectCostsSpending(id),
+            calculateContingencyUsage(id)
+          ]);
+          
+          // Extract budget components
+          let newDcc = 0;
+          let newPreConstruction = 0;
+          let newIndirect = 0;
+          let newContingency = 0;
+          
+          if (isEnhancedBudget(updateData.budget)) {
+            newDcc = updateData.budget.directConstructionCosts || 0;
+            newPreConstruction = updateData.budget.preConstructionCosts || 0;
+            newIndirect = updateData.budget.indirectCosts || 0;
+            newContingency = updateData.budget.contingencyReserve || 0;
+          } else {
+            // Legacy budget - estimate components
+            const estimatedPreConstruction = newBudgetTotal * 0.05;
+            const estimatedIndirect = newBudgetTotal * 0.05;
+            const estimatedContingency = updateData.budget.contingency || (newBudgetTotal * 0.05);
+            newDcc = Math.max(0, newBudgetTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+            newPreConstruction = estimatedPreConstruction;
+            newIndirect = estimatedIndirect;
+            newContingency = estimatedContingency;
+          }
+          
+          // Validate each category against spending
+          const validationErrors = [];
+          const validationWarnings = [];
+          
+          // DCC validation
+          if (newDcc < dccSpending.total) {
+            validationErrors.push(
+              `DCC budget (${newDcc.toLocaleString()} KES) is less than DCC spending (${dccSpending.total.toLocaleString()} KES). ` +
+              `Minimum required: ${dccSpending.total.toLocaleString()} KES.`
+            );
+          } else if (newDcc < dccSpending.total * 1.1) {
+            validationWarnings.push(
+              `DCC budget (${newDcc.toLocaleString()} KES) is close to current spending (${dccSpending.total.toLocaleString()} KES). ` +
+              `Recommended: ${Math.ceil(dccSpending.total * 1.1).toLocaleString()} KES (10% buffer).`
+            );
+          }
+          
+          // Pre-construction validation
+          if (newPreConstruction < preConstructionSpending.total) {
+            validationErrors.push(
+              `Pre-construction budget (${newPreConstruction.toLocaleString()} KES) is less than pre-construction spending (${preConstructionSpending.total.toLocaleString()} KES). ` +
+              `Minimum required: ${preConstructionSpending.total.toLocaleString()} KES.`
+            );
+          } else if (newPreConstruction < preConstructionSpending.total * 1.1) {
+            validationWarnings.push(
+              `Pre-construction budget (${newPreConstruction.toLocaleString()} KES) is close to current spending (${preConstructionSpending.total.toLocaleString()} KES). ` +
+              `Recommended: ${Math.ceil(preConstructionSpending.total * 1.1).toLocaleString()} KES (10% buffer).`
+            );
+          }
+          
+          // Indirect costs validation
+          if (newIndirect < indirectSpending) {
+            validationErrors.push(
+              `Indirect costs budget (${newIndirect.toLocaleString()} KES) is less than indirect costs spending (${indirectSpending.toLocaleString()} KES). ` +
+              `Minimum required: ${indirectSpending.toLocaleString()} KES.`
+            );
+          } else if (newIndirect < indirectSpending * 1.1) {
+            validationWarnings.push(
+              `Indirect costs budget (${newIndirect.toLocaleString()} KES) is close to current spending (${indirectSpending.toLocaleString()} KES). ` +
+              `Recommended: ${Math.ceil(indirectSpending * 1.1).toLocaleString()} KES (10% buffer).`
+            );
+          }
+          
+          // Contingency validation (warning only, as contingency can be used)
+          if (newContingency < contingencyUsage) {
+            validationWarnings.push(
+              `Contingency reserve (${newContingency.toLocaleString()} KES) is less than contingency usage (${contingencyUsage.toLocaleString()} KES). ` +
+              `Consider increasing to ${Math.ceil(contingencyUsage * 1.1).toLocaleString()} KES.`
+            );
+          }
+          
+          // Return errors if critical issues found
+          if (validationErrors.length > 0) {
+            return errorResponse(
+              `Budget validation failed:\n${validationErrors.join('\n')}\n\n` +
+              `Please increase budget amounts to meet minimum requirements.`,
+              400
+            );
+          }
+          
+          // Store warnings to include in response
+          if (validationWarnings.length > 0) {
+            if (!updateData._budgetValidationWarnings) {
+              updateData._budgetValidationWarnings = [];
+            }
+            updateData._budgetValidationWarnings.push(...validationWarnings);
+          }
+        } catch (spendingValidationError) {
+          console.error('Error validating budget against spending:', spendingValidationError);
+          // Don't fail the update if validation check fails, but log it
+          // This allows budget to be set even if spending calculation fails
+        }
+      }
+      
       // Validate that total phase budgets don't exceed the new project budget
       try {
         const newProjectBudget = getBudgetTotal(updateData.budget);
@@ -336,6 +460,76 @@ export async function PATCH(request, { params }) {
       } catch (phaseBudgetError) {
         console.error('Error validating phase budgets against project budget:', phaseBudgetError);
         // Don't fail the update if validation check fails, but log it
+      }
+      
+      // PHASE 1: Detect zero-to-non-zero transition and auto-allocate to phases
+      // Default behavior: auto-allocate (autoAllocatePhases !== false)
+      if (autoAllocatePhases !== false) {
+        try {
+          // Get old and new DCC values
+          const existingBudget = existingProject.budget || {};
+          const newBudget = updateData.budget || {};
+          
+          let oldDcc = 0;
+          let newDcc = 0;
+          
+          if (isEnhancedBudget(existingBudget)) {
+            oldDcc = existingBudget.directConstructionCosts || 0;
+          } else {
+            // Legacy budget - estimate DCC
+            const oldTotal = getBudgetTotal(existingBudget);
+            const estimatedPreConstruction = oldTotal * 0.05;
+            const estimatedIndirect = oldTotal * 0.05;
+            const estimatedContingency = existingBudget.contingency || (oldTotal * 0.05);
+            oldDcc = Math.max(0, oldTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+          }
+          
+          if (isEnhancedBudget(newBudget)) {
+            newDcc = newBudget.directConstructionCosts || 0;
+          } else {
+            // Legacy budget - estimate DCC
+            const newTotal = getBudgetTotal(newBudget);
+            const estimatedPreConstruction = newTotal * 0.05;
+            const estimatedIndirect = newTotal * 0.05;
+            const estimatedContingency = newBudget.contingency || (newTotal * 0.05);
+            newDcc = Math.max(0, newTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+          }
+          
+          // Check if this is a zero-to-non-zero transition
+          if (oldDcc <= 0 && newDcc > 0) {
+            // Check if phases exist with zero budgets
+            const phases = await db.collection('phases').find({
+              projectId: new ObjectId(id),
+              deletedAt: null
+            }).toArray();
+            
+            const phasesWithZeroBudgets = phases.filter(phase => {
+              const currentBudget = phase.budgetAllocation?.total || 0;
+              return currentBudget === 0;
+            });
+            
+            if (phasesWithZeroBudgets.length > 0) {
+              // Auto-allocate budgets to existing phases
+              const allocationResult = await allocateBudgetsToExistingPhases(
+                id,
+                { ...existingProject, budget: newBudget },
+                userProfile._id.toString()
+              );
+              
+              if (allocationResult.allocated > 0) {
+                console.log(`[Project Update] Auto-allocated budgets to ${allocationResult.allocated} phase(s) for project ${id}`);
+                // Store allocation result to include in response
+                if (!updateData._phaseAllocation) {
+                  updateData._phaseAllocation = allocationResult;
+                }
+              }
+            }
+          }
+        } catch (allocationError) {
+          console.error('Error auto-allocating budgets to existing phases during project update:', allocationError);
+          // Don't fail project update if allocation fails, but log it
+          // The user can manually allocate phase budgets if needed
+        }
       }
     }
 
@@ -452,10 +646,22 @@ export async function PATCH(request, { params }) {
     if (phaseRescaleResult) {
       responseData._phaseRescale = phaseRescaleResult;
     }
+    if (updateData._phaseAllocation) {
+      responseData._phaseAllocation = updateData._phaseAllocation;
+    }
+    if (updateData._budgetValidationWarnings && updateData._budgetValidationWarnings.length > 0) {
+      responseData._budgetValidationWarnings = updateData._budgetValidationWarnings;
+    }
 
     let successMessage = 'Project updated successfully';
     if (warning) {
       successMessage += `. Warning: ${warning}`;
+    }
+    if (updateData._budgetValidationWarnings && updateData._budgetValidationWarnings.length > 0) {
+      successMessage += `. ${updateData._budgetValidationWarnings.length} budget validation warning(s).`;
+    }
+    if (updateData._phaseAllocation && updateData._phaseAllocation.allocated > 0) {
+      successMessage += `. Budgets auto-allocated to ${updateData._phaseAllocation.allocated} phase(s).`;
     }
     if (phaseRescaleResult && phaseRescaleResult.rescaled > 0) {
       successMessage += `. Phase budgets rescaled: ${phaseRescaleResult.rescaled} phases updated.`;
@@ -574,6 +780,7 @@ export async function DELETE(request, { params }) {
       notificationsCount,
       auditLogsCount,
       scheduledReportsCount, // CRITICAL: Added missing scheduled_reports dependency
+      discrepanciesCount, // CRITICAL: Added missing discrepancies dependency
     ] = await Promise.all([
       db.collection('materials').countDocuments({ projectId: projectObjectId, deletedAt: null }),
       db.collection('expenses').countDocuments({ projectId: projectObjectId, deletedAt: null }),
@@ -604,6 +811,7 @@ export async function DELETE(request, { params }) {
       db.collection('notifications').countDocuments({ projectId: projectObjectId }),
       db.collection('audit_logs').countDocuments({ projectId: projectObjectId }),
       db.collection('scheduled_reports').countDocuments({ projectId: projectObjectId, deletedAt: null }), // CRITICAL FIX: Added missing dependency
+      db.collection('discrepancies').countDocuments({ projectId: projectObjectId }), // CRITICAL FIX: Added missing discrepancies dependency
     ]);
 
     // Get investors with allocations to this project
@@ -648,6 +856,7 @@ export async function DELETE(request, { params }) {
       notifications: notificationsCount,
       auditLogs: auditLogsCount,
       scheduledReports: scheduledReportsCount, // CRITICAL: Added missing dependency
+      discrepancies: discrepanciesCount, // CRITICAL: Added missing discrepancies dependency
       investorAllocations: allocationsCount,
       totalUsed,
       totalInvested,
@@ -775,6 +984,47 @@ export async function DELETE(request, { params }) {
       });
     }
 
+    // Step 2.5: Clean up user project preferences
+    try {
+      const recentProjectsResult = await db.collection('user_project_preferences').updateMany(
+        { recentProjects: projectObjectId },
+        { $pull: { recentProjects: projectObjectId } }
+      );
+
+      const favoriteProjectsResult = await db.collection('user_project_preferences').updateMany(
+        { favoriteProjects: projectObjectId },
+        { $pull: { favoriteProjects: projectObjectId } }
+      );
+
+      const lastProjectResult = await db.collection('user_project_preferences').updateMany(
+        { lastProjectId: projectObjectId },
+        { $set: { lastProjectId: null } }
+      );
+
+      const totalUserPrefsUpdated = recentProjectsResult.modifiedCount + favoriteProjectsResult.modifiedCount + lastProjectResult.modifiedCount;
+      if (totalUserPrefsUpdated > 0) {
+        console.log(`🗑️ Cleaned up user preferences: ${recentProjectsResult.modifiedCount} recent, ${favoriteProjectsResult.modifiedCount} favorites, ${lastProjectResult.modifiedCount} lastProject`);
+      }
+    } catch (userPrefsError) {
+      console.error(`⚠️ Error cleaning up user preferences for project ${id}:`, userPrefsError);
+      // Don't fail the delete operation
+    }
+
+    // Step 2.6: Remove project from worker profiles
+    try {
+      const workerProfilesResult = await db.collection('worker_profiles').updateMany(
+        { currentProjects: projectObjectId },
+        { $pull: { currentProjects: projectObjectId } }
+      );
+
+      if (workerProfilesResult.modifiedCount > 0) {
+        console.log(`🗑️ Removed project from ${workerProfilesResult.modifiedCount} worker profile(s)`);
+      }
+    } catch (workerProfilesError) {
+      console.error(`⚠️ Error cleaning up worker profiles for project ${id}:`, workerProfilesError);
+      // Don't fail the delete operation
+    }
+
     // Step 3: Delete Cloudinary assets from related entities before hard deleting them
     try {
       const {
@@ -782,6 +1032,8 @@ export async function DELETE(request, { params }) {
         deleteExpenseCloudinaryAssets,
         deleteInitialExpenseCloudinaryAssets,
         deleteProjectCloudinaryAssets,
+        deletePhaseCloudinaryAssets,
+        deleteFloorProgressCloudinaryAssets,
       } = await import('@/lib/cloudinary-cleanup');
 
       // Delete Cloudinary assets from project documents
@@ -824,6 +1076,36 @@ export async function DELETE(request, { params }) {
         for (const initialExpense of initialExpenses) {
           const initialExpenseCleanup = await deleteInitialExpenseCloudinaryAssets(initialExpense);
           console.log(`🗑️ Cloudinary cleanup for initial expense ${initialExpense._id}: ${initialExpenseCleanup.success} deleted`);
+        }
+      }
+
+      // Delete Cloudinary assets from phase documents
+      if (phasesCount > 0) {
+        const phases = await db
+          .collection('phases')
+          .find({ projectId: projectObjectId })
+          .toArray();
+        
+        for (const phase of phases) {
+          const phaseCleanup = await deletePhaseCloudinaryAssets(phase);
+          if (phaseCleanup.success > 0 || phaseCleanup.failed > 0) {
+            console.log(`🗑️ Cloudinary cleanup for phase ${phase._id} documents: ${phaseCleanup.success} deleted, ${phaseCleanup.failed} failed`);
+          }
+        }
+      }
+
+      // Delete Cloudinary assets from floor progress photos
+      if (floorsCount > 0) {
+        const floors = await db
+          .collection('floors')
+          .find({ projectId: projectObjectId })
+          .toArray();
+        
+        for (const floor of floors) {
+          const floorCleanup = await deleteFloorProgressCloudinaryAssets(floor);
+          if (floorCleanup.success > 0 || floorCleanup.failed > 0) {
+            console.log(`🗑️ Cloudinary cleanup for floor ${floor._id} photos: ${floorCleanup.success} deleted, ${floorCleanup.failed} failed`);
+          }
         }
       }
     } catch (cleanupError) {
@@ -961,6 +1243,14 @@ export async function DELETE(request, { params }) {
         projectId: projectObjectId,
       });
       console.log(`🗑️ Deleted ${scheduledReportsCount} scheduled report(s) for project ${id}`);
+    }
+
+    // CRITICAL FIX: Delete discrepancies to prevent data integrity issues
+    if (discrepanciesCount > 0) {
+      await db.collection('discrepancies').deleteMany({
+        projectId: projectObjectId,
+      });
+      console.log(`🗑️ Deleted ${discrepanciesCount} discrepancy record(s) for project ${id}`);
     }
 
     if (approvalsCount > 0) {

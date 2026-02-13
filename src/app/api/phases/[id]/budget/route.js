@@ -17,6 +17,7 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { getBudgetTotal, isEnhancedBudget } from '@/lib/schemas/budget-schema';
 import { calculateTotalPhaseBudgets } from '@/lib/phase-helpers';
+import { allocateSuperstructureBudgetToFloors } from '@/lib/floor-financial-helpers';
 
 /**
  * POST /api/phases/[id]/budget
@@ -60,7 +61,9 @@ export async function POST(request, { params }) {
       labour,
       equipment,
       subcontractors,
-      contingency
+      contingency,
+      autoAllocateFloors, // Flag to auto-allocate to floors (default: true, can opt-out)
+      floorAllocationStrategy // 'even' | 'weighted' (default: 'weighted')
     } = body;
 
     if (total === undefined || total === null) {
@@ -112,6 +115,14 @@ export async function POST(request, { params }) {
     }
     
     const currentPhaseTotal = phase.budgetAllocation?.total || 0;
+    const requestedAllocation = total;
+    
+    // Calculate allocated to other phases for validation and response
+    let allocatedToOtherPhases = 0;
+    if (dccBudget > 0) {
+      const totalPhaseBudgets = await calculateTotalPhaseBudgets(phase.projectId.toString());
+      allocatedToOtherPhases = totalPhaseBudgets - currentPhaseTotal;
+    }
     
     // OPTIONAL BUDGET: If project budget is 0, allow phase budget allocation without validation
     if (dccBudget === 0) {
@@ -123,11 +134,7 @@ export async function POST(request, { params }) {
       );
     } else {
       // Project has budget - validate against DCC budget
-      // Calculate total phase budgets using helper function
-      const totalPhaseBudgets = await calculateTotalPhaseBudgets(phase.projectId.toString());
-      const allocatedToOtherPhases = totalPhaseBudgets - currentPhaseTotal;
       const availableDCC = dccBudget - allocatedToOtherPhases;
-      const requestedAllocation = total;
 
       // Validate: requested allocation must not exceed available DCC
       if (requestedAllocation > availableDCC + currentPhaseTotal) {
@@ -178,8 +185,8 @@ export async function POST(request, { params }) {
       { returnDocument: 'after' }
     );
 
-    if (!updateResult) {
-      return errorResponse('Failed to update phase budget', 500);
+    if (!updateResult || !updateResult.value) {
+      return errorResponse('Failed to update phase budget. The phase may have been deleted.', 500);
     }
 
     // LATE ACTIVATION: Capture phase budget activation if budget is being set for the first time
@@ -207,11 +214,52 @@ export async function POST(request, { params }) {
       },
     });
 
-    return successResponse({
-      phase: updateResult,
+    // Calculate available budget after allocation
+    let availableBudgetAfter = 0;
+    if (dccBudget > 0) {
+      const newTotalPhaseBudgets = allocatedToOtherPhases + requestedAllocation;
+      availableBudgetAfter = dccBudget - newTotalPhaseBudgets;
+    }
+
+    // Auto-allocate to floors if Superstructure phase and flag is enabled (default: true)
+    let floorAllocationResult = null;
+    if (phase.phaseCode === 'PHASE-02' && autoAllocateFloors !== false) {
+      try {
+        const strategy = floorAllocationStrategy || 'weighted';
+        floorAllocationResult = await allocateSuperstructureBudgetToFloors(
+          id,
+          strategy,
+          userProfile._id.toString()
+        );
+        
+        if (floorAllocationResult.allocated > 0) {
+          console.log(`[Phase Budget] Auto-allocated budgets to ${floorAllocationResult.allocated} floor(s) for phase ${id} using ${strategy} strategy.`);
+        }
+      } catch (floorAllocError) {
+        console.error('Error auto-allocating budgets to floors during phase budget allocation:', floorAllocError);
+        // Don't fail phase budget allocation if floor allocation fails, but log it
+      }
+    }
+
+    const responseData = {
+      phase: updateResult.value,
       allocation: budgetAllocation,
-      availableBudget: availableBudget + currentPhaseTotal - requestedAllocation
-    }, 'Budget allocated successfully');
+      availableBudget: availableBudgetAfter
+    };
+    
+    if (floorAllocationResult) {
+      responseData._floorAllocation = floorAllocationResult;
+    }
+
+    let successMessage = 'Budget allocated successfully';
+    if (floorAllocationResult && floorAllocationResult.allocated > 0) {
+      successMessage += `. Budgets auto-allocated to ${floorAllocationResult.allocated} floor(s) using ${floorAllocationResult.strategy} distribution.`;
+      if (floorAllocationResult.warnings && floorAllocationResult.warnings.length > 0) {
+        successMessage += ` ${floorAllocationResult.warnings.length} warning(s) generated.`;
+      }
+    }
+
+    return successResponse(responseData, successMessage);
   } catch (error) {
     console.error('Allocate phase budget error:', error);
     return errorResponse('Failed to allocate budget to phase', 500);
@@ -371,8 +419,8 @@ export async function PATCH(request, { params }) {
       { returnDocument: 'after' }
     );
 
-    if (!updateResult) {
-      return errorResponse('Failed to update phase budget', 500);
+    if (!updateResult || !updateResult.value) {
+      return errorResponse('Failed to update phase budget. The phase may have been deleted.', 500);
     }
 
     // LATE ACTIVATION: Capture phase budget activation if budget is being set for the first time
@@ -400,10 +448,45 @@ export async function PATCH(request, { params }) {
       },
     });
 
-    return successResponse({
-      phase: updateResult,
+    // Auto-allocate to floors if Superstructure phase and flag is enabled (default: true)
+    // Only allocate if budget was actually changed (total was provided)
+    let floorAllocationResult = null;
+    if (phase.phaseCode === 'PHASE-02' && autoAllocateFloors !== false && total !== undefined) {
+      try {
+        const strategy = floorAllocationStrategy || 'weighted';
+        floorAllocationResult = await allocateSuperstructureBudgetToFloors(
+          id,
+          strategy,
+          userProfile._id.toString()
+        );
+        
+        if (floorAllocationResult.allocated > 0) {
+          console.log(`[Phase Budget Update] Auto-allocated budgets to ${floorAllocationResult.allocated} floor(s) for phase ${id} using ${strategy} strategy.`);
+        }
+      } catch (floorAllocError) {
+        console.error('Error auto-allocating budgets to floors during phase budget update:', floorAllocError);
+        // Don't fail phase budget update if floor allocation fails, but log it
+      }
+    }
+
+    const responseData = {
+      phase: updateResult.value,
       allocation: updatedAllocation
-    }, 'Phase budget updated successfully');
+    };
+    
+    if (floorAllocationResult) {
+      responseData._floorAllocation = floorAllocationResult;
+    }
+
+    let successMessage = 'Phase budget updated successfully';
+    if (floorAllocationResult && floorAllocationResult.allocated > 0) {
+      successMessage += `. Budgets auto-allocated to ${floorAllocationResult.allocated} floor(s) using ${floorAllocationResult.strategy} distribution.`;
+      if (floorAllocationResult.warnings && floorAllocationResult.warnings.length > 0) {
+        successMessage += ` ${floorAllocationResult.warnings.length} warning(s) generated.`;
+      }
+    }
+
+    return successResponse(responseData, successMessage);
   } catch (error) {
     console.error('Update phase budget error:', error);
     return errorResponse('Failed to update phase budget', 500);

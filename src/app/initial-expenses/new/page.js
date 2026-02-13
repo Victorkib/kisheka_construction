@@ -128,7 +128,7 @@ export default function NewInitialExpensePage() {
           'Pragma': 'no-cache',
         },
       });
-      const summaryResult = await summaryResponse.json();
+      const summaryResult = await response.json();
 
       if (!summaryResult.success) {
         throw new Error(summaryResult.error || 'Failed to fetch budget information');

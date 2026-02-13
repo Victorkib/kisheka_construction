@@ -36,6 +36,9 @@ function PhaseBudgetPageContent() {
     subcontractors: 0
     // contingency removed - tracked at project level, not phase level
   });
+  
+  const [autoAllocateFloors, setAutoAllocateFloors] = useState(true); // Default: auto-allocate to floors
+  const [floorAllocationStrategy, setFloorAllocationStrategy] = useState('weighted'); // 'even' | 'weighted'
 
   useEffect(() => {
     if (phaseId) {
@@ -97,7 +100,7 @@ function PhaseBudgetPageContent() {
 
       // Fetch project for context
       if (phaseData.projectId) {
-        const response = await fetch(`/api/projects/${phaseData.projectId}`, {
+        const projectResponse = await fetch(`/api/projects/${phaseData.projectId}`, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -145,12 +148,18 @@ function PhaseBudgetPageContent() {
 
     try {
       const response = await fetch(`/api/phases/${phaseId}/budget`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
-        body: JSON.stringify(formData),
+        method: 'PATCH',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({
+          ...formData,
+          autoAllocateFloors: autoAllocateFloors !== false, // Default: true
+          floorAllocationStrategy: floorAllocationStrategy || 'weighted'
+        }),
       });
 
       const data = await response.json();
@@ -159,7 +168,35 @@ function PhaseBudgetPageContent() {
         throw new Error(data.error || 'Failed to update phase budget');
       }
 
-      toast.showSuccess('Phase budget updated successfully');
+      // Show success message with floor allocation info if applicable
+      let successMessage = 'Phase budget updated successfully';
+      let hasWarnings = false;
+      
+      if (data.data?._floorAllocation && data.data._floorAllocation.allocated > 0) {
+        successMessage += `. Budgets auto-allocated to ${data.data._floorAllocation.allocated} floor(s) using ${data.data._floorAllocation.strategy} distribution.`;
+        
+        // Show warnings if any
+        if (data.data._floorAllocation.warnings && data.data._floorAllocation.warnings.length > 0) {
+          hasWarnings = true;
+          const warningCount = data.data._floorAllocation.warnings.length;
+          successMessage += ` ${warningCount} warning(s) generated.`;
+          
+          // Show detailed warnings in console for debugging
+          console.warn('Floor allocation warnings:', data.data._floorAllocation.warnings);
+          
+          // Show first warning as toast for visibility
+          const firstWarning = data.data._floorAllocation.warnings[0];
+          if (firstWarning.message) {
+            toast.showWarning(firstWarning.message);
+          }
+        }
+      }
+      
+      if (hasWarnings) {
+        toast.showWarning(successMessage);
+      } else {
+        toast.showSuccess(successMessage);
+      }
       router.push(`/phases/${phaseId}`);
     } catch (err) {
       setError(err.message);
@@ -395,6 +432,71 @@ function PhaseBudgetPageContent() {
               </p>
             )}
           </div>
+
+          {/* Floor Allocation Options (only for Superstructure phase) */}
+          {phase?.phaseCode === 'PHASE-02' && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-4">
+              <label className="flex items-start cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoAllocateFloors}
+                  onChange={(e) => setAutoAllocateFloors(e.target.checked)}
+                  className="mt-1 mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                />
+                <div className="flex-1">
+                  <span className="text-sm font-medium text-gray-900">
+                    Automatically allocate budget to floors
+                  </span>
+                  <p className="text-xs text-gray-600 mt-1">
+                    When enabled, the phase budget will be automatically distributed to all floors with zero budgets.
+                    You can opt-out by unchecking this box.
+                  </p>
+                </div>
+              </label>
+              
+              {autoAllocateFloors && (
+                <div className="ml-7 space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Distribution Strategy
+                  </label>
+                  <div className="space-y-2">
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="floorAllocationStrategy"
+                        value="weighted"
+                        checked={floorAllocationStrategy === 'weighted'}
+                        onChange={(e) => setFloorAllocationStrategy(e.target.value)}
+                        className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                      />
+                      <div>
+                        <span className="text-sm text-gray-900">Weighted Distribution (Recommended)</span>
+                        <p className="text-xs text-gray-600">
+                          Basement floors get 1.2x, typical floors get 1.0x, penthouse gets 1.3x weight
+                        </p>
+                      </div>
+                    </label>
+                    <label className="flex items-center cursor-pointer">
+                      <input
+                        type="radio"
+                        name="floorAllocationStrategy"
+                        value="even"
+                        checked={floorAllocationStrategy === 'even'}
+                        onChange={(e) => setFloorAllocationStrategy(e.target.value)}
+                        className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                      />
+                      <div>
+                        <span className="text-sm text-gray-900">Even Distribution</span>
+                        <p className="text-xs text-gray-600">
+                          Budget divided equally among all floors
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Submit Buttons */}
           <div className="flex justify-end gap-4 pt-4 border-t">

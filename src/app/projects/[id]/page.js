@@ -1566,9 +1566,9 @@ export default function ProjectDetailPage() {
   const handleDeleteConfirm = async () => {
     setDeleting(true);
     try {
-      const deleteUrl = project?.status === 'archived'
-        ? `/api/projects/${projectId}?force=true`
-        : `/api/projects/${projectId}`;
+      // Always add force=true when user explicitly confirms deletion
+      // The API will handle validation and show appropriate warnings
+      const deleteUrl = `/api/projects/${projectId}?force=true`;
       const response = await fetch(deleteUrl, {
         method: 'DELETE',
       });
