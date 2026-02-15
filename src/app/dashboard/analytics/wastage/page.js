@@ -117,13 +117,18 @@ function WastageAnalyticsPageContent() {
         params.append('category', selectedCategory);
       }
 
-      const response = await fetch(`/api/discrepancies/summary?${params.toString()}`, {
+      const summaryResponse = await fetch(`/api/discrepancies/summary?${params.toString()}`, {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
         },
       });
+
+      if (!summaryResponse.ok) {
+        throw new Error(`HTTP ${summaryResponse.status}: Failed to fetch summary`);
+      }
+
       const summaryData = await summaryResponse.json();
 
       if (!summaryData.success) {
@@ -134,13 +139,18 @@ function WastageAnalyticsPageContent() {
 
       // Fetch suppliers with error handling
       try {
-        const response = await fetch(`/api/discrepancies/suppliers?${params.toString()}`, {
+        const suppliersResponse = await fetch(`/api/discrepancies/suppliers?${params.toString()}`, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
           },
         });
+
+        if (!suppliersResponse.ok) {
+          throw new Error(`HTTP ${suppliersResponse.status}: Failed to fetch suppliers`);
+        }
+
         const suppliersData = await suppliersResponse.json();
 
         if (suppliersData.success) {
@@ -161,6 +171,11 @@ function WastageAnalyticsPageContent() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({}),
         });
+
+        if (!discrepanciesResponse.ok) {
+          throw new Error(`HTTP ${discrepanciesResponse.status}: Failed to fetch discrepancies`);
+        }
+
         const discrepanciesData = await discrepanciesResponse.json();
 
         if (discrepanciesData.success) {
@@ -176,13 +191,18 @@ function WastageAnalyticsPageContent() {
 
       // Fetch trends with error handling
       try {
-        const response = await fetch(`/api/discrepancies/trends?${params.toString()}`, {
+        const trendsResponse = await fetch(`/api/discrepancies/trends?${params.toString()}`, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
           },
         });
+
+        if (!trendsResponse.ok) {
+          throw new Error(`HTTP ${trendsResponse.status}: Failed to fetch trends`);
+        }
+
         const trendsData = await trendsResponse.json();
 
         if (trendsData.success) {
@@ -198,13 +218,18 @@ function WastageAnalyticsPageContent() {
 
       // Fetch category analysis with error handling
       try {
-        const response = await fetch(`/api/discrepancies/categories?${params.toString()}`, {
+        const categoriesResponse = await fetch(`/api/discrepancies/categories?${params.toString()}`, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
           },
         });
+
+        if (!categoriesResponse.ok) {
+          throw new Error(`HTTP ${categoriesResponse.status}: Failed to fetch category analysis`);
+        }
+
         const categoriesData = await categoriesResponse.json();
 
         if (categoriesData.success) {
@@ -292,7 +317,7 @@ function WastageAnalyticsPageContent() {
             if (dateRange.endDate) params.append('endDate', dateRange.endDate);
           }
 
-          const response = await fetch(`/api/discrepancies/summary?${params.toString()}`, {
+          const summaryResponse = await fetch(`/api/discrepancies/summary?${params.toString()}`, {
             cache: 'no-store',
             headers: {
               'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -400,11 +425,13 @@ function WastageAnalyticsPageContent() {
     setSavingThresholds(true);
     try {
       const response = await fetch(`/api/projects/${projectId}/thresholds`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'PUT',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({ thresholds: thresholdForm }),
       });
       const data = await response.json();
