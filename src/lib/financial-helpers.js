@@ -1098,6 +1098,24 @@ export async function recalculateProjectFinances(projectId) {
     .collection('project_finances')
     .findOne({ projectId: new ObjectId(projectId) });
 
+  // Initialize updateData first (before any conditional logic that uses it)
+  const updateData = {
+    totalInvested,
+    totalLoans,
+    totalEquity,
+    totalUsed,
+    committedCost,
+    estimatedCost,
+    availableCapital,
+    materialsBreakdown,
+    capitalBalance,
+    loanBalance,
+    equityBalance,
+    investorCount,
+    lastUpdated: new Date(),
+    updatedAt: new Date(),
+  };
+
   // LATE ACTIVATION: Check if capital activation is needed (capital going from 0 → non-zero)
   // Only check if we have an existing record (to compare old vs new totalInvested)
   if (totalInvested > 0 && existing) {
@@ -1123,23 +1141,6 @@ export async function recalculateProjectFinances(projectId) {
       updateData.capitalActivation = existing.capitalActivation;
     }
   }
-
-  const updateData = {
-    totalInvested,
-    totalLoans,
-    totalEquity,
-    totalUsed,
-    committedCost,
-    estimatedCost,
-    availableCapital,
-    materialsBreakdown,
-    capitalBalance,
-    loanBalance,
-    equityBalance,
-    investorCount,
-    lastUpdated: new Date(),
-    updatedAt: new Date(),
-  };
 
   if (existing) {
     // Preserve existing capitalActivation if it exists and wasn't just created
