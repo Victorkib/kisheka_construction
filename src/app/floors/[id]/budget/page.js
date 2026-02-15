@@ -32,6 +32,10 @@ function FloorBudgetPageContent() {
   const [phaseAllocations, setPhaseAllocations] = useState({});
   const [floorFinancials, setFloorFinancials] = useState(null);
   const [projectFinances, setProjectFinances] = useState(null);
+  const [capitalAllocations, setCapitalAllocations] = useState({});
+  const [capitalStrategy, setCapitalStrategy] = useState('proportional'); // 'proportional' | 'even' | 'manual'
+  const [showCapitalForm, setShowCapitalForm] = useState(false);
+  const [savingCapital, setSavingCapital] = useState(false);
 
   useEffect(() => {
     if (floorId) {
@@ -176,6 +180,82 @@ function FloorBudgetPageContent() {
         [field]: parseFloat(value) || 0
       }
     }));
+  };
+
+  const handleCapitalAllocationChange = (phaseCode, value) => {
+    setCapitalAllocations(prev => ({
+      ...prev,
+      [phaseCode]: parseFloat(value) || 0
+    }));
+  };
+
+  const handleCapitalSubmit = async (e) => {
+    e.preventDefault();
+    setSavingCapital(true);
+    setError(null);
+
+    try {
+      // Calculate total capital
+      const totalCapital = Object.values(capitalAllocations).reduce((sum, amount) => sum + (amount || 0), 0);
+
+      if (totalCapital <= 0) {
+        setError('Total capital allocation must be greater than 0');
+        setSavingCapital(false);
+        return;
+      }
+
+      // Validate against available project capital
+      const availableCapital = projectFinances?.capitalBalance || 0;
+      const currentCapital = capitalTotal || 0;
+      const capitalChange = totalCapital - currentCapital;
+
+      if (capitalChange > 0 && capitalChange > availableCapital) {
+        setError(`Insufficient capital. Available: ${availableCapital.toLocaleString()} KES, Additional needed: ${capitalChange.toLocaleString()} KES`);
+        setSavingCapital(false);
+        return;
+      }
+
+      // Build capital allocation with byPhase structure
+      const byPhase = {};
+      Object.keys(capitalAllocations).forEach(phaseCode => {
+        const amount = capitalAllocations[phaseCode] || 0;
+        if (amount > 0) {
+          byPhase[phaseCode] = amount;
+        }
+      });
+
+      const response = await fetch(`/api/floors/${floorId}/capital`, {
+        method: capitalTotal > 0 ? 'PATCH' : 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({
+          total: totalCapital,
+          byPhase: byPhase,
+          strategy: capitalStrategy,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to update floor capital allocation');
+      }
+
+      toast.showSuccess('Floor capital allocation updated successfully!');
+      setShowCapitalForm(false);
+      // Refresh data
+      fetchData();
+    } catch (err) {
+      setError(err.message);
+      toast.showError(err.message || 'Failed to update floor capital allocation');
+      console.error('Update capital allocation error:', err);
+    } finally {
+      setSavingCapital(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -383,78 +463,286 @@ function FloorBudgetPageContent() {
         </div>
 
         {/* Capital Allocation Summary */}
-        {capitalTotal > 0 && (
-          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Capital Allocation</h2>
-              <div className="text-sm text-gray-600">
-                {capitalVsBudget.toFixed(1)}% of budget
-              </div>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-              <div>
-                <p className="text-sm text-gray-600">Total Capital</p>
-                <p className="text-xl font-bold text-purple-700 mt-1">
-                  {formatCurrency(capitalTotal)}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Used</p>
-                <p className="text-xl font-bold text-blue-600 mt-1">
-                  {formatCurrency(capitalUsed)}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Committed</p>
-                <p className="text-xl font-bold text-yellow-600 mt-1">
-                  {formatCurrency(capitalCommitted)}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Remaining</p>
-                <p className={`text-xl font-bold mt-1 ${
-                  capitalRemaining < 0 ? 'text-red-600' : 'text-green-600'
-                }`}>
-                  {formatCurrency(capitalRemaining)}
-                </p>
-              </div>
-            </div>
-            {/* Capital vs Budget Comparison */}
-            <div className="mt-4 pt-4 border-t border-purple-200">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">Capital Coverage</span>
-                <span className="text-sm text-gray-600">
-                  {formatCurrency(capitalTotal)} / {formatCurrency(totalBudget)}
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
-                <div
-                  className={`h-3 rounded-full ${
-                    capitalVsBudget >= 100
-                      ? 'bg-green-500'
-                      : capitalVsBudget >= 80
-                      ? 'bg-yellow-500'
-                      : 'bg-red-500'
-                  }`}
-                  style={{ width: `${Math.min(capitalVsBudget, 100)}%` }}
-                />
-              </div>
-              {capitalVsBudget < 100 && (
-                <p className="text-xs text-gray-600 mt-2">
-                  Capital covers {capitalVsBudget.toFixed(1)}% of budget. 
-                  {capitalVsBudget < 80 && ' Consider allocating more capital to this floor.'}
-                </p>
+        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Capital Allocation</h2>
+            <div className="flex items-center gap-3">
+              {capitalTotal > 0 && (
+                <div className="text-sm text-gray-600">
+                  {capitalVsBudget.toFixed(1)}% of budget
+                </div>
+              )}
+              {projectAvailableCapital > 0 && (
+                <button
+                  onClick={() => setShowCapitalForm(!showCapitalForm)}
+                  className="px-3 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition"
+                >
+                  {showCapitalForm ? 'Cancel' : capitalTotal > 0 ? 'Edit Capital' : 'Allocate Capital'}
+                </button>
               )}
             </div>
+          </div>
+            {capitalTotal > 0 ? (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                  <div>
+                    <p className="text-sm text-gray-600">Total Capital</p>
+                    <p className="text-xl font-bold text-purple-700 mt-1">
+                      {formatCurrency(capitalTotal)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Used</p>
+                    <p className="text-xl font-bold text-blue-600 mt-1">
+                      {formatCurrency(capitalUsed)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Committed</p>
+                    <p className="text-xl font-bold text-yellow-600 mt-1">
+                      {formatCurrency(capitalCommitted)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Remaining</p>
+                    <p className={`text-xl font-bold mt-1 ${
+                      capitalRemaining < 0 ? 'text-red-600' : 'text-green-600'
+                    }`}>
+                      {formatCurrency(capitalRemaining)}
+                    </p>
+                  </div>
+                </div>
+                {/* Capital vs Budget Comparison */}
+                {totalBudget > 0 && (
+                  <div className="mt-4 pt-4 border-t border-purple-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-gray-700">Capital Coverage</span>
+                      <span className="text-sm text-gray-600">
+                        {formatCurrency(capitalTotal)} / {formatCurrency(totalBudget)}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div
+                        className={`h-3 rounded-full ${
+                          capitalVsBudget >= 100
+                            ? 'bg-green-500'
+                            : capitalVsBudget >= 80
+                            ? 'bg-yellow-500'
+                            : 'bg-red-500'
+                        }`}
+                        style={{ width: `${Math.min(capitalVsBudget, 100)}%` }}
+                      />
+                    </div>
+                    {capitalVsBudget < 100 && (
+                      <p className="text-xs text-gray-600 mt-2">
+                        Capital covers {capitalVsBudget.toFixed(1)}% of budget. 
+                        {capitalVsBudget < 80 && ' Consider allocating more capital to this floor.'}
+                      </p>
+                    )}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-yellow-800">
+                  <strong>No capital allocated</strong> to this floor yet.
+                  {projectAvailableCapital > 0 && (
+                    <span className="ml-1">Click "Allocate Capital" to get started.</span>
+                  )}
+                </p>
+              </div>
+            )}
             {projectFinances && (
               <div className="mt-4 pt-4 border-t border-purple-200">
                 <p className="text-xs text-gray-600">
                   Project Available Capital: <span className="font-semibold">{formatCurrency(projectAvailableCapital)}</span>
                 </p>
+                {projectAvailableCapital === 0 && (
+                  <p className="text-xs text-yellow-700 mt-2">
+                    ⚠️ No capital available. Allocate capital to the project first.
+                    <Link href={`/investors`} className="ml-1 underline hover:text-yellow-900">
+                      Go to Investors
+                    </Link>
+                  </p>
+                )}
               </div>
             )}
           </div>
-        )}
+
+          {/* Capital Allocation Form */}
+          {showCapitalForm && projectAvailableCapital > 0 && (
+            <form onSubmit={handleCapitalSubmit} className="mt-6 pt-6 border-t border-purple-300 bg-white rounded-lg p-4">
+              <h3 className="text-md font-semibold text-gray-900 mb-4">Allocate Capital by Phase</h3>
+              
+              {/* Strategy Selection */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Allocation Strategy
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="capitalStrategy"
+                      value="proportional"
+                      checked={capitalStrategy === 'proportional'}
+                      onChange={(e) => setCapitalStrategy(e.target.value)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Proportional (based on budget)</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="capitalStrategy"
+                      value="even"
+                      checked={capitalStrategy === 'even'}
+                      onChange={(e) => setCapitalStrategy(e.target.value)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Even Distribution</span>
+                  </label>
+                  <label className="flex items-center">
+                    <input
+                      type="radio"
+                      name="capitalStrategy"
+                      value="manual"
+                      checked={capitalStrategy === 'manual'}
+                      onChange={(e) => setCapitalStrategy(e.target.value)}
+                      className="mr-2"
+                    />
+                    <span className="text-sm text-gray-700">Manual</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Phase Capital Allocations */}
+              {capitalStrategy === 'manual' && (
+                <div className="space-y-4 mb-4">
+                  {['PHASE-01', 'PHASE-02', 'PHASE-03', 'PHASE-04'].map(phaseCode => {
+                    const phase = phases.find(p => p.phaseCode === phaseCode);
+                    const isApplicable = phaseCode === 'PHASE-01' 
+                      ? floor?.floorNumber < 0 
+                      : phaseCode === 'PHASE-02' 
+                      ? floor?.floorNumber >= 0 
+                      : true;
+                    
+                    if (!isApplicable) return null;
+
+                    return (
+                      <div key={phaseCode} className="flex items-center gap-4">
+                        <label className="w-48 text-sm font-medium text-gray-700">
+                          {phaseNames[phaseCode]}:
+                        </label>
+                        <input
+                          type="number"
+                          value={capitalAllocations[phaseCode] || 0}
+                          onChange={(e) => handleCapitalAllocationChange(phaseCode, e.target.value)}
+                          min="0"
+                          step="0.01"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          placeholder="0"
+                        />
+                        <span className="text-sm text-gray-500 w-12">KES</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Strategy Info */}
+              {capitalStrategy !== 'manual' && (
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    {capitalStrategy === 'proportional' 
+                      ? 'Capital will be distributed proportionally based on each phase\'s budget share.'
+                      : 'Capital will be distributed evenly across all applicable phases.'}
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Total to allocate: <span className="font-semibold">
+                      {capitalStrategy === 'proportional' 
+                        ? 'Based on budget proportions'
+                        : formatCurrency(Math.floor(projectAvailableCapital / (['PHASE-01', 'PHASE-02', 'PHASE-03', 'PHASE-04'].filter(pc => {
+                          if (pc === 'PHASE-01') return floor?.floorNumber < 0;
+                          if (pc === 'PHASE-02') return floor?.floorNumber >= 0;
+                          return true;
+                        }).length)))} per phase
+                    </span>
+                  </p>
+                </div>
+              )}
+
+              {/* Total Capital Input for Proportional/Even */}
+              {capitalStrategy !== 'manual' && (
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Total Capital to Allocate
+                  </label>
+                  <input
+                    type="number"
+                    value={Object.values(capitalAllocations).reduce((sum, amount) => sum + (amount || 0), 0)}
+                    onChange={(e) => {
+                      const total = parseFloat(e.target.value) || 0;
+                      if (capitalStrategy === 'proportional') {
+                        // Distribute proportionally based on budget
+                        const totalBudget = Object.values(phaseAllocations).reduce((sum, phase) => sum + (phase.total || 0), 0);
+                        if (totalBudget > 0) {
+                          const newAllocations = {};
+                          ['PHASE-01', 'PHASE-02', 'PHASE-03', 'PHASE-04'].forEach(phaseCode => {
+                            const phaseAlloc = phaseAllocations[phaseCode] || { total: 0 };
+                            const phaseBudget = phaseAlloc.total || 0;
+                            const proportion = phaseBudget / totalBudget;
+                            newAllocations[phaseCode] = total * proportion;
+                          });
+                          setCapitalAllocations(newAllocations);
+                        }
+                      } else if (capitalStrategy === 'even') {
+                        // Distribute evenly
+                        const applicablePhases = ['PHASE-01', 'PHASE-02', 'PHASE-03', 'PHASE-04'].filter(pc => {
+                          if (pc === 'PHASE-01') return floor?.floorNumber < 0;
+                          if (pc === 'PHASE-02') return floor?.floorNumber >= 0;
+                          return true;
+                        });
+                        const perPhase = applicablePhases.length > 0 ? total / applicablePhases.length : 0;
+                        const newAllocations = {};
+                        applicablePhases.forEach(phaseCode => {
+                          newAllocations[phaseCode] = perPhase;
+                        });
+                        setCapitalAllocations(newAllocations);
+                      }
+                    }}
+                    min="0"
+                    max={projectAvailableCapital}
+                    step="0.01"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    placeholder="0"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Available: {formatCurrency(projectAvailableCapital)}
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t border-purple-200">
+                <button
+                  type="button"
+                  onClick={() => setShowCapitalForm(false)}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                >
+                  Cancel
+                </button>
+                <LoadingButton
+                  type="submit"
+                  loading={savingCapital}
+                  disabled={Object.values(capitalAllocations).reduce((sum, amount) => sum + (amount || 0), 0) <= 0}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
+                >
+                  {capitalTotal > 0 ? 'Update Capital Allocation' : 'Allocate Capital'}
+                </LoadingButton>
+              </div>
+            </form>
+          )}
 
         {/* Phase Budget Allocation Form */}
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">

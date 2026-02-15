@@ -1254,7 +1254,12 @@ export async function validateBulkMaterialRequestBudget(materials, defaultPhaseI
       materialsByPhase.set(phaseId, []);
     }
     
-    const estimatedCost = material.estimatedCost || 0;
+    // Calculate estimatedCost from estimatedCost or estimatedUnitCost * quantityNeeded
+    const estimatedCost = material.estimatedCost || 
+      (material.estimatedUnitCost && material.quantityNeeded 
+        ? material.estimatedUnitCost * material.quantityNeeded 
+        : 0);
+    
     if (estimatedCost > 0) {
       materialsByPhase.get(phaseId).push({
         materialName: material.name || material.materialName || 'Unknown',

@@ -26,6 +26,8 @@ import {
 } from '@/lib/helpers/batch-helpers';
 import { withTransaction } from '@/lib/mongodb/transaction-helpers';
 import { normalizeUserRole, isRole } from '@/lib/role-constants';
+// Import phase helpers statically to avoid potential circular dependency issues
+import { validateBulkMaterialRequestBudget } from '@/lib/phase-helpers';
 
 /**
  * POST /api/material-requests/bulk
@@ -178,13 +180,27 @@ export async function POST(request) {
     }
 
     // Budget Validation: Validate bulk request budget across all phases
-    const materialsWithCosts = materials.filter(m => {
-      const cost = m.estimatedCost || (m.estimatedUnitCost && m.quantityNeeded ? m.estimatedUnitCost * m.quantityNeeded : 0);
-      return cost > 0;
-    });
+    // Normalize materials with calculated costs (ensure numbers, not strings)
+    const materialsWithCosts = materials
+      .map(m => {
+        // Calculate cost from estimatedCost or estimatedUnitCost * quantityNeeded
+        const estimatedCost = m.estimatedCost 
+          ? parseFloat(m.estimatedCost) 
+          : (m.estimatedUnitCost && m.quantityNeeded 
+              ? parseFloat(m.estimatedUnitCost) * parseFloat(m.quantityNeeded) 
+              : 0);
+        
+        // Return material with normalized cost
+        return {
+          ...m,
+          estimatedCost: estimatedCost || 0,
+          estimatedUnitCost: m.estimatedUnitCost ? parseFloat(m.estimatedUnitCost) : undefined,
+          quantityNeeded: m.quantityNeeded ? parseFloat(m.quantityNeeded) : undefined,
+        };
+      })
+      .filter(m => m.estimatedCost > 0);
 
     if (materialsWithCosts.length > 0) {
-      const { validateBulkMaterialRequestBudget } = await import('@/lib/phase-helpers');
       const budgetValidation = await validateBulkMaterialRequestBudget(materialsWithCosts, defaultPhaseId);
       
       // Only block if budget is set AND exceeded
@@ -202,9 +218,13 @@ export async function POST(request) {
     // Check capital availability (warning only, don't block request creation)
     let capitalWarning = null;
     try {
-      const totalEstimatedCost = materialsWithCosts.reduce((sum, m) => {
-        const cost = m.estimatedCost || (m.estimatedUnitCost && m.quantityNeeded ? m.estimatedUnitCost * m.quantityNeeded : 0);
-        return sum + cost;
+      const totalEstimatedCost = materials.reduce((sum, m) => {
+        const cost = m.estimatedCost 
+          ? parseFloat(m.estimatedCost) 
+          : (m.estimatedUnitCost && m.quantityNeeded 
+              ? parseFloat(m.estimatedUnitCost) * parseFloat(m.quantityNeeded) 
+              : 0);
+        return sum + (isNaN(cost) ? 0 : cost);
       }, 0);
       
       if (totalEstimatedCost > 0) {
@@ -384,6 +404,12 @@ export async function POST(request) {
       name: error.name,
       ...(error.cause && { cause: error.cause }),
     });
+    
+    // Log the full error for debugging
+    if (error.message && error.message.includes('Cannot access')) {
+      console.error('Initialization error detected. Full error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    }
+    
     return errorResponse(
       error.message || 'Failed to create bulk material request',
       500
