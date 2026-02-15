@@ -662,9 +662,16 @@ export async function PATCH(request, { params }) {
     }
     if (updateData._phaseAllocation && updateData._phaseAllocation.allocated > 0) {
       successMessage += `. Budgets auto-allocated to ${updateData._phaseAllocation.allocated} phase(s).`;
+      if (updateData._phaseAllocation.floorAllocations && updateData._phaseAllocation.floorAllocations.length > 0) {
+        const totalFloors = updateData._phaseAllocation.floorAllocations.reduce((sum, r) => sum + r.allocated, 0);
+        successMessage += ` Floor budgets auto-allocated to ${totalFloors} floor(s).`;
+      }
     }
     if (phaseRescaleResult && phaseRescaleResult.rescaled > 0) {
       successMessage += `. Phase budgets rescaled: ${phaseRescaleResult.rescaled} phases updated.`;
+      if (phaseRescaleResult.floorRescale && phaseRescaleResult.floorRescale.totalRescaled > 0) {
+        successMessage += ` Floor budgets rescaled: ${phaseRescaleResult.floorRescale.totalRescaled} floors updated.`;
+      }
     }
 
     return successResponse(responseData, successMessage);

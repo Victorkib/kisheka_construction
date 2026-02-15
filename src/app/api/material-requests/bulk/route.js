@@ -140,9 +140,11 @@ export async function POST(request) {
       );
     }
 
-    // Validate defaultPhaseId if provided using centralized helper
+    // Validate all phaseIds using centralized helper (import once to avoid circular dependency issues)
+    const { validatePhaseForMaterialRequest } = await import('@/lib/phase-validation-helpers');
+    
+    // Validate defaultPhaseId if provided
     if (hasDefaultPhase) {
-      const { validatePhaseForMaterialRequest } = await import('@/lib/phase-validation-helpers');
       const phaseValidation = await validatePhaseForMaterialRequest(defaultPhaseId, projectId);
       
       if (!phaseValidation.isValid) {
@@ -150,8 +152,7 @@ export async function POST(request) {
       }
     }
 
-    // Validate all material phaseIds using centralized helper
-    const { validatePhaseForMaterialRequest } = await import('@/lib/phase-validation-helpers');
+    // Collect all unique phaseIds (default + per-material)
     const uniquePhaseIds = new Set();
     
     // Collect all phaseIds (default + per-material)

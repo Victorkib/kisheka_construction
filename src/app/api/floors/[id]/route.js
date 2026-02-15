@@ -81,7 +81,7 @@ export async function PATCH(request, { params }) {
     }
 
     const body = await request.json();
-    const { status, totalBudget, actualCost, startDate, completionDate, description } = body;
+    const { status, totalBudget, actualCost, startDate, completionDate, description, budgetAllocation } = body;
 
     const db = await getDatabase();
     
@@ -94,17 +94,78 @@ export async function PATCH(request, { params }) {
       return errorResponse('Floor not found', 404);
     }
 
+    // Import helpers
+    const { initializeFloorBudgetAllocation } = await import('@/lib/floor-financial-helpers');
+    const { calculateFloorActualSpending, calculateFloorCommittedCosts } = await import('@/lib/floor-financial-helpers');
+
     // Build update object
     const updateData = {
       updatedAt: new Date(),
     };
 
-    if (status && ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED'].includes(status)) {
+    if (status && ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'ON_HOLD', 'CANCELLED'].includes(status)) {
       updateData.status = status;
     }
 
-    if (totalBudget !== undefined) {
-      updateData.totalBudget = parseFloat(totalBudget) || 0;
+    // Handle budget update - use budgetAllocation structure if provided, otherwise update totalBudget
+    if (budgetAllocation !== undefined) {
+      // If budgetAllocation is provided, use it directly
+      updateData.budgetAllocation = budgetAllocation;
+      // Calculate total from budgetAllocation
+      const budgetTotal = budgetAllocation.total || 
+        (budgetAllocation.byPhase ? 
+          Object.values(budgetAllocation.byPhase).reduce((sum, phase) => sum + (phase.total || 0), 0) : 
+          0);
+      updateData.totalBudget = budgetTotal; // Maintain legacy field
+      
+      // Recalculate financial states
+      try {
+        const actualSpending = await calculateFloorActualSpending(id, true);
+        const committedCosts = await calculateFloorCommittedCosts(id, true);
+        const remaining = Math.max(0, budgetTotal - actualSpending.total - committedCosts.total);
+        
+        updateData['financialStates.remaining'] = remaining;
+        updateData['financialStates.committed'] = committedCosts.total;
+        updateData['financialStates.actual'] = actualSpending.total;
+      } catch (financialError) {
+        console.error('Error calculating floor financials during update:', financialError);
+        // Don't fail the update, just log the error
+      }
+    } else if (totalBudget !== undefined) {
+      // Legacy support: if only totalBudget is provided, update budgetAllocation
+      const newTotalBudget = parseFloat(totalBudget) || 0;
+      const existingBudgetAllocation = existingFloor.budgetAllocation || 
+        initializeFloorBudgetAllocation(existingFloor);
+      
+      // Update total in budgetAllocation
+      const updatedBudgetAllocation = {
+        ...existingBudgetAllocation,
+        total: newTotalBudget
+      };
+      
+      // If byPhase exists, update PHASE-02 total (legacy behavior)
+      if (updatedBudgetAllocation.byPhase && updatedBudgetAllocation.byPhase['PHASE-02']) {
+        const oldPhase02Total = updatedBudgetAllocation.byPhase['PHASE-02'].total || 0;
+        const difference = newTotalBudget - (existingBudgetAllocation.total || existingFloor.totalBudget || 0);
+        updatedBudgetAllocation.byPhase['PHASE-02'].total = Math.max(0, (updatedBudgetAllocation.byPhase['PHASE-02'].total || 0) + difference);
+      }
+      
+      updateData.budgetAllocation = updatedBudgetAllocation;
+      updateData.totalBudget = newTotalBudget; // Maintain legacy field
+      
+      // Recalculate financial states
+      try {
+        const actualSpending = await calculateFloorActualSpending(id, true);
+        const committedCosts = await calculateFloorCommittedCosts(id, true);
+        const remaining = Math.max(0, newTotalBudget - actualSpending.total - committedCosts.total);
+        
+        updateData['financialStates.remaining'] = remaining;
+        updateData['financialStates.committed'] = committedCosts.total;
+        updateData['financialStates.actual'] = actualSpending.total;
+      } catch (financialError) {
+        console.error('Error calculating floor financials during update:', financialError);
+        // Don't fail the update, just log the error
+      }
     }
 
     if (actualCost !== undefined) {

@@ -18,9 +18,9 @@ import { useToast } from '@/components/toast';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState } from '@/components/empty-states';
-import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { PhaseFilter } from '@/components/filters/PhaseFilter';
 import { fetchNoCache } from '@/lib/fetch-helpers';
+import { MaterialGuide } from '@/components/materials/MaterialGuide';
 
 function MaterialRequestsPageContent() {
   const router = useRouter();
@@ -392,31 +392,27 @@ function MaterialRequestsPageContent() {
                 📦 Bulk Request
               </Link>
             )}
-            {canAccess('view_bulk_material_requests') && (
+            {canAccess('view_material_library') && (
               <Link
-                href="/material-requests/batches"
+                href="/material-library"
                 className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition"
               >
-                📋 View Batches
+                📚 Material Library
               </Link>
             )}
           </div>
         </div>
 
-        <PrerequisiteGuide
+        {/* Material Guide - Consolidated Quick Actions & Guide */}
+        <MaterialGuide
           title="Start with projects and items"
           description="Material requests depend on projects and item or library definitions."
           prerequisites={[
             'Project is created',
             'Items or material library entries exist',
           ]}
-          actions={[
-            { href: '/projects/new', label: 'Create Project' },
-            { href: '/material-library', label: 'Material Library' },
-            { href: '/items/new', label: 'Add Item' },
-            { href: '/material-requests/new', label: 'New Request' },
-          ]}
           tip="Bulk requests are best for large lists from the library."
+          projectId={activeProjectId}
         />
 
         {/* Filters */}

@@ -16,6 +16,7 @@ import { LoadingSpinner, LoadingOverlay, LoadingButton } from '@/components/load
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
 import { MaterialLibraryPicker } from '@/components/material-library/material-library-picker';
+import { MaterialRequestFinancialStatus } from '@/components/budget/MaterialRequestFinancialStatus';
 
 function NewItemPageContent() {
   const router = useRouter();
@@ -106,11 +107,6 @@ function NewItemPageContent() {
     },
   });
 
-  // Fetch user and set default entry type based on role
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
   // Fetch categories and projects on mount
   useEffect(() => {
     fetchCategories();
@@ -129,33 +125,63 @@ function NewItemPageContent() {
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
-        // Set default entry type based on role
-        const role = data.data.role?.toLowerCase();
-        if (role === 'clerk' || role === 'supervisor' || role === 'site_clerk') {
-          // CLERK/SUPERVISOR should use new purchase workflow
-          setEntryType('new_purchase');
-        } else {
-          // PM/OWNER can choose, default to null (show selector)
-          setEntryType(null);
-        }
+        return data.data;
       }
     } catch (err) {
       console.error('Error fetching user:', err);
     }
+    return null;
   };
 
-  // Handle projectId from URL query parameter (runs once on mount)
+  // Handle URL query parameters and set entry type (runs once on mount)
   useEffect(() => {
-    const projectIdFromUrl = searchParams.get('projectId');
-    if (projectIdFromUrl) {
-      setFormData(prev => {
-        // Only set if not already set to avoid overwriting user selection
-        if (!prev.projectId) {
-          return { ...prev, projectId: projectIdFromUrl };
+    const initializeFromUrl = async () => {
+      const projectIdFromUrl = searchParams.get('projectId');
+      const entryTypeFromUrl = searchParams.get('entryType');
+      
+      // Handle projectId from URL
+      if (projectIdFromUrl) {
+        setFormData(prev => {
+          // Only set if not already set to avoid overwriting user selection
+          if (!prev.projectId) {
+            return { ...prev, projectId: projectIdFromUrl };
+          }
+          return prev;
+        });
+      }
+      
+      // Handle entryType from URL - skip selector if provided
+      if (entryTypeFromUrl) {
+        if (entryTypeFromUrl === 'retroactive_entry') {
+          // Go directly to retroactive entry form
+          setEntryType('retroactive_entry');
+          setShowContinueAnyway(true); // Skip the "New Purchase" redirect message
+        } else if (entryTypeFromUrl === 'new_purchase') {
+          // Redirect to material request page if new_purchase is specified
+          const projectQuery = projectIdFromUrl ? `?projectId=${projectIdFromUrl}` : '';
+          router.replace(`/material-requests/new${projectQuery}`);
+          return;
         }
-        return prev;
-      });
-    }
+      } else {
+        // No entryType in URL - set default based on role
+        const userData = await fetchUser();
+        if (userData) {
+          const role = userData.role?.toLowerCase();
+          if (role === 'clerk' || role === 'supervisor' || role === 'site_clerk') {
+            // CLERK/SUPERVISOR should use new purchase workflow
+            setEntryType('new_purchase');
+          } else {
+            // PM/OWNER can choose, default to null (show selector)
+            setEntryType(null);
+          }
+        } else {
+          // If user fetch fails, default to showing selector
+          setEntryType(null);
+        }
+      }
+    };
+    
+    initializeFromUrl();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
 
@@ -479,11 +505,13 @@ function NewItemPageContent() {
       };
 
       const response = await fetch('/api/materials', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(payload),
       });
 
@@ -493,13 +521,48 @@ function NewItemPageContent() {
         throw new Error(data.error || 'Failed to create material');
       }
 
-      // Show capital warning if present
+      // Show financial warnings if present
+      const warnings = [];
+      const infoMessages = [];
+      
       if (data.data.capitalWarning) {
-        toast.showWarning(
-          `Material created but capital insufficient: ${data.data.capitalWarning.message}`,
-          { duration: 10000 }
-        );
-      } else {
+        if (data.data.capitalWarning.type === 'info') {
+          infoMessages.push(data.data.capitalWarning.message);
+        } else {
+          warnings.push(`Capital: ${data.data.capitalWarning.message}`);
+        }
+      }
+      
+      if (data.data.phaseBudgetWarning) {
+        if (data.data.phaseBudgetWarning.type === 'info') {
+          infoMessages.push(data.data.phaseBudgetWarning.message);
+        } else {
+          warnings.push(`Phase Budget: ${data.data.phaseBudgetWarning.message}`);
+        }
+      }
+      
+      if (data.data.floorBudgetWarning) {
+        if (data.data.floorBudgetWarning.type === 'info') {
+          infoMessages.push(data.data.floorBudgetWarning.message);
+        } else {
+          warnings.push(`Floor Budget: ${data.data.floorBudgetWarning.message}`);
+        }
+      }
+      
+      // Show info messages
+      if (infoMessages.length > 0) {
+        infoMessages.forEach(msg => {
+          toast.showInfo(msg, { duration: 8000 });
+        });
+      }
+      
+      // Show warnings
+      if (warnings.length > 0) {
+        warnings.forEach(warning => {
+          toast.showWarning(warning, { duration: 10000 });
+        });
+        toast.showSuccess('Material created successfully! (See warnings above)');
+      } else if (infoMessages.length === 0) {
         toast.showSuccess('Material created successfully!');
       }
 
@@ -1236,6 +1299,18 @@ function NewItemPageContent() {
                   </p>
                 </div>
               </div>
+
+              {/* Financial Status Display for Retroactive Entry */}
+              {entryType === 'retroactive_entry' && formData.projectId && formData.phaseId && calculateTotal() && parseFloat(calculateTotal()) > 0 && (
+                <div className="mt-4">
+                  <MaterialRequestFinancialStatus
+                    projectId={formData.projectId}
+                    phaseId={formData.phaseId}
+                    floorId={formData.floor || null}
+                    estimatedCost={parseFloat(calculateTotal()) || 0}
+                  />
+                </div>
+              )}
 
               <div>
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">

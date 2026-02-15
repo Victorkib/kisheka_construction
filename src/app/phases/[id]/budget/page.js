@@ -433,8 +433,8 @@ function PhaseBudgetPageContent() {
             )}
           </div>
 
-          {/* Floor Allocation Options (only for Superstructure phase) */}
-          {phase?.phaseCode === 'PHASE-02' && (
+          {/* Floor Allocation Options (available for all phases) */}
+          {phase && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-4">
               <label className="flex items-start cursor-pointer">
                 <input
@@ -448,8 +448,10 @@ function PhaseBudgetPageContent() {
                     Automatically allocate budget to floors
                   </span>
                   <p className="text-xs text-gray-600 mt-1">
-                    When enabled, the phase budget will be automatically distributed to all floors with zero budgets.
-                    You can opt-out by unchecking this box.
+                    {phase.phaseCode === 'PHASE-01' && 'When enabled, the phase budget will be automatically distributed to basement floors only.'}
+                    {phase.phaseCode === 'PHASE-02' && 'When enabled, the phase budget will be automatically distributed to ground and upper floors.'}
+                    {(phase.phaseCode === 'PHASE-03' || phase.phaseCode === 'PHASE-04') && 'When enabled, the phase budget will be automatically distributed to all floors (basement, ground, and upper floors).'}
+                    {' You can opt-out by unchecking this box.'}
                   </p>
                 </div>
               </label>
@@ -472,7 +474,9 @@ function PhaseBudgetPageContent() {
                       <div>
                         <span className="text-sm text-gray-900">Weighted Distribution (Recommended)</span>
                         <p className="text-xs text-gray-600">
-                          Basement floors get 1.2x, typical floors get 1.0x, penthouse gets 1.3x weight
+                          {phase.phaseCode === 'PHASE-01' && 'Basement floors weighted by complexity.'}
+                          {phase.phaseCode === 'PHASE-02' && 'Ground floor (1.2x), typical floors (1.0x), penthouse (1.5x) weighted differently.'}
+                          {(phase.phaseCode === 'PHASE-03' || phase.phaseCode === 'PHASE-04') && 'Floor types weighted by complexity and phase requirements.'}
                         </p>
                       </div>
                     </label>
@@ -488,7 +492,7 @@ function PhaseBudgetPageContent() {
                       <div>
                         <span className="text-sm text-gray-900">Even Distribution</span>
                         <p className="text-xs text-gray-600">
-                          Budget divided equally among all floors
+                          Budget divided equally among all applicable floors
                         </p>
                       </div>
                     </label>

@@ -15,7 +15,7 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
         <div className="bg-white rounded-lg shadow p-6">
           <p className="text-sm text-gray-600">Budget</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">
-            {formatCurrency(floor.totalBudget || 0)}
+            {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
           </p>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
@@ -27,18 +27,18 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
         <div className="bg-white rounded-lg shadow p-6">
           <p className="text-sm text-gray-600">Remaining</p>
           <p className={`text-2xl font-bold mt-1 ${
-            (floor.totalBudget || 0) - (floor.actualCost || 0) < 0
+            ((floor.budgetAllocation?.total || floor.totalBudget || 0) - (floor.actualCost || 0)) < 0
               ? 'text-red-600'
               : 'text-green-600'
           }`}>
-            {formatCurrency((floor.totalBudget || 0) - (floor.actualCost || 0))}
+            {formatCurrency((floor.budgetAllocation?.total || floor.totalBudget || 0) - (floor.actualCost || 0))}
           </p>
         </div>
         <div className="bg-white rounded-lg shadow p-6">
           <p className="text-sm text-gray-600">Utilization</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">
-            {floor.totalBudget > 0
-              ? `${((floor.actualCost / floor.totalBudget) * 100).toFixed(1)}%`
+            {(floor.budgetAllocation?.total || floor.totalBudget || 0) > 0
+              ? `${((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0) * 100).toFixed(1)}%`
               : 'N/A'}
           </p>
         </div>
@@ -137,25 +137,25 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
       </div>
 
       {/* Budget Utilization Bar */}
-      {floor.totalBudget > 0 && (
+      {((floor.budgetAllocation?.total || floor.totalBudget || 0) > 0) && (
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex justify-between text-sm text-gray-600 mb-2">
             <span>Budget Utilization</span>
             <span>
-              {((floor.actualCost / floor.totalBudget) * 100).toFixed(1)}%
+              {((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0) * 100).toFixed(1)}%
             </span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all ${
-                (floor.actualCost / floor.totalBudget) > 1
+                ((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0)) > 1
                   ? 'bg-red-600'
-                  : (floor.actualCost / floor.totalBudget) > 0.8
+                  : ((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0)) > 0.8
                   ? 'bg-yellow-600'
                   : 'bg-green-600'
               }`}
               style={{
-                width: `${Math.min(100, (floor.actualCost / floor.totalBudget) * 100)}%`
+                width: `${Math.min(100, ((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0)) * 100)}%`
               }}
             />
           </div>

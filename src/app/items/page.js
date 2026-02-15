@@ -18,7 +18,7 @@ import { useToast } from '@/components/toast';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState, NoDataEmptyState } from '@/components/empty-states';
-import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { MaterialGuide } from '@/components/materials/MaterialGuide';
 
 function ItemsPageContent() {
   const router = useRouter();
@@ -603,7 +603,7 @@ function ItemsPageContent() {
             )}
             {canAccess('create_material') && (
               <Link
-                href="/items/new"
+                href={`/items/new${filters.projectId ? `?projectId=${filters.projectId}&entryType=retroactive_entry` : '?entryType=retroactive_entry'}`}
                 className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
               >
                 + Add Material
@@ -612,19 +612,16 @@ function ItemsPageContent() {
           </div>
         </div>
 
-        <PrerequisiteGuide
+        {/* Material Guide - Consolidated Quick Actions & Guide */}
+        <MaterialGuide
           title="Set up items before requesting materials"
           description="Materials and items fuel purchasing and inventory tracking."
           prerequisites={[
             'Project is created',
             'Material library or items are defined',
           ]}
-          actions={[
-            { href: '/projects/new', label: 'Create Project' },
-            { href: '/material-library', label: 'Material Library' },
-            { href: '/items/new', label: 'Add Item' },
-          ]}
           tip="Use categories and suppliers to improve reporting."
+          projectId={filters.projectId || currentProjectId}
         />
 
         {/* Filters */}
@@ -805,7 +802,7 @@ function ItemsPageContent() {
             </p>
             {canAccess('create_material') && (
               <Link
-                href="/items/new"
+                href={`/items/new${filters.projectId ? `?projectId=${filters.projectId}&entryType=retroactive_entry` : '?entryType=retroactive_entry'}`}
                 className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition"
               >
                 + Add Material

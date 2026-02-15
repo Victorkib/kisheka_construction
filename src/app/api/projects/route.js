@@ -451,10 +451,16 @@ export async function POST(request) {
       const maxFloors = Math.min(Math.max(0, requestedFloorCount), 50); // Cap at 50 floors, minimum 0
       const requestedBasementCount = includeBasements ? Math.min(Math.max(0, parseInt(basementCount) || 0), 10) : 0; // Cap at 10 basements
       
+      // Import floor budget initialization helper
+      const { initializeFloorBudgetAllocation } = await import('@/lib/floor-financial-helpers');
+      
+      // Get total floors count for floor type detection
+      const totalFloors = maxFloors + requestedBasementCount;
+      
       // Create basements first (if any) - negative floor numbers
       if (requestedBasementCount > 0) {
         for (let i = requestedBasementCount; i >= 1; i--) {
-          defaultFloors.push({
+          const floorTemplate = {
             projectId: result.insertedId,
             floorNumber: -i, // Negative numbers for basements
             name: `Basement ${i}`,
@@ -466,13 +472,21 @@ export async function POST(request) {
             actualCost: 0,
             createdAt: new Date(),
             updatedAt: new Date(),
-          });
+          };
+          
+          // Initialize budgetAllocation structure with byPhase
+          const budgetAllocation = initializeFloorBudgetAllocation(floorTemplate, totalFloors);
+          floorTemplate.budgetAllocation = budgetAllocation;
+          // Initialize capitalAllocation structure
+          floorTemplate.capitalAllocation = { total: 0, byPhase: {}, used: 0, committed: 0, remaining: 0 };
+          
+          defaultFloors.push(floorTemplate);
         }
       }
       
       // Create ground floor (0) if any floors are requested
       if (maxFloors > 0) {
-        defaultFloors.push({
+        const groundFloorTemplate = {
           projectId: result.insertedId,
           floorNumber: 0,
           name: 'Ground Floor',
@@ -484,11 +498,19 @@ export async function POST(request) {
           actualCost: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
-        });
+        };
+        
+        // Initialize budgetAllocation structure with byPhase
+        const budgetAllocation = initializeFloorBudgetAllocation(groundFloorTemplate, totalFloors);
+        groundFloorTemplate.budgetAllocation = budgetAllocation;
+        // Initialize capitalAllocation structure
+        groundFloorTemplate.capitalAllocation = { total: 0, byPhase: {}, used: 0, committed: 0, remaining: 0 };
+        
+        defaultFloors.push(groundFloorTemplate);
         
         // Create above-ground floors (positive numbers)
         for (let i = 1; i <= maxFloors - 1; i++) {
-          defaultFloors.push({
+          const floorTemplate = {
             projectId: result.insertedId,
             floorNumber: i,
             name: `Floor ${i}`,
@@ -500,7 +522,15 @@ export async function POST(request) {
             actualCost: 0,
             createdAt: new Date(),
             updatedAt: new Date(),
-          });
+          };
+          
+          // Initialize budgetAllocation structure with byPhase
+          const budgetAllocation = initializeFloorBudgetAllocation(floorTemplate, totalFloors);
+          floorTemplate.budgetAllocation = budgetAllocation;
+          // Initialize capitalAllocation structure
+          floorTemplate.capitalAllocation = { total: 0, byPhase: {}, used: 0, committed: 0, remaining: 0 };
+          
+          defaultFloors.push(floorTemplate);
         }
       }
     }

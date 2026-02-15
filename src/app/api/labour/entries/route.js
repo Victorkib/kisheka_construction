@@ -24,6 +24,7 @@ import {
 } from '@/lib/labour-financial-helpers';
 import { withTransaction } from '@/lib/mongodb/transaction-helpers';
 import { recalculatePhaseSpending } from '@/lib/phase-helpers';
+import { updateFloorFinancials } from '@/lib/floor-financial-helpers';
 import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
 // Force dynamic rendering to prevent caching stale data
 export const dynamic = 'force-dynamic';
@@ -666,6 +667,16 @@ export async function POST(request) {
     // Indirect labour doesn't have a phase, so skip phase recalculation
     if (!indirectLabour && phaseId) {
       await recalculatePhaseSpending(phaseId);
+    }
+
+    // Recalculate floor spending if labour entry is linked to a floor
+    if (floorId && ObjectId.isValid(floorId)) {
+      try {
+        await updateFloorFinancials(floorId.toString());
+      } catch (floorError) {
+        console.error('Error recalculating floor spending after labour entry creation:', floorError);
+        // Don't fail the request, just log the error
+      }
     }
 
     // Update labour cost summaries (async, non-blocking)

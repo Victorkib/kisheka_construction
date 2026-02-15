@@ -300,7 +300,7 @@ export default function PMDashboard() {
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Operations</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <Link
-              href="/items/new"
+              href="/items/new?entryType=retroactive_entry"
               className="p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
             >
               <div className="flex items-center gap-3">

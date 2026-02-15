@@ -196,8 +196,8 @@ export async function POST(request, { params }) {
 
       // Calculate remaining budget
       const { calculateFloorActualSpending, calculateFloorCommittedCosts } = await import('@/lib/floor-financial-helpers');
-      const actualSpending = await calculateFloorActualSpending(floorId);
-      const committedCosts = await calculateFloorCommittedCosts(floorId);
+      const actualSpending = await calculateFloorActualSpending(floorId, true);
+      const committedCosts = await calculateFloorCommittedCosts(floorId, true);
       const remaining = Math.max(0, budgetAllocation.total - actualSpending.total - committedCosts.total);
 
       const updateResult = await db.collection('floors').findOneAndUpdate(

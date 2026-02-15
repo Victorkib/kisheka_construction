@@ -651,67 +651,99 @@ export async function createMaterialFromPurchaseOrder({
  * @param {string} floorId - Floor ID
  * @returns {Promise<Object>} Updated floor
  */
+/**
+ * Recalculate floor spending when material/expense is created/updated/deleted
+ * Enhanced to use the new budgetAllocation structure and update financialStates
+ * @param {string} floorId - Floor ID
+ * @returns {Promise<Object>} Updated floor
+ */
 export async function recalculateFloorSpending(floorId) {
-  const db = await getDatabase();
-  
-  // Get floor
-  const floor = await db.collection('floors').findOne({
-    _id: new ObjectId(floorId),
-  });
-  
-  if (!floor) {
-    throw new Error('Floor not found');
+  try {
+    // Use the enhanced updateFloorFinancials function which handles:
+    // - Phase-specific spending calculation
+    // - Financial states update (remaining, committed, actual)
+    // - BudgetAllocation structure
+    const { updateFloorFinancials } = await import('@/lib/floor-financial-helpers');
+    const result = await updateFloorFinancials(floorId);
+    
+    // Also update actualCost for backward compatibility
+    const db = await getDatabase();
+    const updatedFloor = await db.collection('floors').findOneAndUpdate(
+      { _id: new ObjectId(floorId) },
+      {
+        $set: {
+          actualCost: result.actualSpending.total || 0,
+          updatedAt: new Date()
+        }
+      },
+      { returnDocument: 'after' }
+    );
+    
+    return updatedFloor.value || updatedFloor;
+  } catch (error) {
+    console.error(`Error recalculating floor spending for ${floorId}:`, error);
+    // Fallback to legacy calculation if updateFloorFinancials fails
+    const db = await getDatabase();
+    
+    // Get floor
+    const floor = await db.collection('floors').findOne({
+      _id: new ObjectId(floorId),
+    });
+    
+    if (!floor) {
+      throw new Error('Floor not found');
+    }
+    
+    // Calculate actual spending from materials (approved only)
+    const materialsSpending = await db.collection('materials').aggregate([
+      {
+        $match: {
+          floor: new ObjectId(floorId),
+          deletedAt: null,
+          status: { $in: MATERIAL_APPROVED_STATUSES }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$totalCost' }
+        }
+      }
+    ]).toArray();
+    
+    // Calculate actual spending from expenses (approved only)
+    const expensesSpending = await db.collection('expenses').aggregate([
+      {
+        $match: {
+          floor: new ObjectId(floorId),
+          deletedAt: null,
+          status: { $in: ['APPROVED', 'PAID'] }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$amount' }
+        }
+      }
+    ]).toArray();
+    
+    const actualCost = (materialsSpending[0]?.total || 0) + (expensesSpending[0]?.total || 0);
+    
+    // Update floor with actual cost
+    const updatedFloor = await db.collection('floors').findOneAndUpdate(
+      { _id: new ObjectId(floorId) },
+      {
+        $set: {
+          actualCost: actualCost,
+          updatedAt: new Date()
+        }
+      },
+      { returnDocument: 'after' }
+    );
+    
+    return updatedFloor.value || updatedFloor;
   }
-  
-  // Calculate actual spending from materials (approved only)
-  const materialsSpending = await db.collection('materials').aggregate([
-    {
-      $match: {
-        floor: new ObjectId(floorId),
-        deletedAt: null,
-        status: { $in: MATERIAL_APPROVED_STATUSES }
-      }
-    },
-    {
-      $group: {
-        _id: null,
-        total: { $sum: '$totalCost' }
-      }
-    }
-  ]).toArray();
-  
-  // Calculate actual spending from expenses (approved only)
-  const expensesSpending = await db.collection('expenses').aggregate([
-    {
-      $match: {
-        floor: new ObjectId(floorId),
-        deletedAt: null,
-        status: { $in: ['APPROVED', 'PAID'] }
-      }
-    },
-    {
-      $group: {
-        _id: null,
-        total: { $sum: '$amount' }
-      }
-    }
-  ]).toArray();
-  
-  const actualCost = (materialsSpending[0]?.total || 0) + (expensesSpending[0]?.total || 0);
-  
-  // Update floor with actual cost
-  const updatedFloor = await db.collection('floors').findOneAndUpdate(
-    { _id: new ObjectId(floorId) },
-    {
-      $set: {
-        actualCost: actualCost,
-        updatedAt: new Date()
-      }
-    },
-    { returnDocument: 'after' }
-  );
-  
-  return updatedFloor;
 }
 
 /**

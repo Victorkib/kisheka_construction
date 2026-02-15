@@ -83,9 +83,15 @@ export async function POST(request, { params }) {
       ? Math.min(Math.max(0, parseInt(basementCount) || 0), 10)
       : 0; // Cap at 10 basements
 
+    // Import floor budget initialization helper
+    const { initializeFloorBudgetAllocation } = await import('@/lib/floor-financial-helpers');
+    
+    // Get total floors count for floor type detection
+    const totalFloors = maxFloors + requestedBasementCount;
+    
     if (requestedBasementCount > 0) {
       for (let i = requestedBasementCount; i >= 1; i--) {
-        defaultFloors.push({
+        const floorTemplate = {
           projectId: new ObjectId(id),
           floorNumber: -i,
           name: `Basement ${i}`,
@@ -97,12 +103,20 @@ export async function POST(request, { params }) {
           actualCost: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
-        });
+        };
+        
+        // Initialize budgetAllocation structure with byPhase
+        const budgetAllocation = initializeFloorBudgetAllocation(floorTemplate, totalFloors);
+        floorTemplate.budgetAllocation = budgetAllocation;
+        // Initialize capitalAllocation structure
+        floorTemplate.capitalAllocation = { total: 0, byPhase: {}, used: 0, committed: 0, remaining: 0 };
+        
+        defaultFloors.push(floorTemplate);
       }
     }
 
     if (maxFloors > 0) {
-      defaultFloors.push({
+      const groundFloorTemplate = {
         projectId: new ObjectId(id),
         floorNumber: 0,
         name: 'Ground Floor',
@@ -114,10 +128,18 @@ export async function POST(request, { params }) {
         actualCost: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      };
+      
+      // Initialize budgetAllocation structure with byPhase
+      const budgetAllocation = initializeFloorBudgetAllocation(groundFloorTemplate, totalFloors);
+      groundFloorTemplate.budgetAllocation = budgetAllocation;
+      // Initialize capitalAllocation structure
+      groundFloorTemplate.capitalAllocation = { total: 0, byPhase: {}, used: 0, committed: 0, remaining: 0 };
+      
+      defaultFloors.push(groundFloorTemplate);
 
       for (let i = 1; i <= maxFloors - 1; i++) {
-        defaultFloors.push({
+        const floorTemplate = {
           projectId: new ObjectId(id),
           floorNumber: i,
           name: `Floor ${i}`,
@@ -129,7 +151,15 @@ export async function POST(request, { params }) {
           actualCost: 0,
           createdAt: new Date(),
           updatedAt: new Date(),
-        });
+        };
+        
+        // Initialize budgetAllocation structure with byPhase
+        const budgetAllocation = initializeFloorBudgetAllocation(floorTemplate, totalFloors);
+        floorTemplate.budgetAllocation = budgetAllocation;
+        // Initialize capitalAllocation structure
+        floorTemplate.capitalAllocation = { total: 0, byPhase: {}, used: 0, committed: 0, remaining: 0 };
+        
+        defaultFloors.push(floorTemplate);
       }
     }
 

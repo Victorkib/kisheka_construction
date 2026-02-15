@@ -561,10 +561,40 @@ export async function allocateBudgetsToExistingPhases(projectId, project = null,
     }
   }
   
+  // Auto-allocate phase budgets to floors (for all phases that were allocated)
+  const floorAllocationResults = [];
+  for (const allocatedPhase of allocatedPhases) {
+    try {
+      const { allocatePhaseBudgetToFloors } = await import('@/lib/floor-financial-helpers');
+      const floorResult = await allocatePhaseBudgetToFloors(
+        allocatedPhase.phaseId,
+        'weighted', // Default strategy
+        userId,
+        { onlyZeroBudgets: true }
+      );
+      
+      if (floorResult.allocated > 0) {
+        floorAllocationResults.push({
+          phaseId: allocatedPhase.phaseId,
+          phaseName: allocatedPhase.phaseName,
+          ...floorResult
+        });
+        console.log(`[Zero-to-Budget] Auto-allocated budgets to ${floorResult.allocated} floor(s) for phase ${allocatedPhase.phaseName}`);
+      }
+    } catch (floorAllocError) {
+      console.error(`Error auto-allocating floors for phase ${allocatedPhase.phaseId}:`, floorAllocError);
+      // Don't fail phase allocation if floor allocation fails
+    }
+  }
+  
   // Build result message
   let message = `Successfully allocated budgets to ${allocatedPhases.length} phase(s)`;
   if (warnings.length > 0) {
     message += `. ${warnings.length} warning(s) generated.`;
+  }
+  if (floorAllocationResults.length > 0) {
+    const totalFloorsAllocated = floorAllocationResults.reduce((sum, r) => sum + r.allocated, 0);
+    message += ` Budgets auto-allocated to ${totalFloorsAllocated} floor(s) across ${floorAllocationResults.length} phase(s).`;
   }
   
   return {
@@ -573,6 +603,7 @@ export async function allocateBudgetsToExistingPhases(projectId, project = null,
     phases: allocatedPhases,
     skippedPhases: skippedPhases,
     warnings: warnings,
+    floorAllocations: floorAllocationResults,
     message: message
   };
 }
@@ -1532,38 +1563,6 @@ export async function rescalePhaseBudgetsForProject(projectId, oldDcc, newDcc, u
       scaleFactor: scaleFactor.toFixed(4)
     });
     
-    // After rescaling phases, also rescale floor budgets for Superstructure phase
-    let floorRescaleResult = null;
-    const superstructurePhase = rescaledPhases.find(p => {
-      const phase = phases.find(ph => ph._id.toString() === p.phaseId);
-      return phase?.phaseCode === 'PHASE-02';
-    });
-    
-    if (superstructurePhase) {
-      try {
-        const { rescaleFloorBudgetsForPhase } = await import('@/lib/floor-financial-helpers');
-        const superstructurePhaseObj = phases.find(ph => ph._id.toString() === superstructurePhase.phaseId);
-        const oldPhaseBudget = superstructurePhase.oldTotal;
-        const newPhaseBudget = superstructurePhase.newTotal;
-        
-        if (oldPhaseBudget > 0 && newPhaseBudget > 0) {
-          floorRescaleResult = await rescaleFloorBudgetsForPhase(
-            superstructurePhase.phaseId,
-            oldPhaseBudget,
-            newPhaseBudget,
-            userId
-          );
-          
-          if (floorRescaleResult.rescaled > 0) {
-            console.log(`[Rescale Phase Budgets] Floor budgets rescaled for Superstructure phase. Rescaled ${floorRescaleResult.rescaled} floors.`);
-          }
-        }
-      } catch (floorRescaleError) {
-        console.error('Error rescaling floor budgets during phase budget rescale:', floorRescaleError);
-        // Don't fail phase rescale if floor rescale fails, but log it
-      }
-    }
-    
     // Create audit log for each phase
     try {
       await createAuditLog({
@@ -1587,40 +1586,52 @@ export async function rescalePhaseBudgetsForProject(projectId, oldDcc, newDcc, u
     }
   }
   
-  // After rescaling phases, also rescale floor budgets for Superstructure phase
-  let floorRescaleResult = null;
-  const superstructurePhase = rescaledPhases.find(p => {
-    const phase = phases.find(ph => ph._id.toString() === p.phaseId);
-    return phase?.phaseCode === 'PHASE-02';
-  });
-  
-  if (superstructurePhase) {
+  // After rescaling phases, also rescale floor budgets for all phases that were rescaled
+  const floorRescaleResults = [];
+  for (const rescaledPhase of rescaledPhases) {
     try {
       const { rescaleFloorBudgetsForPhase } = await import('@/lib/floor-financial-helpers');
-      const superstructurePhaseObj = phases.find(ph => ph._id.toString() === superstructurePhase.phaseId);
-      const oldPhaseBudget = superstructurePhase.oldTotal;
-      const newPhaseBudget = superstructurePhase.newTotal;
+      const oldPhaseBudget = rescaledPhase.oldTotal;
+      const newPhaseBudget = rescaledPhase.newTotal;
       
       if (oldPhaseBudget > 0 && newPhaseBudget > 0) {
-        floorRescaleResult = await rescaleFloorBudgetsForPhase(
-          superstructurePhase.phaseId,
+        const floorRescaleResult = await rescaleFloorBudgetsForPhase(
+          rescaledPhase.phaseId,
           oldPhaseBudget,
           newPhaseBudget,
           userId
         );
         
         if (floorRescaleResult.rescaled > 0) {
-          console.log(`[Rescale Phase Budgets] Floor budgets rescaled for Superstructure phase. Rescaled ${floorRescaleResult.rescaled} floors.`);
+          floorRescaleResults.push({
+            phaseId: rescaledPhase.phaseId,
+            phaseName: rescaledPhase.phaseName,
+            ...floorRescaleResult
+          });
+          console.log(`[Rescale Phase Budgets] Floor budgets rescaled for phase ${rescaledPhase.phaseName}. Rescaled ${floorRescaleResult.rescaled} floors.`);
         }
       }
     } catch (floorRescaleError) {
-      console.error('Error rescaling floor budgets during phase budget rescale:', floorRescaleError);
-      // Don't fail phase rescale if floor rescale fails, but log it
+      console.error(`Error rescaling floor budgets for phase ${rescaledPhase.phaseId}:`, floorRescaleError);
+      // Don't fail phase rescale if floor rescale fails
     }
   }
   
+  const floorRescaleResult = floorRescaleResults.length > 0 ? {
+    totalRescaled: floorRescaleResults.reduce((sum, r) => sum + r.rescaled, 0),
+    results: floorRescaleResults
+  } : null;
+  
   // Log summary
   console.log(`[Phase Budget Rescale] Rescaled ${rescaledPhases.length} phases for project ${projectId}. Old DCC: ${oldDcc.toLocaleString()}, New DCC: ${newDcc.toLocaleString()}, Scale Factor: ${scaleFactor.toFixed(4)}`);
+  if (floorRescaleResult) {
+    console.log(`[Phase Budget Rescale] Floor budgets rescaled for ${floorRescaleResult.totalRescaled} floor(s) across ${floorRescaleResults.length} phase(s).`);
+  }
+  
+  let message = `Successfully rescaled budgets for ${rescaledPhases.length} phase(s)`;
+  if (floorRescaleResult && floorRescaleResult.totalRescaled > 0) {
+    message += `. Floor budgets rescaled for ${floorRescaleResult.totalRescaled} floor(s) across ${floorRescaleResults.length} phase(s).`;
+  }
   
   return {
     rescaled: rescaledPhases.length,
@@ -1630,6 +1641,7 @@ export async function rescalePhaseBudgetsForProject(projectId, oldDcc, newDcc, u
     scaleFactor: scaleFactor,
     oldDcc: oldDcc,
     newDcc: newDcc,
-    floorRescale: floorRescaleResult || null
+    floorRescale: floorRescaleResult,
+    message: message
   };
 }

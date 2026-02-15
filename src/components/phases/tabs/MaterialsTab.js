@@ -185,7 +185,7 @@ export function MaterialsTab({ phase, formatCurrency, formatDate }) {
             Materials ({filteredMaterials.length})
           </h3>
           <Link
-            href={`/items/new?projectId=${phase.projectId}&phaseId=${phase._id}`}
+            href={`/items/new?projectId=${phase.projectId}&phaseId=${phase._id}&entryType=retroactive_entry`}
             className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
           >
             + Add Material
@@ -200,7 +200,7 @@ export function MaterialsTab({ phase, formatCurrency, formatDate }) {
           <div className="p-12 text-center">
             <p className="text-gray-500 mb-4">No materials found</p>
             <Link
-              href={`/items/new?projectId=${phase.projectId}&phaseId=${phase._id}`}
+              href={`/items/new?projectId=${phase.projectId}&phaseId=${phase._id}&entryType=retroactive_entry`}
               className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               Add First Material

@@ -17,7 +17,7 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateCapitalAvailability, recalculateProjectFinances } from '@/lib/financial-helpers';
 import { recalculatePhaseSpending } from '@/lib/phase-helpers';
-import { recalculateFloorSpending } from '@/lib/material-helpers';
+import { updateFloorFinancials } from '@/lib/floor-financial-helpers';
 
 /**
  * POST /api/materials/[id]/approve
@@ -241,7 +241,7 @@ export async function POST(request, { params }) {
     // Recalculate floor spending if material is linked to a floor
     if (existingMaterial.floor && ObjectId.isValid(existingMaterial.floor)) {
       try {
-        await recalculateFloorSpending(existingMaterial.floor.toString());
+        await updateFloorFinancials(existingMaterial.floor.toString());
       } catch (floorError) {
         console.error('Error recalculating floor spending after material approval:', floorError);
         // Don't fail the request, just log the error

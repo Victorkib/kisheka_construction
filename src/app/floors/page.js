@@ -555,7 +555,7 @@ function FloorsPageContent() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm text-gray-900">
-                            {formatCurrency(floor.totalBudget || 0)}
+                            {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -661,7 +661,7 @@ function FloorsPageContent() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm text-gray-900">
-                            {formatCurrency(floor.totalBudget || 0)}
+                            {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -767,7 +767,7 @@ function FloorsPageContent() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm text-gray-900">
-                            {formatCurrency(floor.totalBudget || 0)}
+                            {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -826,7 +826,7 @@ function FloorsPageContent() {
             <div className="bg-white rounded-lg shadow p-4">
               <p className="text-sm text-gray-600">Total Budget</p>
               <p className="text-2xl font-bold text-gray-900">
-                {formatCurrency(floors.reduce((sum, f) => sum + (f.totalBudget || 0), 0))}
+                {formatCurrency(floors.reduce((sum, f) => sum + (f.budgetAllocation?.total || f.totalBudget || 0), 0))}
               </p>
             </div>
           </div>

@@ -113,8 +113,8 @@ export async function GET(request, { params }) {
       
       for (const floor of floors) {
         try {
-          const actual = await calculateFloorActualSpending(floor._id.toString());
-          const committed = await calculateFloorCommittedCosts(floor._id.toString());
+          const actual = await calculateFloorActualSpending(floor._id.toString(), true);
+          const committed = await calculateFloorCommittedCosts(floor._id.toString(), true);
           
           floorSpending.push({
             floorId: floor._id.toString(),
@@ -128,6 +128,10 @@ export async function GET(request, { params }) {
               labour: actual.labour || 0,
               equipment: actual.equipment || 0,
               subcontractors: actual.subcontractors || 0
+            },
+            byPhase: {
+              actualSpending: actual.byPhase || {},
+              committedCosts: committed.byPhase || {}
             }
           });
         } catch (error) {

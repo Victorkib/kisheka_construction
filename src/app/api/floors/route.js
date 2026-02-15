@@ -174,6 +174,15 @@ export async function POST(request) {
       return errorResponse(`Invalid status. Must be one of: ${validStatuses.join(', ')}`, 400);
     }
 
+    // Import floor budget initialization helper
+    const { initializeFloorBudgetAllocation } = await import('@/lib/floor-financial-helpers');
+    
+    // Get total floors count for floor type detection
+    const totalFloors = await db.collection('floors').countDocuments({
+      projectId: new ObjectId(projectId),
+      deletedAt: null
+    });
+    
     // Create floor
     const floor = {
       projectId: new ObjectId(projectId),
@@ -188,6 +197,12 @@ export async function POST(request) {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+    
+    // Initialize budgetAllocation structure with byPhase
+    const budgetAllocation = initializeFloorBudgetAllocation(floor, totalFloors + 1);
+    floor.budgetAllocation = budgetAllocation;
+    // Initialize capitalAllocation structure
+    floor.capitalAllocation = { total: 0, byPhase: {}, used: 0, committed: 0, remaining: 0 };
 
     const result = await db.collection('floors').insertOne(floor);
 

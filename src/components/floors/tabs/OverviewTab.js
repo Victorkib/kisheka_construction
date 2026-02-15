@@ -55,8 +55,10 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
     }
   };
 
-  const budgetUtilization = floor.totalBudget > 0 
-    ? ((floor.actualCost || 0) / floor.totalBudget) * 100 
+  // Use budgetAllocation.total with fallback to totalBudget for backward compatibility
+  const floorBudget = floor.budgetAllocation?.total || floor.totalBudget || 0;
+  const budgetUtilization = floorBudget > 0 
+    ? ((floor.actualCost || 0) / floorBudget) * 100 
     : 0;
 
   return (
@@ -132,7 +134,7 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
         <div className="bg-white rounded-lg shadow p-4">
           <p className="text-xs text-gray-600">Budget Used</p>
           <p className="text-lg font-bold text-gray-900 mt-1">{budgetUtilization.toFixed(1)}%</p>
-          <p className="text-xs text-gray-500">{formatCurrency(floor.actualCost || 0)} / {formatCurrency(floor.totalBudget || 0)}</p>
+          <p className="text-xs text-gray-500">{formatCurrency(floor.actualCost || 0)} / {formatCurrency(floorBudget)}</p>
         </div>
       </div>
 

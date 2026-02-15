@@ -18,7 +18,7 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { validateCapitalAvailability } from '@/lib/financial-helpers';
 import { recalculatePhaseSpending } from '@/lib/phase-helpers';
-import { recalculateFloorSpending } from '@/lib/material-helpers';
+import { updateFloorFinancials } from '@/lib/floor-financial-helpers';
 import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
 import { normalizeUserRole, isRole } from '@/lib/role-constants';
 import { incrementLibraryUsage } from '@/lib/helpers/material-library-helpers';
@@ -572,6 +572,71 @@ export async function POST(request) {
       console.error('Capital check error during material creation:', capitalError);
     }
 
+    // Phase Budget Validation for Retroactive Entries (non-blocking with warning)
+    // Similar to material requests, but allow override for retroactive entries
+    let phaseBudgetWarning = null;
+    let floorBudgetWarning = null;
+    
+    if (phaseId && ObjectId.isValid(phaseId) && totalCost > 0) {
+      try {
+        const { validatePhaseMaterialBudget } = await import('@/lib/phase-helpers');
+        const budgetValidation = await validatePhaseMaterialBudget(phaseId, totalCost);
+        
+        // For retroactive entries, don't block but show warning if budget exceeded
+        if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
+          phaseBudgetWarning = {
+            message: `Phase material budget exceeded. ${budgetValidation.message}. ` +
+              `Phase material budget: ${budgetValidation.materialBudget.toLocaleString()}, ` +
+              `Available: ${budgetValidation.available.toLocaleString()}, ` +
+              `Required: ${budgetValidation.required.toLocaleString()}. ` +
+              `This is a retroactive entry, so it will be allowed but may affect budget tracking.`,
+            available: budgetValidation.available,
+            required: budgetValidation.required,
+            shortfall: budgetValidation.shortfall,
+            materialBudget: budgetValidation.materialBudget,
+          };
+        } else if (budgetValidation.budgetNotSet) {
+          phaseBudgetWarning = {
+            message: 'No budget set for this phase. Spending will be tracked. Set budget later to enable budget validation.',
+            type: 'info',
+          };
+        }
+      } catch (phaseBudgetError) {
+        // Don't block if phase budget validation fails
+        console.error('Phase budget validation error (non-blocking):', phaseBudgetError);
+      }
+    }
+
+    // Floor Budget Validation (optional, secondary check)
+    if (floor && ObjectId.isValid(floor) && totalCost > 0) {
+      try {
+        const { validateFloorBudget } = await import('@/lib/floor-financial-helpers');
+        const floorBudgetValidation = await validateFloorBudget(floor, totalCost, 'materials');
+        
+        if (!floorBudgetValidation.isValid && !floorBudgetValidation.budgetNotSet) {
+          floorBudgetWarning = {
+            message: `Floor material budget exceeded. ${floorBudgetValidation.message}. ` +
+              `Floor budget: ${floorBudgetValidation.floorBudget.toLocaleString()}, ` +
+              `Available: ${floorBudgetValidation.available.toLocaleString()}, ` +
+              `Required: ${floorBudgetValidation.required.toLocaleString()}. ` +
+              `This is a retroactive entry, so it will be allowed but may affect budget tracking.`,
+            available: floorBudgetValidation.available,
+            required: floorBudgetValidation.required,
+            shortfall: floorBudgetValidation.shortfall,
+            floorBudget: floorBudgetValidation.floorBudget,
+          };
+        } else if (floorBudgetValidation.budgetNotSet) {
+          floorBudgetWarning = {
+            message: 'No floor budget set. Phase budget validation applies.',
+            type: 'info',
+          };
+        }
+      } catch (floorValidationError) {
+        // Don't block if floor validation fails
+        console.error('Floor budget validation error (non-blocking):', floorValidationError);
+      }
+    }
+
     const userRole = normalizeUserRole(userProfile.role);
     const canAutoReceiveRetroactive =
       materialEntryType === 'retroactive_entry' &&
@@ -691,17 +756,23 @@ export async function POST(request) {
     const floorId = insertedMaterial.floor;
     if (floorId && ObjectId.isValid(floorId)) {
       try {
-        await recalculateFloorSpending(floorId.toString());
+        await updateFloorFinancials(floorId.toString());
       } catch (floorError) {
         console.error('Error recalculating floor spending after material creation:', floorError);
         // Don't fail the request, just log the error
       }
     }
 
-    // Include capital warning in response if present
+    // Include warnings in response if present
     const responseData = { ...insertedMaterial };
     if (capitalWarning) {
       responseData.capitalWarning = capitalWarning;
+    }
+    if (phaseBudgetWarning) {
+      responseData.phaseBudgetWarning = phaseBudgetWarning;
+    }
+    if (floorBudgetWarning) {
+      responseData.floorBudgetWarning = floorBudgetWarning;
     }
 
     return successResponse(responseData, 'Material created successfully', 201);

@@ -56,9 +56,9 @@ export async function GET(request, { params }) {
       return errorResponse('Floor not found', 404);
     }
 
-    // Calculate actual spending and committed costs
-    const actualSpending = await calculateFloorActualSpending(id);
-    const committedCosts = await calculateFloorCommittedCosts(id);
+    // Calculate actual spending and committed costs (with phase-specific breakdown)
+    const actualSpending = await calculateFloorActualSpending(id, true);
+    const committedCosts = await calculateFloorCommittedCosts(id, true);
 
     // Get budget allocation (new structure or legacy)
     const budgetAllocation = floor.budgetAllocation || {
@@ -156,18 +156,42 @@ export async function POST(request, { params }) {
       return errorResponse('Floor not found', 404);
     }
 
-    // Build budget allocation object
+    // Import floor budget initialization helper
+    const { initializeFloorBudgetAllocation } = await import('@/lib/floor-financial-helpers');
+    
+    // Get existing budget allocation or initialize
+    const existingBudgetAllocation = floor.budgetAllocation || initializeFloorBudgetAllocation(floor);
+    
+    // Build budget allocation object with byPhase structure
     const budgetAllocation = {
       total: total,
       materials: materials || 0,
       labour: labour || 0,
       equipment: equipment || 0,
       subcontractors: subcontractors || 0,
+      byPhase: existingBudgetAllocation.byPhase || {
+        'PHASE-01': { total: 0, materials: 0, labour: 0, equipment: 0, subcontractors: 0, contingency: 0 },
+        'PHASE-02': { total: 0, materials: 0, labour: 0, equipment: 0, subcontractors: 0, contingency: 0 },
+        'PHASE-03': { total: 0, materials: 0, labour: 0, equipment: 0, subcontractors: 0, contingency: 0 },
+        'PHASE-04': { total: 0, materials: 0, labour: 0, equipment: 0, subcontractors: 0, contingency: 0 }
+      }
     };
+    
+    // If total > 0 and no byPhase allocation exists, allocate to PHASE-02 (legacy behavior)
+    if (total > 0 && Object.values(budgetAllocation.byPhase).every(phase => phase.total === 0)) {
+      budgetAllocation.byPhase['PHASE-02'] = {
+        total: total,
+        materials: materials || Math.round(total * 0.65),
+        labour: labour || Math.round(total * 0.25),
+        equipment: equipment || Math.round(total * 0.05),
+        subcontractors: subcontractors || Math.round(total * 0.03),
+        contingency: 0
+      };
+    }
 
-    // Calculate remaining budget
-    const actualSpending = await calculateFloorActualSpending(id);
-    const committedCosts = await calculateFloorCommittedCosts(id);
+    // Calculate remaining budget (with phase-specific breakdown)
+    const actualSpending = await calculateFloorActualSpending(id, true);
+    const committedCosts = await calculateFloorCommittedCosts(id, true);
     const remaining = Math.max(0, total - actualSpending.total - committedCosts.total);
 
     // Update floor
@@ -255,6 +279,7 @@ export async function PATCH(request, { params }) {
       labour,
       equipment,
       subcontractors,
+      byPhase, // New: phase-specific allocations
     } = body;
 
     const db = await getDatabase();
@@ -276,24 +301,49 @@ export async function PATCH(request, { params }) {
       labour: 0,
       equipment: 0,
       subcontractors: 0,
+      byPhase: {}
     };
 
-    const updatedAllocation = {
-      total: total !== undefined ? total : currentAllocation.total,
-      materials: materials !== undefined ? materials : currentAllocation.materials,
-      labour: labour !== undefined ? labour : currentAllocation.labour,
-      equipment: equipment !== undefined ? equipment : currentAllocation.equipment,
-      subcontractors: subcontractors !== undefined ? subcontractors : currentAllocation.subcontractors,
-    };
+    // If byPhase is provided, use it; otherwise calculate from individual fields
+    let updatedAllocation;
+    if (byPhase && typeof byPhase === 'object') {
+      // Calculate totals from byPhase
+      const calculatedTotal = Object.values(byPhase).reduce((sum, phase) => sum + (phase.total || 0), 0);
+      const calculatedMaterials = Object.values(byPhase).reduce((sum, phase) => sum + (phase.materials || 0), 0);
+      const calculatedLabour = Object.values(byPhase).reduce((sum, phase) => sum + (phase.labour || 0), 0);
+      const calculatedEquipment = Object.values(byPhase).reduce((sum, phase) => sum + (phase.equipment || 0), 0);
+      const calculatedSubcontractors = Object.values(byPhase).reduce((sum, phase) => sum + (phase.subcontractors || 0), 0);
+      const calculatedContingency = Object.values(byPhase).reduce((sum, phase) => sum + (phase.contingency || 0), 0);
+
+      updatedAllocation = {
+        total: total !== undefined ? total : calculatedTotal,
+        byPhase: byPhase,
+        materials: materials !== undefined ? materials : calculatedMaterials,
+        labour: labour !== undefined ? labour : calculatedLabour,
+        equipment: equipment !== undefined ? equipment : calculatedEquipment,
+        subcontractors: subcontractors !== undefined ? subcontractors : calculatedSubcontractors,
+        contingency: calculatedContingency
+      };
+    } else {
+      // Legacy: build from individual fields
+      updatedAllocation = {
+        total: total !== undefined ? total : currentAllocation.total,
+        materials: materials !== undefined ? materials : currentAllocation.materials,
+        labour: labour !== undefined ? labour : currentAllocation.labour,
+        equipment: equipment !== undefined ? equipment : currentAllocation.equipment,
+        subcontractors: subcontractors !== undefined ? subcontractors : currentAllocation.subcontractors,
+        byPhase: currentAllocation.byPhase || {} // Preserve existing byPhase if not provided
+      };
+    }
 
     // Validate total
     if (updatedAllocation.total < 0) {
       return errorResponse('Total budget allocation cannot be negative', 400);
     }
 
-    // Calculate remaining budget
-    const actualSpending = await calculateFloorActualSpending(id);
-    const committedCosts = await calculateFloorCommittedCosts(id);
+    // Calculate remaining budget (with phase-specific breakdown)
+    const actualSpending = await calculateFloorActualSpending(id, true);
+    const committedCosts = await calculateFloorCommittedCosts(id, true);
     const remaining = Math.max(0, updatedAllocation.total - actualSpending.total - committedCosts.total);
 
     // Update floor

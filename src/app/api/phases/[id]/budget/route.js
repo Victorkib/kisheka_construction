@@ -221,19 +221,20 @@ export async function POST(request, { params }) {
       availableBudgetAfter = dccBudget - newTotalPhaseBudgets;
     }
 
-    // Auto-allocate to floors if Superstructure phase and flag is enabled (default: true)
+    // Auto-allocate to floors if flag is enabled (default: true) - now supports all phases
     let floorAllocationResult = null;
-    if (phase.phaseCode === 'PHASE-02' && autoAllocateFloors !== false) {
+    if (autoAllocateFloors !== false) {
       try {
+        const { allocatePhaseBudgetToFloors } = await import('@/lib/floor-financial-helpers');
         const strategy = floorAllocationStrategy || 'weighted';
-        floorAllocationResult = await allocateSuperstructureBudgetToFloors(
+        floorAllocationResult = await allocatePhaseBudgetToFloors(
           id,
           strategy,
           userProfile._id.toString()
         );
         
         if (floorAllocationResult.allocated > 0) {
-          console.log(`[Phase Budget] Auto-allocated budgets to ${floorAllocationResult.allocated} floor(s) for phase ${id} using ${strategy} strategy.`);
+          console.log(`[Phase Budget] Auto-allocated budgets to ${floorAllocationResult.allocated} floor(s) for phase ${phase.phaseCode} using ${strategy} strategy.`);
         }
       } catch (floorAllocError) {
         console.error('Error auto-allocating budgets to floors during phase budget allocation:', floorAllocError);
@@ -448,20 +449,21 @@ export async function PATCH(request, { params }) {
       },
     });
 
-    // Auto-allocate to floors if Superstructure phase and flag is enabled (default: true)
+    // Auto-allocate to floors if flag is enabled (default: true) - now supports all phases
     // Only allocate if budget was actually changed (total was provided)
     let floorAllocationResult = null;
-    if (phase.phaseCode === 'PHASE-02' && autoAllocateFloors !== false && total !== undefined) {
+    if (autoAllocateFloors !== false && total !== undefined) {
       try {
+        const { allocatePhaseBudgetToFloors } = await import('@/lib/floor-financial-helpers');
         const strategy = floorAllocationStrategy || 'weighted';
-        floorAllocationResult = await allocateSuperstructureBudgetToFloors(
+        floorAllocationResult = await allocatePhaseBudgetToFloors(
           id,
           strategy,
           userProfile._id.toString()
         );
         
         if (floorAllocationResult.allocated > 0) {
-          console.log(`[Phase Budget Update] Auto-allocated budgets to ${floorAllocationResult.allocated} floor(s) for phase ${id} using ${strategy} strategy.`);
+          console.log(`[Phase Budget Update] Auto-allocated budgets to ${floorAllocationResult.allocated} floor(s) for phase ${phase.phaseCode} using ${strategy} strategy.`);
         }
       } catch (floorAllocError) {
         console.error('Error auto-allocating budgets to floors during phase budget update:', floorAllocError);

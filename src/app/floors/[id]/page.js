@@ -18,6 +18,7 @@ import { FloorTabNavigation } from '@/components/floors/FloorTabNavigation';
 import { FloorOverviewTab } from '@/components/floors/tabs/OverviewTab';
 import { FloorCostsTab } from '@/components/floors/tabs/CostsTab';
 import { FloorActivityTab } from '@/components/floors/tabs/ActivityTab';
+import { FloorBudgetTab } from '@/components/floors/tabs/BudgetTab';
 import { FloorProgressSection } from '@/components/floors/FloorProgressSection';
 
 export default function FloorDetailPage() {
@@ -543,6 +544,7 @@ export default function FloorDetailPage() {
   // Prepare tabs
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📋' },
+    { id: 'budget', label: 'Budget by Phase', icon: '💵' },
     { id: 'costs', label: 'Costs', icon: '💰', badge: floorSummary.materials.count + floorSummary.labour.count },
     { id: 'activity', label: 'Activity', icon: '📊', badge: ledgerItems.length },
     { id: 'progress', label: 'Progress', icon: '📈' },
@@ -565,6 +567,14 @@ export default function FloorDetailPage() {
             formatCurrency={formatCurrency}
             getStatusColor={getStatusBadgeColor}
             floorSummary={floorSummary}
+          />
+        );
+      case 'budget':
+        return (
+          <FloorBudgetTab
+            floor={floor}
+            project={project}
+            formatCurrency={formatCurrency}
           />
         );
       case 'costs':

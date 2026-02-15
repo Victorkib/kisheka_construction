@@ -19,6 +19,7 @@ import { MaterialLibraryTable } from '@/components/material-library/material-lib
 import { MaterialLibraryFilters } from '@/components/material-library/material-library-filters';
 import { MaterialLibrarySearch } from '@/components/material-library/material-library-search';
 import { ConfirmationModal } from '@/components/modals';
+import { MaterialGuide } from '@/components/materials/MaterialGuide';
 
 function MaterialLibraryPageContent() {
   const router = useRouter();
@@ -328,17 +329,13 @@ function MaterialLibraryPageContent() {
           )}
         </div>
 
-        <PrerequisiteGuide
+        {/* Material Guide - Consolidated Quick Actions & Guide */}
+        <MaterialGuide
           title="Library entries fuel requests and templates"
           description="Keep the library accurate to speed up purchasing."
           prerequisites={[
             'Common materials are known',
             'Categories are defined',
-          ]}
-          actions={[
-            { href: '/material-library/new', label: 'Add Material' },
-            { href: '/material-templates', label: 'Material Templates' },
-            { href: '/material-requests/new', label: 'New Request' },
           ]}
           tip="Include unit costs to improve budget accuracy."
         />

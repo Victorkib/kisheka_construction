@@ -18,6 +18,7 @@ import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { WorkflowGuide } from '@/components/workflow/WorkflowGuide';
 import { HelpIcon, FieldHelp } from '@/components/help/HelpTooltip';
 import { MaterialLibraryPicker } from '@/components/material-library/material-library-picker';
+import { MaterialRequestFinancialStatus } from '@/components/budget/MaterialRequestFinancialStatus';
 
 function NewMaterialRequestPageContent() {
   const router = useRouter();
@@ -492,11 +493,13 @@ function NewMaterialRequestPageContent() {
       };
 
       const response = await fetch('/api/material-requests', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(payload),
       });
 
@@ -984,6 +987,18 @@ function NewMaterialRequestPageContent() {
                 />
               </div>
             </div>
+
+            {/* Financial Status Display */}
+            {formData.projectId && formData.phaseId && formData.estimatedCost && parseFloat(formData.estimatedCost) > 0 && (
+              <div className="mt-4">
+                <MaterialRequestFinancialStatus
+                  projectId={formData.projectId}
+                  phaseId={formData.phaseId}
+                  floorId={formData.floorId || null}
+                  estimatedCost={parseFloat(formData.estimatedCost) || 0}
+                />
+              </div>
+            )}
 
             {/* Reason */}
             <div>
