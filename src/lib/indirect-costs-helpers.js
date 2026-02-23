@@ -5,7 +5,7 @@
 
 import { getDatabase } from '@/lib/mongodb/connection';
 import { ObjectId } from 'mongodb';
-import { INITIAL_EXPENSE_APPROVED_STATUSES, LABOUR_APPROVED_STATUSES } from '@/lib/status-constants';
+import { INITIAL_EXPENSE_APPROVED_STATUSES } from '@/lib/status-constants';
 import { isEnhancedBudget, getBudgetTotal } from '@/lib/schemas/budget-schema';
 
 /**
@@ -16,49 +16,55 @@ import { isEnhancedBudget, getBudgetTotal } from '@/lib/schemas/budget-schema';
  */
 export async function calculateIndirectCostsSpending(projectId) {
   const db = await getDatabase();
-  
+
   // Calculate expenses marked as indirect costs
-  const expenseResult = await db.collection('expenses').aggregate([
-    {
-      $match: {
-        projectId: new ObjectId(projectId),
-        deletedAt: null,
-        isIndirectCost: true,
-        status: { $in: ['APPROVED', 'PAID'] }
-      }
-    },
-    {
-      $group: {
-        _id: null,
-        total: { $sum: '$amount' }
-      }
-    }
-  ]).toArray();
-  
+  const expenseResult = await db
+    .collection('expenses')
+    .aggregate([
+      {
+        $match: {
+          projectId: new ObjectId(projectId),
+          deletedAt: null,
+          isIndirectCost: true,
+          status: { $in: ['APPROVED', 'PAID'] },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$amount' },
+        },
+      },
+    ])
+    .toArray();
+
   const expenseTotal = expenseResult[0]?.total || 0;
-  
+
   // Calculate labour entries marked as indirect labour
   // CRITICAL: Include labour entries in indirect costs spending
-  const labourResult = await db.collection('labour_entries').aggregate([
-    {
-      $match: {
-        projectId: new ObjectId(projectId),
-        deletedAt: null,
-        isIndirectLabour: true,
-        indirectCostCategory: { $exists: true, $ne: null },
-        status: { $in: LABOUR_APPROVED_STATUSES } // Labour entries are approved on creation
-      }
-    },
-    {
-      $group: {
-        _id: null,
-        total: { $sum: '$totalCost' }
-      }
-    }
-  ]).toArray();
-  
+  const labourResult = await db
+    .collection('labour_entries')
+    .aggregate([
+      {
+        $match: {
+          projectId: new ObjectId(projectId),
+          deletedAt: null,
+          isIndirectLabour: true,
+          indirectCostCategory: { $exists: true, $ne: null },
+          status: { $in: ['DRAFT', 'PENDING', 'APPROVED'] }, // Labour entries are approved on creation
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          total: { $sum: '$totalCost' },
+        },
+      },
+    ])
+    .toArray();
+
   const labourTotal = labourResult[0]?.total || 0;
-  
+
   return expenseTotal + labourTotal;
 }
 
@@ -70,66 +76,72 @@ export async function calculateIndirectCostsSpending(projectId) {
  */
 export async function calculateIndirectCostsByCategory(projectId) {
   const db = await getDatabase();
-  
+
   // Get expenses by category
-  const expenseResult = await db.collection('expenses').aggregate([
-    {
-      $match: {
-        projectId: new ObjectId(projectId),
-        deletedAt: null,
-        isIndirectCost: true,
-        status: { $in: ['APPROVED', 'PAID'] }
-      }
-    },
-    {
-      $group: {
-        _id: '$indirectCostCategory',
-        total: { $sum: '$amount' }
-      }
-    }
-  ]).toArray();
-  
+  const expenseResult = await db
+    .collection('expenses')
+    .aggregate([
+      {
+        $match: {
+          projectId: new ObjectId(projectId),
+          deletedAt: null,
+          isIndirectCost: true,
+          status: { $in: ['APPROVED', 'PAID'] },
+        },
+      },
+      {
+        $group: {
+          _id: '$indirectCostCategory',
+          total: { $sum: '$amount' },
+        },
+      },
+    ])
+    .toArray();
+
   // Get labour entries by category
-  const labourResult = await db.collection('labour_entries').aggregate([
-    {
-      $match: {
-        projectId: new ObjectId(projectId),
-        deletedAt: null,
-        isIndirectLabour: true,
-        indirectCostCategory: { $exists: true, $ne: null },
-        status: { $in: LABOUR_APPROVED_STATUSES }
-      }
-    },
-    {
-      $group: {
-        _id: '$indirectCostCategory',
-        total: { $sum: '$totalCost' }
-      }
-    }
-  ]).toArray();
-  
+  const labourResult = await db
+    .collection('labour_entries')
+    .aggregate([
+      {
+        $match: {
+          projectId: new ObjectId(projectId),
+          deletedAt: null,
+          isIndirectLabour: true,
+          indirectCostCategory: { $exists: true, $ne: null },
+          status: { $in: ['DRAFT', 'PENDING', 'APPROVED'] },
+        },
+      },
+      {
+        $group: {
+          _id: '$indirectCostCategory',
+          total: { $sum: '$totalCost' },
+        },
+      },
+    ])
+    .toArray();
+
   // Initialize all categories to 0
   const byCategory = {
     utilities: 0,
     siteOverhead: 0,
     transportation: 0,
-    safetyCompliance: 0
+    safetyCompliance: 0,
   };
-  
+
   // Fill in actual values from expenses
-  expenseResult.forEach(item => {
+  expenseResult.forEach((item) => {
     if (item._id && byCategory.hasOwnProperty(item._id)) {
       byCategory[item._id] += item.total;
     }
   });
-  
+
   // Fill in actual values from labour entries (accumulate with expenses)
-  labourResult.forEach(item => {
+  labourResult.forEach((item) => {
     if (item._id && byCategory.hasOwnProperty(item._id)) {
       byCategory[item._id] += item.total;
     }
   });
-  
+
   return byCategory;
 }
 
@@ -141,15 +153,22 @@ export async function calculateIndirectCostsByCategory(projectId) {
  * @param {Object} [session] - MongoDB session for transaction (optional)
  * @returns {Promise<void>}
  */
-export async function updateIndirectCostsSpending(projectId, category, amount, session = null) {
+export async function updateIndirectCostsSpending(
+  projectId,
+  category,
+  amount,
+  session = null,
+) {
   const db = await getDatabase();
-  
+
   // Get or create project_finances record
-  let projectFinances = await db.collection('project_finances').findOne(
-    { projectId: new ObjectId(projectId) },
-    session ? { session } : undefined
-  );
-  
+  let projectFinances = await db
+    .collection('project_finances')
+    .findOne(
+      { projectId: new ObjectId(projectId) },
+      session ? { session } : undefined,
+    );
+
   if (!projectFinances) {
     // Create new project_finances record
     projectFinances = {
@@ -162,15 +181,17 @@ export async function updateIndirectCostsSpending(projectId, category, amount, s
           utilities: 0,
           siteOverhead: 0,
           transportation: 0,
-          safetyCompliance: 0
-        }
+          safetyCompliance: 0,
+        },
       },
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     };
-    await db.collection('project_finances').insertOne(projectFinances, session ? { session } : undefined);
+    await db
+      .collection('project_finances')
+      .insertOne(projectFinances, session ? { session } : undefined);
   }
-  
+
   // Initialize indirectCosts if it doesn't exist
   if (!projectFinances.indirectCosts) {
     projectFinances.indirectCosts = {
@@ -181,16 +202,16 @@ export async function updateIndirectCostsSpending(projectId, category, amount, s
         utilities: 0,
         siteOverhead: 0,
         transportation: 0,
-        safetyCompliance: 0
-      }
+        safetyCompliance: 0,
+      },
     };
   }
-  
+
   // Get budget from project
   const project = await db.collection('projects').findOne({
-    _id: new ObjectId(projectId)
+    _id: new ObjectId(projectId),
   });
-  
+
   if (project && project.budget) {
     let indirectBudget = 0;
     if (isEnhancedBudget(project.budget)) {
@@ -200,19 +221,23 @@ export async function updateIndirectCostsSpending(projectId, category, amount, s
       const totalBudget = getBudgetTotal(project.budget);
       indirectBudget = totalBudget * 0.05;
     }
-    
+
     projectFinances.indirectCosts.budgeted = indirectBudget;
   }
-  
+
   // Update spending
   const currentTotal = projectFinances.indirectCosts.spent || 0;
-  const currentCategory = projectFinances.indirectCosts.byCategory[category] || 0;
+  const currentCategory =
+    projectFinances.indirectCosts.byCategory[category] || 0;
   const newTotal = currentTotal + amount;
   const newCategory = currentCategory + amount;
-  const remaining = Math.max(0, projectFinances.indirectCosts.budgeted - newTotal);
-  
+  const remaining = Math.max(
+    0,
+    projectFinances.indirectCosts.budgeted - newTotal,
+  );
+
   const updateOptions = session ? { session } : undefined;
-  
+
   await db.collection('project_finances').updateOne(
     { projectId: new ObjectId(projectId) },
     {
@@ -220,10 +245,10 @@ export async function updateIndirectCostsSpending(projectId, category, amount, s
         'indirectCosts.spent': newTotal,
         [`indirectCosts.byCategory.${category}`]: newCategory,
         'indirectCosts.remaining': remaining,
-        updatedAt: new Date()
-      }
+        updatedAt: new Date(),
+      },
     },
-    updateOptions
+    updateOptions,
   );
 }
 
@@ -234,18 +259,18 @@ export async function updateIndirectCostsSpending(projectId, category, amount, s
  */
 export async function getIndirectCostsRemaining(projectId) {
   const db = await getDatabase();
-  
+
   const project = await db.collection('projects').findOne({
-    _id: new ObjectId(projectId)
+    _id: new ObjectId(projectId),
   });
-  
+
   if (!project || !project.budget) {
     return 0;
   }
-  
+
   const budget = project.budget;
   let indirectBudget = 0;
-  
+
   if (isEnhancedBudget(budget)) {
     indirectBudget = budget.indirectCosts || 0;
   } else {
@@ -253,10 +278,10 @@ export async function getIndirectCostsRemaining(projectId) {
     const totalBudget = getBudgetTotal(budget);
     indirectBudget = totalBudget * 0.05;
   }
-  
+
   const spending = await calculateIndirectCostsSpending(projectId);
   const remaining = Math.max(0, indirectBudget - spending);
-  
+
   return remaining;
 }
 
@@ -268,31 +293,38 @@ export async function getIndirectCostsRemaining(projectId) {
  */
 export async function getIndirectCostsByPhase(projectId, phaseId) {
   const db = await getDatabase();
-  
+
   // Get indirect cost expenses for this phase
-  const expenses = await db.collection('expenses').find({
-    projectId: new ObjectId(projectId),
-    phaseId: new ObjectId(phaseId),
-    deletedAt: null,
-    isIndirectCost: true,
-    status: { $in: ['APPROVED', 'PAID'] }
-  }).sort({ datePaid: 1 }).toArray();
-  
+  const expenses = await db
+    .collection('expenses')
+    .find({
+      projectId: new ObjectId(projectId),
+      phaseId: new ObjectId(phaseId),
+      deletedAt: null,
+      isIndirectCost: true,
+      status: { $in: ['APPROVED', 'PAID'] },
+    })
+    .sort({ datePaid: 1 })
+    .toArray();
+
   // Get indirect labour entries for this phase (if any - indirect labour is typically project-level)
-  const labourEntries = await db.collection('labour_entries').find({
-    projectId: new ObjectId(projectId),
-    phaseId: new ObjectId(phaseId),
-    deletedAt: null,
-    isIndirectLabour: true,
-    indirectCostCategory: { $exists: true, $ne: null },
-    status: { $in: ['approved', 'paid', 'APPROVED', 'PAID'] }
-  }).sort({ entryDate: 1 }).toArray();
-  
+  const labourEntries = await db
+    .collection('labour_entries')
+    .find({
+      projectId: new ObjectId(projectId),
+      phaseId: new ObjectId(phaseId),
+      deletedAt: null,
+      isIndirectLabour: true,
+      indirectCostCategory: { $exists: true, $ne: null },
+    })
+    .sort({ entryDate: 1 })
+    .toArray();
+
   // Combine results
   return {
     expenses,
     labourEntries,
-    all: [...expenses, ...labourEntries]
+    all: [...expenses, ...labourEntries],
   };
 }
 
@@ -303,17 +335,17 @@ export async function getIndirectCostsByPhase(projectId, phaseId) {
  */
 export async function getIndirectCostsBudget(projectId) {
   const db = await getDatabase();
-  
+
   const project = await db.collection('projects').findOne({
-    _id: new ObjectId(projectId)
+    _id: new ObjectId(projectId),
   });
-  
+
   if (!project || !project.budget) {
     return 0;
   }
-  
+
   const budget = project.budget;
-  
+
   if (isEnhancedBudget(budget)) {
     return budget.indirectCosts || 0;
   } else {
@@ -333,12 +365,12 @@ export async function getIndirectCostsSummary(projectId) {
   const spent = await calculateIndirectCostsSpending(projectId);
   const byCategory = await calculateIndirectCostsByCategory(projectId);
   const remaining = Math.max(0, budget - spent);
-  
+
   return {
     budgeted: budget,
     spent,
     remaining,
-    byCategory
+    byCategory,
   };
 }
 
@@ -349,7 +381,11 @@ export async function getIndirectCostsSummary(projectId) {
  * @param {string} [category] - Optional: indirect cost category for category-level validation
  * @returns {Promise<Object>} { isValid: boolean, available: number, required: number, shortfall: number, message: string }
  */
-export async function validateIndirectCostsBudget(projectId, amount, category = null) {
+export async function validateIndirectCostsBudget(
+  projectId,
+  amount,
+  category = null,
+) {
   if (!projectId || !ObjectId.isValid(projectId)) {
     return {
       isValid: false,
@@ -366,7 +402,8 @@ export async function validateIndirectCostsBudget(projectId, amount, category = 
       available: 0,
       required: 0,
       shortfall: 0,
-      message: 'No amount provided. Budget validation will occur when expense is approved.',
+      message:
+        'No amount provided. Budget validation will occur when expense is approved.',
     };
   }
 
@@ -388,32 +425,21 @@ export async function validateIndirectCostsBudget(projectId, amount, category = 
 
   // Get indirect costs budget
   const indirectBudget = await getIndirectCostsBudget(projectId);
-  
-  // OPTIONAL BUDGET: If budget is zero, allow operation and track spending
+
   if (indirectBudget <= 0) {
     return {
-      isValid: true,
+      isValid: false,
       available: 0,
       required: amount,
-      shortfall: 0,
-      message: 'No indirect costs budget set. Operation allowed - spending will be tracked. Set budget later to enable budget validation.',
-      budgetNotSet: true
+      shortfall: amount,
+      message:
+        'Indirect costs budget not set. Please set a project budget with indirect costs first.',
     };
   }
 
   // Get current spending
   const spending = await calculateIndirectCostsSpending(projectId);
-  
-  // LATE ACTIVATION: Use effective spending (current - baseline) for validation
-  const { getEffectiveProjectSpending, getPreBudgetBaseline } = await import('@/lib/activation-helpers');
-  const effectiveSpending = getEffectiveProjectSpending(project, spending);
-  const baseline = getPreBudgetBaseline(project);
-  
-  // For indirect costs, use the indirect specific baseline if available
-  const indirectBaseline = project.budgetActivation?.preBudgetSpending?.indirect || 0;
-  const effectiveIndirectSpending = Math.max(0, spending - indirectBaseline);
-  
-  const available = Math.max(0, indirectBudget - effectiveIndirectSpending);
+  const available = Math.max(0, indirectBudget - spending);
 
   // If category is provided, also check category-level spending
   if (category) {
@@ -478,28 +504,27 @@ export function autoCategorizeIndirectCost(category) {
   // Map expense categories to indirect cost categories
   const categoryMapping = {
     // Utilities → utilities
-    'utilities': { isIndirect: true, indirectCategory: 'utilities' },
-    
+    utilities: { isIndirect: true, indirectCategory: 'utilities' },
+
     // Transport → transportation
-    'transport': { isIndirect: true, indirectCategory: 'transportation' },
-    
+    transport: { isIndirect: true, indirectCategory: 'transportation' },
+
     // Safety → safetyCompliance
-    'safety': { isIndirect: true, indirectCategory: 'safetyCompliance' },
-    
+    safety: { isIndirect: true, indirectCategory: 'safetyCompliance' },
+
     // Site overhead categories → siteOverhead
-    'accommodation': { isIndirect: true, indirectCategory: 'siteOverhead' },
-    'training': { isIndirect: true, indirectCategory: 'siteOverhead' },
-    
+    accommodation: { isIndirect: true, indirectCategory: 'siteOverhead' },
+    training: { isIndirect: true, indirectCategory: 'siteOverhead' },
+
     // Direct cost categories (not indirect)
-    'equipment_rental': { isIndirect: false, indirectCategory: null },
-    'excavation': { isIndirect: false, indirectCategory: null },
-    'earthworks': { isIndirect: false, indirectCategory: null },
-    'construction_services': { isIndirect: false, indirectCategory: null },
-    'permits': { isIndirect: false, indirectCategory: null }, // Permits are preconstruction, not indirect
+    equipment_rental: { isIndirect: false, indirectCategory: null },
+    excavation: { isIndirect: false, indirectCategory: null },
+    earthworks: { isIndirect: false, indirectCategory: null },
+    construction_services: { isIndirect: false, indirectCategory: null },
+    permits: { isIndirect: false, indirectCategory: null }, // Permits are preconstruction, not indirect
   };
 
-  return categoryMapping[category] || { isIndirect: false, indirectCategory: null };
+  return (
+    categoryMapping[category] || { isIndirect: false, indirectCategory: null }
+  );
 }
-
-
-

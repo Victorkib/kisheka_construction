@@ -69,16 +69,10 @@ export function Header({ onMenuClick }) {
     if (
       user &&
       ['owner', 'pm', 'project_manager', 'accountant'].includes(
-        user.role?.toLowerCase()
+        user.role?.toLowerCase(),
       )
     ) {
-      fetch('/api/dashboard/summary', {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-        },
-      })
+      fetch('/api/dashboard/summary')
         .then((res) => res.json())
         .then((data) => {
           if (data?.success && data?.data?.summary?.totalPendingApprovals) {
@@ -94,16 +88,16 @@ export function Header({ onMenuClick }) {
     try {
       // Clear client-side caches
       clearUserCache();
-      
+
       // Clear service worker cache
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
         for (const registration of registrations) {
           const cacheNames = await caches.keys();
-          await Promise.all(cacheNames.map(name => caches.delete(name)));
+          await Promise.all(cacheNames.map((name) => caches.delete(name)));
         }
       }
-      
+
       // Clear sessionStorage and localStorage of any app data
       try {
         sessionStorage.clear();
@@ -111,10 +105,10 @@ export function Header({ onMenuClick }) {
       } catch (e) {
         // Storage might not be available
       }
-      
+
       // Call logout API
       await fetch('/api/auth/logout', { method: 'POST' });
-      
+
       // Redirect to login
       router.push('/auth/login');
     } catch (err) {
@@ -167,10 +161,7 @@ export function Header({ onMenuClick }) {
 
       {/* Center: Logo & Project Switcher */}
       <div className="flex items-center gap-4">
-        {/* IMPORTANT: On authenticated pages, linking to `/` can trigger the server redirect-to-dashboard flow.
-            In production, prefetch/redirect interactions can look like "random redirect to dashboard".
-            Use `/dashboard` explicitly here and disable prefetch for maximum stability. */}
-        <Link href="/dashboard" prefetch={false} className="flex items-center gap-2 hover:opacity-90">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-90">
           <img
             src="/logo.png"
             alt="Doshaki Construction Logo"

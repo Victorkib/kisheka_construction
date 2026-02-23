@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingTable, LoadingSpinner } from '@/components/loading';
@@ -16,8 +16,13 @@ import { ArchiveBadge } from '@/components/badges';
 import { ConfirmationModal, RestoreModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
 
+// Force dynamic rendering for pages using useSearchParams
+export const dynamic = 'force-dynamic';
+
 function ArchivedInvestorsPageContent() {
   const router = useRouter();
+  // Use useSearchParams to ensure Suspense boundary is recognized
+  const searchParams = useSearchParams();
   const toast = useToast();
   const [investors, setInvestors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -337,14 +342,12 @@ function ArchivedInvestorsPageContent() {
 export default function ArchivedInvestorsPage() {
   return (
     <Suspense fallback={
-      <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center py-12">
-            <LoadingSpinner />
-            <p className="mt-4 text-gray-600">Loading archived investors...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner />
+          <p className="mt-4 text-gray-600">Loading archived investors...</p>
         </div>
-      </AppLayout>
+      </div>
     }>
       <ArchivedInvestorsPageContent />
     </Suspense>

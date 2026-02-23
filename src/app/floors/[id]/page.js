@@ -19,6 +19,7 @@ import { FloorOverviewTab } from '@/components/floors/tabs/OverviewTab';
 import { FloorCostsTab } from '@/components/floors/tabs/CostsTab';
 import { FloorActivityTab } from '@/components/floors/tabs/ActivityTab';
 import { FloorBudgetTab } from '@/components/floors/tabs/BudgetTab';
+import { FloorPhaseBreakdownTab } from '@/components/floors/tabs/PhaseBreakdownTab';
 import { FloorProgressSection } from '@/components/floors/FloorProgressSection';
 
 export default function FloorDetailPage() {
@@ -227,24 +228,96 @@ export default function FloorDetailPage() {
       });
       const equipmentTotal = floorEquipment.reduce((sum, item) => sum + toNumber(item.totalCost), 0);
 
-      const phaseMap = workItems.reduce((acc, item) => {
-        const key = item.phaseId?.toString() || 'unknown';
-        if (!acc[key]) {
-          acc[key] = {
-            phaseId: item.phaseId,
-            phaseName: item.phaseName || 'Unknown Phase',
-            count: 0,
-            totalCost: 0,
-          };
+      // Build comprehensive phase breakdown from all sources (not just work items)
+      const phaseMap = {};
+      
+      // Add phases from work items
+      workItems.forEach((item) => {
+        const key = item.phaseId?.toString();
+        if (key && key !== 'null' && key !== 'undefined') {
+          if (!phaseMap[key]) {
+            phaseMap[key] = {
+              phaseId: item.phaseId,
+              phaseName: item.phaseName || 'Unknown Phase',
+              count: 0,
+              totalCost: 0,
+            };
+          }
+          phaseMap[key].count += 1;
+          phaseMap[key].totalCost += toNumber(item.actualCost || item.estimatedCost);
         }
-        acc[key].count += 1;
-        acc[key].totalCost += toNumber(item.actualCost || item.estimatedCost);
-        return acc;
-      }, {});
+      });
+      
+      // Add phases from materials
+      materials.forEach((item) => {
+        const key = item.phaseId?.toString();
+        if (key && key !== 'null' && key !== 'undefined') {
+          if (!phaseMap[key]) {
+            phaseMap[key] = {
+              phaseId: item.phaseId,
+              phaseName: item.phaseName || 'Unknown Phase',
+              count: 0,
+              totalCost: 0,
+            };
+          }
+          phaseMap[key].count += 1;
+          phaseMap[key].totalCost += toNumber(item.totalCost);
+        }
+      });
+      
+      // Add phases from material requests
+      requests.forEach((item) => {
+        const key = item.phaseId?.toString();
+        if (key && key !== 'null' && key !== 'undefined') {
+          if (!phaseMap[key]) {
+            phaseMap[key] = {
+              phaseId: item.phaseId,
+              phaseName: item.phaseName || 'Unknown Phase',
+              count: 0,
+              totalCost: 0,
+            };
+          }
+          phaseMap[key].count += 1;
+          phaseMap[key].totalCost += toNumber(item.estimatedCost);
+        }
+      });
+      
+      // Add phases from labour entries
+      labourEntries.forEach((item) => {
+        const key = item.phaseId?.toString();
+        if (key && key !== 'null' && key !== 'undefined') {
+          if (!phaseMap[key]) {
+            phaseMap[key] = {
+              phaseId: item.phaseId,
+              phaseName: item.phaseName || 'Unknown Phase',
+              count: 0,
+              totalCost: 0,
+            };
+          }
+          phaseMap[key].count += 1;
+          phaseMap[key].totalCost += toNumber(item.totalCost);
+        }
+      });
+      
+      // Add phases from equipment
+      floorEquipment.forEach((item) => {
+        const key = item.phaseId?.toString();
+        if (key && key !== 'null' && key !== 'undefined') {
+          if (!phaseMap[key]) {
+            phaseMap[key] = {
+              phaseId: item.phaseId,
+              phaseName: item.phaseName || 'Unknown Phase',
+              count: 0,
+              totalCost: 0,
+            };
+          }
+          phaseMap[key].count += 1;
+          phaseMap[key].totalCost += toNumber(item.totalCost);
+        }
+      });
 
       const phaseSummary = Object.values(phaseMap)
-        .sort((a, b) => b.totalCost - a.totalCost)
-        .slice(0, 5);
+        .sort((a, b) => b.totalCost - a.totalCost);
 
       setFloorSummary({
         materials: { count: materials.length, totalCost: materialsTotal },
@@ -264,6 +337,7 @@ export default function FloorDetailPage() {
           amount: toNumber(item.totalCost),
           date: item.createdAt || item.updatedAt,
           link: `/items/${item._id}`,
+          phaseId: item.phaseId, // Add phaseId for filtering
         })),
         ...requests.slice(0, 10).map((item) => ({
           id: item._id,
@@ -272,6 +346,7 @@ export default function FloorDetailPage() {
           amount: toNumber(item.estimatedCost),
           date: item.createdAt || item.updatedAt,
           link: `/material-requests/${item._id}`,
+          phaseId: item.phaseId, // Add phaseId for filtering
         })),
         ...orders.slice(0, 10).map((item) => ({
           id: item._id,
@@ -280,6 +355,7 @@ export default function FloorDetailPage() {
           amount: toNumber(item.totalCost),
           date: item.createdAt || item.sentAt,
           link: `/purchase-orders/${item._id}`,
+          phaseId: item.phaseId || item.materialRequestId ? (item.materialRequest?.phaseId || null) : null, // Add phaseId if available
         })),
         ...labourEntries.slice(0, 10).map((item) => ({
           id: item._id,
@@ -288,6 +364,7 @@ export default function FloorDetailPage() {
           amount: toNumber(item.totalCost),
           date: item.entryDate || item.createdAt,
           link: null,
+          phaseId: item.phaseId, // Add phaseId for filtering
         })),
         ...workItems.slice(0, 10).map((item) => ({
           id: item._id,
@@ -296,6 +373,7 @@ export default function FloorDetailPage() {
           amount: toNumber(item.actualCost || item.estimatedCost),
           date: item.updatedAt || item.createdAt,
           link: `/work-items/${item._id}`,
+          phaseId: item.phaseId, // Add phaseId for filtering
         })),
         ...floorEquipment.slice(0, 10).map((item) => ({
           id: item._id,
@@ -304,6 +382,7 @@ export default function FloorDetailPage() {
           amount: toNumber(item.totalCost),
           date: item.startDate || item.createdAt,
           link: `/equipment/${item._id}`,
+          phaseId: item.phaseId, // Add phaseId for filtering
         })),
       ]
         .filter((item) => item.date)
@@ -544,6 +623,7 @@ export default function FloorDetailPage() {
   // Prepare tabs
   const tabs = [
     { id: 'overview', label: 'Overview', icon: '📋' },
+    { id: 'phases', label: 'Phase Breakdown', icon: '🏗️' },
     { id: 'budget', label: 'Budget by Phase', icon: '💵' },
     { id: 'costs', label: 'Costs', icon: '💰', badge: floorSummary.materials.count + floorSummary.labour.count },
     { id: 'activity', label: 'Activity', icon: '📊', badge: ledgerItems.length },
@@ -569,12 +649,23 @@ export default function FloorDetailPage() {
             floorSummary={floorSummary}
           />
         );
+      case 'phases':
+        return (
+          <FloorPhaseBreakdownTab
+            floor={floor}
+            project={project}
+            formatCurrency={formatCurrency}
+            formatDate={formatDate}
+            canEdit={canEdit}
+          />
+        );
       case 'budget':
         return (
           <FloorBudgetTab
             floor={floor}
             project={project}
             formatCurrency={formatCurrency}
+            canEdit={canEdit}
           />
         );
       case 'costs':
@@ -699,6 +790,12 @@ export default function FloorDetailPage() {
                     >
                       Edit Floor
                     </button>
+                    <Link
+                      href={`/floors/${floorId}/budget`}
+                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    >
+                      Manage Budget & Capital
+                    </Link>
                     {canDelete && (
                       <button
                         onClick={() => setShowDeleteModal(true)}

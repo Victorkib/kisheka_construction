@@ -343,3 +343,48 @@ export async function deleteProfessionalFeeCloudinaryAssets(fee) {
   return await deleteMultipleCloudinaryAssets(uniqueUrls);
 }
 
+/**
+ * Extract and delete Cloudinary assets from phase documents
+ * @param {object} phase - Phase document
+ * @returns {Promise<{success: number, failed: number}>}
+ */
+export async function deletePhaseCloudinaryAssets(phase) {
+  if (!phase) return { success: 0, failed: 0 };
+
+  const urls = [];
+
+  // Collect all Cloudinary URLs from phase documents
+  if (phase.documents && Array.isArray(phase.documents)) {
+    phase.documents.forEach((doc) => {
+      if (doc.url) urls.push(doc.url);
+      if (doc.cloudinaryUrl) urls.push(doc.cloudinaryUrl);
+      if (doc.fileUrl) urls.push(doc.fileUrl);
+    });
+  }
+
+  // Remove duplicates
+  const uniqueUrls = [...new Set(urls.filter(Boolean))];
+
+  return await deleteMultipleCloudinaryAssets(uniqueUrls);
+}/**
+ * Extract and delete Cloudinary assets from floor progress photos
+ * @param {object} floor - Floor document
+ * @returns {Promise<{success: number, failed: number}>}
+ */
+export async function deleteFloorProgressCloudinaryAssets(floor) {
+  if (!floor) return { success: 0, failed: 0 };
+
+  const urls = [];  // Collect all Cloudinary URLs from floor progress photos
+  if (floor.progress?.photos && Array.isArray(floor.progress.photos)) {
+    floor.progress.photos.forEach((photo) => {
+      if (photo.url) urls.push(photo.url);
+      if (photo.cloudinaryUrl) urls.push(photo.cloudinaryUrl);
+      if (photo.fileUrl) urls.push(photo.fileUrl);
+    });
+  }
+
+  // Remove duplicates
+  const uniqueUrls = [...new Set(urls.filter(Boolean))];
+
+  return await deleteMultipleCloudinaryAssets(uniqueUrls);
+}

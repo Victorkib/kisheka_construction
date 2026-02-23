@@ -499,6 +499,22 @@ function PhaseBudgetPageContent() {
                   </div>
                 </div>
               )}
+              
+              {/* Manual Floor Allocation Link */}
+              <div className="ml-7 mt-4 pt-4 border-t border-green-300">
+                <p className="text-xs text-gray-600 mb-2">
+                  Want more control? Manually allocate budgets to specific floors:
+                </p>
+                <Link
+                  href={`/phases/${phaseId}/floors/budget`}
+                  className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                  Manually Allocate to Floors
+                </Link>
+              </div>
             </div>
           )}
 

@@ -2334,23 +2334,75 @@ export default function ProjectDetailPage() {
               </div>
               <div>
                 <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Start Date</label>
-                <input
-                  type="date"
-                  name="startDate"
-                  value={formData.startDate || ''}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all cursor-pointer"
-                />
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="startDate"
+                    value={formData.startDate || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 pr-12 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all cursor-pointer"
+                  />
+                  {/* Visible Calendar Icon on the Right */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const input = e.target.closest('.relative').querySelector('input[type="date"]');
+                      if (input) {
+                        input.showPicker?.();
+                        input.focus();
+                      }
+                    }}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                    aria-label="Open date picker"
+                    tabIndex={-1}
+                  >
+                    <svg
+                      className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div>
                 <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Planned End Date</label>
-                <input
-                  type="date"
-                  name="plannedEndDate"
-                  value={formData.plannedEndDate || ''}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all cursor-pointer"
-                />
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="plannedEndDate"
+                    value={formData.plannedEndDate || ''}
+                    onChange={handleChange}
+                    className="w-full px-4 pr-12 py-3 text-base font-medium text-gray-900 bg-white border-2 border-gray-400 rounded-lg shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 focus:border-blue-600 transition-all cursor-pointer"
+                  />
+                  {/* Visible Calendar Icon on the Right */}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const input = e.target.closest('.relative').querySelector('input[type="date"]');
+                      if (input) {
+                        input.showPicker?.();
+                        input.focus();
+                      }
+                    }}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                    aria-label="Open date picker"
+                    tabIndex={-1}
+                  >
+                    <svg
+                      className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
               <div className="md:col-span-2">
                 <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">Description</label>

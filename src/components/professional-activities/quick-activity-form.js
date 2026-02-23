@@ -16,6 +16,7 @@ import {
   TEST_TYPES,
   TEST_RESULTS,
 } from '@/lib/constants/professional-activities-constants';
+import { FeeCalculator } from './FeeCalculator';
 
 export function QuickActivityForm({
   initialData = null,
@@ -80,6 +81,7 @@ export function QuickActivityForm({
     testResult: 'pass',
     testDate: new Date().toISOString().split('T')[0],
   });
+  const [suggestedFee, setSuggestedFee] = useState(null);
 
   // Load initial data if editing
   useEffect(() => {
@@ -1021,6 +1023,22 @@ export function QuickActivityForm({
         </div>
       )}
 
+      {/* Fee Calculator */}
+      {formData.professionalServiceId && formData.activityType && (
+        <div className="mb-6">
+          <FeeCalculator
+            professionalServiceId={formData.professionalServiceId}
+            activityType={formData.activityType}
+            visitDuration={formData.visitDuration}
+            inspectionDuration={formData.inspectionDuration}
+            revisionDuration={formData.revisionDuration}
+            onCalculatedFeeChange={(fee) => {
+              setSuggestedFee(fee);
+            }}
+          />
+        </div>
+      )}
+
       {/* Financial Information */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Information (Optional)</h2>
@@ -1029,16 +1047,37 @@ export function QuickActivityForm({
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Fees Charged (KES)
             </label>
-            <input
-              type="number"
-              name="feesCharged"
-              value={formData.feesCharged}
-              onChange={handleChange}
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            <div className="flex gap-2">
+              <input
+                type="number"
+                name="feesCharged"
+                value={formData.feesCharged}
+                onChange={handleChange}
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              {suggestedFee && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      feesCharged: suggestedFee.toString(),
+                    }));
+                  }}
+                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-colors text-sm font-medium whitespace-nowrap"
+                >
+                  Use Suggested
+                </button>
+              )}
+            </div>
+            {suggestedFee && !formData.feesCharged && (
+              <p className="mt-1 text-xs text-gray-500">
+                Suggested: {suggestedFee.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">

@@ -2,7 +2,7 @@
  * Project Finances API Route
  * GET: Get project finances summary
  * Auto-calculates from investors, expenses, materials, initial expenses
- * 
+ *
  * GET /api/project-finances?projectId=xxx
  */
 
@@ -27,9 +27,6 @@ import {
 } from '@/lib/financial-helpers';
 import { calculateTotalPhaseBudgets } from '@/lib/phase-helpers';
 
-// Force dynamic rendering to prevent caching stale data
-export const dynamic = 'force-dynamic';
-
 /**
  * GET /api/project-finances
  * Returns project finances summary
@@ -39,7 +36,10 @@ export const dynamic = 'force-dynamic';
 export async function GET(request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return errorResponse('Unauthorized', 401);
@@ -56,9 +56,18 @@ export async function GET(request) {
     const forceRecalculate = searchParams.get('forceRecalculate') === 'true';
 
     // Check if user has permission to view project finances
-    const allowedRoles = ['owner', 'investor', 'accountant', 'project_manager', 'pm'];
+    const allowedRoles = [
+      'owner',
+      'investor',
+      'accountant',
+      'project_manager',
+      'pm',
+    ];
     if (!allowedRoles.includes(userRole)) {
-      return errorResponse('You do not have permission to view project finances', 403);
+      return errorResponse(
+        'You do not have permission to view project finances',
+        403,
+      );
     }
 
     const db = await getDatabase();
@@ -77,7 +86,10 @@ export async function GET(request) {
       }
 
       // Get list of project IDs this investor is allocated to
-      if (investor.projectAllocations && investor.projectAllocations.length > 0) {
+      if (
+        investor.projectAllocations &&
+        investor.projectAllocations.length > 0
+      ) {
         allowedProjectIds = investor.projectAllocations
           .map((allocation) => {
             if (allocation.projectId) {
@@ -93,7 +105,10 @@ export async function GET(request) {
         if (projectId && ObjectId.isValid(projectId)) {
           const requestedProjectId = new ObjectId(projectId);
           if (!allowedProjectIds.some((id) => id.equals(requestedProjectId))) {
-            return errorResponse('Access denied. You do not have access to this project.', 403);
+            return errorResponse(
+              'Access denied. You do not have access to this project.',
+              403,
+            );
           }
         }
 
@@ -151,7 +166,10 @@ export async function GET(request) {
 
     // Build query for expenses
     // Expenses use uppercase status values: 'APPROVED' or 'PAID'
-    const expensesQuery = { deletedAt: null, status: { $in: EXPENSE_APPROVED_STATUSES } };
+    const expensesQuery = {
+      deletedAt: null,
+      status: { $in: EXPENSE_APPROVED_STATUSES },
+    };
     if (projectId && ObjectId.isValid(projectId)) {
       expensesQuery.projectId = new ObjectId(projectId);
     } else if (allowedProjectIds && allowedProjectIds.length > 0) {
@@ -174,7 +192,10 @@ export async function GET(request) {
       .toArray();
 
     // Get total from materials
-    const materialsQuery = { deletedAt: null, status: { $in: MATERIAL_APPROVED_STATUSES } };
+    const materialsQuery = {
+      deletedAt: null,
+      status: { $in: MATERIAL_APPROVED_STATUSES },
+    };
     if (projectId && ObjectId.isValid(projectId)) {
       materialsQuery.projectId = new ObjectId(projectId);
     } else if (allowedProjectIds && allowedProjectIds.length > 0) {
@@ -196,7 +217,10 @@ export async function GET(request) {
       .toArray();
 
     // Get total from initial expenses
-    const initialExpensesQuery = { deletedAt: null, status: { $in: INITIAL_EXPENSE_APPROVED_STATUSES } };
+    const initialExpensesQuery = {
+      deletedAt: null,
+      status: { $in: INITIAL_EXPENSE_APPROVED_STATUSES },
+    };
     if (projectId && ObjectId.isValid(projectId)) {
       initialExpensesQuery.projectId = new ObjectId(projectId);
     } else if (allowedProjectIds && allowedProjectIds.length > 0) {
@@ -218,7 +242,10 @@ export async function GET(request) {
       .toArray();
 
     // Get total from labour entries (approved/paid only)
-    const labourQuery = { deletedAt: null, status: { $in: ['approved', 'paid'] } };
+    const labourQuery = {
+      deletedAt: null,
+      status: { $in: ['approved', 'paid'] },
+    };
     if (projectId && ObjectId.isValid(projectId)) {
       labourQuery.projectId = new ObjectId(projectId);
     } else if (allowedProjectIds && allowedProjectIds.length > 0) {
@@ -243,7 +270,8 @@ export async function GET(request) {
     const totalMaterials = materialsTotal[0]?.total || 0;
     const totalInitialExpenses = initialExpensesTotal[0]?.total || 0;
     const totalLabour = labourTotal[0]?.total || 0;
-    const totalUsed = totalExpenses + totalMaterials + totalInitialExpenses + totalLabour;
+    const totalUsed =
+      totalExpenses + totalMaterials + totalInitialExpenses + totalLabour;
 
     // Calculate project-specific totals from allocations (if projectId provided)
     let totalInvested = 0;
@@ -257,7 +285,7 @@ export async function GET(request) {
       totalInvested = projectTotals.totalInvested;
       totalLoans = projectTotals.totalLoans;
       totalEquity = projectTotals.totalEquity;
-      
+
       // Get investor count for this project
       const projectAllocations = await db
         .collection('investors')
@@ -279,7 +307,9 @@ export async function GET(request) {
       const investorSet = new Set();
 
       for (const allocatedProjectId of allowedProjectIds) {
-        const projectTotals = await calculateProjectTotals(allocatedProjectId.toString());
+        const projectTotals = await calculateProjectTotals(
+          allocatedProjectId.toString(),
+        );
         totalInvestedSum += projectTotals.totalInvested || 0;
         totalLoansSum += projectTotals.totalLoans || 0;
         totalEquitySum += projectTotals.totalEquity || 0;
@@ -306,14 +336,14 @@ export async function GET(request) {
       totalLoans = totalLoansSum;
       totalEquity = totalEquitySum;
       investorCount = investorSet.size;
-      
+
       // If no allocations, fall back to aggregate (backward compatibility)
       if (totalInvested === 0) {
         const investors = await db
           .collection('investors')
           .find({ status: 'ACTIVE' })
           .toArray();
-        
+
         const investorTotals = investors.reduce(
           (acc, inv) => {
             acc.totalInvested += inv.totalInvested || 0;
@@ -327,7 +357,7 @@ export async function GET(request) {
             }
             return acc;
           },
-          { totalInvested: 0, totalLoans: 0, totalEquity: 0 }
+          { totalInvested: 0, totalLoans: 0, totalEquity: 0 },
         );
         totalInvested = investorTotals.totalInvested;
         totalLoans = investorTotals.totalLoans;
@@ -340,7 +370,7 @@ export async function GET(request) {
         .collection('project_finances')
         .find({})
         .toArray();
-      
+
       if (allProjectFinances.length > 0) {
         const totals = allProjectFinances.reduce(
           (acc, pf) => {
@@ -349,7 +379,7 @@ export async function GET(request) {
             acc.totalEquity += pf.totalEquity || 0;
             return acc;
           },
-          { totalInvested: 0, totalLoans: 0, totalEquity: 0 }
+          { totalInvested: 0, totalLoans: 0, totalEquity: 0 },
         );
         totalInvested = totals.totalInvested;
         totalLoans = totals.totalLoans;
@@ -360,7 +390,7 @@ export async function GET(request) {
           .collection('investors')
           .find({ status: 'ACTIVE' })
           .toArray();
-        
+
         const investorTotals = investors.reduce(
           (acc, inv) => {
             acc.totalInvested += inv.totalInvested || 0;
@@ -374,7 +404,7 @@ export async function GET(request) {
             }
             return acc;
           },
-          { totalInvested: 0, totalLoans: 0, totalEquity: 0 }
+          { totalInvested: 0, totalLoans: 0, totalEquity: 0 },
         );
         totalInvested = investorTotals.totalInvested;
         totalLoans = investorTotals.totalLoans;
@@ -385,8 +415,10 @@ export async function GET(request) {
 
     // Calculate balances
     const capitalBalance = totalInvested - totalUsed;
-    const loanBalance = totalLoans - (totalUsed * (totalLoans / totalInvested || 0));
-    const equityBalance = totalEquity - (totalUsed * (totalEquity / totalInvested || 0));
+    const loanBalance =
+      totalLoans - totalUsed * (totalLoans / totalInvested || 0);
+    const equityBalance =
+      totalEquity - totalUsed * (totalEquity / totalInvested || 0);
 
     // NEW: Calculate committed and estimated costs (for specific project only)
     let committedCost = 0;
@@ -397,18 +429,20 @@ export async function GET(request) {
     if (projectId && ObjectId.isValid(projectId)) {
       // Get project finances (includes committedCost if already calculated)
       const finances = await getProjectFinances(projectId.toString());
-      
+
       // Calculate committed cost from accepted purchase orders
       committedCost = await calculateCommittedCost(projectId.toString());
-      
+
       // Calculate estimated cost from approved material requests
       estimatedCost = await calculateEstimatedCost(projectId.toString());
-      
+
       // Calculate available capital (totalInvested - totalUsed - committedCost)
       availableCapital = totalInvested - totalUsed - committedCost;
-      
+
       // Calculate materials breakdown
-      materialsBreakdown = await calculateMaterialsBreakdown(projectId.toString());
+      materialsBreakdown = await calculateMaterialsBreakdown(
+        projectId.toString(),
+      );
     }
 
     // Get or create project_finances record
@@ -419,7 +453,10 @@ export async function GET(request) {
         try {
           await recalculateProjectFinances(projectId);
         } catch (err) {
-          console.error(`Error force recalculating project finances for ${projectId}:`, err);
+          console.error(
+            `Error force recalculating project finances for ${projectId}:`,
+            err,
+          );
           // Continue even if recalculation fails
         }
       }
@@ -449,25 +486,23 @@ export async function GET(request) {
         projectFinances = newRecord;
       } else {
         // Update existing record (always update to ensure latest data)
-        await db
-          .collection('project_finances')
-          .updateOne(
-            { projectId: new ObjectId(projectId) },
-            {
-              $set: {
-                totalInvested,
-                totalLoans,
-                totalEquity,
-                totalUsed,
-                capitalBalance,
-                loanBalance,
-                equityBalance,
-                investorCount,
-                lastUpdated: new Date(),
-                updatedAt: new Date(),
-              },
-            }
-          );
+        await db.collection('project_finances').updateOne(
+          { projectId: new ObjectId(projectId) },
+          {
+            $set: {
+              totalInvested,
+              totalLoans,
+              totalEquity,
+              totalUsed,
+              capitalBalance,
+              loanBalance,
+              equityBalance,
+              investorCount,
+              lastUpdated: new Date(),
+              updatedAt: new Date(),
+            },
+          },
+        );
 
         projectFinances = await db
           .collection('project_finances')
@@ -508,13 +543,14 @@ export async function GET(request) {
     if (projectId && ObjectId.isValid(projectId)) {
       const project = await db.collection('projects').findOne({
         _id: new ObjectId(projectId),
-        deletedAt: null
+        deletedAt: null,
       });
-      
+
       if (project) {
-        const { getBudgetTotal, isEnhancedBudget } = await import('@/lib/schemas/budget-schema');
+        const { getBudgetTotal, isEnhancedBudget } =
+          await import('@/lib/schemas/budget-schema');
         const projectBudget = project.budget || {};
-        
+
         // Get pre-construction budget
         if (isEnhancedBudget(projectBudget)) {
           preConstructionBudget = {
@@ -525,8 +561,8 @@ export async function GET(request) {
               landAcquisition: 0,
               legalRegulatory: 0,
               permitsApprovals: 0,
-              sitePreparation: 0
-            }
+              sitePreparation: 0,
+            },
           };
         } else {
           // Legacy: Estimate 5% of total
@@ -539,18 +575,25 @@ export async function GET(request) {
               landAcquisition: 0,
               legalRegulatory: 0,
               permitsApprovals: 0,
-              sitePreparation: 0
-            }
+              sitePreparation: 0,
+            },
           };
         }
-        
+
         // Get pre-construction spending from project_finances
-        const { getPreConstructionSpending } = await import('@/lib/financial-helpers');
-        const preConstructionSpending = await getPreConstructionSpending(projectId);
+        const { getPreConstructionSpending } =
+          await import('@/lib/financial-helpers');
+        const preConstructionSpending =
+          await getPreConstructionSpending(projectId);
         preConstructionBudget.spent = preConstructionSpending.total || 0;
-        preConstructionBudget.remaining = Math.max(0, preConstructionBudget.budgeted - preConstructionBudget.spent);
-        preConstructionBudget.byCategory = preConstructionSpending.byCategory || preConstructionBudget.byCategory;
-        
+        preConstructionBudget.remaining = Math.max(
+          0,
+          preConstructionBudget.budgeted - preConstructionBudget.spent,
+        );
+        preConstructionBudget.byCategory =
+          preConstructionSpending.byCategory ||
+          preConstructionBudget.byCategory;
+
         // Calculate unallocated DCC (not total budget)
         let dccBudget = 0;
         if (isEnhancedBudget(projectBudget)) {
@@ -559,10 +602,17 @@ export async function GET(request) {
           const projectBudgetTotal = getBudgetTotal(projectBudget);
           const estimatedPreConstruction = projectBudgetTotal * 0.05;
           const estimatedIndirect = projectBudgetTotal * 0.05;
-          const estimatedContingency = projectBudget.contingency || (projectBudgetTotal * 0.05);
-          dccBudget = Math.max(0, projectBudgetTotal - estimatedPreConstruction - estimatedIndirect - estimatedContingency);
+          const estimatedContingency =
+            projectBudget.contingency || projectBudgetTotal * 0.05;
+          dccBudget = Math.max(
+            0,
+            projectBudgetTotal -
+              estimatedPreConstruction -
+              estimatedIndirect -
+              estimatedContingency,
+          );
         }
-        
+
         allocatedToPhases = await calculateTotalPhaseBudgets(projectId);
         unallocatedBudget = Math.max(0, dccBudget - allocatedToPhases);
       }
@@ -571,23 +621,25 @@ export async function GET(request) {
     // Get indirect costs summary if projectId provided
     let indirectCostsSummary = null;
     if (projectId && ObjectId.isValid(projectId)) {
-      const { getIndirectCostsSummary } = await import('@/lib/indirect-costs-helpers');
+      const { getIndirectCostsSummary } =
+        await import('@/lib/indirect-costs-helpers');
       indirectCostsSummary = await getIndirectCostsSummary(projectId);
     }
 
     return successResponse({
       ...projectFinances,
       // NEW: Add committed and estimated costs
-      ...(projectId && ObjectId.isValid(projectId) && {
-        committedCost,
-        estimatedCost,
-        availableCapital,
-        materialsBreakdown,
-        allocatedToPhases,
-        unallocatedBudget,
-        preConstructionBudget, // NEW: Pre-construction budget tracking
-        indirectCostsSummary, // NEW: Indirect costs budget tracking
-      }),
+      ...(projectId &&
+        ObjectId.isValid(projectId) && {
+          committedCost,
+          estimatedCost,
+          availableCapital,
+          materialsBreakdown,
+          allocatedToPhases,
+          unallocatedBudget,
+          preConstructionBudget, // NEW: Pre-construction budget tracking
+          indirectCostsSummary, // NEW: Indirect costs budget tracking
+        }),
       breakdown: {
         expenses: totalExpenses,
         materials: totalMaterials,
@@ -606,4 +658,3 @@ export async function GET(request) {
     return errorResponse('Failed to retrieve project finances', 500);
   }
 }
-

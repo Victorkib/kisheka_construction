@@ -285,6 +285,15 @@ export async function POST(request) {
       return errorResponse(validation.errors.join(', '), 400);
     }
 
+    // Denormalize rates from library (snapshot at assignment time)
+    const ratesSnapshot = {
+      hourlyRate: libraryEntry.defaultHourlyRate || null,
+      perVisitRate: libraryEntry.defaultPerVisitRate || null,
+      monthlyRetainer: libraryEntry.defaultMonthlyRetainer || null,
+      snapshotDate: new Date(),
+      libraryId: new ObjectId(body.libraryId),
+    };
+
     // Generate professional code
     const existingCount = await db.collection('professional_services').countDocuments({
       projectId: new ObjectId(body.projectId),
@@ -302,6 +311,11 @@ export async function POST(request) {
     const assignment = {
       ...assignmentData,
       professionalCode,
+      // Denormalize rates for quick access and historical accuracy
+      hourlyRate: ratesSnapshot.hourlyRate,
+      perVisitRate: ratesSnapshot.perVisitRate,
+      monthlyRetainer: ratesSnapshot.monthlyRetainer,
+      ratesSnapshot,
       totalFees: 0,
       feesPaid: 0,
       feesPending: 0,

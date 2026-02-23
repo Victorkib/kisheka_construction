@@ -44,6 +44,7 @@ export async function GET(request) {
     // Filters
     const projectId = searchParams.get('projectId');
     const phaseId = searchParams.get('phaseId');
+    const floorId = searchParams.get('floorId');
     const status = searchParams.get('status');
     const equipmentType = searchParams.get('equipmentType');
     const acquisitionType = searchParams.get('acquisitionType');
@@ -54,6 +55,10 @@ export async function GET(request) {
 
     if (phaseId && ObjectId.isValid(phaseId)) {
       query.phaseId = new ObjectId(phaseId);
+    }
+
+    if (floorId && ObjectId.isValid(floorId)) {
+      query.floorId = new ObjectId(floorId);
     }
 
     if (status && EQUIPMENT_STATUSES.includes(status)) {
@@ -151,6 +156,7 @@ export async function POST(request) {
     const {
       projectId,
       phaseId,
+      floorId,
       equipmentName,
       equipmentType,
       acquisitionType,
@@ -201,6 +207,15 @@ export async function POST(request) {
       if (!phase) {
         return errorResponse('Phase not found or does not belong to this project', 400);
       }
+
+      // Phase-Floor Applicability Validation (if floorId is provided and phase-specific)
+      if (floorId && ObjectId.isValid(floorId)) {
+        const { validatePhaseFloorApplicability } = await import('@/lib/phase-floor-validation-helpers');
+        const applicability = await validatePhaseFloorApplicability(phaseId, floorId, projectId);
+        if (!applicability.isValid) {
+          return errorResponse(applicability.error || 'Floor is not applicable to the selected phase', 400);
+        }
+      }
     }
 
     // Verify supplier exists if provided
@@ -219,6 +234,7 @@ export async function POST(request) {
     const equipmentData = {
       projectId,
       phaseId: scope === 'site_wide' ? null : phaseId,
+      floorId: floorId || null,
       equipmentName,
       equipmentType,
       acquisitionType,
@@ -244,6 +260,7 @@ export async function POST(request) {
         equipmentType,
         acquisitionType,
         equipmentScope: scope,
+        floorId: floorId || null,
         supplierId,
         startDate,
         endDate,

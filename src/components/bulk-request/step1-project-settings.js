@@ -11,10 +11,14 @@ import Link from 'next/link';
 export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
   const [projects, setProjects] = useState([]);
   const [floors, setFloors] = useState([]);
+  const [applicableFloors, setApplicableFloors] = useState([]);
+  const [nonApplicableFloors, setNonApplicableFloors] = useState([]);
+  const [selectedPhaseInfo, setSelectedPhaseInfo] = useState(null);
   const [phases, setPhases] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingFloors, setLoadingFloors] = useState(false);
+  const [loadingApplicableFloors, setLoadingApplicableFloors] = useState(false);
   const [loadingPhases, setLoadingPhases] = useState(false);
   const [loadingCategories, setLoadingCategories] = useState(true);
 
@@ -32,8 +36,26 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
     } else {
       setFloors([]);
       setPhases([]);
+      setApplicableFloors([]);
+      setNonApplicableFloors([]);
+      setSelectedPhaseInfo(null);
     }
   }, [wizardData.projectId]);
+
+  // Fetch applicable floors when phase changes
+  useEffect(() => {
+    if (wizardData.projectId && wizardData.defaultPhaseId) {
+      fetchApplicableFloors(wizardData.defaultPhaseId, wizardData.projectId);
+    } else {
+      setApplicableFloors([]);
+      setNonApplicableFloors([]);
+      setSelectedPhaseInfo(null);
+      // Only clear floor if phase is cleared (not if phase is being set)
+      if (!wizardData.defaultPhaseId && wizardData.defaultFloorId) {
+        // Don't clear floor here - let user decide or validation will catch it
+      }
+    }
+  }, [wizardData.defaultPhaseId, wizardData.projectId]);
 
   // Validate and notify parent
   // Phase is now required: either defaultPhaseId must be set, or validation will check per-material in Step 3
@@ -156,6 +178,77 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
     }
   };
 
+  const fetchApplicableFloors = async (phaseId, projectId) => {
+    if (!phaseId || !projectId) {
+      setApplicableFloors([]);
+      setNonApplicableFloors([]);
+      setSelectedPhaseInfo(null);
+      return;
+    }
+    setLoadingApplicableFloors(true);
+    try {
+      const response = await fetch(`/api/phases/${phaseId}/applicable-floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        const applicable = data.data.applicableFloors || [];
+        const allFloors = floors.length > 0 ? floors : (data.data.allFloors || []);
+        const applicableIds = new Set(applicable.map(f => {
+          const id = f._id?.toString() || f.toString();
+          return id;
+        }));
+        const applicableFloorsList = allFloors.filter(f => {
+          const id = f._id?.toString() || f.toString();
+          return applicableIds.has(id);
+        });
+        const nonApplicableFloorsList = allFloors.filter(f => {
+          const id = f._id?.toString() || f.toString();
+          return !applicableIds.has(id);
+        });
+        
+        setApplicableFloors(applicableFloorsList);
+        setNonApplicableFloors(nonApplicableFloorsList);
+        setSelectedPhaseInfo({
+          phaseCode: data.data.phaseCode,
+          phaseName: data.data.phaseName
+        });
+
+        // CRITICAL FIX: Only clear floor if it's actually NOT applicable
+        // Normalize IDs to strings for comparison
+        if (wizardData.defaultFloorId) {
+          const currentFloorIdStr = wizardData.defaultFloorId.toString();
+          const isCurrentFloorApplicable = applicableFloorsList.some(f => {
+            const floorIdStr = f._id?.toString() || f.toString();
+            return floorIdStr === currentFloorIdStr;
+          });
+          // Only clear if floor is NOT applicable AND there are applicable floors available
+          if (!isCurrentFloorApplicable && applicableFloorsList.length > 0) {
+            onUpdate({ defaultFloorId: '' });
+          }
+          // If floor IS applicable, keep it - don't clear it
+        }
+      } else {
+        // Fallback: if API doesn't exist yet, use all floors
+        setApplicableFloors(floors);
+        setNonApplicableFloors([]);
+        setSelectedPhaseInfo(null);
+      }
+    } catch (err) {
+      console.error('Error fetching applicable floors:', err);
+      // Fallback: use all floors if API call fails
+      setApplicableFloors(floors);
+      setNonApplicableFloors([]);
+      setSelectedPhaseInfo(null);
+    } finally {
+      setLoadingApplicableFloors(false);
+    }
+  };
+
   const handleChange = (field, value) => {
     onUpdate({ [field]: value });
   };
@@ -218,7 +311,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
           <label className="block text-sm font-semibold text-gray-700 mb-1">
             Default Floor (Optional)
           </label>
-          {loadingFloors ? (
+          {loadingFloors || loadingApplicableFloors ? (
             <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-500">
               Loading floors...
             </div>
@@ -230,27 +323,81 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
             <select
               value={wizardData.defaultFloorId || ''}
               onChange={(e) => handleChange('defaultFloorId', e.target.value)}
-              disabled={!wizardData.projectId || floors.length === 0}
+              disabled={!wizardData.projectId || floors.length === 0 || loadingApplicableFloors}
               className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
             >
               <option value="" className="text-gray-900">No default floor</option>
-              {floors.map((floor) => {
-                const getFloorDisplay = (floorNumber, name) => {
-                  if (name) return name;
-                  if (floorNumber === undefined || floorNumber === null) return 'N/A';
-                  if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
-                  if (floorNumber === 0) return 'Ground Floor';
-                  return `Floor ${floorNumber}`;
-                };
-                return (
-                  <option key={floor._id} value={floor._id} className="text-gray-900">
-                    {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)}
-                  </option>
-                );
-              })}
+              {/* Show applicable floors first */}
+              {applicableFloors.length > 0 && (
+                <>
+                  {applicableFloors.map((floor) => {
+                    const getFloorDisplay = (floorNumber, name) => {
+                      if (name) return name;
+                      if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                      if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                      if (floorNumber === 0) return 'Ground Floor';
+                      return `Floor ${floorNumber}`;
+                    };
+                    return (
+                      <option key={floor._id} value={floor._id} className="text-gray-900">
+                        {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)} ✓
+                      </option>
+                    );
+                  })}
+                </>
+              )}
+              {/* Show non-applicable floors (disabled) if phase is selected */}
+              {wizardData.defaultPhaseId && nonApplicableFloors.length > 0 && (
+                <>
+                  <optgroup label={`Not applicable to ${selectedPhaseInfo?.phaseName || 'selected phase'}`} className="text-gray-500">
+                    {nonApplicableFloors.map((floor) => {
+                      const getFloorDisplay = (floorNumber, name) => {
+                        if (name) return name;
+                        if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                        if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                        if (floorNumber === 0) return 'Ground Floor';
+                        return `Floor ${floorNumber}`;
+                      };
+                      return (
+                        <option key={floor._id} value={floor._id} disabled className="text-gray-400 italic">
+                          {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)} ✗
+                        </option>
+                      );
+                    })}
+                  </optgroup>
+                </>
+              )}
+              {/* Fallback: show all floors if no phase selected or API not available */}
+              {!wizardData.defaultPhaseId && floors.length > 0 && applicableFloors.length === 0 && (
+                <>
+                  {floors.map((floor) => {
+                    const getFloorDisplay = (floorNumber, name) => {
+                      if (name) return name;
+                      if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                      if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                      if (floorNumber === 0) return 'Ground Floor';
+                      return `Floor ${floorNumber}`;
+                    };
+                    return (
+                      <option key={floor._id} value={floor._id} className="text-gray-900">
+                        {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)}
+                      </option>
+                    );
+                  })}
+                </>
+              )}
             </select>
           )}
-          <p className="mt-1 text-sm text-gray-600">Default floor for all materials (can be overridden per material)</p>
+          <p className="mt-1 text-sm text-gray-600">
+            Default floor for all materials (can be overridden per material)
+            {wizardData.defaultPhaseId && selectedPhaseInfo && (
+              <span className="block mt-1 text-xs text-blue-600">
+                {applicableFloors.length > 0 
+                  ? `✓ ${applicableFloors.length} floor(s) applicable to ${selectedPhaseInfo.phaseName}`
+                  : 'No floors are applicable to this phase. Floor assignment is optional.'}
+              </span>
+            )}
+          </p>
         </div>
 
         {/* Default Phase - REQUIRED */}

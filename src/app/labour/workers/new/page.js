@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -24,7 +24,7 @@ import {
   getWorkerTypeLabel 
 } from '@/lib/constants/labour-constants';
 
-export default function NewWorkerPage() {
+function NewWorkerPageContent() {
   const router = useRouter();
   const { canAccess } = usePermissions();
   const toast = useToast();
@@ -382,5 +382,19 @@ export default function NewWorkerPage() {
         </form>
       </div>
     </AppLayout>
+  );
+}
+
+export default function NewWorkerPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner size="lg" text="Loading..." />
+        </div>
+      </div>
+    }>
+      <NewWorkerPageContent />
+    </Suspense>
   );
 }

@@ -21,18 +21,9 @@ export function OAuthButtons({ mode = 'login' }) {
     try {
       // Use the server-side callback so the server can exchange the code
       // and sync the user to MongoDB before redirecting to the app
-      const currentPath = window.location.pathname;
-      const isPublicRoute = currentPath === '/' || currentPath.startsWith('/auth/');
-      
-      // Only preserve pathname if user is on a protected route (not public/auth routes)
-      // Otherwise, always redirect to dashboard
-      const nextPath = isPublicRoute ? '/dashboard' : (currentPath || '/dashboard');
-      
-      // CRITICAL FIX: Always use the current browser origin for OAuth callback.
-      // This avoids cross-domain auth issues on Netlify previews/custom domains.
-      const redirectUrl = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(nextPath)}`;
-      
-      console.log('[OAuth] Redirect URL:', redirectUrl);
+      const redirectUrl = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(
+        window.location.pathname || '/dashboard',
+      )}`;
 
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider,
@@ -129,4 +120,3 @@ export function OAuthButtons({ mode = 'login' }) {
     </div>
   );
 }
-

@@ -7,12 +7,15 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
 import { AppLayout } from '@/components/layout/app-layout';
+import { LoadingSpinner } from '@/components/loading';
 
-export default function NotFound() {
+function NotFoundContent() {
   const router = useRouter();
+  // Use useSearchParams to ensure Suspense boundary is recognized
+  const searchParams = useSearchParams();
 
   return (
     <AppLayout>
@@ -129,5 +132,19 @@ export default function NotFound() {
         </div>
       </div>
     </AppLayout>
+  );
+}
+
+export default function NotFound() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner size="lg" text="Loading..." />
+        </div>
+      </div>
+    }>
+      <NotFoundContent />
+    </Suspense>
   );
 }

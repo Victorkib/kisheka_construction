@@ -5,9 +5,24 @@
 
 'use client';
 
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 
 export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDate, formatCurrency, floorSummary }) {
+  const [selectedPhaseFilter, setSelectedPhaseFilter] = useState('all');
+  
+  // Filter ledger items by selected phase
+  const filteredLedgerItems = useMemo(() => {
+    if (selectedPhaseFilter === 'all' || !selectedPhaseFilter) {
+      return ledgerItems;
+    }
+    // Filter items that have phaseId matching the selected phase
+    return ledgerItems.filter(item => {
+      const itemPhaseId = item.phaseId?.toString();
+      return itemPhaseId === selectedPhaseFilter.toString();
+    });
+  }, [ledgerItems, selectedPhaseFilter]);
+  
   return (
     <div className="space-y-6">
       {/* Activity Summary */}
@@ -29,22 +44,72 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
         </div>
         <div className="bg-white rounded-lg shadow p-4">
           <p className="text-xs text-gray-600">Total Activity</p>
-          <p className="text-lg font-bold text-gray-900 mt-1">{ledgerItems.length}</p>
-          <p className="text-xs text-gray-500">Recent items</p>
+          <p className="text-lg font-bold text-gray-900 mt-1">{filteredLedgerItems.length}</p>
+          <p className="text-xs text-gray-500">
+            {selectedPhaseFilter === 'all' ? 'All phases' : 'Filtered'}
+          </p>
         </div>
       </div>
+
+      {/* Phase Filter */}
+      {phaseBreakdown && phaseBreakdown.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-900">Filter by Phase</h3>
+            <Link
+              href={`/floors/${floor._id}?tab=phases`}
+              className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+            >
+              View Full Phase Breakdown →
+            </Link>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedPhaseFilter('all')}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
+                selectedPhaseFilter === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All Phases
+            </button>
+            {phaseBreakdown.map((phase) => (
+              <button
+                key={phase.phaseId || phase._id}
+                onClick={() => setSelectedPhaseFilter(phase.phaseId || phase._id)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
+                  selectedPhaseFilter === (phase.phaseId || phase._id)
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {phase.phaseCode || phase.phaseName}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Recent Activity Ledger */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-          <span className="text-xs text-gray-500">Last 20 items</span>
+          <span className="text-xs text-gray-500">
+            {selectedPhaseFilter === 'all' 
+              ? `Last ${Math.min(20, filteredLedgerItems.length)} items`
+              : `${filteredLedgerItems.length} item(s) for selected phase`}
+          </span>
         </div>
-        {ledgerItems.length === 0 ? (
-          <p className="text-gray-500 text-sm">No recent activity</p>
+        {filteredLedgerItems.length === 0 ? (
+          <p className="text-gray-500 text-sm">
+            {selectedPhaseFilter === 'all' 
+              ? 'No recent activity'
+              : 'No activity for the selected phase'}
+          </p>
         ) : (
           <div className="space-y-3">
-            {ledgerItems.slice(0, 20).map((item, index) => (
+            {filteredLedgerItems.slice(0, 20).map((item, index) => (
               <div
                 key={index}
                 className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
@@ -79,30 +144,86 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
         )}
       </div>
 
-      {/* Phase Breakdown */}
+      {/* Phase Filter */}
       {phaseBreakdown.length > 0 && (
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-900">Filter by Phase</h3>
+            <Link
+              href={`/floors/${floor._id}?tab=phases`}
+              className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+            >
+              View Full Phase Breakdown →
+            </Link>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedPhaseFilter('all')}
+              className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
+                selectedPhaseFilter === 'all'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All Phases
+            </button>
+            {phaseBreakdown.map((phase) => (
+              <button
+                key={phase.phaseId}
+                onClick={() => setSelectedPhaseFilter(phase.phaseId)}
+                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
+                  selectedPhaseFilter === phase.phaseId
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {phase.phaseCode || phase.phaseName}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Phase Breakdown */}
+      {phaseBreakdown && phaseBreakdown.length > 0 && (
         <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Phase Breakdown</h3>
-          <p className="text-sm text-gray-600 mb-4">
-            Phases with work items on this floor
-          </p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900">Phase Breakdown</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Phases with activity on this floor
+              </p>
+            </div>
+            <Link
+              href={`/floors/${floor._id}?tab=phases`}
+              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            >
+              View Full Breakdown →
+            </Link>
+          </div>
           <div className="space-y-3">
             {phaseBreakdown.map((phase, index) => (
               <div
-                key={index}
+                key={phase.phaseId || phase._id || index}
                 className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-3 flex-1">
                   <span className="text-lg">🏗️</span>
                   <div className="flex-1">
-                    <Link
-                      href={`/phases/${phase.phaseId}`}
-                      className="font-medium text-gray-900 hover:text-blue-600"
-                    >
-                      {phase.phaseName}
-                    </Link>
+                    {phase.phaseId ? (
+                      <Link
+                        href={`/phases/${phase.phaseId}`}
+                        className="font-medium text-gray-900 hover:text-blue-600"
+                      >
+                        {phase.phaseName || 'Unknown Phase'}
+                      </Link>
+                    ) : (
+                      <span className="font-medium text-gray-900">
+                        {phase.phaseName || 'Unknown Phase'}
+                      </span>
+                    )}
                     <p className="text-xs text-gray-500">
-                      {phase.count || phase.materials || 0} work item(s) • {phase.workItems || 0} work items
+                      {phase.count || 0} item(s) • {formatCurrency(phase.totalCost || 0)} total
                     </p>
                   </div>
                 </div>

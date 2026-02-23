@@ -14,6 +14,8 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
   const [categories, setCategories] = useState([]);
   const [floors, setFloors] = useState([]);
   const [phases, setPhases] = useState([]);
+  const [applicableFloorsMap, setApplicableFloorsMap] = useState({}); // phaseId -> applicable floors
+  const [phaseInfoMap, setPhaseInfoMap] = useState({}); // phaseId -> phase info
   const [editingRow, setEditingRow] = useState(null);
 
   useEffect(() => {
@@ -137,15 +139,84 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
       const data = await response.json();
       if (data.success) {
         setPhases(data.data || []);
+        // Pre-fetch applicable floors for all phases
+        const phasesList = data.data || [];
+        for (const phase of phasesList) {
+          await fetchApplicableFloorsForPhase(phase._id, projectId);
+        }
       }
     } catch (err) {
       console.error('Error fetching phases:', err);
     }
   };
 
-  const handleMaterialUpdate = (index, field, value) => {
+  const fetchApplicableFloorsForPhase = async (phaseId, projectId) => {
+    if (!phaseId || !projectId) return;
+    try {
+      const response = await fetch(`/api/phases/${phaseId}/applicable-floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        const applicable = data.data.applicableFloors || [];
+        const allFloors = floors.length > 0 ? floors : (data.data.allFloors || []);
+        // Normalize IDs to strings for consistent comparison
+        const applicableIds = new Set(applicable.map(f => {
+          const id = f._id?.toString() || f.toString();
+          return id;
+        }));
+        const applicableFloorsList = allFloors.filter(f => {
+          const id = f._id?.toString() || f.toString();
+          return applicableIds.has(id);
+        });
+        
+        setApplicableFloorsMap(prev => ({
+          ...prev,
+          [phaseId]: applicableFloorsList
+        }));
+        setPhaseInfoMap(prev => ({
+          ...prev,
+          [phaseId]: {
+            phaseCode: data.data.phaseCode,
+            phaseName: data.data.phaseName
+          }
+        }));
+      }
+    } catch (err) {
+      console.error(`Error fetching applicable floors for phase ${phaseId}:`, err);
+    }
+  };
+
+  const handleMaterialUpdate = async (index, field, value) => {
     const updated = [...materials];
     updated[index] = { ...updated[index], [field]: value };
+    
+    // If phase changed, fetch applicable floors for the new phase
+    if (field === 'phaseId' && value && wizardData.projectId) {
+      await fetchApplicableFloorsForPhase(value, wizardData.projectId);
+      // CRITICAL FIX: Wait for fetch to complete, then check if current floor is applicable
+      // Normalize IDs to strings for proper comparison
+      const currentFloorId = updated[index].floorId;
+      if (currentFloorId) {
+        // Get applicable floors from the map (should be populated after fetch)
+        const applicableFloors = applicableFloorsMap[value] || [];
+        const currentFloorIdStr = currentFloorId.toString();
+        const isCurrentFloorApplicable = applicableFloors.some(f => {
+          const floorIdStr = f._id?.toString() || f.toString();
+          return floorIdStr === currentFloorIdStr;
+        });
+        // Only clear if floor is NOT applicable AND there are applicable floors available
+        // If floor IS applicable, keep it - don't clear it
+        if (!isCurrentFloorApplicable && applicableFloors.length > 0) {
+          updated[index].floorId = '';
+        }
+        // If floor IS applicable or no applicable floors yet, keep the selection
+      }
+    }
     
     // Auto-calculate total cost if unit cost or quantity changes
     if (field === 'estimatedUnitCost' || field === 'quantityNeeded') {
@@ -393,27 +464,99 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                     </select>
                   </td>
                   <td className="px-4 py-3">
-                    <select
-                      value={material.floorId || ''}
-                      onChange={(e) => handleMaterialUpdate(index, 'floorId', e.target.value)}
-                      className="w-32 px-2 py-1 bg-white text-gray-900 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    >
-                      <option value="" className="text-gray-900">None</option>
-                      {floors.map((floor) => {
-                        const getFloorDisplay = (floorNumber, name) => {
-                          if (name) return name;
-                          if (floorNumber === undefined || floorNumber === null) return 'N/A';
-                          if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
-                          if (floorNumber === 0) return 'Ground Floor';
-                          return `Floor ${floorNumber}`;
-                        };
-                        return (
-                          <option key={floor._id} value={floor._id} className="text-gray-900">
-                            {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)}
-                          </option>
-                        );
-                      })}
-                    </select>
+                    {(() => {
+                      const materialPhaseId = material.phaseId || wizardData.defaultPhaseId || '';
+                      const applicableFloors = materialPhaseId ? (applicableFloorsMap[materialPhaseId] || []) : [];
+                      // Normalize IDs to strings for consistent comparison
+                      const nonApplicableFloors = materialPhaseId 
+                        ? floors.filter(f => {
+                            const floorIdStr = f._id?.toString() || f.toString();
+                            return !applicableFloors.some(af => {
+                              const afIdStr = af._id?.toString() || af.toString();
+                              return afIdStr === floorIdStr;
+                            });
+                          })
+                        : [];
+                      const phaseInfo = materialPhaseId ? phaseInfoMap[materialPhaseId] : null;
+                      
+                      return (
+                        <select
+                          value={material.floorId || ''}
+                          onChange={(e) => {
+                            const selectedFloorId = e.target.value;
+                            // Validate floor is applicable to phase
+                            if (selectedFloorId && materialPhaseId) {
+                              const isApplicable = applicableFloors.some(f => f._id === selectedFloorId || f._id?.toString() === selectedFloorId);
+                              if (!isApplicable && applicableFloors.length > 0) {
+                                // Floor is not applicable, but allow it (validation will catch it on submit)
+                                // Just proceed with the update
+                              }
+                            }
+                            handleMaterialUpdate(index, 'floorId', selectedFloorId);
+                          }}
+                          className="w-32 px-2 py-1 bg-white text-gray-900 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        >
+                          <option value="" className="text-gray-900">None</option>
+                          {/* Show applicable floors first */}
+                          {applicableFloors.length > 0 && (
+                            <>
+                              {applicableFloors.map((floor) => {
+                                const getFloorDisplay = (floorNumber, name) => {
+                                  if (name) return name;
+                                  if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                                  if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                                  if (floorNumber === 0) return 'Ground Floor';
+                                  return `Floor ${floorNumber}`;
+                                };
+                                return (
+                                  <option key={floor._id} value={floor._id} className="text-gray-900">
+                                    {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)} ✓
+                                  </option>
+                                );
+                              })}
+                            </>
+                          )}
+                          {/* Show non-applicable floors (disabled) if phase is selected */}
+                          {materialPhaseId && nonApplicableFloors.length > 0 && (
+                            <>
+                              {nonApplicableFloors.map((floor) => {
+                                const getFloorDisplay = (floorNumber, name) => {
+                                  if (name) return name;
+                                  if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                                  if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                                  if (floorNumber === 0) return 'Ground Floor';
+                                  return `Floor ${floorNumber}`;
+                                };
+                                return (
+                                  <option key={floor._id} value={floor._id} disabled className="text-gray-400 italic">
+                                    {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)} ✗
+                                  </option>
+                                );
+                              })}
+                            </>
+                          )}
+                          {/* Fallback: show all floors if no phase selected */}
+                          {!materialPhaseId && floors.length > 0 && applicableFloors.length === 0 && (
+                            <>
+                              {floors.map((floor) => {
+                                const getFloorDisplay = (floorNumber, name) => {
+                                  if (name) return name;
+                                  if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                                  if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                                  if (floorNumber === 0) return 'Ground Floor';
+                                  return `Floor ${floorNumber}`;
+                                };
+                                return (
+                                  <option key={floor._id} value={floor._id} className="text-gray-900">
+                                    {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)}
+                                  </option>
+                                );
+                              })}
+                            </>
+                          )}
+                        </select>
+                      );
+                    })()}
                   </td>
                   <td className="px-4 py-3">
                     <select

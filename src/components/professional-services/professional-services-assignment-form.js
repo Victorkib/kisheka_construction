@@ -13,6 +13,7 @@ import {
   PAYMENT_STATUSES,
 } from '@/lib/constants/professional-services-constants';
 import { CloudinaryUploadWidget } from '@/components/uploads/cloudinary-upload-widget';
+import { ContractValueCalculator } from './ContractValueCalculator';
 
 export function ProfessionalServicesAssignmentForm({
   initialData = null,
@@ -53,6 +54,7 @@ export function ProfessionalServicesAssignmentForm({
     paymentAmount: '',
     paymentStatus: 'pending',
   });
+  const [suggestedContractValue, setSuggestedContractValue] = useState(null);
 
   // Load initial data if editing
   useEffect(() => {
@@ -366,6 +368,25 @@ export function ProfessionalServicesAssignmentForm({
       {/* Contract Details */}
       <div>
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Contract Details</h2>
+        
+        {/* Contract Value Calculator */}
+        {selectedProfessional && formData.paymentSchedule && formData.contractType && formData.contractStartDate && (
+          <div className="mb-6">
+            <ContractValueCalculator
+              professional={selectedProfessional}
+              paymentSchedule={formData.paymentSchedule}
+              contractType={formData.contractType}
+              contractStartDate={formData.contractStartDate}
+              contractEndDate={formData.contractEndDate || null}
+              visitFrequency={formData.visitFrequency || null}
+              currentContractValue={formData.contractValue}
+              onSuggestedValueChange={(value) => {
+                setSuggestedContractValue(value);
+              }}
+            />
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">
@@ -396,21 +417,42 @@ export function ProfessionalServicesAssignmentForm({
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Contract Value (KES) <span className="text-red-500">*</span>
             </label>
-            <input
-              type="number"
-              name="contractValue"
-              value={formData.contractValue}
-              onChange={handleChange}
-              placeholder="0.00"
-              min="0.01"
-              step="0.01"
-              required
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
-                validationErrors.contractValue ? 'border-red-300' : 'border-gray-300'
-              }`}
-            />
+            <div className="flex gap-2">
+              <input
+                type="number"
+                name="contractValue"
+                value={formData.contractValue}
+                onChange={handleChange}
+                placeholder="0.00"
+                min="0.01"
+                step="0.01"
+                required
+                className={`flex-1 px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
+                  validationErrors.contractValue ? 'border-red-300' : 'border-gray-300'
+                }`}
+              />
+              {suggestedContractValue && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      contractValue: suggestedContractValue.toString(),
+                    }));
+                  }}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-sm font-medium whitespace-nowrap"
+                >
+                  Use Suggested
+                </button>
+              )}
+            </div>
             {validationErrors.contractValue && (
               <p className="mt-1 text-sm text-red-600">{validationErrors.contractValue}</p>
+            )}
+            {suggestedContractValue && !formData.contractValue && (
+              <p className="mt-1 text-xs text-gray-500">
+                Suggested: {suggestedContractValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}
+              </p>
             )}
           </div>
 

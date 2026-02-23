@@ -25,9 +25,15 @@ function NewEquipmentPageContent() {
   const { canAccess } = usePermissions();
   const [projects, setProjects] = useState([]);
   const [phases, setPhases] = useState([]);
+  const [floors, setFloors] = useState([]);
+  const [applicableFloors, setApplicableFloors] = useState([]);
+  const [nonApplicableFloors, setNonApplicableFloors] = useState([]);
+  const [selectedPhaseInfo, setSelectedPhaseInfo] = useState(null);
   const [suppliers, setSuppliers] = useState([]);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [loadingPhases, setLoadingPhases] = useState(false);
+  const [loadingFloors, setLoadingFloors] = useState(false);
+  const [loadingApplicableFloors, setLoadingApplicableFloors] = useState(false);
   const [loadingSuppliers, setLoadingSuppliers] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -35,10 +41,12 @@ function NewEquipmentPageContent() {
   
   const projectIdFromUrl = searchParams.get('projectId');
   const phaseIdFromUrl = searchParams.get('phaseId');
+  const floorIdFromUrl = searchParams.get('floorId');
   
   const [formData, setFormData] = useState({
     projectId: projectIdFromUrl || '',
     phaseId: phaseIdFromUrl || '',
+    floorId: floorIdFromUrl || '',
     equipmentName: '',
     equipmentType: '',
     acquisitionType: 'rental',
@@ -60,10 +68,28 @@ function NewEquipmentPageContent() {
   useEffect(() => {
     if (formData.projectId) {
       fetchPhases(formData.projectId);
+      fetchFloors(formData.projectId);
     } else {
       setPhases([]);
+      setFloors([]);
+      setApplicableFloors([]);
+      setNonApplicableFloors([]);
+      setSelectedPhaseInfo(null);
     }
   }, [formData.projectId]);
+
+  useEffect(() => {
+    if (formData.projectId && formData.phaseId && formData.equipmentScope === 'phase_specific') {
+      fetchApplicableFloors(formData.phaseId, formData.projectId);
+    } else {
+      setApplicableFloors([]);
+      setNonApplicableFloors([]);
+      setSelectedPhaseInfo(null);
+      if (!formData.phaseId && formData.floorId) {
+        setFormData((prev) => ({ ...prev, floorId: '' }));
+      }
+    }
+  }, [formData.phaseId, formData.projectId, formData.equipmentScope]);
 
   const fetchProjects = async () => {
     try {
@@ -128,6 +154,108 @@ function NewEquipmentPageContent() {
       setPhases([]);
     } finally {
       setLoadingPhases(false);
+    }
+  };
+
+  const fetchFloors = async (projectId) => {
+    if (!projectId) {
+      setFloors([]);
+      return;
+    }
+    setLoadingFloors(true);
+    try {
+      const response = await fetch(`/api/floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        setFloors(data.data || []);
+      } else {
+        setFloors([]);
+      }
+    } catch (err) {
+      console.error('Error fetching floors:', err);
+      setFloors([]);
+    } finally {
+      setLoadingFloors(false);
+    }
+  };
+
+  const fetchApplicableFloors = async (phaseId, projectId) => {
+    if (!phaseId || !projectId) {
+      setApplicableFloors([]);
+      setNonApplicableFloors([]);
+      setSelectedPhaseInfo(null);
+      return;
+    }
+    setLoadingApplicableFloors(true);
+    try {
+      const response = await fetch(`/api/phases/${phaseId}/applicable-floors?projectId=${projectId}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        const applicable = data.data.applicableFloors || [];
+        const allFloors = floors.length > 0 ? floors : (data.data.allFloors || []);
+        // Normalize IDs to strings for consistent comparison
+        const applicableIds = new Set(applicable.map(f => {
+          const id = f._id?.toString() || f.toString();
+          return id;
+        }));
+        const applicableFloorsList = allFloors.filter(f => {
+          const id = f._id?.toString() || f.toString();
+          return applicableIds.has(id);
+        });
+        const nonApplicableFloorsList = allFloors.filter(f => {
+          const id = f._id?.toString() || f.toString();
+          return !applicableIds.has(id);
+        });
+        
+        setApplicableFloors(applicableFloorsList);
+        setNonApplicableFloors(nonApplicableFloorsList);
+        setSelectedPhaseInfo({
+          phaseCode: data.data.phaseCode,
+          phaseName: data.data.phaseName
+        });
+
+        // CRITICAL FIX: Only clear floor if it's actually NOT applicable
+        // Normalize IDs to strings for proper comparison
+        if (formData.floorId) {
+          const currentFloorIdStr = formData.floorId.toString();
+          const isCurrentFloorApplicable = applicableFloorsList.some(f => {
+            const floorIdStr = f._id?.toString() || f.toString();
+            return floorIdStr === currentFloorIdStr;
+          });
+          // Only clear if floor is NOT applicable AND there are applicable floors available
+          // If floor IS applicable, keep it - don't clear it
+          if (!isCurrentFloorApplicable && applicableFloorsList.length > 0) {
+            setFormData((prev) => ({ ...prev, floorId: '' }));
+            toast.showWarning(`The selected floor is not applicable to ${data.data.phaseName}. Floor selection has been cleared.`);
+          }
+          // If floor IS applicable, do nothing - keep the selection
+        }
+      } else {
+        // Fallback: if API doesn't exist yet, use all floors
+        setApplicableFloors(floors);
+        setNonApplicableFloors([]);
+        setSelectedPhaseInfo(null);
+      }
+    } catch (err) {
+      console.error('Error fetching applicable floors:', err);
+      // Fallback: use all floors if API call fails
+      setApplicableFloors(floors);
+      setNonApplicableFloors([]);
+      setSelectedPhaseInfo(null);
+    } finally {
+      setLoadingApplicableFloors(false);
     }
   };
 

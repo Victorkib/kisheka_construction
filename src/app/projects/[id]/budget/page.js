@@ -55,6 +55,8 @@ function BudgetManagementContent() {
   const [showAllocationPreview, setShowAllocationPreview] = useState(false);
   const [budgetValidationWarnings, setBudgetValidationWarnings] = useState([]);
   const [preBudgetSummary, setPreBudgetSummary] = useState(null);
+  const [allocatingFloors, setAllocatingFloors] = useState(false);
+  const [floorAllocationStrategy, setFloorAllocationStrategy] = useState('weighted'); // 'even' | 'weighted'
 
   useEffect(() => {
     if (projectId) {
@@ -306,6 +308,56 @@ function BudgetManagementContent() {
       console.error('Update budget error:', err);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleBulkFloorAllocation = async () => {
+    if (!projectId) {
+      toast.showError('Project ID not found');
+      return;
+    }
+
+    setAllocatingFloors(true);
+    try {
+      const response = await fetch(`/api/projects/${projectId}/floors/budget`, {
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({
+          strategy: floorAllocationStrategy,
+          onlyZeroBudgets: true
+        }),
+      });
+
+      const result = await response.json();
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to allocate floor budgets');
+      }
+
+      let successMessage = result.message || 'Floor budgets allocated successfully';
+      if (result.data?.warnings && result.data.warnings.length > 0) {
+        successMessage += ` ${result.data.warnings.length} warning(s) generated.`;
+        // Show first warning
+        if (result.data.warnings[0]?.message) {
+          toast.showWarning(result.data.warnings[0].message);
+        }
+      }
+      if (result.data?.errors && result.data.errors.length > 0) {
+        successMessage += ` ${result.data.errors.length} error(s) occurred.`;
+        console.error('Floor allocation errors:', result.data.errors);
+      }
+
+      toast.showSuccess(successMessage);
+      await fetchData(); // Refresh data
+    } catch (err) {
+      toast.showError(err.message || 'Failed to allocate floor budgets');
+      console.error('Bulk floor allocation error:', err);
+    } finally {
+      setAllocatingFloors(false);
     }
   };
 
@@ -841,10 +893,33 @@ function BudgetManagementContent() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Phase Budget Allocation</h2>
-            <div className="text-sm text-gray-600">
-              Total Allocated: {formatCurrency(totalPhaseBudgets)} / {formatCurrency(dcc)} DCC
-              {unallocatedDCC > 0 && (
-                <span className="ml-2 text-green-600">({formatCurrency(unallocatedDCC)} unallocated)</span>
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-gray-600">
+                Total Allocated: {formatCurrency(totalPhaseBudgets)} / {formatCurrency(dcc)} DCC
+                {unallocatedDCC > 0 && (
+                  <span className="ml-2 text-green-600">({formatCurrency(unallocatedDCC)} unallocated)</span>
+                )}
+              </div>
+              {phases.length > 0 && phases.some(p => (p.budgetAllocation?.total || 0) > 0) && (
+                <button
+                  onClick={handleBulkFloorAllocation}
+                  disabled={allocatingFloors}
+                  className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center gap-2"
+                >
+                  {allocatingFloors ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Allocating...
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                      </svg>
+                      Allocate to Floors
+                    </>
+                  )}
+                </button>
               )}
             </div>
           </div>

@@ -17,6 +17,7 @@ import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { useProjectContext } from '@/contexts/ProjectContext';
+import { useProfessionalPrerequisites } from '@/hooks/use-professional-prerequisites';
 
 function ProfessionalFeesPageContent() {
   const router = useRouter();
@@ -61,6 +62,14 @@ function ProfessionalFeesPageContent() {
     receiptUrl: '',
   });
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Check prerequisites for creating fees
+  const {
+    canProceed: canCreateFee,
+    prerequisites: prereqStatus,
+    prerequisiteDetails,
+    loading: prereqLoading,
+  } = useProfessionalPrerequisites('fees', filters.projectId || currentProjectId);
 
   useEffect(() => {
     setProjects(accessibleProjects || []);
@@ -402,29 +411,60 @@ function ProfessionalFeesPageContent() {
           {canAccess('create_professional_fee') && (
             <Link
               href="/professional-fees/new"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className={`inline-flex items-center px-4 py-2 rounded-lg transition-all ${
+                canCreateFee
+                  ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+              }`}
+              onClick={(e) => {
+                if (!canCreateFee) {
+                  e.preventDefault();
+                  toast.showWarning('Please complete prerequisites first (Active assignments required)');
+                }
+              }}
+              title={
+                !canCreateFee
+                  ? 'Complete prerequisites: Active assignments required'
+                  : 'Create a new professional fee'
+              }
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Create Fee
+              {!canCreateFee && (
+                <svg
+                  className="w-4 h-4 ml-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                  />
+                </svg>
+              )}
             </Link>
           )}
         </div>
 
-        <PrerequisiteGuide
-          title="Fees depend on assignments"
-          description="Fees are tied to professional service assignments and projects."
-          prerequisites={[
-            'At least one professional assignment exists',
-            'Project is selected for tracking',
-          ]}
-          actions={[
-            { href: '/professional-services', label: 'View Assignments' },
-            { href: '/professional-fees/new', label: 'Create Fee' },
-          ]}
-          tip="If you do not see a professional, add the assignment first."
-        />
+        {!prereqLoading && (
+          <PrerequisiteGuide
+            title="Fees depend on assignments"
+            description="Fees are tied to professional service assignments and projects."
+            prerequisiteDetails={prerequisiteDetails}
+            blocking={!canCreateFee}
+            canProceed={canCreateFee}
+            actions={[
+              { href: '/professional-services', label: 'View Assignments', required: false },
+              { href: '/professional-fees/new', label: 'Create Fee', required: !canCreateFee },
+            ]}
+            tip="If you do not see a professional, add the assignment first."
+          />
+        )}
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -529,7 +569,22 @@ function ProfessionalFeesPageContent() {
               <div className="mt-6">
                 <Link
                   href="/professional-fees/new"
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className={`inline-flex items-center px-4 py-2 rounded-lg transition-all ${
+                    canCreateFee
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+                  }`}
+                  onClick={(e) => {
+                    if (!canCreateFee) {
+                      e.preventDefault();
+                      toast.showWarning('Please complete prerequisites first (Active assignments required)');
+                    }
+                  }}
+                  title={
+                    !canCreateFee
+                      ? 'Complete prerequisites: Active assignments required'
+                      : 'Create a new professional fee'
+                  }
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

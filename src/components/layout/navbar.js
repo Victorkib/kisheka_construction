@@ -34,7 +34,10 @@ export function Navbar({ children }) {
         </div>
 
         {/* Mobile Navigation Drawer */}
-        <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+        <MobileNav
+          isOpen={mobileNavOpen}
+          onClose={() => setMobileNavOpen(false)}
+        />
 
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col min-w-0">
@@ -42,9 +45,7 @@ export function Navbar({ children }) {
           <Header onMenuClick={() => setMobileNavOpen(true)} />
 
           {/* Page Content */}
-          <main className="flex-1 overflow-y-auto">
-            {children}
-          </main>
+          <main className="flex-1 overflow-y-auto">{children}</main>
         </div>
       </div>
     );
@@ -63,10 +64,15 @@ export function Navbar({ children }) {
       </div>
 
       {/* Mobile Navigation Drawer */}
-      <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
+      <MobileNav
+        isOpen={mobileNavOpen}
+        onClose={() => setMobileNavOpen(false)}
+      />
 
       {/* Header - In normal flow with margin for sidebar */}
-      <div className={`${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'} transition-all duration-300`}>
+      <div
+        className={`${sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'} transition-all duration-300`}
+      >
         <Header onMenuClick={() => setMobileNavOpen(true)} />
       </div>
     </>
@@ -89,13 +95,7 @@ export function LegacyNavbar() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch('/api/auth/me', {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-        },
-      });
+      const response = await fetch('/api/auth/me');
       const data = await response.json();
       if (data.success) {
         setUser(data.data);
@@ -109,16 +109,16 @@ export function LegacyNavbar() {
     try {
       // Clear client-side caches
       clearUserCache();
-      
+
       // Clear service worker cache
       if ('serviceWorker' in navigator) {
         const registrations = await navigator.serviceWorker.getRegistrations();
         for (const registration of registrations) {
           const cacheNames = await caches.keys();
-          await Promise.all(cacheNames.map(name => caches.delete(name)));
+          await Promise.all(cacheNames.map((name) => caches.delete(name)));
         }
       }
-      
+
       // Clear sessionStorage and localStorage of any app data
       try {
         sessionStorage.clear();
@@ -126,10 +126,10 @@ export function LegacyNavbar() {
       } catch (e) {
         // Storage might not be available
       }
-      
+
       // Call logout API
       await fetch('/api/auth/logout', { method: 'POST' });
-      
+
       // Redirect to login
       router.push('/auth/login');
     } catch (err) {
@@ -139,7 +139,8 @@ export function LegacyNavbar() {
     }
   };
 
-  const isActive = (path) => pathname === path || pathname.startsWith(path + '/');
+  const isActive = (path) =>
+    pathname === path || pathname.startsWith(path + '/');
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
@@ -147,7 +148,10 @@ export function LegacyNavbar() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/dashboard" className="text-xl font-bold text-blue-600">
+              <Link
+                href="/dashboard"
+                className="text-xl font-bold text-blue-600"
+              >
                 Doshaki
               </Link>
             </div>
@@ -186,18 +190,21 @@ export function LegacyNavbar() {
                   >
                     Projects
                   </Link>
-                  {user && ['owner', 'investor', 'accountant'].includes(user.role?.toLowerCase()) && (
-                    <Link
-                      href="/financing"
-                      className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                        isActive('/financing')
-                          ? 'border-blue-500 text-gray-900'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
-                    >
-                      Financing
-                    </Link>
-                  )}
+                  {user &&
+                    ['owner', 'investor', 'accountant'].includes(
+                      user.role?.toLowerCase(),
+                    ) && (
+                      <Link
+                        href="/financing"
+                        className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                          isActive('/financing')
+                            ? 'border-blue-500 text-gray-900'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Financing
+                      </Link>
+                    )}
                   {user && user.role?.toLowerCase() === 'owner' && (
                     <Link
                       href="/investors"
@@ -290,18 +297,25 @@ export function LegacyNavbar() {
                   >
                     Analytics
                   </Link>
-                  {user && ['owner', 'investor', 'accountant', 'pm', 'project_manager'].includes(user.role?.toLowerCase()) && (
-                    <Link
-                      href="/dashboard/budget"
-                      className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                        isActive('/dashboard/budget')
-                          ? 'border-blue-500 text-gray-900'
-                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                      }`}
-                    >
-                      Budget
-                    </Link>
-                  )}
+                  {user &&
+                    [
+                      'owner',
+                      'investor',
+                      'accountant',
+                      'pm',
+                      'project_manager',
+                    ].includes(user.role?.toLowerCase()) && (
+                      <Link
+                        href="/dashboard/budget"
+                        className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                          isActive('/dashboard/budget')
+                            ? 'border-blue-500 text-gray-900'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                        }`}
+                      >
+                        Budget
+                      </Link>
+                    )}
                 </>
               )}
             </div>
@@ -311,7 +325,9 @@ export function LegacyNavbar() {
               <div className="flex items-center gap-4">
                 {user && (
                   <div className="text-sm text-gray-700">
-                    <span className="font-medium">{user.firstName || user.email}</span>
+                    <span className="font-medium">
+                      {user.firstName || user.email}
+                    </span>
                     <span className="text-gray-500 ml-2">({user.role})</span>
                   </div>
                 )}
@@ -329,11 +345,26 @@ export function LegacyNavbar() {
               onClick={() => setShowMenu(!showMenu)}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             >
-              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
                 {showMenu ? (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 ) : (
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
                 )}
               </svg>
             </button>
@@ -382,19 +413,22 @@ export function LegacyNavbar() {
                 >
                   Projects
                 </Link>
-                {user && ['owner', 'investor', 'accountant'].includes(user.role?.toLowerCase()) && (
-                  <Link
-                    href="/financing"
-                    className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                      isActive('/financing')
-                        ? 'bg-blue-50 border-blue-500 text-blue-700'
-                        : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
-                    }`}
-                    onClick={() => setShowMenu(false)}
-                  >
-                    Financing
-                  </Link>
-                )}
+                {user &&
+                  ['owner', 'investor', 'accountant'].includes(
+                    user.role?.toLowerCase(),
+                  ) && (
+                    <Link
+                      href="/financing"
+                      className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+                        isActive('/financing')
+                          ? 'bg-blue-50 border-blue-500 text-blue-700'
+                          : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
+                      }`}
+                      onClick={() => setShowMenu(false)}
+                    >
+                      Financing
+                    </Link>
+                  )}
                 {user && user.role?.toLowerCase() === 'owner' && (
                   <Link
                     href="/investors"
@@ -496,19 +530,26 @@ export function LegacyNavbar() {
                 >
                   Analytics
                 </Link>
-                {user && ['owner', 'investor', 'accountant', 'pm', 'project_manager'].includes(user.role?.toLowerCase()) && (
-                  <Link
-                    href="/dashboard/budget"
-                    className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                      isActive('/dashboard/budget')
-                        ? 'bg-blue-50 border-blue-500 text-blue-700'
-                        : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
-                    }`}
-                    onClick={() => setShowMenu(false)}
-                  >
-                    Budget
-                  </Link>
-                )}
+                {user &&
+                  [
+                    'owner',
+                    'investor',
+                    'accountant',
+                    'pm',
+                    'project_manager',
+                  ].includes(user.role?.toLowerCase()) && (
+                    <Link
+                      href="/dashboard/budget"
+                      className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+                        isActive('/dashboard/budget')
+                          ? 'bg-blue-50 border-blue-500 text-blue-700'
+                          : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
+                      }`}
+                      onClick={() => setShowMenu(false)}
+                    >
+                      Budget
+                    </Link>
+                  )}
               </>
             )}
             <div className="border-t border-gray-200 pt-4 pb-3">

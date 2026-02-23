@@ -136,6 +136,65 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
         </div>
       </div>
 
+      {/* Phase Cost Breakdown */}
+      {(() => {
+        const floorBudgetAllocation = floor.budgetAllocation || { total: floor.totalBudget || 0, byPhase: {} };
+        const byPhase = floorBudgetAllocation.byPhase || {};
+        const phasesWithBudget = Object.keys(byPhase).filter(phaseCode => byPhase[phaseCode]?.total > 0);
+        
+        if (phasesWithBudget.length === 0) {
+          return null;
+        }
+
+        return (
+          <div className="bg-white rounded-lg shadow p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Cost Breakdown by Phase</h3>
+              <Link
+                href={`/floors/${floor._id}?tab=phases`}
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              >
+                View Full Phase Breakdown →
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {phasesWithBudget.map((phaseCode) => {
+                const phaseBudget = byPhase[phaseCode] || { total: 0, materials: 0, labour: 0, equipment: 0, subcontractors: 0 };
+                // Note: Actual costs would need to be fetched separately or passed as prop
+                return (
+                  <div key={phaseCode} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-gray-900">{phaseCode}</h4>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {formatCurrency(phaseBudget.total)} budget
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                      <div>
+                        <p className="text-gray-500">Materials</p>
+                        <p className="font-semibold text-gray-900">{formatCurrency(phaseBudget.materials)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Labour</p>
+                        <p className="font-semibold text-gray-900">{formatCurrency(phaseBudget.labour)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Equipment</p>
+                        <p className="font-semibold text-gray-900">{formatCurrency(phaseBudget.equipment)}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-500">Subcontractors</p>
+                        <p className="font-semibold text-gray-900">{formatCurrency(phaseBudget.subcontractors)}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Budget Utilization Bar */}
       {((floor.budgetAllocation?.total || floor.totalBudget || 0) > 0) && (
         <div className="bg-white rounded-lg shadow p-6">

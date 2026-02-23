@@ -8,19 +8,25 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ProfessionalServicesAssignmentForm } from '@/components/professional-services/professional-services-assignment-form';
+import { PrerequisiteBlock } from '@/components/help/PrerequisiteBlock';
+import { useProfessionalPrerequisites } from '@/hooks/use-professional-prerequisites';
+import { useProjectContext } from '@/contexts/ProjectContext';
 
-export default function NewProfessionalServicePage() {
+function NewProfessionalServicePageContent() {
   const router = useRouter();
+  // Use useSearchParams to ensure Suspense boundary is recognized
+  const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
+  const { currentProjectId } = useProjectContext();
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -28,6 +34,14 @@ export default function NewProfessionalServicePage() {
   const [projects, setProjects] = useState([]);
   const [phases, setPhases] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
+
+  // Check prerequisites
+  const {
+    canProceed,
+    prerequisiteDetails,
+    loading: prereqLoading,
+    error: prereqError,
+  } = useProfessionalPrerequisites('assignments', currentProjectId);
 
   useEffect(() => {
     fetchData();
@@ -45,7 +59,7 @@ export default function NewProfessionalServicePage() {
           'Pragma': 'no-cache',
         },
       });
-      const professionalsData = await professionalsResponse.json();
+      const professionalsData = await response.json();
       if (professionalsData.success) {
         setProfessionals(professionalsData.data.professionals || []);
       }
@@ -89,11 +103,13 @@ export default function NewProfessionalServicePage() {
 
     try {
       const response = await fetch('/api/professional-services', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(formData),
       });
 
@@ -133,7 +149,29 @@ export default function NewProfessionalServicePage() {
     );
   }
 
-  if (loadingData) {
+  // Show blocking UI if prerequisites not met
+  if (!prereqLoading && !canProceed) {
+    return (
+      <AppLayout>
+        <PrerequisiteBlock
+          title="Cannot Create Assignment"
+          description="You need to set up the required prerequisites before creating a professional service assignment."
+          missingItems={Object.entries(prerequisiteDetails)
+            .filter(([_, item]) => !item.completed)
+            .map(([_, item]) => item.message)}
+          prerequisites={prerequisiteDetails}
+          actions={[
+            { href: '/professional-services-library/new', label: 'Add to Library', icon: '📚' },
+            { href: '/projects/new', label: 'Create Project', icon: '🏗️' },
+            { href: '/professional-services', label: 'View Assignments', icon: '←' },
+          ]}
+          onRetry={() => window.location.reload()}
+        />
+      </AppLayout>
+    );
+  }
+
+  if (loadingData || prereqLoading) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -174,6 +212,20 @@ export default function NewProfessionalServicePage() {
         </div>
       </div>
     </AppLayout>
+  );
+}
+
+export default function NewProfessionalServicePage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner size="lg" text="Loading..." />
+        </div>
+      </div>
+    }>
+      <NewProfessionalServicePageContent />
+    </Suspense>
   );
 }
 

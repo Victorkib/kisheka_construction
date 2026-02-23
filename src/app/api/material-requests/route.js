@@ -332,6 +332,16 @@ export async function POST(request) {
     
     const phase = phaseValidation.phase;
 
+    // Phase-Floor Applicability Validation: Check if floor is applicable to phase
+    if (floorId && ObjectId.isValid(floorId)) {
+      const { validatePhaseFloorApplicability } = await import('@/lib/phase-floor-validation-helpers');
+      const phaseFloorValidation = await validatePhaseFloorApplicability(phaseId, floorId, projectId);
+      
+      if (!phaseFloorValidation.isValid) {
+        return errorResponse(phaseFloorValidation.error || 'Floor is not applicable to the selected phase', 400);
+      }
+    }
+
     // Validate using schema validation (includes phaseId validation)
     const validation = validateMaterialRequest(materialRequestData);
     if (!validation.isValid) {

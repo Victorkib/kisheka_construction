@@ -274,10 +274,51 @@ export async function calculateFloorActualSpending(floorId, includeByPhase = tru
     });
   }
   
-  // Calculate equipment spending (if equipment is linked to floors)
-  // Note: Equipment might not be directly linked to floors, so this might be 0
-  const equipmentSpending = 0; // Placeholder for future implementation
+  // Calculate equipment spending - linked via work items or direct floorId
+  // First, get work items for this floor to find equipment linked via work items
+  const workItems = await db.collection('work_items').find({
+    floorId: floorObjectId,
+    deletedAt: null
+  }).toArray();
+  
+  const workItemPhaseIds = new Set(workItems.map(wi => wi.phaseId?.toString()).filter(Boolean));
+  const workItemIds = workItems.map(wi => wi._id);
+  
+  // Get equipment linked via work items or directly to floor
+  const equipmentQuery = {
+    deletedAt: null,
+    $or: [
+      { workItemId: { $in: workItemIds } },
+      { floorId: floorObjectId } // Direct floor linkage (if exists)
+    ]
+  };
+  
+  // If includeByPhase, also filter by phase
+  const equipmentAggregation = await db.collection('equipment').aggregate([
+    {
+      $match: equipmentQuery
+    },
+    {
+      $group: {
+        _id: includeByPhase ? '$phaseId' : null,
+        total: { $sum: '$totalCost' },
+      },
+    },
+  ]).toArray();
+  
+  // Calculate total equipment spending
+  const equipmentSpending = equipmentAggregation.reduce((sum, item) => sum + (item.total || 0), 0);
+  
+  // Build phase-specific equipment spending map
   const equipmentByPhase = {};
+  if (includeByPhase) {
+    equipmentAggregation.forEach(item => {
+      const phaseId = item._id?.toString();
+      if (phaseId) {
+        equipmentByPhase[phaseId] = (equipmentByPhase[phaseId] || 0) + (item.total || 0);
+      }
+    });
+  }
   
   // Calculate subcontractor spending (if subcontractors are linked to floors)
   // Note: Subcontractors might not be directly linked to floors, so this might be 0

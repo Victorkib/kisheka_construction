@@ -37,6 +37,10 @@ export const PROFESSIONAL_TYPES = PROFESSIONAL_TYPES_CONST_IMPORT;
  * @property {string} [contractDocumentUrl] - Cloudinary URL to contract document
  * @property {string} [paymentTerms] - Payment terms (e.g., "Net 30")
  * @property {Array} [milestonePayments] - Milestone-based payments array
+ * @property {number} [hourlyRate] - Denormalized hourly rate from library (snapshot at assignment time)
+ * @property {number} [perVisitRate] - Denormalized per-visit rate from library (snapshot at assignment time)
+ * @property {number} [monthlyRetainer] - Denormalized monthly retainer from library (snapshot at assignment time)
+ * @property {Object} [ratesSnapshot] - Complete rates snapshot for historical accuracy
  * @property {number} totalFees - Total fees paid/committed (default: 0)
  * @property {number} feesPaid - Amount paid so far (default: 0)
  * @property {number} feesPending - Amount pending (default: 0)
@@ -84,6 +88,16 @@ export const PROFESSIONAL_SERVICES_SCHEMA = {
       paidDate: Date,
     },
   ],
+  hourlyRate: Number, // Optional, denormalized from library
+  perVisitRate: Number, // Optional, denormalized from library
+  monthlyRetainer: Number, // Optional, denormalized from library
+  ratesSnapshot: {
+    hourlyRate: Number,
+    perVisitRate: Number,
+    monthlyRetainer: Number,
+    snapshotDate: Date,
+    libraryId: 'ObjectId', // Reference to library version
+  },
   totalFees: Number, // Default: 0
   feesPaid: Number, // Default: 0
   feesPending: Number, // Default: 0

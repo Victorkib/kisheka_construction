@@ -1380,14 +1380,34 @@ function NewItemPageContent() {
                 <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Purchase Date
                 </label>
-                <input
-                  type="date"
-                  name="datePurchased"
-                  value={formData.datePurchased}
-                  onChange={handleChange}
-                  max={entryType === 'retroactive_entry' ? new Date().toISOString().split('T')[0] : undefined}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                />
+                <div className="relative">
+                  <input
+                    type="date"
+                    name="datePurchased"
+                    value={formData.datePurchased}
+                    onChange={handleChange}
+                    max={entryType === 'retroactive_entry' ? new Date().toISOString().split('T')[0] : undefined}
+                    className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const input = e.target.closest('.relative').querySelector('input[type="date"]');
+                      if (input) {
+                        input.showPicker?.();
+                        input.focus();
+                      }
+                    }}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                    aria-label="Open date picker"
+                    tabIndex={-1}
+                  >
+                    <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </button>
+                </div>
                 {entryType === 'retroactive_entry' && (
                   <p className="text-xs text-gray-500 mt-1">Can be in the past for retroactive entries</p>
                 )}
@@ -1402,14 +1422,34 @@ function NewItemPageContent() {
                     <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                       Original Purchase Date
                     </label>
-                    <input
-                      type="date"
-                      name="originalPurchaseDate"
-                      value={formData.originalPurchaseDate || formData.datePurchased}
-                      onChange={(e) => setFormData(prev => ({ ...prev, originalPurchaseDate: e.target.value }))}
-                      max={new Date().toISOString().split('T')[0]}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                    />
+                    <div className="relative">
+                      <input
+                        type="date"
+                        name="originalPurchaseDate"
+                        value={formData.originalPurchaseDate || formData.datePurchased}
+                        onChange={(e) => setFormData(prev => ({ ...prev, originalPurchaseDate: e.target.value }))}
+                        max={new Date().toISOString().split('T')[0]}
+                        className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const input = e.target.closest('.relative').querySelector('input[type="date"]');
+                          if (input) {
+                            input.showPicker?.();
+                            input.focus();
+                          }
+                        }}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                        aria-label="Open date picker"
+                        tabIndex={-1}
+                      >
+                        <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </button>
+                    </div>
                     <p className="text-xs text-gray-500 mt-1">Date when the material was originally purchased (can be in the past)</p>
                   </div>
 
@@ -1510,12 +1550,32 @@ function NewItemPageContent() {
                           <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Installation Date
                           </label>
-                          <input
-                            type="date"
-                            value={formData.finishingDetails.installationDate}
-                            onChange={(e) => handleFinishingChange('installationDate', e.target.value)}
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                          />
+                          <div className="relative">
+                            <input
+                              type="date"
+                              value={formData.finishingDetails.installationDate}
+                              onChange={(e) => handleFinishingChange('installationDate', e.target.value)}
+                              className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer"
+                            />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const input = e.target.closest('.relative').querySelector('input[type="date"]');
+                                if (input) {
+                                  input.showPicker?.();
+                                  input.focus();
+                                }
+                              }}
+                              className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                              aria-label="Open date picker"
+                              tabIndex={-1}
+                            >
+                              <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}
@@ -1553,12 +1613,32 @@ function NewItemPageContent() {
                           <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Installation Date
                           </label>
-                          <input
-                            type="date"
-                            value={formData.finishingDetails.installationDate}
-                            onChange={(e) => handleFinishingChange('installationDate', e.target.value)}
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
-                          />
+                          <div className="relative">
+                            <input
+                              type="date"
+                              value={formData.finishingDetails.installationDate}
+                              onChange={(e) => handleFinishingChange('installationDate', e.target.value)}
+                              className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer"
+                            />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                const input = e.target.closest('.relative').querySelector('input[type="date"]');
+                                if (input) {
+                                  input.showPicker?.();
+                                  input.focus();
+                                }
+                              }}
+                              className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                              aria-label="Open date picker"
+                              tabIndex={-1}
+                            >
+                              <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}

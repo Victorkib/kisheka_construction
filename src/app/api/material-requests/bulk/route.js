@@ -179,6 +179,44 @@ export async function POST(request) {
       }
     }
 
+    // Phase-Floor Applicability Validation: Validate each material's phase-floor combination
+    const { validatePhaseFloorApplicability } = await import('@/lib/phase-floor-validation-helpers');
+    const phaseFloorValidationErrors = [];
+    
+    for (let i = 0; i < materials.length; i++) {
+      const material = materials[i];
+      const materialPhaseId = material.phaseId && ObjectId.isValid(material.phaseId) 
+        ? material.phaseId 
+        : (defaultPhaseId && ObjectId.isValid(defaultPhaseId) ? defaultPhaseId : null);
+      const materialFloorId = material.floorId && ObjectId.isValid(material.floorId)
+        ? material.floorId
+        : (defaultFloorId && ObjectId.isValid(defaultFloorId) ? defaultFloorId : null);
+      
+      // Only validate if both phaseId and floorId are provided
+      if (materialPhaseId && materialFloorId) {
+        const validation = await validatePhaseFloorApplicability(materialPhaseId, materialFloorId, projectId);
+        
+        if (!validation.isValid) {
+          const materialName = material.name || material.materialName || `Material ${i + 1}`;
+          phaseFloorValidationErrors.push({
+            materialIndex: i,
+            materialName,
+            error: validation.error || 'Floor is not applicable to the selected phase'
+          });
+        }
+      }
+    }
+    
+    if (phaseFloorValidationErrors.length > 0) {
+      const errorMessages = phaseFloorValidationErrors.map(err => 
+        `${err.materialName} (item ${err.materialIndex + 1}): ${err.error}`
+      );
+      return errorResponse(
+        `Phase-floor validation failed for ${phaseFloorValidationErrors.length} material(s):\n${errorMessages.join('\n')}`,
+        400
+      );
+    }
+
     // Budget Validation: Validate bulk request budget across all phases
     // Normalize materials with calculated costs (ensure numbers, not strings)
     const materialsWithCosts = materials

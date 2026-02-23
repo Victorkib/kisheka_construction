@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner } from '@/components/loading';
@@ -16,8 +16,13 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
 import { MessageSquare, Mail, Phone, FileText, CheckCircle, XCircle, Clock, Eye } from 'lucide-react';
 
+// Force dynamic rendering for pages using useSearchParams
+export const dynamic = 'force-dynamic';
+
 function SupervisorSubmissionsPageContent() {
   const router = useRouter();
+  // Use useSearchParams to ensure Suspense boundary is recognized
+  const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
   const [loading, setLoading] = useState(true);
@@ -282,7 +287,13 @@ function SupervisorSubmissionsPageContent() {
 
 export default function SupervisorSubmissionsPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner size="lg" text="Loading..." />
+        </div>
+      </div>
+    }>
       <SupervisorSubmissionsPageContent />
     </Suspense>
   );

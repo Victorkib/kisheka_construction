@@ -1,11 +1,11 @@
 /**
  * Projects List Page
  * Displays all projects with filtering, sorting, and project management
- * 
+ *
  * Route: /projects
  */
 
- 'use client';
+'use client';
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -13,7 +13,6 @@ import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingTable, LoadingSpinner } from '@/components/loading';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
-import { fetchNoCache } from '@/lib/fetch-helpers';
 
 function ProjectsPageContent() {
   const router = useRouter();
@@ -34,7 +33,7 @@ function ProjectsPageContent() {
   useEffect(() => {
     const urlStatus = searchParams.get('status') || '';
     const urlSearch = searchParams.get('search') || '';
-    
+
     setFilters((prev) => {
       // Only update if values actually changed to prevent unnecessary re-renders
       if (prev.status !== urlStatus || prev.search !== urlSearch) {
@@ -77,7 +76,7 @@ function ProjectsPageContent() {
       if (filters.status) queryParams.append('status', filters.status);
       if (filters.search) queryParams.append('search', filters.search);
 
-      const response = await fetchNoCache(`/api/projects?${queryParams}`);
+      const response = await fetch(`/api/projects?${queryParams}`);
       const data = await response.json();
 
       if (!data.success) {
@@ -100,17 +99,20 @@ function ProjectsPageContent() {
     }
   }, [user, fetchProjects]);
 
-  const handleFilterChange = useCallback((key, value) => {
-    // Update URL - the useEffect will sync the filters state from URL
-    const currentStatus = key === 'status' ? value : filters.status;
-    const currentSearch = key === 'search' ? value : filters.search;
-    
-    const params = new URLSearchParams();
-    if (currentStatus) params.set('status', currentStatus);
-    if (currentSearch) params.set('search', currentSearch);
-    
-    router.push(`/projects?${params.toString()}`);
-  }, [router, filters.status, filters.search]);
+  const handleFilterChange = useCallback(
+    (key, value) => {
+      // Update URL - the useEffect will sync the filters state from URL
+      const currentStatus = key === 'status' ? value : filters.status;
+      const currentSearch = key === 'search' ? value : filters.search;
+
+      const params = new URLSearchParams();
+      if (currentStatus) params.set('status', currentStatus);
+      if (currentSearch) params.set('search', currentSearch);
+
+      router.push(`/projects?${params.toString()}`);
+    },
+    [router, filters.status, filters.search],
+  );
 
   const getStatusBadgeColor = (status) => {
     const colors = {
@@ -137,8 +139,12 @@ function ProjectsPageContent() {
         {/* Header */}
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Projects</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage construction projects</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              Projects
+            </h1>
+            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+              Manage construction projects
+            </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
@@ -178,11 +184,17 @@ function ProjectsPageContent() {
         {!loading && projects.length > 0 && (
           <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-              <p className="text-sm font-medium text-gray-600">Total Projects</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{projects.length}</p>
+              <p className="text-sm font-medium text-gray-600">
+                Total Projects
+              </p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">
+                {projects.length}
+              </p>
             </div>
             <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
-              <p className="text-sm font-medium text-gray-600">Active Projects</p>
+              <p className="text-sm font-medium text-gray-600">
+                Active Projects
+              </p>
               <p className="text-2xl font-bold text-green-600 mt-1">
                 {projects.filter((p) => p.status === 'active').length}
               </p>
@@ -190,7 +202,9 @@ function ProjectsPageContent() {
             <div className="bg-white rounded-lg shadow p-4 border-l-4 border-purple-500">
               <p className="text-sm font-medium text-gray-600">Total Budget</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
-                {formatCurrency(projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0))}
+                {formatCurrency(
+                  projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0),
+                )}
               </p>
             </div>
             <div className="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
@@ -206,7 +220,9 @@ function ProjectsPageContent() {
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Search</label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Search
+              </label>
               <input
                 type="text"
                 placeholder="Search by name, code, or location..."
@@ -216,7 +232,9 @@ function ProjectsPageContent() {
               />
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Status</label>
+              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                Status
+              </label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
@@ -256,7 +274,9 @@ function ProjectsPageContent() {
         ) : projects.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-12 text-center">
             <div className="text-6xl mb-4">🏗️</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No projects found</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              No projects found
+            </h3>
             <p className="text-gray-600 mb-6">
               {filters.search || filters.status
                 ? 'Try adjusting your filters'
@@ -306,15 +326,20 @@ function ProjectsPageContent() {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {projects.map((project) => {
-                      const totalInvested = project.statistics?.totalInvested || 0;
-                      const capitalBalance = project.statistics?.capitalBalance || 0;
+                      const totalInvested =
+                        project.statistics?.totalInvested || 0;
+                      const capitalBalance =
+                        project.statistics?.capitalBalance || 0;
                       const availableCapital = capitalBalance;
                       const totalUsed = totalInvested - capitalBalance;
-                      const usagePercentage = totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
-                      
+                      const usagePercentage =
+                        totalInvested > 0
+                          ? (totalUsed / totalInvested) * 100
+                          : 0;
+
                       let capitalStatusColor = 'bg-green-100 text-green-800';
                       let capitalStatusText = 'Capital OK';
-                      
+
                       if (totalInvested === 0) {
                         capitalStatusColor = 'bg-red-100 text-red-800';
                         capitalStatusText = 'No Capital';
@@ -327,7 +352,10 @@ function ProjectsPageContent() {
                       }
 
                       return (
-                        <tr key={project._id} className="hover:bg-gray-50 transition-colors">
+                        <tr
+                          key={project._id}
+                          className="hover:bg-gray-50 transition-colors"
+                        >
                           <td className="px-6 py-4">
                             <div>
                               <Link
@@ -336,13 +364,15 @@ function ProjectsPageContent() {
                               >
                                 {project.projectName}
                               </Link>
-                              <p className="text-xs text-gray-500 mt-0.5">{project.projectCode}</p>
+                              <p className="text-xs text-gray-500 mt-0.5">
+                                {project.projectCode}
+                              </p>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span
                               className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                                project.status
+                                project.status,
                               )}`}
                             >
                               {project.status || 'planning'}
@@ -358,9 +388,11 @@ function ProjectsPageContent() {
                               <div className="space-y-1">
                                 <div className="flex items-center gap-2">
                                   <span className="text-sm font-medium text-gray-900">
-                                    {formatCurrency(project.statistics.totalInvested)}
+                                    {formatCurrency(
+                                      project.statistics.totalInvested,
+                                    )}
                                   </span>
-                                  <span 
+                                  <span
                                     className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${capitalStatusColor}`}
                                     title={`Capital: ${formatCurrency(totalInvested)}, Available: ${formatCurrency(availableCapital)}`}
                                   >
@@ -368,21 +400,33 @@ function ProjectsPageContent() {
                                   </span>
                                 </div>
                                 <div className="text-xs text-gray-600">
-                                  Balance: {formatCurrency(project.statistics.capitalBalance || 0)}
+                                  Balance:{' '}
+                                  {formatCurrency(
+                                    project.statistics.capitalBalance || 0,
+                                  )}
                                 </div>
                                 {project.statistics.budgetVsCapitalWarning && (
-                                  <div className="text-xs text-yellow-600 flex items-center gap-1" title={project.statistics.budgetVsCapitalWarning}>
+                                  <div
+                                    className="text-xs text-yellow-600 flex items-center gap-1"
+                                    title={
+                                      project.statistics.budgetVsCapitalWarning
+                                    }
+                                  >
                                     <span>⚠️</span>
                                     <span>Budget exceeds capital</span>
                                   </div>
                                 )}
                               </div>
                             ) : (
-                              <span className="text-sm text-gray-400">No financing</span>
+                              <span className="text-sm text-gray-400">
+                                No financing
+                              </span>
                             )}
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-sm text-gray-900">{project.location || 'N/A'}</span>
+                            <span className="text-sm text-gray-900">
+                              {project.location || 'N/A'}
+                            </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <Link
@@ -407,11 +451,12 @@ function ProjectsPageContent() {
                 const capitalBalance = project.statistics?.capitalBalance || 0;
                 const availableCapital = capitalBalance;
                 const totalUsed = totalInvested - capitalBalance;
-                const usagePercentage = totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
-                
+                const usagePercentage =
+                  totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
+
                 let capitalStatusColor = 'bg-green-100 text-green-800';
                 let capitalStatusText = 'Capital OK';
-                
+
                 if (totalInvested === 0) {
                   capitalStatusColor = 'bg-red-100 text-red-800';
                   capitalStatusText = 'No Capital';
@@ -424,7 +469,10 @@ function ProjectsPageContent() {
                 }
 
                 return (
-                  <div key={project._id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                  <div
+                    key={project._id}
+                    className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                  >
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
                         <Link
@@ -433,17 +481,19 @@ function ProjectsPageContent() {
                         >
                           {project.projectName}
                         </Link>
-                        <p className="text-sm text-gray-500 mt-0.5">{project.projectCode}</p>
+                        <p className="text-sm text-gray-500 mt-0.5">
+                          {project.projectCode}
+                        </p>
                       </div>
                       <span
                         className={`inline-flex px-2.5 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(
-                          project.status
+                          project.status,
                         )}`}
                       >
                         {project.status || 'planning'}
                       </span>
                     </div>
-                    
+
                     <div className="grid grid-cols-2 gap-3 mb-3">
                       <div>
                         <p className="text-xs text-gray-500">Budget</p>
@@ -463,7 +513,7 @@ function ProjectsPageContent() {
                       <div className="border-t border-gray-200 pt-3 mt-3">
                         <div className="flex items-center justify-between mb-2">
                           <p className="text-xs text-gray-500">Financing</p>
-                          <span 
+                          <span
                             className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${capitalStatusColor}`}
                             title={`Capital: ${formatCurrency(totalInvested)}, Available: ${formatCurrency(availableCapital)}`}
                           >
@@ -472,19 +522,28 @@ function ProjectsPageContent() {
                         </div>
                         <div className="space-y-1">
                           <div className="flex justify-between">
-                            <span className="text-xs text-gray-600">Capital Raised</span>
+                            <span className="text-xs text-gray-600">
+                              Capital Raised
+                            </span>
                             <span className="text-sm font-medium text-gray-900">
                               {formatCurrency(project.statistics.totalInvested)}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-xs text-gray-600">Balance</span>
+                            <span className="text-xs text-gray-600">
+                              Balance
+                            </span>
                             <span className="text-sm font-medium text-gray-900">
-                              {formatCurrency(project.statistics.capitalBalance || 0)}
+                              {formatCurrency(
+                                project.statistics.capitalBalance || 0,
+                              )}
                             </span>
                           </div>
                           {project.statistics.budgetVsCapitalWarning && (
-                            <div className="text-xs text-yellow-600 flex items-center gap-1 mt-1" title={project.statistics.budgetVsCapitalWarning}>
+                            <div
+                              className="text-xs text-yellow-600 flex items-center gap-1 mt-1"
+                              title={project.statistics.budgetVsCapitalWarning}
+                            >
                               <span>⚠️</span>
                               <span>Budget exceeds capital</span>
                             </div>
@@ -527,4 +586,3 @@ export default function ProjectsPage() {
     </Suspense>
   );
 }
-

@@ -305,7 +305,9 @@ export async function PATCH(request, { params }) {
       labour,
       equipment,
       subcontractors,
-      contingency
+      contingency,
+      autoAllocateFloors, // Flag to auto-allocate to floors (default: true, can opt-out)
+      floorAllocationStrategy // 'even' | 'weighted' (default: 'weighted')
     } = body;
 
     const db = await getDatabase();

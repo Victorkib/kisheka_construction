@@ -7,11 +7,15 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
+import { LoadingSpinner } from '@/components/loading';
 
-export default function ExpensesPage() {
+function ExpensesPageContent() {
+  // Use useSearchParams to ensure Suspense boundary is recognized
+  const searchParams = useSearchParams();
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -416,3 +420,16 @@ function SupplierSummaryTable({ dateRange }) {
   );
 }
 
+export default function ExpensesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner size="lg" text="Loading..." />
+        </div>
+      </div>
+    }>
+      <ExpensesPageContent />
+    </Suspense>
+  );
+}

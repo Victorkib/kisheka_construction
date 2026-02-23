@@ -7,14 +7,14 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { CloudinaryUploadWidget } from '@/components/uploads/cloudinary-upload-widget';
-import { LoadingOverlay, LoadingButton } from '@/components/loading';
+import { LoadingOverlay, LoadingButton, LoadingSpinner } from '@/components/loading';
 
-export default function NewInvestorPage() {
+function NewInvestorPageContent() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -475,3 +475,16 @@ export default function NewInvestorPage() {
   );
 }
 
+export default function NewInvestorPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner size="lg" text="Loading..." />
+        </div>
+      </div>
+    }>
+      <NewInvestorPageContent />
+    </Suspense>
+  );
+}

@@ -1,13 +1,20 @@
 /**
  * Material Library List Page
  * Displays all library materials with filtering, sorting, and pagination
- * 
+ *
  * Route: /material-library
  */
 
- 'use client';
+'use client';
 
-import { useState, useEffect, useCallback, useMemo, useRef, Suspense } from 'react';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  Suspense,
+} from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -19,20 +26,24 @@ import { MaterialLibraryTable } from '@/components/material-library/material-lib
 import { MaterialLibraryFilters } from '@/components/material-library/material-library-filters';
 import { MaterialLibrarySearch } from '@/components/material-library/material-library-search';
 import { ConfirmationModal } from '@/components/modals';
-import { MaterialGuide } from '@/components/materials/MaterialGuide';
 
 function MaterialLibraryPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
-  
+
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, pages: 0 });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    pages: 0,
+  });
   const [categories, setCategories] = useState([]);
-  
+
   const [filters, setFilters] = useState({
     category: '',
     categoryId: searchParams.get('categoryId') || '',
@@ -56,15 +67,26 @@ function MaterialLibraryPageContent() {
   }, []);
 
   // Memoize filter values to prevent unnecessary re-renders
-  const filterValues = useMemo(() => ({
-    categoryId: filters.categoryId,
-    category: filters.category,
-    isCommon: filters.isCommon,
-    isActive: filters.isActive,
-    search: filters.search,
-    sortBy: filters.sortBy,
-    sortOrder: filters.sortOrder,
-  }), [filters.categoryId, filters.category, filters.isCommon, filters.isActive, filters.search, filters.sortBy, filters.sortOrder]);
+  const filterValues = useMemo(
+    () => ({
+      categoryId: filters.categoryId,
+      category: filters.category,
+      isCommon: filters.isCommon,
+      isActive: filters.isActive,
+      search: filters.search,
+      sortBy: filters.sortBy,
+      sortOrder: filters.sortOrder,
+    }),
+    [
+      filters.categoryId,
+      filters.category,
+      filters.isCommon,
+      filters.isActive,
+      filters.search,
+      filters.sortBy,
+      filters.sortOrder,
+    ],
+  );
 
   // Fetch materials when filters or page change
   const fetchMaterials = useCallback(async () => {
@@ -145,13 +167,7 @@ function MaterialLibraryPageContent() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/categories', {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-        },
-      });
+      const response = await fetch('/api/categories');
       const data = await response.json();
       if (data.success) {
         setCategories(data.data || []);
@@ -161,26 +177,31 @@ function MaterialLibraryPageContent() {
     }
   };
 
-  const handleFilterChange = useCallback((key, value) => {
-    setFilters((prev) => {
-      const newFilters = { ...prev, [key]: value };
-      
-      // Update URL params (use setTimeout to avoid blocking state update)
-      setTimeout(() => {
-        const params = new URLSearchParams();
-        Object.entries(newFilters).forEach(([k, v]) => {
-          if (v) params.set(k, v);
-        });
-        router.push(`/material-library?${params.toString()}`, { scroll: false });
-      }, 0);
-      
-      return newFilters;
-    });
-    setPagination((prev) => {
-      if (prev.page === 1) return prev; // Avoid unnecessary update
-      return { ...prev, page: 1 };
-    });
-  }, [router]);
+  const handleFilterChange = useCallback(
+    (key, value) => {
+      setFilters((prev) => {
+        const newFilters = { ...prev, [key]: value };
+
+        // Update URL params (use setTimeout to avoid blocking state update)
+        setTimeout(() => {
+          const params = new URLSearchParams();
+          Object.entries(newFilters).forEach(([k, v]) => {
+            if (v) params.set(k, v);
+          });
+          router.push(`/material-library?${params.toString()}`, {
+            scroll: false,
+          });
+        }, 0);
+
+        return newFilters;
+      });
+      setPagination((prev) => {
+        if (prev.page === 1) return prev; // Avoid unnecessary update
+        return { ...prev, page: 1 };
+      });
+    },
+    [router],
+  );
 
   const handleDelete = (materialId, materialName) => {
     setMaterialToDelete({ id: materialId, name: materialName });
@@ -192,9 +213,12 @@ function MaterialLibraryPageContent() {
 
     setActionLoading(true);
     try {
-      const response = await fetch(`/api/material-library/${materialToDelete.id}`, {
-        method: 'DELETE',
-      });
+      const response = await fetch(
+        `/api/material-library/${materialToDelete.id}`,
+        {
+          method: 'DELETE',
+        },
+      );
 
       const data = await response.json();
 
@@ -228,7 +252,7 @@ function MaterialLibraryPageContent() {
       }
 
       toast.showSuccess(
-        `Material ${!currentValue ? 'marked as' : 'unmarked from'} commonly used`
+        `Material ${!currentValue ? 'marked as' : 'unmarked from'} commonly used`,
       );
       fetchMaterials();
     } catch (err) {
@@ -250,7 +274,9 @@ function MaterialLibraryPageContent() {
         throw new Error(data.error || 'Failed to update material');
       }
 
-      toast.showSuccess(`Material ${!currentValue ? 'activated' : 'deactivated'}`);
+      toast.showSuccess(
+        `Material ${!currentValue ? 'activated' : 'deactivated'}`,
+      );
       fetchMaterials();
     } catch (err) {
       toast.showError(`Error: ${err.message}`);
@@ -280,8 +306,12 @@ function MaterialLibraryPageContent() {
       <AppLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-            <p className="text-gray-600">You don't have permission to view the material library.</p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Access Denied
+            </h1>
+            <p className="text-gray-600">
+              You don't have permission to view the material library.
+            </p>
           </div>
         </div>
       </AppLayout>
@@ -301,7 +331,9 @@ function MaterialLibraryPageContent() {
         {/* Header */}
         <div className="mb-6 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Material Library</h1>
+            <h1 className="text-3xl font-bold text-gray-900">
+              Material Library
+            </h1>
             <p className="mt-1 text-sm text-gray-600">
               Manage commonly used construction materials
             </p>
@@ -329,13 +361,17 @@ function MaterialLibraryPageContent() {
           )}
         </div>
 
-        {/* Material Guide - Consolidated Quick Actions & Guide */}
-        <MaterialGuide
+        <PrerequisiteGuide
           title="Library entries fuel requests and templates"
           description="Keep the library accurate to speed up purchasing."
           prerequisites={[
             'Common materials are known',
             'Categories are defined',
+          ]}
+          actions={[
+            { href: '/material-library/new', label: 'Add Material' },
+            { href: '/material-templates', label: 'Material Templates' },
+            { href: '/material-requests/new', label: 'New Request' },
           ]}
           tip="Include unit costs to improve budget accuracy."
         />
@@ -355,7 +391,9 @@ function MaterialLibraryPageContent() {
             categoryId={filters.categoryId}
             isCommon={filters.isCommon}
             isActive={filters.isActive}
-            onCategoryChange={(value) => handleFilterChange('categoryId', value)}
+            onCategoryChange={(value) =>
+              handleFilterChange('categoryId', value)
+            }
             onCommonToggle={(value) => handleFilterChange('isCommon', value)}
             onActiveToggle={(value) => handleFilterChange('isActive', value)}
             onClearFilters={handleClearFilters}
@@ -393,20 +431,34 @@ function MaterialLibraryPageContent() {
                   </span>{' '}
                   to{' '}
                   <span className="font-medium">
-                    {Math.min(pagination.page * pagination.limit, pagination.total)}
+                    {Math.min(
+                      pagination.page * pagination.limit,
+                      pagination.total,
+                    )}
                   </span>{' '}
-                  of <span className="font-medium">{pagination.total}</span> results
+                  of <span className="font-medium">{pagination.total}</span>{' '}
+                  results
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
+                    onClick={() =>
+                      setPagination((prev) => ({
+                        ...prev,
+                        page: prev.page - 1,
+                      }))
+                    }
                     disabled={pagination.page === 1}
                     className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
                   <button
-                    onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
+                    onClick={() =>
+                      setPagination((prev) => ({
+                        ...prev,
+                        page: prev.page + 1,
+                      }))
+                    }
                     disabled={pagination.page >= pagination.pages}
                     className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
@@ -453,4 +505,3 @@ export default function MaterialLibraryPage() {
     </Suspense>
   );
 }
-

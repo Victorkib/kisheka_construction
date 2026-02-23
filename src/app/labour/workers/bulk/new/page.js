@@ -8,7 +8,7 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner, LoadingButton } from '@/components/loading';
@@ -26,6 +26,8 @@ import {
 
 function BulkWorkerCreationPageContent() {
   const router = useRouter();
+  // Use useSearchParams to ensure Suspense boundary is recognized
+  const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
   const toast = useToast();
   const [loading, setLoading] = useState(false);
@@ -551,13 +553,11 @@ function BulkWorkerCreationPageContent() {
 export default function BulkWorkerCreationPage() {
   return (
     <Suspense fallback={
-      <AppLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <LoadingSpinner size="lg" text="Loading..." />
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner size="lg" text="Loading..." />
         </div>
-      </AppLayout>
+      </div>
     }>
       <BulkWorkerCreationPageContent />
     </Suspense>

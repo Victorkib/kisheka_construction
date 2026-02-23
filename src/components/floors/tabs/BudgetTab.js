@@ -9,16 +9,37 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { LoadingSpinner } from '@/components/loading';
 
-export function FloorBudgetTab({ floor, project, formatCurrency }) {
+export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false }) {
   const [phaseBudgets, setPhaseBudgets] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [projectFinances, setProjectFinances] = useState(null);
 
   useEffect(() => {
     if (floor && project) {
       fetchPhaseBudgets();
+      fetchProjectFinances();
     }
   }, [floor, project]);
+
+  const fetchProjectFinances = async () => {
+    if (!project?._id) return;
+    try {
+      const response = await fetch(`/api/project-finances?projectId=${project._id}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        setProjectFinances(data.data);
+      }
+    } catch (err) {
+      console.error('Fetch project finances error:', err);
+    }
+  };
 
   const fetchPhaseBudgets = async () => {
     try {
@@ -182,15 +203,28 @@ export function FloorBudgetTab({ floor, project, formatCurrency }) {
         </div>
       </div>
 
-      {/* Capital Allocation Summary */}
-      {capitalTotal > 0 && (
-        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Capital Allocation</h3>
-            <div className="text-sm text-gray-600">
-              {capitalVsBudget.toFixed(1)}% of budget
-            </div>
+      {/* Capital Allocation Summary - Always show, even when zero */}
+      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Capital Allocation</h3>
+          <div className="flex items-center gap-3">
+            {capitalTotal > 0 && (
+              <div className="text-sm text-gray-600">
+                {capitalVsBudget.toFixed(1)}% of budget
+              </div>
+            )}
+            {canEdit && (
+              <Link
+                href={`/floors/${floor._id}/budget`}
+                className="px-3 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition"
+              >
+                {capitalTotal > 0 ? 'Manage Capital' : 'Allocate Capital'}
+              </Link>
+            )}
           </div>
+        </div>
+        {capitalTotal > 0 ? (
+          <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <div>
               <p className="text-sm text-gray-600">Total Capital</p>
@@ -291,8 +325,40 @@ export function FloorBudgetTab({ floor, project, formatCurrency }) {
               </p>
             )}
           </div>
-        </div>
-      )}
+          </>
+        ) : (
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <p className="text-sm text-yellow-800 mb-3">
+              <strong>No capital allocated</strong> to this floor yet.
+            </p>
+            {projectFinances && projectFinances.capitalBalance > 0 && (
+              <p className="text-xs text-yellow-700 mb-3">
+                Project Available Capital: <span className="font-semibold">{formatCurrency(projectFinances.capitalBalance)}</span>
+              </p>
+            )}
+            {canEdit && (
+              <Link
+                href={`/floors/${floor._id}/budget`}
+                className="inline-block px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition"
+              >
+                Allocate Capital Now
+              </Link>
+            )}
+            {(!canEdit || (projectFinances && projectFinances.capitalBalance === 0)) && (
+              <p className="text-xs text-yellow-700 mt-2">
+                {!canEdit 
+                  ? 'Contact PM or OWNER to allocate capital.'
+                  : 'No capital available. Allocate capital to the project first.'}
+                {projectFinances && projectFinances.capitalBalance === 0 && (
+                  <Link href="/investors" className="ml-1 underline hover:text-yellow-900">
+                    Go to Investors
+                  </Link>
+                )}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Phase Budget Breakdown */}
       {phaseBudgets && phaseBudgets.length > 0 ? (

@@ -13,6 +13,7 @@ import { EQUIPMENT_TYPES, EQUIPMENT_STATUSES, ACQUISITION_TYPES } from '@/lib/co
  * @property {ObjectId} _id - Equipment ID
  * @property {ObjectId} projectId - Project ID (required, indexed)
  * @property {ObjectId} phaseId - Phase ID (required, indexed)
+ * @property {ObjectId} [floorId] - Floor ID (optional, for direct floor linkage)
  * @property {string} equipmentName - Equipment name (required)
  * @property {string} equipmentType - Equipment type (required)
  * @property {string} acquisitionType - 'rental' | 'purchase' | 'owned' (required)
@@ -41,6 +42,7 @@ export { EQUIPMENT_TYPES, EQUIPMENT_STATUSES, ACQUISITION_TYPES };
 export const EQUIPMENT_SCHEMA = {
   projectId: 'ObjectId', // Required
   phaseId: 'ObjectId', // Required (can be null for site-wide equipment)
+  floorId: 'ObjectId', // Optional (for direct floor linkage)
   equipmentName: String, // Required
   equipmentType: String, // Required
   acquisitionType: String, // Required: 'rental' | 'purchase' | 'owned'
@@ -77,6 +79,7 @@ export function createEquipment(input, projectId, phaseId, createdBy) {
     equipmentType,
     acquisitionType,
     equipmentScope,
+    floorId,
     supplierId,
     startDate,
     endDate,
@@ -102,6 +105,7 @@ export function createEquipment(input, projectId, phaseId, createdBy) {
   return {
     projectId: typeof projectId === 'string' ? new ObjectId(projectId) : projectId,
     phaseId: finalPhaseId && ObjectId.isValid(finalPhaseId) ? (typeof finalPhaseId === 'string' ? new ObjectId(finalPhaseId) : finalPhaseId) : null,
+    floorId: floorId && ObjectId.isValid(floorId) ? (typeof floorId === 'string' ? new ObjectId(floorId) : floorId) : null,
     equipmentName: equipmentName?.trim() || '',
     equipmentType: equipmentType || 'other',
     acquisitionType: acquisitionType || 'rental',

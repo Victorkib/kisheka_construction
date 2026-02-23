@@ -1,7 +1,7 @@
 /**
  * Labour Entry Schema Definition
  * Centralized schema definition for individual labour entries
- * 
+ *
  * NOTE: This file contains MongoDB imports and should only be used in server-side code.
  * For client components, use @/lib/constants/labour-constants.js instead.
  */
@@ -225,14 +225,18 @@ export function createLabourEntry(input, createdBy) {
     notes,
     equipmentId,
     subcontractorId,
-    } = input;
-  
+  } = input;
+
   // Determine if this is indirect labour
   // Indirect labour: site management, security, general site office staff
   const indirectLabour = isIndirectLabour === true;
-  
+
   // For indirect labour, phaseId can be null (it's project-level, not phase-specific)
-  const finalPhaseId = indirectLabour ? null : (phaseId && ObjectId.isValid(phaseId) ? new ObjectId(phaseId) : null);
+  const finalPhaseId = indirectLabour
+    ? null
+    : phaseId && ObjectId.isValid(phaseId)
+      ? new ObjectId(phaseId)
+      : null;
 
   // Calculate hours
   let totalHours = 0;
@@ -253,7 +257,8 @@ export function createLabourEntry(input, createdBy) {
   const calculatedOvertimeHours = Math.max(0, totalHours - 8);
 
   // Use provided overtime hours if available, otherwise calculate
-  const finalOvertimeHours = overtimeHours > 0 ? overtimeHours : calculatedOvertimeHours;
+  const finalOvertimeHours =
+    overtimeHours > 0 ? overtimeHours : calculatedOvertimeHours;
   const finalRegularHours = totalHours - finalOvertimeHours;
 
   // Calculate costs
@@ -269,16 +274,27 @@ export function createLabourEntry(input, createdBy) {
   }
 
   return {
-    batchId: batchId && ObjectId.isValid(batchId) ? new ObjectId(batchId) : null,
+    batchId:
+      batchId && ObjectId.isValid(batchId) ? new ObjectId(batchId) : null,
     batchNumber: batchNumber || null,
-    projectId: ObjectId.isValid(projectId) ? new ObjectId(projectId) : projectId,
+    projectId: ObjectId.isValid(projectId)
+      ? new ObjectId(projectId)
+      : projectId,
     phaseId: finalPhaseId,
     isIndirectLabour: indirectLabour,
-    floorId: floorId && ObjectId.isValid(floorId) ? new ObjectId(floorId) : null,
+    floorId:
+      floorId && ObjectId.isValid(floorId) ? new ObjectId(floorId) : null,
     indirectCostCategory: indirectCostCategory || null,
-    categoryId: categoryId && ObjectId.isValid(categoryId) ? new ObjectId(categoryId) : null,
-    workItemId: workItemId && ObjectId.isValid(workItemId) ? new ObjectId(workItemId) : null,
-    workerId: workerId && ObjectId.isValid(workerId) ? new ObjectId(workerId) : null,
+    categoryId:
+      categoryId && ObjectId.isValid(categoryId)
+        ? new ObjectId(categoryId)
+        : null,
+    workItemId:
+      workItemId && ObjectId.isValid(workItemId)
+        ? new ObjectId(workItemId)
+        : null,
+    workerId:
+      workerId && ObjectId.isValid(workerId) ? new ObjectId(workerId) : null,
     workerName: workerName?.trim() || '',
     workerType: workerType || 'internal',
     workerRole: workerRole || 'skilled',
@@ -303,12 +319,26 @@ export function createLabourEntry(input, createdBy) {
     visitPurpose: visitPurpose?.trim() || null,
     deliverables: Array.isArray(deliverables) ? deliverables : [],
     status: 'draft',
-    createdBy: ObjectId.isValid(createdBy) ? new ObjectId(createdBy) : createdBy,
-    qualityRating: qualityRating && qualityRating >= 1 && qualityRating <= 5 ? qualityRating : null,
-    productivityRating: productivityRating && productivityRating >= 1 && productivityRating <= 5 ? productivityRating : null,
+    createdBy: ObjectId.isValid(createdBy)
+      ? new ObjectId(createdBy)
+      : createdBy,
+    qualityRating:
+      qualityRating && qualityRating >= 1 && qualityRating <= 5
+        ? qualityRating
+        : null,
+    productivityRating:
+      productivityRating && productivityRating >= 1 && productivityRating <= 5
+        ? productivityRating
+        : null,
     notes: notes?.trim() || '',
-    equipmentId: equipmentId && ObjectId.isValid(equipmentId) ? new ObjectId(equipmentId) : null,
-    subcontractorId: subcontractorId && ObjectId.isValid(subcontractorId) ? new ObjectId(subcontractorId) : null,
+    equipmentId:
+      equipmentId && ObjectId.isValid(equipmentId)
+        ? new ObjectId(equipmentId)
+        : null,
+    subcontractorId:
+      subcontractorId && ObjectId.isValid(subcontractorId)
+        ? new ObjectId(subcontractorId)
+        : null,
     createdAt: new Date(),
     updatedAt: new Date(),
     deletedAt: null,
@@ -335,18 +365,25 @@ export function validateLabourEntry(data) {
     if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
       errors.push('Valid phaseId is required for direct labour');
     }
-    if (!data.workItemId || !ObjectId.isValid(data.workItemId)) {
-      errors.push('Valid workItemId is required for direct labour');
-    }
   }
   // If indirect labour, ensure phaseId is not provided and category is present
   if (data.isIndirectLabour) {
     if (data.phaseId && ObjectId.isValid(data.phaseId)) {
       errors.push('phaseId must be empty (null) for indirect labour entries');
     }
-    const VALID_INDIRECT_CATEGORIES = ['utilities', 'siteOverhead', 'transportation', 'safetyCompliance'];
-    if (!data.indirectCostCategory || !VALID_INDIRECT_CATEGORIES.includes(data.indirectCostCategory)) {
-      errors.push(`indirectCostCategory is required for indirect labour and must be one of: ${VALID_INDIRECT_CATEGORIES.join(', ')}`);
+    const VALID_INDIRECT_CATEGORIES = [
+      'utilities',
+      'siteOverhead',
+      'transportation',
+      'safetyCompliance',
+    ];
+    if (
+      !data.indirectCostCategory ||
+      !VALID_INDIRECT_CATEGORIES.includes(data.indirectCostCategory)
+    ) {
+      errors.push(
+        `indirectCostCategory is required for indirect labour and must be one of: ${VALID_INDIRECT_CATEGORIES.join(', ')}`,
+      );
     }
   }
 
@@ -355,26 +392,42 @@ export function validateLabourEntry(data) {
   }
 
   if (!data.workerType || !VALID_WORKER_TYPES.includes(data.workerType)) {
-    errors.push(`workerType is required and must be one of: ${VALID_WORKER_TYPES.join(', ')}`);
+    errors.push(
+      `workerType is required and must be one of: ${VALID_WORKER_TYPES.join(', ')}`,
+    );
   }
 
   if (!data.workerRole || !VALID_WORKER_ROLES.includes(data.workerRole)) {
-    errors.push(`workerRole is required and must be one of: ${VALID_WORKER_ROLES.join(', ')}`);
+    errors.push(
+      `workerRole is required and must be one of: ${VALID_WORKER_ROLES.join(', ')}`,
+    );
   }
 
   if (!data.skillType || !VALID_SKILL_TYPES.includes(data.skillType)) {
-    errors.push(`skillType is required and must be one of: ${VALID_SKILL_TYPES.join(', ')}`);
+    errors.push(
+      `skillType is required and must be one of: ${VALID_SKILL_TYPES.join(', ')}`,
+    );
   }
 
   if (!data.entryDate) {
     errors.push('entryDate is required');
   }
 
-  if (data.hourlyRate === undefined || data.hourlyRate === null || isNaN(data.hourlyRate) || data.hourlyRate < 0) {
+  if (
+    data.hourlyRate === undefined ||
+    data.hourlyRate === null ||
+    isNaN(data.hourlyRate) ||
+    data.hourlyRate < 0
+  ) {
     errors.push('hourlyRate is required and must be >= 0');
   }
 
-  if (data.totalHours === undefined || data.totalHours === null || isNaN(data.totalHours) || data.totalHours < 0) {
+  if (
+    data.totalHours === undefined ||
+    data.totalHours === null ||
+    isNaN(data.totalHours) ||
+    data.totalHours < 0
+  ) {
     errors.push('totalHours is required and must be >= 0');
   }
 
@@ -387,25 +440,45 @@ export function validateLabourEntry(data) {
   }
 
   // Optional field validation
-  if (data.breakDuration !== undefined && (isNaN(data.breakDuration) || data.breakDuration < 0)) {
+  if (
+    data.breakDuration !== undefined &&
+    (isNaN(data.breakDuration) || data.breakDuration < 0)
+  ) {
     errors.push('breakDuration must be >= 0');
   }
 
-  if (data.overtimeHours !== undefined && (isNaN(data.overtimeHours) || data.overtimeHours < 0)) {
+  if (
+    data.overtimeHours !== undefined &&
+    (isNaN(data.overtimeHours) || data.overtimeHours < 0)
+  ) {
     errors.push('overtimeHours must be >= 0');
   }
 
   // Validate qualityRating - handle empty strings, NaN, and invalid values
-  if (data.qualityRating !== undefined && data.qualityRating !== null && data.qualityRating !== '') {
-    const rating = typeof data.qualityRating === 'string' ? parseFloat(data.qualityRating) : Number(data.qualityRating);
+  if (
+    data.qualityRating !== undefined &&
+    data.qualityRating !== null &&
+    data.qualityRating !== ''
+  ) {
+    const rating =
+      typeof data.qualityRating === 'string'
+        ? parseFloat(data.qualityRating)
+        : Number(data.qualityRating);
     if (isNaN(rating) || rating < 1 || rating > 5) {
       errors.push('qualityRating must be between 1 and 5');
     }
   }
 
   // Validate productivityRating - handle empty strings, NaN, and invalid values
-  if (data.productivityRating !== undefined && data.productivityRating !== null && data.productivityRating !== '') {
-    const rating = typeof data.productivityRating === 'string' ? parseFloat(data.productivityRating) : Number(data.productivityRating);
+  if (
+    data.productivityRating !== undefined &&
+    data.productivityRating !== null &&
+    data.productivityRating !== ''
+  ) {
+    const rating =
+      typeof data.productivityRating === 'string'
+        ? parseFloat(data.productivityRating)
+        : Number(data.productivityRating);
     if (isNaN(rating) || rating < 1 || rating > 5) {
       errors.push('productivityRating must be between 1 and 5');
     }
@@ -422,7 +495,9 @@ export function validateLabourEntry(data) {
 
   // Warnings
   if (data.totalHours > 12) {
-    warnings.push('Total hours exceeds 12 hours. Please verify this is correct.');
+    warnings.push(
+      'Total hours exceeds 12 hours. Please verify this is correct.',
+    );
   }
 
   if (data.hourlyRate > 10000) {
@@ -453,7 +528,11 @@ export function calculateLabourEntryCost(entry) {
   const overtimeCost = overtimeHours * overtimeRate;
 
   // If daily rate is provided and no hours, use daily rate
-  if (entry.dailyRate && entry.dailyRate > 0 && (regularHours + overtimeHours) === 0) {
+  if (
+    entry.dailyRate &&
+    entry.dailyRate > 0 &&
+    regularHours + overtimeHours === 0
+  ) {
     return entry.dailyRate;
   }
 
@@ -472,4 +551,3 @@ export default {
   validateLabourEntry,
   calculateLabourEntryCost,
 };
-

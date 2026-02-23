@@ -138,11 +138,8 @@ export default function ApprovalsPage() {
     setProcessingItems((prev) => new Set(prev).add(materialId));
     try {
       const response = await fetch(`/api/materials/${materialId}/approve`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notes }),
       });
 
@@ -184,11 +181,8 @@ export default function ApprovalsPage() {
     setProcessingItems((prev) => new Set(prev).add(materialId));
     try {
       const response = await fetch(`/api/materials/${materialId}/reject`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason }),
       });
 
@@ -217,11 +211,8 @@ export default function ApprovalsPage() {
   const handleApproveExpense = async (expenseId, notes = '') => {
     try {
       const response = await fetch(`/api/expenses/${expenseId}/approve`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ notes }),
       });
 
@@ -256,11 +247,8 @@ export default function ApprovalsPage() {
 
     try {
       const response = await fetch(`/api/expenses/${expenseId}/reject`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason }),
       });
 

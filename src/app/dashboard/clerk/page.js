@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -14,7 +14,7 @@ import { useProjectContext } from '@/contexts/ProjectContext';
 import { NoProjectsEmptyState, ErrorState } from '@/components/empty-states';
 import { fetchNoCache } from '@/lib/fetch-helpers';
 
-export default function ClerkDashboard() {
+function ClerkDashboardContent() {
   const { isEmpty, loading: contextLoading, refreshAccessibleProjects } = useProjectContext();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -249,3 +249,16 @@ export default function ClerkDashboard() {
   );
 }
 
+export default function ClerkDashboard() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner size="lg" text="Loading..." />
+        </div>
+      </div>
+    }>
+      <ClerkDashboardContent />
+    </Suspense>
+  );
+}

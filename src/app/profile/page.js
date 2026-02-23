@@ -5,7 +5,7 @@
  * Auth: All authenticated users
  */
 
- 'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -17,7 +17,6 @@ import { NotificationPreferences } from '@/components/profile/notification-prefe
 import { NotificationStatusCard } from '@/components/push-notifications/notification-status-indicator';
 import { ActivitySummary } from '@/components/profile/activity-summary';
 import { ChangePassword } from '@/components/profile/change-password';
-import { fetchNoCache } from '@/lib/fetch-helpers';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -34,7 +33,7 @@ export default function ProfilePage() {
       setLoading(true);
       setError(null);
 
-      const response = await fetchNoCache('/api/profile');
+      const response = await fetch('/api/profile');
       const data = await response.json();
 
       if (!data.success) {
@@ -136,4 +135,3 @@ export default function ProfilePage() {
     </AppLayout>
   );
 }
-

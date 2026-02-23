@@ -12,6 +12,7 @@ import {
   CURRENCIES,
 } from '@/lib/constants/professional-fees-constants';
 import { CloudinaryUploadWidget } from '@/components/uploads/cloudinary-upload-widget';
+import { RateInformationPanel } from './RateInformationPanel';
 
 export function ProfessionalFeesForm({
   initialData = null,
@@ -50,6 +51,7 @@ export function ProfessionalFeesForm({
   const [selectedProfessional, setSelectedProfessional] = useState(null);
   const [validationErrors, setValidationErrors] = useState({});
   const [autoApprove, setAutoApprove] = useState(false);
+  const [suggestedAmount, setSuggestedAmount] = useState(null);
 
   // Load initial data if editing
   useEffect(() => {
@@ -283,21 +285,42 @@ export function ProfessionalFeesForm({
             <label className="block text-sm font-semibold text-gray-700 mb-1">
               Amount (KES) <span className="text-red-500">*</span>
             </label>
-            <input
-              type="number"
-              name="amount"
-              value={formData.amount}
-              onChange={handleChange}
-              placeholder="0.00"
-              min="0.01"
-              step="0.01"
-              required
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
-                validationErrors.amount ? 'border-red-300' : 'border-gray-300'
-              }`}
-            />
+            <div className="flex gap-2">
+              <input
+                type="number"
+                name="amount"
+                value={formData.amount}
+                onChange={handleChange}
+                placeholder="0.00"
+                min="0.01"
+                step="0.01"
+                required
+                className={`flex-1 px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
+                  validationErrors.amount ? 'border-red-300' : 'border-gray-300'
+                }`}
+              />
+              {suggestedAmount && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      amount: suggestedAmount.toString(),
+                    }));
+                  }}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors text-sm font-medium whitespace-nowrap"
+                >
+                  Use Suggested
+                </button>
+              )}
+            </div>
             {validationErrors.amount && (
               <p className="mt-1 text-sm text-red-600">{validationErrors.amount}</p>
+            )}
+            {suggestedAmount && !formData.amount && (
+              <p className="mt-1 text-xs text-gray-500">
+                Suggested: {suggestedAmount.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}
+              </p>
             )}
           </div>
 
@@ -376,6 +399,20 @@ export function ProfessionalFeesForm({
           />
         </div>
       </div>
+
+      {/* Rate Information Panel */}
+      {selectedProfessional && (
+        <div className="mt-6">
+          <RateInformationPanel
+            professionalService={selectedProfessional}
+            feeType={formData.feeType}
+            currentAmount={formData.amount}
+            onSuggestedAmountChange={(amount) => {
+              setSuggestedAmount(amount);
+            }}
+          />
+        </div>
+      )}
 
       {/* Invoice Information */}
       <div>

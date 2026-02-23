@@ -11,12 +11,13 @@ import { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingTable, LoadingOverlay } from '@/components/loading';
+import { LoadingTable, LoadingOverlay, LoadingSpinner } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { useProjectContext } from '@/contexts/ProjectContext';
+import { useProfessionalPrerequisites } from '@/hooks/use-professional-prerequisites';
 
 const normalizeId = (value) => {
   if (!value) return '';
@@ -59,6 +60,14 @@ function ProfessionalServicesPageContent() {
   const [showTerminateModal, setShowTerminateModal] = useState(false);
   const [assignmentToTerminate, setAssignmentToTerminate] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Check prerequisites for creating assignments
+  const {
+    canProceed: canCreateAssignment,
+    prerequisites: prereqStatus,
+    prerequisiteDetails,
+    loading: prereqLoading,
+  } = useProfessionalPrerequisites('assignments', filters.projectId || currentProjectId);
 
   useEffect(() => {
     setProjects(accessibleProjects || []);
@@ -283,31 +292,62 @@ function ProfessionalServicesPageContent() {
             {canAccess('assign_professional_service') && (
               <Link
                 href="/professional-services/new"
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+                className={`inline-flex items-center px-4 py-2 rounded-lg transition-all whitespace-nowrap ${
+                  canCreateAssignment
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+                }`}
+                onClick={(e) => {
+                  if (!canCreateAssignment) {
+                    e.preventDefault();
+                    toast.showWarning('Please complete prerequisites first (Library entries and Projects)');
+                  }
+                }}
+                title={
+                  !canCreateAssignment
+                    ? 'Complete prerequisites: Library entries and Projects required'
+                    : 'Assign a professional to a project'
+                }
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
                 Assign Professional
+                {!canCreateAssignment && (
+                  <svg
+                    className="w-4 h-4 ml-2"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                    />
+                  </svg>
+                )}
               </Link>
             )}
         </div>
         </div>
 
-        <PrerequisiteGuide
-          title="Before you create an assignment"
-          description="Assignments link a professional to a project and scope. Set up the project and service library first."
-          prerequisites={[
-            'Project exists for the assignment',
-            'Professional service library entry is created',
-          ]}
-          actions={[
-            { href: '/projects/new', label: 'Create Project' },
-            { href: '/professional-services-library/new', label: 'Add Service Type' },
-            { href: '/professional-services/new', label: 'New Assignment' },
-          ]}
-          tip="Use project filters to keep billing and activity tracking aligned."
-        />
+        {!prereqLoading && (
+          <PrerequisiteGuide
+            title="Before you create an assignment"
+            description="Assignments link a professional to a project and scope. Set up the project and service library first."
+            prerequisiteDetails={prerequisiteDetails}
+            blocking={!canCreateAssignment}
+            canProceed={canCreateAssignment}
+            actions={[
+              { href: '/projects/new', label: 'Create Project', required: false },
+              { href: '/professional-services-library/new', label: 'Add Service Type', required: false },
+              { href: '/professional-services/new', label: 'New Assignment', required: !canCreateAssignment },
+            ]}
+            tip="Use project filters to keep billing and activity tracking aligned."
+          />
+        )}
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
@@ -407,7 +447,22 @@ function ProfessionalServicesPageContent() {
               <div className="mt-6">
                 <Link
                   href="/professional-services/new"
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className={`inline-flex items-center px-4 py-2 rounded-lg transition-all ${
+                    canCreateAssignment
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+                  }`}
+                  onClick={(e) => {
+                    if (!canCreateAssignment) {
+                      e.preventDefault();
+                      toast.showWarning('Please complete prerequisites first (Library entries and Projects)');
+                    }
+                  }}
+                  title={
+                    !canCreateAssignment
+                      ? 'Complete prerequisites: Library entries and Projects required'
+                      : 'Assign a professional to a project'
+                  }
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -638,7 +693,13 @@ function ProfessionalServicesPageContent() {
 
 export default function ProfessionalServicesPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <LoadingSpinner size="lg" text="Loading..." />
+        </div>
+      </div>
+    }>
       <ProfessionalServicesPageContent />
     </Suspense>
   );

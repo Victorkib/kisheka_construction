@@ -16,11 +16,15 @@ import { LoadingSpinner } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { QuickActivityForm } from '@/components/professional-activities/quick-activity-form';
+import { PrerequisiteBlock } from '@/components/help/PrerequisiteBlock';
+import { useProfessionalPrerequisites } from '@/hooks/use-professional-prerequisites';
+import { useProjectContext } from '@/contexts/ProjectContext';
 
 export default function NewProfessionalActivityPage() {
   const router = useRouter();
   const { canAccess } = usePermissions();
   const toast = useToast();
+  const { currentProjectId } = useProjectContext();
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -29,6 +33,13 @@ export default function NewProfessionalActivityPage() {
   const [phases, setPhases] = useState([]);
   const [floors, setFloors] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
+
+  // Check prerequisites
+  const {
+    canProceed,
+    prerequisiteDetails,
+    loading: prereqLoading,
+  } = useProfessionalPrerequisites('activities', currentProjectId);
 
   useEffect(() => {
     fetchData();
@@ -46,7 +57,7 @@ export default function NewProfessionalActivityPage() {
           'Pragma': 'no-cache',
         },
       });
-      const servicesData = await servicesResponse.json();
+      const servicesData = await response.json();
       if (servicesData.success) {
         setProfessionalServices(servicesData.data.assignments || []);
       }
@@ -103,11 +114,13 @@ export default function NewProfessionalActivityPage() {
 
     try {
       const response = await fetch('/api/professional-activities', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(formData),
       });
 
@@ -147,7 +160,29 @@ export default function NewProfessionalActivityPage() {
     );
   }
 
-  if (loadingData) {
+  // Show blocking UI if prerequisites not met
+  if (!prereqLoading && !canProceed) {
+    return (
+      <AppLayout>
+        <PrerequisiteBlock
+          title="Cannot Create Activity"
+          description="You need active professional assignments before logging activities."
+          missingItems={Object.entries(prerequisiteDetails)
+            .filter(([_, item]) => !item.completed)
+            .map(([_, item]) => item.message)}
+          prerequisites={prerequisiteDetails}
+          actions={[
+            { href: '/professional-services/new', label: 'Create Assignment', icon: '➕' },
+            { href: '/professional-services', label: 'View Assignments', icon: '📋' },
+            { href: '/professional-activities', label: 'Back to Activities', icon: '←' },
+          ]}
+          onRetry={() => window.location.reload()}
+        />
+      </AppLayout>
+    );
+  }
+
+  if (loadingData || prereqLoading) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

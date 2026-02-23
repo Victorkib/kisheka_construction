@@ -51,7 +51,7 @@ export async function POST(request) {
             lastName: lastName || userProfile.lastName || '',
             updatedAt: new Date(),
           },
-        }
+        },
       );
 
       // Refresh the profile to get updated data
@@ -61,9 +61,13 @@ export async function POST(request) {
     }
 
     return successResponse(
-      { userId: supabaseId, _id: userProfile._id?.toString(), role: userProfile.role },
+      {
+        userId: supabaseId,
+        _id: userProfile._id?.toString(),
+        role: userProfile.role,
+      },
       'User synced successfully',
-      200
+      200,
     );
   } catch (error) {
     console.error('OAuth sync error:', error);
