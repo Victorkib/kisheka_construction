@@ -69,7 +69,10 @@ export async function GET(request) {
       if (error) {
         console.error('Auth callback error:', error);
         return NextResponse.redirect(
-          new URL(`/auth/login?error=${encodeURIComponent('Authentication failed')}`, request.url)
+          new URL(
+            `/auth/login?error=${encodeURIComponent(`Authentication failed: ${error.message || 'Unknown error'}`)}`,
+            request.url,
+          )
         );
       }
 

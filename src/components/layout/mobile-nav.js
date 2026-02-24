@@ -182,6 +182,17 @@ export function MobileNav({ isOpen, onClose }) {
       try {
         sessionStorage.clear();
         localStorage.removeItem('currentProjectId');
+        // CRITICAL: Clear Supabase/PKCE state to avoid account-switch OAuth failures
+        for (const key of Object.keys(localStorage)) {
+          if (key.startsWith('sb-') || key.toLowerCase().includes('supabase')) {
+            localStorage.removeItem(key);
+          }
+        }
+        for (const key of Object.keys(sessionStorage)) {
+          if (key.startsWith('sb-') || key.toLowerCase().includes('supabase')) {
+            sessionStorage.removeItem(key);
+          }
+        }
       } catch (e) {
         // Storage might not be available
       }
