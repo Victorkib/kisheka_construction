@@ -249,7 +249,10 @@ export async function proxy(request) {
     }
 
     // Handle auth routes (redirect to dashboard if already logged in)
-    if (isAuthRoute && session) {
+    // CRITICAL FIX: Skip redirect for RSC prefetch requests to prevent redirect loops
+    // RSC prefetch requests (with _rsc param) should not trigger redirects
+    const isRSCPrefetch = request.nextUrl.searchParams.has('_rsc');
+    if (isAuthRoute && session && !isRSCPrefetch) {
       return applyCookiesToResponse(NextResponse.redirect(new URL('/dashboard', request.url)));
     }
 

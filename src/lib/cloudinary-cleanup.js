@@ -384,7 +384,5 @@ export async function deleteFloorProgressCloudinaryAssets(floor) {
   }
 
   // Remove duplicates
-  const uniqueUrls = [...new Set(urls.filter(Boolean))];
-
-  return await deleteMultipleCloudinaryAssets(uniqueUrls);
+  const uniqueUrls = [...new Set(urls.filter(Boolean))];  return await deleteMultipleCloudinaryAssets(uniqueUrls);
 }
