@@ -94,18 +94,91 @@ export async function GET(request) {
       if (data.user && data.session) {
         // FIXED: Only check type parameter for email verification
         // OAuth always has provider in app_metadata, email verification doesn't
-        // The original logic was: type === 'signup' || (!data.user.app_metadata?.provider && data.user.email_confirmed_at)
-        // This incorrectly identified OAuth as email verification when provider was missing
         const isEmailVerification = type === 'signup';
         
-        // Sync user to MongoDB (non-blocking - doesn't delay redirect)
-        // Fire and forget - sync happens in background
-        syncUserToMongoDB(data.user, {
-          isVerified: data.user.email_confirmed_at ? true : false,
-        }).catch(syncError => {
-          console.error('MongoDB sync error (non-fatal):', syncError);
-          // Continue even if sync fails - user can still log in
-        });
+        // CRITICAL FIX: For OAuth users, ALWAYS ensure MongoDB profile exists before redirecting
+        // OAuth works for both registration (new users) and login (existing users)
+        const isOAuthUser = !!data.user.app_metadata?.provider;
+        
+        if (isOAuthUser) {
+          console.log('[Auth Callback] OAuth user detected:', {
+            userId: data.user.id,
+            email: data.user.email,
+            provider: data.user.app_metadata.provider
+          });
+          
+          // CRITICAL: For ALL OAuth users (new or existing), ensure MongoDB sync completes
+          // This ensures profile exists before redirecting to dashboard
+          try {
+            console.log('[Auth Callback] Syncing user to MongoDB...', {
+              userId: data.user.id,
+              email: data.user.email
+            });
+            
+            const syncedProfile = await syncUserToMongoDB(data.user, {
+              isVerified: data.user.email_confirmed_at ? true : false,
+            });
+            
+            console.log('[Auth Callback] MongoDB sync successful:', {
+              userId: data.user.id,
+              mongoId: syncedProfile._id?.toString(),
+              role: syncedProfile.role
+            });
+            
+            // Verify the profile was actually created/updated
+            // CRITICAL: Retry verification up to 3 times with delays
+            // This handles race conditions where MongoDB write hasn't propagated yet
+            const { getUserProfile } = await import('@/lib/auth-helpers');
+            let verifyProfile = null;
+            let verifyAttempts = 0;
+            const maxVerifyAttempts = 3;
+            
+            while (!verifyProfile && verifyAttempts < maxVerifyAttempts) {
+              await new Promise(resolve => setTimeout(resolve, verifyAttempts * 200)); // 0ms, 200ms, 400ms
+              verifyProfile = await getUserProfile(data.user.id);
+              verifyAttempts++;
+              
+              if (!verifyProfile && verifyAttempts < maxVerifyAttempts) {
+                console.log(`[Auth Callback] Profile not found, retrying verification (attempt ${verifyAttempts}/${maxVerifyAttempts})...`);
+              }
+            }
+            
+            if (!verifyProfile) {
+              console.error('[Auth Callback] CRITICAL: Profile not found after sync and verification retries!');
+              throw new Error('Profile not found after sync - MongoDB sync may have failed');
+            }
+            
+            console.log('[Auth Callback] Profile verified in MongoDB:', {
+              userId: data.user.id,
+              mongoId: verifyProfile._id?.toString(),
+              verificationAttempts: verifyAttempts
+            });
+          } catch (syncError) {
+            console.error('[Auth Callback] CRITICAL MongoDB sync error:', {
+              error: syncError.message,
+              stack: syncError.stack,
+              userId: data.user.id,
+              email: data.user.email
+            });
+            
+            // CRITICAL FIX: If MongoDB sync fails, don't redirect to dashboard
+            // Redirect to login with error message so user can retry
+            // This prevents redirect loops where user has Supabase session but no MongoDB profile
+            return NextResponse.redirect(
+              new URL(
+                `/auth/login?error=${encodeURIComponent('Account setup failed. Please try signing in again.')}`,
+                request.url
+              )
+            );
+          }
+        } else {
+          // Non-OAuth user (email/password) - sync in background
+          syncUserToMongoDB(data.user, {
+            isVerified: data.user.email_confirmed_at ? true : false,
+          }).catch(syncError => {
+            console.error('MongoDB sync error (non-fatal):', syncError);
+          });
+        }
 
         // Create redirect response
         // For OAuth flows, always redirect to dashboard (not landing page)
@@ -132,6 +205,8 @@ export async function GET(request) {
               httpOnly: options?.httpOnly ?? true,
               // Path should be root to ensure cookies are available everywhere
               path: options?.path || '/',
+              // MaxAge should be set for session cookies (default 1 year)
+              maxAge: options?.maxAge || 60 * 60 * 24 * 365, // 1 year
             };
             response.cookies.set(name, value, cookieOptions);
           } catch (error) {

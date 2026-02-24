@@ -231,13 +231,15 @@ export async function proxy(request) {
     // Handle protected routes
     if (isProtectedRoute) {
       if (!session) {
-        // CRITICAL FIX: Don't redirect if we're already on a dashboard route and session check failed
-        // This prevents redirect loops when session is temporarily unavailable
-        // The client-side code will handle re-authentication
-        if (pathname.startsWith('/dashboard/')) {
+        // CRITICAL FIX: Allow dashboard routes to pass through even without session
+        // This prevents redirect loops when session is temporarily unavailable after OAuth callback
+        // The client-side code will handle auth check and redirect if needed
+        // This is especially important for OAuth flows where session cookies might not be immediately available
+        if (pathname === '/dashboard' || pathname.startsWith('/dashboard/')) {
           // Allow dashboard routes to continue even without session
           // Client-side will handle auth check and redirect if needed
-          console.warn('Dashboard route accessed without session, allowing client-side handling');
+          // This prevents 401 errors immediately after OAuth callback
+          console.warn('[Proxy] Dashboard route accessed without session, allowing client-side handling:', pathname);
           return applyCookiesToResponse(response);
         }
         

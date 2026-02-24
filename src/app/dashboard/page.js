@@ -51,17 +51,30 @@ export default function DashboardPage() {
         const response = await fetchNoCache('/api/auth/me');
         const data = await response.json();
 
-        // CRITICAL FIX: If profile not found (404), it might be MongoDB sync race condition
-        // Retry a few times with delays for OAuth users
-        if (!data.success && data.error === 'User profile not found' && retryCount < 3) {
-          console.log(`User profile not found, retrying... (attempt ${retryCount + 1}/3)`);
-          // Wait before retry: 500ms, 1s, 2s
-          const delay = [500, 1000, 2000][retryCount] || 2000;
-          await new Promise(resolve => setTimeout(resolve, delay));
-          return redirectToRoleDashboard(retryCount + 1);
-        }
-
+        // CRITICAL FIX: Handle different error scenarios
+        // 401 = Session not available (might be race condition after OAuth)
+        // 404 = Profile not found (MongoDB sync race condition)
         if (!data.success) {
+          // For 401 errors, retry - session might be initializing after OAuth callback
+          if (response.status === 401 && retryCount < 3) {
+            console.log(`Session not available, retrying... (attempt ${retryCount + 1}/3)`);
+            // Wait before retry: 500ms, 1s, 2s
+            const delay = [500, 1000, 2000][retryCount] || 2000;
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return redirectToRoleDashboard(retryCount + 1);
+          }
+          
+          // For 404 errors (profile not found), retry - MongoDB sync might still be in progress
+          if (response.status === 404 && retryCount < 5) {
+            console.log(`User profile not found, retrying... (attempt ${retryCount + 1}/5)`);
+            // Wait before retry: 500ms, 1s, 2s, 3s, 4s
+            const delay = [500, 1000, 2000, 3000, 4000][retryCount] || 4000;
+            await new Promise(resolve => setTimeout(resolve, delay));
+            return redirectToRoleDashboard(retryCount + 1);
+          }
+          
+          // After all retries, redirect to login
+          console.error('Authentication failed after retries:', data.error);
           router.push('/auth/login');
           return;
         }

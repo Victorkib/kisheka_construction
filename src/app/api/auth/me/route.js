@@ -23,13 +23,52 @@ export async function GET(request) {
     } = await supabase.auth.getUser();
 
     if (authError || !user) {
+      // CRITICAL FIX: Check if this is a session error that might be transient
+      // For OAuth callbacks, session might not be immediately available
+      // Return 401 but with a retry indicator
+      const isTransientError = authError?.message?.includes('JWT') === false &&
+                               authError?.message?.includes('expired') === false;
+      
+      if (isTransientError) {
+        // Might be a race condition - return 401 but allow client to retry
+        return errorResponse('Unauthorized - session may be initializing', 401);
+      }
+      
       return errorResponse('Unauthorized', 401);
     }
 
-    // Get full user profile from MongoDB
-    const userProfile = await getUserProfile(user.id);
+    // CRITICAL FIX: For OAuth users, retry MongoDB profile lookup
+    // OAuth callback might have just completed and profile might not be ready yet
+    const isOAuthUser = !!user.app_metadata?.provider;
+    let userProfile = null;
+    let retryCount = 0;
+    const maxRetries = isOAuthUser ? 3 : 1; // More retries for OAuth users
+    
+    while (!userProfile && retryCount < maxRetries) {
+      userProfile = await getUserProfile(user.id);
+      
+      if (!userProfile && retryCount < maxRetries - 1) {
+        // Wait before retry: 200ms, 500ms, 1s
+        const delay = [200, 500, 1000][retryCount] || 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        retryCount++;
+        console.log(`[Auth Me] Profile not found, retrying... (attempt ${retryCount}/${maxRetries})`);
+      } else {
+        retryCount++;
+      }
+    }
 
     if (!userProfile) {
+      // CRITICAL FIX: For OAuth users, if profile not found after retries,
+      // it might be a sync issue - return 404 but with helpful message
+      if (isOAuthUser) {
+        console.error('[Auth Me] OAuth user profile not found after retries:', {
+          userId: user.id,
+          email: user.email,
+          provider: user.app_metadata.provider
+        });
+        return errorResponse('User profile not found - account may still be syncing. Please try again in a moment.', 404);
+      }
       return errorResponse('User profile not found', 404);
     }
 
