@@ -9,7 +9,8 @@
  */
 
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 import { syncUserToMongoDB } from '@/lib/auth-helpers';
 
 // Force dynamic rendering to prevent caching
@@ -31,11 +32,38 @@ export async function GET(request) {
 
   // If there's a code, exchange it (for email verification links and OAuth)
   if (code) {
-    const supabase = await createClient();
+    // CRITICAL FIX: Track cookies set during exchangeCodeForSession
+    // In production, cookies must be explicitly copied to redirect response
+    const cookieStore = await cookies();
+    const cookiesToSet = [];
+    
+    // Create Supabase client with custom cookie handler that tracks cookies
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookies) {
+            // Track all cookies being set
+            cookies.forEach(({ name, value, options }) => {
+              cookiesToSet.push({ name, value, options });
+              try {
+                cookieStore.set(name, value, options);
+              } catch (error) {
+                console.warn('Failed to set cookie:', error.message);
+              }
+            });
+          },
+        },
+      }
+    );
 
     try {
       // Exchange the code for a session
-      // This automatically sets session cookies via the server client
+      // This will trigger setAll callback which tracks cookies
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
@@ -160,6 +188,20 @@ export async function GET(request) {
 
         const response = NextResponse.redirect(redirectUrl);
         
+        // CRITICAL FIX: Copy all session cookies to redirect response
+        // In production, cookies set during exchangeCodeForSession must be explicitly included
+        // This ensures cookies are sent with the redirect response
+        cookiesToSet.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, {
+            ...options,
+            // Ensure production cookie settings
+            httpOnly: options?.httpOnly ?? true,
+            secure: options?.secure ?? (process.env.NODE_ENV === 'production'),
+            sameSite: options?.sameSite ?? 'lax',
+            path: options?.path ?? '/',
+          });
+        });
+        
         // Ensure no caching of this response
         response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
         response.headers.set('Pragma', 'no-cache');
@@ -183,7 +225,27 @@ export async function GET(request) {
   // If no code, check if there's an existing session
   // This handles cases where Supabase redirects without a code (modern flow)
   try {
-    const supabase = await createClient();
+    const cookieStore = await cookies();
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() {
+            return cookieStore.getAll();
+          },
+          setAll(cookies) {
+            cookies.forEach(({ name, value, options }) => {
+              try {
+                cookieStore.set(name, value, options);
+              } catch (error) {
+                console.warn('Failed to set cookie:', error.message);
+              }
+            });
+          },
+        },
+      }
+    );
     const { data: { session } } = await supabase.auth.getSession();
     
     if (session) {
