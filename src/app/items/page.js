@@ -508,9 +508,9 @@ function ItemsPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Materials & Items</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage construction materials</p>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Materials & Items</h1>
+            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage construction materials</p>
           </div>
           <NoProjectsEmptyState
             canCreate={canAccess('create_project')}
@@ -555,15 +555,15 @@ function ItemsPageContent() {
           fullScreen
         />
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Materials & Items</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage construction materials</p>
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Materials & Items</h1>
+            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage construction materials</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             {selectedMaterials.length > 0 && (
-              <div className="flex items-center gap-2 mr-4">
-                <span className="text-sm text-gray-600">
+              <div className="flex flex-wrap items-center gap-2 sm:mr-4">
+                <span className="text-sm text-gray-600 font-medium">
                   {selectedMaterials.length} selected
                 </span>
                 {canAccess('approve_material') && (
@@ -571,16 +571,16 @@ function ItemsPageContent() {
                     <button
                       onClick={handleBulkApproveClick}
                       disabled={bulkActionLoading}
-                      className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition disabled:opacity-50"
+                      className="px-3 sm:px-4 py-2 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 touch-manipulation"
                     >
-                      {bulkActionLoading ? 'Processing...' : 'Approve Selected'}
+                      {bulkActionLoading ? 'Processing...' : 'Approve'}
                     </button>
                     <button
                       onClick={handleBulkRejectClick}
                       disabled={bulkActionLoading}
-                      className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition disabled:opacity-50"
+                      className="px-3 sm:px-4 py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 touch-manipulation"
                     >
-                      {bulkActionLoading ? 'Processing...' : 'Reject Selected'}
+                      {bulkActionLoading ? 'Processing...' : 'Reject'}
                     </button>
                   </>
                 )}
@@ -588,14 +588,14 @@ function ItemsPageContent() {
                   <button
                     onClick={handleBulkSubmitClick}
                     disabled={bulkActionLoading}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition disabled:opacity-50"
+                    className="px-3 sm:px-4 py-2 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-50 touch-manipulation"
                   >
-                    {bulkActionLoading ? 'Processing...' : 'Submit Selected'}
+                    {bulkActionLoading ? 'Processing...' : 'Submit'}
                   </button>
                 )}
                 <button
                   onClick={() => setSelectedMaterials([])}
-                  className="px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition"
+                  className="px-3 sm:px-4 py-2 border border-gray-300 hover:bg-gray-50 active:bg-gray-100 text-gray-700 text-sm font-medium rounded-lg transition-colors touch-manipulation"
                 >
                   Clear
                 </button>
@@ -604,7 +604,7 @@ function ItemsPageContent() {
             {canAccess('create_material') && (
               <Link
                 href={`/items/new${filters.projectId ? `?projectId=${filters.projectId}&entryType=retroactive_entry` : '?entryType=retroactive_entry'}`}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
               >
                 + Add Material
               </Link>
@@ -1163,14 +1163,14 @@ function ItemsPageContent() {
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="mt-6 bg-white rounded-lg shadow p-4">
+              <div className="mt-6 bg-white rounded-lg shadow p-4 border border-gray-200">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
                     <span className="text-sm text-gray-700">Items per page:</span>
                     <select
                       value={pagination.limit}
                       onChange={(e) => handleLimitChange(e.target.value)}
-                      className="px-3 py-1 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      className="px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm touch-manipulation"
                     >
                       <option value="10" className="text-gray-900">10</option>
                       <option value="20" className="text-gray-900">20</option>
@@ -1179,15 +1179,15 @@ function ItemsPageContent() {
                     </select>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm text-gray-700 text-center sm:text-left">
                       Page {pagination.page} of {pagination.pages} ({pagination.total} total)
                     </span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
                     <button
                       onClick={() => handlePageChange(pagination.page - 1)}
                       disabled={pagination.page === 1}
-                      className="px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                      className="flex-1 sm:flex-none px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors touch-manipulation"
                     >
                       Previous
                     </button>
@@ -1207,10 +1207,10 @@ function ItemsPageContent() {
                           <button
                             key={pageNum}
                             onClick={() => handlePageChange(pageNum)}
-                            className={`px-3 py-2 rounded-lg text-sm font-medium ${
+                            className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors touch-manipulation ${
                               pagination.page === pageNum
                                 ? 'bg-blue-600 text-white'
-                                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
                             }`}
                           >
                             {pageNum}
@@ -1221,7 +1221,7 @@ function ItemsPageContent() {
                     <button
                       onClick={() => handlePageChange(pagination.page + 1)}
                       disabled={pagination.page === pagination.pages}
-                      className="px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                      className="flex-1 sm:flex-none px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors touch-manipulation"
                     >
                       Next
                     </button>

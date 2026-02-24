@@ -212,9 +212,9 @@ function ExpensesPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expenses</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage project expenses</p>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expenses</h1>
+            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage project expenses</p>
           </div>
           <NoProjectsEmptyState
             canCreate={canAccess('create_project')}
@@ -229,15 +229,15 @@ function ExpensesPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expenses</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage project expenses</p>
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expenses</h1>
+            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage project expenses</p>
           </div>
           {canAccess('create_expense') && (
             <Link
               href="/expenses/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base"
             >
               + Add Expense
             </Link>
@@ -267,9 +267,9 @@ function ExpensesPageContent() {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl md:text-2xl font-semibold mb-4 leading-tight text-gray-900">Filters</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 leading-tight text-gray-900">Filters</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Search</label>
               <input
@@ -420,23 +420,32 @@ function ExpensesPageContent() {
         </div>
 
         {/* Expenses Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          {loading ? (
+        {loading ? (
+          <div className="bg-white rounded-lg shadow overflow-hidden">
             <LoadingTable rows={10} columns={7} showHeader={true} />
-          ) : expenses.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No expenses found</p>
-              {canAccess('create_expense') && (
-                <Link
-                  href="/expenses/new"
-                  className="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  Create your first expense
-                </Link>
-              )}
-            </div>
-          ) : (
-            <>
+          </div>
+        ) : expenses.length === 0 ? (
+          <div className="bg-white rounded-lg shadow p-12 text-center">
+            <div className="text-6xl mb-4">💸</div>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">No expenses found</h3>
+            <p className="text-gray-600 mb-6">
+              {filters.search || filters.category || filters.status
+                ? 'Try adjusting your filters'
+                : 'Get started by creating your first expense'}
+            </p>
+            {canAccess('create_expense') && (
+              <Link
+                href="/expenses/new"
+                className="inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation"
+              >
+                Create Your First Expense
+              </Link>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -518,10 +527,10 @@ function ExpensesPageContent() {
                 </table>
               </div>
 
-              {/* Pagination */}
+              {/* Desktop Pagination */}
               {pagination.pages > 1 && (
-                <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-                  <div className="text-sm text-gray-700">
+                <div className="bg-gray-50 px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-200">
+                  <div className="text-sm text-gray-700 text-center sm:text-left">
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
                     {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} expenses
                   </div>
@@ -529,26 +538,123 @@ function ExpensesPageContent() {
                     <button
                       onClick={() => setPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                       disabled={pagination.page === 1}
-                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
                     >
                       Previous
                     </button>
-                    <span className="px-4 py-2 text-sm text-gray-700">
+                    <span className="px-4 py-2 text-sm text-gray-700 flex items-center">
                       Page {pagination.page} of {pagination.pages}
                     </span>
                     <button
                       onClick={() => setPagination((prev) => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                       disabled={pagination.page === pagination.pages}
-                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
                     >
                       Next
                     </button>
                   </div>
                 </div>
               )}
-            </>
-          )}
-        </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {expenses.map((expense) => (
+                <div
+                  key={expense._id}
+                  className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                >
+                  {/* Header Row */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-base font-semibold text-gray-900 truncate">
+                          {expense.expenseCode || 'N/A'}
+                        </p>
+                        {expense.isIndirectCost && (
+                          <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-100 text-purple-800 flex-shrink-0" title="Indirect Cost">
+                            Indirect
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-900 line-clamp-2">{expense.description}</p>
+                    </div>
+                    <span
+                      className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ml-2 ${getStatusBadgeColor(
+                        expense.status
+                      )}`}
+                    >
+                      {expense.status}
+                    </span>
+                  </div>
+
+                  {/* Details Grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-3">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">Amount</p>
+                      <p className="text-sm font-semibold text-gray-900">
+                        {formatCurrency(expense.amount, expense.currency)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">Date</p>
+                      <p className="text-sm text-gray-700">{formatDate(expense.date)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">Category</p>
+                      <p className="text-sm text-gray-700">
+                        {expense.category?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">Vendor</p>
+                      <p className="text-sm text-gray-700 truncate">{expense.vendor || 'N/A'}</p>
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="pt-3 border-t border-gray-200">
+                    <Link
+                      href={`/expenses/${expense._id}`}
+                      className="block text-center px-4 py-2.5 bg-blue-50 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation"
+                    >
+                      View Details →
+                    </Link>
+                  </div>
+                </div>
+              ))}
+
+              {/* Mobile Pagination */}
+              {pagination.pages > 1 && (
+                <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                  <div className="text-sm text-gray-700 text-center mb-3">
+                    Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
+                    {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} expenses
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => setPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                      disabled={pagination.page === 1}
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation font-medium"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2.5 text-sm text-gray-700 font-medium">
+                      {pagination.page} / {pagination.pages}
+                    </span>
+                    <button
+                      onClick={() => setPagination((prev) => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
+                      disabled={pagination.page === pagination.pages}
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation font-medium"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </AppLayout>
   );

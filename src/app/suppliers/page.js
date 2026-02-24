@@ -170,19 +170,19 @@ function SuppliersPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
               Suppliers
             </h1>
-            <p className="text-gray-700 mt-2 font-medium">
+            <p className="text-sm sm:text-base text-gray-700 mt-2 font-medium">
               Manage supplier contacts and information
             </p>
           </div>
           {canCreate && (
             <Link
               href="/suppliers/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg transition shadow-md"
+              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 sm:px-6 py-2.5 rounded-lg transition-colors shadow-md touch-manipulation text-sm sm:text-base text-center"
             >
               + Add Supplier
             </Link>
@@ -205,8 +205,8 @@ function SuppliersPageContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-900 mb-2">
                 Search
@@ -272,7 +272,7 @@ function SuppliersPageContent() {
             {canCreate && (
               <Link
                 href="/suppliers/new"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg transition inline-block shadow-md"
+                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg transition-colors inline-block shadow-md touch-manipulation"
               >
                 + Add Supplier
               </Link>
@@ -280,7 +280,8 @@ function SuppliersPageContent() {
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-lg shadow overflow-hidden">
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
@@ -407,32 +408,161 @@ function SuppliersPageContent() {
                   </tbody>
                 </table>
               </div>
+              
+              {/* Desktop Pagination */}
+              {totalPages > 1 && (
+                <div className="mt-6 flex justify-center">
+                  <div className="flex gap-2 items-center">
+                    <button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-medium bg-white transition-colors touch-manipulation"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2 text-gray-900 font-medium">
+                      Page {page} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-medium bg-white transition-colors touch-manipulation"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <div className="mt-6 flex justify-center">
-                <div className="flex gap-2 items-center">
-                  <button
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-900 font-medium bg-white"
-                  >
-                    Previous
-                  </button>
-                  <span className="px-4 py-2 text-gray-900 font-medium">
-                    Page {page} of {totalPages}
-                  </span>
-                  <button
-                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                    disabled={page === totalPages}
-                    className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-gray-900 font-medium bg-white"
-                  >
-                    Next
-                  </button>
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {suppliers.map((supplier) => (
+                <div
+                  key={supplier._id}
+                  className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                >
+                  {/* Header Row */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-base font-semibold text-gray-900 truncate">
+                        {supplier.name}
+                      </h3>
+                      {supplier.contactPerson && (
+                        <p className="text-sm text-gray-600 mt-0.5">
+                          Contact: {supplier.contactPerson}
+                        </p>
+                      )}
+                    </div>
+                    <span
+                      className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full flex-shrink-0 ml-2 ${getStatusBadge(supplier.status)}`}
+                    >
+                      {supplier.status}
+                    </span>
+                  </div>
+
+                  {/* Contact Details */}
+                  <div className="space-y-2 mb-3 pb-3 border-b border-gray-200">
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs text-gray-500 w-16 flex-shrink-0">Phone:</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-900 font-medium">{supplier.phone || 'N/A'}</p>
+                        {supplier.alternatePhone && (
+                          <p className="text-xs text-gray-600 mt-0.5">{supplier.alternatePhone}</p>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <span className="text-xs text-gray-500 w-16 flex-shrink-0">Email:</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-900 font-medium truncate">{supplier.email || 'N/A'}</p>
+                        {supplier.alternateEmail && (
+                          <p className="text-xs text-gray-600 mt-0.5 truncate">{supplier.alternateEmail}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Communication Methods */}
+                  {(supplier.emailEnabled || supplier.smsEnabled || supplier.pushNotificationsEnabled) && (
+                    <div className="mb-3 pb-3 border-b border-gray-200">
+                      <p className="text-xs text-gray-500 mb-1.5">Communication:</p>
+                      <div className="flex flex-wrap gap-2">
+                        {supplier.emailEnabled && (
+                          <span className="px-2 py-0.5 text-xs text-green-700 font-medium bg-green-50 rounded">
+                            ✓ Email
+                          </span>
+                        )}
+                        {supplier.smsEnabled && (
+                          <span className="px-2 py-0.5 text-xs text-green-700 font-medium bg-green-50 rounded">
+                            ✓ SMS
+                          </span>
+                        )}
+                        {supplier.pushNotificationsEnabled && (
+                          <span className="px-2 py-0.5 text-xs text-green-700 font-medium bg-green-50 rounded">
+                            ✓ Push
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex flex-wrap gap-2 pt-3">
+                    <Link
+                      href={`/suppliers/${supplier._id}`}
+                      className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                    >
+                      View
+                    </Link>
+                    {canAccess('edit_supplier') && (
+                      <Link
+                        href={`/suppliers/${supplier._id}/edit`}
+                        className="flex-1 px-3 py-2 bg-indigo-50 text-indigo-600 text-sm font-semibold rounded-lg hover:bg-indigo-100 active:bg-indigo-200 transition-colors touch-manipulation text-center"
+                      >
+                        Edit
+                      </Link>
+                    )}
+                    {canAccess('delete_supplier') && (
+                      <button
+                        onClick={() => handleDelete(supplier._id, supplier.name)}
+                        className="flex-1 px-3 py-2 bg-red-50 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-100 active:bg-red-200 transition-colors touch-manipulation"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
+              ))}
+
+              {/* Mobile Pagination */}
+              {totalPages > 1 && (
+                <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                  <div className="text-sm text-gray-700 text-center mb-3">
+                    Page {page} of {totalPages}
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => setPage((p) => Math.max(1, p - 1))}
+                      disabled={page === 1}
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-medium transition-colors touch-manipulation"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2.5 text-sm text-gray-700 font-medium">
+                      {page} / {totalPages}
+                    </span>
+                    <button
+                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={page === totalPages}
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-medium transition-colors touch-manipulation"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>

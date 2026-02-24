@@ -65,9 +65,20 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
             <div className="flex-shrink-0">
               <img
                 src={url}
-                alt={title}
-                className="h-16 w-16 object-cover rounded border border-gray-300 cursor-pointer"
+                alt={title || 'Image preview'}
+                className="h-16 w-16 object-cover rounded border border-gray-300 cursor-pointer transition-transform hover:scale-105"
                 onClick={() => setShowFullscreen(true)}
+                loading="lazy"
+                decoding="async"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setShowFullscreen(true);
+                  }
+                }}
+                aria-label={`View full size image: ${title}`}
               />
             </div>
           )}
@@ -103,16 +114,18 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
             <button
               type="button"
               onClick={() => window.open(url, '_blank')}
-              className="px-3 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+              className="px-3 py-1.5 text-xs bg-blue-600 text-white rounded hover:bg-blue-700 active:bg-blue-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 touch-manipulation"
               title="View in new tab"
+              aria-label={`Open ${title} in new tab`}
             >
               View
             </button>
             <button
               type="button"
               onClick={handleDownload}
-              className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition"
+              className="px-3 py-1.5 text-xs bg-green-600 text-white rounded hover:bg-green-700 active:bg-green-800 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 touch-manipulation"
               title="Download file"
+              aria-label={`Download ${title}`}
             >
               Download
             </button>
@@ -120,8 +133,10 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
               <button
                 type="button"
                 onClick={handleDelete}
-                className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition"
+                className="px-3 py-1.5 text-xs bg-red-600 text-white rounded hover:bg-red-700 active:bg-red-800 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 touch-manipulation"
                 title="Delete file"
+                aria-label={showDeleteConfirm ? `Confirm deletion of ${title}` : `Delete ${title}`}
+                aria-pressed={showDeleteConfirm}
               >
                 {showDeleteConfirm ? 'Confirm?' : 'Delete'}
               </button>
@@ -156,20 +171,25 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
       {/* Fullscreen Modal */}
       {showFullscreen && isImage && (
         <div
-          className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4"
           onClick={() => setShowFullscreen(false)}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Full screen image viewer"
         >
           <div className="relative max-w-7xl max-h-full">
             <button
               type="button"
               onClick={() => setShowFullscreen(false)}
-              className="absolute top-4 right-4 text-white bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75 transition"
+              className="absolute top-4 right-4 text-white bg-black/50 rounded-full p-2.5 hover:bg-black/75 active:bg-black/90 transition-all focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
+              aria-label="Close full screen view"
             >
               <svg
                 className="h-6 w-6"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -181,9 +201,11 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
             </button>
             <img
               src={url}
-              alt={title}
-              className="max-w-full max-h-[90vh] object-contain rounded"
+              alt={title || 'Full screen image'}
+              className="max-w-full max-h-[90vh] object-contain rounded shadow-2xl"
               onClick={(e) => e.stopPropagation()}
+              loading="eager"
+              decoding="async"
             />
           </div>
         </div>

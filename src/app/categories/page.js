@@ -190,15 +190,15 @@ function CategoriesPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Categories</h1>
-            <p className="text-gray-600 mt-2">Manage categories by area</p>
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Categories</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-2">Manage categories by area</p>
           </div>
           {canCreate && (
             <Link
               href="/categories/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
             >
               + Create Category
             </Link>
@@ -253,18 +253,18 @@ function CategoriesPageContent() {
             {canCreate && (
               <Link
                 href="/categories/new"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation"
               >
                 Create First Category
               </Link>
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {categories.map((category) => (
               <div
                 key={category._id}
-                className="bg-white rounded-lg shadow p-6 hover:shadow-md transition"
+                className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md transition border border-gray-200"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -281,11 +281,11 @@ function CategoriesPageContent() {
                       </p>
                       {(category.usageTotal !== undefined ? category.usageTotal : category.usageCount || 0) > 0 && (
                         <div className="mt-1">
-                          <button
-                            type="button"
-                            onClick={() => toggleUsageExpansion(category._id)}
-                            className="text-xs text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1"
-                          >
+                        <button
+                          type="button"
+                          onClick={() => toggleUsageExpansion(category._id)}
+                          className="text-xs text-blue-600 hover:text-blue-800 active:text-blue-900 font-medium flex items-center gap-1 touch-manipulation min-h-[44px] py-2"
+                        >
                             <span>
                               Used by{' '}
                               {category.usageTotal !== undefined
@@ -351,10 +351,10 @@ function CategoriesPageContent() {
                         : 'N/A'}
                     </span>
                     {canCreate && (
-                      <div className="flex gap-2 flex-wrap">
+                      <div className="flex flex-wrap gap-2">
                         <Link
                           href={`/categories/${category._id}`}
-                          className="text-blue-600 hover:text-blue-800 text-xs font-medium"
+                          className="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 active:bg-blue-200 text-xs font-medium rounded-lg transition-colors touch-manipulation"
                         >
                           Edit
                         </Link>
@@ -362,7 +362,7 @@ function CategoriesPageContent() {
                           type="button"
                           onClick={() => handleCloneClick(category)}
                           disabled={cloningId === category._id}
-                          className="text-green-600 hover:text-green-800 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 bg-green-50 text-green-600 hover:bg-green-100 active:bg-green-200 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                         >
                           {cloningId === category._id ? 'Cloning...' : 'Clone'}
                         </button>
@@ -370,7 +370,7 @@ function CategoriesPageContent() {
                           type="button"
                           onClick={() => handleDelete(category._id)}
                           disabled={deletingId === category._id}
-                          className="text-red-600 hover:text-red-800 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-100 active:bg-red-200 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                         >
                           {deletingId === category._id ? 'Deleting...' : 'Delete'}
                         </button>
@@ -385,14 +385,14 @@ function CategoriesPageContent() {
 
         {/* Pagination & Summary */}
         {categories.length > 0 && (
-          <div className="mt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white rounded-lg shadow p-4">
-            <p className="text-sm text-gray-600">
+          <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white rounded-lg shadow p-4 sm:p-6 border border-gray-200">
+            <p className="text-sm text-gray-600 text-center sm:text-left">
               Total Categories:{' '}
               <span className="font-semibold text-gray-900">
                 {total || categories.length}
               </span>
             </p>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-center sm:justify-end gap-3">
               <button
                 type="button"
                 onClick={() => {
@@ -403,11 +403,11 @@ function CategoriesPageContent() {
                   }
                 }}
                 disabled={page <= 1 || loading}
-                className="px-3 py-1 text-sm rounded border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium"
               >
                 Previous
               </button>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-gray-600 px-2">
                 Page{' '}
                 <span className="font-semibold text-gray-900">{page}</span>
                 {total > 0 && (
@@ -431,7 +431,7 @@ function CategoriesPageContent() {
                   }
                 }}
                 disabled={loading || (total > 0 && page >= Math.max(1, Math.ceil(total / PAGE_SIZE)))}
-                className="px-3 py-1 text-sm rounded border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium"
               >
                 Next
               </button>
@@ -441,8 +441,8 @@ function CategoriesPageContent() {
 
         {/* Clone Modal */}
         {cloneModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 safe-area-inset">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Clone Category</h3>
               <p className="text-sm text-gray-600 mb-4">
                 Create a copy of <span className="font-semibold">{cloneModal.category.name}</span> with a new name.
@@ -467,14 +467,14 @@ function CategoriesPageContent() {
                   }}
                 />
               </div>
-              <div className="flex justify-end gap-3">
+              <div className="flex flex-col sm:flex-row justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => {
                     setCloneModal(null);
                     setError(null);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+                  className="px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 text-gray-700 transition-colors touch-manipulation font-medium"
                 >
                   Cancel
                 </button>
@@ -482,7 +482,7 @@ function CategoriesPageContent() {
                   type="button"
                   onClick={handleCloneSubmit}
                   disabled={cloningId !== null || !cloneModal.newName?.trim()}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium"
                 >
                   {cloningId ? 'Cloning...' : 'Clone Category'}
                 </button>

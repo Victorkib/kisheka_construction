@@ -10,11 +10,11 @@ import Link from 'next/link';
 export function PortfolioOverview({ projects, formatCurrency }) {
   if (!projects || projects.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-8 text-center">
-        <p className="text-gray-500">No projects found. Create your first project to get started.</p>
+      <div className="bg-white rounded-lg shadow p-6 sm:p-8 text-center">
+        <p className="text-sm sm:text-base text-gray-500">No projects found. Create your first project to get started.</p>
         <Link
           href="/projects/new"
-          className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="mt-4 inline-block px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium touch-manipulation"
         >
           Create Project
         </Link>
@@ -54,31 +54,31 @@ export function PortfolioOverview({ projects, formatCurrency }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">All Projects</h2>
+    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">All Projects</h2>
         <Link
           href="/projects"
-          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 active:text-blue-900 font-medium transition-colors touch-manipulation"
         >
           View All →
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {projects.map((project) => (
           <Link
             key={project.id}
             href={`/projects/${project.id}`}
-            className="block bg-gradient-to-br from-white to-gray-50 rounded-lg p-6 border-2 border-gray-200 hover:border-blue-400 hover:shadow-lg transition-all"
+            className="block bg-gradient-to-br from-white to-gray-50 rounded-lg p-4 sm:p-6 border-2 border-gray-200 hover:border-blue-400 active:border-blue-500 hover:shadow-lg active:shadow-xl transition-all touch-manipulation"
           >
             {/* Header */}
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-900 mb-1">{project.name}</h3>
-                <p className="text-sm text-gray-600">{project.code}</p>
+            <div className="flex items-start justify-between mb-3 sm:mb-4">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1 break-words">{project.name}</h3>
+                <p className="text-xs sm:text-sm text-gray-600 break-words">{project.code}</p>
               </div>
-              <span className={`px-2 py-1 text-xs font-semibold rounded-full border ${getStatusColor(project.status)}`}>
+              <span className={`px-2 py-1 text-xs font-semibold rounded-full border flex-shrink-0 ml-2 ${getStatusColor(project.status)}`}>
                 {project.status}
               </span>
             </div>

@@ -317,12 +317,12 @@ export default function ExpenseDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm sm:text-base">
             {error || 'Expense not found'}
           </div>
           <Link
             href="/expenses"
-            className="mt-4 inline-block text-blue-600 hover:text-blue-800"
+            className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation"
           >
             ← Back to Expenses
           </Link>
@@ -340,23 +340,23 @@ export default function ExpenseDetailPage() {
           fullScreen
         />
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Link
             href="/expenses"
-            className="text-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation"
           >
             ← Back to Expenses
           </Link>
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expense Details</h1>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">Expense Details</h1>
                 {(expense.deletedAt || expense.status === 'ARCHIVED') && <ArchiveBadge />}
               </div>
-              <p className="text-gray-600 mt-2">Expense Code: {expense.expenseCode || 'N/A'}</p>
+              <p className="text-sm sm:text-base text-gray-600 mt-2">Expense Code: {expense.expenseCode || 'N/A'}</p>
             </div>
             <span
-              className={`px-4 py-2 text-sm font-semibold rounded-full ${getStatusBadgeColor(
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-full ${getStatusBadgeColor(
                 expense.status
               )}`}
             >
@@ -365,13 +365,13 @@ export default function ExpenseDetailPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Expense Information */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4">Expense Information</h2>
-              <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-semibold mb-4">Expense Information</h2>
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <dt className="text-sm font-medium text-gray-500">Amount</dt>
                   <dd className="mt-1 text-lg font-semibold text-gray-900">
@@ -463,8 +463,8 @@ export default function ExpenseDetailPage() {
 
             {/* Receipt */}
             {expense.receiptFileUrl && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Receipt</h2>
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4">Receipt</h2>
                 <ImagePreview
                   url={expense.receiptFileUrl}
                   title="Receipt"
@@ -475,8 +475,8 @@ export default function ExpenseDetailPage() {
 
             {/* Approval History */}
             {expense.approvalHistory && expense.approvalHistory.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4">Approval History</h2>
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-semibold mb-4">Approval History</h2>
                 <div className="space-y-4">
                   {expense.approvalHistory.map((approval, index) => (
                     <div key={index} className="border-l-4 border-blue-500 pl-4">
@@ -504,11 +504,11 @@ export default function ExpenseDetailPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Approval Actions */}
             {expense.status === 'PENDING' && canAccess('approve_expense') && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold mb-4 text-gray-900">Actions</h3>
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-900">Actions</h3>
                 {/* Capital Balance Warning */}
                 {expense.projectId && (
                   <div className="mb-4">
@@ -520,7 +520,7 @@ export default function ExpenseDetailPage() {
                 )}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-base font-semibold text-gray-900 mb-2 leading-normal">
+                    <label className="block text-sm sm:text-base font-semibold text-gray-900 mb-2 leading-normal">
                       Approval Notes (Optional)
                     </label>
                     <textarea
@@ -528,15 +528,15 @@ export default function ExpenseDetailPage() {
                       onChange={(e) => setApprovalNotes(e.target.value)}
                       rows={3}
                       placeholder="Add notes for approval/rejection..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 text-gray-900"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 text-gray-900 text-sm sm:text-base touch-manipulation"
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <LoadingButton
                       onClick={handleApproveClick}
                       isLoading={isApproving}
                       loadingText="Processing..."
-                      className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                      className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium touch-manipulation"
                     >
                       Approve
                     </LoadingButton>
@@ -544,7 +544,7 @@ export default function ExpenseDetailPage() {
                       onClick={handleRejectClick}
                       isLoading={isApproving}
                       loadingText="Processing..."
-                      className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                      className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm font-medium touch-manipulation"
                     >
                       Reject
                     </LoadingButton>
@@ -555,18 +555,18 @@ export default function ExpenseDetailPage() {
 
             {/* Archive/Delete Actions */}
             {canAccess('delete_expense') && !expense.deletedAt && expense.status !== 'ARCHIVED' && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Actions</h3>
-                <div className="flex gap-2">
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Actions</h3>
+                <div className="flex flex-col sm:flex-row gap-2">
                   <button
                     onClick={handleArchiveClick}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+                    className="flex-1 px-4 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 active:bg-gray-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Archive
                   </button>
                   <button
                     onClick={handleDeleteClick}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                    className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Delete
                   </button>
@@ -574,20 +574,20 @@ export default function ExpenseDetailPage() {
               </div>
             )}
             {canAccess('delete_expense') && (expense.deletedAt || expense.status === 'ARCHIVED') && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Actions</h3>
-                <div className="flex gap-2">
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Actions</h3>
+                <div className="flex flex-col sm:flex-row gap-2">
                   <button
                     onClick={handleRestoreClick}
                     disabled={isRestoring}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+                    className="flex-1 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors disabled:opacity-50 text-sm font-medium touch-manipulation"
                   >
                     {isRestoring ? 'Restoring...' : 'Restore'}
                   </button>
                   <button
                     onClick={handleDeleteClick}
                     disabled={isDeleting}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                    className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 text-sm font-medium touch-manipulation"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete Permanently'}
                   </button>
@@ -596,8 +596,8 @@ export default function ExpenseDetailPage() {
             )}
 
             {/* Quick Info */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">Quick Info</h3>
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-900">Quick Info</h3>
               <dl className="space-y-3">
                 <div>
                   <dt className="text-sm font-semibold text-gray-700 leading-normal">Created</dt>
@@ -639,40 +639,40 @@ export default function ExpenseDetailPage() {
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
           <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
-              <div className="p-6">
+            <div className="relative bg-white rounded-lg shadow-xl max-w-full sm:max-w-md w-full transform transition-all mx-4" onClick={(e) => e.stopPropagation()}>
+              <div className="p-4 sm:p-6">
                 <div className="flex items-start">
-                  <div className="flex-shrink-0 mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
-                    <svg className="w-6 h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="flex-shrink-0 mx-auto flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-yellow-100 mb-4">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                   </div>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
+                  <h3 className="text-base sm:text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
                     Reject Expense
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-xs sm:text-sm text-gray-500 mb-4">
                       Please provide a reason for rejecting this expense:
                     </p>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Enter rejection reason..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm sm:text-base touch-manipulation"
                       rows="4"
                       disabled={isRejecting}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-200">
+              <div className="bg-gray-50 px-4 sm:px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-200">
                 <button
                   type="button"
                   onClick={() => setShowRejectModal(false)}
                   disabled={isRejecting}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
                 >
                   Cancel
                 </button>
@@ -680,7 +680,7 @@ export default function ExpenseDetailPage() {
                   type="button"
                   onClick={handleRejectConfirm}
                   disabled={isRejecting || !rejectReason.trim()}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 active:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
                 >
                   {isRejecting ? 'Rejecting...' : 'Reject Expense'}
                 </button>

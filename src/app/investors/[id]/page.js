@@ -346,10 +346,10 @@ export default function InvestorDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm sm:text-base">
             {error || 'Investor not found'}
           </div>
-          <Link href="/investors" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href="/investors" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Investors
           </Link>
         </div>
@@ -386,27 +386,27 @@ export default function InvestorDetailPage() {
             </div>
           </div>
         )}
-        <div className="mb-6">
+        <div className="mb-6 sm:mb-8">
           <Link
             href="/investors"
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-4 inline-block"
+            className="text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm font-medium mb-4 inline-block transition-colors touch-manipulation"
           >
             ← Back to Investors
           </Link>
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">{investor.name}</h1>
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">{investor.name}</h1>
                 {investor.status === 'ARCHIVED' && <ArchiveBadge />}
               </div>
-              <p className="mt-2 text-sm text-gray-700">
-                {investor.email || 'No email'} {investor.phone && `• ${investor.phone}`}
+              <p className="mt-2 text-xs sm:text-sm text-gray-700 break-words">
+                {investor.email || 'No email'} {investor.phone && <span className="block sm:inline sm:ml-2 mt-1 sm:mt-0">• {investor.phone}</span>}
               </p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
               <button
                 onClick={handleOpenStatementGenerator}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors text-sm font-medium touch-manipulation"
               >
                 Generate Statement
               </button>
@@ -414,13 +414,13 @@ export default function InvestorDetailPage() {
                 <>
                   <button
                     onClick={handleArchiveClick}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 active:bg-gray-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Archive
                   </button>
                   <button
                     onClick={handleDeleteClick}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Delete
                   </button>
@@ -431,14 +431,14 @@ export default function InvestorDetailPage() {
                   <button
                     onClick={handleRestoreClick}
                     disabled={restoring}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors disabled:opacity-50 text-sm font-medium touch-manipulation"
                   >
                     {restoring ? 'Restoring...' : 'Restore'}
                   </button>
                   <button
                     onClick={handleDeleteClick}
                     disabled={deleting}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 text-sm font-medium touch-manipulation"
                   >
                     {deleting ? 'Deleting...' : 'Delete Permanently'}
                   </button>
@@ -449,22 +449,22 @@ export default function InvestorDetailPage() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">Total Invested</div>
-            <div className="text-2xl font-bold text-gray-900 mt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="text-sm sm:text-base font-semibold text-gray-700 leading-normal">Total Invested</div>
+            <div className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">
               {formatCurrency(investor.totalInvested || 0)}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">Investment Type</div>
-            <div className="text-xl font-semibold text-gray-900 mt-1">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="text-sm sm:text-base font-semibold text-gray-700 leading-normal">Investment Type</div>
+            <div className="text-lg sm:text-xl font-semibold text-gray-900 mt-1">
               {investor.investmentType}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">Status</div>
-            <div className="text-xl font-semibold text-gray-900 mt-1">{investor.status}</div>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="text-sm sm:text-base font-semibold text-gray-700 leading-normal">Status</div>
+            <div className="text-lg sm:text-xl font-semibold text-gray-900 mt-1">{investor.status}</div>
           </div>
         </div>
 
@@ -477,14 +477,14 @@ export default function InvestorDetailPage() {
             const delta = totalInvested - contributionsTotal;
             if (Math.abs(delta) < 0.01) return null;
             return (
-              <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                <div>
+              <div className="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-xs sm:text-sm text-amber-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <div className="flex-1 min-w-0">
                   <span className="font-semibold">Data mismatch detected.</span> Contributions total {formatCurrency(contributionsTotal)} but Total Invested is {formatCurrency(totalInvested)}.
                 </div>
                 <button
                   onClick={handleReconcileContributions}
                   disabled={reconciling}
-                  className="inline-flex items-center justify-center px-4 py-2 rounded-md bg-amber-600 text-white font-medium hover:bg-amber-700 disabled:opacity-60"
+                  className="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 rounded-md bg-amber-600 text-white font-medium hover:bg-amber-700 active:bg-amber-800 disabled:opacity-60 text-sm touch-manipulation"
                 >
                   {reconciling ? 'Reconciling...' : 'Reconcile Contributions'}
                 </button>
@@ -509,9 +509,9 @@ export default function InvestorDetailPage() {
 
         {/* Loan Terms (if applicable) */}
         {investor.loanTerms && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Loan Terms</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Loan Terms</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {investor.loanTerms.interestRate && (
                 <div>
                   <div className="text-sm text-gray-700 font-medium mb-1">Interest Rate</div>
@@ -547,18 +547,18 @@ export default function InvestorDetailPage() {
         )}
 
         {/* Contributions */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6 relative">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6 relative">
           <LoadingOverlay 
             isLoading={isSubmitting || fetchingContributions} 
             message={isSubmitting ? "Adding contribution..." : "Loading contributions..."} 
             fullScreen={false} 
           />
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Contributions</h2>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Contributions</h2>
             <button
               onClick={() => setShowAddForm(!showAddForm)}
               disabled={isSubmitting || fetchingContributions}
-              className="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="w-full sm:w-auto px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
             >
               {showAddForm ? 'Cancel' : '+ Add Contribution'}
             </button>
@@ -566,9 +566,9 @@ export default function InvestorDetailPage() {
 
           {showAddForm && (
             <form onSubmit={handleAddContribution} className="mb-6 p-4 bg-gray-50 rounded-lg">
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Amount</label>
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Amount</label>
                   <input
                     type="number"
                     value={newContribution.amount}
@@ -578,11 +578,11 @@ export default function InvestorDetailPage() {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
                   />
                 </div>
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Date</label>
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Date</label>
                   <div className="relative">
                     <input
                       type="date"
@@ -591,7 +591,7 @@ export default function InvestorDetailPage() {
                         setNewContribution({ ...newContribution, date: e.target.value })
                       }
                       required
-                      className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                      className="w-full px-3 pr-12 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer touch-manipulation"
                     />
                     <button
                       type="button"
@@ -614,29 +614,29 @@ export default function InvestorDetailPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Type</label>
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Type</label>
                   <select
                     value={newContribution.type}
                     onChange={(e) =>
                       setNewContribution({ ...newContribution, type: e.target.value })
                     }
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
                   >
                     <option value="EQUITY">Equity</option>
                     <option value="LOAN">Loan</option>
                     <option value="MIXED">Mixed</option>
                   </select>
                 </div>
-                <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Notes</label>
+                <div className="sm:col-span-2">
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Notes</label>
                   <input
                     type="text"
                     value={newContribution.notes}
                     onChange={(e) =>
                       setNewContribution({ ...newContribution, notes: e.target.value })
                     }
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
                   />
                 </div>
               </div>
@@ -644,7 +644,7 @@ export default function InvestorDetailPage() {
                 type="submit"
                 isLoading={isSubmitting}
                 loadingText="Adding..."
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 text-sm font-medium touch-manipulation"
               >
                 Add Contribution
               </LoadingButton>
@@ -652,40 +652,65 @@ export default function InvestorDetailPage() {
           )}
 
           {contributions.length === 0 ? (
-            <div className="text-center text-gray-600 py-8">No contributions yet</div>
+            <div className="text-center text-gray-600 py-8 text-sm sm:text-base">No contributions yet</div>
           ) : (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Amount
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Type
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
-                    Notes
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+            <>
+              {/* Desktop Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                        Date
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                        Amount
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                        Type
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                        Notes
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {contributions.map((contrib, idx) => (
+                      <tr key={idx}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formatDate(contrib.date)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                          {formatCurrency(contrib.amount || 0)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contrib.type}</td>
+                        <td className="px-6 py-4 text-sm text-gray-700">{contrib.notes || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Cards */}
+              <div className="md:hidden space-y-4">
                 {contributions.map((contrib, idx) => (
-                  <tr key={idx}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {formatDate(contrib.date)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {formatCurrency(contrib.amount || 0)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contrib.type}</td>
-                    <td className="px-6 py-4 text-sm text-gray-700">{contrib.notes || '-'}</td>
-                  </tr>
+                  <div key={idx} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{formatCurrency(contrib.amount || 0)}</p>
+                        <p className="text-xs text-gray-600 mt-1">{formatDate(contrib.date)}</p>
+                      </div>
+                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded">
+                        {contrib.type}
+                      </span>
+                    </div>
+                    {contrib.notes && (
+                      <p className="text-sm text-gray-700 mt-2">{contrib.notes}</p>
+                    )}
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </>
           )}
         </div>
 

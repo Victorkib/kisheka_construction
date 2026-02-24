@@ -174,13 +174,13 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
           <button
             onClick={handleToggle}
             data-sidebar-active={isActive ? 'true' : undefined}
-            className={`group relative w-full flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${colors.container} ${isActive ? 'shadow-sm' : 'hover:shadow-sm'}`}
+            className={`group relative w-full flex items-center px-3 py-2.5 sm:py-3 text-sm rounded-lg transition-all duration-200 border min-h-[44px] touch-manipulation ${colors.container} ${isActive ? 'shadow-sm' : 'hover:shadow-sm active:shadow'}`}
           >
             <ActiveIndicator isActive={isActive} isParentActive={isParentActive} accentColor={colors.accent} />
             {section.icon && (
               <Icon
                 name={section.icon}
-                className={`w-5 h-5 mr-3 flex-shrink-0 transition-all duration-200 ${colors.icon} ${
+                className={`w-5 h-5 sm:w-6 sm:h-6 mr-3 flex-shrink-0 transition-all duration-200 ${colors.icon} ${
                   isActive ? 'scale-110' : isParentActive || isChildActive ? 'scale-105' : 'group-hover:scale-105'
                 }`}
               />
@@ -222,7 +222,7 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
                     key={child.href}
                     href={child.href}
                     data-sidebar-active={childActiveState.isActive ? 'true' : undefined}
-                    className={`group relative flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${childColors.container} ${childActiveState.isActive ? 'shadow-sm font-semibold' : 'font-normal hover:shadow-sm hover:font-medium'}`}
+                    className={`group relative flex items-center px-3 py-2.5 sm:py-3 text-sm rounded-lg transition-all duration-200 border min-h-[44px] touch-manipulation ${childColors.container} ${childActiveState.isActive ? 'shadow-sm font-semibold' : 'font-normal hover:shadow-sm hover:font-medium active:shadow'}`}
                   >
                     <ActiveIndicator isActive={childActiveState.isActive} accentColor={childColors.accent} />
                     <span className="flex-1 truncate">{child.label}</span>
@@ -237,13 +237,13 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
         <Link
           href={section.href}
           data-sidebar-active={isActive ? 'true' : undefined}
-          className={`group relative flex items-center px-3 py-2 text-sm rounded-lg transition-all duration-200 border ${colors.container} ${isActive ? 'shadow-sm' : 'hover:shadow-sm'}`}
+          className={`group relative flex items-center px-3 py-2.5 sm:py-3 text-sm rounded-lg transition-all duration-200 border min-h-[44px] touch-manipulation ${colors.container} ${isActive ? 'shadow-sm' : 'hover:shadow-sm active:shadow'}`}
         >
           <ActiveIndicator isActive={isActive} accentColor={colors.accent} />
           {section.icon && (
             <Icon
               name={section.icon}
-              className={`w-5 h-5 mr-3 flex-shrink-0 transition-all duration-200 ${colors.icon} ${
+              className={`w-5 h-5 sm:w-6 sm:h-6 mr-3 flex-shrink-0 transition-all duration-200 ${colors.icon} ${
                 isActive ? 'scale-110' : 'group-hover:scale-105'
               }`}
             />
@@ -457,7 +457,7 @@ const SidebarContent = memo(function SidebarContent({
   return (
     <aside
       className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen ${
-        isCollapsed ? 'w-16' : 'w-64'
+        isCollapsed ? 'w-16 lg:w-20' : 'w-64 lg:w-72'
       }`}
     >
       {/* Logo/Brand - Sticky Top */}
@@ -475,7 +475,7 @@ const SidebarContent = memo(function SidebarContent({
           )}
           <button
             onClick={onToggleCollapse}
-            className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0"
+            className="p-1.5 sm:p-2 rounded-md hover:bg-gray-100 active:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

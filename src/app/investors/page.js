@@ -154,19 +154,19 @@ function InvestorsPageContent() {
             </div>
           </div>
         )}
-        <div className="mb-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
                 Investors
               </h1>
-              <p className="mt-2 text-sm text-gray-700">
+              <p className="mt-2 text-sm sm:text-base text-gray-700">
                 Manage investors and track contributions
               </p>
             </div>
             <Link
               href="/investors/new"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center font-medium"
             >
               + Add Investor
             </Link>
@@ -174,46 +174,46 @@ function InvestorsPageContent() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm md:text-base font-semibold text-gray-700 leading-normal">
               Total Investors
             </div>
-            <div className="text-2xl font-bold text-gray-900 mt-1">
+            <div className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">
               {summary.count}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm md:text-base font-semibold text-gray-700 leading-normal">
               Total Invested
             </div>
-            <div className="text-2xl font-bold text-green-600 mt-1">
+            <div className="text-xl sm:text-2xl font-bold text-green-600 mt-1 truncate">
               {formatCurrency(summary.totalInvested)}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm md:text-base font-semibold text-gray-700 leading-normal">
               Total Loans
             </div>
-            <div className="text-2xl font-bold text-purple-600 mt-1">
+            <div className="text-xl sm:text-2xl font-bold text-purple-600 mt-1 truncate">
               {formatCurrency(summary.totalLoans)}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm md:text-base font-semibold text-gray-700 leading-normal">
               Total Equity
             </div>
-            <div className="text-2xl font-bold text-blue-600 mt-1">
+            <div className="text-xl sm:text-2xl font-bold text-blue-600 mt-1 truncate">
               {formatCurrency(summary.totalEquity)}
             </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Investment Type
               </label>
               <select
@@ -230,7 +230,7 @@ function InvestorsPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Status
               </label>
               <select
@@ -244,8 +244,8 @@ function InvestorsPageContent() {
                 <option value="ARCHIVED">Archived</option>
               </select>
             </div>
-            <div className="md:col-span-2">
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+            <div className="sm:col-span-2 lg:col-span-2">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Search
               </label>
               <div className="relative">
@@ -281,14 +281,16 @@ function InvestorsPageContent() {
             <div className="text-gray-600">No investors found</div>
             <Link
               href="/investors/new"
-              className="mt-4 inline-block text-blue-600 hover:text-blue-800"
+              className="mt-4 inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation"
             >
-              Add your first investor
+              Add Your First Investor
             </Link>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
@@ -367,7 +369,84 @@ function InvestorsPageContent() {
                   ))}
               </tbody>
             </table>
-          </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {investors &&
+                investors.length > 0 &&
+                investors?.map((investor) => (
+                  <div
+                    key={investor._id}
+                    className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                  >
+                    {/* Header Row */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <Link
+                          href={`/investors/${investor._id}${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}${returnProjectId ? `&projectId=${returnProjectId}` : ''}` : ''}`}
+                          className="text-base font-semibold text-blue-600 hover:text-blue-800 block truncate"
+                        >
+                          {investor.name}
+                        </Link>
+                      </div>
+                      <div className="flex flex-col gap-1 items-end ml-2">
+                        <span
+                          className={`px-2 py-1 text-xs font-semibold rounded-full ${getInvestmentTypeBadge(
+                            investor.investmentType,
+                          )}`}
+                        >
+                          {investor.investmentType}
+                        </span>
+                        <span
+                          className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadge(
+                            investor.status,
+                          )}`}
+                        >
+                          {investor.status}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Contact Details */}
+                    <div className="space-y-2 mb-3 pb-3 border-b border-gray-200">
+                      <div className="flex items-start gap-2">
+                        <span className="text-xs text-gray-500 w-16 flex-shrink-0">Email:</span>
+                        <p className="text-sm text-gray-900 font-medium truncate flex-1">
+                          {investor.email || 'N/A'}
+                        </p>
+                      </div>
+                      {investor.phone && (
+                        <div className="flex items-start gap-2">
+                          <span className="text-xs text-gray-500 w-16 flex-shrink-0">Phone:</span>
+                          <p className="text-sm text-gray-900 font-medium">
+                            {investor.phone}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Investment Details */}
+                    <div className="mb-3 pb-3 border-b border-gray-200">
+                      <p className="text-xs text-gray-500 mb-0.5">Total Invested</p>
+                      <p className="text-lg font-bold text-gray-900">
+                        {formatCurrency(investor.totalInvested || 0)}
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="pt-3">
+                      <Link
+                        href={`/investors/${investor._id}${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}${returnProjectId ? `&projectId=${returnProjectId}` : ''}` : ''}`}
+                        className="block text-center px-4 py-2.5 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation"
+                      >
+                        View Details →
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </>
         )}
       </div>
     </AppLayout>

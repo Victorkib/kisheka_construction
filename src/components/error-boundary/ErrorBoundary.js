@@ -1,64 +1,111 @@
 /**
  * Error Boundary Component
- * Catches React component errors and displays user-friendly error UI
+ * Catches JavaScript errors anywhere in the child component tree,
+ * logs those errors, and displays a fallback UI instead of crashing
  */
 
 'use client';
 
-import React from 'react';
+import { Component } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
-class ErrorBoundaryClass extends React.Component {
+class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-      errorInfo: null,
-    };
+    this.state = { hasError: false, error: null, errorInfo: null };
   }
 
   static getDerivedStateFromError(error) {
+    // Update state so the next render will show the fallback UI
     return { hasError: true };
   }
 
   componentDidCatch(error, errorInfo) {
+    // Log error to console and error reporting service
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    
     this.setState({
       error,
       errorInfo,
     });
 
-    // Store error for error reporting page
-    if (typeof window !== 'undefined') {
-      try {
-        const errorData = {
-          message: error?.message || 'Unknown error',
-          stack: error?.stack || '',
-          componentStack: errorInfo?.componentStack || '',
-          timestamp: new Date().toISOString(),
-          url: window.location.href,
-          userAgent: navigator.userAgent,
-          type: 'react_error',
-        };
-        sessionStorage.setItem('lastError', JSON.stringify(errorData));
-      } catch (e) {
-        console.error('Failed to store error data:', e);
-      }
-    }
+    // You can also log the error to an error reporting service here
+    // Example: logErrorToService(error, errorInfo);
   }
+
+  handleReset = () => {
+    this.setState({ hasError: false, error: null, errorInfo: null });
+  };
 
   render() {
     if (this.state.hasError) {
+      // Custom fallback UI
       return (
-        <ErrorFallback
-          error={this.state.error}
-          errorInfo={this.state.errorInfo}
-          onReset={() => {
-            this.setState({ hasError: false, error: null, errorInfo: null });
-          }}
-        />
+        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 sm:p-8 text-center">
+            <div className="mb-4">
+              <svg
+                className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-red-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+              Something went wrong
+            </h1>
+            <p className="text-sm sm:text-base text-gray-600 mb-6">
+              We're sorry, but something unexpected happened. Please try refreshing the page or contact support if the problem persists.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={this.handleReset}
+                className="px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                aria-label="Try again"
+              >
+                Try Again
+              </button>
+              <Link
+                href="/"
+                className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 active:bg-gray-400 transition-colors text-sm font-medium touch-manipulation focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-center"
+                aria-label="Go to home page"
+              >
+                Go Home
+              </Link>
+            </div>
+
+            {process.env.NODE_ENV === 'development' && this.state.error && (
+              <details className="mt-6 text-left">
+                <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 mb-2">
+                  Error Details (Development Only)
+                </summary>
+                <div className="mt-2 p-3 bg-gray-100 rounded text-xs font-mono text-red-600 overflow-auto max-h-48">
+                  <p className="font-semibold mb-1">Error:</p>
+                  <pre className="whitespace-pre-wrap break-words">
+                    {this.state.error.toString()}
+                  </pre>
+                  {this.state.errorInfo && (
+                    <>
+                      <p className="font-semibold mt-3 mb-1">Component Stack:</p>
+                      <pre className="whitespace-pre-wrap break-words">
+                        {this.state.errorInfo.componentStack}
+                      </pre>
+                    </>
+                  )}
+                </div>
+              </details>
+            )}
+          </div>
+        </div>
       );
     }
 
@@ -66,121 +113,4 @@ class ErrorBoundaryClass extends React.Component {
   }
 }
 
-function ErrorFallback({ error, errorInfo, onReset }) {
-  const router = useRouter();
-
-  const handleReportError = () => {
-    try {
-      // Ensure error is stored before navigation
-      if (typeof window !== 'undefined') {
-        try {
-          const errorData = {
-            message: error?.message || 'Unknown error',
-            stack: error?.stack || '',
-            componentStack: errorInfo?.componentStack || '',
-            timestamp: new Date().toISOString(),
-            url: window.location.href,
-            userAgent: navigator.userAgent,
-            type: 'react_error',
-          };
-          sessionStorage.setItem('lastError', JSON.stringify(errorData));
-        } catch (e) {
-          console.error('Failed to store error data:', e);
-        }
-      }
-      
-      // Use window.location directly for more reliable navigation in error context
-      // Router might not work properly in error boundary context
-      window.location.href = '/error-report?auto=true';
-    } catch (err) {
-      console.error('Error in handleReportError:', err);
-      // Last resort: direct navigation
-      if (typeof window !== 'undefined') {
-        window.location.href = '/error-report?auto=true';
-      }
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center px-4 py-12">
-      <div className="max-w-2xl w-full bg-white rounded-xl shadow-xl p-8 border border-red-200">
-        <div className="text-center mb-6">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Something went wrong</h1>
-          <p className="text-lg text-gray-600">
-            We're sorry, but something unexpected happened. Our team has been notified.
-          </p>
-        </div>
-
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <p className="text-sm text-red-800 font-medium mb-2">Error Details:</p>
-          <p className="text-sm text-red-700 font-mono break-all">
-            {error?.message || 'An unknown error occurred'}
-          </p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <button
-            onClick={onReset}
-            className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Try Again
-          </button>
-          <button
-            onClick={handleReportError}
-            className="flex-1 px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
-          >
-            Report Error
-          </button>
-        </div>
-
-        <div className="border-t border-gray-200 pt-6">
-          <p className="text-sm text-gray-600 mb-4">Quick Navigation:</p>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href="/dashboard"
-              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link
-              href="/projects"
-              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Projects
-            </Link>
-            <Link
-              href="/"
-              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Home
-            </Link>
-            <button
-              onClick={() => router.back()}
-              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              Go Back
-            </button>
-          </div>
-        </div>
-
-        {process.env.NODE_ENV === 'development' && errorInfo && (
-          <details className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <summary className="text-sm font-medium text-gray-700 cursor-pointer">
-              Technical Details (Development Only)
-            </summary>
-            <pre className="mt-2 text-xs text-gray-600 overflow-auto max-h-64">
-              {error?.stack}
-              {'\n\n'}
-              {errorInfo.componentStack}
-            </pre>
-          </details>
-        )}
-      </div>
-    </div>
-  );
-}
-
-export default function ErrorBoundary({ children }) {
-  return <ErrorBoundaryClass>{children}</ErrorBoundaryClass>;
-}
+export default ErrorBoundary;

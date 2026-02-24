@@ -320,7 +320,7 @@ function FloorsPageContent() {
     <div className="flex items-center gap-3">
       <Link
         href={`/floors/${floor._id}`}
-        className="text-blue-600 hover:text-blue-900"
+        className="text-blue-600 hover:text-blue-900 active:text-blue-950 transition-colors touch-manipulation"
       >
         {canEdit ? 'Edit/View' : 'View'}
       </Link>
@@ -328,7 +328,7 @@ function FloorsPageContent() {
         <button
           type="button"
           onClick={() => handleDeleteClick(floor)}
-          className="text-red-600 hover:text-red-800"
+          className="text-red-600 hover:text-red-800 active:text-red-950 transition-colors touch-manipulation"
         >
           Delete
         </button>
@@ -340,9 +340,9 @@ function FloorsPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Floors</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage building floors and their status</p>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Floors</h1>
+            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage building floors and their status</p>
           </div>
           <NoProjectsEmptyState />
         </div>
@@ -354,21 +354,21 @@ function FloorsPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Floors</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Floors</h1>
+            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
               {selectedProjectId 
                 ? `Floors for ${getProjectName(selectedProjectId)}`
                 : 'Manage building floors and their status'}
             </p>
           </div>
           {canCreate && (
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               {selectedProjectId && (
                 <Link
                   href={`/floors/new?projectId=${selectedProjectId}&basement=true`}
-                  className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition flex items-center gap-2"
+                  className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base"
                   title="Add a basement floor"
                 >
                   <span>🏢</span> Add Basement
@@ -376,7 +376,7 @@ function FloorsPageContent() {
               )}
               <Link
                 href={selectedProjectId ? `/floors/new?projectId=${selectedProjectId}` : '/floors/new'}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
               >
                 + Create Floor
               </Link>
@@ -385,8 +385,8 @@ function FloorsPageContent() {
         </div>
 
         {/* Project Filter */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2 leading-normal">
             Filter by Project
           </label>
           {projectLoading ? (
@@ -397,7 +397,7 @@ function FloorsPageContent() {
             <select
               value={selectedProjectId}
               onChange={handleProjectChange}
-              className="w-full md:w-1/3 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full sm:w-full md:w-1/3 px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
             >
               <option value="">All Projects</option>
               {accessibleProjects.map((project) => (
@@ -435,19 +435,19 @@ function FloorsPageContent() {
                     <button
                       type="button"
                       onClick={openFloorInitModal}
-                      className="inline-flex items-center justify-center bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-lg shadow-blue-500/20"
+                      className="inline-flex items-center justify-center bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 active:from-indigo-800 active:to-blue-800 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-lg shadow-blue-500/20 touch-manipulation"
                     >
                       Auto-create Floors
                     </button>
                     <Link
                       href={`/floors/new?projectId=${selectedProjectId}`}
-                      className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg transition"
+                      className="inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-center"
                     >
                       Create Floor Manually
                     </Link>
                     <Link
                       href="/floors/new"
-                      className="inline-block bg-gray-600 hover:bg-gray-700 text-white font-medium px-6 py-2.5 rounded-lg transition"
+                      className="inline-block bg-gray-600 hover:bg-gray-700 active:bg-gray-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-center"
                     >
                       Create Floor (Select Project)
                     </Link>
@@ -467,13 +467,13 @@ function FloorsPageContent() {
                       type="button"
                       onClick={openFloorInitModal}
                       disabled={!selectedProjectId}
-                      className="inline-flex items-center justify-center bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-semibold px-6 py-2.5 rounded-lg transition shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="inline-flex items-center justify-center bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 active:from-indigo-800 active:to-blue-800 text-white font-semibold px-6 py-2.5 rounded-lg transition-colors shadow-lg shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                     >
                       Auto-create Floors
                     </button>
                     <Link
                       href="/floors/new"
-                      className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg transition"
+                      className="inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-center"
                     >
                       Create First Floor
                     </Link>
@@ -486,13 +486,16 @@ function FloorsPageContent() {
           <div className="space-y-6">
             {/* Basements Section */}
             {groupedFloors.basements.length > 0 && (
-              <div className="bg-white rounded-lg shadow overflow-hidden">
-                <div className="bg-purple-50 px-6 py-3 border-b border-purple-200">
-                  <h3 className="text-sm font-semibold text-purple-900">
-                    Basements ({groupedFloors.basements.length})
-                  </h3>
-                </div>
-                <table className="min-w-full divide-y divide-gray-200">
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+                  <div className="bg-purple-50 px-6 py-3 border-b border-purple-200">
+                    <h3 className="text-sm font-semibold text-purple-900">
+                      Basements ({groupedFloors.basements.length})
+                    </h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
@@ -585,20 +588,102 @@ function FloorsPageContent() {
                         </td>
                       </tr>
                     ))}
-                  </tbody>
-                </table>
-              </div>
+                    </tbody>
+                  </table>
+                </div>
+                </div>
+
+                {/* Mobile Card View - Basements */}
+                <div className="md:hidden space-y-4">
+                  <div className="bg-purple-50 px-4 py-2 border-b border-purple-200 rounded-t-lg">
+                    <h3 className="text-sm font-semibold text-purple-900">
+                      Basements ({groupedFloors.basements.length})
+                    </h3>
+                  </div>
+                  {groupedFloors.basements.map((floor) => (
+                    <div key={floor._id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1 min-w-0">
+                          <Link
+                            href={`/floors/${floor._id}`}
+                            className="text-base font-semibold text-blue-600 hover:text-blue-800 block truncate"
+                          >
+                            {getFloorDisplayName(floor.floorNumber, floor.name)}
+                          </Link>
+                          {floor.usageCount !== undefined && (
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              Used by {floor.usageCount} material{floor.usageCount !== 1 ? 's' : ''}
+                            </p>
+                          )}
+                        </div>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ml-2 ${getStatusBadgeColor(floor.status)}`}>
+                          {floor.status || 'NOT_STARTED'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-200">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-0.5">Budget</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 mb-0.5">Actual Cost</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {formatCurrency(floor.actualCost || 0)}
+                          </p>
+                        </div>
+                      </div>
+                      {floor.projectId && (
+                        <div className="mb-3 pb-3 border-b border-gray-200">
+                          <p className="text-xs text-gray-500 mb-0.5">Project</p>
+                          <Link
+                            href={`/projects/${floor.projectId}`}
+                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            {getProjectName(floor.projectId)}
+                          </Link>
+                        </div>
+                      )}
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-500 mb-1.5">Dependencies</p>
+                        {renderDependencyChips(floor)}
+                      </div>
+                      <div className="flex flex-wrap gap-2 pt-3">
+                        <Link
+                          href={`/floors/${floor._id}`}
+                          className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                        >
+                          {canEdit ? 'Edit/View' : 'View'}
+                        </Link>
+                        {canDelete && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteClick(floor)}
+                            className="flex-1 px-3 py-2 bg-red-50 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-100 active:bg-red-200 transition-colors touch-manipulation"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
 
             {/* Ground Floor Section */}
             {groupedFloors.ground.length > 0 && (
-              <div className="bg-white rounded-lg shadow overflow-hidden">
-                <div className="bg-blue-50 px-6 py-3 border-b border-blue-200">
-                  <h3 className="text-sm font-semibold text-blue-900">
-                    Ground Floor ({groupedFloors.ground.length})
-                  </h3>
-                </div>
-                <table className="min-w-full divide-y divide-gray-200">
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+                  <div className="bg-blue-50 px-6 py-3 border-b border-blue-200">
+                    <h3 className="text-sm font-semibold text-blue-900">
+                      Ground Floor ({groupedFloors.ground.length})
+                    </h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
@@ -691,20 +776,102 @@ function FloorsPageContent() {
                         </td>
                       </tr>
                     ))}
-                  </tbody>
-                </table>
-              </div>
+                    </tbody>
+                  </table>
+                </div>
+                </div>
+
+                {/* Mobile Card View - Ground Floor */}
+                <div className="md:hidden space-y-4">
+                  <div className="bg-blue-50 px-4 py-2 border-b border-blue-200 rounded-t-lg">
+                    <h3 className="text-sm font-semibold text-blue-900">
+                      Ground Floor ({groupedFloors.ground.length})
+                    </h3>
+                  </div>
+                  {groupedFloors.ground.map((floor) => (
+                    <div key={floor._id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1 min-w-0">
+                          <Link
+                            href={`/floors/${floor._id}`}
+                            className="text-base font-semibold text-blue-600 hover:text-blue-800 block truncate"
+                          >
+                            {getFloorDisplayName(floor.floorNumber, floor.name)}
+                          </Link>
+                          {floor.usageCount !== undefined && (
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              Used by {floor.usageCount} material{floor.usageCount !== 1 ? 's' : ''}
+                            </p>
+                          )}
+                        </div>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ml-2 ${getStatusBadgeColor(floor.status)}`}>
+                          {floor.status || 'NOT_STARTED'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-200">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-0.5">Budget</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 mb-0.5">Actual Cost</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {formatCurrency(floor.actualCost || 0)}
+                          </p>
+                        </div>
+                      </div>
+                      {floor.projectId && (
+                        <div className="mb-3 pb-3 border-b border-gray-200">
+                          <p className="text-xs text-gray-500 mb-0.5">Project</p>
+                          <Link
+                            href={`/projects/${floor.projectId}`}
+                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            {getProjectName(floor.projectId)}
+                          </Link>
+                        </div>
+                      )}
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-500 mb-1.5">Dependencies</p>
+                        {renderDependencyChips(floor)}
+                      </div>
+                      <div className="flex flex-wrap gap-2 pt-3">
+                        <Link
+                          href={`/floors/${floor._id}`}
+                          className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                        >
+                          {canEdit ? 'Edit/View' : 'View'}
+                        </Link>
+                        {canDelete && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteClick(floor)}
+                            className="flex-1 px-3 py-2 bg-red-50 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-100 active:bg-red-200 transition-colors touch-manipulation"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
 
             {/* Above-Ground Floors Section */}
             {groupedFloors.aboveGround.length > 0 && (
-              <div className="bg-white rounded-lg shadow overflow-hidden">
-                <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
-                  <h3 className="text-sm font-semibold text-gray-900">
-                    Above-Ground Floors ({groupedFloors.aboveGround.length})
-                  </h3>
-                </div>
-                <table className="min-w-full divide-y divide-gray-200">
+              <>
+                {/* Desktop Table View */}
+                <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+                  <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Above-Ground Floors ({groupedFloors.aboveGround.length})
+                    </h3>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
@@ -797,35 +964,114 @@ function FloorsPageContent() {
                         </td>
                       </tr>
                     ))}
-                  </tbody>
-                </table>
-              </div>
+                    </tbody>
+                  </table>
+                </div>
+                </div>
+
+                {/* Mobile Card View - Above-Ground Floors */}
+                <div className="md:hidden space-y-4">
+                  <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 rounded-t-lg">
+                    <h3 className="text-sm font-semibold text-gray-900">
+                      Above-Ground Floors ({groupedFloors.aboveGround.length})
+                    </h3>
+                  </div>
+                  {groupedFloors.aboveGround.map((floor) => (
+                    <div key={floor._id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex-1 min-w-0">
+                          <Link
+                            href={`/floors/${floor._id}`}
+                            className="text-base font-semibold text-blue-600 hover:text-blue-800 block truncate"
+                          >
+                            {getFloorDisplayName(floor.floorNumber, floor.name)}
+                          </Link>
+                          {floor.usageCount !== undefined && (
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              Used by {floor.usageCount} material{floor.usageCount !== 1 ? 's' : ''}
+                            </p>
+                          )}
+                        </div>
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ml-2 ${getStatusBadgeColor(floor.status)}`}>
+                          {floor.status || 'NOT_STARTED'}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-200">
+                        <div>
+                          <p className="text-xs text-gray-500 mb-0.5">Budget</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500 mb-0.5">Actual Cost</p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {formatCurrency(floor.actualCost || 0)}
+                          </p>
+                        </div>
+                      </div>
+                      {floor.projectId && (
+                        <div className="mb-3 pb-3 border-b border-gray-200">
+                          <p className="text-xs text-gray-500 mb-0.5">Project</p>
+                          <Link
+                            href={`/projects/${floor.projectId}`}
+                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                          >
+                            {getProjectName(floor.projectId)}
+                          </Link>
+                        </div>
+                      )}
+                      <div className="mb-3">
+                        <p className="text-xs text-gray-500 mb-1.5">Dependencies</p>
+                        {renderDependencyChips(floor)}
+                      </div>
+                      <div className="flex flex-wrap gap-2 pt-3">
+                        <Link
+                          href={`/floors/${floor._id}`}
+                          className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                        >
+                          {canEdit ? 'Edit/View' : 'View'}
+                        </Link>
+                        {canDelete && (
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteClick(floor)}
+                            className="flex-1 px-3 py-2 bg-red-50 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-100 active:bg-red-200 transition-colors touch-manipulation"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         )}
 
         {/* Summary Stats */}
         {floors.length > 0 && (
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">Total Floors</p>
-              <p className="text-2xl font-bold text-gray-900">{floors.length}</p>
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <p className="text-xs sm:text-sm text-gray-600">Total Floors</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{floors.length}</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">In Progress</p>
-              <p className="text-2xl font-bold text-blue-600">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <p className="text-xs sm:text-sm text-gray-600">In Progress</p>
+              <p className="text-xl sm:text-2xl font-bold text-blue-600">
                 {floors.filter((f) => f.status === 'IN_PROGRESS').length}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">Completed</p>
-              <p className="text-2xl font-bold text-green-600">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <p className="text-xs sm:text-sm text-gray-600">Completed</p>
+              <p className="text-xl sm:text-2xl font-bold text-green-600">
                 {floors.filter((f) => f.status === 'COMPLETED').length}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <p className="text-sm text-gray-600">Total Budget</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6 col-span-2 md:col-span-1">
+              <p className="text-xs sm:text-sm text-gray-600">Total Budget</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900 truncate">
                 {formatCurrency(floors.reduce((sum, f) => sum + (f.budgetAllocation?.total || f.totalBudget || 0), 0))}
               </p>
             </div>
@@ -843,28 +1089,28 @@ function FloorsPageContent() {
           loadingMessage="Creating floors..."
           preventCloseDuringLoading={true}
         >
-          <div className="px-8 py-6 border-b border-gray-200/50">
+          <div className="px-4 sm:px-8 py-4 sm:py-6 border-b border-gray-200/50">
             <div className="flex items-center gap-3">
-              <div className="bg-indigo-600/90 text-white rounded-xl p-3 shadow-lg shadow-indigo-500/30">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="bg-indigo-600/90 text-white rounded-xl p-2 sm:p-3 shadow-lg shadow-indigo-500/30 flex-shrink-0">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
-              <div>
-                <h3 className="text-2xl font-bold text-gray-900">Auto-create Floors</h3>
-                <p className="text-sm text-gray-600">Generate a default floor stack for this project.</p>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-lg sm:text-2xl font-bold text-gray-900">Auto-create Floors</h3>
+                <p className="text-xs sm:text-sm text-gray-600">Generate a default floor stack for this project.</p>
               </div>
             </div>
           </div>
 
-          <div className="px-8 py-6 space-y-6">
+          <div className="px-4 sm:px-8 py-4 sm:py-6 space-y-6">
             {floorInitError && (
               <div className="bg-red-50/80 border border-red-200/70 text-red-700 px-4 py-3 rounded-xl">
                 {floorInitError}
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   Number of Floors
@@ -875,7 +1121,7 @@ function FloorsPageContent() {
                   max="50"
                   value={floorInitForm.floorCount}
                   onChange={(e) => handleFloorInitChange('floorCount', e.target.value)}
-                  className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-black"
+                  className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-black touch-manipulation"
                 />
                 <p className="text-xs text-gray-500 mt-2">Includes ground floor. Range: 0-50.</p>
               </div>
@@ -890,7 +1136,7 @@ function FloorsPageContent() {
                     type="checkbox"
                     checked={floorInitForm.includeBasements}
                     onChange={(e) => handleFloorInitChange('includeBasements', e.target.checked)}
-                    className="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                      className="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 touch-manipulation"
                   />
                 </div>
                 {floorInitForm.includeBasements && (
@@ -904,7 +1150,7 @@ function FloorsPageContent() {
                       max="10"
                       value={floorInitForm.basementCount}
                       onChange={(e) => handleFloorInitChange('basementCount', e.target.value)}
-                      className="w-full px-4 py-2.5 bg-white/90 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-black"
+                      className="w-full px-4 py-2.5 bg-white/90 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-black touch-manipulation"
                     />
                     <p className="text-xs text-gray-500 mt-2">Range: 0-10.</p>
                   </div>
@@ -913,12 +1159,12 @@ function FloorsPageContent() {
             </div>
           </div>
 
-          <div className="px-8 py-6 border-t border-gray-200/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 bg-gradient-to-br from-gray-50/60 to-transparent">
+          <div className="px-4 sm:px-8 py-4 sm:py-6 border-t border-gray-200/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 bg-gradient-to-br from-gray-50/60 to-transparent">
             <button
               type="button"
               onClick={() => setShowFloorInitModal(false)}
               disabled={initializingFloors}
-              className="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-gray-700 bg-white/70 backdrop-blur-sm border border-gray-300/50 rounded-xl hover:bg-white/90 hover:border-gray-400/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-gray-700 bg-white/70 backdrop-blur-sm border border-gray-300/50 rounded-xl hover:bg-white/90 active:bg-white active:border-gray-400/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               Cancel
             </button>
@@ -926,7 +1172,7 @@ function FloorsPageContent() {
               type="button"
               onClick={handleSubmitFloorInit}
               disabled={initializingFloors}
-              className="relative w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl hover:from-indigo-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40"
+              className="relative w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl hover:from-indigo-600 hover:to-blue-700 active:from-indigo-700 active:to-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 touch-manipulation"
             >
               {initializingFloors ? 'Creating Floors...' : 'Create Floors'}
             </button>

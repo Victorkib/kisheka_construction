@@ -663,18 +663,18 @@ function NewItemPageContent() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
         <LoadingOverlay isLoading={loading} message="Creating material entry..." fullScreen={false} />
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Link
             href="/items"
-            className="text-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation"
           >
             ← Back to Materials
           </Link>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Add New Material</h1>
-          <p className="text-gray-600 mt-2">Create a new material entry</p>
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
-            <p className="text-sm text-green-800 font-semibold mb-1">💡 When to use Materials vs Expenses:</p>
-            <ul className="text-sm text-green-700 list-disc list-inside space-y-1">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Add New Material</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-2">Create a new material entry</p>
+          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+            <p className="text-xs sm:text-sm text-green-800 font-semibold mb-1">💡 When to use Materials vs Expenses:</p>
+            <ul className="text-xs sm:text-sm text-green-700 list-disc list-inside space-y-1">
               <li><strong>Use Materials</strong> for physical items you purchase with quantities (e.g., cement, steel bars, tiles, paint, electrical wires, plumbing pipes)</li>
               <li><strong>Use Expenses</strong> for services, work performed, rentals, and operational costs (e.g., excavation, equipment rental, transport, utilities)</li>
               <li>Materials are deducted from your <strong>Materials Budget</strong></li>
@@ -875,7 +875,7 @@ function NewItemPageContent() {
 
         {/* Form - Only show for retroactive entries */}
         {entryType === 'retroactive_entry' && (
-          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 relative">
+          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-4 sm:p-6 relative">
             {changingStep && (
               <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-lg">
                 <LoadingSpinner size="md" color="blue-600" text="Loading step..." />
@@ -887,7 +887,7 @@ function NewItemPageContent() {
               <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
               
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Project <span className="text-red-500">*</span>
                 </label>
                 {projects.length > 0 ? (
@@ -897,7 +897,7 @@ function NewItemPageContent() {
                     onChange={handleChange}
                     required
                     disabled={loadingProjects || loading}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                   >
                     {loadingProjects ? (
                       <option>Loading projects...</option>
@@ -966,7 +966,7 @@ function NewItemPageContent() {
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Material Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -993,7 +993,7 @@ function NewItemPageContent() {
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Description
                 </label>
                 <textarea
@@ -1008,7 +1008,7 @@ function NewItemPageContent() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                     Category
                   </label>
                   <select
@@ -1032,7 +1032,7 @@ function NewItemPageContent() {
                         }));
                       }
                     }}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                     disabled={loadingCategories || loading}
                   >
                     {loadingCategories ? (
@@ -1060,7 +1060,7 @@ function NewItemPageContent() {
                 </div>
 
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                     Floor
                   </label>
                   {!formData.projectId ? (
@@ -1086,7 +1086,7 @@ function NewItemPageContent() {
                       value={formData.floor}
                       onChange={handleChange}
                       disabled={loadingFloors || loading || !formData.projectId}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                     >
                       {loadingFloors ? (
                         <option>Loading floors...</option>
@@ -1115,7 +1115,7 @@ function NewItemPageContent() {
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Construction Phase <span className="text-red-500">*</span>
                 </label>
                 {!formData.projectId ? (
@@ -1142,7 +1142,7 @@ function NewItemPageContent() {
                     onChange={handleChange}
                     disabled={loadingPhases || loading || !formData.projectId}
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                   >
                     {loadingPhases ? (
                       <option>Loading phases...</option>
@@ -1169,7 +1169,7 @@ function NewItemPageContent() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                     Quantity Purchased <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1197,7 +1197,7 @@ function NewItemPageContent() {
                 </div>
 
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                     Unit <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -1236,7 +1236,7 @@ function NewItemPageContent() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                     Unit Cost (KES) {entryType === 'retroactive_entry' ? '(Optional)' : <span className="text-red-500">*</span>}
                   </label>
                   <input
@@ -1269,7 +1269,7 @@ function NewItemPageContent() {
                 </div>
                 {entryType === 'retroactive_entry' && (
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                    <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                       Estimated Unit Cost (KES) <span className="text-gray-500">(Optional)</span>
                     </label>
                     <input
@@ -1288,7 +1288,7 @@ function NewItemPageContent() {
                 )}
 
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                     Total Cost (KES)
                   </label>
                   <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
@@ -1313,7 +1313,7 @@ function NewItemPageContent() {
               )}
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Supplier Name {entryType === 'retroactive_entry' ? '(Optional)' : <span className="text-red-500">*</span>}
                 </label>
                 <input
@@ -1331,7 +1331,7 @@ function NewItemPageContent() {
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Payment Method
                 </label>
                 <select
@@ -1349,7 +1349,7 @@ function NewItemPageContent() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                     Invoice Number
                   </label>
                   <input
@@ -1363,7 +1363,7 @@ function NewItemPageContent() {
                 </div>
 
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                     Invoice Date
                   </label>
                   <input
@@ -1377,7 +1377,7 @@ function NewItemPageContent() {
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Purchase Date
                 </label>
                 <div className="relative">
@@ -1419,7 +1419,7 @@ function NewItemPageContent() {
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Retroactive Entry Details</h3>
                   
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                    <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                       Original Purchase Date
                     </label>
                     <div className="relative">
@@ -1455,7 +1455,7 @@ function NewItemPageContent() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                      <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                         Documentation Status
                       </label>
                       <select
@@ -1471,7 +1471,7 @@ function NewItemPageContent() {
                     </div>
 
                     <div>
-                      <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                      <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                         Cost Status
                       </label>
                       <select
@@ -1489,7 +1489,7 @@ function NewItemPageContent() {
                   </div>
 
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                    <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                       Retroactive Notes
                     </label>
                     <textarea
@@ -1521,7 +1521,7 @@ function NewItemPageContent() {
                     {finishingType === 'electrical' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Brand <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1534,7 +1534,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Technician Name <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1547,7 +1547,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Installation Date
                           </label>
                           <div className="relative">
@@ -1584,7 +1584,7 @@ function NewItemPageContent() {
                     {finishingType === 'plumbing' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Brand <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1597,7 +1597,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Technician Name <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1610,7 +1610,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Installation Date
                           </label>
                           <div className="relative">
@@ -1647,7 +1647,7 @@ function NewItemPageContent() {
                     {finishingType === 'joinery' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Material Type <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1660,7 +1660,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Installation Team <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1673,7 +1673,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Installation Date <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1691,7 +1691,7 @@ function NewItemPageContent() {
                     {finishingType === 'paintwork' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Brand <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1704,7 +1704,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Colour <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1717,7 +1717,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Team Leader
                           </label>
                           <input
@@ -1735,7 +1735,7 @@ function NewItemPageContent() {
                     {finishingType === 'tiling' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Tile Type <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1748,7 +1748,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Square Meters Covered <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1763,7 +1763,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Supplier <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1782,7 +1782,7 @@ function NewItemPageContent() {
                     {finishingType === 'lift' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Contract Number <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1795,7 +1795,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Payment Schedule <span className="text-red-500">*</span>
                           </label>
                           <textarea
@@ -1808,7 +1808,7 @@ function NewItemPageContent() {
                           />
                         </div>
                         <div>
-                          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                             Warranty Documents <span className="text-red-500">*</span>
                           </label>
                           <CloudinaryUploadWidget
@@ -1954,7 +1954,7 @@ function NewItemPageContent() {
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Notes (Optional)
                 </label>
                 <textarea
@@ -1970,13 +1970,13 @@ function NewItemPageContent() {
           )}
 
           {/* Navigation Buttons */}
-          <div className="mt-8 flex justify-between items-center">
-            <div>
+          <div className="mt-6 sm:mt-8 flex flex-col-reverse sm:flex-row justify-between items-stretch sm:items-center gap-3">
+            <div className="w-full sm:w-auto">
               {step > 1 && (
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+                  className="w-full sm:w-auto px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 flex items-center justify-center gap-2 transition-colors touch-manipulation"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -1985,7 +1985,7 @@ function NewItemPageContent() {
                 </button>
               )}
             </div>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
               {step < 5 ? (
                 <>
                   <LoadingButton
@@ -2002,7 +2002,7 @@ function NewItemPageContent() {
                     }}
                     isLoading={changingStep}
                     loadingText="Loading..."
-                    className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                    className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 flex items-center justify-center gap-2 transition-colors touch-manipulation"
                   >
                     Next
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2015,7 +2015,7 @@ function NewItemPageContent() {
                   <button
                     type="button"
                     onClick={() => setStep(4)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                    className="w-full sm:w-auto px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 text-sm transition-colors touch-manipulation"
                   >
                     Edit
                   </button>
@@ -2023,7 +2023,7 @@ function NewItemPageContent() {
                     type="submit"
                     isLoading={loading}
                     loadingText="Creating..."
-                    className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="w-full sm:w-auto px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors touch-manipulation"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />

@@ -646,22 +646,22 @@ function NewMaterialRequestPageContent() {
           fullScreen={false} 
         />
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Breadcrumbs 
             items={[
               { label: 'Material Requests', href: '/material-requests' },
               { label: 'Create Request', href: '/material-requests/new', current: true },
             ]}
           />
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create Material Request</h1>
-          <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Request materials needed for your project</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create Material Request</h1>
+          <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Request materials needed for your project</p>
         </div>
 
         {/* Financial Warning */}
         {formData.estimatedCost && availableCapital !== null && parseFloat(formData.estimatedCost) > availableCapital && (
           <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-6">
-            <p className="font-semibold">⚠️ Financial Warning</p>
-            <p className="text-sm mt-1">
+            <p className="font-semibold text-sm sm:text-base">⚠️ Financial Warning</p>
+            <p className="text-xs sm:text-sm mt-1">
               Estimated cost ({formatCurrency(parseFloat(formData.estimatedCost))}) exceeds available capital ({formatCurrency(availableCapital)}).
               This is just an estimate and will not block approval, but please review carefully.
             </p>
@@ -671,7 +671,7 @@ function NewMaterialRequestPageContent() {
         {/* Available Capital Display */}
         {formData.projectId && availableCapital !== null && canAccess('view_financing') && (
           <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-6">
-            <p className="text-sm">
+            <p className="text-xs sm:text-sm">
               <span className="font-semibold">Available Capital:</span> {formatCurrency(availableCapital)}
             </p>
           </div>
@@ -731,11 +731,11 @@ function NewMaterialRequestPageContent() {
         <WorkflowGuide projectId={formData.projectId} compact={true} />
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
-          <div className="space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Project Selection */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Project <span className="text-red-500">*</span>
                 <HelpIcon 
                   content="Select the project for which you're requesting materials. The project must have capital allocated. Budget is optional - spending will be tracked even without a budget set."
@@ -751,7 +751,7 @@ function NewMaterialRequestPageContent() {
                 onChange={handleChange}
                 required
                 disabled={loadingProjects || loading}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
               >
                 {loadingProjects ? (
                   <option>Loading projects...</option>
@@ -771,7 +771,7 @@ function NewMaterialRequestPageContent() {
             {/* Floor Selection (Optional) */}
             {formData.projectId && floors.length > 0 && (
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Floor (Optional)
                   <HelpIcon 
                     content="Select the specific floor if this material is for a particular floor. This helps with organization and tracking."
@@ -786,7 +786,7 @@ function NewMaterialRequestPageContent() {
                   value={formData.floorId}
                   onChange={handleChange}
                   disabled={loadingFloors || loadingApplicableFloors || loading || !formData.projectId}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                 >
                   {loadingFloors || loadingApplicableFloors ? (
                     <option>Loading floors...</option>
@@ -868,7 +868,7 @@ function NewMaterialRequestPageContent() {
             {/* Phase Selection (Required) */}
             {formData.projectId && (
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Construction Phase <span className="text-red-500">*</span>
                   <HelpIcon 
                     content="Select the construction phase for this material. This is required for phase-based budget tracking and financial management."
@@ -901,7 +901,7 @@ function NewMaterialRequestPageContent() {
                     value={formData.phaseId}
                     onChange={handleChange}
                     disabled={loadingPhases || loading || !formData.projectId}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                   >
                     {loadingPhases ? (
                       <option>Loading phases...</option>
@@ -922,7 +922,7 @@ function NewMaterialRequestPageContent() {
 
             {/* Category Selection (Optional) */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Category (Optional)
               </label>
               <select
@@ -930,7 +930,7 @@ function NewMaterialRequestPageContent() {
                 value={formData.categoryId}
                 onChange={handleChange}
                 disabled={loadingCategories || loading}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
               >
                 {loadingCategories ? (
                   <option>Loading categories...</option>
@@ -947,8 +947,8 @@ function NewMaterialRequestPageContent() {
               </select>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">Select From Material Library (Optional)</h3>
+            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4">
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2">Select From Material Library (Optional)</h3>
               <p className="text-xs text-gray-600 mb-3">
                 Use the library to prefill material name, unit, category, and estimated unit cost.
               </p>
@@ -960,7 +960,7 @@ function NewMaterialRequestPageContent() {
 
             {/* Material Name */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Material Name <span className="text-red-500">*</span>
                 <HelpIcon 
                   content="Enter the name of the material you need. Be specific and clear (e.g., 'Portland Cement Grade 42.5' instead of just 'Cement')."
@@ -979,13 +979,13 @@ function NewMaterialRequestPageContent() {
                 minLength={2}
                 placeholder="e.g., Cement, Steel Bars, etc."
                 disabled={loading}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Description (Optional)
               </label>
               <textarea
@@ -995,14 +995,14 @@ function NewMaterialRequestPageContent() {
                 rows={3}
                 placeholder="Additional details about the material..."
                 disabled={loading}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
               />
             </div>
 
             {/* Quantity and Unit */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Quantity Needed <span className="text-red-500">*</span>
                   <HelpIcon 
                     content="Enter the total quantity needed. This should match the unit you select (e.g., if unit is 'bags', enter number of bags)."
@@ -1021,11 +1021,11 @@ function NewMaterialRequestPageContent() {
                   min="0.01"
                   step="0.01"
                   placeholder="0.00"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Unit <span className="text-red-500">*</span>
                   <HelpIcon 
                     content="Select the unit of measurement. Choose from common units or select 'Others' to enter a custom unit name."
@@ -1056,7 +1056,7 @@ function NewMaterialRequestPageContent() {
                     onChange={handleChange}
                     required
                     placeholder="Enter custom unit name"
-                    className="w-full mt-2 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full mt-2 px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
                   />
                 )}
               </div>
@@ -1064,7 +1064,7 @@ function NewMaterialRequestPageContent() {
 
             {/* Urgency */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Urgency <span className="text-red-500">*</span>
                 <HelpIcon 
                   content="Select how urgent this material request is. High urgency requests are prioritized for approval and procurement."
@@ -1089,9 +1089,9 @@ function NewMaterialRequestPageContent() {
             </div>
 
             {/* Estimated Cost (Optional) */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Estimated Unit Cost (Optional)
                   <HelpIcon 
                     content="Enter the estimated cost per unit. The total estimated cost will be calculated automatically (Quantity × Unit Cost)."
@@ -1109,11 +1109,11 @@ function NewMaterialRequestPageContent() {
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                   Estimated Total Cost (Optional)
                   <HelpIcon 
                     content="Enter the total estimated cost. If you enter this, the unit cost will be calculated automatically (Total Cost ÷ Quantity)."
@@ -1131,7 +1131,7 @@ function NewMaterialRequestPageContent() {
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
                 />
               </div>
             </div>
@@ -1150,7 +1150,7 @@ function NewMaterialRequestPageContent() {
 
             {/* Reason */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Reason for Request (Optional)
                 <HelpIcon 
                   content="Explain why this material is needed. This helps approvers understand the context and make informed decisions."
@@ -1166,13 +1166,13 @@ function NewMaterialRequestPageContent() {
                 onChange={handleChange}
                 rows={3}
                 placeholder="Why is this material needed?"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Additional Notes (Optional)
                 <HelpIcon 
                   content="Add any additional information, specifications, or special requirements for this material request."
@@ -1188,15 +1188,15 @@ function NewMaterialRequestPageContent() {
                 onChange={handleChange}
                 rows={3}
                 placeholder="Any additional information..."
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
               />
             </div>
 
             {/* Submit Buttons */}
-            <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t border-gray-200">
               <Link
                 href="/material-requests"
-                className="px-6 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition"
+                className="w-full sm:w-auto px-6 py-2.5 border border-gray-300 hover:bg-gray-50 active:bg-gray-100 text-gray-700 font-medium rounded-lg transition-colors touch-manipulation text-center"
               >
                 Cancel
               </Link>
@@ -1204,7 +1204,7 @@ function NewMaterialRequestPageContent() {
                 type="submit"
                 isLoading={loading}
                 loadingText="Creating Request..."
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
+                className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium rounded-lg transition-colors touch-manipulation"
               >
                 Create Request
               </LoadingButton>

@@ -600,10 +600,10 @@ export default function FloorDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
             {error}
           </div>
-          <Link href="/floors" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/floors" className="text-blue-600 hover:text-blue-900 active:text-blue-800 underline text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Floors
           </Link>
         </div>
@@ -706,7 +706,7 @@ export default function FloorDetailPage() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumbs */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <Breadcrumbs
             items={[
               { label: 'Projects', href: '/projects' },
@@ -718,10 +718,10 @@ export default function FloorDetailPage() {
         </div>
 
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6 sm:mb-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-            <div className="flex-1">
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
                 {floor.name || (() => {
                   if (floor.floorNumber === undefined || floor.floorNumber === null) return 'N/A';
                   if (floor.floorNumber < 0) return `Basement ${Math.abs(floor.floorNumber)}`;
@@ -729,15 +729,15 @@ export default function FloorDetailPage() {
                   return `Floor ${floor.floorNumber}`;
                 })()}
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-sm sm:text-base text-gray-600 mt-1 break-words">
                 Floor Number: {floor.floorNumber !== undefined ? (
                   floor.floorNumber < 0 ? `Basement ${Math.abs(floor.floorNumber)} (${floor.floorNumber})` :
                   floor.floorNumber === 0 ? `Ground Floor (${floor.floorNumber})` :
                   `Floor ${floor.floorNumber} (${floor.floorNumber})`
                 ) : 'N/A'}
                 {project && (
-                  <span className="ml-4">
-                    • Project: <Link href={`/projects/${floor.projectId}`} className="text-blue-600 hover:underline">
+                  <span className="block sm:inline sm:ml-4 mt-1 sm:mt-0">
+                    • Project: <Link href={`/projects/${floor.projectId}`} className="text-blue-600 hover:text-blue-800 active:text-blue-900 underline transition-colors touch-manipulation">
                       {project.projectCode} - {project.projectName}
                     </Link>
                   </span>
@@ -745,7 +745,7 @@ export default function FloorDetailPage() {
               </p>
             </div>
             {canEdit && (
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
                 {editMode || hasUnsavedChanges ? (
                   <>
                     <button
@@ -755,29 +755,30 @@ export default function FloorDetailPage() {
                         setHasUnsavedChanges(false);
                         fetchFloor(); // Reset form
                       }}
-                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                      className="flex-1 sm:flex-none px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors text-sm font-medium touch-manipulation"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSave}
                       disabled={saving}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors shadow-md hover:shadow-lg"
+                      className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 transition-colors shadow-md hover:shadow-lg text-sm font-medium touch-manipulation"
                     >
                       {saving ? (
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center justify-center gap-2">
                           <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          Saving...
+                          <span className="hidden sm:inline">Saving...</span>
                         </span>
                       ) : (
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center justify-center gap-2">
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                           </svg>
-                          Save Changes
+                          <span className="hidden sm:inline">Save Changes</span>
+                          <span className="sm:hidden">Save</span>
                         </span>
                       )}
                     </button>
@@ -786,20 +787,21 @@ export default function FloorDetailPage() {
                   <>
                     <button
                       onClick={() => setEditMode(true)}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium touch-manipulation"
                     >
                       Edit Floor
                     </button>
                     <Link
                       href={`/floors/${floorId}/budget`}
-                      className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      className="flex-1 sm:flex-none px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 active:bg-purple-800 transition-colors text-sm font-medium text-center touch-manipulation"
                     >
-                      Manage Budget & Capital
+                      <span className="hidden sm:inline">Manage Budget & Capital</span>
+                      <span className="sm:hidden">Budget</span>
                     </Link>
                     {canDelete && (
                       <button
                         onClick={() => setShowDeleteModal(true)}
-                        className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        className="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors text-sm font-medium touch-manipulation"
                       >
                         Delete Floor
                       </button>
@@ -813,7 +815,7 @@ export default function FloorDetailPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
             {error}
           </div>
         )}
@@ -848,16 +850,17 @@ export default function FloorDetailPage() {
                 animation: slide-up 0.3s ease-out;
               }
             `}</style>
-            <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
+            <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 animate-slide-up">
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold px-6 py-4 rounded-xl shadow-2xl hover:shadow-3xl transition-all duration-200 transform hover:-translate-y-1 flex items-center gap-3 min-w-[180px] justify-center"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 text-white font-semibold px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-2xl hover:shadow-3xl transition-all duration-200 transform hover:-translate-y-1 active:translate-y-0 flex items-center gap-2 sm:gap-3 min-w-[140px] sm:min-w-[180px] justify-center text-sm sm:text-base touch-manipulation"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span>Save Changes</span>
+                <span className="hidden sm:inline">Save Changes</span>
+                <span className="sm:hidden">Save</span>
               </button>
             </div>
           </>
@@ -865,17 +868,17 @@ export default function FloorDetailPage() {
 
         {/* Edit Mode Form (shown when editMode is true) */}
         {editMode && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Edit Floor Information</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Edit Floor Information</h2>
             <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Status</label>
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Status</label>
                   <select
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
                   >
                     <option value="NOT_STARTED">Not Started</option>
                     <option value="IN_PROGRESS">In Progress</option>
@@ -883,7 +886,7 @@ export default function FloorDetailPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Total Budget (KES)</label>
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Total Budget (KES)</label>
                   <input
                     type="number"
                     name="totalBudget"
@@ -891,11 +894,11 @@ export default function FloorDetailPage() {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
                   />
                 </div>
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Actual Cost (KES)</label>
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Actual Cost (KES)</label>
                   <input
                     type="number"
                     name="actualCost"
@@ -903,38 +906,38 @@ export default function FloorDetailPage() {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
                   />
                 </div>
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Start Date</label>
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Start Date</label>
                   <input
                     type="date"
                     name="startDate"
                     value={formData.startDate}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
                   />
                 </div>
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Completion Date</label>
+                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Completion Date</label>
                   <input
                     type="date"
                     name="completionDate"
                     value={formData.completionDate}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Description</label>
+                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Description</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
                 />
               </div>
             </div>
@@ -944,8 +947,8 @@ export default function FloorDetailPage() {
 
         {/* Project Link */}
         {floor.projectId && project && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Related Project</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Related Project</h2>
             <div className="space-y-2">
               <p className="text-sm text-gray-600">
                 <span className="font-medium">Project Code:</span> {project.projectCode}

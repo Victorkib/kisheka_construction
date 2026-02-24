@@ -234,12 +234,12 @@ function LabourEntryDetailPageContent() {
   if (error || !entry) {
     return (
       <AppLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <p className="text-red-800 mb-4">{error || 'Labour entry not found'}</p>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6 text-center">
+            <p className="text-red-800 mb-4 text-sm sm:text-base">{error || 'Labour entry not found'}</p>
             <Link
               href="/labour/entries"
-              className="text-blue-600 hover:text-blue-800 font-medium"
+              className="text-blue-600 hover:text-blue-800 active:text-blue-900 font-medium text-sm sm:text-base transition-colors touch-manipulation"
             >
               ← Back to Entries
             </Link>
@@ -261,41 +261,41 @@ function LabourEntryDetailPageContent() {
 
   return (
     <AppLayout>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <LoadingOverlay
           isLoading={isDeleting}
           message="Deleting entry..."
           fullScreen
         />
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6 sm:mb-8">
           <Link
             href="/labour/entries"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 active:text-gray-950 mb-4 text-sm sm:text-base transition-colors touch-manipulation"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Entries
           </Link>
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Labour Entry Details</h1>
-              <p className="text-gray-600 mt-1">Entry Number: {entry.entryNumber || entry._id}</p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">Labour Entry Details</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">Entry Number: {entry.entryNumber || entry._id}</p>
               {entry.batchId && (
                 <Link
                   href={`/labour/batches/${entry.batchId}`}
-                  className="text-blue-600 hover:text-blue-800 text-sm mt-1 inline-flex items-center gap-1"
+                  className="text-blue-600 hover:text-blue-800 active:text-blue-900 text-xs sm:text-sm mt-1 inline-flex items-center gap-1 transition-colors touch-manipulation"
                 >
                   Part of Batch: {entry.batchNumber || entry.batchId} →
                 </Link>
               )}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
               {getStatusBadge(entry.status)}
               {canApprove && entry.status === 'pending_approval' && (
                 <button
                   onClick={handleApprove}
                   disabled={isApproving}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 disabled:opacity-50 text-sm font-medium transition-colors touch-manipulation"
                 >
                   <CheckCircle className="w-4 h-4" />
                   {isApproving ? 'Approving...' : 'Approve'}
@@ -304,7 +304,7 @@ function LabourEntryDetailPageContent() {
               {canEdit && entry.status === 'draft' && (
                 <Link
                   href={`/labour/entries/${entryId}/edit`}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-sm font-medium transition-colors touch-manipulation"
                 >
                   <Edit className="w-4 h-4" />
                   Edit
@@ -313,7 +313,7 @@ function LabourEntryDetailPageContent() {
               {canDelete && (entry.status === 'draft' || entry.status === 'rejected') && (
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 text-sm font-medium transition-colors touch-manipulation"
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete
@@ -324,13 +324,13 @@ function LabourEntryDetailPageContent() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <Clock className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium text-gray-700">Total Hours</span>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-gray-700">Total Hours</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">
               {entry.totalHours?.toFixed(1)} hrs
             </div>
             {finalOvertimeHours > 0 && (
@@ -339,12 +339,12 @@ function LabourEntryDetailPageContent() {
               </div>
             )}
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <DollarSign className="w-5 h-5 text-green-600" />
-              <span className="text-sm font-medium text-gray-700">Total Cost</span>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
+              <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-gray-700">Total Cost</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">
               {entry.totalCost?.toLocaleString()} KES
             </div>
             {finalOvertimeHours > 0 && (
@@ -353,22 +353,22 @@ function LabourEntryDetailPageContent() {
               </div>
             )}
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <User className="w-5 h-5 text-purple-600" />
-              <span className="text-sm font-medium text-gray-700">Hourly Rate</span>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2">
+              <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+              <span className="text-xs sm:text-sm font-medium text-gray-700">Hourly Rate</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-xl sm:text-2xl font-bold text-gray-900">
               {entry.hourlyRate?.toLocaleString()} KES/hr
             </div>
           </div>
         </div>
 
         {/* Main Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
           {/* Worker Information */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Worker Information</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Worker Information</h2>
             <div className="space-y-3">
               <div>
                 <label className="text-sm font-medium text-gray-500">Worker Name</label>
@@ -409,8 +409,8 @@ function LabourEntryDetailPageContent() {
           </div>
 
           {/* Project Information */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Project Information</h2>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Project Information</h2>
             <div className="space-y-3">
               {project && (
                 <div>
@@ -480,17 +480,17 @@ function LabourEntryDetailPageContent() {
 
         {/* Additional Details */}
         {entry.taskDescription && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Task Description</h2>
-            <p className="text-gray-700">{entry.taskDescription}</p>
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Task Description</h2>
+            <p className="text-sm sm:text-base text-gray-700 break-words">{entry.taskDescription}</p>
           </div>
         )}
 
         {/* Professional Service Details */}
         {entry.workerType === 'professional' && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Professional Service Details</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Professional Service Details</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {entry.serviceType && (
                 <div>
                   <label className="text-sm font-medium text-gray-500">Service Type</label>
@@ -518,8 +518,8 @@ function LabourEntryDetailPageContent() {
         )}
 
         {/* Cost Breakdown */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Cost Breakdown</h2>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Cost Breakdown</h2>
           <div className="space-y-2">
             <div className="flex justify-between py-2 border-b">
               <span className="text-gray-600 text-gray-900">Regular Hours ({finalRegularHours.toFixed(1)} hrs)</span>

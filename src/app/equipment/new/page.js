@@ -331,12 +331,12 @@ function NewEquipmentPageContent() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
-      <div className="mb-6">
-        <Link href="/equipment" className="text-blue-600 hover:text-blue-800 mb-4 inline-block font-medium">
+      <div className="mb-6 sm:mb-8">
+        <Link href="/equipment" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block font-medium text-sm sm:text-base transition-colors touch-manipulation">
           ← Back to Equipment
         </Link>
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">New Equipment Assignment</h1>
-        <p className="text-gray-600 mt-1">Create a new equipment assignment for a phase</p>
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">New Equipment Assignment</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Create a new equipment assignment for a phase</p>
       </div>
 
       {/* Information Card */}
@@ -354,7 +354,7 @@ function NewEquipmentPageContent() {
               <h3 className="text-base sm:text-lg font-bold text-gray-900">Creating an Equipment Assignment</h3>
               <button
                 onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-white/80 hover:bg-white border border-green-300 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 bg-white/80 hover:bg-white active:bg-white border border-green-300 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 touch-manipulation"
                 aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                 aria-expanded={isInfoExpanded}
               >
@@ -390,23 +390,23 @@ function NewEquipmentPageContent() {
       </div>
 
       {/* Form */}
-      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+      <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8">
         {error && (
-          <div className="bg-red-50 border-2 border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 font-medium">
+          <div className="bg-red-50 border-2 border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 font-medium text-sm sm:text-base">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           {/* Project & Phase Selection Section */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-100">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
               Project & Phase Selection
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               {/* Project Selection */}
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
@@ -427,7 +427,7 @@ function NewEquipmentPageContent() {
                     onChange={handleChange}
                     required
                     disabled={loadingProjects}
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium touch-manipulation"
                   >
                     <option value="" className="text-gray-500">Select Project</option>
                     {projects.map((project) => (
@@ -467,7 +467,7 @@ function NewEquipmentPageContent() {
                       onChange={handleChange}
                       required
                       disabled={loadingPhases || !formData.projectId}
-                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium touch-manipulation"
                     >
                       <option value="" className="text-gray-500">Select Phase</option>
                       {phases.map((phase) => (
@@ -501,7 +501,7 @@ function NewEquipmentPageContent() {
                   }));
                 }}
                 required
-                className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
               >
                 <option value="phase_specific">Phase-Specific (DCC)</option>
                 <option value="site_wide">Site-Wide (Indirect Cost)</option>
@@ -515,16 +515,16 @@ function NewEquipmentPageContent() {
           </div>
 
           {/* Equipment Details Section */}
-          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               Equipment Details
             </h2>
             
             {/* Equipment Name */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Equipment Name <span className="text-red-600">*</span>
               </label>
@@ -536,12 +536,12 @@ function NewEquipmentPageContent() {
                 required
                 minLength={2}
                 placeholder="e.g., Excavator CAT 320"
-                className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium touch-manipulation"
               />
             </div>
 
             {/* Equipment Type and Acquisition Type */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Equipment Type <span className="text-red-600">*</span>
@@ -584,16 +584,16 @@ function NewEquipmentPageContent() {
           </div>
 
           {/* Supplier & Dates Section */}
-          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Supplier & Duration
             </h2>
 
             {/* Supplier Selection */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Supplier
               </label>
@@ -621,7 +621,7 @@ function NewEquipmentPageContent() {
             </div>
 
             {/* Start and End Dates */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Start Date
@@ -631,7 +631,7 @@ function NewEquipmentPageContent() {
                   name="startDate"
                   value={formData.startDate}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                 />
               </div>
 
@@ -644,23 +644,23 @@ function NewEquipmentPageContent() {
                   name="endDate"
                   value={formData.endDate}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                 />
               </div>
             </div>
           </div>
 
           {/* Costs & Hours Section */}
-          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Costs & Hours
             </h2>
 
             {/* Daily Rate and Estimated Hours */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Daily Rate <span className="text-gray-500 text-xs">(Optional)</span>
@@ -692,23 +692,23 @@ function NewEquipmentPageContent() {
                   placeholder="0"
                   step="0.5"
                   min="0"
-                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium touch-manipulation"
                 />
               </div>
             </div>
           </div>
 
           {/* Additional Info Section */}
-          <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200">
+            <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Additional Information
             </h2>
 
             {/* Status */}
-            <div className="mb-6">
+            <div className="mb-4 sm:mb-6">
               <label className="block text-sm font-semibold text-gray-900 mb-2">
                 Status <span className="text-red-600">*</span>
               </label>
@@ -736,16 +736,16 @@ function NewEquipmentPageContent() {
                 onChange={handleChange}
                 placeholder="Add any additional notes or specifications..."
                 rows={4}
-                className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium resize-none"
+                className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium resize-none touch-manipulation"
               />
             </div>
           </div>
 
           {/* Form Actions */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
             <Link 
               href="/equipment"
-              className="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 font-bold rounded-lg transition-all duration-200 text-center"
+              className="flex-1 px-6 py-2.5 bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-900 font-bold rounded-lg transition-colors duration-200 text-center touch-manipulation"
             >
               Cancel
             </Link>
@@ -753,7 +753,7 @@ function NewEquipmentPageContent() {
               type="submit"
               disabled={saving || loadingProjects}
               loading={saving}
-              className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               Create Equipment
             </LoadingButton>

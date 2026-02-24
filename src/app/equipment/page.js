@@ -179,14 +179,14 @@ function EquipmentPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Equipment</h1>
-            <p className="text-gray-600 mt-1">Manage equipment assignments and tracking</p>
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Equipment</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">Manage equipment assignments and tracking</p>
           </div>
           <Link
             href={`/equipment/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}`}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -213,7 +213,7 @@ function EquipmentPageContent() {
                 </h3>
                 <button
                   onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                  className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-white/80 hover:bg-white border border-green-300 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 bg-white/80 hover:bg-white active:bg-white border border-green-300 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 touch-manipulation"
                   aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                   aria-expanded={isInfoExpanded}
                 >
@@ -283,8 +283,8 @@ function EquipmentPageContent() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-2">Project</label>
               <select
@@ -350,13 +350,13 @@ function EquipmentPageContent() {
                 ))}
               </select>
             </div>
-            <div className="flex items-end">
+            <div className="flex items-end sm:col-span-2 lg:col-span-1">
               <button
                 onClick={() => {
                   setFilters({ projectId: '', phaseId: '', status: '', equipmentType: '', acquisitionType: '', search: '' });
                   router.push('/equipment', { scroll: false });
                 }}
-                className="w-full px-4 py-2.5 border-2 border-gray-300 hover:bg-gray-50 hover:border-gray-400 text-gray-900 font-semibold rounded-lg transition-all duration-200"
+                className="w-full px-4 py-2.5 border-2 border-gray-300 hover:bg-gray-50 active:bg-gray-100 hover:border-gray-400 text-gray-900 font-semibold rounded-lg transition-all duration-200 touch-manipulation"
               >
                 Clear Filters
               </button>
@@ -376,15 +376,17 @@ function EquipmentPageContent() {
             <p className="text-gray-500 mb-4">No equipment found</p>
             <Link
               href={`/equipment/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}`}
-              className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-block px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation font-medium"
             >
               Add First Equipment
             </Link>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gradient-to-br from-gray-50 to-gray-100">
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
@@ -476,31 +478,147 @@ function EquipmentPageContent() {
               </table>
             </div>
 
-            {/* Pagination */}
-            {pagination.pages > 1 && (
-              <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
-                  Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} equipment
+              {/* Desktop Pagination */}
+              {pagination.pages > 1 && (
+                <div className="bg-gray-50 px-4 sm:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div className="text-sm text-gray-700 text-center sm:text-left">
+                    Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} equipment
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                      disabled={pagination.page === 1}
+                      className="px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-900 font-semibold hover:bg-gray-50 active:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 touch-manipulation"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2 text-sm text-gray-700 font-medium flex items-center">
+                      Page {pagination.page} of {pagination.pages}
+                    </span>
+                    <button
+                      onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
+                      disabled={pagination.page === pagination.pages}
+                      className="px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-900 font-semibold hover:bg-gray-50 active:bg-gray-100 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 touch-manipulation"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
-                    disabled={pagination.page === 1}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-900 font-semibold hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                  >
-                    Previous
-                  </button>
-                  <button
-                    onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
-                    disabled={pagination.page === pagination.pages}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-900 font-semibold hover:bg-gray-50 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
-                  >
-                    Next
-                  </button>
+              )}
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {equipment.map((eq) => (
+                <div
+                  key={eq._id}
+                  className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                >
+                  {/* Header Row */}
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1 min-w-0">
+                      <Link
+                        href={`/equipment/${eq._id}`}
+                        className="text-base font-semibold text-blue-600 hover:text-blue-800 block truncate"
+                      >
+                        {eq.equipmentName}
+                      </Link>
+                      <p className="text-sm text-gray-600 mt-0.5">
+                        {eq.equipmentType?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Other'}
+                      </p>
+                    </div>
+                    <span className={`px-2 py-1 text-xs font-bold rounded-full flex-shrink-0 ml-2 ${getStatusColor(eq.status)}`}>
+                      {eq.status?.replace('_', ' ').toUpperCase() || 'UNKNOWN'}
+                    </span>
+                  </div>
+
+                  {/* Details Grid */}
+                  <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-200">
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">Acquisition</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {eq.acquisitionType?.replace(/\b\w/g, l => l.toUpperCase()) || 'N/A'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">Phase</p>
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {eq.phaseName || 'N/A'}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">Total Cost</p>
+                      <p className="text-sm font-bold text-gray-900">
+                        {formatCurrency(eq.totalCost || 0)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500 mb-0.5">Utilization</p>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-gray-900">
+                          {eq.utilization?.utilizationPercentage?.toFixed(1) || 0}%
+                        </span>
+                        <div className="flex-1 max-w-16 bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                            style={{
+                              width: `${Math.min(100, eq.utilization?.utilizationPercentage || 0)}%`
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Period */}
+                  <div className="mb-3 pb-3 border-b border-gray-200">
+                    <p className="text-xs text-gray-500 mb-0.5">Period</p>
+                    <p className="text-sm text-gray-700">
+                      {formatDate(eq.startDate)} - {eq.endDate ? formatDate(eq.endDate) : <span className="text-blue-600 font-semibold">Ongoing</span>}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="pt-3">
+                    <Link
+                      href={`/equipment/${eq._id}`}
+                      className="block text-center px-4 py-2.5 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation"
+                    >
+                      View Details →
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              ))}
+
+              {/* Mobile Pagination */}
+              {pagination.pages > 1 && (
+                <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                  <div className="text-sm text-gray-700 text-center mb-3">
+                    Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} equipment
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                      disabled={pagination.page === 1}
+                      className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold transition-all duration-200 touch-manipulation"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2.5 text-sm text-gray-700 font-medium">
+                      {pagination.page} / {pagination.pages}
+                    </span>
+                    <button
+                      onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
+                      disabled={pagination.page === pagination.pages}
+                      className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold transition-all duration-200 touch-manipulation"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </AppLayout>

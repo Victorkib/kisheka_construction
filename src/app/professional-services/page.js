@@ -259,23 +259,23 @@ function ProfessionalServicesPageContent() {
           fullScreen
         />
         {/* Header */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Left Section: Heading and Description */}
-          <div className="flex-1">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
               Assignments
             </h1>
-            <p className="text-gray-600 mt-2">
+            <p className="text-sm sm:text-base text-gray-600 mt-2">
               Manage architect and engineer assignments to projects
             </p>
         </div>
 
         {/* Right Section: Action Buttons */}
-        <div className="flex flex-row items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             {canAccess('assign_professional_service') && (
               <Link
                 href="/professional-services-library"
-                className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors whitespace-nowrap"
+                className="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 active:bg-gray-800 transition-colors touch-manipulation text-sm sm:text-base"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path 
@@ -292,9 +292,9 @@ function ProfessionalServicesPageContent() {
             {canAccess('assign_professional_service') && (
               <Link
                 href="/professional-services/new"
-                className={`inline-flex items-center px-4 py-2 rounded-lg transition-all whitespace-nowrap ${
+                className={`inline-flex items-center justify-center px-4 sm:px-6 py-2.5 rounded-lg transition-all touch-manipulation text-sm sm:text-base ${
                   canCreateAssignment
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                    ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
                 }`}
                 onClick={(e) => {
@@ -350,8 +350,8 @@ function ProfessionalServicesPageContent() {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Project Filter */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -360,7 +360,7 @@ function ProfessionalServicesPageContent() {
               <select
                 value={filters.projectId}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black touch-manipulation"
               >
                 <option value="">All Projects</option>
                 {projects.map((project) => (
@@ -379,7 +379,7 @@ function ProfessionalServicesPageContent() {
               <select
                 value={filters.type}
                 onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black touch-manipulation"
               >
                 <option value="">All Types</option>
                 <option value="architect">Architects</option>
@@ -395,7 +395,7 @@ function ProfessionalServicesPageContent() {
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black touch-manipulation"
               >
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
@@ -406,7 +406,7 @@ function ProfessionalServicesPageContent() {
             </div>
 
             {/* Search */}
-            <div className="md:col-span-2">
+            <div className="sm:col-span-2 lg:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Search
               </label>
@@ -415,7 +415,7 @@ function ProfessionalServicesPageContent() {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search by professional name..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black touch-manipulation"
               />
             </div>
           </div>
@@ -447,9 +447,9 @@ function ProfessionalServicesPageContent() {
               <div className="mt-6">
                 <Link
                   href="/professional-services/new"
-                  className={`inline-flex items-center px-4 py-2 rounded-lg transition-all ${
+                  className={`inline-flex items-center justify-center px-4 sm:px-6 py-2.5 rounded-lg transition-all touch-manipulation text-sm sm:text-base ${
                     canCreateAssignment
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg'
                       : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
                   }`}
                   onClick={(e) => {
@@ -473,9 +473,11 @@ function ProfessionalServicesPageContent() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -593,21 +595,21 @@ function ProfessionalServicesPageContent() {
               </table>
             </div>
 
-            {/* Pagination */}
+            {/* Desktop Pagination */}
             {pagination.pages > 1 && (
               <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                     disabled={pagination.page === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 transition-colors touch-manipulation"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                     disabled={pagination.page === pagination.pages}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 transition-colors touch-manipulation"
                   >
                     Next
                   </button>
@@ -627,7 +629,7 @@ function ProfessionalServicesPageContent() {
                       <button
                         onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                         disabled={pagination.page === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 transition-colors touch-manipulation"
                       >
                         Previous
                       </button>
@@ -642,10 +644,10 @@ function ProfessionalServicesPageContent() {
                             <button
                               key={page}
                               onClick={() => setPagination(prev => ({ ...prev, page }))}
-                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                              className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors touch-manipulation ${
                                 page === pagination.page
                                   ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 active:bg-gray-100'
                               }`}
                             >
                               {page}
@@ -659,7 +661,7 @@ function ProfessionalServicesPageContent() {
                       <button
                         onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                         disabled={pagination.page === pagination.pages}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 transition-colors touch-manipulation"
                       >
                         Next
                       </button>
@@ -668,7 +670,171 @@ function ProfessionalServicesPageContent() {
                 </div>
               </div>
             )}
-          </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {assignments.map((assignment) => {
+                const assignmentId = normalizeId(assignment._id);
+                return (
+                  <div
+                    key={assignmentId || assignment._id}
+                    className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                  >
+                    {/* Header Row */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-semibold text-gray-900 truncate">
+                          {assignment.library?.name || 'N/A'}
+                        </h3>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeBadgeColor(assignment.type)}`}>
+                            {getTypeLabel(assignment.type)}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {assignment.professionalCode}
+                          </span>
+                        </div>
+                      </div>
+                      <span className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ml-2 ${getStatusBadgeColor(assignment.status)}`}>
+                        {assignment.status?.charAt(0).toUpperCase() + assignment.status?.slice(1) || 'N/A'}
+                      </span>
+                    </div>
+
+                    {/* Project Info */}
+                    <div className="mb-3 pb-3 border-b border-gray-200">
+                      <p className="text-xs text-gray-500 mb-0.5">Project</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {assignment.project?.projectName || 'N/A'}
+                      </p>
+                      {assignment.project?.projectCode && (
+                        <p className="text-xs text-gray-600 mt-0.5">
+                          {assignment.project.projectCode}
+                        </p>
+                      )}
+                      {assignment.phase && (
+                        <p className="text-xs text-gray-500 mt-1">
+                          Phase: {assignment.phase.phaseName}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Contract Details */}
+                    <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-200">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Contract Type</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {assignment.contractType?.replace('_', ' ') || 'N/A'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Contract Value</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {formatCurrency(assignment.contractValue)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Financials */}
+                    <div className="grid grid-cols-3 gap-2 mb-3 pb-3 border-b border-gray-200">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Total</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {formatCurrency(assignment.totalFees)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Paid</p>
+                        <p className="text-sm font-semibold text-green-600">
+                          {formatCurrency(assignment.feesPaid)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Pending</p>
+                        <p className="text-sm font-semibold text-red-600">
+                          {formatCurrency(assignment.feesPending)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Statistics */}
+                    <div className="mb-3 pb-3 border-b border-gray-200">
+                      <p className="text-xs text-gray-500 mb-1">Statistics</p>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="text-xs text-gray-700">
+                          Activities: <strong>{assignment.totalActivities || 0}</strong>
+                        </span>
+                        {assignment.type === 'architect' && (
+                          <span className="text-xs text-gray-700">
+                            Visits: <strong>{assignment.totalSiteVisits || 0}</strong>
+                          </span>
+                        )}
+                        {assignment.type === 'engineer' && (
+                          <span className="text-xs text-gray-700">
+                            Inspections: <strong>{assignment.totalInspections || 0}</strong>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-2 pt-3">
+                      <Link
+                        href={`/professional-services/${assignmentId}`}
+                        className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                      >
+                        View
+                      </Link>
+                      {canAccess('edit_professional_service_assignment') && (
+                        <Link
+                          href={`/professional-services/${assignmentId}/edit`}
+                          className="flex-1 px-3 py-2 bg-indigo-50 text-indigo-600 text-sm font-semibold rounded-lg hover:bg-indigo-100 active:bg-indigo-200 transition-colors touch-manipulation text-center"
+                        >
+                          Edit
+                        </Link>
+                      )}
+                      {canAccess('terminate_professional_service') && assignment.status === 'active' && (
+                        <button
+                          onClick={() => handleTerminate(assignmentId, assignment.library?.name)}
+                          className="flex-1 px-3 py-2 bg-red-50 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-100 active:bg-red-200 transition-colors touch-manipulation"
+                        >
+                          Terminate
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Mobile Pagination */}
+              {pagination.pages > 1 && (
+                <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                  <div className="text-sm text-gray-700 text-center mb-3">
+                    Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
+                      disabled={pagination.page === 1}
+                      className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold transition-all duration-200 touch-manipulation"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2.5 text-sm text-gray-700 font-medium">
+                      {pagination.page} / {pagination.pages}
+                    </span>
+                    <button
+                      onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
+                      disabled={pagination.page === pagination.pages}
+                      className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold transition-all duration-200 touch-manipulation"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
         )}
 
         {/* Terminate Confirmation Modal */}

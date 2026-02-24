@@ -192,25 +192,25 @@ function NewPhasePageContent() {
   return (
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6">
-          <Link href="/phases" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+        <div className="mb-6 sm:mb-8">
+          <Link href="/phases" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Phases
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Create New Phase</h1>
-          <p className="text-gray-600 mt-1">Add a new construction phase to track progress and budget</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Create New Phase</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Add a new construction phase to track progress and budget</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6 text-sm sm:text-base">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Basic Information */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Project <span className="text-red-500">*</span>
@@ -220,7 +220,7 @@ function NewPhasePageContent() {
                   value={formData.projectId}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 >
                   <option value="">Select Project</option>
                   {projects.map((project) => (
@@ -241,7 +241,7 @@ function NewPhasePageContent() {
                   value={formData.phaseName}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                   placeholder="e.g., Basement/Substructure"
                 />
               </div>
@@ -255,7 +255,7 @@ function NewPhasePageContent() {
                   name="phaseCode"
                   value={formData.phaseCode}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                   placeholder="e.g., PHASE-01 (auto-generated if empty)"
                 />
               </div>
@@ -269,7 +269,7 @@ function NewPhasePageContent() {
                   value={formData.phaseType}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 >
                   {phaseTypes.map((type) => (
                     <option key={type.value} value={type.value}>
@@ -290,7 +290,7 @@ function NewPhasePageContent() {
                   onChange={handleChange}
                   required
                   min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                   placeholder="0"
                 />
                 <p className="text-xs text-gray-500 mt-1">Order of execution (0 = first, 1 = second, etc.)</p>
@@ -304,7 +304,7 @@ function NewPhasePageContent() {
                   name="applicableFloors"
                   value={formData.applicableFloors}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 >
                   <option value="all">All Floors</option>
                   <option value="basement">Basement Only</option>
@@ -314,7 +314,7 @@ function NewPhasePageContent() {
               </div>
             </div>
 
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Description
               </label>
@@ -323,7 +323,7 @@ function NewPhasePageContent() {
                 value={formData.description}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 placeholder="Describe this phase..."
               />
             </div>
@@ -331,8 +331,8 @@ function NewPhasePageContent() {
 
           {/* Budget Allocation */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget Allocation</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Budget Allocation</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Total Budget
@@ -344,7 +344,7 @@ function NewPhasePageContent() {
                   onChange={handleChange}
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 />
               </div>
               <div>
@@ -358,7 +358,7 @@ function NewPhasePageContent() {
                   onChange={handleChange}
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 />
               </div>
               <div>
@@ -372,7 +372,7 @@ function NewPhasePageContent() {
                   onChange={handleChange}
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 />
               </div>
               <div>
@@ -386,7 +386,7 @@ function NewPhasePageContent() {
                   onChange={handleChange}
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 />
               </div>
               <div>
@@ -400,7 +400,7 @@ function NewPhasePageContent() {
                   onChange={handleChange}
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 />
               </div>
               <div>
@@ -414,7 +414,7 @@ function NewPhasePageContent() {
                   onChange={handleChange}
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 />
               </div>
             </div>
@@ -422,8 +422,8 @@ function NewPhasePageContent() {
 
           {/* Dates */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Timeline</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Timeline</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Start Date
@@ -433,7 +433,7 @@ function NewPhasePageContent() {
                   name="startDate"
                   value={formData.startDate}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 />
               </div>
               <div>
@@ -445,7 +445,7 @@ function NewPhasePageContent() {
                   name="plannedEndDate"
                   value={formData.plannedEndDate}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                 />
               </div>
             </div>
@@ -453,13 +453,13 @@ function NewPhasePageContent() {
 
           {/* Template Option */}
           <div>
-            <label className="flex items-center">
+            <label className="flex items-center gap-2 touch-manipulation cursor-pointer">
               <input
                 type="checkbox"
                 name="useTemplate"
                 checked={formData.useTemplate}
                 onChange={handleChange}
-                className="mr-2"
+                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
               <span className="text-sm font-medium text-gray-700">Use Phase Template</span>
             </label>
@@ -468,7 +468,7 @@ function NewPhasePageContent() {
                 name="templateName"
                 value={formData.templateName}
                 onChange={handleChange}
-                className="mt-2 w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="mt-2 w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
               >
                 <option value="">Select Template</option>
                 {templates.map((template) => (
@@ -481,17 +481,17 @@ function NewPhasePageContent() {
           </div>
 
           {/* Submit Buttons */}
-          <div className="flex justify-end gap-4 pt-4 border-t">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t">
             <Link
               href="/phases"
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="w-full sm:w-auto px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors text-center touch-manipulation"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               {submitting ? 'Creating...' : 'Create Phase'}
             </button>
@@ -515,6 +515,3 @@ export default function NewPhasePage() {
     </Suspense>
   );
 }
-
-
-

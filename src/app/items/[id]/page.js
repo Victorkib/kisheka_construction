@@ -606,10 +606,10 @@ export default function ItemDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Link href="/items" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href="/items" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Materials
           </Link>
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm sm:text-base">
             {error || 'Material not found'}
           </div>
         </div>
@@ -636,28 +636,28 @@ export default function ItemDetailPage() {
           fullScreen={false} 
         />
         {/* Header */}
-        <div className="mb-6">
-          <Link href="/items" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+        <div className="mb-6 sm:mb-8">
+          <Link href="/items" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Materials
           </Link>
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
                   {material.name || material.materialName}
                 </h1>
                 {material.deletedAt && <ArchiveBadge />}
               </div>
-              <div className="mt-2 flex items-center gap-4 flex-wrap">
+              <div className="mt-2 flex flex-wrap items-center gap-2 sm:gap-4">
                 <span
-                  className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusBadgeColor(
+                  className={`inline-flex px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${getStatusBadgeColor(
                     material.status
                   )}`}
                 >
                   {material.status?.replace('_', ' ').toUpperCase() || 'DRAFT'}
                 </span>
                 {material.entryType && (
-                  <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
+                  <span className={`inline-flex px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${
                     material.entryType === 'new_procurement'
                       ? 'bg-blue-100 text-blue-800'
                       : material.entryType === 'retroactive_entry'
@@ -672,14 +672,14 @@ export default function ItemDetailPage() {
                   </span>
                 )}
                 {material.category && (
-                  <span className="text-sm text-gray-600">Category: {material.category}</span>
+                  <span className="text-xs sm:text-sm text-gray-600">Category: {material.category}</span>
                 )}
                 {/* Show links to purchase order or material request */}
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                   {material.purchaseOrderId && (
                     <Link
                       href={`/purchase-orders/${material.purchaseOrderId}`}
-                      className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                      className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 active:text-blue-900 font-medium transition-colors touch-manipulation"
                     >
                       📦 View Purchase Order
                     </Link>
@@ -687,7 +687,7 @@ export default function ItemDetailPage() {
                   {material.materialRequestId && (
                     <Link
                       href={`/material-requests/${material.materialRequestId}`}
-                      className="text-sm text-green-600 hover:text-green-800 font-medium"
+                      className="text-xs sm:text-sm text-green-600 hover:text-green-800 active:text-green-900 font-medium transition-colors touch-manipulation"
                     >
                       📋 View Material Request
                     </Link>
@@ -695,11 +695,11 @@ export default function ItemDetailPage() {
                 </div>
               </div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
               {canEdit && (
                 <Link
                   href={`/items/${materialId}/edit`}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium text-center touch-manipulation"
                 >
                   Edit
                 </Link>
@@ -709,7 +709,7 @@ export default function ItemDetailPage() {
                   onClick={handleSubmitClick}
                   isLoading={isApproving}
                   loadingText="Submitting..."
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 active:bg-purple-800 disabled:opacity-50 text-sm font-medium touch-manipulation"
                 >
                   Submit for Approval
                 </LoadingButton>
@@ -720,7 +720,7 @@ export default function ItemDetailPage() {
                     onClick={handleApproveClick}
                     isLoading={isApproving}
                     loadingText="Processing..."
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 disabled:opacity-50 text-sm font-medium touch-manipulation"
                   >
                     Approve
                   </LoadingButton>
@@ -728,7 +728,7 @@ export default function ItemDetailPage() {
                     onClick={handleRejectClick}
                     isLoading={isApproving}
                     loadingText="Processing..."
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 disabled:opacity-50 text-sm font-medium touch-manipulation"
                   >
                     Reject
                   </LoadingButton>
@@ -739,7 +739,7 @@ export default function ItemDetailPage() {
                   onClick={handleVerifyReceiptClick}
                   isLoading={isVerifyingReceipt}
                   loadingText="Verifying..."
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 active:bg-purple-800 disabled:opacity-50 text-sm font-medium touch-manipulation"
                 >
                   Verify Receipt
                 </LoadingButton>
@@ -748,13 +748,13 @@ export default function ItemDetailPage() {
                 <>
                   <button
                     onClick={handleArchiveClick}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 active:bg-gray-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Archive
                   </button>
                   <button
                     onClick={handleDeleteClick}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Delete
                   </button>
@@ -765,14 +765,14 @@ export default function ItemDetailPage() {
                   <button
                     onClick={handleRestoreClick}
                     disabled={isRestoring}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors disabled:opacity-50 text-sm font-medium touch-manipulation"
                   >
                     {isRestoring ? 'Restoring...' : 'Restore'}
                   </button>
                   <button
                     onClick={handleDeleteClick}
                     disabled={isDeleting}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 text-sm font-medium touch-manipulation"
                   >
                     {isDeleting ? 'Deleting...' : 'Delete Permanently'}
                   </button>
@@ -783,8 +783,8 @@ export default function ItemDetailPage() {
         </div>
 
         {/* Material Lifecycle Status */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl md:text-2xl font-semibold mb-4 leading-tight">Material Lifecycle</h2>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 leading-tight">Material Lifecycle</h2>
           <div className="flex items-center justify-between overflow-x-auto pb-4">
             {[
               { status: 'draft', label: 'Draft', color: 'bg-gray-200', textColor: 'text-gray-700' },
@@ -878,33 +878,35 @@ export default function ItemDetailPage() {
         {material && material.quantityDelivered > 0 && discrepancy && 
           userRole !== 'clerk' && userRole !== 'site_clerk' && (
           <div className={`bg-white rounded-lg shadow mb-6 border-2 ${hasDiscrepancyIssues ? getSeverityColor(discrepancy.severity) : 'border-gray-200'}`}>
-            <div className="p-6">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h2 className="text-xl font-semibold text-gray-900">Discrepancy Analysis</h2>
-                  <p className="text-sm text-gray-600 mt-1">
+            <div className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Discrepancy Analysis</h2>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-1">
                     Material variance, loss, and wastage tracking
                   </p>
                 </div>
-                {hasDiscrepancyIssues && (
-                  <span className={`px-4 py-2 rounded-full text-sm font-semibold ${getSeverityColor(discrepancy.severity)}`}>
-                    {discrepancy.severity} SEVERITY
-                  </span>
-                )}
-                {material.projectId && (
-                  <Link
-                    href={`/dashboard/analytics/wastage?projectId=${material.projectId}`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
-                  >
-                    View Full Analytics →
-                  </Link>
-                )}
+                <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                  {hasDiscrepancyIssues && (
+                    <span className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-semibold ${getSeverityColor(discrepancy.severity)}`}>
+                      {discrepancy.severity} SEVERITY
+                    </span>
+                  )}
+                  {material.projectId && (
+                    <Link
+                      href={`/dashboard/analytics/wastage?projectId=${material.projectId}`}
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-xs sm:text-sm font-medium transition-colors touch-manipulation"
+                    >
+                      View Full Analytics →
+                    </Link>
+                  )}
+                </div>
               </div>
 
               {hasDiscrepancyIssues ? (
                 <div className="space-y-4">
                   {/* Alert Indicators */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {discrepancy.alerts.variance && (
                       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-2">
@@ -978,8 +980,8 @@ export default function ItemDetailPage() {
 
               {/* Detailed Metrics */}
               <div className="mt-4 pt-4 border-t border-gray-200">
-                <h3 className="text-base font-semibold text-gray-700 mb-3 leading-normal">Detailed Metrics</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                <h3 className="text-sm sm:text-base font-semibold text-gray-700 mb-3 leading-normal">Detailed Metrics</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                   <div>
                     <dt className="text-sm font-semibold text-gray-700 leading-normal">Variance</dt>
                     <dd className="mt-1 text-sm font-semibold text-gray-900">
@@ -1020,8 +1022,8 @@ export default function ItemDetailPage() {
 
         {/* Tabs */}
         <div className="bg-white rounded-lg shadow mb-6">
-          <div className="border-b border-gray-200">
-            <nav className="flex -mb-px">
+          <div className="border-b border-gray-200 overflow-x-auto">
+            <nav className="flex -mb-px min-w-max sm:min-w-0">
               {['overview', 'discrepancy', 'approval', 'activity']
               .filter(tab => {
                 // Hide discrepancy tab for clerk
@@ -1034,10 +1036,10 @@ export default function ItemDetailPage() {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-                  className={`px-6 py-3 text-sm font-medium border-b-2 ${
+                  className={`px-3 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap touch-manipulation ${
                     activeTab === tab
                       ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 active:text-gray-900'
                   }`}
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -1046,7 +1048,7 @@ export default function ItemDetailPage() {
             </nav>
           </div>
 
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             {/* Overview Tab */}
             {activeTab === 'overview' && (
               <div className="space-y-6">

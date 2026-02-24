@@ -69,21 +69,21 @@ export function QuickActions({ pendingApprovals = 0 }) {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Quick Actions</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         {actions.map((action, idx) => (
           <Link
             key={idx}
             href={action.href}
-            className={`relative group bg-gradient-to-br ${action.color} p-6 rounded-lg text-white hover:shadow-xl transition-all transform hover:scale-105`}
+            className={`relative group bg-gradient-to-br ${action.color} p-4 sm:p-6 rounded-lg text-white hover:shadow-xl active:shadow-2xl transition-all transform hover:scale-105 active:scale-95 touch-manipulation min-h-[120px] sm:min-h-[140px] flex items-center justify-center`}
           >
-            <div className="flex flex-col items-center text-center">
-              <span className="text-4xl mb-2">{action.icon}</span>
-              <h3 className="font-semibold text-white mb-1">{action.title}</h3>
-              <p className="text-xs text-white/90">{action.description}</p>
+            <div className="flex flex-col items-center text-center w-full">
+              <span className="text-3xl sm:text-4xl mb-2">{action.icon}</span>
+              <h3 className="font-semibold text-white mb-1 text-sm sm:text-base">{action.title}</h3>
+              <p className="text-xs text-white/90 leading-tight">{action.description}</p>
               {action.badge && action.badge > 0 && (
-                <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
+                <span className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center">
                   {action.badge}
                 </span>
               )}

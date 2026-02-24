@@ -156,22 +156,22 @@ export default function SupervisorDashboard() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Supervisor Dashboard</h1>
-          <p className="text-gray-600 mt-2">Welcome back, {user.firstName || user.email}!</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">Supervisor Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-2">Welcome back, {user.firstName || user.email}!</p>
         </div>
 
         {/* Overview Cards */}
         {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-base font-semibold text-gray-700 mb-2 leading-normal">Total Projects</h2>
-              <p className="text-3xl font-bold text-blue-600">{summary.totalProjects || 0}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Total Projects</h2>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600">{summary.totalProjects || 0}</p>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-base font-semibold text-gray-700 mb-2 leading-normal">Total Cost</h2>
-              <p className="text-3xl font-bold text-green-600">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Total Cost</h2>
+              <p className="text-2xl sm:text-3xl font-bold text-green-600 break-words">
                 {new Intl.NumberFormat('en-KE', {
                   style: 'currency',
                   currency: 'KES',
@@ -179,16 +179,16 @@ export default function SupervisorDashboard() {
                   maximumFractionDigits: 0,
                 }).format(summary.totalOverallCost || 0)}
               </p>
-              <p className="text-sm text-gray-700 mt-1 leading-normal">
+              <p className="text-xs sm:text-sm text-gray-700 mt-1 leading-normal break-words">
                 Materials: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(summary.totalMaterialsCost || 0)} | 
                 Expenses: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(summary.totalExpensesCost || 0)} | 
                 Labour: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(summary.totalLabourCost || 0)}
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-base font-semibold text-gray-700 mb-2 leading-normal">Approved Materials</h2>
-              <p className="text-3xl font-bold text-purple-600">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Approved Materials</h2>
+              <p className="text-2xl sm:text-3xl font-bold text-purple-600 break-words">
                 {summary.totalMaterialsCost ? 
                   new Intl.NumberFormat('en-KE', {
                     style: 'currency',
@@ -199,9 +199,9 @@ export default function SupervisorDashboard() {
             </div>
 
             {summary.capital && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-base font-semibold text-gray-700 mb-2 leading-normal">Capital Used</h2>
-                <p className="text-3xl font-bold text-orange-600">
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Capital Used</h2>
+                <p className="text-2xl sm:text-3xl font-bold text-orange-600 break-words">
                   {new Intl.NumberFormat('en-KE', {
                     style: 'currency',
                     currency: 'KES',
@@ -215,48 +215,48 @@ export default function SupervisorDashboard() {
         )}
 
         {/* View & Verify Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">View & Verify</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6 sm:mb-8">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">View & Verify</h2>
+          <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
             As a supervisor, you can view materials, expenses, and projects for verification purposes.
             Labour log approval functionality will be available in Phase 3.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <Link
               href="/items"
-              className="p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+              className="p-3 sm:p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 active:border-blue-600 hover:bg-blue-50 active:bg-blue-100 transition-colors touch-manipulation"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">📦</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Materials</h3>
-                  <p className="text-sm text-gray-600">View all materials</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="text-xl sm:text-2xl flex-shrink-0">📦</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Materials</h3>
+                  <p className="text-xs sm:text-sm text-gray-600">View all materials</p>
                 </div>
               </div>
             </Link>
 
             <Link
               href="/expenses"
-              className="p-4 border-2 border-red-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition"
+              className="p-3 sm:p-4 border-2 border-red-200 rounded-lg hover:border-red-500 active:border-red-600 hover:bg-red-50 active:bg-red-100 transition-colors touch-manipulation"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">💸</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Expenses</h3>
-                  <p className="text-sm text-gray-600">View all expenses</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="text-xl sm:text-2xl flex-shrink-0">💸</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Expenses</h3>
+                  <p className="text-xs sm:text-sm text-gray-600">View all expenses</p>
                 </div>
               </div>
             </Link>
 
             <Link
               href="/projects"
-              className="p-4 border-2 border-indigo-200 rounded-lg hover:border-indigo-500 hover:bg-indigo-50 transition"
+              className="p-3 sm:p-4 border-2 border-indigo-200 rounded-lg hover:border-indigo-500 active:border-indigo-600 hover:bg-indigo-50 active:bg-indigo-100 transition-colors touch-manipulation"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">🏗️</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Projects</h3>
-                  <p className="text-sm text-gray-600">View project details</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="text-xl sm:text-2xl flex-shrink-0">🏗️</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Projects</h3>
+                  <p className="text-xs sm:text-sm text-gray-600">View project details</p>
                 </div>
               </div>
             </Link>
@@ -264,9 +264,9 @@ export default function SupervisorDashboard() {
         </div>
 
         {/* Information Section */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-md font-semibold text-blue-900 mb-2">ℹ️ Supervisor Role Information</h3>
-          <ul className="text-sm text-blue-800 space-y-1">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
+          <h3 className="text-sm sm:text-base font-semibold text-blue-900 mb-2">ℹ️ Supervisor Role Information</h3>
+          <ul className="text-xs sm:text-sm text-blue-800 space-y-1">
             <li>• You have view-only access to materials, expenses, and projects</li>
             <li>• You cannot create, edit, delete, or approve materials/expenses</li>
             <li>• Labour log approval functionality will be available in Phase 3</li>

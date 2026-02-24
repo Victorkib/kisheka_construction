@@ -429,10 +429,10 @@ export default function PhaseDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || 'Phase not found'}
           </div>
-          <Link href="/phases" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href="/phases" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Phases
           </Link>
         </div>
@@ -501,7 +501,7 @@ export default function PhaseDetailPage() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumbs */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <Breadcrumbs
             items={[
               { label: 'Projects', href: '/projects' },
@@ -513,39 +513,39 @@ export default function PhaseDetailPage() {
         </div>
 
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-6 sm:mb-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-            <div className="flex-1">
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{phase.phaseName}</h1>
-              <p className="text-gray-600 mt-1">{phase.description || 'No description'}</p>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">{phase.phaseName}</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1 break-words">{phase.description || 'No description'}</p>
               {project && (
                 <Link 
                   href={`/projects/${project._id}`}
-                  className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block"
+                  className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 active:text-blue-900 mt-2 inline-block transition-colors touch-manipulation"
                 >
                   Project: {project.projectName} →
                 </Link>
               )}
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
               {/* Refresh button - available to all users */}
               <button
                 onClick={handleRefresh}
                 disabled={refreshing || loading}
-                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+                className="flex-1 sm:flex-none bg-gray-500 text-white px-4 py-2.5 rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm font-medium touch-manipulation"
                 title="Refresh phase data and financial information"
               >
                 {refreshing ? (
                   <>
                     <LoadingSpinner size="sm" />
-                    Refreshing...
+                    <span className="hidden sm:inline">Refreshing...</span>
                   </>
                 ) : (
                   <>
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    Refresh
+                    <span className="hidden sm:inline">Refresh</span>
                   </>
                 )}
               </button>
@@ -553,7 +553,7 @@ export default function PhaseDetailPage() {
                 <>
                   <Link
                     href={`/phases/${params.id}/dashboard`}
-                    className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+                    className="flex-1 sm:flex-none bg-gray-600 text-white px-4 py-2.5 rounded-lg hover:bg-gray-700 active:bg-gray-800 transition-colors text-sm font-medium text-center touch-manipulation"
                   >
                     Dashboard
                   </Link>
@@ -561,7 +561,7 @@ export default function PhaseDetailPage() {
                     <button
                       onClick={handleAutoAdvance}
                       disabled={autoAdvancing}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                      className="flex-1 sm:flex-none bg-green-600 text-white px-4 py-2.5 rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors disabled:opacity-50 text-sm font-medium touch-manipulation"
                       title={autoAdvanceStatus.reason}
                     >
                       {autoAdvancing ? 'Auto-Advancing...' : 'Auto-Advance'}
@@ -569,7 +569,7 @@ export default function PhaseDetailPage() {
                   )}
                   <button
                     onClick={() => setShowEditModal(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Edit Phase
                   </button>
@@ -593,26 +593,27 @@ export default function PhaseDetailPage() {
 
         {/* Edit Modal */}
         {showEditModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-              <div className="p-6">
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-4 sm:p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-bold text-gray-900">Edit Phase</h2>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900">Edit Phase</h2>
                   <button
                     onClick={() => setShowEditModal(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600 active:text-gray-800 w-8 h-8 flex items-center justify-center touch-manipulation"
+                    aria-label="Close"
                   >
                     ✕
                   </button>
                 </div>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm sm:text-base">
                     {error}
                   </div>
                 )}
 
-                <form onSubmit={handleEditSubmit} className="space-y-4">
+                <form onSubmit={handleEditSubmit} className="space-y-4 sm:space-y-6">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Phase Name <span className="text-red-500">*</span>
@@ -623,7 +624,7 @@ export default function PhaseDetailPage() {
                       value={formData.phaseName}
                       onChange={handleFormChange}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                     />
                   </div>
 
@@ -636,7 +637,7 @@ export default function PhaseDetailPage() {
                       name="phaseCode"
                       value={formData.phaseCode}
                       onChange={handleFormChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                     />
                   </div>
 
@@ -649,11 +650,11 @@ export default function PhaseDetailPage() {
                       value={formData.description}
                       onChange={handleFormChange}
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         Start Date
@@ -663,7 +664,7 @@ export default function PhaseDetailPage() {
                         name="startDate"
                         value={formData.startDate}
                         onChange={handleFormChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                       />
                     </div>
 
@@ -676,7 +677,7 @@ export default function PhaseDetailPage() {
                         name="plannedEndDate"
                         value={formData.plannedEndDate}
                         onChange={handleFormChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                       />
                     </div>
                   </div>
@@ -691,23 +692,23 @@ export default function PhaseDetailPage() {
                         name="actualEndDate"
                         value={formData.actualEndDate}
                         onChange={handleFormChange}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                       />
                     </div>
                   )}
 
-                  <div className="flex justify-end gap-4 pt-4 border-t">
+                  <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t">
                     <button
                       type="button"
                       onClick={() => setShowEditModal(false)}
-                      className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                      className="w-full sm:w-auto px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors text-sm font-medium touch-manipulation"
                     >
                       Cancel
                     </button>
                     <LoadingButton
                       type="submit"
                       loading={saving}
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                      className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium touch-manipulation"
                     >
                       Save Changes
                     </LoadingButton>

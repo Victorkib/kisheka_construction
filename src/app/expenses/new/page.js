@@ -339,18 +339,18 @@ function NewExpensePageContent() {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
         <LoadingOverlay isLoading={loading} message="Creating expense..." fullScreen={false} />
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Link
             href="/expenses"
-            className="text-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation"
           >
             ← Back to Expenses
           </Link>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Add New Expense</h1>
-          <p className="text-gray-600 mt-2">Create a new expense entry</p>
-          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800 font-semibold mb-1">💡 When to use Expenses vs Materials:</p>
-            <ul className="text-sm text-blue-700 list-disc list-inside space-y-1">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Add New Expense</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-2">Create a new expense entry</p>
+          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
+            <p className="text-xs sm:text-sm text-blue-800 font-semibold mb-1">💡 When to use Expenses vs Materials:</p>
+            <ul className="text-xs sm:text-sm text-blue-700 list-disc list-inside space-y-1">
               <li><strong>Use Expenses</strong> for services, work performed, rentals, and operational costs (e.g., excavation, equipment rental, transport, utilities)</li>
               <li><strong>Use Materials</strong> for physical items you purchase with quantities (e.g., cement, steel, tiles, paint)</li>
               <li>Expenses are deducted from your <strong>Contingency Budget</strong></li>
@@ -366,7 +366,7 @@ function NewExpensePageContent() {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Project Selection */}
           <div>
             <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
@@ -394,9 +394,9 @@ function NewExpensePageContent() {
           </div>
 
           {/* Amount and Category */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Amount <span className="text-red-500">*</span>
               </label>
               <div className="flex">
@@ -404,7 +404,7 @@ function NewExpensePageContent() {
                   name="currency"
                   value={formData.currency}
                   onChange={handleChange}
-                  className="px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                  className="px-3 py-2.5 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50 touch-manipulation"
                 >
                   <option value="KES">KES</option>
                   <option value="USD">USD</option>
@@ -419,7 +419,7 @@ function NewExpensePageContent() {
                   min="0"
                   step="0.01"
                   required
-                  className={`flex-1 px-3 py-2 bg-white text-gray-900 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 ${
+                  className={`flex-1 px-3 py-2.5 bg-white text-gray-900 border rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation ${
                     budgetInfo?.exceeded ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
                   }`}
                 />
@@ -504,7 +504,7 @@ function NewExpensePageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Category <span className="text-red-500">*</span>
               </label>
               <select
@@ -512,7 +512,7 @@ function NewExpensePageContent() {
                 value={formData.category}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
               >
                 <option value="">Select category</option>
                 {expenseCategories.map((cat) => (
@@ -605,9 +605,9 @@ function NewExpensePageContent() {
           </div>
 
           {/* Vendor and Date */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Vendor <span className="text-red-500">*</span>
               </label>
               <input
@@ -617,12 +617,12 @@ function NewExpensePageContent() {
                 onChange={handleChange}
                 placeholder="Vendor name"
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
               />
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Date <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -632,7 +632,7 @@ function NewExpensePageContent() {
                   value={formData.date}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer"
+                  className="w-full px-3 pr-12 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer touch-manipulation"
                 />
                 <button
                   type="button"
@@ -644,7 +644,7 @@ function NewExpensePageContent() {
                       input.focus();
                     }
                   }}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 active:bg-gray-100 rounded-r-lg transition-colors touch-manipulation min-h-[44px]"
                   aria-label="Open date picker"
                   tabIndex={-1}
                 >
@@ -657,16 +657,16 @@ function NewExpensePageContent() {
           </div>
 
           {/* Payment Method and Reference */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Payment Method
               </label>
               <select
                 name="paymentMethod"
                 value={formData.paymentMethod}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
               >
                 {paymentMethods.map((method) => (
                   <option key={method.value} value={method.value}>
@@ -677,7 +677,7 @@ function NewExpensePageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
                 Reference Number
               </label>
               <input
@@ -686,13 +686,13 @@ function NewExpensePageContent() {
                 value={formData.referenceNumber}
                 onChange={handleChange}
                 placeholder="Payment reference (optional)"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
               />
             </div>
           </div>
 
           {/* Indirect Cost Options */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4">
             <div className="flex items-start gap-3 mb-3">
               <input
                 type="checkbox"
@@ -700,13 +700,13 @@ function NewExpensePageContent() {
                 name="isIndirectCost"
                 checked={formData.isIndirectCost}
                 onChange={handleChange}
-                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="mt-1 w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 touch-manipulation flex-shrink-0"
               />
-              <div className="flex-1">
-                <label htmlFor="isIndirectCost" className="block text-base font-semibold text-gray-700 mb-1">
+              <div className="flex-1 min-w-0">
+                <label htmlFor="isIndirectCost" className="block text-sm sm:text-base font-semibold text-gray-700 mb-1">
                   This is an Indirect Cost
                 </label>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs sm:text-sm text-gray-600">
                   Indirect costs (utilities, transport, site overhead, safety) are charged to the project-level indirect costs budget, not the phase budget. They are still linked to a phase for timeline tracking.
                 </p>
               </div>
@@ -722,7 +722,7 @@ function NewExpensePageContent() {
                   value={formData.indirectCostCategory}
                   onChange={handleChange}
                   required={formData.isIndirectCost}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
                 >
                   <option value="">Select category</option>
                   <option value="utilities">Utilities</option>
@@ -764,10 +764,10 @@ function NewExpensePageContent() {
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end gap-4 pt-4 border-t">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t">
             <Link
               href="/expenses"
-              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+              className="w-full sm:w-auto px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation text-center"
             >
               Cancel
             </Link>
@@ -775,7 +775,7 @@ function NewExpensePageContent() {
               type="submit"
               isLoading={loading}
               loadingText="Creating..."
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              className="w-full sm:w-auto px-6 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
             >
               Create Expense
             </LoadingButton>

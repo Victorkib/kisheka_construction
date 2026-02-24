@@ -114,8 +114,8 @@ function PhasesSection({ projectId, canEdit }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Construction Phases</h2>
+      <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Construction Phases</h2>
         <p className="text-sm text-gray-500">Loading phases...</p>
       </div>
     );
@@ -123,8 +123,8 @@ function PhasesSection({ projectId, canEdit }) {
 
   if (error && phases.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Construction Phases</h2>
+      <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Construction Phases</h2>
         <p className="text-sm text-red-600">{error}</p>
         {canEdit && (
           <button
@@ -147,7 +147,7 @@ function PhasesSection({ projectId, canEdit }) {
               }
             }}
             disabled={initializing}
-            className="mt-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            className="mt-4 w-full sm:w-auto bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-medium transition-colors touch-manipulation"
           >
             {initializing ? 'Initializing...' : 'Initialize Default Phases'}
           </button>
@@ -157,10 +157,10 @@ function PhasesSection({ projectId, canEdit }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Construction Phases</h2>
-        <div className="flex gap-2">
+    <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-2 mb-4">
+        <h2 className="text-base sm:text-lg font-semibold text-gray-900">Construction Phases</h2>
+        <div className="flex flex-wrap gap-2">
           <Link
             href={`/phases?projectId=${projectId}`}
             className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -208,7 +208,7 @@ function PhasesSection({ projectId, canEdit }) {
                 }
               }}
               disabled={initializing}
-              className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-medium transition-colors touch-manipulation"
             >
               {initializing ? 'Initializing...' : 'Initialize Default Phases'}
             </button>
@@ -231,9 +231,9 @@ function PhasesSection({ projectId, canEdit }) {
             const allocationPercentage = projectTotal > 0 ? (totalPhaseBudgets / projectTotal) * 100 : 0;
             
             return (
-              <div className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-700 mb-3">Phase Budget Summary</h3>
-                <div className="grid grid-cols-4 gap-4">
+              <div className="bg-gray-50 rounded-lg p-3 sm:p-4 mb-4 border border-gray-200">
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-3">Phase Budget Summary</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   <div>
                     <p className="text-xs text-gray-600 mb-1">Project Budget</p>
                     <p className="text-sm font-semibold text-gray-900">{formatCurrency(projectTotal)}</p>
@@ -291,7 +291,7 @@ function PhasesSection({ projectId, canEdit }) {
                       </span>
                       <span className="text-xs text-gray-500">{phase.phaseCode}</span>
                     </div>
-                    <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-sm">
                       <div>
                         <p className="text-gray-600">Budget</p>
                         <p className="font-semibold text-gray-900">{formatCurrency(financialSummary.budgetTotal)}</p>
@@ -1831,10 +1831,10 @@ export default function ProjectDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
             {error}
           </div>
-          <Link href="/projects" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/projects" className="text-blue-600 hover:text-blue-900 active:text-blue-800 underline text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Projects
           </Link>
         </div>
@@ -1909,7 +1909,7 @@ export default function ProjectDetailPage() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
         {/* Breadcrumbs */}
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <Breadcrumbs 
             items={[
               { label: 'Projects', href: '/projects' },
@@ -1919,11 +1919,11 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* Header Band */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-            <div className="flex-1">
-              <div className="flex items-center gap-3 flex-wrap mb-2">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap mb-2">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
                   {project.projectName}
                 </h1>
                 {project.status === 'archived' && <ArchiveBadge />}
@@ -1953,12 +1953,12 @@ export default function ProjectDetailPage() {
                   );
                 })()}
               </div>
-              <p className="text-gray-600 mt-1">
+              <p className="text-sm sm:text-base text-gray-600 mt-1 break-words">
                 {project.projectCode} {project.location && `• ${project.location}`}
                 {project.client && ` • ${project.client}`}
               </p>
               {(project.startDate || project.plannedEndDate) && (
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-xs sm:text-sm text-gray-500 mt-1">
                   {project.startDate && formatDate(project.startDate)}
                   {project.startDate && project.plannedEndDate && ' - '}
                   {project.plannedEndDate && formatDate(project.plannedEndDate)}
@@ -1967,30 +1967,30 @@ export default function ProjectDetailPage() {
             </div>
             
             {/* Actions */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
               {canEdit && project.status !== 'archived' && (
                 <>
                   <button
                     onClick={handleEditClick}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Edit Project
                   </button>
                   <Link
                     href={`/projects/${projectId}/costs`}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors text-sm font-medium text-center touch-manipulation"
                   >
                     Cost Management
                   </Link>
                   <Link
                     href={`/projects/${projectId}/budget`}
-                    className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition text-sm font-medium"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 active:bg-blue-300 transition-colors text-sm font-medium text-center touch-manipulation"
                   >
                     Budget Management
                   </Link>
                   <Link
                     href={`/projects/${projectId}/finances`}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors text-sm font-medium text-center touch-manipulation"
                   >
                     Financial Overview
                   </Link>
@@ -2000,13 +2000,13 @@ export default function ProjectDetailPage() {
                 <>
                   <button
                     onClick={handleArchiveClick}
-                    className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition text-sm font-medium"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 active:bg-gray-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Archive
                   </button>
                   <button
                     onClick={handleDeleteClick}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition text-sm font-medium"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Delete
                   </button>
@@ -2017,14 +2017,14 @@ export default function ProjectDetailPage() {
                   <button
                     onClick={handleRestoreClick}
                     disabled={restoring}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:opacity-50 text-sm font-medium"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium touch-manipulation"
                   >
                     {restoring ? 'Restoring...' : 'Restore'}
                   </button>
                   <button
                     onClick={handleDeleteClick}
                     disabled={deleting}
-                    className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50 text-sm font-medium"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium touch-manipulation"
                   >
                     {deleting ? 'Deleting...' : 'Delete Permanently'}
                   </button>
@@ -2036,13 +2036,13 @@ export default function ProjectDetailPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
             {error}
           </div>
         )}
 
         {/* Core KPIs */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
           <CoreKPICard
             title="Budget"
             primaryValue={formatCurrency(budgetTotal)}
@@ -2089,7 +2089,7 @@ export default function ProjectDetailPage() {
         </div>
 
         {/* Domain Tiles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6">
           <DomainTile
             icon="🏗️"
             title="Phases"
@@ -2188,9 +2188,9 @@ export default function ProjectDetailPage() {
         {/* Setup & Administration (moved to bottom) */}
         <div className="space-y-6 mt-8">
           {/* Project Information (compact) */}
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Project Information</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Project Information</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-600">Project Code</p>
                 <p className="text-base font-medium text-gray-900 mt-1">{project.projectCode}</p>
@@ -2206,9 +2206,9 @@ export default function ProjectDetailPage() {
                 </span>
               </div>
               {project.description && (
-                <div className="md:col-span-2">
+                <div className="sm:col-span-2">
                   <p className="text-sm text-gray-600">Description</p>
-                  <p className="text-base text-gray-900 mt-1">{project.description}</p>
+                  <p className="text-sm sm:text-base text-gray-900 mt-1 break-words">{project.description}</p>
                 </div>
               )}
             </div>
@@ -2233,10 +2233,10 @@ export default function ProjectDetailPage() {
 
           {/* Floors Setup (if no floors) */}
           {!floorsLoading && floors.length === 0 && (
-            <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-lg font-semibold text-gray-900">Floors</h2>
+            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200">
+              <div className="flex flex-col sm:flex-row items-start sm:justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-base sm:text-lg font-semibold text-gray-900">Floors</h2>
                   <p className="text-sm text-gray-600 mt-1">
                     No floors have been created for this project yet.
                   </p>
@@ -2245,7 +2245,7 @@ export default function ProjectDetailPage() {
                   <button
                     onClick={handleInitializeFloors}
                     disabled={initializingFloors}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg text-sm font-medium"
+                    className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors touch-manipulation"
                   >
                     {initializingFloors ? 'Creating Floors...' : 'Auto-create Floors'}
                   </button>
@@ -2277,7 +2277,7 @@ export default function ProjectDetailPage() {
       >
         <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="block text-base font-bold text-gray-900 mb-2 leading-tight">
                   Project Name <span className="text-red-600 font-bold">*</span>

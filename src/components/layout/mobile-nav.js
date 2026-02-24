@@ -164,6 +164,57 @@ export function MobileNav({ isOpen, onClose }) {
     }
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Handle keyboard navigation (ESC to close)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
+  // Trap focus within drawer when open
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const drawer = document.querySelector('[role="dialog"][aria-label="Navigation menu"]');
+    if (!drawer) return;
+
+    const focusableElements = drawer.querySelectorAll(
+      'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    const handleTabKey = (e) => {
+      if (e.key !== 'Tab') return;
+
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+
+    drawer.addEventListener('keydown', handleTabKey);
+    firstElement?.focus();
+
+    return () => {
+      drawer.removeEventListener('keydown', handleTabKey);
+    };
+  }, [isOpen]);
+
   const handleLogout = async () => {
     try {
       // Clear client-side caches
@@ -228,35 +279,39 @@ export function MobileNav({ isOpen, onClose }) {
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity duration-300"
           onClick={onClose}
+          onTouchStart={onClose}
           aria-hidden="true"
         />
       )}
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-lg z-50 transform transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 left-0 h-full h-[100dvh] w-64 sm:w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-out lg:hidden ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation menu"
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full safe-area-inset">
           {/* Header */}
-          <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+          <div className="p-4 sm:p-5 border-b border-gray-200 flex items-center justify-between flex-shrink-0 bg-white">
             <Link
               href="/dashboard"
-              className="text-xl font-bold text-blue-600"
+              className="text-lg sm:text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
               onClick={onClose}
             >
               Doshaki
             </Link>
             <button
               onClick={onClose}
-              className="p-2 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-700"
+              className="p-2 sm:p-2.5 rounded-md hover:bg-gray-100 active:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               aria-label="Close menu"
             >
               <svg
-                className="w-6 h-6"
+                className="w-6 h-6 sm:w-7 sm:h-7"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -272,7 +327,7 @@ export function MobileNav({ isOpen, onClose }) {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4">
+          <nav className="flex-1 overflow-y-auto overflow-x-hidden p-3 sm:p-4 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
             <div className="space-y-1">
               {navigationWithBadges.map((item, index) => {
                 const isActive =
@@ -285,16 +340,17 @@ export function MobileNav({ isOpen, onClose }) {
                     key={uniqueKey}
                     href={item.href}
                     onClick={onClose}
-                    className={`flex items-center px-3 py-2 text-base font-medium rounded-lg transition-colors ${
+                    className={`flex items-center px-3 sm:px-4 py-3 sm:py-3.5 text-base sm:text-base font-medium rounded-lg transition-all duration-200 touch-manipulation min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                       isActive
-                        ? 'bg-blue-50 text-blue-700'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-blue-50 text-blue-700 shadow-sm'
+                        : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
                     }`}
+                    aria-current={isActive ? 'page' : undefined}
                   >
                     {item.icon && (
-                      <Icon name={item.icon} className="w-5 h-5 mr-3" />
+                      <Icon name={item.icon} className="w-5 h-5 sm:w-6 sm:h-6 mr-3 flex-shrink-0" />
                     )}
-                    <span className="flex-1">{item.label}</span>
+                    <span className="flex-1 truncate">{item.label}</span>
                     {item.badge && <Badge count={item.badge} />}
                   </Link>
                 );
@@ -303,21 +359,25 @@ export function MobileNav({ isOpen, onClose }) {
           </nav>
 
           {/* User Info & Logout */}
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 sm:p-5 border-t border-gray-200 bg-white flex-shrink-0">
             {user && (
-              <div className="mb-4 text-sm">
-                <p className="font-medium text-gray-900">
+              <div className="mb-4 pb-4 border-b border-gray-200">
+                <p className="font-medium text-gray-900 text-sm sm:text-base truncate">
                   {user.firstName || user.email}
                 </p>
-                <p className="text-gray-500 capitalize">
+                <p className="text-gray-500 capitalize text-xs sm:text-sm mt-0.5">
                   {user.role || 'User'}
                 </p>
               </div>
             )}
             <button
               onClick={handleLogout}
-              className="w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              className="w-full text-left px-3 sm:px-4 py-3 sm:py-3.5 text-base sm:text-base font-medium text-red-600 hover:bg-red-50 active:bg-red-100 rounded-lg transition-colors touch-manipulation min-h-[44px] flex items-center gap-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              aria-label="Logout from account"
             >
+              <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
               Logout
             </button>
           </div>

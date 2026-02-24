@@ -241,12 +241,12 @@ function NewWorkItemPageContent() {
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-6">
-          <Link href="/work-items" className="text-blue-600 hover:text-blue-800 mb-4 inline-block font-medium">
+        <div className="mb-6 sm:mb-8">
+          <Link href="/work-items" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block font-medium text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Work Items
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">New Work Item</h1>
-          <p className="text-gray-600 mt-1">Create a new work item for a phase</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">New Work Item</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Create a new work item for a phase</p>
         </div>
 
         {/* Information Card */}
@@ -264,7 +264,7 @@ function NewWorkItemPageContent() {
                 <h3 className="text-base sm:text-lg font-bold text-gray-900">Creating a Work Item</h3>
                 <button
                   onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                  className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-white/80 hover:bg-white border border-blue-300 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 bg-white/80 hover:bg-white active:bg-white border border-blue-300 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 touch-manipulation"
                   aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                   aria-expanded={isInfoExpanded}
                 >
@@ -300,34 +300,34 @@ function NewWorkItemPageContent() {
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 lg:p-8">
           {error && (
-            <div className="bg-red-50 border-2 border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 font-medium">
+            <div className="bg-red-50 border-2 border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 font-medium text-sm sm:text-base">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             {/* Project & Phase Selection Section */}
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6 border border-blue-100">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 Project & Phase Selection
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {/* Project Selection */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Project <span className="text-red-600">*</span>
                   </label>
                   {loadingProjects ? (
-                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500 text-sm sm:text-base">
                       Loading projects...
                     </div>
                   ) : projects.length === 0 ? (
-                    <div className="w-full px-4 py-2.5 bg-yellow-50 border-2 border-yellow-300 rounded-lg text-yellow-800">
+                    <div className="w-full px-4 py-2.5 bg-yellow-50 border-2 border-yellow-300 rounded-lg text-yellow-800 text-sm sm:text-base">
                       No projects available
                     </div>
                   ) : (
@@ -337,7 +337,7 @@ function NewWorkItemPageContent() {
                       onChange={handleChange}
                       required
                       disabled={loadingProjects}
-                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium touch-manipulation"
                     >
                       <option value="" className="text-gray-500">Select Project</option>
                       {projects.map((project) => (
@@ -358,15 +358,15 @@ function NewWorkItemPageContent() {
                     Phase <span className="text-red-600">*</span>
                   </label>
                   {loadingPhases ? (
-                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500 text-sm sm:text-base">
                       Loading phases...
                     </div>
                   ) : !formData.projectId ? (
-                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500 text-sm sm:text-base">
                       Select Project First
                     </div>
                   ) : phases.length === 0 ? (
-                    <div className="w-full px-4 py-2.5 bg-yellow-50 border-2 border-yellow-300 rounded-lg text-yellow-800">
+                    <div className="w-full px-4 py-2.5 bg-yellow-50 border-2 border-yellow-300 rounded-lg text-yellow-800 text-sm sm:text-base">
                       No phases available for this project
                     </div>
                   ) : (
@@ -376,7 +376,7 @@ function NewWorkItemPageContent() {
                       onChange={handleChange}
                       required
                       disabled={loadingPhases || !formData.projectId}
-                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium touch-manipulation"
                     >
                       <option value="" className="text-gray-500">Select Phase</option>
                       {phases.map((phase) => (
@@ -394,16 +394,16 @@ function NewWorkItemPageContent() {
             </div>
 
             {/* Work Item Details Section */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 Work Item Details
               </h2>
               
               {/* Work Item Name */}
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Work Item Name <span className="text-red-600">*</span>
                 </label>
@@ -415,12 +415,12 @@ function NewWorkItemPageContent() {
                   required
                   minLength={2}
                   placeholder="e.g., Pour Foundation Concrete"
-                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium touch-manipulation"
                 />
               </div>
 
               {/* Description */}
-              <div className="mb-6">
+              <div className="mb-4 sm:mb-6">
                 <label className="block text-sm font-semibold text-gray-900 mb-2">
                   Description <span className="text-gray-500 text-xs font-normal">(Optional)</span>
                 </label>
@@ -430,18 +430,18 @@ function NewWorkItemPageContent() {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Describe the work item, requirements, and any important details..."
-                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium resize-y"
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium resize-y touch-manipulation"
                 />
               </div>
 
               {/* Category, Priority, and Status */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Category <span className="text-red-600">*</span>
                   </label>
                   {loadingCategories ? (
-                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500 text-sm sm:text-base">
                       Loading categories...
                     </div>
                   ) : (
@@ -450,7 +450,7 @@ function NewWorkItemPageContent() {
                       value={usesLegacyCategories ? formData.category : formData.categoryId}
                       onChange={handleCategoryChange}
                       required
-                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium touch-manipulation"
                     >
                       <option value="" className="text-gray-500">Select Category</option>
                       {categoryOptions.map((category) => (
@@ -475,7 +475,7 @@ function NewWorkItemPageContent() {
                     name="priority"
                     value={formData.priority}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium touch-manipulation"
                   >
                     {WORK_ITEM_PRIORITIES.map((priority) => (
                       <option key={priority} value={priority} className="text-gray-900">
@@ -493,7 +493,7 @@ function NewWorkItemPageContent() {
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium touch-manipulation"
                   >
                     {WORK_ITEM_STATUSES.map((status) => (
                       <option key={status} value={status} className="text-gray-900">
@@ -505,7 +505,7 @@ function NewWorkItemPageContent() {
               </div>
 
               {/* Worker Assignment */}
-              <div className="mt-6">
+              <div className="mt-4 sm:mt-6">
                 <MultiWorkerSelector
                   value={formData.assignedTo || []}
                   onChange={(workerIds) => setFormData(prev => ({ ...prev, assignedTo: workerIds }))}
@@ -517,21 +517,21 @@ function NewWorkItemPageContent() {
             </div>
 
             {/* Time & Cost Estimates Section */}
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 sm:p-6 border border-green-100">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Time & Cost Estimates
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Estimated Hours <span className="text-gray-500 text-xs font-normal">(Optional)</span>
                   </label>
                   <div className="relative">
-                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">hrs</span>
+                    <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">hrs</span>
                     <input
                       type="number"
                       name="estimatedHours"
@@ -540,7 +540,7 @@ function NewWorkItemPageContent() {
                       min="0"
                       step="0.1"
                       placeholder="0"
-                      className="w-full px-4 pr-16 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                      className="w-full px-4 pr-16 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium touch-manipulation"
                     />
                   </div>
                 </div>
@@ -550,7 +550,7 @@ function NewWorkItemPageContent() {
                     Estimated Cost (KES) <span className="text-gray-500 text-xs font-normal">(Optional)</span>
                   </label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium">KES</span>
+                    <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-600 font-medium text-sm sm:text-base">KES</span>
                     <input
                       type="number"
                       name="estimatedCost"
@@ -559,7 +559,7 @@ function NewWorkItemPageContent() {
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      className="w-full pl-12 pr-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                      className="w-full pl-12 pr-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium touch-manipulation"
                     />
                   </div>
                 </div>
@@ -567,15 +567,15 @@ function NewWorkItemPageContent() {
             </div>
 
             {/* Schedule Section */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 Schedule
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Start Date <span className="text-gray-500 text-xs font-normal">(Optional)</span>
@@ -585,7 +585,7 @@ function NewWorkItemPageContent() {
                     name="startDate"
                     value={formData.startDate}
                     onChange={handleChange}
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                   />
                 </div>
 
@@ -599,16 +599,16 @@ function NewWorkItemPageContent() {
                     value={formData.plannedEndDate}
                     onChange={handleChange}
                     min={formData.startDate}
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                   />
                 </div>
               </div>
             </div>
 
             {/* Additional Information Section */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-200">
+              <h2 className="text-base sm:text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 text-gray-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
                 Additional Information
@@ -625,23 +625,23 @@ function NewWorkItemPageContent() {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Additional notes about this work item, special requirements, or important details..."
-                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium resize-y"
+                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all duration-200 font-medium resize-y touch-manipulation"
                 />
               </div>
             </div>
 
             {/* Submit Buttons */}
-            <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-200">
               <Link
                 href="/work-items"
-                className="px-6 py-2.5 border-2 border-gray-300 rounded-lg text-gray-900 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                className="w-full sm:w-auto px-6 py-2.5 border-2 border-gray-300 rounded-lg text-gray-900 font-semibold hover:bg-gray-50 active:bg-gray-100 hover:border-gray-400 transition-all duration-200 text-center touch-manipulation"
               >
                 Cancel
               </Link>
               <LoadingButton
                 type="submit"
                 loading={saving}
-                className="px-8 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl transition-all duration-200"
+                className="w-full sm:w-auto px-8 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl transition-all duration-200 touch-manipulation"
               >
                 {saving ? 'Creating...' : 'Create Work Item'}
               </LoadingButton>

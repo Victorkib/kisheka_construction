@@ -224,20 +224,20 @@ function PhasesPageContent() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Construction Phases</h1>
-            <p className="text-gray-600 mt-1">Manage and track construction phases</p>
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Construction Phases</h1>
+            <p className="text-sm sm:text-base text-gray-600 mt-1">Manage and track construction phases</p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center gap-1 sm:gap-2 bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('table')}
-                className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+                className={`px-3 py-2 sm:py-1.5 text-sm font-medium rounded transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                   viewMode === 'table'
                     ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900'
                 }`}
               >
                 <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -247,10 +247,10 @@ function PhasesPageContent() {
               </button>
               <button
                 onClick={() => setViewMode('timeline')}
-                className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+                className={`px-3 py-2 sm:py-1.5 text-sm font-medium rounded transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                   viewMode === 'timeline'
                     ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900'
                 }`}
               >
                 <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -262,7 +262,7 @@ function PhasesPageContent() {
             {canCreate && (
               <Link
                 href={`/phases/new${selectedProjectId ? `?projectId=${selectedProjectId}` : ''}`}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-blue-600 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation text-sm sm:text-base text-center font-medium"
               >
                 + New Phase
               </Link>
@@ -286,9 +286,9 @@ function PhasesPageContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <h3 className="text-sm font-medium text-gray-700 mb-4">Filters & Sorting</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+          <h3 className="text-sm sm:text-base font-medium text-gray-700 mb-4">Filters & Sorting</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             <div>
               <label className="block text-xs font-medium text-gray-600 mb-1">
                 Project
@@ -441,7 +441,7 @@ function PhasesPageContent() {
             {canCreate && (
               <Link
                 href={`/phases/new${selectedProjectId ? `?projectId=${selectedProjectId}` : ''}`}
-                className="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation font-medium"
               >
                 Create First Phase
               </Link>
@@ -450,9 +450,11 @@ function PhasesPageContent() {
         ) : viewMode === 'timeline' ? (
           <PhaseTimeline phases={phases} projectId={selectedProjectId} />
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -602,7 +604,127 @@ function PhasesPageContent() {
                 </tbody>
               </table>
             </div>
-          </div>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {phases.map((phase) => {
+                const financialSummary = phase.financialSummary || {
+                  budgetTotal: phase.budgetAllocation?.total || 0,
+                  actualTotal: phase.actualSpending?.total || 0,
+                  remaining: phase.financialStates?.remaining || 0,
+                  utilizationPercentage: 0
+                };
+                const project = projectMap[phase.projectId] || {};
+                
+                return (
+                  <div
+                    key={phase._id}
+                    className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                  >
+                    {/* Header Row */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-base font-semibold text-gray-900 truncate">
+                          {phase.phaseName}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-0.5">
+                          {phase.phaseCode} • {getPhaseTypeLabel(phase.phaseType)}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-0.5 truncate">
+                          {project.projectName || 'Unknown'}
+                        </p>
+                      </div>
+                      <div className="flex flex-col gap-1 items-end ml-2">
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ${getStatusColor(phase.status)}`}>
+                          {phase.status.replace('_', ' ').toUpperCase()}
+                        </span>
+                        {phase.dependsOn && phase.dependsOn.length > 0 && (
+                          <span 
+                            className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-purple-100 text-purple-800"
+                            title={`Depends on ${phase.dependsOn.length} phase(s)`}
+                          >
+                            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                            {phase.dependsOn.length}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Financial Summary */}
+                    <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-200">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Budget</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {formatCurrency(financialSummary.budgetTotal)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Spent</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {formatCurrency(financialSummary.actualTotal)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Remaining</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {formatCurrency(financialSummary.remaining)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Progress</p>
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 max-w-20 bg-gray-200 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full ${
+                                financialSummary.utilizationPercentage > 100 
+                                  ? 'bg-red-600' 
+                                  : financialSummary.utilizationPercentage > 80 
+                                  ? 'bg-yellow-600' 
+                                  : 'bg-green-600'
+                              }`}
+                              style={{
+                                width: `${Math.min(100, financialSummary.utilizationPercentage)}%`
+                              }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-600 font-medium">
+                            {financialSummary.utilizationPercentage.toFixed(1)}%
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-2 pt-3">
+                      <Link
+                        href={`/phases/${phase._id}/dashboard`}
+                        className="flex-1 px-3 py-2 bg-purple-50 text-purple-600 text-sm font-semibold rounded-lg hover:bg-purple-100 active:bg-purple-200 transition-colors touch-manipulation text-center"
+                      >
+                        Dashboard
+                      </Link>
+                      <Link
+                        href={`/phases/${phase._id}`}
+                        className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                      >
+                        View
+                      </Link>
+                      {canEdit && (
+                        <Link
+                          href={`/phases/${phase._id}?edit=true`}
+                          className="flex-1 px-3 py-2 bg-indigo-50 text-indigo-600 text-sm font-semibold rounded-lg hover:bg-indigo-100 active:bg-indigo-200 transition-colors touch-manipulation text-center"
+                        >
+                          Edit
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </div>
     </AppLayout>

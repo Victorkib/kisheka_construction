@@ -43,9 +43,9 @@ export function AppLayout({ children, forceSmartNav = null }) {
   const MobileNavComponent = useSmartNav ? SmartMobileNav : MobileNav;
 
   return (
-    <div className="h-screen bg-gray-50 flex overflow-hidden">
+    <div className="h-screen h-[100dvh] bg-gray-50 flex overflow-hidden safe-area-inset">
       {/* Desktop Sidebar */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block flex-shrink-0">
         <SidebarComponent
           isCollapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -56,17 +56,19 @@ export function AppLayout({ children, forceSmartNav = null }) {
       <MobileNavComponent isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Header */}
         <Header onMenuClick={() => setMobileNavOpen(true)} />
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto">
-          {children || (
-            <div className="flex items-center justify-center min-h-[400px]">
-              <LoadingSpinner size="lg" text="Loading..." />
-            </div>
-          )}
+        <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
+          <div className="min-h-full">
+            {children || (
+              <div className="flex items-center justify-center min-h-[400px] p-4">
+                <LoadingSpinner size="lg" text="Loading..." />
+              </div>
+            )}
+          </div>
         </main>
       </div>
     </div>

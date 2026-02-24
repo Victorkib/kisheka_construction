@@ -41,35 +41,35 @@ export function ExecutiveSummary({ data, formatCurrency }) {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg p-6 mb-8 border border-blue-200">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Portfolio Overview</h2>
-        <span className="text-sm text-gray-600">Executive Summary</span>
+    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 border border-blue-200">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Portfolio Overview</h2>
+        <span className="text-xs sm:text-sm text-gray-600">Executive Summary</span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Projects */}
         <Link
           href="/projects"
-          className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-all border border-gray-200 hover:border-blue-300"
+          className="bg-white rounded-lg p-4 sm:p-6 shadow-md hover:shadow-lg active:shadow-xl transition-all border border-gray-200 hover:border-blue-300 active:border-blue-400 touch-manipulation"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">Total Projects</span>
-            <span className="text-2xl">🏗️</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-600">Total Projects</span>
+            <span className="text-xl sm:text-2xl">🏗️</span>
           </div>
-          <p className="text-3xl font-bold text-gray-900 mb-1">{totalProjects}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{totalProjects}</p>
           <p className="text-xs text-gray-500">
             {activeProjects} active • {statusBreakdown?.completed || 0} completed
           </p>
         </Link>
 
         {/* Capital Status */}
-        <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
+        <div className="bg-white rounded-lg p-4 sm:p-6 shadow-md border border-gray-200">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">Total Capital</span>
-            <span className="text-2xl">💰</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-600">Total Capital</span>
+            <span className="text-xl sm:text-2xl">💰</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900 mb-1">
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 break-words">
             {formatCurrency(totalCapitalRaised)}
           </p>
           <div className="mt-2">
@@ -93,12 +93,12 @@ export function ExecutiveSummary({ data, formatCurrency }) {
         </div>
 
         {/* Portfolio Health */}
-        <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
+        <div className="bg-white rounded-lg p-4 sm:p-6 shadow-md border border-gray-200">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">Portfolio Health</span>
-            <span className="text-2xl">📊</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-600">Portfolio Health</span>
+            <span className="text-xl sm:text-2xl">📊</span>
           </div>
-          <p className={`text-3xl font-bold mb-1 ${getHealthColor(portfolioHealthScore)}`}>
+          <p className={`text-2xl sm:text-3xl font-bold mb-1 ${getHealthColor(portfolioHealthScore)}`}>
             {portfolioHealthScore}
           </p>
           <p className="text-xs text-gray-500">
@@ -107,12 +107,12 @@ export function ExecutiveSummary({ data, formatCurrency }) {
         </div>
 
         {/* Monthly Spending */}
-        <div className="bg-white rounded-lg p-6 shadow-md border border-gray-200">
+        <div className="bg-white rounded-lg p-4 sm:p-6 shadow-md border border-gray-200">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-600">Monthly Spending</span>
-            <span className="text-2xl">📈</span>
+            <span className="text-xs sm:text-sm font-medium text-gray-600">Monthly Spending</span>
+            <span className="text-xl sm:text-2xl">📈</span>
           </div>
-          <p className="text-2xl font-bold text-gray-900 mb-1">
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 break-words">
             {formatCurrency(monthlySpending)}
           </p>
           <p className="text-xs text-gray-500">Last 30 days</p>
@@ -120,11 +120,11 @@ export function ExecutiveSummary({ data, formatCurrency }) {
       </div>
 
       {/* Available Capital Highlight */}
-      <div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">Available Capital</p>
-            <p className={`text-2xl font-bold mt-1 ${
+      <div className="mt-4 sm:mt-6 bg-white rounded-lg p-4 border border-gray-200">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-gray-600">Available Capital</p>
+            <p className={`text-xl sm:text-2xl font-bold mt-1 break-words ${
               availableCapital < 0
                 ? 'text-red-600'
                 : availableCapital < totalCapitalRaised * 0.1
@@ -136,7 +136,7 @@ export function ExecutiveSummary({ data, formatCurrency }) {
           </div>
           <Link
             href="/financing"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+            className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium text-center touch-manipulation"
           >
             View Finances →
           </Link>

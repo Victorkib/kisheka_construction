@@ -123,10 +123,10 @@ function SupplierDetailPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border-2 border-red-300 text-red-900 px-4 py-3 rounded mb-6 font-medium">
+          <div className="bg-red-50 border-2 border-red-300 text-red-900 px-4 py-3 rounded mb-6 font-medium text-sm sm:text-base">
             {error || 'Supplier not found'}
           </div>
-          <Link href="/suppliers" className="text-blue-600 hover:text-blue-800 underline font-semibold">
+          <Link href="/suppliers" className="text-blue-600 hover:text-blue-800 active:text-blue-900 underline font-semibold text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Suppliers
           </Link>
         </div>
@@ -138,21 +138,21 @@ function SupplierDetailPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8 flex justify-between items-start">
-          <div>
-            <Link href="/suppliers" className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block font-semibold underline">
+        <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <Link href="/suppliers" className="text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm mb-4 inline-block font-semibold underline transition-colors touch-manipulation">
               ← Back to Suppliers
             </Link>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
               {supplier.name}
             </h1>
-            <p className="text-gray-700 mt-2 font-medium">Supplier Details</p>
+            <p className="text-sm sm:text-base text-gray-700 mt-2 font-medium">Supplier Details</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
             {canAccess('edit_supplier') && (
               <Link
                 href={`/suppliers/${supplierId}/edit`}
-                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-semibold shadow-md"
+                className="flex-1 sm:flex-none px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 active:bg-indigo-800 font-semibold shadow-md text-sm text-center transition-colors touch-manipulation"
               >
                 Edit
               </Link>
@@ -160,7 +160,7 @@ function SupplierDetailPageContent() {
             {canAccess('delete_supplier') && (
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-semibold shadow-md"
+                className="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 font-semibold shadow-md text-sm transition-colors touch-manipulation"
               >
                 Delete
               </button>
@@ -168,13 +168,13 @@ function SupplierDetailPageContent() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Main Details */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Basic Information */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm font-semibold text-gray-900">Status</p>
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1 ${getStatusBadge(supplier.status)}`}>
@@ -212,8 +212,8 @@ function SupplierDetailPageContent() {
 
             {/* Business Details */}
             {(supplier.businessType || supplier.taxId || supplier.address) && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Details</h2>
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Business Details</h2>
                 <div className="space-y-4">
                   {supplier.businessType && (
                     <div>
@@ -238,8 +238,8 @@ function SupplierDetailPageContent() {
             )}
 
             {/* Communication Preferences */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Communication Preferences</h2>
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Communication Preferences</h2>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
                   <span className={`w-3 h-3 rounded-full ${supplier.emailEnabled ? 'bg-green-500' : 'bg-gray-300'}`}></span>
@@ -262,8 +262,8 @@ function SupplierDetailPageContent() {
 
             {/* Specialties */}
             {supplier.specialties && supplier.specialties.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Specialties</h2>
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Specialties</h2>
                 <div className="flex flex-wrap gap-2">
                   {supplier.specialties.map((specialty, index) => (
                     <span
@@ -279,18 +279,18 @@ function SupplierDetailPageContent() {
 
             {/* Notes */}
             {supplier.notes && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Notes</h2>
-                <p className="text-gray-900 whitespace-pre-wrap font-medium">{supplier.notes}</p>
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Notes</h2>
+                <p className="text-sm sm:text-base text-gray-900 whitespace-pre-wrap font-medium break-words">{supplier.notes}</p>
               </div>
             )}
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Statistics */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Statistics</h2>
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Statistics</h2>
               <div className="space-y-4">
                 <div>
                   <p className="text-sm font-semibold text-gray-900">Total Purchase Orders</p>
@@ -313,17 +313,17 @@ function SupplierDetailPageContent() {
 
             {/* Recent Orders */}
             {recentOrders.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Orders</h2>
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Recent Orders</h2>
                 <div className="space-y-3">
                   {recentOrders.map((order) => (
                     <Link
                       key={order._id}
                       href={`/purchase-orders/${order._id}`}
-                      className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition"
+                      className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
                     >
-                      <p className="font-semibold text-gray-900 text-sm">{order.purchaseOrderNumber}</p>
-                      <p className="text-xs text-gray-700 mt-1 font-medium">{order.materialName}</p>
+                      <p className="font-semibold text-gray-900 text-sm break-words">{order.purchaseOrderNumber}</p>
+                      <p className="text-xs text-gray-700 mt-1 font-medium break-words">{order.materialName}</p>
                       <p className="text-xs text-gray-700 mt-1 font-medium">
                         {new Date(order.createdAt).toLocaleDateString()}
                       </p>
@@ -333,7 +333,7 @@ function SupplierDetailPageContent() {
                 {orderCount > recentOrders.length && (
                   <Link
                     href={`/purchase-orders?supplierId=${supplierId}`}
-                    className="block mt-4 text-center text-sm text-blue-600 hover:text-blue-800 font-semibold underline"
+                    className="block mt-4 text-center text-sm text-blue-600 hover:text-blue-800 active:text-blue-900 font-semibold underline transition-colors touch-manipulation"
                   >
                     View All Orders →
                   </Link>

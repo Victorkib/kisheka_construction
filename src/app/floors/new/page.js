@@ -132,7 +132,7 @@ function NewFloorPageContent() {
             'Pragma': 'no-cache',
           },
         });
-        const floorsData = await floorsResponse.json();
+        const floorsData = await response.json();
         if (floorsData.success) {
           const existingFloors = floorsData.data || [];
           const basementFloors = existingFloors.filter(f => f.floorNumber < 0);
@@ -202,11 +202,11 @@ function NewFloorPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-6">
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to create floors. Only Project Managers and Owners can create floors.</p>
           </div>
-          <Link href="/floors" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/floors" className="text-blue-600 hover:text-blue-900 active:text-blue-800 underline text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Floors
           </Link>
         </div>
@@ -218,36 +218,36 @@ function NewFloorPageContent() {
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <Link href="/floors" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
+        <div className="mb-6 sm:mb-8">
+          <Link href="/floors" className="text-blue-600 hover:text-blue-900 active:text-blue-800 text-sm sm:text-base mb-4 inline-block transition-colors touch-manipulation">
             ← Back to Floors
           </Link>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create New Floor</h1>
-          <p className="text-gray-600 mt-2">Add a new floor to a project</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create New Floor</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-2">Add a new floor to a project</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
             {error}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
+        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Project Selection */}
-          <div className="mb-6">
-            <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+          <div>
+            <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2 leading-normal">
               Project <span className="text-red-500">*</span>
             </label>
             {loadingProjects ? (
-              <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-500">
+              <div className="px-3 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-gray-500 text-sm sm:text-base">
                 Loading projects...
               </div>
             ) : projects.length === 0 ? (
-              <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700">
+              <div className="px-3 py-2.5 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm sm:text-base">
                 No projects found. Please create a project first.
-                <Link href="/projects/new" className="ml-2 text-blue-600 hover:underline">
+                <Link href="/projects/new" className="ml-2 text-blue-600 hover:underline active:text-blue-800 touch-manipulation">
                   Create Project
                 </Link>
               </div>
@@ -257,7 +257,7 @@ function NewFloorPageContent() {
                 value={formData.projectId}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
               >
                 <option value="">Select a project</option>
                 {projects.map((project) => (
@@ -270,8 +270,8 @@ function NewFloorPageContent() {
           </div>
 
           {/* Floor Number */}
-          <div className="mb-6">
-            <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+          <div>
+            <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2 leading-normal">
               Floor Number <span className="text-red-500">*</span>
             </label>
             <input
@@ -283,26 +283,26 @@ function NewFloorPageContent() {
               max="100"
               required
               placeholder="e.g., -2 for Basement 2, -1 for Basement 1, 0 for Ground Floor, 1 for First Floor"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
             />
             <div className="mt-2 space-y-1">
-              <p className="text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">
                 <strong>Floor Numbering System:</strong>
               </p>
-              <ul className="text-sm text-gray-600 list-disc list-inside space-y-1 ml-2">
+              <ul className="text-xs sm:text-sm text-gray-600 list-disc list-inside space-y-1 ml-2">
                 <li><strong>Negative numbers (-1, -2, etc.):</strong> Basements (below ground level)</li>
                 <li><strong>Zero (0):</strong> Ground Floor (at ground level)</li>
                 <li><strong>Positive numbers (1, 2, 3, etc.):</strong> Above-ground floors</li>
               </ul>
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-xs sm:text-sm text-gray-500 mt-2">
                 <strong>Tip:</strong> If creating a basement and leaving floor number empty, the system will automatically assign the next available basement number.
               </p>
             </div>
           </div>
 
           {/* Floor Name */}
-          <div className="mb-6">
-            <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+          <div>
+            <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2 leading-normal">
               Floor Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -312,13 +312,13 @@ function NewFloorPageContent() {
               onChange={handleChange}
               required
               placeholder="e.g., Ground Floor, First Floor, Basement"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
             />
           </div>
 
           {/* Description */}
-          <div className="mb-6">
-            <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+          <div>
+            <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2 leading-normal">
               Description
             </label>
             <textarea
@@ -327,20 +327,20 @@ function NewFloorPageContent() {
               onChange={handleChange}
               rows={3}
               placeholder="Optional description of this floor"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
             />
           </div>
 
           {/* Status */}
-          <div className="mb-6">
-            <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+          <div>
+            <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2 leading-normal">
               Status
             </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
             >
               <option value="NOT_STARTED">Not Started</option>
               <option value="IN_PROGRESS">In Progress</option>
@@ -349,9 +349,9 @@ function NewFloorPageContent() {
           </div>
 
           {/* Budget Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2 leading-normal">
                 Total Budget (KES)
               </label>
               <input
@@ -362,11 +362,11 @@ function NewFloorPageContent() {
                 min="0"
                 step="0.01"
                 placeholder="0.00"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
               />
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2 leading-normal">
                 Actual Cost (KES)
               </label>
               <input
@@ -377,15 +377,15 @@ function NewFloorPageContent() {
                 min="0"
                 step="0.01"
                 placeholder="0.00"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
               />
             </div>
           </div>
 
           {/* Date Fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2 leading-normal">
                 Start Date
               </label>
               <input
@@ -393,11 +393,11 @@ function NewFloorPageContent() {
                 name="startDate"
                 value={formData.startDate}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
               />
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-2 leading-normal">
                 Completion Date
               </label>
               <input
@@ -405,16 +405,16 @@ function NewFloorPageContent() {
                 name="completionDate"
                 value={formData.completionDate}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
               />
             </div>
           </div>
 
           {/* Submit Button */}
-          <div className="flex justify-end gap-4">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t">
             <Link
               href="/floors"
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+              className="w-full sm:w-auto px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors text-center touch-manipulation"
             >
               Cancel
             </Link>
@@ -422,7 +422,7 @@ function NewFloorPageContent() {
               type="submit"
               isLoading={loading}
               disabled={loading || !formData.projectId || projects.length === 0}
-              className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               Create Floor
             </LoadingButton>
@@ -448,4 +448,3 @@ export default function NewFloorPage() {
     </Suspense>
   );
 }
-

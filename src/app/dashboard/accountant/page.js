@@ -155,17 +155,17 @@ export default function AccountantDashboard() {
   return (
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Accountant Dashboard</h1>
-          <p className="text-gray-700 mt-2">Welcome back, {user.firstName || user.email}!</p>
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">Accountant Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-700 mt-2">Welcome back, {user.firstName || user.email}!</p>
         </div>
 
         {/* Financial Summary Cards */}
         {summary && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-base font-semibold text-gray-700 mb-2 leading-normal">Total Cost</h2>
-              <p className="text-3xl font-bold text-green-600">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Total Cost</h2>
+              <p className="text-2xl sm:text-3xl font-bold text-green-600 break-words">
                 {new Intl.NumberFormat('en-KE', {
                   style: 'currency',
                   currency: 'KES',
@@ -173,18 +173,18 @@ export default function AccountantDashboard() {
                   maximumFractionDigits: 0,
                 }).format(summary.totalOverallCost || 0)}
               </p>
-              <p className="text-sm text-gray-700 mt-1 leading-normal">
+              <p className="text-xs sm:text-sm text-gray-700 mt-1 leading-normal break-words">
                 Materials: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(summary.totalMaterialsCost || 0)} | 
                 Expenses: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(summary.totalExpensesCost || 0)} | 
                 Labour: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(summary.totalLabourCost || 0)}
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-base font-semibold text-gray-700 mb-2 leading-normal">Pending Approvals</h2>
-              <p className="text-3xl font-bold text-yellow-600">{summary.totalPendingApprovals || 0}</p>
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Pending Approvals</h2>
+              <p className="text-2xl sm:text-3xl font-bold text-yellow-600">{summary.totalPendingApprovals || 0}</p>
               {summary.totalPendingApprovals > 0 && (
-                <p className="text-sm text-gray-700 mt-1 leading-normal">
+                <p className="text-xs sm:text-sm text-gray-700 mt-1 leading-normal">
                   {summary.pendingBreakdown?.materials || 0} materials, {summary.pendingBreakdown?.expenses || 0} expenses, {summary.pendingBreakdown?.initialExpenses || 0} initial
                 </p>
               )}
@@ -192,13 +192,13 @@ export default function AccountantDashboard() {
 
             <Link
               href="/financing"
-              className="bg-white rounded-lg shadow p-6 hover:shadow-md transition col-span-2"
+              className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md active:shadow-lg transition-all touch-manipulation sm:col-span-2"
             >
-              <h2 className="text-base font-semibold text-gray-700 mb-2 leading-normal">Financing Dashboard</h2>
-              <div className="grid grid-cols-2 gap-4">
+              <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Financing Dashboard</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <p className="text-sm text-gray-700">Capital Raised</p>
-                  <p className="text-xl font-bold text-purple-600 mt-1">
+                  <p className="text-xs sm:text-sm text-gray-700">Capital Raised</p>
+                  <p className="text-lg sm:text-xl font-bold text-purple-600 mt-1 break-words">
                     {summary.capital ? (
                       new Intl.NumberFormat('en-KE', {
                         style: 'currency',
@@ -212,8 +212,8 @@ export default function AccountantDashboard() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-700">Capital Balance</p>
-                  <p className="text-xl font-bold text-blue-600 mt-1">
+                  <p className="text-xs sm:text-sm text-gray-700">Capital Balance</p>
+                  <p className="text-lg sm:text-xl font-bold text-blue-600 mt-1 break-words">
                     {summary.capital ? (
                       new Intl.NumberFormat('en-KE', {
                         style: 'currency',
@@ -227,24 +227,24 @@ export default function AccountantDashboard() {
                   </p>
                 </div>
               </div>
-              <p className="text-sm text-gray-700 mt-2 leading-normal">Click to view full financing dashboard</p>
+              <p className="text-xs sm:text-sm text-gray-700 mt-2 leading-normal">Click to view full financing dashboard</p>
             </Link>
           </div>
         )}
 
         {/* Approval Queue - Priority Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Approval Queue</h2>
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6 sm:mb-8">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Approval Queue</h2>
           <div className="mb-4">
             <Link
               href="/dashboard/approvals"
-              className="inline-flex items-center px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition"
+              className="inline-flex items-center w-full sm:w-auto justify-center sm:justify-start px-4 sm:px-6 py-2.5 sm:py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 active:bg-yellow-800 transition-colors text-sm sm:text-base touch-manipulation"
             >
-              <span className="text-2xl mr-3">✅</span>
+              <span className="text-xl sm:text-2xl mr-2 sm:mr-3">✅</span>
               <div className="text-left">
-                <div className="font-semibold">Review Pending Approvals</div>
+                <div className="font-semibold text-sm sm:text-base">Review Pending Approvals</div>
                 {summary && summary.totalPendingApprovals > 0 && (
-                  <div className="text-sm opacity-90">
+                  <div className="text-xs sm:text-sm opacity-90">
                     {summary.totalPendingApprovals} items awaiting approval
                   </div>
                 )}
@@ -254,44 +254,44 @@ export default function AccountantDashboard() {
         </div>
 
         {/* Financial Management Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Management</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6 sm:mb-8">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Financial Management</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <Link
               href="/financing"
-              className="p-4 border-2 border-purple-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition"
+              className="p-3 sm:p-4 border-2 border-purple-200 rounded-lg hover:border-purple-500 active:border-purple-600 hover:bg-purple-50 active:bg-purple-100 transition-colors touch-manipulation"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">💰</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Financing Dashboard</h3>
-                  <p className="text-sm text-gray-700">View capital and finances</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="text-xl sm:text-2xl flex-shrink-0">💰</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Financing Dashboard</h3>
+                  <p className="text-xs sm:text-sm text-gray-700">View capital and finances</p>
                 </div>
               </div>
             </Link>
 
             <Link
               href="/initial-expenses"
-              className="p-4 border-2 border-orange-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition"
+              className="p-3 sm:p-4 border-2 border-orange-200 rounded-lg hover:border-orange-500 active:border-orange-600 hover:bg-orange-50 active:bg-orange-100 transition-colors touch-manipulation"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">🏛️</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Initial Expenses</h3>
-                  <p className="text-sm text-gray-700">Track pre-construction costs</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="text-xl sm:text-2xl flex-shrink-0">🏛️</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Initial Expenses</h3>
+                  <p className="text-xs sm:text-sm text-gray-700">Track pre-construction costs</p>
                 </div>
               </div>
             </Link>
 
             <Link
               href="/expenses"
-              className="p-4 border-2 border-red-200 rounded-lg hover:border-red-500 hover:bg-red-50 transition"
+              className="p-3 sm:p-4 border-2 border-red-200 rounded-lg hover:border-red-500 active:border-red-600 hover:bg-red-50 active:bg-red-100 transition-colors touch-manipulation"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">💸</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Expenses</h3>
-                  <p className="text-sm text-gray-700">View and manage expenses</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="text-xl sm:text-2xl flex-shrink-0">💸</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Expenses</h3>
+                  <p className="text-xs sm:text-sm text-gray-700">View and manage expenses</p>
                 </div>
               </div>
             </Link>
@@ -299,44 +299,44 @@ export default function AccountantDashboard() {
         </div>
 
         {/* Reports & Analytics Section */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Reports & Analytics</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Reports & Analytics</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <Link
               href="/dashboard/budget"
-              className="p-4 border-2 border-emerald-200 rounded-lg hover:border-emerald-500 hover:bg-emerald-50 transition"
+              className="p-3 sm:p-4 border-2 border-emerald-200 rounded-lg hover:border-emerald-500 active:border-emerald-600 hover:bg-emerald-50 active:bg-emerald-100 transition-colors touch-manipulation"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">💵</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Budget vs Actual</h3>
-                  <p className="text-sm text-gray-700">Compare budget to spending</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="text-xl sm:text-2xl flex-shrink-0">💵</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Budget vs Actual</h3>
+                  <p className="text-xs sm:text-sm text-gray-700">Compare budget to spending</p>
                 </div>
               </div>
             </Link>
 
             <Link
               href="/dashboard/analytics/wastage"
-              className="p-4 border-2 border-amber-200 rounded-lg hover:border-amber-500 hover:bg-amber-50 transition"
+              className="p-3 sm:p-4 border-2 border-amber-200 rounded-lg hover:border-amber-500 active:border-amber-600 hover:bg-amber-50 active:bg-amber-100 transition-colors touch-manipulation"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">📈</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Wastage Analytics</h3>
-                  <p className="text-sm text-gray-700">View variance and wastage reports</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="text-xl sm:text-2xl flex-shrink-0">📈</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Wastage Analytics</h3>
+                  <p className="text-xs sm:text-sm text-gray-700">View variance and wastage reports</p>
                 </div>
               </div>
             </Link>
 
             <Link
               href="/dashboard/stock"
-              className="p-4 border-2 border-purple-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition"
+              className="p-3 sm:p-4 border-2 border-purple-200 rounded-lg hover:border-purple-500 active:border-purple-600 hover:bg-purple-50 active:bg-purple-100 transition-colors touch-manipulation"
             >
-              <div className="flex items-center gap-3">
-                <div className="text-2xl">📊</div>
-                <div>
-                  <h3 className="font-semibold text-gray-900">Stock Tracking</h3>
-                  <p className="text-sm text-gray-700">Monitor inventory levels</p>
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="text-xl sm:text-2xl flex-shrink-0">📊</div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Stock Tracking</h3>
+                  <p className="text-xs sm:text-sm text-gray-700">Monitor inventory levels</p>
                 </div>
               </div>
             </Link>

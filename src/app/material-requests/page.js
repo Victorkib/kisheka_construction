@@ -370,16 +370,16 @@ function MaterialRequestsPageContent() {
           fullScreen
         />
         {/* Header */}
-        <div className="mb-8 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Material Requests</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage material procurement requests</p>
+        <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
+          <div className="flex-1 min-w-0">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Material Requests</h1>
+            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage material procurement requests</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
             {canAccess('create_material_request') && (
               <Link
                 href="/material-requests/new"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base"
               >
                 + New Request
               </Link>
@@ -387,7 +387,7 @@ function MaterialRequestsPageContent() {
             {canAccess('create_bulk_material_request') && (
               <Link
                 href="/material-requests/bulk"
-                className="bg-green-600 hover:bg-green-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base"
               >
                 📦 Bulk Request
               </Link>
@@ -395,7 +395,7 @@ function MaterialRequestsPageContent() {
             {canAccess('view_material_library') && (
               <Link
                 href="/material-library"
-                className="bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base"
               >
                 📚 Material Library
               </Link>
@@ -416,8 +416,8 @@ function MaterialRequestsPageContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
             <div>
               <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Project</label>
               <select
@@ -479,7 +479,7 @@ function MaterialRequestsPageContent() {
                 className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
               />
             </div>
-            <div className="flex items-end">
+            <div className="flex items-end sm:col-span-2 lg:col-span-1">
               <button
                 onClick={() => {
                   const resetFilters = { projectId: currentProjectId || '', status: '', urgency: '', phaseId: '', search: '' };
@@ -490,7 +490,7 @@ function MaterialRequestsPageContent() {
                   });
                   router.push(`/material-requests?${params.toString()}`, { scroll: false });
                 }}
-                className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition"
+                className="w-full px-4 py-2.5 border border-gray-300 hover:bg-gray-50 active:bg-gray-100 text-gray-700 font-medium rounded-lg transition-colors touch-manipulation"
               >
                 Clear Filters
               </button>
@@ -519,52 +519,57 @@ function MaterialRequestsPageContent() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <>
             {/* Bulk Actions Toolbar */}
             {selectedRequests.size > 0 && (
-              <div className="bg-blue-50 border-b border-blue-200 px-6 py-3 flex items-center justify-between">
-                <div className="flex items-center gap-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 sm:px-6 py-3 mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                   <span className="text-sm font-medium text-blue-900">
                     {selectedRequests.size} request(s) selected
                   </span>
-                  {canAccess('approve_material_request') && (
-                    <button
-                      onClick={() => handleBulkAction('approve')}
-                      disabled={bulkActionLoading}
-                      className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:opacity-50"
-                    >
-                      Approve Selected
-                    </button>
-                  )}
-                  {canAccess('reject_material_request') && (
-                    <button
-                      onClick={() => handleBulkAction('reject')}
-                      disabled={bulkActionLoading}
-                      className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700 disabled:opacity-50"
-                    >
-                      Reject Selected
-                    </button>
-                  )}
-                  {canAccess('delete_material_request') && (
-                    <button
-                      onClick={() => handleBulkAction('delete')}
-                      disabled={bulkActionLoading}
-                      className="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700 disabled:opacity-50"
-                    >
-                      Delete Selected
-                    </button>
-                  )}
+                  <div className="flex flex-wrap gap-2">
+                    {canAccess('approve_material_request') && (
+                      <button
+                        onClick={() => handleBulkAction('approve')}
+                        disabled={bulkActionLoading}
+                        className="px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors touch-manipulation"
+                      >
+                        Approve Selected
+                      </button>
+                    )}
+                    {canAccess('reject_material_request') && (
+                      <button
+                        onClick={() => handleBulkAction('reject')}
+                        disabled={bulkActionLoading}
+                        className="px-3 py-1.5 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors touch-manipulation"
+                      >
+                        Reject Selected
+                      </button>
+                    )}
+                    {canAccess('delete_material_request') && (
+                      <button
+                        onClick={() => handleBulkAction('delete')}
+                        disabled={bulkActionLoading}
+                        className="px-3 py-1.5 bg-gray-600 text-white text-sm rounded-lg hover:bg-gray-700 disabled:opacity-50 transition-colors touch-manipulation"
+                      >
+                        Delete Selected
+                      </button>
+                    )}
+                  </div>
                 </div>
                 <button
                   onClick={() => setSelectedRequests(new Set())}
-                  className="text-sm text-blue-600 hover:text-blue-800"
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors touch-manipulation"
                 >
                   Clear Selection
                 </button>
               </div>
             )}
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left">
@@ -719,34 +724,193 @@ function MaterialRequestsPageContent() {
               </table>
             </div>
 
-            {/* Pagination */}
-            {pagination.pages > 1 && (
-              <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-                <div className="text-sm text-gray-700">
-                  Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} requests
+              {/* Pagination */}
+              {pagination.pages > 1 && (
+                <div className="bg-gray-50 px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-200">
+                  <div className="text-sm text-gray-700 text-center sm:text-left">
+                    Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} requests
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
+                      disabled={pagination.page === 1}
+                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2 text-sm text-gray-700 flex items-center">
+                      Page {pagination.page} of {pagination.pages}
+                    </span>
+                    <button
+                      onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
+                      disabled={pagination.page >= pagination.pages}
+                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
-                    disabled={pagination.page === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-4">
+              {requests.map((request) => {
+                const canApprove = canAccess('approve_material_request') && request.status === 'pending_approval';
+                const canReject = canAccess('reject_material_request') && request.status === 'pending_approval';
+                const canConvert = canAccess('create_purchase_order') && request.status === 'approved';
+                const canEdit = canAccess('edit_material_request') && ['requested', 'pending_approval'].includes(request.status);
+                const canView = canAccess('view_material_requests');
+
+                return (
+                  <div
+                    key={request._id}
+                    className="bg-white rounded-lg shadow p-4 border border-gray-200"
                   >
-                    Previous
-                  </button>
-                  <span className="px-4 py-2 text-sm text-gray-700">
-                    Page {pagination.page} of {pagination.pages}
-                  </span>
-                  <button
-                    onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
-                    disabled={pagination.page >= pagination.pages}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    Next
-                  </button>
+                    {/* Header Row */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <input
+                            type="checkbox"
+                            checked={selectedRequests.has(request._id)}
+                            onChange={() => handleSelectRequest(request._id)}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0 mt-1"
+                          />
+                          <Link
+                            href={`/material-requests/${request._id}`}
+                            className="text-base font-semibold text-blue-600 hover:text-blue-800 truncate"
+                          >
+                            {request.requestNumber}
+                          </Link>
+                        </div>
+                        <p className="text-sm font-medium text-gray-900 truncate">{request.materialName}</p>
+                        {request.description && (
+                          <p className="text-xs text-gray-600 mt-1 line-clamp-2">{request.description}</p>
+                        )}
+                      </div>
+                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ml-2 ${getStatusBadgeColor(request.status)}`}>
+                        {request.status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Unknown'}
+                      </span>
+                    </div>
+
+                    {/* Details Grid */}
+                    <div className="grid grid-cols-2 gap-3 mb-3">
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Quantity</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {request.quantityNeeded} {request.unit}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Estimated Cost</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          {formatCurrency(request.estimatedCost)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Urgency</p>
+                        <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${getUrgencyBadgeColor(request.urgency)}`}>
+                          {request.urgency?.toUpperCase() || 'N/A'}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500 mb-0.5">Requested By</p>
+                        <p className="text-sm text-gray-900 truncate">
+                          {request.requestedByName || 'Unknown'}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Batch Info */}
+                    {request.batchNumber && (
+                      <div className="mb-3 pb-3 border-b border-gray-200">
+                        <p className="text-xs text-gray-500 mb-0.5">Batch</p>
+                        <Link
+                          href={`/material-requests/bulk/${request.batchId}`}
+                          className="text-sm text-purple-600 hover:text-purple-800 font-medium"
+                        >
+                          {request.batchNumber}
+                        </Link>
+                      </div>
+                    )}
+
+                    {/* Date */}
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-500 mb-0.5">Date</p>
+                      <p className="text-sm text-gray-700">{formatDate(request.createdAt)}</p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-2 pt-3 border-t border-gray-200">
+                      {canView && (
+                        <Link
+                          href={`/material-requests/${request._id}`}
+                          className="px-3 py-1.5 bg-blue-50 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-100 transition-colors touch-manipulation"
+                        >
+                          View
+                        </Link>
+                      )}
+                      {canApprove && (
+                        <button
+                          onClick={() => handleApproveClick(request._id)}
+                          disabled={actionLoading}
+                          className="px-3 py-1.5 bg-green-50 text-green-600 text-sm font-medium rounded-lg hover:bg-green-100 disabled:opacity-50 transition-colors touch-manipulation"
+                        >
+                          Approve
+                        </button>
+                      )}
+                      {canReject && (
+                        <button
+                          onClick={() => handleRejectClick(request._id)}
+                          disabled={actionLoading}
+                          className="px-3 py-1.5 bg-red-50 text-red-600 text-sm font-medium rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors touch-manipulation"
+                        >
+                          Reject
+                        </button>
+                      )}
+                      {canConvert && (
+                        <Link
+                          href={`/purchase-orders/new?requestId=${request._id}`}
+                          className="px-3 py-1.5 bg-purple-50 text-purple-600 text-sm font-medium rounded-lg hover:bg-purple-100 transition-colors touch-manipulation"
+                        >
+                          Create Order
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Mobile Pagination */}
+              {pagination.pages > 1 && (
+                <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                  <div className="text-sm text-gray-700 text-center mb-3">
+                    Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} requests
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
+                      disabled={pagination.page === 1}
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium"
+                    >
+                      Previous
+                    </button>
+                    <span className="px-4 py-2.5 text-sm text-gray-700 font-medium">
+                      {pagination.page} / {pagination.pages}
+                    </span>
+                    <button
+                      onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
+                      disabled={pagination.page >= pagination.pages}
+                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium"
+                    >
+                      Next
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          </>
         )}
 
         {/* Approve Modal */}

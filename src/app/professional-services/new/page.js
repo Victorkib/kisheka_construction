@@ -137,11 +137,11 @@ function NewProfessionalServicePageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-6">
+          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to assign professionals to projects. Only OWNER and PM can assign professionals.</p>
           </div>
-          <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 active:text-blue-800 underline text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Assignments
           </Link>
         </div>
@@ -187,18 +187,18 @@ function NewProfessionalServicePageContent() {
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
+        <div className="mb-6 sm:mb-8">
+          <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 active:text-blue-800 text-sm sm:text-base mb-4 inline-block transition-colors touch-manipulation">
             ← Back to Assignments
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
             Assign Professional to Project
           </h1>
-          <p className="text-gray-600 mt-2">Assign a professional from the library to a project with contract details</p>
+          <p className="text-sm sm:text-base text-gray-600 mt-2">Assign a professional from the library to a project with contract details</p>
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
           <ProfessionalServicesAssignmentForm
             professionals={professionals}
             projects={projects}
@@ -228,8 +228,3 @@ export default function NewProfessionalServicePage() {
     </Suspense>
   );
 }
-
-
-
-
-

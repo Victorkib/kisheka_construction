@@ -41,7 +41,7 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, [isOpen, index]);
+  }, [isOpen, onClose, handlePrevious, handleNext]);
 
   const handlePrevious = useCallback(() => {
     setIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
@@ -63,9 +63,12 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-95 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm"
       onClick={onClose}
       style={{ animation: 'fadeIn 0.2s ease-in-out' }}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Image lightbox viewer"
     >
       <style jsx>{`
         @keyframes fadeIn {
@@ -91,7 +94,7 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
       {/* Close Button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-2 hover:bg-opacity-75"
+        className="absolute top-4 right-4 z-10 text-white hover:text-gray-300 active:text-gray-400 transition-colors bg-black/50 rounded-full p-2.5 hover:bg-black/75 active:bg-black/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
         aria-label="Close lightbox"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -106,7 +109,7 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
             e.stopPropagation();
             handlePrevious();
           }}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-3 hover:bg-opacity-75"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-gray-300 active:text-gray-400 transition-colors bg-black/50 rounded-full p-3 hover:bg-black/75 active:bg-black/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
           aria-label="Previous image"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +125,7 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
             e.stopPropagation();
             handleNext();
           }}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-gray-300 transition-colors bg-black bg-opacity-50 rounded-full p-3 hover:bg-opacity-75"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-gray-300 active:text-gray-400 transition-colors bg-black/50 rounded-full p-3 hover:bg-black/75 active:bg-black/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
           aria-label="Next image"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,13 +149,17 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
         <div className="relative w-full h-full flex flex-col items-center justify-center">
           <img
             src={currentImage.url}
-            alt={currentImage.description || `Image ${index + 1}`}
+            alt={currentImage.description || `Image ${index + 1} of ${images.length}`}
             onClick={handleImageClick}
             className={`max-w-full max-h-[85vh] object-contain cursor-${isZoomed ? 'zoom-out' : 'zoom-in'} transition-transform duration-300 ${
               isZoomed ? 'scale-150' : 'scale-100'
             }`}
             style={{ animation: 'slideIn 0.3s ease-out' }}
             draggable={false}
+            loading="eager"
+            decoding="async"
+            role="img"
+            aria-label={currentImage.description || `Image ${index + 1} of ${images.length}`}
           />
 
           {/* Image Info */}
@@ -189,8 +196,8 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
               }
             }
           }}
-          className="absolute bottom-4 right-4 z-10 text-white hover:text-red-300 transition-colors bg-red-600 bg-opacity-75 rounded-full p-3 hover:bg-opacity-100"
-          aria-label="Delete image"
+          className="absolute bottom-4 right-4 z-10 text-white hover:text-red-300 active:text-red-400 transition-colors bg-red-600/75 rounded-full p-3 hover:bg-red-600 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
+          aria-label={`Delete image ${index + 1} of ${images.length}`}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -209,17 +216,22 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
                 setIndex(idx);
                 setIsZoomed(false);
               }}
-              className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+              className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 touch-manipulation ${
                 idx === index
                   ? 'border-blue-500 ring-2 ring-blue-300'
-                  : 'border-transparent opacity-60 hover:opacity-100'
+                  : 'border-transparent opacity-60 hover:opacity-100 active:opacity-100'
               }`}
+              aria-label={`View image ${idx + 1}${idx === index ? ' (currently viewing)' : ''}`}
+              aria-current={idx === index ? 'true' : undefined}
             >
               <img
                 src={img.url}
-                alt={`Thumbnail ${idx + 1}`}
+                alt={`Thumbnail ${idx + 1}${idx === index ? ' (current)' : ''}`}
                 className="w-full h-full object-cover"
                 draggable={false}
+                loading="lazy"
+                decoding="async"
+                aria-current={idx === index ? 'true' : undefined}
               />
             </button>
           ))}

@@ -335,10 +335,10 @@ export default function WorkItemDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || 'Work item not found'}
           </div>
-          <Link href="/work-items" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href="/work-items" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Work Items
           </Link>
         </div>
@@ -350,41 +350,41 @@ export default function WorkItemDetailPage() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-6">
-          <Link href="/work-items" className="text-blue-600 hover:text-blue-800 mb-4 inline-block font-medium">
+        <div className="mb-6 sm:mb-8">
+          <Link href="/work-items" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block font-medium text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Work Items
           </Link>
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{workItem.name}</h1>
-              <p className="text-gray-600 mt-1">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 break-words">{workItem.name}</h1>
+              <p className="text-sm sm:text-base text-gray-600 mt-1">
                 {workItem.category?.replace(/\b\w/g, l => l.toUpperCase()) || 'Work Item'}
               </p>
               {project && phase && (
-                <div className="mt-2 space-x-4 text-sm">
+                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
                   <Link 
                     href={`/projects/${project._id}`}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-blue-600 hover:text-blue-800 active:text-blue-900 transition-colors touch-manipulation"
                   >
                     Project: {project.projectName}
                   </Link>
                   <span className="text-gray-400">•</span>
                   <Link 
                     href={`/phases/${phase._id}`}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="text-blue-600 hover:text-blue-800 active:text-blue-900 transition-colors touch-manipulation"
                   >
                     Phase: {phase.phaseName}
                   </Link>
                 </div>
               )}
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
               {canEdit && (
                 <button
                   onClick={() => setShowEditModal(true)}
-                  className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                  className="flex-1 sm:flex-none bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                   Edit
@@ -393,9 +393,9 @@ export default function WorkItemDetailPage() {
               {canDelete && (
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="bg-gradient-to-r from-red-600 to-red-700 text-white px-6 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center gap-2"
+                  className="flex-1 sm:flex-none bg-gradient-to-r from-red-600 to-red-700 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 active:from-red-800 active:to-red-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
                   Delete
@@ -449,7 +449,7 @@ export default function WorkItemDetailPage() {
         </div>
 
         {/* Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
           <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-shadow duration-200">
             <p className="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wide">Status</p>
             <span className={`inline-block px-4 py-2 text-sm font-bold rounded-full mb-4 ${getStatusColor(workItem.status)}`}>
@@ -502,30 +502,30 @@ export default function WorkItemDetailPage() {
 
         {/* Description */}
         {workItem.description && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
               Description
             </h2>
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <p className="text-gray-900 whitespace-pre-wrap font-medium leading-relaxed">{workItem.description}</p>
+              <p className="text-sm sm:text-base text-gray-900 whitespace-pre-wrap font-medium leading-relaxed break-words">{workItem.description}</p>
             </div>
           </div>
         )}
 
         {/* Dependencies */}
         {workItem.dependencies && workItem.dependencies.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
               </svg>
               Dependencies
             </h2>
             <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
-              <p className="text-sm font-medium text-gray-900">
+              <p className="text-xs sm:text-sm font-medium text-gray-900">
                 This work item depends on <span className="font-bold text-yellow-700">{workItem.dependencies.length}</span> other work item(s).
               </p>
             </div>
@@ -534,31 +534,31 @@ export default function WorkItemDetailPage() {
 
         {/* Assigned Workers */}
         {workItem.assignedWorkers && workItem.assignedWorkers.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
               Assigned Workers ({workItem.assignedWorkers.length})
             </h2>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-xs sm:text-sm text-gray-600 mb-4">
               Log labour using quick entry for a single worker, or bulk entry for multiple workers.
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3">
               {workItem.assignedWorkers.map((worker) => (
                 <Link
                   key={worker._id?.toString()}
                   href={`/labour/workers/${worker._id}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors"
+                  className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors text-sm touch-manipulation"
                 >
-                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
-                  <span className="font-medium text-blue-900">{worker.workerName}</span>
+                  <span className="font-medium text-blue-900 break-words">{worker.workerName}</span>
                   {worker.employeeId && (
                     <span className="text-xs text-blue-600">({worker.employeeId})</span>
                   )}
-                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
@@ -568,7 +568,7 @@ export default function WorkItemDetailPage() {
               <div className="mt-4 pt-4 border-t border-gray-200 flex flex-col gap-2">
                 {workItem.assignedWorkers.length > 1 ? (
                   <>
-                    <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-purple-700">
+                    <div className="inline-flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-purple-700">
                       Multiple workers detected
                       <span className="rounded-full bg-purple-100 px-2 py-0.5 text-purple-700">
                         Bulk recommended
@@ -579,7 +579,7 @@ export default function WorkItemDetailPage() {
                         .map((worker) => worker._id?.toString() || worker.userId?.toString())
                         .filter(Boolean)
                         .join(',')}`}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-purple-600 text-white rounded-lg hover:bg-purple-700 active:bg-purple-800 transition-colors text-sm font-medium touch-manipulation"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -589,7 +589,7 @@ export default function WorkItemDetailPage() {
                   </>
                 ) : (
                   <>
-                    <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-green-700">
+                    <div className="inline-flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wide text-green-700">
                       Single worker assigned
                       <span className="rounded-full bg-green-100 px-2 py-0.5 text-green-700">
                         Quick entry
@@ -597,7 +597,7 @@ export default function WorkItemDetailPage() {
                     </div>
                     <Link
                       href={`/labour/entries/new?workItemId=${workItem._id}&workerId=${workItem.assignedWorkers[0]?._id?.toString() || workItem.assignedWorkers[0]?.userId?.toString() || ''}`}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors text-sm font-medium touch-manipulation"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -613,24 +613,24 @@ export default function WorkItemDetailPage() {
 
         {/* Notes */}
         {workItem.notes && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
               Notes
             </h2>
             <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-              <p className="text-gray-900 whitespace-pre-wrap font-medium leading-relaxed">{workItem.notes}</p>
+              <p className="text-sm sm:text-base text-gray-900 whitespace-pre-wrap font-medium leading-relaxed break-words">{workItem.notes}</p>
             </div>
           </div>
         )}
 
         {/* Assignment History */}
         {workItem.assignmentHistory && workItem.assignmentHistory.length > 0 && (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Assignment History
@@ -640,9 +640,9 @@ export default function WorkItemDetailPage() {
         )}
 
         {/* Labour Tracking */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-4 sm:p-6 mb-6">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
             </svg>
             Labour Tracking
@@ -654,31 +654,32 @@ export default function WorkItemDetailPage() {
         {showEditModal && canEdit && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-gray-200">
-              <div className="p-8">
-                <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200">
-                  <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-4 sm:p-8">
+                <div className="flex justify-between items-center mb-4 sm:mb-6 pb-4 border-b border-gray-200">
+                  <h2 className="text-lg sm:text-2xl font-bold text-gray-900 flex items-center gap-2">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                     Edit Work Item
                   </h2>
                   <button
                     onClick={() => setShowEditModal(false)}
-                    className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
+                    className="text-gray-400 hover:text-gray-600 active:text-gray-800 transition-colors p-1 rounded-lg hover:bg-gray-100 active:bg-gray-200 w-8 h-8 flex items-center justify-center touch-manipulation"
+                    aria-label="Close"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
 
                 {error && (
-                  <div className="bg-red-50 border-2 border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 font-medium">
+                  <div className="bg-red-50 border-2 border-red-200 text-red-800 px-4 py-3 rounded-lg mb-4 sm:mb-6 font-medium text-sm sm:text-base">
                     {error}
                   </div>
                 )}
 
-                <form onSubmit={handleEditSubmit} className="space-y-6">
+                <form onSubmit={handleEditSubmit} className="space-y-4 sm:space-y-6">
                   <div>
                     <label className="block text-sm font-semibold text-gray-900 mb-2">
                       Work Item Name <span className="text-red-600">*</span>
@@ -689,7 +690,7 @@ export default function WorkItemDetailPage() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
-                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                     />
                   </div>
 
@@ -707,7 +708,7 @@ export default function WorkItemDetailPage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                       <label className="block text-sm font-semibold text-gray-900 mb-2">
                         Category <span className="text-red-600">*</span>
@@ -807,7 +808,7 @@ export default function WorkItemDetailPage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                       <label className="block text-sm font-semibold text-gray-900 mb-2">
                         Estimated Cost (KES) <span className="text-gray-500 text-xs font-normal">(Optional)</span>
@@ -821,7 +822,7 @@ export default function WorkItemDetailPage() {
                           onChange={(e) => setFormData({ ...formData, estimatedCost: e.target.value })}
                           min="0"
                           step="0.01"
-                          className="w-full pl-12 pr-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                          className="w-full pl-12 pr-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                         />
                       </div>
                     </div>
@@ -839,13 +840,13 @@ export default function WorkItemDetailPage() {
                           onChange={(e) => setFormData({ ...formData, actualCost: e.target.value })}
                           min="0"
                           step="0.01"
-                          className="w-full pl-12 pr-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                          className="w-full pl-12 pr-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                     <div>
                       <label className="block text-sm font-semibold text-gray-900 mb-2">
                         Start Date <span className="text-gray-500 text-xs font-normal">(Optional)</span>
@@ -855,7 +856,7 @@ export default function WorkItemDetailPage() {
                         name="startDate"
                         value={formData.startDate}
                         onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                        className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                       />
                     </div>
 
@@ -869,7 +870,7 @@ export default function WorkItemDetailPage() {
                         value={formData.plannedEndDate}
                         onChange={(e) => setFormData({ ...formData, plannedEndDate: e.target.value })}
                         min={formData.startDate}
-                        className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                        className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                       />
                     </div>
                   </div>
@@ -906,18 +907,18 @@ export default function WorkItemDetailPage() {
                     />
                   </div>
 
-                  <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+                  <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-200">
                     <button
                       type="button"
                       onClick={() => setShowEditModal(false)}
-                      className="px-6 py-2.5 border-2 border-gray-300 rounded-lg text-gray-900 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                      className="w-full sm:w-auto px-6 py-2.5 border-2 border-gray-300 rounded-lg text-gray-900 font-semibold hover:bg-gray-50 active:bg-gray-100 hover:border-gray-400 transition-all duration-200 text-sm touch-manipulation"
                     >
                       Cancel
                     </button>
                     <LoadingButton
                       type="submit"
                       loading={saving}
-                      className="px-8 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl transition-all duration-200"
+                      className="w-full sm:w-auto px-6 sm:px-8 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl transition-all duration-200 text-sm touch-manipulation"
                     >
                       {saving ? 'Saving...' : 'Save Changes'}
                     </LoadingButton>

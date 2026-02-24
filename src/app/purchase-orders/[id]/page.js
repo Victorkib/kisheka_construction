@@ -1528,10 +1528,10 @@ function PurchaseOrderDetailPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || "Purchase order not found"}
           </div>
-          <Link href="/purchase-orders" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href="/purchase-orders" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Purchase Orders
           </Link>
         </div>
@@ -1597,34 +1597,34 @@ function PurchaseOrderDetailPageContent() {
           fullScreen={false}
         />
         {/* Header */}
-        <div className="mb-8">
-          <Link href="/purchase-orders" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+        <div className="mb-6 sm:mb-8">
+          <Link href="/purchase-orders" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Purchase Orders
           </Link>
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
                   {order.purchaseOrderNumber}
                 </h1>
                 <span
-                  className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusBadgeColor(order.status)}`}
+                  className={`inline-flex px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${getStatusBadgeColor(order.status)}`}
                 >
                   {order.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown"}
                 </span>
                 <span
-                  className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getFinancialStatusBadgeColor(order.financialStatus)}`}
+                  className={`inline-flex px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${getFinancialStatusBadgeColor(order.financialStatus)}`}
                 >
                   {order.financialStatus?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "N/A"}
                 </span>
               </div>
-              <p className="text-gray-700 mt-2">{order.materialName}</p>
+              <p className="text-sm sm:text-base text-gray-700 mt-2 break-words">{order.materialName}</p>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
               {canAccept && (
                 <button
                   onClick={() => setShowAcceptModal(true)}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition"
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-medium rounded-lg transition-colors text-sm touch-manipulation"
                 >
                   Accept
                 </button>
@@ -1632,7 +1632,7 @@ function PurchaseOrderDetailPageContent() {
               {canReject && (
                 <button
                   onClick={() => setShowRejectModal(true)}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition"
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-medium rounded-lg transition-colors text-sm touch-manipulation"
                 >
                   Reject
                 </button>
@@ -1640,7 +1640,7 @@ function PurchaseOrderDetailPageContent() {
               {canModify && (
                 <button
                   onClick={() => setShowModifyModal(true)}
-                  className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white font-medium rounded-lg transition"
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-yellow-600 hover:bg-yellow-700 active:bg-yellow-800 text-white font-medium rounded-lg transition-colors text-sm touch-manipulation"
                 >
                   Modify
                 </button>
@@ -1648,7 +1648,7 @@ function PurchaseOrderDetailPageContent() {
               {canFulfill && (
                 <button
                   onClick={() => setShowFulfillModal(true)}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition"
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium rounded-lg transition-colors text-sm touch-manipulation"
                 >
                   Fulfill
                 </button>
@@ -1665,7 +1665,7 @@ function PurchaseOrderDetailPageContent() {
                     setShowConfirmDeliveryModal(true)
                   }}
                   disabled={isConfirmingDelivery}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition disabled:opacity-50"
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-medium rounded-lg transition-colors disabled:opacity-50 text-sm touch-manipulation"
                 >
                   {isConfirmingDelivery ? "Confirming..." : "Confirm Delivery"}
                 </button>
@@ -1674,7 +1674,7 @@ function PurchaseOrderDetailPageContent() {
                 <button
                   onClick={handleCreateMaterial}
                   disabled={isCreatingMaterial}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition disabled:opacity-50"
+                  className="flex-1 sm:flex-none px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-medium rounded-lg transition-colors disabled:opacity-50 text-sm touch-manipulation"
                 >
                   {isCreatingMaterial ? "Creating..." : "Create Material"}
                 </button>
@@ -1687,8 +1687,8 @@ function PurchaseOrderDetailPageContent() {
         {order && <EnhancedOrderStatus order={order} canManage={canEdit} onRefresh={() => fetchOrder()} />}
 
         {/* Workflow Status Section */}
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-lg p-6 shadow-md mb-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">📋 Workflow Status & Next Steps</h3>
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-lg p-4 sm:p-6 shadow-md mb-6">
+          <h3 className="text-base sm:text-lg font-semibold text-blue-900 mb-2">📋 Workflow Status & Next Steps</h3>
           {order.status === "order_sent" && (
             <div className="text-sm text-blue-800">
               <p className="mb-2">
@@ -1891,14 +1891,14 @@ function PurchaseOrderDetailPageContent() {
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* Left Column - Main Details */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Batch Information (for bulk orders) */}
             {order.batch && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-                <h2 className="text-lg font-semibold text-blue-900 mb-2">Batch Information</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6 mb-6">
+                <h2 className="text-base sm:text-lg font-semibold text-blue-900 mb-2">Batch Information</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <dt className="text-sm font-semibold text-blue-700">Batch Number</dt>
                     <dd className="mt-1 text-base text-blue-900">
@@ -1915,10 +1915,10 @@ function PurchaseOrderDetailPageContent() {
                     </dd>
                   </div>
                   {order.batch._id && (
-                    <div className="md:col-span-2">
+                    <div className="sm:col-span-2">
                       <Link
                         href={`/material-requests/bulk/${order.batch._id}`}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        className="text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm font-medium transition-colors touch-manipulation"
                       >
                         View Batch Details →
                       </Link>
@@ -1929,8 +1929,8 @@ function PurchaseOrderDetailPageContent() {
             )}
 
             {/* Order Details */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Order Details</h2>
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Order Details</h2>
 
               {/* Bulk Order - Show Materials Table */}
               {order.isBulkOrder && order.materials && Array.isArray(order.materials) && order.materials.length > 0 ? (
@@ -2011,21 +2011,21 @@ function PurchaseOrderDetailPageContent() {
               )}
 
               <div className="mt-6 pt-6 border-t border-gray-200">
-                <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <dt className="text-sm font-semibold text-gray-700">Delivery Date</dt>
-                    <dd className="mt-1 text-base text-gray-900">{formatDate(order.deliveryDate)}</dd>
+                    <dd className="mt-1 text-sm sm:text-base text-gray-900">{formatDate(order.deliveryDate)}</dd>
                   </div>
                   {order.terms && (
-                    <div className="md:col-span-2">
+                    <div className="sm:col-span-2">
                       <dt className="text-sm font-semibold text-gray-700">Payment Terms</dt>
-                      <dd className="mt-1 text-base text-gray-900">{order.terms}</dd>
+                      <dd className="mt-1 text-sm sm:text-base text-gray-900 break-words">{order.terms}</dd>
                     </div>
                   )}
                   {order.notes && (
-                    <div className="md:col-span-2">
+                    <div className="sm:col-span-2">
                       <dt className="text-sm font-semibold text-gray-700">Notes</dt>
-                      <dd className="mt-1 text-base text-gray-900">{order.notes}</dd>
+                      <dd className="mt-1 text-sm sm:text-base text-gray-900 break-words">{order.notes}</dd>
                     </div>
                   )}
                 </dl>
@@ -2034,9 +2034,9 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Financial Information */}
             {(order.totalCost || availableCapital !== null) && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Financial Information</h2>
-                <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Financial Information</h2>
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <dt className="text-sm font-semibold text-gray-700">Total Cost</dt>
                     <dd className="mt-1 text-base font-semibold text-gray-900">{formatCurrency(order.totalCost)}</dd>
@@ -2070,9 +2070,9 @@ function PurchaseOrderDetailPageContent() {
                     </>
                   )}
                   {order.financialStatus === "committed" && (
-                    <div className="md:col-span-2">
+                    <div className="sm:col-span-2">
                       <dt className="text-sm font-semibold text-amber-600">Committed Cost Impact</dt>
-                      <dd className="mt-1 text-base text-amber-700">
+                      <dd className="mt-1 text-xs sm:text-sm text-amber-700 break-words">
                         This order has committed {formatCurrency(order.totalCost)} from available capital. The cost will
                         be moved to actual when the material is created and approved.
                       </dd>
@@ -2080,8 +2080,8 @@ function PurchaseOrderDetailPageContent() {
                   )}
                 </dl>
                 {order.totalCost && availableCapital !== null && order.totalCost > availableCapital && (
-                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <p className="text-sm font-semibold text-red-800">
+                  <div className="mt-4 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-xs sm:text-sm font-semibold text-red-800 break-words">
                       ⚠️ Warning: Total cost ({formatCurrency(order.totalCost)}) exceeds available capital (
                       {formatCurrency(availableCapital)}) by {formatCurrency(order.totalCost - availableCapital)}
                     </p>
@@ -2089,8 +2089,8 @@ function PurchaseOrderDetailPageContent() {
                 )}
                 {projectFinances && projectFinances.materialsBreakdown && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">Materials Budget Context</h3>
-                    <dl className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Materials Budget Context</h3>
+                    <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                       <div>
                         <dt className="text-gray-700">Budget</dt>
                         <dd className="font-semibold text-gray-900">
@@ -2122,9 +2122,9 @@ function PurchaseOrderDetailPageContent() {
             )}
 
             {/* Supplier Information */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Supplier Information</h2>
-              <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Supplier Information</h2>
+              <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <dt className="text-sm font-semibold text-gray-700">Supplier Name</dt>
                   <dd className="mt-1 text-base text-gray-900">{order.supplierName || "N/A"}</dd>
@@ -2145,8 +2145,8 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Supplier Response */}
             {order.supplierResponse && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Supplier Response</h2>
+              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Supplier Response</h2>
                 <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <dt className="text-sm font-semibold text-gray-700">Response</dt>
