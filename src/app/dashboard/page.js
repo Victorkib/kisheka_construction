@@ -51,21 +51,10 @@ export default function DashboardPage() {
         const response = await fetchNoCache('/api/auth/me');
         const data = await response.json();
 
-        // CRITICAL FIX: Handle 401 errors with retry (cookies might not be available immediately after OAuth)
-        // This is especially important in production where cookie propagation can be delayed
-        if (response.status === 401 && retryCount < 3) {
-          console.log(`[Dashboard] 401 Unauthorized, retrying... (attempt ${retryCount + 1}/3)`);
-          console.log(`[Dashboard] This might be a cookie propagation delay after OAuth`);
-          // Wait before retry: 500ms, 1s, 2s - allows cookies to propagate
-          const delay = [500, 1000, 2000][retryCount] || 2000;
-          await new Promise(resolve => setTimeout(resolve, delay));
-          return redirectToRoleDashboard(retryCount + 1);
-        }
-
         // CRITICAL FIX: If profile not found (404), it might be MongoDB sync race condition
         // Retry a few times with delays for OAuth users
         if (!data.success && data.error === 'User profile not found' && retryCount < 3) {
-          console.log(`[Dashboard] User profile not found, retrying... (attempt ${retryCount + 1}/3)`);
+          console.log(`User profile not found, retrying... (attempt ${retryCount + 1}/3)`);
           // Wait before retry: 500ms, 1s, 2s
           const delay = [500, 1000, 2000][retryCount] || 2000;
           await new Promise(resolve => setTimeout(resolve, delay));
@@ -73,7 +62,6 @@ export default function DashboardPage() {
         }
 
         if (!data.success) {
-          console.error('[Dashboard] Failed to fetch user after retries:', data.error);
           router.push('/auth/login');
           return;
         }

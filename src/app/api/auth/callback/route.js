@@ -21,34 +21,6 @@ export async function GET(request) {
   const code = requestUrl.searchParams.get('code');
   const type = requestUrl.searchParams.get('type'); // 'signup' for email verification
   const next = requestUrl.searchParams.get('next') || '/dashboard';
-  const isRSCPrefetch = requestUrl.searchParams.has('_rsc');
-
-  // CRITICAL FIX: Handle RSC prefetch requests intelligently
-  // RSC prefetch requests are background requests from Next.js
-  // 
-  // IMPORTANT: In production, Next.js may add _rsc param to actual OAuth callbacks
-  // So we can't completely ignore prefetch requests with codes
-  //
-  // Strategy:
-  // 1. If prefetch has NO code → Ignore it (just prefetching, no OAuth)
-  // 2. If prefetch HAS code → Process it (might be actual callback with _rsc added)
-  //
-  // This prevents:
-  // - Processing empty prefetch requests (wasteful)
-  // - Missing actual OAuth callbacks that have _rsc param
-  // - Code consumption issues (we only process if code exists)
-  if (isRSCPrefetch && !code) {
-    console.log('[OAuth Callback] RSC prefetch request detected (no code), ignoring');
-    // Return a simple response without processing
-    return new NextResponse(null, { status: 200 });
-  }
-  
-  // If prefetch has code, it's likely the actual callback (Next.js added _rsc param in production)
-  // Process it normally - the code check below will handle it
-  if (isRSCPrefetch && code) {
-    console.log('[OAuth Callback] RSC prefetch request with code detected - processing as actual callback');
-    // Continue to normal processing below
-  }
 
   // CRITICAL FIX: Always redirect to dashboard for OAuth flows
   // Don't allow redirecting to landing page (/) or auth pages after OAuth
@@ -95,13 +67,9 @@ export async function GET(request) {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
-        console.error('[OAuth Callback] Exchange code error:', {
-          message: error.message,
-          status: error.status,
-          code: code?.substring(0, 10) + '...',
-        });
+        console.error('Auth callback error:', error);
         return NextResponse.redirect(
-          new URL(`/auth/login?error=${encodeURIComponent('Authentication failed: ' + error.message)}`, request.url)
+          new URL(`/auth/login?error=${encodeURIComponent('Authentication failed')}`, request.url)
         );
       }
 
@@ -218,94 +186,38 @@ export async function GET(request) {
           ? new URL('/auth/login?verified=true', request.url)
           : new URL(finalNext, request.url);
 
-        // CRITICAL FIX: Verify cookies were tracked before creating redirect
-        if (cookiesToSet.length === 0) {
-          console.error('[OAuth Callback] WARNING: No cookies were tracked during exchangeCodeForSession!');
-          console.error('[OAuth Callback] This might indicate a cookie setting issue');
-          // Still proceed with redirect - cookies might be set via cookieStore
-          // But log this for debugging
-        }
-        
         const response = NextResponse.redirect(redirectUrl);
         
         // CRITICAL FIX: Copy all session cookies to redirect response
         // In production, cookies set during exchangeCodeForSession must be explicitly included
         // This ensures cookies are sent with the redirect response
-        console.log(`[OAuth Callback] Setting ${cookiesToSet.length} cookies on redirect response`);
-        console.log(`[OAuth Callback] Redirecting to: ${redirectUrl.toString()}`);
-        
         cookiesToSet.forEach(({ name, value, options }) => {
-          // CRITICAL: Ensure production cookie settings for security
-          const cookieOptions = {
+          response.cookies.set(name, value, {
             ...options,
+            // Ensure production cookie settings
             httpOnly: options?.httpOnly ?? true,
-            secure: options?.secure ?? (process.env.NODE_ENV === 'production' || requestUrl.protocol === 'https:'),
+            secure: options?.secure ?? (process.env.NODE_ENV === 'production'),
             sameSite: options?.sameSite ?? 'lax',
             path: options?.path ?? '/',
-            // Don't set domain in production - let browser handle it
-            // Setting domain can cause issues with subdomains
-          };
-          
-          // Remove undefined values
-          Object.keys(cookieOptions).forEach(key => {
-            if (cookieOptions[key] === undefined) {
-              delete cookieOptions[key];
-            }
           });
-          
-          try {
-            response.cookies.set(name, value, cookieOptions);
-            console.log(`[OAuth Callback] Set cookie: ${name} (secure: ${cookieOptions.secure}, sameSite: ${cookieOptions.sameSite})`);
-          } catch (cookieError) {
-            console.error(`[OAuth Callback] Failed to set cookie ${name}:`, cookieError);
-          }
         });
-        
-        // CRITICAL: Also verify cookies are in cookieStore and copy them if not already tracked
-        // This handles cases where cookies were set but not tracked
-        try {
-          const allCookies = cookieStore.getAll();
-          const trackedCookieNames = new Set(cookiesToSet.map(c => c.name));
-          allCookies.forEach(cookie => {
-            if (!trackedCookieNames.has(cookie.name) && cookie.name.includes('supabase')) {
-              console.log(`[OAuth Callback] Found untracked cookie: ${cookie.name}, adding to response`);
-              response.cookies.set(cookie.name, cookie.value, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production' || requestUrl.protocol === 'https:',
-                sameSite: 'lax',
-                path: '/',
-              });
-            }
-          });
-        } catch (cookieCheckError) {
-          console.warn('[OAuth Callback] Could not verify cookies from cookieStore:', cookieCheckError);
-        }
         
         // Ensure no caching of this response
         response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
         response.headers.set('Pragma', 'no-cache');
         response.headers.set('Expires', '0');
         
-        console.log('[OAuth Callback] Redirect response created successfully');
         return response;
       } else {
-        console.error('[OAuth Callback] No user or session in callback data:', {
-          hasUser: !!data?.user,
-          hasSession: !!data?.session,
-          dataKeys: data ? Object.keys(data) : [],
-        });
+        console.error('No user or session in callback data');
         return NextResponse.redirect(
           new URL(`/auth/login?error=${encodeURIComponent('Authentication failed: No session')}`, request.url)
         );
       }
     } catch (error) {
-      console.error('[OAuth Callback] Processing error:', {
-        message: error.message,
-        stack: error.stack,
-        code: code?.substring(0, 10) + '...',
-      });
+      console.error('Auth callback processing error:', error);
       return NextResponse.redirect(
-        new URL(`/auth/login?error=${encodeURIComponent('Authentication failed: ' + error.message)}`, request.url)
+        new URL(`/auth/login?error=${encodeURIComponent('Authentication failed')}`, request.url)
       );
     }
   }
