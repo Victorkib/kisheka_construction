@@ -34,13 +34,32 @@ export async function createClient() {
         },
         setAll(cookiesToSet) {
           try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
+            cookiesToSet.forEach(({ name, value, options }) => {
+              // CRITICAL FIX: Set explicit cookie options for OAuth/PKCE flow
+              // These options ensure cookies work correctly in production
+              const cookieOptions = {
+                ...options,
+                // SameSite must be 'lax' or 'none' for OAuth redirects
+                // 'lax' works for same-site redirects, 'none' needed for cross-site (with Secure)
+                sameSite: options?.sameSite || 'lax',
+                // Secure should be true in production (HTTPS required)
+                secure: process.env.NODE_ENV === 'production' ? true : (options?.secure ?? false),
+                // HttpOnly for session cookies (but code verifier may need to be accessible)
+                httpOnly: options?.httpOnly ?? true,
+                // Path should be root to ensure cookies are available everywhere
+                path: options?.path || '/',
+                // Domain should match the application domain
+                // Don't set domain in development (localhost), set in production if needed
+                ...(process.env.NODE_ENV === 'production' && options?.domain 
+                  ? { domain: options.domain } 
+                  : {}),
+              };
+              cookieStore.set(name, value, cookieOptions);
+            });
           } catch (error) {
             // Handle setting cookies in Server Components
             // This can fail in certain contexts (e.g., during static generation)
-            console.warn('Failed to set cookie:', error.message);
+            console.warn('[Supabase Server] Failed to set cookie:', error.message);
           }
         },
       },

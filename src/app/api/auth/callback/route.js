@@ -2,7 +2,7 @@
  * Auth Callback Route
  * Handles OAuth provider callbacks (Google, Discord) and email verification
  * GET /api/auth/callback
- *
+ * 
  * Note: With Supabase modern flow, this route is optional.
  * Supabase now handles session internally and redirects to origin.
  * This route handles edge cases and MongoDB syncing.
@@ -32,12 +32,20 @@ export async function GET(request) {
 
   // If there's a code, exchange it (for email verification links and OAuth)
   if (code) {
-    // CRITICAL FIX: Track cookies set during exchangeCodeForSession
-    // In production, cookies must be explicitly copied to redirect response
+    // CRITICAL FIX: Properly handle cookies for PKCE flow
+    // The code verifier is stored in cookies by the browser client during OAuth initiation
+    // We must read ALL cookies from the request to ensure code verifier is available
     const cookieStore = await cookies();
     const cookiesToSet = [];
     
-    // Create Supabase client with custom cookie handler that tracks cookies
+    // Log available cookies in development for debugging
+    if (process.env.NODE_ENV === 'development') {
+      const allCookies = cookieStore.getAll();
+      console.log('[Auth Callback] Available cookies:', allCookies.map(c => c.name));
+    }
+    
+    // Create Supabase client with explicit cookie handling
+    // This ensures we can read the code verifier cookie set by the browser client
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
@@ -46,14 +54,14 @@ export async function GET(request) {
           getAll() {
             return cookieStore.getAll();
           },
-          setAll(cookies) {
-            // Track all cookies being set
-            cookies.forEach(({ name, value, options }) => {
+          setAll(cookiesToSetArray) {
+            // Track all cookies being set during exchangeCodeForSession
+            cookiesToSetArray.forEach(({ name, value, options }) => {
               cookiesToSet.push({ name, value, options });
               try {
                 cookieStore.set(name, value, options);
               } catch (error) {
-                console.warn('Failed to set cookie:', error.message);
+                console.warn('[Auth Callback] Failed to set cookie:', name, error.message);
               }
             });
           },
@@ -63,124 +71,41 @@ export async function GET(request) {
 
     try {
       // Exchange the code for a session
-      // This will trigger setAll callback which tracks cookies
+      // This requires the code verifier cookie to be available
+      // The code verifier was set by the browser client during signInWithOAuth
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error) {
-        console.error('Auth callback error:', error);
+        console.error('[Auth Callback] Exchange error:', {
+          message: error.message,
+          status: error.status,
+          name: error.name,
+        });
+        
+        // Include actual error message in redirect (sanitized for URL)
+        const errorMessage = error.message || 'Authentication failed';
+        const sanitizedError = encodeURIComponent(errorMessage);
+        
         return NextResponse.redirect(
-          new URL(
-            `/auth/login?error=${encodeURIComponent(`Authentication failed: ${error.message || 'Unknown error'}`)}`,
-            request.url,
-          )
+          new URL(`/auth/login?error=${sanitizedError}`, request.url)
         );
       }
 
       if (data.user && data.session) {
         // FIXED: Only check type parameter for email verification
         // OAuth always has provider in app_metadata, email verification doesn't
+        // The original logic was: type === 'signup' || (!data.user.app_metadata?.provider && data.user.email_confirmed_at)
+        // This incorrectly identified OAuth as email verification when provider was missing
         const isEmailVerification = type === 'signup';
         
-        // CRITICAL FIX: For OAuth users, ALWAYS ensure MongoDB profile exists
-        // OAuth works for both registration (new users) and login (existing users)
-        const isOAuthUser = !!data.user.app_metadata?.provider;
-        
-        if (isOAuthUser) {
-          console.log('[OAuth Callback] OAuth user detected:', {
-            userId: data.user.id,
-            email: data.user.email,
-            provider: data.user.app_metadata.provider
-          });
-          
-          // Check if user already exists in MongoDB
-          const { getUserProfile } = await import('@/lib/auth-helpers');
-          let existingProfile = null;
-          
-          try {
-            existingProfile = await getUserProfile(data.user.id);
-            console.log('[OAuth Callback] MongoDB profile check:', {
-              exists: !!existingProfile,
-              userId: data.user.id
-            });
-          } catch (profileError) {
-            console.error('[OAuth Callback] Error checking MongoDB profile:', profileError);
-          }
-          
-          const isNewUser = !existingProfile;
-          
-          // CRITICAL: For ALL OAuth users (new or existing), ensure MongoDB sync completes
-          // This ensures profile exists before redirecting to dashboard
-          try {
-            console.log('[OAuth Callback] Syncing user to MongoDB...', {
-              isNewUser,
-              userId: data.user.id,
-              email: data.user.email
-            });
-            
-            const syncedProfile = await syncUserToMongoDB(data.user, {
-              isVerified: data.user.email_confirmed_at ? true : false,
-            });
-            
-            console.log('[OAuth Callback] MongoDB sync successful:', {
-              userId: data.user.id,
-              mongoId: syncedProfile._id?.toString(),
-              role: syncedProfile.role,
-              isNewUser
-            });
-            
-            // Verify the profile was actually created/updated
-            // CRITICAL: Retry verification up to 3 times with delays
-            // This handles race conditions where MongoDB write hasn't propagated yet
-            let verifyProfile = null;
-            let verifyAttempts = 0;
-            const maxVerifyAttempts = 3;
-            
-            while (!verifyProfile && verifyAttempts < maxVerifyAttempts) {
-              await new Promise(resolve => setTimeout(resolve, verifyAttempts * 200)); // 0ms, 200ms, 400ms
-              verifyProfile = await getUserProfile(data.user.id);
-              verifyAttempts++;
-              
-              if (!verifyProfile && verifyAttempts < maxVerifyAttempts) {
-                console.log(`[OAuth Callback] Profile not found, retrying verification (attempt ${verifyAttempts}/${maxVerifyAttempts})...`);
-              }
-            }
-            
-            if (!verifyProfile) {
-              console.error('[OAuth Callback] CRITICAL: Profile not found after sync and verification retries!');
-              throw new Error('Profile not found after sync - MongoDB sync may have failed');
-            }
-            
-            console.log('[OAuth Callback] Profile verified in MongoDB:', {
-              userId: data.user.id,
-              mongoId: verifyProfile._id?.toString(),
-              verificationAttempts: verifyAttempts
-            });
-          } catch (syncError) {
-            console.error('[OAuth Callback] CRITICAL MongoDB sync error:', {
-              error: syncError.message,
-              stack: syncError.stack,
-              userId: data.user.id,
-              email: data.user.email
-            });
-            
-            // CRITICAL FIX: If MongoDB sync fails, don't redirect to dashboard
-            // Redirect to login with error message so user can retry
-            // This prevents redirect loops where user has Supabase session but no MongoDB profile
-            return NextResponse.redirect(
-              new URL(
-                `/auth/login?error=${encodeURIComponent('Account setup failed. Please try signing in again.')}`,
-                request.url
-              )
-            );
-          }
-        } else {
-          // Non-OAuth user (email/password) - sync in background
-          syncUserToMongoDB(data.user, {
-            isVerified: data.user.email_confirmed_at ? true : false,
-          }).catch(syncError => {
-            console.error('MongoDB sync error (non-fatal):', syncError);
-          });
-        }
+        // Sync user to MongoDB (non-blocking - doesn't delay redirect)
+        // Fire and forget - sync happens in background
+        syncUserToMongoDB(data.user, {
+          isVerified: data.user.email_confirmed_at ? true : false,
+        }).catch(syncError => {
+          console.error('MongoDB sync error (non-fatal):', syncError);
+          // Continue even if sync fails - user can still log in
+        });
 
         // Create redirect response
         // For OAuth flows, always redirect to dashboard (not landing page)
@@ -191,18 +116,27 @@ export async function GET(request) {
 
         const response = NextResponse.redirect(redirectUrl);
         
-        // CRITICAL FIX: Copy all session cookies to redirect response
-        // In production, cookies set during exchangeCodeForSession must be explicitly included
-        // This ensures cookies are sent with the redirect response
+        // CRITICAL FIX: Copy ALL cookies to redirect response
+        // Session cookies and code verifier cookies must be included in the redirect
+        // This ensures the session persists after redirect
         cookiesToSet.forEach(({ name, value, options }) => {
-          response.cookies.set(name, value, {
-            ...options,
-            // Ensure production cookie settings
-            httpOnly: options?.httpOnly ?? true,
-            secure: options?.secure ?? (process.env.NODE_ENV === 'production'),
-            sameSite: options?.sameSite ?? 'lax',
-            path: options?.path ?? '/',
-          });
+          try {
+            // Set cookie with proper options for production
+            const cookieOptions = {
+              ...options,
+              // Ensure SameSite is set correctly for OAuth redirects
+              sameSite: options?.sameSite || 'lax',
+              // Secure should be true in production (HTTPS)
+              secure: process.env.NODE_ENV === 'production' ? true : (options?.secure ?? false),
+              // HttpOnly for session cookies
+              httpOnly: options?.httpOnly ?? true,
+              // Path should be root to ensure cookies are available everywhere
+              path: options?.path || '/',
+            };
+            response.cookies.set(name, value, cookieOptions);
+          } catch (error) {
+            console.warn('[Auth Callback] Failed to set cookie in response:', name, error.message);
+          }
         });
         
         // Ensure no caching of this response
@@ -237,18 +171,19 @@ export async function GET(request) {
           getAll() {
             return cookieStore.getAll();
           },
-          setAll(cookies) {
-            cookies.forEach(({ name, value, options }) => {
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value, options }) => {
               try {
                 cookieStore.set(name, value, options);
               } catch (error) {
-                console.warn('Failed to set cookie:', error.message);
+                console.warn('[Auth Callback] Failed to set cookie:', name, error.message);
               }
             });
           },
         },
       }
     );
+    
     const { data: { session } } = await supabase.auth.getSession();
     
     if (session) {
@@ -258,9 +193,10 @@ export async function GET(request) {
       return response;
     }
   } catch (error) {
-    console.error('Session check error:', error);
+    console.error('[Auth Callback] Session check error:', error);
   }
 
   // If no code and no session, redirect to login
   return NextResponse.redirect(new URL('/auth/login', request.url));
 }
+

@@ -19,13 +19,22 @@ export function OAuthButtons({ mode = 'login' }) {
     setError(null);
 
     try {
-      // Use the server-side callback so the server can exchange the code
-      // and sync the user to MongoDB before redirecting to the app
-      const redirectUrl = `${window.location.origin}/api/auth/callback?next=${encodeURIComponent(
-        window.location.pathname || '/dashboard',
-      )}`;
+      // CRITICAL: Ensure redirect URL matches Supabase and OAuth provider configuration
+      // The redirect URL must exactly match what's configured in:
+      // 1. Supabase Dashboard → Authentication → URL Configuration
+      // 2. Google Cloud Console → OAuth 2.0 Client → Authorized redirect URIs
+      const baseUrl = window.location.origin;
+      const currentPath = window.location.pathname || '/dashboard';
+      const redirectUrl = `${baseUrl}/api/auth/callback?next=${encodeURIComponent(currentPath)}`;
 
-      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+      // Verify redirect URL is valid
+      if (!redirectUrl.startsWith('http://') && !redirectUrl.startsWith('https://')) {
+        throw new Error('Invalid redirect URL');
+      }
+
+      // Initiate OAuth flow with PKCE (automatically handled by Supabase)
+      // The code verifier will be stored in cookies by the browser client
+      const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: redirectUrl,
@@ -33,20 +42,31 @@ export function OAuthButtons({ mode = 'login' }) {
             access_type: 'offline',
             prompt: 'consent',
           },
+          // PKCE is automatically enabled by Supabase
+          // The code verifier will be stored in cookies
         },
       });
 
       if (oauthError) {
-        setError(`Failed to sign in with ${provider}. Please try again.`);
+        const errorMessage = oauthError.message || `Failed to sign in with ${provider}`;
+        setError(errorMessage);
         setLoading(null);
-        console.error(`${provider} OAuth error:`, oauthError);
+        console.error(`[OAuth] ${provider} error:`, {
+          message: oauthError.message,
+          status: oauthError.status,
+          name: oauthError.name,
+        });
+      } else if (data?.url) {
+        // OAuth flow initiated successfully
+        // User will be redirected to OAuth provider
+        // Then redirected back to callback route
+        // The code verifier is automatically stored in cookies
       }
-      // If successful, user will be redirected to OAuth provider
-      // Then redirected back to callback route
     } catch (err) {
-      setError(`An error occurred with ${provider} sign in.`);
+      const errorMessage = err.message || `An error occurred with ${provider} sign in`;
+      setError(errorMessage);
       setLoading(null);
-      console.error(`${provider} OAuth error:`, err);
+      console.error(`[OAuth] ${provider} exception:`, err);
     }
   };
 
