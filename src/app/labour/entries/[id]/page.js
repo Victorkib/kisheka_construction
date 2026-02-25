@@ -147,11 +147,14 @@ function LabourEntryDetailPageContent() {
     setIsApproving(true);
     try {
       const response = await fetch(`/api/labour/entries/${entryId}/approve`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({}),
       });
 
       const data = await response.json();
@@ -174,11 +177,12 @@ function LabourEntryDetailPageContent() {
     setIsDeleting(true);
     try {
       const response = await fetch(`/api/labour/entries/${entryId}`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'DELETE',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
       });
 
       const data = await response.json();

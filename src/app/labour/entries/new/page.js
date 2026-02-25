@@ -18,6 +18,8 @@ import {
 } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { useLabourPrerequisites } from '@/hooks/use-labour-prerequisites';
 import {
   VALID_WORKER_TYPES,
   VALID_WORKER_ROLES,
@@ -42,6 +44,13 @@ function NewLabourEntryPageContent() {
   const [loadingFloors, setLoadingFloors] = useState(false);
   const [budgetInfo, setBudgetInfo] = useState(null);
   const [validatingBudget, setValidatingBudget] = useState(false);
+
+  // Check prerequisites
+  const {
+    prerequisiteDetails,
+    loading: prerequisitesLoading,
+    canProceed,
+  } = useLabourPrerequisites('entry-new', formData.projectId || null);
 
   const [formData, setFormData] = useState({
     projectId: '',
@@ -697,6 +706,18 @@ function NewLabourEntryPageContent() {
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
+        )}
+
+        {/* Prerequisites Guide */}
+        {!prerequisitesLoading && (
+          <PrerequisiteGuide
+            title="Before you create a labour entry"
+            description="Labour entries require projects, phases, and workers. For direct labour, work items are also needed. For indirect labour, indirect cost categories are required."
+            prerequisiteDetails={prerequisiteDetails}
+            canProceed={canProceed}
+            blocking={!canProceed}
+            tip="Select a project and phase first. Then choose a work item for direct labour or an indirect cost category for indirect labour."
+          />
         )}
 
         <form

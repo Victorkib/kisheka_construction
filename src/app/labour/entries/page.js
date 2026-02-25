@@ -17,6 +17,7 @@ import { useToast } from '@/components/toast/toast-container';
 import { Plus, Search, Filter, Download, Edit, Trash2, CheckCircle, XCircle, Eye, Calendar, Clock, DollarSign, Users } from 'lucide-react';
 import { ConfirmationModal } from '@/components/modals';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { useLabourPrerequisites } from '@/hooks/use-labour-prerequisites';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { NoProjectsEmptyState } from '@/components/empty-states';
 
@@ -50,6 +51,13 @@ function LabourEntriesPageContent() {
   const [loadingPhases, setLoadingPhases] = useState(false);
   const [loadingWorkers, setLoadingWorkers] = useState(false);
   const [loadingWorkItems, setLoadingWorkItems] = useState(false);
+
+  // Check prerequisites
+  const {
+    prerequisiteDetails,
+    loading: prerequisitesLoading,
+    canProceed,
+  } = useLabourPrerequisites('entries', filters.projectId || null);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -284,11 +292,12 @@ function LabourEntriesPageContent() {
     setDeletingId(entryId);
     try {
       const response = await fetch(`/api/labour/entries/${entryId}`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'DELETE',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
       });
 
       const data = await response.json();
@@ -313,11 +322,14 @@ function LabourEntriesPageContent() {
     setApprovingId(entryId);
     try {
       const response = await fetch(`/api/labour/entries/${entryId}/approve`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+        body: JSON.stringify({}),
       });
 
       const data = await response.json();
@@ -404,20 +416,15 @@ function LabourEntriesPageContent() {
           </Link>
         </div>
 
-        <PrerequisiteGuide
-          title="Labour entries rely on workers and phases"
-          description="Track labour only after workers and project phases are set up."
-          prerequisites={[
-            'Workers are created',
-            'Project and phase are selected',
-          ]}
-          actions={[
-            { href: '/labour/workers/new', label: 'Add Worker' },
-            { href: '/phases', label: 'View Phases' },
-            { href: '/labour/entries/new', label: 'New Entry' },
-          ]}
-          tip="Use batch entry for multiple workers at once."
-        />
+        {!prerequisitesLoading && (
+          <PrerequisiteGuide
+            title="Before you view labour entries"
+            description="Labour entries link workers to projects, phases, and work items. Ensure the foundation is set up first."
+            prerequisiteDetails={prerequisiteDetails}
+            canProceed={canProceed}
+            tip="Select a project and phase to filter entries. Use batch entry for multiple workers at once."
+          />
+        )}
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

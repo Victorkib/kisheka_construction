@@ -9,7 +9,7 @@ import { ObjectId } from 'mongodb';
  * Worker Profile Schema
  * @typedef {Object} WorkerProfileSchema
  * @property {ObjectId} _id - Worker profile ID
- * @property {ObjectId} [userId] - User ID (optional, null for external workers)
+ * @property {ObjectId} [userId] - User ID (optional, omitted for external workers to work with sparse unique index)
  * @property {string} employeeId - Company employee ID (unique, indexed)
  * @property {string} workerName - Worker name (required)
  * @property {string} workerType - 'internal' | 'external' | 'professional' (required)
@@ -195,8 +195,9 @@ export function createWorkerProfile(input) {
     status = 'active',
   } = input;
 
-  return {
-    userId: userId && ObjectId.isValid(userId) ? new ObjectId(userId) : null,
+  // Build worker profile object
+  // Only include userId if it's provided and valid (for sparse unique index compatibility)
+  const profile = {
     employeeId: employeeId?.trim() || '',
     workerName: workerName?.trim() || '',
     workerType: workerType || 'internal',
@@ -243,6 +244,13 @@ export function createWorkerProfile(input) {
     createdAt: new Date(),
     updatedAt: new Date(),
   };
+
+  // Only include userId if it's provided and valid (omit field for null/undefined to work with sparse index)
+  if (userId && ObjectId.isValid(userId)) {
+    profile.userId = new ObjectId(userId);
+  }
+
+  return profile;
 }
 
 /**

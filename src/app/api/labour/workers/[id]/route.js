@@ -173,10 +173,37 @@ export async function PATCH(request, { params }) {
       return errorResponse('Worker profile not found', 404);
     }
 
-    // Merge updates
+    // Format update data - properly handle strings, numbers, dates
+    const formattedUpdates = {};
+    
+    // Handle string fields - trim whitespace
+    if (body.employeeId !== undefined) formattedUpdates.employeeId = body.employeeId?.trim() || '';
+    if (body.workerName !== undefined) formattedUpdates.workerName = body.workerName?.trim() || '';
+    if (body.workerType !== undefined) formattedUpdates.workerType = body.workerType;
+    if (body.nationalId !== undefined) formattedUpdates.nationalId = body.nationalId?.trim() || null;
+    if (body.phoneNumber !== undefined) formattedUpdates.phoneNumber = body.phoneNumber?.trim() || null;
+    if (body.email !== undefined) formattedUpdates.email = body.email?.trim() || null;
+    
+    // Handle number fields - parse to float
+    if (body.defaultHourlyRate !== undefined) formattedUpdates.defaultHourlyRate = parseFloat(body.defaultHourlyRate) || 0;
+    if (body.defaultDailyRate !== undefined) formattedUpdates.defaultDailyRate = body.defaultDailyRate ? parseFloat(body.defaultDailyRate) : null;
+    if (body.overtimeMultiplier !== undefined) formattedUpdates.overtimeMultiplier = parseFloat(body.overtimeMultiplier) || 1.5;
+    
+    // Handle array fields
+    if (body.skillTypes !== undefined) formattedUpdates.skillTypes = Array.isArray(body.skillTypes) ? body.skillTypes : [];
+    
+    // Handle enum fields
+    if (body.employmentType !== undefined) formattedUpdates.employmentType = body.employmentType;
+    if (body.status !== undefined) formattedUpdates.status = body.status;
+    
+    // Handle date fields
+    if (body.hireDate !== undefined) formattedUpdates.hireDate = body.hireDate ? new Date(body.hireDate) : null;
+    if (body.terminationDate !== undefined) formattedUpdates.terminationDate = body.terminationDate ? new Date(body.terminationDate) : null;
+
+    // Merge updates with existing worker
     const updatedData = {
       ...existingWorker,
-      ...body,
+      ...formattedUpdates,
       updatedAt: new Date(),
     };
 
@@ -187,10 +214,11 @@ export async function PATCH(request, { params }) {
     }
 
     // Check if employeeId is being changed and if new one already exists
-    if (body.employeeId && body.employeeId !== existingWorker.employeeId) {
+    if (formattedUpdates.employeeId && formattedUpdates.employeeId !== existingWorker.employeeId) {
       const existing = await db.collection('worker_profiles').findOne({
-        employeeId: body.employeeId,
+        employeeId: formattedUpdates.employeeId,
         _id: { $ne: new ObjectId(id) },
+        deletedAt: null,
       });
 
       if (existing) {
@@ -198,11 +226,16 @@ export async function PATCH(request, { params }) {
       }
     }
 
-    // Update worker profile
+    // Update worker profile - only update the fields that were provided
+    const updateFields = {
+      ...formattedUpdates,
+      updatedAt: new Date(),
+    };
+
     await db.collection('worker_profiles').updateOne(
       { _id: new ObjectId(id) },
       {
-        $set: updatedData,
+        $set: updateFields,
       }
     );
 
@@ -239,9 +272,13 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();    if (authError || !user) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    if (authError || !user) {
       return errorResponse('Unauthorized', 401);
-    }    // Check permission
+    }
+
+    // Check permission
     const userProfile = await getUserProfile(user.id);
     if (!userProfile) {
       return errorResponse('User profile not found', 404);
@@ -250,14 +287,26 @@ export async function DELETE(request, { params }) {
     const hasAccess = await hasPermission(user.id, 'delete_worker_profile');
     if (!hasAccess) {
       return errorResponse('Insufficient permissions. You do not have permission to delete worker profiles.', 403);
-    }    const { id } = await params;    if (!id || !ObjectId.isValid(id)) {
+    }
+
+    const { id } = await params;
+
+    if (!id || !ObjectId.isValid(id)) {
       return errorResponse('Valid worker ID is required', 400);
-    }    const db = await getDatabase();    // Get existing worker
+    }
+
+    const db = await getDatabase();
+
+    // Get existing worker
     const existingWorker = await db.collection('worker_profiles').findOne({
       _id: new ObjectId(id),
-    });    if (!existingWorker) {
+    });
+
+    if (!existingWorker) {
       return errorResponse('Worker profile not found', 404);
-    }    // Soft delete - set deletedAt timestamp
+    }
+
+    // Soft delete - set deletedAt timestamp
     await db.collection('worker_profiles').updateOne(
       { _id: new ObjectId(id) },
       {
@@ -267,7 +316,9 @@ export async function DELETE(request, { params }) {
           updatedAt: new Date(),
         },
       }
-    );    // Create audit log
+    );
+
+    // Create audit log
     await createAuditLog({
       userId: userProfile._id.toString(),
       action: 'DELETED',
@@ -277,7 +328,9 @@ export async function DELETE(request, { params }) {
       changes: {
         deleted: existingWorker,
       },
-    });    return successResponse(null, 'Worker profile deleted successfully');
+    });
+
+    return successResponse(null, 'Worker profile deleted successfully');
   } catch (error) {
     console.error('DELETE /api/labour/workers/[id] error:', error);
     return errorResponse(error.message || 'Failed to delete worker profile', 500);

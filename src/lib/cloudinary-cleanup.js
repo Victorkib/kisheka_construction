@@ -363,9 +363,7 @@ export async function deletePhaseCloudinaryAssets(phase) {
   }
 
   // Remove duplicates
-  const uniqueUrls = [...new Set(urls.filter(Boolean))];
-
-  return await deleteMultipleCloudinaryAssets(uniqueUrls);
+  const uniqueUrls = [...new Set(urls.filter(Boolean))];  return await deleteMultipleCloudinaryAssets(uniqueUrls);
 }/**
  * Extract and delete Cloudinary assets from floor progress photos
  * @param {object} floor - Floor document

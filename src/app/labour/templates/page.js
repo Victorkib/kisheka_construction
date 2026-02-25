@@ -87,11 +87,12 @@ function LabourTemplatesPageContent() {
     setDeletingId(templateId);
     try {
       const response = await fetch(`/api/labour/templates/${templateId}`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'DELETE',
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
       });
 
       const data = await response.json();

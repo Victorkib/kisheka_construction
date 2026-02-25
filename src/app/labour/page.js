@@ -13,6 +13,8 @@ import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner } from '@/components/loading';
 import { useToast } from '@/components/toast/toast-container';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { useLabourPrerequisites } from '@/hooks/use-labour-prerequisites';
 import {
   Plus,
   Clock,
@@ -30,6 +32,13 @@ export default function LabourDashboardPage() {
   const [summary, setSummary] = useState(null);
   const [recentEntries, setRecentEntries] = useState([]);
   const [budgetAlerts, setBudgetAlerts] = useState([]);
+  
+  // Check prerequisites
+  const {
+    prerequisiteDetails,
+    loading: prerequisitesLoading,
+    canProceed,
+  } = useLabourPrerequisites('dashboard');
 
   useEffect(() => {
     fetchDashboardData();
@@ -48,32 +57,88 @@ export default function LabourDashboardPage() {
       // Fetch today's entries
       const entriesResponse = await fetch(
         `/api/labour/entries?dateFrom=${todayStart.toISOString()}&dateTo=${todayEnd.toISOString()}&limit=50`,
+        {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        }
       );
+
+      if (!entriesResponse.ok) {
+        throw new Error(`HTTP error! status: ${entriesResponse.status}`);
+      }
+
       const entriesData = await entriesResponse.json();
 
-      if (entriesData.success) {
-        const entries = entriesData.data?.entries || [];
-        setRecentEntries(entries.slice(0, 10)); // Show last 10
-
-        // Calculate summary
-        const todaySummary = entriesData.data?.summary || {
-          totalHours: 0,
-          totalCost: 0,
-          entryCount: 0,
-        };
-
-        setSummary({
-          today: todaySummary,
-          workersActive: new Set(entries.map((e) => e.workerId || e.workerName))
-            .size,
-        });
+      if (!entriesData.success) {
+        throw new Error(entriesData.error || 'Failed to fetch entries');
       }
+
+      const entries = entriesData.data?.entries || [];
+      
+      // Process entries to ensure data consistency
+      const processedEntries = entries.map((entry) => ({
+        ...entry,
+        totalHours: typeof entry.totalHours === 'number' ? entry.totalHours : parseFloat(entry.totalHours) || 0,
+        totalCost: typeof entry.totalCost === 'number' ? entry.totalCost : parseFloat(entry.totalCost) || 0,
+        workerName: entry.workerName || 'Unknown Worker',
+        skillType: entry.skillType || 'general_worker',
+        status: entry.status || 'draft',
+        entryDate: entry.entryDate ? new Date(entry.entryDate) : new Date(),
+      }));
+
+      setRecentEntries(processedEntries.slice(0, 10)); // Show last 10
+
+      // Calculate summary - ensure numbers are properly handled
+      const todaySummary = entriesData.data?.summary || {
+        totalHours: 0,
+        totalCost: 0,
+        entryCount: 0,
+      };
+
+      // Ensure summary values are numbers
+      const processedSummary = {
+        totalHours: typeof todaySummary.totalHours === 'number' 
+          ? todaySummary.totalHours 
+          : parseFloat(todaySummary.totalHours) || 0,
+        totalCost: typeof todaySummary.totalCost === 'number' 
+          ? todaySummary.totalCost 
+          : parseFloat(todaySummary.totalCost) || 0,
+        entryCount: typeof todaySummary.entryCount === 'number' 
+          ? todaySummary.entryCount 
+          : parseInt(todaySummary.entryCount) || 0,
+      };
+
+      // Count unique workers - handle both workerId (ObjectId or string) and workerName
+      // Use workerName as primary identifier since workerId can be null for external workers
+      const uniqueWorkers = new Set();
+      processedEntries.forEach((entry) => {
+        // Prefer workerName, fallback to workerId if workerName is missing
+        const workerIdentifier = entry.workerName || 
+          (entry.workerId ? (typeof entry.workerId === 'string' ? entry.workerId : entry.workerId.toString()) : null);
+        if (workerIdentifier) {
+          uniqueWorkers.add(workerIdentifier);
+        }
+      });
+
+      setSummary({
+        today: processedSummary,
+        workersActive: uniqueWorkers.size,
+      });
 
       // TODO: Fetch budget alerts (will be implemented in Phase 5)
       setBudgetAlerts([]);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
-      toast.showError('Failed to load dashboard data');
+      toast.showError(err.message || 'Failed to load dashboard data');
+      // Set empty state on error
+      setSummary({
+        today: { totalHours: 0, totalCost: 0, entryCount: 0 },
+        workersActive: 0,
+      });
+      setRecentEntries([]);
     } finally {
       setLoading(false);
     }
@@ -101,6 +166,17 @@ export default function LabourDashboardPage() {
             Track and manage all labour activities
           </p>
         </div>
+
+        {/* Prerequisites Guide */}
+        {!prerequisitesLoading && (
+          <PrerequisiteGuide
+            title="Before you start tracking labour"
+            description="Labour tracking links workers to projects, phases, and work items. Set up the foundation first."
+            prerequisiteDetails={prerequisiteDetails}
+            canProceed={canProceed}
+            tip="Start by creating a project and adding phases. Then add workers and work items for complete labour tracking."
+          />
+        )}
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -177,7 +253,7 @@ export default function LabourDashboardPage() {
                   </span>
                 </div>
                 <div className="text-2xl font-bold text-blue-600">
-                  {summary.today.totalHours.toFixed(1)} hrs
+                  {(summary.today.totalHours || 0).toFixed(1)} hrs
                 </div>
               </div>
 
@@ -189,7 +265,7 @@ export default function LabourDashboardPage() {
                   </span>
                 </div>
                 <div className="text-2xl font-bold text-green-600">
-                  {summary.today.totalCost.toLocaleString()} KES
+                  {(summary.today.totalCost || 0).toLocaleString()} KES
                 </div>
               </div>
 
@@ -213,7 +289,7 @@ export default function LabourDashboardPage() {
                   </span>
                 </div>
                 <div className="text-2xl font-bold text-gray-600">
-                  {summary.today.entryCount}
+                  {summary.today.entryCount || 0}
                 </div>
               </div>
             </div>
@@ -293,13 +369,13 @@ export default function LabourDashboardPage() {
                         {entry.workerName}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {entry.skillType?.replace(/_/g, ' ')}
+                        {entry.skillType ? entry.skillType.replace(/_/g, ' ') : 'N/A'}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {entry.totalHours?.toFixed(1)} hrs
+                        {(entry.totalHours || 0).toFixed(1)} hrs
                       </td>
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                        {entry.totalCost?.toLocaleString()} KES
+                        {(entry.totalCost || 0).toLocaleString()} KES
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <span
@@ -308,14 +384,16 @@ export default function LabourDashboardPage() {
                               ? 'bg-green-100 text-green-800'
                               : entry.status === 'paid'
                                 ? 'bg-blue-100 text-blue-800'
-                                : 'bg-yellow-100 text-yellow-800'
+                                : entry.status === 'rejected'
+                                  ? 'bg-red-100 text-red-800'
+                                  : 'bg-yellow-100 text-yellow-800'
                           }`}
                         >
-                          {entry.status}
+                          {entry.status || 'draft'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {new Date(entry.entryDate).toLocaleDateString()}
+                        {entry.entryDate ? new Date(entry.entryDate).toLocaleDateString() : 'N/A'}
                       </td>
                     </tr>
                   ))}

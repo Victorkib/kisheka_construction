@@ -18,6 +18,8 @@ import {
 } from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast/toast-container';
+import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { useLabourPrerequisites } from '@/hooks/use-labour-prerequisites';
 import { WizardProgress } from '@/components/bulk-request/wizard-progress';
 import { WizardNavigation } from '@/components/bulk-request/wizard-navigation';
 import { Step2AddWorkers } from '@/components/bulk-labour/step2-add-workers';
@@ -42,6 +44,13 @@ function BulkLabourEntryPageContent() {
   const [budgetValidation, setBudgetValidation] = useState(null);
   const [preSelectedWorkerId, setPreSelectedWorkerId] = useState(null);
   const [preSelectedWorkerIds, setPreSelectedWorkerIds] = useState([]);
+
+  // Check prerequisites
+  const {
+    prerequisiteDetails,
+    loading: prerequisitesLoading,
+    canProceed,
+  } = useLabourPrerequisites('bulk-new', wizardData.projectId || null);
 
   // Wizard data state
   const [wizardData, setWizardData] = useState({
@@ -447,6 +456,18 @@ function BulkLabourEntryPageContent() {
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
+        )}
+
+        {/* Prerequisites Guide */}
+        {!prerequisitesLoading && (
+          <PrerequisiteGuide
+            title="Before you create a bulk labour entry"
+            description="Bulk labour entries require projects, phases, and workers. For direct labour, work items are also needed. For indirect labour, indirect cost categories are required."
+            prerequisiteDetails={prerequisiteDetails}
+            canProceed={canProceed}
+            blocking={!canProceed}
+            tip="Select a project and phase first. Then add workers. Use batch entry to create multiple entries efficiently."
+          />
         )}
 
         {/* Wizard Progress */}
