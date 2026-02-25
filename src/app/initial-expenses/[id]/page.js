@@ -90,11 +90,13 @@ export default function InitialExpenseDetailPage() {
     setIsApproving(true);
     try {
       const response = await fetch(`/api/initial-expenses/${expenseId}/approve`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({ approved: true, notes: approvalNotes || 'Approved via UI' }),
       });
 
@@ -130,11 +132,13 @@ export default function InitialExpenseDetailPage() {
     setIsRejecting(true);
     try {
       const response = await fetch(`/api/initial-expenses/${expenseId}/approve`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify({ approved: false, notes: rejectReason.trim() }),
       });
 
