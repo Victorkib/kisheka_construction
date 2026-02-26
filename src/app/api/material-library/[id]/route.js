@@ -241,8 +241,10 @@ export async function PATCH(request, { params }) {
 
 /**
  * DELETE /api/material-library/[id]
- * Soft delete library material
+ * Permanently delete library material (hard delete)
  * Auth: OWNER only
+ * 
+ * Note: Materials in use cannot be deleted. They must be removed from all references first.
  */
 export async function DELETE(request, { params }) {
   try {
@@ -270,19 +272,19 @@ export async function DELETE(request, { params }) {
     }
 
     const db = await getDatabase();
+    const materialId = new ObjectId(id);
 
-    // Check if material exists
+    // Check if material exists (hard delete - no need to check deletedAt)
     const existing = await db.collection('material_library').findOne({
-      _id: new ObjectId(id),
-      deletedAt: null,
+      _id: materialId,
     });
 
     if (!existing) {
+      console.error(`[DELETE Material] Material with ID ${id} does not exist in database`);
       return errorResponse('Material not found in library', 404);
     }
 
     // Check if material is in use - prevent deletion if actively used
-    const materialId = new ObjectId(id);
     
     // Check material requests (any status except cancelled)
     const usedInRequests = await db.collection('material_requests').countDocuments({
@@ -312,32 +314,33 @@ export async function DELETE(request, { params }) {
       );
     }
 
-    // Soft delete (only if not in use)
-    const result = await db.collection('material_library').findOneAndUpdate(
-      { _id: new ObjectId(id) },
-      { 
-        $set: { 
-          deletedAt: new Date(),
-          updatedAt: new Date(),
-        } 
-      },
-      { returnDocument: 'after' }
-    );
+    // Hard delete (permanent removal) - only if not in use
+    // Use the materialId we already validated
+    const result = await db.collection('material_library').deleteOne({
+      _id: materialId,
+    });
 
-    if (!result.value) {
-      return errorResponse('Material not found in library', 404);
+    if (result.deletedCount === 0) {
+      console.error(`[DELETE Material] Failed to delete material with ID ${id} - deleteOne returned 0 deletedCount`);
+      return errorResponse('Failed to delete material. Material may have been deleted by another process.', 409); // 409 Conflict
     }
 
-    // Create audit log
+    // Create audit log with material details before deletion
     await createAuditLog({
       userId: userProfile._id.toString(),
       action: 'DELETED',
       entityType: 'MATERIAL_LIBRARY',
       entityId: id,
-      changes: { deleted: result.value },
+      changes: { 
+        deleted: {
+          name: existing.name,
+          category: existing.category,
+          defaultUnit: existing.defaultUnit,
+        }
+      },
     });
 
-    return successResponse(null, 'Material removed from library successfully');
+    return successResponse(null, 'Material permanently deleted from library');
   } catch (error) {
     console.error('Delete material library error:', error);
     return errorResponse('Failed to remove material from library', 500);
