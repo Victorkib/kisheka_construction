@@ -11,9 +11,11 @@ export function MaterialLibraryTable({
   materials = [],
   onEdit,
   onDelete,
+  onDuplicate,
   onToggleCommon,
   onToggleActive,
   canManage = false,
+  duplicatingId = null,
 }) {
   const formatCurrency = (amount) => {
     if (!amount || amount === 0) return 'N/A';
@@ -138,9 +140,20 @@ export function MaterialLibraryTable({
                       <button
                         onClick={() => onEdit(material._id)}
                         className="text-blue-600 hover:text-blue-800"
+                        title="Edit material"
                       >
                         Edit
                       </button>
+                      {onDuplicate && (
+                        <button
+                          onClick={() => onDuplicate(material._id)}
+                          disabled={duplicatingId === material._id}
+                          className="text-purple-600 hover:text-purple-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Duplicate material"
+                        >
+                          {duplicatingId === material._id ? '...' : '📋'}
+                        </button>
+                      )}
                       <button
                         onClick={() => onToggleCommon(material._id, material.isCommon)}
                         className={`${
@@ -166,6 +179,7 @@ export function MaterialLibraryTable({
                       <button
                         onClick={() => onDelete(material._id, material.name)}
                         className="text-red-600 hover:text-red-800"
+                        title="Delete material"
                       >
                         Delete
                       </button>

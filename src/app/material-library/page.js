@@ -56,7 +56,9 @@ function MaterialLibraryPageContent() {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [materialToDelete, setMaterialToDelete] = useState(null);
+  const [materialUsage, setMaterialUsage] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [duplicatingId, setDuplicatingId] = useState(null);
   const fetchKeyRef = useRef('');
   const fetchAbortRef = useRef(null);
   const loadingRef = useRef(false);
@@ -203,9 +205,48 @@ function MaterialLibraryPageContent() {
     [router],
   );
 
-  const handleDelete = (materialId, materialName) => {
+  const handleDelete = async (materialId, materialName) => {
+    // Check usage before showing delete modal
+    try {
+      const usageResponse = await fetch(`/api/material-library/${materialId}/usage`);
+      const usageData = await usageResponse.json();
+      
+      if (usageData.success) {
+        setMaterialUsage(usageData.data);
+      }
+    } catch (err) {
+      console.error('Error checking material usage:', err);
+    }
+    
     setMaterialToDelete({ id: materialId, name: materialName });
     setShowDeleteModal(true);
+  };
+
+  const handleDuplicate = async (materialId) => {
+    setDuplicatingId(materialId);
+    try {
+      const response = await fetch(`/api/material-library/${materialId}/duplicate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({}),
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to duplicate material');
+      }
+
+      toast.showSuccess('Material duplicated successfully. You can now edit the copy.');
+      // Navigate to edit page for the duplicated material
+      router.push(`/material-library/${data.data._id}/edit`);
+    } catch (err) {
+      toast.showError(`Error: ${err.message}`);
+    } finally {
+      setDuplicatingId(null);
+    }
   };
 
   const confirmDelete = async () => {
@@ -229,6 +270,7 @@ function MaterialLibraryPageContent() {
       toast.showSuccess('Material removed from library');
       setShowDeleteModal(false);
       setMaterialToDelete(null);
+      setMaterialUsage(null);
       fetchMaterials();
     } catch (err) {
       toast.showError(`Error: ${err.message}`);
@@ -416,9 +458,11 @@ function MaterialLibraryPageContent() {
               materials={materials}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onDuplicate={handleDuplicate}
               onToggleCommon={handleToggleCommon}
               onToggleActive={handleToggleActive}
               canManage={canManage}
+              duplicatingId={duplicatingId}
             />
 
             {/* Pagination */}
@@ -476,14 +520,49 @@ function MaterialLibraryPageContent() {
           onClose={() => {
             setShowDeleteModal(false);
             setMaterialToDelete(null);
+            setMaterialUsage(null);
           }}
           onConfirm={confirmDelete}
           title="Delete Material"
-          message={`Are you sure you want to remove "${materialToDelete?.name}" from the library? This action cannot be undone.`}
-          confirmText="Delete"
+          message={
+            <div>
+              <p className="mb-3">
+                Are you sure you want to remove "{materialToDelete?.name}" from the library?
+              </p>
+              {materialUsage && materialUsage.total > 0 && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-3">
+                  <p className="font-semibold text-yellow-800 mb-2">
+                    ⚠️ This material is currently in use:
+                  </p>
+                  <ul className="text-sm text-yellow-700 space-y-1">
+                    {materialUsage.materialRequests.count > 0 && (
+                      <li>• {materialUsage.materialRequests.count} material request(s)</li>
+                    )}
+                    {materialUsage.materials.count > 0 && (
+                      <li>• {materialUsage.materials.count} material entry/entries</li>
+                    )}
+                    {materialUsage.materialTemplates.count > 0 && (
+                      <li>• {materialUsage.materialTemplates.count} material template(s)</li>
+                    )}
+                  </ul>
+                  <p className="text-sm text-yellow-700 mt-2">
+                    <strong>Deletion is not allowed</strong> when a material is in use. Consider duplicating the material instead if you need a similar entry.
+                  </p>
+                </div>
+              )}
+              {(!materialUsage || materialUsage.total === 0) && (
+                <p className="text-sm text-gray-600">
+                  This action cannot be undone.
+                </p>
+              )}
+            </div>
+          }
+          confirmText={materialUsage && materialUsage.total > 0 ? 'Close' : 'Delete'}
           cancelText="Cancel"
-          variant="danger"
+          variant={materialUsage && materialUsage.total > 0 ? 'warning' : 'danger'}
           isLoading={actionLoading}
+          actionsDisabled={materialUsage && materialUsage.total > 0}
+          actionsDisabledReason={materialUsage && materialUsage.total > 0 ? 'Material is in use and cannot be deleted' : ''}
         />
       </div>
     </AppLayout>

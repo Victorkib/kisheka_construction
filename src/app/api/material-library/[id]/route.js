@@ -281,16 +281,38 @@ export async function DELETE(request, { params }) {
       return errorResponse('Material not found in library', 404);
     }
 
-    // Check if used in active batches (optional check - can be removed if not needed)
-    const usedInBatches = await db.collection('material_request_batches').countDocuments({
-      status: { $in: ['draft', 'submitted', 'pending_approval', 'approved'] },
+    // Check if material is in use - prevent deletion if actively used
+    const materialId = new ObjectId(id);
+    
+    // Check material requests (any status except cancelled)
+    const usedInRequests = await db.collection('material_requests').countDocuments({
+      libraryMaterialId: materialId,
+      status: { $ne: 'cancelled' },
       deletedAt: null,
     });
 
-    // Note: We still allow deletion even if used, as it's just a soft delete
-    // The material can be restored if needed
+    // Check materials (actual inventory)
+    const usedInMaterials = await db.collection('materials').countDocuments({
+      libraryMaterialId: materialId,
+      deletedAt: null,
+    });
 
-    // Soft delete
+    // Check material templates
+    const usedInTemplates = await db.collection('material_templates').countDocuments({
+      'materials.libraryMaterialId': materialId,
+      deletedAt: null,
+    });
+
+    const totalUsage = usedInRequests + usedInMaterials + usedInTemplates;
+
+    if (totalUsage > 0) {
+      return errorResponse(
+        `Cannot delete material: It is currently in use. Found ${totalUsage} reference(s) in material requests, materials, or templates. Consider duplicating the material instead.`,
+        400
+      );
+    }
+
+    // Soft delete (only if not in use)
     const result = await db.collection('material_library').findOneAndUpdate(
       { _id: new ObjectId(id) },
       { 
