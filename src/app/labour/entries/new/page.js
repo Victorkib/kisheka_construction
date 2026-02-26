@@ -45,13 +45,7 @@ function NewLabourEntryPageContent() {
   const [budgetInfo, setBudgetInfo] = useState(null);
   const [validatingBudget, setValidatingBudget] = useState(false);
 
-  // Check prerequisites
-  const {
-    prerequisiteDetails,
-    loading: prerequisitesLoading,
-    canProceed,
-  } = useLabourPrerequisites('entry-new', formData.projectId || null);
-
+  // Form data - must be declared before useLabourPrerequisites
   const [formData, setFormData] = useState({
     projectId: '',
     phaseId: '',
@@ -86,6 +80,13 @@ function NewLabourEntryPageContent() {
     equipmentId: '',
     subcontractorId: '',
   });
+
+  // Check prerequisites - must be after formData declaration
+  const {
+    prerequisiteDetails,
+    loading: prerequisitesLoading,
+    canProceed,
+  } = useLabourPrerequisites('entry-new', formData.projectId || null);
 
   // Fetch projects on mount
   useEffect(() => {

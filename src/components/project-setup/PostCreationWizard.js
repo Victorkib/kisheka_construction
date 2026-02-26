@@ -96,7 +96,8 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
       id: 'budget',
       title: 'Set Project Budget',
       description: 'Define the total budget and allocate amounts for materials, labour, and contingency',
-      href: `/projects/${projectId}/edit`,
+      // Use the dedicated budget management page instead of a non-existent /edit route
+      href: `/projects/${projectId}/budget`,
       icon: '💰',
       color: 'blue',
       completed: false,

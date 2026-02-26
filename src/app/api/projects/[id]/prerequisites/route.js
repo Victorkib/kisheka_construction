@@ -157,7 +157,8 @@ export async function GET(request, { params }) {
           labour: budget.labour || 0,
           contingency: budget.contingency || 0,
         },
-        actionUrl: `/projects/${id}/edit`,
+        // Use dedicated budget management page for setting/editing budget
+        actionUrl: `/projects/${id}/budget`,
         actionLabel: 'Set Budget',
       },
       capital: {
@@ -175,7 +176,8 @@ export async function GET(request, { params }) {
           availableCapital: Math.max(0, availableCapital),
           capitalStatus,
         },
-        actionUrl: '/financing',
+        // Direct user to financing dashboard scoped to this project
+        actionUrl: `/financing?projectId=${id}`,
         actionLabel: 'Allocate Capital',
       },
       floors: {

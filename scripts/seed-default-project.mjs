@@ -1,6 +1,6 @@
 /**
  * Seed Default Project Script
- * Creates a default project for the Kisheka Construction system
+ * Creates a default project for the Doshaki Construction system
  * 
  * Run with: node scripts/seed-default-project.mjs
  */
@@ -29,7 +29,7 @@ const defaultProject = {
   projectName: 'Kisheka 10-Storey Building',
   description: '10-storey residential/commercial building construction project',
   location: 'Nairobi, Kenya',
-  client: 'Kisheka Construction Ltd',
+  client: 'Doshaki Construction Ltd',
   status: 'active',
   startDate: new Date(),
   plannedEndDate: null, // To be set by project manager

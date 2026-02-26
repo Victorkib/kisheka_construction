@@ -45,14 +45,7 @@ function BulkLabourEntryPageContent() {
   const [preSelectedWorkerId, setPreSelectedWorkerId] = useState(null);
   const [preSelectedWorkerIds, setPreSelectedWorkerIds] = useState([]);
 
-  // Check prerequisites
-  const {
-    prerequisiteDetails,
-    loading: prerequisitesLoading,
-    canProceed,
-  } = useLabourPrerequisites('bulk-new', wizardData.projectId || null);
-
-  // Wizard data state
+  // Wizard data state - must be declared before useLabourPrerequisites
   const [wizardData, setWizardData] = useState({
     // Step 1: Project & Settings
     projectId: '',
@@ -70,6 +63,13 @@ function BulkLabourEntryPageContent() {
     // Step 2: Workers
     labourEntries: [],
   });
+
+  // Check prerequisites - must be after wizardData declaration
+  const {
+    prerequisiteDetails,
+    loading: prerequisitesLoading,
+    canProceed,
+  } = useLabourPrerequisites('bulk-new', wizardData.projectId || null);
 
   // Handle workerId and workItemId from URL
   useEffect(() => {

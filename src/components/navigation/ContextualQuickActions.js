@@ -9,12 +9,14 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { usePermissions } from '@/hooks/use-permissions';
+import { useProjectContext } from '@/contexts/ProjectContext';
 import { SidebarSection } from '@/components/layout/SidebarSection';
 
 /**
  * Get contextual quick actions based on current path
+ * Now uses ProjectContext to get current project
  */
-function getContextualActions(pathname, searchParams, canAccess) {
+function getContextualActions(pathname, searchParams, canAccess, currentProjectId) {
   const actions = [];
 
   // Project detail page
@@ -39,7 +41,8 @@ function getContextualActions(pathname, searchParams, canAccess) {
     if (canAccess && canAccess('edit_project')) {
       actions.push({
         label: 'Edit Project',
-        href: `/projects/${projectId}/edit`,
+        // Navigate to project detail page where inline edit is available
+        href: `/projects/${projectId}`,
         icon: '✏️',
         color: 'gray',
       });
@@ -84,7 +87,8 @@ function getContextualActions(pathname, searchParams, canAccess) {
 
   // Material requests list page
   if (pathname === '/material-requests') {
-    const projectId = searchParams.get('projectId');
+    // Prioritize ProjectContext over URL param
+    const projectId = currentProjectId || searchParams.get('projectId');
     if (canAccess && canAccess('create_material_request')) {
       actions.push({
         label: projectId ? 'Create Request for Project' : 'Create Material Request',
@@ -105,7 +109,8 @@ function getContextualActions(pathname, searchParams, canAccess) {
 
   // Purchase orders list page
   if (pathname === '/purchase-orders') {
-    const projectId = searchParams.get('projectId');
+    // Prioritize ProjectContext over URL param
+    const projectId = currentProjectId || searchParams.get('projectId');
     if (canAccess && canAccess('create_purchase_order')) {
       actions.push({
         label: projectId ? 'Create Order for Project' : 'Create Purchase Order',
@@ -148,10 +153,11 @@ export function ContextualQuickActions({ isCollapsed = false }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { canAccess } = usePermissions();
+  const { currentProjectId } = useProjectContext();
 
   const actions = useMemo(() => {
-    return getContextualActions(pathname, searchParams, canAccess);
-  }, [pathname, searchParams, canAccess]);
+    return getContextualActions(pathname, searchParams, canAccess, currentProjectId);
+  }, [pathname, searchParams, canAccess, currentProjectId]);
 
   // Don't show if no actions
   if (actions.length === 0) {

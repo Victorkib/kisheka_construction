@@ -379,8 +379,6 @@ export async function deleteFloorProgressCloudinaryAssets(floor) {
       if (photo.cloudinaryUrl) urls.push(photo.cloudinaryUrl);
       if (photo.fileUrl) urls.push(photo.fileUrl);
     });
-  }
-
-  // Remove duplicates
+  }  // Remove duplicates
   const uniqueUrls = [...new Set(urls.filter(Boolean))];  return await deleteMultipleCloudinaryAssets(uniqueUrls);
 }

@@ -92,7 +92,7 @@ export async function sendEmail(options) {
   }
 
   const emailOptions = {
-    from: from || process.env.EMAIL_FROM || process.env.GMAIL_USER || 'noreply@kisheka.com',
+    from: from || process.env.EMAIL_FROM || process.env.GMAIL_USER || 'doshaki.ecobriq@gmail.com',
     fromName: fromName || process.env.EMAIL_FROM_NAME || 'Doshaki Construction',
     to,
     toName,

@@ -1,6 +1,6 @@
 /**
  * Database Setup Script
- * Creates all collections and indexes for the Kisheka Construction Accountability System
+ * Creates all collections and indexes for the Doshaki Construction Accountability System
  * 
  * Run with: npm run setup:db
  * Or: node scripts/setup-database.mjs

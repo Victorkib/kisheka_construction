@@ -52,14 +52,7 @@ function LabourEntriesPageContent() {
   const [loadingWorkers, setLoadingWorkers] = useState(false);
   const [loadingWorkItems, setLoadingWorkItems] = useState(false);
 
-  // Check prerequisites
-  const {
-    prerequisiteDetails,
-    loading: prerequisitesLoading,
-    canProceed,
-  } = useLabourPrerequisites('entries', filters.projectId || null);
-
-  // Filters
+  // Filters - must be declared before useLabourPrerequisites
   const [filters, setFilters] = useState({
     projectId: searchParams.get('projectId') || currentProjectId || '',
     phaseId: searchParams.get('phaseId') || '',
@@ -72,6 +65,13 @@ function LabourEntriesPageContent() {
     dateTo: searchParams.get('dateTo') || '',
     search: searchParams.get('search') || '',
   });
+
+  // Check prerequisites
+  const {
+    prerequisiteDetails,
+    loading: prerequisitesLoading,
+    canProceed,
+  } = useLabourPrerequisites('entries', filters.projectId || null);
 
   // Sort config
   const [sortConfig, setSortConfig] = useState({

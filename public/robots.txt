@@ -1,4 +1,4 @@
-# Robots.txt for Kisheka Construction Accountability System
+# Robots.txt for Doshaki Construction Accountability System
 # Controls search engine crawling and indexing
 
 # Default rules for all bots

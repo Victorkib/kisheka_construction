@@ -226,7 +226,7 @@ export async function sendPurchaseOrderEmail({
       <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; font-size: 12px; color: #6b7280; margin-bottom: 20px;">
         <p style="margin: 0; font-weight: bold; margin-bottom: 5px;">Contact Information:</p>
         <p style="margin: 2px 0;">Doshaki Construction</p>
-        <p style="margin: 2px 0;">Email: ${process.env.COMPANY_EMAIL || 'info@kisheka.com'}</p>
+        <p style="margin: 2px 0;">Email: ${process.env.COMPANY_EMAIL || 'doshaki.ecobriq@gmail.com'}</p>
         ${process.env.COMPANY_PHONE ? `<p style="margin: 2px 0;">Phone: ${process.env.COMPANY_PHONE}</p>` : ''}
         ${process.env.COMPANY_ADDRESS ? `<p style="margin: 2px 0;">Address: ${process.env.COMPANY_ADDRESS}</p>` : ''}
       </div>
@@ -275,7 +275,7 @@ Important: Please respond to this order as soon as possible.
 
 Contact Information:
 Doshaki Construction
-Email: ${process.env.COMPANY_EMAIL || 'info@kisheka.com'}
+Email: ${process.env.COMPANY_EMAIL || 'doshaki.ecobriq@gmail.com'}
 ${process.env.COMPANY_PHONE ? `Phone: ${process.env.COMPANY_PHONE}` : ''}
 ${process.env.COMPANY_ADDRESS ? `Address: ${process.env.COMPANY_ADDRESS}` : ''}
 
