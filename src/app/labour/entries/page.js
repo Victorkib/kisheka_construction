@@ -350,12 +350,12 @@ function LabourEntriesPageContent() {
 
   const getStatusBadge = (status) => {
     const badges = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       paid: 'bg-blue-100 text-blue-800',
       rejected: 'bg-red-100 text-red-800',
-      cancelled: 'bg-gray-100 text-gray-600',
+      cancelled: 'ds-bg-surface-muted ds-text-secondary',
     };
 
     return (
@@ -374,8 +374,8 @@ function LabourEntriesPageContent() {
       <AppLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Labour Entries</h1>
-            <p className="text-gray-600 mt-1">Track labour costs, hours, and approvals</p>
+            <h1 className="text-3xl font-bold ds-text-primary">Labour Entries</h1>
+            <p className="ds-text-secondary mt-1">Track labour costs, hours, and approvals</p>
           </div>
           <NoProjectsEmptyState />
         </div>
@@ -404,8 +404,8 @@ function LabourEntriesPageContent() {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Labour Entries</h1>
-            <p className="text-gray-600 mt-1">View and manage all labour entries</p>
+            <h1 className="text-3xl font-bold ds-text-primary">Labour Entries</h1>
+            <p className="ds-text-secondary mt-1">View and manage all labour entries</p>
           </div>
           <Link
             href="/labour/entries/new"
@@ -428,41 +428,41 @@ function LabourEntriesPageContent() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
               <Clock className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium text-gray-700">Total Hours</span>
+              <span className="text-sm font-medium ds-text-secondary">Total Hours</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold ds-text-primary">
               {summary.totalHours.toFixed(1)} hrs
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
               <DollarSign className="w-5 h-5 text-green-600" />
-              <span className="text-sm font-medium text-gray-700">Total Cost</span>
+              <span className="text-sm font-medium ds-text-secondary">Total Cost</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold ds-text-primary">
               {summary.totalCost.toLocaleString()} KES
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
               <Users className="w-5 h-5 text-purple-600" />
-              <span className="text-sm font-medium text-gray-700">Total Entries</span>
+              <span className="text-sm font-medium ds-text-secondary">Total Entries</span>
             </div>
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold ds-text-primary">
               {summary.entryCount}
             </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow mb-6">
-          <div className="p-4 border-b border-gray-200">
+        <div className="ds-bg-surface rounded-lg shadow mb-6">
+          <div className="p-4 border-b ds-border-subtle">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 text-gray-700 hover:text-gray-900"
+              className="flex items-center gap-2 ds-text-secondary hover:ds-text-primary"
             >
               <Filter className="w-4 h-4" />
               <span className="font-medium">Filters</span>
@@ -473,13 +473,13 @@ function LabourEntriesPageContent() {
           {showFilters && (
             <div className="p-4 grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Project</label>
                 <LoadingSelect
                   value={filters.projectId}
                   onChange={(e) => handleFilterChange('projectId', e.target.value)}
                   loading={projectLoading}
                   loadingText="Loading projects..."
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Projects</option>
                   {projects.map((project) => (
@@ -491,14 +491,14 @@ function LabourEntriesPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phase</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Phase</label>
                 <LoadingSelect
                   value={filters.phaseId}
                   onChange={(e) => handleFilterChange('phaseId', e.target.value)}
                   loading={loadingPhases}
                   loadingText="Loading phases..."
                   disabled={!filters.projectId}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Phases</option>
                   {phases.map((phase) => (
@@ -510,14 +510,14 @@ function LabourEntriesPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Work Item</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Work Item</label>
                 <LoadingSelect
                   value={filters.workItemId}
                   onChange={(e) => handleFilterChange('workItemId', e.target.value)}
                   loading={loadingWorkItems}
                   loadingText="Loading work items..."
                   disabled={!filters.phaseId}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Work Items</option>
                   {workItems.map((item) => (
@@ -529,13 +529,13 @@ function LabourEntriesPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Worker</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Worker</label>
                 <LoadingSelect
                   value={filters.workerId}
                   onChange={(e) => handleFilterChange('workerId', e.target.value)}
                   loading={loadingWorkers}
                   loadingText="Loading workers..."
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Workers</option>
                   {workers.map((worker) => (
@@ -547,11 +547,11 @@ function LabourEntriesPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Status</label>
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Statuses</option>
                   <option value="draft">Draft</option>
@@ -563,35 +563,35 @@ function LabourEntriesPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date From</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Date From</label>
                 <input
                   type="date"
                   value={filters.dateFrom}
                   onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Date To</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Date To</label>
                 <input
                   type="date"
                   value={filters.dateTo}
                   onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Search</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted" />
                   <input
                     type="text"
                     value={filters.search}
                     onChange={(e) => handleFilterChange('search', e.target.value)}
                     placeholder="Search by worker name, skill type..."
-                    className="w-full pl-10 pr-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full pl-10 pr-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   />
                 </div>
               </div>
@@ -599,7 +599,7 @@ function LabourEntriesPageContent() {
               <div className="flex items-end">
                 <button
                   onClick={handleClearFilters}
-                  className="w-full px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="w-full px-4 py-2 text-sm ds-text-secondary ds-bg-surface-muted rounded-lg hover:ds-bg-surface-muted transition-colors"
                 >
                   Clear Filters
                 </button>
@@ -609,17 +609,17 @@ function LabourEntriesPageContent() {
         </div>
 
         {/* Entries Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
           {error && (
-            <div className="p-4 bg-red-50 border-b border-red-200">
+            <div className="p-4 bg-red-50 border-b border-red-400/60">
               <p className="text-sm text-red-800">{error}</p>
             </div>
           )}
 
           {entries.length === 0 && !loading ? (
             <div className="p-12 text-center">
-              <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-2">No labour entries found</p>
+              <Users className="w-12 h-12 ds-text-muted mx-auto mb-4" />
+              <p className="ds-text-secondary mb-2">No labour entries found</p>
               <Link
                 href="/labour/entries/new"
                 className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -629,10 +629,10 @@ function LabourEntriesPageContent() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider cursor-pointer hover:ds-bg-surface-muted"
                         onClick={() => handleSort('entryDate')}>
                       <div className="flex items-center gap-1">
                         <Calendar className="w-4 h-4" />
@@ -640,57 +640,57 @@ function LabourEntriesPageContent() {
                         {sortConfig.key === 'entryDate' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider cursor-pointer hover:ds-bg-surface-muted"
                         onClick={() => handleSort('workerName')}>
                       <div className="flex items-center gap-1">
                         Worker
                         {sortConfig.key === 'workerName' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Skill Type
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Batch
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Work Item
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider cursor-pointer hover:ds-bg-surface-muted"
                         onClick={() => handleSort('totalHours')}>
                       <div className="flex items-center gap-1">
                         Hours
                         {sortConfig.key === 'totalHours' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider cursor-pointer hover:ds-bg-surface-muted"
                         onClick={() => handleSort('totalCost')}>
                       <div className="flex items-center gap-1">
                         Cost
                         {sortConfig.key === 'totalCost' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
                       </div>
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {entries.map((entry) => (
-                    <tr key={entry._id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                    <tr key={entry._id} className="hover:ds-bg-surface-muted">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm ds-text-secondary">
                         {new Date(entry.entryDate).toLocaleDateString()}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">{entry.workerName}</div>
+                        <div className="text-sm font-medium ds-text-primary">{entry.workerName}</div>
                         {entry.workerType && (
-                          <div className="text-xs text-gray-500 capitalize">{entry.workerType}</div>
+                          <div className="text-xs ds-text-muted capitalize">{entry.workerType}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm ds-text-secondary">
                         {entry.skillType?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm">
@@ -702,7 +702,7 @@ function LabourEntriesPageContent() {
                             {entry.batchNumber || 'View Batch'}
                           </Link>
                         ) : (
-                          <span className="text-gray-400">—</span>
+                          <span className="ds-text-muted">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap text-sm">
@@ -715,13 +715,13 @@ function LabourEntriesPageContent() {
                             {entry.workItemName}
                           </Link>
                         ) : (
-                          <span className="text-gray-400">—</span>
+                          <span className="ds-text-muted">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm ds-text-secondary">
                         {entry.totalHours?.toFixed(1)} hrs
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm font-medium ds-text-primary">
                         {entry.totalCost?.toLocaleString()} KES
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
@@ -739,7 +739,7 @@ function LabourEntriesPageContent() {
                           {canEdit && entry.status === 'draft' && (
                             <Link
                               href={`/labour/entries/${entry._id}`}
-                              className="text-gray-600 hover:text-gray-800"
+                              className="ds-text-secondary hover:ds-text-primary"
                               title="Edit"
                             >
                               <Edit className="w-4 h-4" />
@@ -787,8 +787,8 @@ function LabourEntriesPageContent() {
 
           {/* Pagination */}
           {pagination.totalPages > 1 && (
-            <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between">
-              <div className="text-sm text-gray-700">
+            <div className="px-4 py-3 border-t ds-border-subtle flex items-center justify-between">
+              <div className="text-sm ds-text-secondary">
                 Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
                 {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} entries
               </div>
@@ -796,17 +796,17 @@ function LabourEntriesPageContent() {
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                   disabled={pagination.page === 1}
-                  className="px-3 py-1 text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                  className="px-3 py-1 text-sm border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted"
                 >
                   Previous
                 </button>
-                <span className="text-sm text-gray-700">
+                <span className="text-sm ds-text-secondary">
                   Page {pagination.page} of {pagination.totalPages}
                 </span>
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                   disabled={pagination.page >= pagination.totalPages}
-                  className="px-3 py-1 text-sm border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                  className="px-3 py-1 text-sm border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted"
                 >
                   Next
                 </button>

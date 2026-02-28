@@ -199,9 +199,9 @@ function EditSupplierPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-900 font-medium">Loading supplier...</p>
+            <p className="mt-4 ds-text-primary font-medium">Loading supplier...</p>
           </div>
         </div>
       </AppLayout>
@@ -212,7 +212,7 @@ function EditSupplierPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border-2 border-yellow-300 text-yellow-900 px-4 py-3 rounded mb-6">
+          <div className="bg-yellow-50 border-2 border-yellow-400/60 text-yellow-900 px-4 py-3 rounded mb-6">
             <p className="font-bold">Access Denied</p>
             <p className="font-medium">You do not have permission to edit suppliers. Only OWNER and PM can edit suppliers.</p>
           </div>
@@ -232,13 +232,13 @@ function EditSupplierPageContent() {
           <Link href={`/suppliers/${supplierId}`} className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block font-semibold underline">
             ← Back to Supplier
           </Link>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Edit Supplier</h1>
-          <p className="text-gray-700 mt-2 font-medium">Update supplier information</p>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Edit Supplier</h1>
+          <p className="ds-text-secondary mt-2 font-medium">Update supplier information</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border-2 border-red-300 text-red-900 px-4 py-3 rounded mb-6 flex items-start gap-2">
+          <div className="bg-red-50 border-2 border-red-400/60 text-red-900 px-4 py-3 rounded mb-6 flex items-start gap-2">
             <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -253,13 +253,13 @@ function EditSupplierPageContent() {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow p-6 space-y-6">
           {/* Basic Information */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Supplier Name <span className="text-red-600">*</span>
                 </label>
                 <input
@@ -269,12 +269,12 @@ function EditSupplierPageContent() {
                   onChange={handleChange}
                   placeholder="e.g., ABC Construction Supplies"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Contact Person
                 </label>
                 <input
@@ -283,12 +283,12 @@ function EditSupplierPageContent() {
                   value={formData.contactPerson}
                   onChange={handleChange}
                   placeholder="e.g., John Doe"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Email <span className="text-red-600">*</span>
                 </label>
                 <input
@@ -298,12 +298,12 @@ function EditSupplierPageContent() {
                   onChange={handleChange}
                   placeholder="supplier@example.com"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Phone <span className="text-red-600">*</span>
                 </label>
                 <input
@@ -313,12 +313,12 @@ function EditSupplierPageContent() {
                   onChange={handleChange}
                   placeholder="+254712345678"
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Alternate Phone
                 </label>
                 <input
@@ -327,12 +327,12 @@ function EditSupplierPageContent() {
                   value={formData.alternatePhone}
                   onChange={handleChange}
                   placeholder="+254712345679"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Alternate Email
                 </label>
                 <input
@@ -341,7 +341,7 @@ function EditSupplierPageContent() {
                   value={formData.alternateEmail}
                   onChange={handleChange}
                   placeholder="alternate@example.com"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
             </div>
@@ -349,10 +349,10 @@ function EditSupplierPageContent() {
 
           {/* Business Details */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Details</h2>
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Business Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Business Type
                 </label>
                 <input
@@ -361,12 +361,12 @@ function EditSupplierPageContent() {
                   value={formData.businessType}
                   onChange={handleChange}
                   placeholder="e.g., Limited Company, Sole Proprietor"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Tax ID
                 </label>
                 <input
@@ -375,12 +375,12 @@ function EditSupplierPageContent() {
                   value={formData.taxId}
                   onChange={handleChange}
                   placeholder="e.g., P123456789X"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Address
                 </label>
                 <textarea
@@ -389,7 +389,7 @@ function EditSupplierPageContent() {
                   onChange={handleChange}
                   placeholder="Physical address..."
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
             </div>
@@ -397,17 +397,17 @@ function EditSupplierPageContent() {
 
           {/* Communication Preferences */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Communication Preferences</h2>
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Communication Preferences</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                <label className="block text-sm font-semibold ds-text-primary mb-2">
                   Preferred Contact Method
                 </label>
                 <select
                   name="preferredContactMethod"
                   value={formData.preferredContactMethod}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary ds-bg-surface"
                 >
                   <option value="all">All Methods</option>
                   <option value="email">Email Only</option>
@@ -424,9 +424,9 @@ function EditSupplierPageContent() {
                     name="emailEnabled"
                     checked={formData.emailEnabled}
                     onChange={handleChange}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm font-semibold text-gray-900">Enable Email Notifications</span>
+                  <span className="text-sm font-semibold ds-text-primary">Enable Email Notifications</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -434,9 +434,9 @@ function EditSupplierPageContent() {
                     name="smsEnabled"
                     checked={formData.smsEnabled}
                     onChange={handleChange}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm font-semibold text-gray-900">Enable SMS Notifications</span>
+                  <span className="text-sm font-semibold ds-text-primary">Enable SMS Notifications</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -444,9 +444,9 @@ function EditSupplierPageContent() {
                     name="pushNotificationsEnabled"
                     checked={formData.pushNotificationsEnabled}
                     onChange={handleChange}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm font-semibold text-gray-900">Enable Push Notifications</span>
+                  <span className="text-sm font-semibold ds-text-primary">Enable Push Notifications</span>
                 </label>
               </div>
             </div>
@@ -454,7 +454,7 @@ function EditSupplierPageContent() {
 
           {/* Specialties */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Specialties (Optional)</h2>
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Specialties (Optional)</h2>
             <div className="space-y-4">
               <div className="flex gap-2">
                 <input
@@ -468,12 +468,12 @@ function EditSupplierPageContent() {
                     }
                   }}
                   placeholder="e.g., Concrete, Steel, Electrical"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
                 <button
                   type="button"
                   onClick={handleAddSpecialty}
-                  className="px-4 py-2 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200 font-semibold"
+                  className="px-4 py-2 ds-bg-surface-muted ds-text-primary rounded-lg hover:ds-bg-surface-muted font-semibold"
                 >
                   Add
                 </button>
@@ -503,10 +503,10 @@ function EditSupplierPageContent() {
 
           {/* Additional Information */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Additional Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Rating (1-5)
                 </label>
                 <input
@@ -518,19 +518,19 @@ function EditSupplierPageContent() {
                   max="5"
                   step="0.1"
                   placeholder="e.g., 4.5"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Status
                 </label>
                 <select
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary ds-bg-surface"
                 >
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
@@ -539,7 +539,7 @@ function EditSupplierPageContent() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-900 mb-1">
+                <label className="block text-sm font-semibold ds-text-primary mb-1">
                   Notes
                 </label>
                 <textarea
@@ -548,7 +548,7 @@ function EditSupplierPageContent() {
                   onChange={handleChange}
                   placeholder="Additional notes about this supplier..."
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
                 />
               </div>
             </div>
@@ -556,7 +556,7 @@ function EditSupplierPageContent() {
 
           {/* Submit Buttons */}
           <div className="flex justify-end gap-4 pt-4 border-t">
-            <Link href={`/suppliers/${supplierId}`} className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-900 font-semibold">
+            <Link href={`/suppliers/${supplierId}`} className="px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-primary font-semibold">
               Cancel
             </Link>
             <button
@@ -578,9 +578,9 @@ export default function EditSupplierPage() {
     <Suspense fallback={
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-900 font-medium">Loading...</p>
+            <p className="mt-4 ds-text-primary font-medium">Loading...</p>
           </div>
         </div>
       </AppLayout>

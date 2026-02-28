@@ -116,15 +116,15 @@ export function MaterialLibraryPicker({ onSelectMaterial, selectedMaterialId = n
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">Category</label>
           <select
             value={filters.categoryId}
             onChange={(e) => setFilters((prev) => ({ ...prev, categoryId: e.target.value }))}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="" className="text-gray-900">All Categories</option>
+            <option value="" className="ds-text-primary">All Categories</option>
             {categories.map((cat) => (
-              <option key={cat._id} value={cat._id} className="text-gray-900">
+              <option key={cat._id} value={cat._id} className="ds-text-primary">
                 {cat.name}
               </option>
             ))}
@@ -136,16 +136,16 @@ export function MaterialLibraryPicker({ onSelectMaterial, selectedMaterialId = n
               type="checkbox"
               checked={filters.isCommon === 'true'}
               onChange={(e) => setFilters((prev) => ({ ...prev, isCommon: e.target.checked ? 'true' : '' }))}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
             />
-            <span className="text-sm font-medium text-gray-700">Common Only</span>
+            <span className="text-sm font-medium ds-text-secondary">Common Only</span>
           </label>
         </div>
         <div className="flex items-end">
           <button
             type="button"
             onClick={() => setFilters({ categoryId: '', isCommon: '', isActive: 'true', search: '' })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 text-sm"
+            className="w-full px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary text-sm"
           >
             Clear Filters
           </button>
@@ -153,23 +153,23 @@ export function MaterialLibraryPicker({ onSelectMaterial, selectedMaterialId = n
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg">
           <p className="text-sm font-medium">{error}</p>
         </div>
       )}
 
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-4">
         {loading ? (
-          <p className="text-sm text-gray-600">Loading materials...</p>
+          <p className="text-sm ds-text-secondary">Loading materials...</p>
         ) : materials.length === 0 ? (
-          <p className="text-sm text-gray-600">No materials found. Try adjusting filters.</p>
+          <p className="text-sm ds-text-secondary">No materials found. Try adjusting filters.</p>
         ) : (
           <div className="space-y-2">
             {materials.map((material) => (
-              <div key={material._id} className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-3 py-2">
+              <div key={material._id} className="flex items-center justify-between ds-bg-surface border ds-border-subtle rounded-lg px-3 py-2">
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{material.name}</p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-sm font-semibold ds-text-primary">{material.name}</p>
+                  <p className="text-xs ds-text-secondary">
                     Unit: {material.defaultUnit || 'N/A'} • Default Cost: {formatCurrency(material.defaultUnitCost)}
                   </p>
                 </div>
@@ -179,7 +179,7 @@ export function MaterialLibraryPicker({ onSelectMaterial, selectedMaterialId = n
                   className={`px-3 py-1.5 text-xs rounded-lg border ${
                     selectedMaterialId === material._id.toString()
                       ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-blue-600 border-blue-600 hover:bg-blue-50'
+                      : 'ds-bg-surface text-blue-600 border-blue-600 hover:bg-blue-50'
                   }`}
                 >
                   {selectedMaterialId === material._id.toString() ? 'Selected' : 'Use'}
@@ -196,18 +196,18 @@ export function MaterialLibraryPicker({ onSelectMaterial, selectedMaterialId = n
             type="button"
             onClick={() => setPagination((prev) => ({ ...prev, page: Math.max(prev.page - 1, 1) }))}
             disabled={pagination.page <= 1}
-            className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
+            className="px-3 py-1 border ds-border-subtle rounded text-sm disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-xs text-gray-600">
+          <span className="text-xs ds-text-secondary">
             Page {pagination.page} of {pagination.pages}
           </span>
           <button
             type="button"
             onClick={() => setPagination((prev) => ({ ...prev, page: Math.min(prev.page + 1, pagination.pages) }))}
             disabled={pagination.page >= pagination.pages}
-            className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50"
+            className="px-3 py-1 border ds-border-subtle rounded text-sm disabled:opacity-50"
           >
             Next
           </button>

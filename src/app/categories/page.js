@@ -192,8 +192,8 @@ function CategoriesPageContent() {
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Categories</h1>
-            <p className="text-sm sm:text-base text-gray-600 mt-2">Manage categories by area</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Categories</h1>
+            <p className="text-sm sm:text-base ds-text-secondary mt-2">Manage categories by area</p>
           </div>
           {canCreate && (
             <Link
@@ -207,14 +207,14 @@ function CategoriesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
 
         {/* Category Type Filter */}
         <div className="mb-6">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold ds-text-secondary mb-2">
             Category Type
           </label>
           <select
@@ -225,7 +225,7 @@ function CategoriesPageContent() {
               setPage(1);
               fetchCategories(nextType, 1);
             }}
-            className="w-full max-w-xs px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full max-w-xs px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             {CATEGORY_TYPE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -237,15 +237,15 @@ function CategoriesPageContent() {
 
         {/* Categories Grid */}
         {loading ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading categories...</p>
+            <p className="mt-4 ds-text-secondary">Loading categories...</p>
           </div>
         ) : categories.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="text-6xl mb-4">📁</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No categories found</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-xl font-semibold ds-text-primary mb-2">No categories found</h3>
+            <p className="ds-text-secondary mb-6">
               {canCreate
                 ? 'Get started by creating your first category'
                 : 'No categories have been created yet. Contact an Owner to create categories.'}
@@ -264,7 +264,7 @@ function CategoriesPageContent() {
             {categories.map((category) => (
               <div
                 key={category._id}
-                className="bg-white rounded-lg shadow p-4 sm:p-6 hover:shadow-md transition border border-gray-200"
+                className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 hover:shadow-md transition border ds-border-subtle"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -272,11 +272,11 @@ function CategoriesPageContent() {
                       <span className="text-3xl">{category.icon}</span>
                     )}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{category.name}</h3>
+                      <h3 className="text-lg font-semibold ds-text-primary">{category.name}</h3>
                       {category.description && (
-                        <p className="text-sm text-gray-600 mt-1">{category.description}</p>
+                        <p className="text-sm ds-text-secondary mt-1">{category.description}</p>
                       )}
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs ds-text-muted mt-1">
                         Type: {(category.type || categoryType).replace('_', ' ')}
                       </p>
                       {(category.usageTotal !== undefined ? category.usageTotal : category.usageCount || 0) > 0 && (
@@ -310,11 +310,11 @@ function CategoriesPageContent() {
                             )}
                           </button>
                           {expandedUsage.has(category._id) && category.usageDetails && category.usageDetails.length > 0 && (
-                            <div className="mt-2 pl-2 border-l-2 border-blue-200 space-y-1">
+                            <div className="mt-2 pl-2 border-l-2 border-blue-400/60 space-y-1">
                               {category.usageDetails.map((detail, idx) => (
-                                <div key={idx} className="text-xs text-gray-600 flex justify-between">
+                                <div key={idx} className="text-xs ds-text-secondary flex justify-between">
                                   <span>{detail.label}:</span>
-                                  <span className="font-semibold text-gray-900">{detail.count}</span>
+                                  <span className="font-semibold ds-text-primary">{detail.count}</span>
                                 </div>
                               ))}
                             </div>
@@ -322,19 +322,19 @@ function CategoriesPageContent() {
                         </div>
                       )}
                       {(category.usageTotal !== undefined ? category.usageTotal : category.usageCount || 0) === 0 && (
-                        <p className="text-xs text-gray-400 mt-1 italic">Not in use</p>
+                        <p className="text-xs ds-text-muted mt-1 italic">Not in use</p>
                       )}
                     </div>
                   </div>
                 </div>
                 {category.subcategories && category.subcategories.length > 0 && (
                   <div className="mt-4 pt-4 border-t">
-                    <p className="text-sm font-semibold text-gray-700 mb-2 leading-normal">Subcategories:</p>
+                    <p className="text-sm font-semibold ds-text-secondary mb-2 leading-normal">Subcategories:</p>
                     <div className="flex flex-wrap gap-2">
                       {category.subcategories.map((sub, idx) => (
                         <span
                           key={idx}
-                          className="inline-flex px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded"
+                          className="inline-flex px-2 py-1 text-xs ds-bg-surface-muted ds-text-secondary rounded"
                         >
                           {sub}
                         </span>
@@ -342,7 +342,7 @@ function CategoriesPageContent() {
                     </div>
                   </div>
                 )}
-                <div className="mt-4 pt-4 border-t text-sm text-gray-600 leading-normal">
+                <div className="mt-4 pt-4 border-t text-sm ds-text-secondary leading-normal">
                   <div className="flex items-center justify-between">
                     <span>
                       Created:{' '}
@@ -385,10 +385,10 @@ function CategoriesPageContent() {
 
         {/* Pagination & Summary */}
         {categories.length > 0 && (
-          <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white rounded-lg shadow p-4 sm:p-6 border border-gray-200">
-            <p className="text-sm text-gray-600 text-center sm:text-left">
+          <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ds-bg-surface rounded-lg shadow p-4 sm:p-6 border ds-border-subtle">
+            <p className="text-sm ds-text-secondary text-center sm:text-left">
               Total Categories:{' '}
-              <span className="font-semibold text-gray-900">
+              <span className="font-semibold ds-text-primary">
                 {total || categories.length}
               </span>
             </p>
@@ -403,18 +403,18 @@ function CategoriesPageContent() {
                   }
                 }}
                 disabled={page <= 1 || loading}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium"
+                className="px-4 py-2 text-sm rounded-lg border ds-border-subtle ds-text-secondary hover:ds-bg-surface-muted active:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium"
               >
                 Previous
               </button>
-              <span className="text-sm text-gray-600 px-2">
+              <span className="text-sm ds-text-secondary px-2">
                 Page{' '}
-                <span className="font-semibold text-gray-900">{page}</span>
+                <span className="font-semibold ds-text-primary">{page}</span>
                 {total > 0 && (
                   <>
                     {' '}
                     of{' '}
-                    <span className="font-semibold text-gray-900">
+                    <span className="font-semibold ds-text-primary">
                       {Math.max(1, Math.ceil((total || 0) / PAGE_SIZE))}
                     </span>
                   </>
@@ -431,7 +431,7 @@ function CategoriesPageContent() {
                   }
                 }}
                 disabled={loading || (total > 0 && page >= Math.max(1, Math.ceil(total / PAGE_SIZE)))}
-                className="px-4 py-2 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium"
+                className="px-4 py-2 text-sm rounded-lg border ds-border-subtle ds-text-secondary hover:ds-bg-surface-muted active:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation font-medium"
               >
                 Next
               </button>
@@ -442,13 +442,13 @@ function CategoriesPageContent() {
         {/* Clone Modal */}
         {cloneModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 safe-area-inset">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Clone Category</h3>
-              <p className="text-sm text-gray-600 mb-4">
+            <div className="ds-bg-surface rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+              <h3 className="text-lg font-semibold ds-text-primary mb-4">Clone Category</h3>
+              <p className="text-sm ds-text-secondary mb-4">
                 Create a copy of <span className="font-semibold">{cloneModal.category.name}</span> with a new name.
               </p>
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">
                   New Category Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -458,7 +458,7 @@ function CategoriesPageContent() {
                     setCloneModal({ ...cloneModal, newName: e.target.value })
                   }
                   placeholder="Enter new category name"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   autoFocus
                   onKeyPress={(e) => {
                     if (e.key === 'Enter') {
@@ -474,7 +474,7 @@ function CategoriesPageContent() {
                     setCloneModal(null);
                     setError(null);
                   }}
-                  className="px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 text-gray-700 transition-colors touch-manipulation font-medium"
+                  className="px-4 py-2.5 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface-muted ds-text-secondary transition-colors touch-manipulation font-medium"
                 >
                   Cancel
                 </button>
@@ -503,7 +503,7 @@ export default function CategoriesPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading categories...</p>
+              <p className="mt-4 ds-text-secondary">Loading categories...</p>
             </div>
           </div>
         </AppLayout>

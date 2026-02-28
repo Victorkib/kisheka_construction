@@ -385,7 +385,7 @@ function BudgetManagementContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading budget management...</p>
+            <p className="mt-4 ds-text-secondary">Loading budget management...</p>
           </div>
         </div>
       </AppLayout>
@@ -396,7 +396,7 @@ function BudgetManagementContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
             <button
@@ -415,8 +415,8 @@ function BudgetManagementContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600">Project not found.</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="ds-text-secondary">Project not found.</p>
           </div>
         </div>
       </AppLayout>
@@ -463,23 +463,23 @@ function BudgetManagementContent() {
           <nav className="flex" aria-label="Breadcrumb">
             <ol className="flex items-center space-x-4">
               <li>
-                <Link href="/projects" className="text-gray-400 hover:text-gray-500">
+                <Link href="/projects" className="ds-text-muted hover:ds-text-muted">
                   Projects
                 </Link>
               </li>
               <li>
-                <span className="text-gray-500">/</span>
+                <span className="ds-text-muted">/</span>
               </li>
               <li>
-                <Link href={`/projects/${projectId}`} className="text-gray-400 hover:text-gray-500">
+                <Link href={`/projects/${projectId}`} className="ds-text-muted hover:ds-text-muted">
                   {project.projectName || 'Project'}
                 </Link>
               </li>
               <li>
-                <span className="text-gray-500">/</span>
+                <span className="ds-text-muted">/</span>
               </li>
               <li>
-                <span className="text-gray-900 font-medium">Budget Management</span>
+                <span className="ds-text-primary font-medium">Budget Management</span>
               </li>
             </ol>
           </nav>
@@ -489,15 +489,15 @@ function BudgetManagementContent() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Budget Management</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-3xl font-bold ds-text-primary">Budget Management</h1>
+              <p className="mt-2 ds-text-secondary">
                 {project.projectName} ({project.projectCode})
               </p>
             </div>
             <div className="flex gap-3">
               <Link
                 href={`/projects/${projectId}`}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition text-sm font-medium"
               >
                 Back to Project
               </Link>
@@ -523,7 +523,7 @@ function BudgetManagementContent() {
 
         {/* Budget Validation Warnings */}
         {budgetValidationWarnings.length > 0 && (
-          <div className="mb-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="mb-6 bg-yellow-50 border border-yellow-400/60 rounded-lg p-4">
             <div className="flex items-start">
               <svg className="w-5 h-5 text-yellow-600 mt-0.5 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -561,7 +561,7 @@ function BudgetManagementContent() {
 
         {/* Activation Banner */}
         {budgetActivation?.activatedAt && (
-          <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="mb-6 bg-blue-50 border border-blue-400/60 rounded-lg p-4">
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
@@ -594,7 +594,7 @@ function BudgetManagementContent() {
 
         {/* Capital Activation Banner */}
         {capitalActivation?.activatedAt && (
-          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="mb-6 bg-green-50 border border-green-400/60 rounded-lg p-4">
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
@@ -631,24 +631,24 @@ function BudgetManagementContent() {
 
         {/* Budget Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <p className="text-sm text-gray-600 mb-1">Total Budget</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(budgetTotal)}</p>
+          <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-4">
+            <p className="text-sm ds-text-secondary mb-1">Total Budget</p>
+            <p className="text-2xl font-bold ds-text-primary">{formatCurrency(budgetTotal)}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <p className="text-sm text-gray-600 mb-1">DCC</p>
+          <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-4">
+            <p className="text-sm ds-text-secondary mb-1">DCC</p>
             <p className="text-2xl font-bold text-blue-600">{formatCurrency(dcc)}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <p className="text-sm text-gray-600 mb-1">Pre-Construction</p>
+          <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-4">
+            <p className="text-sm ds-text-secondary mb-1">Pre-Construction</p>
             <p className="text-2xl font-bold text-green-600">{formatCurrency(preConstruction)}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <p className="text-sm text-gray-600 mb-1">Indirect</p>
+          <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-4">
+            <p className="text-sm ds-text-secondary mb-1">Indirect</p>
             <p className="text-2xl font-bold text-yellow-600">{formatCurrency(indirect)}</p>
           </div>
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <p className="text-sm text-gray-600 mb-1">Contingency</p>
+          <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-4">
+            <p className="text-sm ds-text-secondary mb-1">Contingency</p>
             <p className="text-2xl font-bold text-red-600">{formatCurrency(contingency)}</p>
           </div>
         </div>
@@ -656,8 +656,8 @@ function BudgetManagementContent() {
         {/* Budget Breakdown Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Pie Chart */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget Breakdown</h2>
+          <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Budget Breakdown</h2>
             {budgetBreakdownData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -679,7 +679,7 @@ function BudgetManagementContent() {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 ds-text-muted">
                 <p>No budget data available</p>
                 <p className="text-sm mt-2">Set a budget to see breakdown</p>
               </div>
@@ -687,8 +687,8 @@ function BudgetManagementContent() {
           </div>
 
           {/* Phase Budgets Bar Chart */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Phase Budget Allocation</h2>
+          <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Phase Budget Allocation</h2>
             {phaseBudgetData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={phaseBudgetData}>
@@ -703,7 +703,7 @@ function BudgetManagementContent() {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <div className="text-center py-12 text-gray-500">
+              <div className="text-center py-12 ds-text-muted">
                 <p>No phases with budgets</p>
                 <p className="text-sm mt-2">Allocate budgets to phases to see breakdown</p>
               </div>
@@ -712,8 +712,8 @@ function BudgetManagementContent() {
         </div>
 
         {/* Budget Management Actions */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget Actions</h2>
+        <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-6 mb-8">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Budget Actions</h2>
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => {
@@ -749,7 +749,7 @@ function BudgetManagementContent() {
 
           {/* Allocation Preview */}
           {showAllocationPreview && (
-            <div className="mt-6 border-t border-gray-200 pt-6">
+            <div className="mt-6 border-t ds-border-subtle pt-6">
               <AllocationPreview
                 projectId={projectId}
                 proposedBudget={budgetData}
@@ -767,8 +767,8 @@ function BudgetManagementContent() {
 
           {/* Edit Budget Form */}
           {showEditBudget && !showAllocationPreview && (
-            <div className="mt-6 border-t border-gray-200 pt-6">
-              <h3 className="text-md font-semibold text-gray-900 mb-4">Edit Budget</h3>
+            <div className="mt-6 border-t ds-border-subtle pt-6">
+              <h3 className="text-md font-semibold ds-text-primary mb-4">Edit Budget</h3>
               <EnhancedBudgetInput
                 value={budgetData}
                 onChange={handleBudgetChange}
@@ -787,19 +787,19 @@ function BudgetManagementContent() {
                 });
                 
                 return isZeroToNonZero && phasesWithZeroBudgets.length > 0 ? (
-                  <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="mt-4 p-4 bg-green-50 border border-green-400/60 rounded-lg">
                     <label className="flex items-start cursor-pointer">
                       <input
                         type="checkbox"
                         checked={autoAllocatePhases}
                         onChange={(e) => setAutoAllocatePhases(e.target.checked)}
-                        className="mt-1 mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                        className="mt-1 mr-3 h-4 w-4 text-green-600 focus:ring-green-500 ds-border-subtle rounded"
                       />
                       <div className="flex-1">
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium ds-text-primary">
                           Automatically allocate budgets to {phasesWithZeroBudgets.length} phase(s) with zero budgets
                         </span>
-                        <p className="text-xs text-gray-600 mt-1">
+                        <p className="text-xs ds-text-secondary mt-1">
                           When enabled, budgets will be automatically allocated to existing phases based on standard percentages:
                           Basement (15%), Superstructure (65%), Finishing (15%), Final Systems (5%). 
                           You can opt-out by unchecking this box.
@@ -815,19 +815,19 @@ function BudgetManagementContent() {
                 const newDcc = budgetData.directConstructionCosts || 0;
                 const dccChanged = oldDcc !== newDcc && oldDcc > 0 && newDcc > 0;
                 return dccChanged ? (
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <div className="mt-4 p-4 bg-blue-50 border border-blue-400/60 rounded-lg">
                     <label className="flex items-start cursor-pointer">
                       <input
                         type="checkbox"
                         checked={reallocatePhases}
                         onChange={(e) => setReallocatePhases(e.target.checked)}
-                        className="mt-1 mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="mt-1 mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 ds-border-subtle rounded"
                       />
                       <div className="flex-1">
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium ds-text-primary">
                           Also reallocate phase budgets proportionally to match new DCC
                         </span>
-                        <p className="text-xs text-gray-600 mt-1">
+                        <p className="text-xs ds-text-secondary mt-1">
                           When enabled, all phase budgets will be scaled proportionally based on the change in Direct Construction Costs (DCC). 
                           This ensures phase budgets remain proportional to the new project budget.
                         </p>
@@ -852,7 +852,7 @@ function BudgetManagementContent() {
                     setReallocatePhases(false);
                     setAutoAllocatePhases(true); // Reset to default
                   }}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium"
+                  className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted text-sm font-medium"
                 >
                   Cancel
                 </button>
@@ -862,7 +862,7 @@ function BudgetManagementContent() {
 
           {/* Budget Adjustment Form */}
           {showAdjustmentForm && (
-            <div className="mt-6 border-t border-gray-200 pt-6">
+            <div className="mt-6 border-t ds-border-subtle pt-6">
               <BudgetAdjustmentForm
                 projectId={projectId}
                 onClose={() => setShowAdjustmentForm(false)}
@@ -876,7 +876,7 @@ function BudgetManagementContent() {
 
           {/* Budget Transfer Form */}
           {showTransferForm && (
-            <div className="mt-6 border-t border-gray-200 pt-6">
+            <div className="mt-6 border-t ds-border-subtle pt-6">
               <BudgetTransferForm
                 projectId={projectId}
                 onClose={() => setShowTransferForm(false)}
@@ -890,11 +890,11 @@ function BudgetManagementContent() {
         </div>
 
         {/* Phase Impact Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Phase Budget Allocation</h2>
+            <h2 className="text-lg font-semibold ds-text-primary">Phase Budget Allocation</h2>
             <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600">
+              <div className="text-sm ds-text-secondary">
                 Total Allocated: {formatCurrency(totalPhaseBudgets)} / {formatCurrency(dcc)} DCC
                 {unallocatedDCC > 0 && (
                   <span className="ml-2 text-green-600">({formatCurrency(unallocatedDCC)} unallocated)</span>
@@ -925,30 +925,30 @@ function BudgetManagementContent() {
           </div>
           {phases.length > 0 ? (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Phase
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Budget Allocated
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       % of DCC
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Spent
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Remaining
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {phases.map((phase) => {
                     const phaseBudget = phase.budgetAllocation?.total || 0;
                     const phaseSpent = phase.actualSpending?.total || 0;
@@ -959,18 +959,18 @@ function BudgetManagementContent() {
                     return (
                       <tr key={phase._id} className={isOverBudget ? 'bg-red-50' : ''}>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium ds-text-primary">
                             {phase.phaseName || phase.phaseCode}
                           </div>
-                          <div className="text-sm text-gray-500">{phase.phaseCode}</div>
+                          <div className="text-sm ds-text-muted">{phase.phaseCode}</div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {formatCurrency(phaseBudget)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {phasePercentage}%
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {formatCurrency(phaseSpent)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -1001,7 +1001,7 @@ function BudgetManagementContent() {
               </table>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 ds-text-muted">
               <p>No phases found for this project</p>
               <Link
                 href={`/phases/new?projectId=${projectId}`}
@@ -1014,118 +1014,118 @@ function BudgetManagementContent() {
         </div>
 
         {/* Budget Details Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget Details</h2>
+        <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Budget Details</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Budgeted
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Spent
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Remaining
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     % Used
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                     Direct Construction Costs (DCC)
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(dcc)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(financialOverview?.actual?.materials || 0)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(Math.max(0, dcc - (financialOverview?.actual?.materials || 0)))}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {dcc > 0
                       ? `${((((financialOverview?.actual?.materials || 0) / dcc) * 100).toFixed(1))}%`
                       : 'N/A'}
                   </td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                     Pre-Construction Costs
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(preConstruction)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(financialOverview?.budget?.preConstruction?.spent || 0)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(financialOverview?.budget?.preConstruction?.remaining || 0)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {preConstruction > 0
                       ? `${(((financialOverview?.budget?.preConstruction?.spent || 0) / preConstruction) * 100).toFixed(1)}%`
                       : 'N/A'}
                   </td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                     Indirect Costs
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(indirect)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(financialOverview?.budget?.indirectCosts?.spent || 0)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(financialOverview?.budget?.indirectCosts?.remaining || 0)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {indirect > 0
                       ? `${(((financialOverview?.budget?.indirectCosts?.spent || 0) / indirect) * 100).toFixed(1)}%`
                       : 'N/A'}
                   </td>
                 </tr>
                 <tr>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                     Contingency Reserve
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(contingency)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(financialOverview?.contingency?.used || 0)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {formatCurrency(financialOverview?.contingency?.remaining || 0)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                     {contingency > 0
                       ? `${(((financialOverview?.contingency?.used || 0) / contingency) * 100).toFixed(1)}%`
                       : 'N/A'}
                   </td>
                 </tr>
-                <tr className="bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">Total</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                <tr className="ds-bg-surface-muted">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold ds-text-primary">Total</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold ds-text-primary">
                     {formatCurrency(budgetTotal)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold ds-text-primary">
                     {formatCurrency(financialOverview?.actual?.total || 0)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold ds-text-primary">
                     {formatCurrency(Math.max(0, budgetTotal - (financialOverview?.actual?.total || 0)))}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-bold ds-text-primary">
                     {budgetTotal > 0
                       ? `${(((financialOverview?.actual?.total || 0) / budgetTotal) * 100).toFixed(1)}%`
                       : 'N/A'}
@@ -1147,7 +1147,7 @@ export default function BudgetManagementPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
+            <p className="mt-4 ds-text-secondary">Loading...</p>
           </div>
         </div>
       </AppLayout>

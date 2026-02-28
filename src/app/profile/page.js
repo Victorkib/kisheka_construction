@@ -17,6 +17,7 @@ import { NotificationPreferences } from '@/components/profile/notification-prefe
 import { NotificationStatusCard } from '@/components/push-notifications/notification-status-indicator';
 import { ActivitySummary } from '@/components/profile/activity-summary';
 import { ChangePassword } from '@/components/profile/change-password';
+import { ThemePreferences } from '@/components/profile/theme-preferences';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -73,7 +74,7 @@ export default function ProfilePage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm">
             {error}
           </div>
           <button
@@ -95,10 +96,10 @@ export default function ProfilePage() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">
             My Profile
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="ds-text-secondary mt-1">
             Manage your account information and preferences
           </p>
         </div>
@@ -118,6 +119,9 @@ export default function ProfilePage() {
 
           {/* Right Column */}
           <div className="space-y-6">
+            {/* Appearance / Theme */}
+            <ThemePreferences />
+
             {/* Browser Notifications Status */}
             <NotificationStatusCard onRefresh={fetchProfile} />
 

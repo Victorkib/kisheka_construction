@@ -43,7 +43,7 @@ export function AppLayout({ children, forceSmartNav = null }) {
   const MobileNavComponent = useSmartNav ? SmartMobileNav : MobileNav;
 
   return (
-    <div className="h-screen h-[100dvh] bg-gray-50 flex overflow-hidden safe-area-inset">
+    <div className="h-screen h-[100dvh] ds-bg-app flex overflow-hidden safe-area-inset">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block flex-shrink-0">
         <SidebarComponent

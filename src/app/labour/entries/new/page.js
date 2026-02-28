@@ -695,16 +695,16 @@ function NewLabourEntryPageContent() {
           >
             ← Back to Labour
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">
+          <h1 className="text-3xl font-bold ds-text-primary mt-2">
             New Labour Entry
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="ds-text-secondary mt-1">
             Create a new labour entry for tracking work and costs
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-500/10 border border-red-400/60 text-red-200 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
@@ -723,13 +723,13 @@ function NewLabourEntryPageContent() {
 
         <form
           onSubmit={handleSubmit}
-          className="bg-white rounded-lg shadow p-6"
+          className="ds-bg-surface rounded-lg shadow border ds-border-subtle p-6"
         >
           <div className="space-y-6">
             {/* Project & Phase Selection */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Project <span className="text-red-500">*</span>
                 </label>
                 <LoadingSelect
@@ -739,7 +739,7 @@ function NewLabourEntryPageContent() {
                   required
                   loading={loadingProjects}
                   loadingText="Loading projects..."
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   <option value="">Select Project</option>
                   {projects.map((project) => (
@@ -753,7 +753,7 @@ function NewLabourEntryPageContent() {
               {/* Phase Selection - Only required for direct labour */}
               {!formData.isIndirectLabour && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Phase <span className="text-red-500">*</span>
                   </label>
                   <LoadingSelect
@@ -764,7 +764,7 @@ function NewLabourEntryPageContent() {
                     loading={loadingPhases}
                     loadingText="Loading phases..."
                     disabled={!formData.projectId}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   >
                     <option value="">Select Phase</option>
                     {phases.map((phase) => (
@@ -798,7 +798,7 @@ function NewLabourEntryPageContent() {
                       phaseId: e.target.checked ? '' : prev.phaseId, // Clear phase if indirect
                     }));
                   }}
-                  className="mt-1 w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
+                  className="mt-1 w-4 h-4 text-amber-500 border-ds-border-subtle rounded focus:ring-amber-500"
                 />
                 <div className="flex-1">
                   <label
@@ -806,7 +806,7 @@ function NewLabourEntryPageContent() {
                     className={`block font-medium mb-2 ${
                       formData.isIndirectLabour
                         ? 'text-amber-900 text-base'
-                        : 'text-gray-700 text-sm'
+                        : 'ds-text-secondary text-sm'
                     }`}
                   >
                     This is Indirect Labour
@@ -815,7 +815,7 @@ function NewLabourEntryPageContent() {
                     className={`${
                       formData.isIndirectLabour
                         ? 'text-amber-800 text-sm font-medium mb-2'
-                        : 'text-xs text-gray-600 mb-2'
+                        : 'text-xs ds-text-secondary mb-2'
                     }`}
                   >
                     {formData.isIndirectLabour
@@ -826,7 +826,7 @@ function NewLabourEntryPageContent() {
                     className={`text-xs space-y-1 ${
                       formData.isIndirectLabour
                         ? 'text-amber-700'
-                        : 'text-gray-600'
+                        : 'ds-text-secondary'
                     }`}
                   >
                     <p>
@@ -858,14 +858,14 @@ function NewLabourEntryPageContent() {
                 <h4 className="font-semibold text-amber-900 mb-3">Indirect Cost Details</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium ds-text-secondary mb-1">
                       Cost Category <span className="text-red-500">*</span>
                     </label>
                     <select
                       name="indirectCostCategory"
                       value={formData.indirectCostCategory}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
                     >
                       <option value="">-- Select Category --</option>
                       <option value="siteOverhead">Site Overhead (management, admin, office)</option>
@@ -873,7 +873,7 @@ function NewLabourEntryPageContent() {
                       <option value="transportation">Transportation (vehicles, fuel, logistics)</option>
                       <option value="safetyCompliance">Safety Compliance (training, gear, protocols)</option>
                     </select>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs ds-text-secondary mt-1">
                       💡 Helps track which categories consume budget. Appears in audit trail and reports.
                     </p>
                   </div>
@@ -884,7 +884,7 @@ function NewLabourEntryPageContent() {
             {/* Floor & Category (Optional) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Floor (Optional)
                 </label>
                 <LoadingSelect
@@ -894,7 +894,7 @@ function NewLabourEntryPageContent() {
                   loading={loadingFloors}
                   loadingText="Loading floors..."
                   disabled={!formData.projectId}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   <option value="">Select Floor</option>
                   {floors.map((floor) => (
@@ -906,14 +906,14 @@ function NewLabourEntryPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Work Category (Optional)
                 </label>
                 <select
                   name="categoryId"
                   value={formData.categoryId}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   <option value="">Select Category</option>
                   {categories.map((category) => (
@@ -927,13 +927,13 @@ function NewLabourEntryPageContent() {
 
             {/* Worker Information */}
             <div className="border-t pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">
                 Worker Information
               </h2>
 
               {/* Assigned Worker Suggestion */}
               {suggestedWorker && workItemDetails && (
-                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-400/60 rounded-lg">
                   <div className="flex items-start gap-2">
                     <svg
                       className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0"
@@ -971,14 +971,14 @@ function NewLabourEntryPageContent() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Worker <span className="text-red-500">*</span>
                   </label>
                   <select
                     name="workerId"
                     value={formData.workerId}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   >
                     <option value="">
                       Select Worker (or enter name below)
@@ -1020,7 +1020,7 @@ function NewLabourEntryPageContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Worker Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1029,7 +1029,7 @@ function NewLabourEntryPageContent() {
                     value={formData.workerName}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                     placeholder="Enter worker name"
                   />
                 </div>
@@ -1037,7 +1037,7 @@ function NewLabourEntryPageContent() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Worker Type <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -1045,7 +1045,7 @@ function NewLabourEntryPageContent() {
                     value={formData.workerType}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   >
                     {VALID_WORKER_TYPES.map((type) => (
                       <option key={type} value={type}>
@@ -1056,7 +1056,7 @@ function NewLabourEntryPageContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Worker Role <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -1064,7 +1064,7 @@ function NewLabourEntryPageContent() {
                     value={formData.workerRole}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   >
                     {VALID_WORKER_ROLES.map((role) => (
                       <option key={role} value={role}>
@@ -1075,7 +1075,7 @@ function NewLabourEntryPageContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Skill Type <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -1083,7 +1083,7 @@ function NewLabourEntryPageContent() {
                     value={formData.skillType}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   >
                     {VALID_SKILL_TYPES.map((skill) => (
                       <option key={skill} value={skill}>
@@ -1099,13 +1099,13 @@ function NewLabourEntryPageContent() {
 
             {/* Time Tracking */}
             <div className="border-t pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">
                 Time Tracking
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Entry Date <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1114,12 +1114,12 @@ function NewLabourEntryPageContent() {
                     value={formData.entryDate}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Total Hours <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1131,14 +1131,14 @@ function NewLabourEntryPageContent() {
                     min="0"
                     max="24"
                     step="0.5"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Clock In Time (Optional)
                   </label>
                   <input
@@ -1146,12 +1146,12 @@ function NewLabourEntryPageContent() {
                     name="clockInTime"
                     value={formData.clockInTime}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Clock Out Time (Optional)
                   </label>
                   <input
@@ -1159,12 +1159,12 @@ function NewLabourEntryPageContent() {
                     name="clockOutTime"
                     value={formData.clockOutTime}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Break Duration (minutes)
                   </label>
                   <input
@@ -1175,16 +1175,16 @@ function NewLabourEntryPageContent() {
                     min="0"
                     max="480"
                     step="1"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs ds-text-muted mt-1">
                     Maximum 8 hours (480 minutes)
                   </p>
                 </div>
               </div>
 
               <div className="mt-4">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   Regular Hours: {finalRegularHours.toFixed(2)} hrs | Overtime:{' '}
                   {finalOvertimeHours.toFixed(2)} hrs
                 </p>
@@ -1193,13 +1193,13 @@ function NewLabourEntryPageContent() {
 
             {/* Cost Information */}
             <div className="border-t pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">
                 Cost Information
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Hourly Rate (KES) <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1210,12 +1210,12 @@ function NewLabourEntryPageContent() {
                     required
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Daily Rate (KES) - Optional
                   </label>
                   <input
@@ -1225,7 +1225,7 @@ function NewLabourEntryPageContent() {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                     placeholder="For daily-rate workers"
                   />
                 </div>
@@ -1233,42 +1233,42 @@ function NewLabourEntryPageContent() {
 
               {/* Cost Summary */}
               <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                <h3 className="text-sm font-semibold ds-text-primary mb-2">
                   Cost Calculation
                 </h3>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-900">
+                    <span className="ds-text-primary">
                       Regular Hours ({finalRegularHours.toFixed(2)} hrs ×{' '}
                       {hourlyRate.toLocaleString()}):
                     </span>
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium ds-text-primary">
                       {regularCost.toLocaleString()} KES
                     </span>
                   </div>
                   {finalOvertimeHours > 0 && (
                     <div className="flex justify-between">
-                      <span className="text-gray-900">
+                      <span className="ds-text-primary">
                         Overtime Hours ({finalOvertimeHours.toFixed(2)} hrs ×{' '}
                         {(hourlyRate * 1.5).toLocaleString()}):
                       </span>
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium ds-text-primary">
                         {overtimeCost.toLocaleString()} KES
                       </span>
                     </div>
                   )}
-                  <div className="flex justify-between pt-2 border-t border-blue-200">
-                    <span className="font-semibold text-gray-900">
+                  <div className="flex justify-between pt-2 border-t border-blue-400/60">
+                    <span className="font-semibold ds-text-primary">
                       Total Cost:
                     </span>
-                    <span className="font-bold text-gray-900">
+                    <span className="font-bold ds-text-primary">
                       {totalCost.toLocaleString()} KES
                     </span>
                   </div>
                 </div>
                 {/* Budget Validation */}
                 {validatingBudget && (
-                  <div className="mt-3 p-3 rounded bg-blue-50 border border-blue-200">
+                  <div className="mt-3 p-3 rounded bg-blue-50 border border-blue-400/60">
                     <div className="flex items-center gap-2">
                       <LoadingSpinner size="sm" color="blue-600" />
                       <p className="text-sm font-medium text-blue-800">
@@ -1284,12 +1284,12 @@ function NewLabourEntryPageContent() {
                         ? `${
                             budgetInfo.isValid
                               ? 'bg-orange-50 border border-orange-200'
-                              : 'bg-red-50 border border-red-200'
+                              : 'bg-red-50 border border-red-400/60'
                           }`
                         : `${
                             budgetInfo.isValid
-                              ? 'bg-green-50 border border-green-200'
-                              : 'bg-red-50 border border-red-200'
+                              ? 'bg-green-50 border border-green-400/60'
+                              : 'bg-red-50 border border-red-400/60'
                           }`
                     }`}
                   >
@@ -1310,12 +1310,12 @@ function NewLabourEntryPageContent() {
                       {budgetInfo.isValid ? '✅' : '⚠️'} {budgetInfo.message}
                     </p>
                     {formData.isIndirectLabour && formData.indirectCostCategory && (
-                      <p className="text-xs text-gray-700 mt-2 font-medium">
+                      <p className="text-xs ds-text-secondary mt-2 font-medium">
                         Category: {formData.indirectCostCategory}
                       </p>
                     )}
                     {budgetInfo.available !== undefined && (
-                      <div className="text-xs text-gray-700 mt-2 space-y-1">
+                      <div className="text-xs ds-text-secondary mt-2 space-y-1">
                         <p>Available: {budgetInfo.available.toLocaleString()} KES</p>
                         {budgetInfo.required !== undefined && (
                           <p>This Entry: {budgetInfo.required.toLocaleString()} KES</p>
@@ -1343,8 +1343,8 @@ function NewLabourEntryPageContent() {
                   <div
                     className={`mt-3 p-4 rounded ${
                       budgetInfo.floorValidation.isValid
-                        ? 'bg-blue-50 border border-blue-200'
-                        : 'bg-red-50 border border-red-200'
+                        ? 'bg-blue-50 border border-blue-400/60'
+                        : 'bg-red-50 border border-red-400/60'
                     }`}
                   >
                     <h4 className={`text-sm font-semibold mb-2 ${
@@ -1360,7 +1360,7 @@ function NewLabourEntryPageContent() {
                       {budgetInfo.floorValidation.isValid ? '✅' : '⚠️'} {budgetInfo.floorValidation.message}
                     </p>
                     {budgetInfo.floorValidation.available !== undefined && (
-                      <div className="text-xs text-gray-700 mt-2 space-y-1">
+                      <div className="text-xs ds-text-secondary mt-2 space-y-1">
                         <p>Available: {budgetInfo.floorValidation.available.toLocaleString()} KES</p>
                         {budgetInfo.floorValidation.required !== undefined && (
                           <p>This Entry: {budgetInfo.floorValidation.required.toLocaleString()} KES</p>
@@ -1384,20 +1384,20 @@ function NewLabourEntryPageContent() {
             {/* Professional Services Fields (Conditional) */}
             {formData.workerType === 'professional' && (
               <div className="border-t pt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-lg font-semibold ds-text-primary mb-4">
                   Professional Service Details
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium ds-text-secondary mb-1">
                       Service Type
                     </label>
                     <select
                       name="serviceType"
                       value={formData.serviceType}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                     >
                       <option value="">Select Service Type</option>
                       <option value="consultation">Consultation</option>
@@ -1410,7 +1410,7 @@ function NewLabourEntryPageContent() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium ds-text-secondary mb-1">
                       Visit Purpose
                     </label>
                     <input
@@ -1418,14 +1418,14 @@ function NewLabourEntryPageContent() {
                       name="visitPurpose"
                       value={formData.visitPurpose}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                       placeholder="Purpose of visit/service"
                     />
                   </div>
                 </div>
 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Deliverables
                   </label>
                   <textarea
@@ -1439,10 +1439,10 @@ function NewLabourEntryPageContent() {
                       setFormData((prev) => ({ ...prev, deliverables }));
                     }}
                     rows="3"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                     placeholder="Enter deliverables separated by commas (e.g., Site plan, Structural drawings, Inspection report)"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs ds-text-muted mt-1">
                     Separate multiple deliverables with commas
                   </p>
                 </div>
@@ -1451,12 +1451,12 @@ function NewLabourEntryPageContent() {
 
             {/* Task Information */}
             <div className="border-t pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">
                 Task Information
               </h2>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Task Description
                 </label>
                 <textarea
@@ -1464,13 +1464,13 @@ function NewLabourEntryPageContent() {
                   value={formData.taskDescription}
                   onChange={handleChange}
                   rows="3"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   placeholder="Describe the work performed..."
                 />
               </div>
 
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Work Item {!formData.isIndirectLabour && <span className="text-red-600">*</span>}
                 </label>
                 <LoadingSelect
@@ -1478,7 +1478,7 @@ function NewLabourEntryPageContent() {
                   value={formData.workItemId}
                   onChange={handleChange}
                   disabled={!formData.phaseId}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   <option value="">Select Work Item</option>
                   {workItems.map((item) => (
@@ -1488,7 +1488,7 @@ function NewLabourEntryPageContent() {
                   ))}
                 </LoadingSelect>
                 {!formData.isIndirectLabour && (
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs ds-text-muted">
                     Direct labour entries must be linked to a work item.
                   </p>
                 )}
@@ -1497,15 +1497,15 @@ function NewLabourEntryPageContent() {
 
             {/* Performance Ratings (Optional) */}
             <div className="border-t pt-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">
                 Performance Ratings (Optional)
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Quality Rating
-                    <span className="text-gray-500 text-xs font-normal ml-1">
+                    <span className="ds-text-muted text-xs font-normal ml-1">
                       (1-5, Optional)
                     </span>
                   </label>
@@ -1518,17 +1518,17 @@ function NewLabourEntryPageContent() {
                     max="5"
                     step="1"
                     placeholder="1-5"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs ds-text-muted mt-1">
                     Rate the quality of work (1 = Poor, 5 = Excellent)
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Productivity Rating
-                    <span className="text-gray-500 text-xs font-normal ml-1">
+                    <span className="ds-text-muted text-xs font-normal ml-1">
                       (1-5, Optional)
                     </span>
                   </label>
@@ -1541,9 +1541,9 @@ function NewLabourEntryPageContent() {
                     max="5"
                     step="1"
                     placeholder="1-5"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs ds-text-muted mt-1">
                     Rate the productivity/efficiency (1 = Low, 5 = High)
                   </p>
                 </div>
@@ -1552,7 +1552,7 @@ function NewLabourEntryPageContent() {
 
             {/* Notes */}
             <div className="border-t pt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Notes
               </label>
               <textarea
@@ -1560,7 +1560,7 @@ function NewLabourEntryPageContent() {
                 value={formData.notes}
                 onChange={handleChange}
                 rows="3"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                 placeholder="Additional notes..."
               />
             </div>
@@ -1569,7 +1569,7 @@ function NewLabourEntryPageContent() {
             <div className="flex justify-end gap-4 pt-6 border-t">
               <Link
                 href="/labour"
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                className="px-6 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted"
               >
                 Cancel
               </Link>

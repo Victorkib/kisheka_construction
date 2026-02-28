@@ -372,7 +372,7 @@ export default function StockPage() {
         status: 'pending_delivery',
         percentage: null,
         label: 'Pending Delivery',
-        color: 'bg-gray-100 text-gray-800',
+        color: 'ds-bg-surface-muted ds-text-primary',
       };
     }
     
@@ -409,7 +409,7 @@ export default function StockPage() {
   };
 
   const getStockStatusColor = (percentage) => {
-    if (percentage === null) return 'bg-gray-100 text-gray-800';
+    if (percentage === null) return 'ds-bg-surface-muted ds-text-primary';
     if (percentage === 0) return 'bg-red-100 text-red-800';
     if (percentage < 20) return 'bg-yellow-100 text-yellow-800';
     if (percentage < 50) return 'bg-blue-100 text-blue-800';
@@ -419,7 +419,7 @@ export default function StockPage() {
   const getWastageColor = (wastage) => {
     if (wastage > 20) return 'text-red-600 font-bold';
     if (wastage > 10) return 'text-yellow-600';
-    return 'text-gray-600';
+    return 'ds-text-secondary';
   };
 
   const handleSort = (key) => {
@@ -446,7 +446,7 @@ export default function StockPage() {
   const SortIcon = ({ columnKey }) => {
     if (sortConfig.key !== columnKey) {
       return (
-        <span className="ml-1 text-gray-400">
+        <span className="ml-1 ds-text-muted">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
           </svg>
@@ -474,15 +474,15 @@ export default function StockPage() {
         {/* Header */}
         <div className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Stock Tracking</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Monitor inventory levels and track wastage</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Stock Tracking</h1>
+            <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Monitor inventory levels and track wastage</p>
           </div>
           <div className="flex flex-col items-end gap-2">
             {/* Refresh button - available to all users */}
             <button
               onClick={handleRefresh}
               disabled={refreshing || loading}
-              className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="ds-bg-surface-muted0 text-white px-4 py-2 rounded-lg hover:bg-slate-600 transition-colors disabled:opacity-50 flex items-center gap-2"
               title="Refresh stock data"
             >
               {refreshing ? (
@@ -500,11 +500,11 @@ export default function StockPage() {
               <select
                 value={selectedProjectId}
                 onChange={(e) => setSelectedProjectId(e.target.value)}
-                className="px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="" className="text-gray-900">Select Project</option>
+                <option value="" className="ds-text-primary">Select Project</option>
                 {projects.map((project) => (
-                  <option key={project._id} value={project._id} className="text-gray-900">
+                  <option key={project._id} value={project._id} className="ds-text-primary">
                     {project.projectName}
                   </option>
                 ))}
@@ -525,14 +525,14 @@ export default function StockPage() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-          <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 border border-gray-100 hover:shadow-lg transition-shadow">
+          <div className="ds-bg-surface rounded-lg shadow-md p-4 sm:p-6 border ds-border-subtle hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-xs sm:text-sm font-medium text-gray-500 uppercase tracking-wide">Total Items</h3>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">{summary.totalItems.toLocaleString()}</p>
+                <h3 className="text-xs sm:text-sm font-medium ds-text-muted uppercase tracking-wide">Total Items</h3>
+                <p className="text-2xl sm:text-3xl font-bold ds-text-primary mt-2">{summary.totalItems.toLocaleString()}</p>
               </div>
-              <div className="bg-gray-100 rounded-full p-3">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="ds-bg-surface-muted rounded-full p-3">
+                <svg className="w-6 h-6 ds-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
               </div>
@@ -581,21 +581,21 @@ export default function StockPage() {
         </div>
 
         {/* Filters and Search */}
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
           <div className="space-y-4">
             {/* Search Bar */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Search Materials</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-2">Search Materials</label>
               <div className="relative">
                 <input
                   type="text"
                   placeholder="Search by material name, category, or supplier..."
                   value={filters.search}
                   onChange={(e) => handleFilterChange('search', e.target.value)}
-                  className="w-full px-4 py-2 pl-10 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-4 py-2 pl-10 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
                 <svg
-                  className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                  className="absolute left-3 top-2.5 h-5 w-5 ds-text-muted"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -608,23 +608,23 @@ export default function StockPage() {
             {/* Filter Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">Category</label>
                 <input
                   type="text"
                   placeholder="Filter by category..."
                   value={filters.category}
                   onChange={(e) => handleFilterChange('category', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Floor</label>
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">Floor</label>
                 <input
                   type="text"
                   placeholder="Filter by floor..."
                   value={filters.floor}
                   onChange={(e) => handleFilterChange('floor', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
               </div>
               <div className="flex items-end">
@@ -633,9 +633,9 @@ export default function StockPage() {
                     type="checkbox"
                     checked={filters.lowStockOnly}
                     onChange={(e) => handleFilterChange('lowStockOnly', e.target.checked)}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
+                    className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500 w-4 h-4"
                   />
-                  <span className="ml-2 text-sm text-gray-700">Low stock only (&lt;20%)</span>
+                  <span className="ml-2 text-sm ds-text-secondary">Low stock only (&lt;20%)</span>
                 </label>
               </div>
               <div className="flex items-end">
@@ -644,7 +644,7 @@ export default function StockPage() {
                     setFilters({ category: '', floor: '', lowStockOnly: false, search: '' });
                     setPagination((prev) => ({ ...prev, page: 1 }));
                   }}
-                  className="w-full px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 font-medium transition-colors"
+                  className="w-full px-4 py-2 ds-bg-surface-muted ds-text-secondary border ds-border-subtle rounded-lg hover:ds-bg-surface-muted font-medium transition-colors"
                 >
                   Clear Filters
                 </button>
@@ -655,24 +655,24 @@ export default function StockPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
 
         {/* Stock Table - Desktop View */}
         {loading ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading stock data...</p>
+            <p className="mt-4 ds-text-secondary">Loading stock data...</p>
           </div>
         ) : materials.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <svg className="mx-auto h-12 w-12 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">No materials found</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <h3 className="mt-4 text-lg font-medium ds-text-primary">No materials found</h3>
+            <p className="mt-2 text-sm ds-text-muted">
               {filters.search || filters.category || filters.floor || filters.lowStockOnly
                 ? 'Try adjusting your filters'
                 : 'No stock data available'}
@@ -681,13 +681,13 @@ export default function StockPage() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden lg:block bg-white rounded-lg shadow overflow-hidden">
+            <div className="hidden lg:block ds-bg-surface rounded-lg shadow overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('name')}
                       >
                         <div className="flex items-center">
@@ -696,7 +696,7 @@ export default function StockPage() {
                         </div>
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('category')}
                       >
                         <div className="flex items-center">
@@ -704,17 +704,17 @@ export default function StockPage() {
                           <SortIcon columnKey="category" />
                         </div>
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide">
                         Request
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide">
                         Purchase Order
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide">
                         Quantity
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('remaining')}
                       >
                         <div className="flex items-center">
@@ -723,7 +723,7 @@ export default function StockPage() {
                         </div>
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('stockLevel')}
                       >
                         <div className="flex items-center">
@@ -732,7 +732,7 @@ export default function StockPage() {
                         </div>
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('wastage')}
                       >
                         <div className="flex items-center">
@@ -740,18 +740,18 @@ export default function StockPage() {
                           <SortIcon columnKey="wastage" />
                         </div>
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide">
                         Last Transaction
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide">
                         Supplier
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {materials.map((material) => {
                       const stockStatus = getStockStatus(material);
                       const wastage = material.wastage || 0;
@@ -760,7 +760,7 @@ export default function StockPage() {
                       const pendingDelivery = purchased - delivered;
 
                       return (
-                        <tr key={material._id} className="hover:bg-gray-50 transition-colors">
+                        <tr key={material._id} className="hover:ds-bg-surface-muted transition-colors">
                           <td className="px-4 py-4 whitespace-nowrap">
                             <Link
                               href={`/items/${material._id}`}
@@ -770,7 +770,7 @@ export default function StockPage() {
                             </Link>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <span className="text-sm text-gray-900">{material.category || 'N/A'}</span>
+                            <span className="text-sm ds-text-primary">{material.category || 'N/A'}</span>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
                             {material.materialRequestNumber ? (
@@ -794,7 +794,7 @@ export default function StockPage() {
                                 )}
                               </div>
                             ) : (
-                              <span className="text-sm text-gray-400">N/A</span>
+                              <span className="text-sm ds-text-muted">N/A</span>
                             )}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
@@ -811,15 +811,15 @@ export default function StockPage() {
                                 )}
                               </div>
                             ) : (
-                              <span className="text-sm text-gray-400">N/A</span>
+                              <span className="text-sm ds-text-muted">N/A</span>
                             )}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
+                            <div className="text-sm ds-text-primary">
                               {purchased} {material.unit || ''}
                             </div>
                             {delivered > 0 && (
-                              <div className="text-xs text-gray-600">
+                              <div className="text-xs ds-text-secondary">
                                 Delivered: {delivered} {material.unit || ''}
                               </div>
                             )}
@@ -830,7 +830,7 @@ export default function StockPage() {
                             )}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <span className="text-sm font-medium text-gray-900">
+                            <span className="text-sm font-medium ds-text-primary">
                               {material.quantityRemaining || 0} {material.unit || ''}
                             </span>
                           </td>
@@ -847,14 +847,14 @@ export default function StockPage() {
                             </span>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <span className="text-sm text-gray-500">
+                            <span className="text-sm ds-text-muted">
                               {material.updatedAt
                                 ? new Date(material.updatedAt).toLocaleDateString()
                                 : 'N/A'}
                             </span>
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap">
-                            <span className="text-sm text-gray-900">
+                            <span className="text-sm ds-text-primary">
                               {material.supplierName || material.supplier || 'N/A'}
                             </span>
                           </td>
@@ -931,7 +931,7 @@ export default function StockPage() {
                 const pendingDelivery = purchased - delivered;
 
                 return (
-                  <div key={material._id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                  <div key={material._id} className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
                     <div className="flex justify-between items-start mb-3">
                       <Link
                         href={`/items/${material._id}`}
@@ -948,17 +948,17 @@ export default function StockPage() {
 
                     <div className="grid grid-cols-2 gap-3 text-sm mb-3">
                       <div>
-                        <span className="text-gray-500">Category:</span>
-                        <span className="ml-1 text-gray-900 font-medium">{material.category || 'N/A'}</span>
+                        <span className="ds-text-muted">Category:</span>
+                        <span className="ml-1 ds-text-primary font-medium">{material.category || 'N/A'}</span>
                       </div>
                       <div>
-                        <span className="text-gray-500">Supplier:</span>
-                        <span className="ml-1 text-gray-900 font-medium">
+                        <span className="ds-text-muted">Supplier:</span>
+                        <span className="ml-1 ds-text-primary font-medium">
                           {material.supplierName || material.supplier || 'N/A'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-gray-500">Request:</span>
+                        <span className="ds-text-muted">Request:</span>
                         {material.materialRequestNumber ? (
                           <Link
                             href={`/material-requests/${material.materialRequestId}`}
@@ -967,11 +967,11 @@ export default function StockPage() {
                             {material.materialRequestNumber}
                           </Link>
                         ) : (
-                          <span className="ml-1 text-gray-400 text-sm">N/A</span>
+                          <span className="ml-1 ds-text-muted text-sm">N/A</span>
                         )}
                       </div>
                       <div>
-                        <span className="text-gray-500">PO:</span>
+                        <span className="ds-text-muted">PO:</span>
                         {material.purchaseOrderNumber ? (
                           <Link
                             href={`/purchase-orders/${material.purchaseOrderId || material.linkedPurchaseOrderId}`}
@@ -981,16 +981,16 @@ export default function StockPage() {
                             {material.isBulkOrder && <span className="text-xs text-purple-600 ml-1">(Bulk)</span>}
                           </Link>
                         ) : (
-                          <span className="ml-1 text-gray-400 text-sm">N/A</span>
+                          <span className="ml-1 ds-text-muted text-sm">N/A</span>
                         )}
                       </div>
                       <div>
-                        <span className="text-gray-500">Quantity:</span>
-                        <span className="ml-1 text-gray-900 font-medium">
+                        <span className="ds-text-muted">Quantity:</span>
+                        <span className="ml-1 ds-text-primary font-medium">
                           {purchased} {material.unit || ''}
                         </span>
                         {delivered > 0 && (
-                          <div className="text-xs text-gray-600 mt-0.5">
+                          <div className="text-xs ds-text-secondary mt-0.5">
                             Delivered: {delivered} {material.unit || ''}
                           </div>
                         )}
@@ -1001,20 +1001,20 @@ export default function StockPage() {
                         )}
                       </div>
                       <div>
-                        <span className="text-gray-500">Remaining:</span>
-                        <span className="ml-1 text-gray-900 font-semibold">
+                        <span className="ds-text-muted">Remaining:</span>
+                        <span className="ml-1 ds-text-primary font-semibold">
                           {material.quantityRemaining || 0} {material.unit || ''}
                         </span>
                       </div>
                       <div>
-                        <span className="text-gray-500">Wastage:</span>
+                        <span className="ds-text-muted">Wastage:</span>
                         <span className={`ml-1 font-medium ${getWastageColor(wastage)}`}>
                           {wastage > 0 ? `${wastage.toFixed(1)}%` : 'N/A'}
                         </span>
                       </div>
                       <div>
-                        <span className="text-gray-500">Last Update:</span>
-                        <span className="ml-1 text-gray-600 text-xs">
+                        <span className="ds-text-muted">Last Update:</span>
+                        <span className="ml-1 ds-text-secondary text-xs">
                           {material.updatedAt
                             ? new Date(material.updatedAt).toLocaleDateString()
                             : 'N/A'}
@@ -1022,7 +1022,7 @@ export default function StockPage() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col gap-2 pt-3 border-t border-gray-200">
+                    <div className="flex flex-col gap-2 pt-3 border-t ds-border-subtle">
                       <Link
                         href={`/items/${material._id}`}
                         className="text-sm text-blue-600 hover:text-blue-900 font-medium text-center py-2"
@@ -1082,23 +1082,23 @@ export default function StockPage() {
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="mt-6 bg-white rounded-lg shadow p-4">
+              <div className="mt-6 ds-bg-surface rounded-lg shadow p-4">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-700">Items per page:</span>
+                    <span className="text-sm ds-text-secondary">Items per page:</span>
                     <select
                       value={pagination.limit}
                       onChange={(e) => handleLimitChange(e.target.value)}
-                      className="px-3 py-1 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                      className="px-3 py-1 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                     >
-                      <option value="10" className="text-gray-900">10</option>
-                      <option value="20" className="text-gray-900">20</option>
-                      <option value="50" className="text-gray-900">50</option>
-                      <option value="100" className="text-gray-900">100</option>
+                      <option value="10" className="ds-text-primary">10</option>
+                      <option value="20" className="ds-text-primary">20</option>
+                      <option value="50" className="ds-text-primary">50</option>
+                      <option value="100" className="ds-text-primary">100</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-700">
+                    <span className="text-sm ds-text-secondary">
                       Page {pagination.page} of {pagination.pages} ({pagination.total} total)
                     </span>
                   </div>
@@ -1106,7 +1106,7 @@ export default function StockPage() {
                     <button
                       onClick={() => handlePageChange(pagination.page - 1)}
                       disabled={pagination.page === 1}
-                      className="px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                      className="px-3 py-2 ds-bg-surface ds-text-secondary border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                     >
                       Previous
                     </button>
@@ -1129,7 +1129,7 @@ export default function StockPage() {
                             className={`px-3 py-2 rounded-lg text-sm font-medium ${
                               pagination.page === pageNum
                                 ? 'bg-blue-600 text-white'
-                                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                                : 'ds-bg-surface ds-text-secondary border ds-border-subtle hover:ds-bg-surface-muted'
                             }`}
                           >
                             {pageNum}
@@ -1140,7 +1140,7 @@ export default function StockPage() {
                     <button
                       onClick={() => handlePageChange(pagination.page + 1)}
                       disabled={pagination.page === pagination.pages}
-                      className="px-3 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                      className="px-3 py-2 ds-bg-surface ds-text-secondary border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                     >
                       Next
                     </button>
@@ -1163,26 +1163,26 @@ export default function StockPage() {
           message={
             autoReorderPreview ? (
               <div className="space-y-4">
-                <p className="text-sm text-gray-700">
+                <p className="text-sm ds-text-secondary">
                   The following {autoReorderPreview.materials?.length || 0} material(s) will be added to a bulk request:
                 </p>
-                <div className="max-h-64 overflow-y-auto border border-gray-200 rounded-lg p-4">
+                <div className="max-h-64 overflow-y-auto border ds-border-subtle rounded-lg p-4">
                   <table className="min-w-full text-sm">
-                    <thead className="bg-gray-50">
+                    <thead className="ds-bg-surface-muted">
                       <tr>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Material</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Quantity</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Unit</th>
-                        <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">Est. Cost</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted">Material</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted">Quantity</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted">Unit</th>
+                        <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted">Est. Cost</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-ds-border-subtle">
                       {autoReorderPreview.materials?.map((material, index) => (
                         <tr key={index}>
-                          <td className="px-3 py-2 text-gray-900">{material.name}</td>
-                          <td className="px-3 py-2 text-gray-600">{material.quantityNeeded}</td>
-                          <td className="px-3 py-2 text-gray-600">{material.unit}</td>
-                          <td className="px-3 py-2 text-gray-600">
+                          <td className="px-3 py-2 ds-text-primary">{material.name}</td>
+                          <td className="px-3 py-2 ds-text-secondary">{material.quantityNeeded}</td>
+                          <td className="px-3 py-2 ds-text-secondary">{material.unit}</td>
+                          <td className="px-3 py-2 ds-text-secondary">
                             {material.estimatedCost
                               ? new Intl.NumberFormat('en-KE', {
                                   style: 'currency',
@@ -1196,7 +1196,7 @@ export default function StockPage() {
                   </table>
                 </div>
                 {autoReorderPreview.summary && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-3">
                     <p className="text-sm font-medium text-blue-900">
                       Total Estimated Cost:{' '}
                       {new Intl.NumberFormat('en-KE', {
@@ -1206,7 +1206,7 @@ export default function StockPage() {
                     </p>
                   </div>
                 )}
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   Click "Confirm" to create the bulk request, or "Cancel" to go back.
                 </p>
               </div>

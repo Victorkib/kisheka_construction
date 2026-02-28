@@ -124,14 +124,14 @@ function UsersPageContent() {
       pm: 'bg-green-100 text-green-800',
       project_manager: 'bg-green-100 text-green-800',
       supervisor: 'bg-yellow-100 text-yellow-800',
-      site_clerk: 'bg-gray-100 text-gray-800',
-      clerk: 'bg-gray-100 text-gray-800',
+      site_clerk: 'ds-bg-surface-muted ds-text-primary',
+      clerk: 'ds-bg-surface-muted ds-text-primary',
       accountant: 'bg-indigo-100 text-indigo-800',
       supplier: 'bg-orange-100 text-orange-800',
     };
 
     const normalizedRole = role?.toLowerCase() || 'unknown';
-    const colorClass = colors[normalizedRole] || 'bg-gray-100 text-gray-800';
+    const colorClass = colors[normalizedRole] || 'ds-bg-surface-muted ds-text-primary';
     const displayRole = normalizedRole === 'pm' || normalizedRole === 'project_manager' 
       ? 'Project Manager' 
       : normalizedRole === 'site_clerk' 
@@ -152,7 +152,7 @@ function UsersPageContent() {
       suspended: 'bg-yellow-100 text-yellow-800',
     };
 
-    const colorClass = colors[status] || 'bg-gray-100 text-gray-800';
+    const colorClass = colors[status] || 'ds-bg-surface-muted ds-text-primary';
     const displayStatus = status?.charAt(0).toUpperCase() + status?.slice(1) || 'Unknown';
 
     return (
@@ -188,8 +188,8 @@ function UsersPageContent() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">User Management</h1>
-              <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Manage users, roles, and access permissions</p>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">User Management</h1>
+              <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Manage users, roles, and access permissions</p>
             </div>
             <Link
               href="/dashboard/users/invite"
@@ -204,36 +204,36 @@ function UsersPageContent() {
         {Object.keys(roleDistribution).length > 0 && (
           <div className="mb-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             {Object.entries(roleDistribution).map(([role, count]) => (
-              <div key={role} className="bg-white rounded-lg shadow p-4">
-                <p className="text-sm text-gray-600">{role === 'pm' ? 'Project Manager' : role.charAt(0).toUpperCase() + role.slice(1)}</p>
-                <p className="text-2xl font-bold text-gray-900">{count}</p>
+              <div key={role} className="ds-bg-surface rounded-lg shadow p-4">
+                <p className="text-sm ds-text-secondary">{role === 'pm' ? 'Project Manager' : role.charAt(0).toUpperCase() + role.slice(1)}</p>
+                <p className="text-2xl font-bold ds-text-primary">{count}</p>
               </div>
             ))}
           </div>
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">Search</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">Search</label>
               <input
                 type="text"
                 placeholder="Search by name or email..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
             {/* Role Filter */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">Role</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">Role</label>
               <select
                 value={filters.role}
                 onChange={(e) => handleFilterChange('role', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Roles</option>
                 <option value="owner">Owner</option>
@@ -248,11 +248,11 @@ function UsersPageContent() {
 
             {/* Status Filter */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">Status</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">Status</label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
@@ -265,7 +265,7 @@ function UsersPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -274,47 +274,47 @@ function UsersPageContent() {
         {loading ? (
           <LoadingTable rows={5} cols={6} />
         ) : users.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-gray-500 text-lg">No users found</p>
-            <p className="text-gray-400 text-sm mt-2">Try adjusting your filters</p>
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <p className="ds-text-muted text-lg">No users found</p>
+            <p className="ds-text-muted text-sm mt-2">Try adjusting your filters</p>
           </div>
         ) : (
           <>
-            <div className="bg-white rounded-lg shadow overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+            <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       User
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Role
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Created
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Last Login
                     </th>
-                    <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {users.map((userItem) => (
-                    <tr key={userItem.id} className="hover:bg-gray-50">
+                    <tr key={userItem.id} className="hover:ds-bg-surface-muted">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium ds-text-primary">
                             {userItem.firstName || userItem.lastName
                               ? `${userItem.firstName || ''} ${userItem.lastName || ''}`.trim()
                               : 'No Name'}
                           </div>
-                          <div className="text-sm text-gray-500">{userItem.email}</div>
+                          <div className="text-sm ds-text-muted">{userItem.email}</div>
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -323,10 +323,10 @@ function UsersPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(userItem.status)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {formatDate(userItem.createdAt)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {formatDate(userItem.lastLogin)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -346,7 +346,7 @@ function UsersPageContent() {
             {/* Pagination */}
             {pagination.totalPages > 1 && (
               <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
+                <div className="text-sm ds-text-secondary">
                   Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
                   {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
                   {pagination.total} users
@@ -355,14 +355,14 @@ function UsersPageContent() {
                   <button
                     onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
                     disabled={pagination.page === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    className="px-4 py-2 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
                     disabled={pagination.page >= pagination.totalPages}
-                    className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                    className="px-4 py-2 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted"
                   >
                     Next
                   </button>

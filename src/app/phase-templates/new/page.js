@@ -213,22 +213,22 @@ function NewPhaseTemplatePageContent() {
           <Link href="/phase-templates" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
             ← Back to Templates
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900">Create Phase Template</h1>
+          <h1 className="text-2xl font-bold ds-text-primary">Create Phase Template</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
               {error}
             </div>
           )}
 
           {/* Template Basic Info */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Template Information</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Template Information</h2>
             <div className="space-y-4">
               <div>
-                <label htmlFor="templateName" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="templateName" className="block text-sm font-medium ds-text-secondary mb-2">
                   Template Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -239,12 +239,12 @@ function NewPhaseTemplatePageContent() {
                   onChange={handleChange}
                   required
                   minLength={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label htmlFor="templateType" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="templateType" className="block text-sm font-medium ds-text-secondary mb-2">
                   Template Type <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -253,7 +253,7 @@ function NewPhaseTemplatePageContent() {
                   value={formData.templateType}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   {TEMPLATE_TYPES.map((type) => (
                     <option key={type} value={type}>
@@ -264,7 +264,7 @@ function NewPhaseTemplatePageContent() {
               </div>
 
               <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="description" className="block text-sm font-medium ds-text-secondary mb-2">
                   Description
                 </label>
                 <textarea
@@ -273,19 +273,19 @@ function NewPhaseTemplatePageContent() {
                   value={formData.description}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
           </div>
 
           {/* Budget Allocation */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Default Budget Allocation</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Default Budget Allocation</h2>
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               {Object.entries(formData.defaultBudgetAllocation).map(([key, value]) => (
                 <div key={key}>
-                  <label htmlFor={`budget.${key}`} className="block text-sm font-medium text-gray-700 mb-2 capitalize">
+                  <label htmlFor={`budget.${key}`} className="block text-sm font-medium ds-text-secondary mb-2 capitalize">
                     {key}
                   </label>
                   <input
@@ -297,7 +297,7 @@ function NewPhaseTemplatePageContent() {
                     min="0"
                     max="100"
                     step="0.1"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               ))}
@@ -310,8 +310,8 @@ function NewPhaseTemplatePageContent() {
           </div>
 
           {/* Phases */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Phase Definitions</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Phase Definitions</h2>
             
             {/* Existing Phases */}
             {formData.phases.length > 0 && (
@@ -320,9 +320,9 @@ function NewPhaseTemplatePageContent() {
                   <div key={index} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900">{phase.phaseCode}: {phase.phaseName}</h3>
-                        <p className="text-sm text-gray-600">Budget: {phase.defaultBudgetPercentage}%</p>
-                        <p className="text-sm text-gray-600">
+                        <h3 className="font-semibold ds-text-primary">{phase.phaseCode}: {phase.phaseName}</h3>
+                        <p className="text-sm ds-text-secondary">Budget: {phase.defaultBudgetPercentage}%</p>
+                        <p className="text-sm ds-text-secondary">
                           {phase.defaultWorkItems.length} work items, {phase.defaultMilestones.length} milestones
                         </p>
                       </div>
@@ -340,12 +340,12 @@ function NewPhaseTemplatePageContent() {
             )}
 
             {/* Add New Phase Form */}
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
-              <h3 className="text-md font-semibold text-gray-900 mb-4">Add Phase</h3>
+            <div className="border-2 border-dashed ds-border-subtle rounded-lg p-4">
+              <h3 className="text-md font-semibold ds-text-primary mb-4">Add Phase</h3>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="phaseName" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="phaseName" className="block text-sm font-medium ds-text-secondary mb-2">
                       Phase Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -354,11 +354,11 @@ function NewPhaseTemplatePageContent() {
                       name="phaseName"
                       value={newPhase.phaseName}
                       onChange={handlePhaseChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label htmlFor="phaseCode" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="phaseCode" className="block text-sm font-medium ds-text-secondary mb-2">
                       Phase Code
                     </label>
                     <input
@@ -368,14 +368,14 @@ function NewPhaseTemplatePageContent() {
                       value={newPhase.phaseCode}
                       onChange={handlePhaseChange}
                       placeholder="Auto-generated if empty"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="phaseType" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="phaseType" className="block text-sm font-medium ds-text-secondary mb-2">
                       Phase Type
                     </label>
                     <select
@@ -383,7 +383,7 @@ function NewPhaseTemplatePageContent() {
                       name="phaseType"
                       value={newPhase.phaseType}
                       onChange={handlePhaseChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       {Object.values(PHASE_TYPE_CONSTANTS).map((type) => (
                         <option key={type} value={type}>
@@ -393,7 +393,7 @@ function NewPhaseTemplatePageContent() {
                     </select>
                   </div>
                   <div>
-                    <label htmlFor="defaultBudgetPercentage" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="defaultBudgetPercentage" className="block text-sm font-medium ds-text-secondary mb-2">
                       Budget Percentage <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -406,13 +406,13 @@ function NewPhaseTemplatePageContent() {
                       max="100"
                       step="0.1"
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="phaseDescription" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="phaseDescription" className="block text-sm font-medium ds-text-secondary mb-2">
                     Description
                   </label>
                   <textarea
@@ -421,13 +421,13 @@ function NewPhaseTemplatePageContent() {
                     value={newPhase.description}
                     onChange={handlePhaseChange}
                     rows={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 {/* Work Items */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     Default Work Items
                   </label>
                   <div className="flex gap-2 mb-2">
@@ -442,12 +442,12 @@ function NewPhaseTemplatePageContent() {
                         }
                       }}
                       placeholder="Enter work item name..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       type="button"
                       onClick={addWorkItem}
-                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition-colors"
                     >
                       Add
                     </button>
@@ -475,7 +475,7 @@ function NewPhaseTemplatePageContent() {
 
                 {/* Milestones */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     Default Milestones
                   </label>
                   <div className="flex gap-2 mb-2">
@@ -490,12 +490,12 @@ function NewPhaseTemplatePageContent() {
                         }
                       }}
                       placeholder="Enter milestone name..."
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       type="button"
                       onClick={addMilestone}
-                      className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition-colors"
                     >
                       Add
                     </button>
@@ -535,7 +535,7 @@ function NewPhaseTemplatePageContent() {
           <div className="flex justify-end gap-4">
             <Link
               href="/phase-templates"
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
             >
               Cancel
             </Link>

@@ -260,7 +260,7 @@ export function CloudinaryUploadWidget({
       {/* Upload Overlay - Shows during upload */}
       {uploading && (
         <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">
+          <div className="ds-bg-surface rounded-lg shadow-xl p-8 max-w-md w-full">
             <div className="flex flex-col items-center space-y-4">
               {showSuccess ? (
                 <>
@@ -279,8 +279,8 @@ export function CloudinaryUploadWidget({
                       />
                     </svg>
                   </div>
-                  <p className="text-lg font-semibold text-gray-900">Upload Complete!</p>
-                  <p className="text-sm text-gray-600">Your file has been successfully uploaded.</p>
+                  <p className="text-lg font-semibold ds-text-primary">Upload Complete!</p>
+                  <p className="text-sm ds-text-secondary">Your file has been successfully uploaded.</p>
                 </>
               ) : (
                 <>
@@ -293,7 +293,7 @@ export function CloudinaryUploadWidget({
                       showPercentage={true}
                     />
                   </div>
-                  <p className="text-sm text-gray-600 text-center">
+                  <p className="text-sm ds-text-secondary text-center">
                     {progress < 95 ? 'Uploading your file...' : 'Processing and securing your file...'}
                   </p>
                 </>
@@ -303,13 +303,13 @@ export function CloudinaryUploadWidget({
         </div>
       )}
 
-      <label className="block text-sm font-medium text-gray-700 mb-1">
+      <label className="block text-sm font-medium ds-text-secondary mb-1">
         {label}
       </label>
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+        <div className="bg-red-50 border border-red-400/60 text-red-700 px-3 py-2 rounded text-sm">
           {error}
         </div>
       )}
@@ -320,7 +320,7 @@ export function CloudinaryUploadWidget({
           className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
             dragActive
               ? 'border-blue-500 bg-blue-50'
-              : 'border-gray-300 hover:border-gray-400'
+              : 'ds-border-subtle hover:border-ds-border-strong'
           } ${uploading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -345,14 +345,14 @@ export function CloudinaryUploadWidget({
                 color="blue-600"
                 showPercentage={true}
               />
-              <p className="text-xs text-gray-500 text-center">
+              <p className="text-xs ds-text-muted text-center">
                 Please wait while your file is being uploaded...
               </p>
             </div>
           ) : (
             <div className="space-y-2">
               <svg
-                className="mx-auto h-12 w-12 text-gray-400"
+                className="mx-auto h-12 w-12 ds-text-muted"
                 stroke="currentColor"
                 fill="none"
                 viewBox="0 0 48 48"
@@ -365,10 +365,10 @@ export function CloudinaryUploadWidget({
                 />
               </svg>
               <div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   <span className="font-semibold text-blue-600">Click to upload</span> or drag and drop
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs ds-text-muted mt-1">
                   {acceptedTypes.includes('image/*') && 'Images'}
                   {acceptedTypes.includes('application/pdf') && ' or PDFs'}
                   {` (Max ${maxSizeMB}MB)`}
@@ -381,7 +381,7 @@ export function CloudinaryUploadWidget({
 
       {/* Preview Area */}
       {preview && (
-        <div className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+        <div className="border ds-border-subtle rounded-lg p-4 ds-bg-surface-muted">
           <div className="flex items-start gap-4">
             {/* Image Preview */}
             {isImage(preview) && (
@@ -389,7 +389,7 @@ export function CloudinaryUploadWidget({
                 <img
                   src={preview}
                   alt="Preview"
-                  className="h-24 w-24 object-cover rounded border border-gray-300"
+                  className="h-24 w-24 object-cover rounded border ds-border-subtle"
                 />
               </div>
             )}
@@ -397,7 +397,7 @@ export function CloudinaryUploadWidget({
             {/* PDF Preview */}
             {isPDF(preview) && (
               <div className="flex-shrink-0">
-                <div className="h-24 w-24 bg-red-100 rounded border border-red-300 flex items-center justify-center">
+                <div className="h-24 w-24 bg-red-100 rounded border border-red-400/60 flex items-center justify-center">
                   <svg
                     className="h-12 w-12 text-red-600"
                     fill="none"
@@ -417,10 +417,10 @@ export function CloudinaryUploadWidget({
 
             {/* File Info */}
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">
+              <p className="text-sm font-medium ds-text-primary truncate">
                 {isImage(preview) ? 'Image' : isPDF(preview) ? 'PDF Document' : 'File'} uploaded
               </p>
-              <p className="text-xs text-gray-500 truncate mt-1">{preview}</p>
+              <p className="text-xs ds-text-muted truncate mt-1">{preview}</p>
               <div className="flex gap-2 mt-3">
                 <button
                   type="button"
@@ -433,7 +433,7 @@ export function CloudinaryUploadWidget({
                   type="button"
                   onClick={handleReplace}
                   disabled={uploading}
-                  className="text-xs px-3 py-1 bg-gray-600 text-white rounded hover:bg-gray-700 transition disabled:opacity-50"
+                  className="text-xs px-3 py-1 bg-slate-600 text-white rounded hover:bg-slate-700 transition disabled:opacity-50"
                 >
                   Replace
                 </button>
@@ -472,7 +472,7 @@ export function CloudinaryUploadWidget({
             <p className="mb-3">
               Are you sure you want to remove this file?
             </p>
-            <p className="text-gray-600 text-sm">
+            <p className="ds-text-secondary text-sm">
               The file will be removed from this form. You can upload a new file if needed.
             </p>
           </>

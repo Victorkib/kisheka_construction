@@ -256,8 +256,8 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Project & Default Settings</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold ds-text-primary mb-4">Project & Default Settings</h2>
+        <p className="text-sm ds-text-secondary mb-6">
           Select the project and set default values that will apply to all materials in this bulk request.
           You can override these defaults for individual materials in later steps.
         </p>
@@ -266,11 +266,11 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
       <div className="space-y-4">
         {/* Project Selection */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Project <span className="text-red-500">*</span>
           </label>
           {loadingProjects ? (
-            <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-500">
+            <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-muted">
               Loading projects...
             </div>
           ) : (
@@ -278,22 +278,22 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
               value={wizardData.projectId || ''}
               onChange={(e) => handleChange('projectId', e.target.value)}
               required
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="" className="text-gray-900">Select a project</option>
+              <option value="" className="ds-text-primary">Select a project</option>
               {projects.map((project) => (
-                <option key={project._id} value={project._id} className="text-gray-900">
+                <option key={project._id} value={project._id} className="ds-text-primary">
                   {project.projectCode} - {project.projectName}
                 </option>
               ))}
             </select>
           )}
-          <p className="mt-1 text-sm text-gray-600">Select the project for this bulk material request</p>
+          <p className="mt-1 text-sm ds-text-secondary">Select the project for this bulk material request</p>
         </div>
 
         {/* Batch Name (Optional) */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Batch Name (Optional)
           </label>
           <input
@@ -301,22 +301,22 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
             value={wizardData.batchName || ''}
             onChange={(e) => handleChange('batchName', e.target.value)}
             placeholder="e.g., Foundation Materials, Roofing Supplies"
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
           />
-          <p className="mt-1 text-sm text-gray-600">Give this batch a descriptive name for easy identification</p>
+          <p className="mt-1 text-sm ds-text-secondary">Give this batch a descriptive name for easy identification</p>
         </div>
 
         {/* Default Floor */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Default Floor (Optional)
           </label>
           {loadingFloors || loadingApplicableFloors ? (
-            <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-500">
+            <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-muted">
               Loading floors...
             </div>
           ) : floors.length === 0 && wizardData.projectId ? (
-            <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700">
+            <div className="px-3 py-2 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700">
               No floors found for this project
             </div>
           ) : (
@@ -324,9 +324,9 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
               value={wizardData.defaultFloorId || ''}
               onChange={(e) => handleChange('defaultFloorId', e.target.value)}
               disabled={!wizardData.projectId || floors.length === 0 || loadingApplicableFloors}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted disabled:cursor-not-allowed"
             >
-              <option value="" className="text-gray-900">No default floor</option>
+              <option value="" className="ds-text-primary">No default floor</option>
               {/* Show applicable floors first */}
               {applicableFloors.length > 0 && (
                 <>
@@ -339,7 +339,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
                       return `Floor ${floorNumber}`;
                     };
                     return (
-                      <option key={floor._id} value={floor._id} className="text-gray-900">
+                      <option key={floor._id} value={floor._id} className="ds-text-primary">
                         {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)} ✓
                       </option>
                     );
@@ -349,7 +349,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
               {/* Show non-applicable floors (disabled) if phase is selected */}
               {wizardData.defaultPhaseId && nonApplicableFloors.length > 0 && (
                 <>
-                  <optgroup label={`Not applicable to ${selectedPhaseInfo?.phaseName || 'selected phase'}`} className="text-gray-500">
+                  <optgroup label={`Not applicable to ${selectedPhaseInfo?.phaseName || 'selected phase'}`} className="ds-text-muted">
                     {nonApplicableFloors.map((floor) => {
                       const getFloorDisplay = (floorNumber, name) => {
                         if (name) return name;
@@ -359,7 +359,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
                         return `Floor ${floorNumber}`;
                       };
                       return (
-                        <option key={floor._id} value={floor._id} disabled className="text-gray-400 italic">
+                        <option key={floor._id} value={floor._id} disabled className="ds-text-muted italic">
                           {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)} ✗
                         </option>
                       );
@@ -379,7 +379,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
                       return `Floor ${floorNumber}`;
                     };
                     return (
-                      <option key={floor._id} value={floor._id} className="text-gray-900">
+                      <option key={floor._id} value={floor._id} className="ds-text-primary">
                         {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)}
                       </option>
                     );
@@ -388,7 +388,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
               )}
             </select>
           )}
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm ds-text-secondary">
             Default floor for all materials (can be overridden per material)
             {wizardData.defaultPhaseId && selectedPhaseInfo && (
               <span className="block mt-1 text-xs text-blue-600">
@@ -402,16 +402,16 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
 
         {/* Default Phase - REQUIRED */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Default Construction Phase <span className="text-red-500">*</span>
           </label>
           {loadingPhases ? (
-            <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-500">
+            <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-muted">
               Loading phases...
             </div>
           ) : phases.length === 0 && wizardData.projectId ? (
             <div className="space-y-2">
-              <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700">
+              <div className="px-3 py-2 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700">
                 No phases found for this project
               </div>
               <Link
@@ -428,17 +428,17 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
               onChange={(e) => handleChange('defaultPhaseId', e.target.value)}
               required
               disabled={!wizardData.projectId || phases.length === 0}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted disabled:cursor-not-allowed"
             >
-              <option value="" className="text-gray-900">Select phase (required)</option>
+              <option value="" className="ds-text-primary">Select phase (required)</option>
               {phases.map((phase) => (
-                <option key={phase._id} value={phase._id} className="text-gray-900">
+                <option key={phase._id} value={phase._id} className="ds-text-primary">
                   {phase.phaseName || phase.name} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
                 </option>
               ))}
             </select>
           )}
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm ds-text-secondary">
             <span className="font-medium text-red-600">Required:</span> Default construction phase for all materials. 
             You can override this for individual materials in Step 3 if needed.
           </p>
@@ -446,11 +446,11 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
 
         {/* Default Category */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Default Category (Optional)
           </label>
           {loadingCategories ? (
-            <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-500">
+            <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-muted">
               Loading categories...
             </div>
           ) : (
@@ -463,41 +463,41 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
                   handleChange('defaultCategory', selectedCategory.name);
                 }
               }}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="" className="text-gray-900">No default category</option>
+              <option value="" className="ds-text-primary">No default category</option>
               {categories.map((category) => (
-                <option key={category._id} value={category._id} className="text-gray-900">
+                <option key={category._id} value={category._id} className="ds-text-primary">
                   {category.name}
                 </option>
               ))}
             </select>
           )}
-          <p className="mt-1 text-sm text-gray-600">Default category for all materials (can be overridden per material)</p>
+          <p className="mt-1 text-sm ds-text-secondary">Default category for all materials (can be overridden per material)</p>
         </div>
 
         {/* Default Urgency */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Default Urgency <span className="text-red-500">*</span>
           </label>
           <select
             value={wizardData.defaultUrgency || 'medium'}
             onChange={(e) => handleChange('defaultUrgency', e.target.value)}
             required
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="low" className="text-gray-900">Low</option>
-            <option value="medium" className="text-gray-900">Medium</option>
-            <option value="high" className="text-gray-900">High</option>
-            <option value="critical" className="text-gray-900">Critical</option>
+            <option value="low" className="ds-text-primary">Low</option>
+            <option value="medium" className="ds-text-primary">Medium</option>
+            <option value="high" className="ds-text-primary">High</option>
+            <option value="critical" className="ds-text-primary">Critical</option>
           </select>
-          <p className="mt-1 text-sm text-gray-600">Default urgency level for all materials</p>
+          <p className="mt-1 text-sm ds-text-secondary">Default urgency level for all materials</p>
         </div>
 
         {/* Default Reason */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Default Reason (Optional)
           </label>
           <textarea
@@ -505,9 +505,9 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
             onChange={(e) => handleChange('defaultReason', e.target.value)}
             placeholder="e.g., Foundation construction, Roofing installation"
             rows={3}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
           />
-          <p className="mt-1 text-sm text-gray-600">Default reason for requesting these materials</p>
+          <p className="mt-1 text-sm ds-text-secondary">Default reason for requesting these materials</p>
         </div>
       </div>
     </div>

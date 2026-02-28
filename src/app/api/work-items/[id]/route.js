@@ -235,7 +235,9 @@ export async function PATCH(request, { params }) {
       floorId,
       categoryId,
       priority,
-      notes
+      notes,
+      executionModel,
+      subcontractorId
     } = body;
 
     const db = await getDatabase();
@@ -429,6 +431,32 @@ export async function PATCH(request, { params }) {
 
     if (notes !== undefined) {
       updateData.notes = notes?.trim() || '';
+    }
+
+    if (executionModel !== undefined) {
+      const validModels = ['direct_labour', 'contract_based'];
+      if (executionModel !== null && executionModel !== '' && !validModels.includes(executionModel)) {
+        return errorResponse(`Invalid execution model. Must be one of: ${validModels.join(', ')}`, 400);
+      }
+      updateData.executionModel = executionModel && executionModel !== '' ? executionModel : null;
+    }
+
+    if (subcontractorId !== undefined) {
+      if (subcontractorId === null || subcontractorId === '') {
+        updateData.subcontractorId = null;
+      } else if (!ObjectId.isValid(subcontractorId)) {
+        return errorResponse('If provided, subcontractorId must be a valid ObjectId', 400);
+      } else {
+        // Verify subcontractor exists
+        const subcontractor = await db.collection('subcontractors').findOne({
+          _id: new ObjectId(subcontractorId),
+          deletedAt: null
+        });
+        if (!subcontractor) {
+          return errorResponse('Subcontractor not found', 404);
+        }
+        updateData.subcontractorId = new ObjectId(subcontractorId);
+      }
     }
 
     // Update work item

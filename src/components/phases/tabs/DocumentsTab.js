@@ -181,11 +181,13 @@ export function DocumentsTab({ phase, canEdit }) {
 
   const addDocumentToPhase = async (documentData) => {
     const response = await fetch(`/api/phases/${phase._id}/documents`, {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-        },
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
       body: JSON.stringify(documentData)
     });
 
@@ -297,11 +299,13 @@ export function DocumentsTab({ phase, canEdit }) {
   const handleUpdate = async (documentId, updates) => {
     try {
       const response = await fetch(`/api/phases/${phase._id}/documents/${documentId}`, {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'PATCH',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(updates)
       });
 
@@ -346,13 +350,13 @@ export function DocumentsTab({ phase, canEdit }) {
   return (
     <div className="space-y-6">
       {/* Header with Search and Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-semibold ds-text-primary">
               Documents ({documents.length})
             </h3>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm ds-text-muted mt-1">
               Manage phase documents, drawings, permits, and photos
             </p>
           </div>
@@ -379,9 +383,9 @@ export function DocumentsTab({ phase, canEdit }) {
                   placeholder="Search documents..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 pl-10 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <svg className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="absolute left-3 top-2.5 h-5 w-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
@@ -389,7 +393,7 @@ export function DocumentsTab({ phase, canEdit }) {
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="all">All Categories</option>
               {documentCategories.map(cat => (
@@ -402,7 +406,7 @@ export function DocumentsTab({ phase, canEdit }) {
                 className={`px-3 py-2 border rounded-lg transition-colors ${
                   viewMode === 'grid'
                     ? 'bg-blue-50 border-blue-500 text-blue-700'
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    : 'ds-border-subtle ds-text-secondary hover:ds-bg-surface-muted'
                 }`}
                 title="Grid view"
               >
@@ -415,7 +419,7 @@ export function DocumentsTab({ phase, canEdit }) {
                 className={`px-3 py-2 border rounded-lg transition-colors ${
                   viewMode === 'list'
                     ? 'bg-blue-50 border-blue-500 text-blue-700'
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                    : 'ds-border-subtle ds-text-secondary hover:ds-bg-surface-muted'
                 }`}
                 title="List view"
               >
@@ -430,11 +434,11 @@ export function DocumentsTab({ phase, canEdit }) {
 
       {/* Documents Display */}
       {documents.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <svg className="mx-auto h-16 w-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+          <svg className="mx-auto h-16 w-16 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <p className="text-gray-500 mt-4 mb-4 text-lg">No documents uploaded for this phase</p>
+          <p className="ds-text-muted mt-4 mb-4 text-lg">No documents uploaded for this phase</p>
           {canEdit && (
             <button
               onClick={() => setShowUploadModal(true)}
@@ -445,8 +449,8 @@ export function DocumentsTab({ phase, canEdit }) {
           )}
         </div>
       ) : filteredDocuments.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-8 text-center">
-          <p className="text-gray-500">No documents match your search criteria</p>
+        <div className="ds-bg-surface rounded-lg shadow p-8 text-center">
+          <p className="ds-text-muted">No documents match your search criteria</p>
         </div>
       ) : (
         <div className={viewMode === 'grid' 
@@ -520,34 +524,34 @@ function DocumentCard({ document, canEdit, onPreview, onDelete, onEdit, getCateg
   
   if (viewMode === 'list') {
     return (
-      <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+      <div className="ds-bg-surface border ds-border-subtle rounded-lg p-4 hover:shadow-md transition-shadow">
         <div className="flex items-center gap-4">
           {isImage ? (
             <img
               src={document.url}
               alt={document.name}
-              className="h-16 w-16 object-cover rounded border border-gray-300 cursor-pointer"
+              className="h-16 w-16 object-cover rounded border ds-border-subtle cursor-pointer"
               onClick={onPreview}
             />
           ) : (
-            <div className="h-16 w-16 bg-gray-100 rounded border border-gray-300 flex items-center justify-center text-2xl">
+            <div className="h-16 w-16 ds-bg-surface-muted rounded border ds-border-subtle flex items-center justify-center text-2xl">
               {getFileIcon(document.url, document.fileType)}
             </div>
           )}
           <div className="flex-1 min-w-0">
-            <h4 className="font-medium text-gray-900 truncate">{document.name}</h4>
+            <h4 className="font-medium ds-text-primary truncate">{document.name}</h4>
             {document.description && (
-              <p className="text-sm text-gray-500 truncate mt-1">{document.description}</p>
+              <p className="text-sm ds-text-muted truncate mt-1">{document.description}</p>
             )}
             <div className="flex items-center gap-3 mt-2">
-              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded">
+              <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium ds-text-secondary ds-bg-surface-muted rounded">
                 {getCategoryIcon(document.category)} {getCategoryLabel(document.category)}
               </span>
               {document.fileSize && (
-                <span className="text-xs text-gray-500">{formatFileSize(document.fileSize)}</span>
+                <span className="text-xs ds-text-muted">{formatFileSize(document.fileSize)}</span>
               )}
               {document.uploadedAt && (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs ds-text-muted">
                   {new Date(document.uploadedAt).toLocaleDateString()}
                 </span>
               )}
@@ -556,14 +560,14 @@ function DocumentCard({ document, canEdit, onPreview, onDelete, onEdit, getCateg
           <div className="flex gap-2">
             <button
               onClick={onPreview}
-              className="px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 border border-blue-200 rounded hover:bg-blue-50 transition-colors"
+              className="px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 border border-blue-400/60 rounded hover:bg-blue-50 transition-colors"
             >
               View
             </button>
             <a
               href={document.url}
               download
-              className="px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 border border-gray-200 rounded hover:bg-gray-50 transition-colors"
+              className="px-3 py-1.5 text-sm ds-text-secondary hover:ds-text-primary border ds-border-subtle rounded hover:ds-bg-surface-muted transition-colors"
             >
               Download
             </a>
@@ -577,7 +581,7 @@ function DocumentCard({ document, canEdit, onPreview, onDelete, onEdit, getCateg
                 </button>
                 <button
                   onClick={onDelete}
-                  className="px-3 py-1.5 text-sm text-red-600 hover:text-red-800 border border-red-200 rounded hover:bg-red-50 transition-colors"
+                  className="px-3 py-1.5 text-sm text-red-600 hover:text-red-800 border border-red-400/60 rounded hover:bg-red-50 transition-colors"
                 >
                   Delete
                 </button>
@@ -590,7 +594,7 @@ function DocumentCard({ document, canEdit, onPreview, onDelete, onEdit, getCateg
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+    <div className="ds-bg-surface border ds-border-subtle rounded-lg p-4 hover:shadow-md transition-shadow">
       {isImage ? (
         <img
           src={document.url}
@@ -599,41 +603,41 @@ function DocumentCard({ document, canEdit, onPreview, onDelete, onEdit, getCateg
           onClick={onPreview}
         />
       ) : (
-        <div className="w-full h-48 bg-gray-100 rounded mb-3 flex items-center justify-center text-6xl">
+        <div className="w-full h-48 ds-bg-surface-muted rounded mb-3 flex items-center justify-center text-6xl">
           {getFileIcon(document.url, document.fileType)}
         </div>
       )}
       <div className="space-y-2">
-        <h4 className="font-medium text-gray-900 truncate" title={document.name}>
+        <h4 className="font-medium ds-text-primary truncate" title={document.name}>
           {document.name}
         </h4>
         {document.description && (
-          <p className="text-sm text-gray-500 line-clamp-2">{document.description}</p>
+          <p className="text-sm ds-text-muted line-clamp-2">{document.description}</p>
         )}
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded">
+          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium ds-text-secondary ds-bg-surface-muted rounded">
             {getCategoryIcon(document.category)} {getCategoryLabel(document.category)}
           </span>
           {document.fileSize && (
-            <span className="text-xs text-gray-500">{formatFileSize(document.fileSize)}</span>
+            <span className="text-xs ds-text-muted">{formatFileSize(document.fileSize)}</span>
           )}
         </div>
         {document.uploadedAt && (
-          <p className="text-xs text-gray-500">
+          <p className="text-xs ds-text-muted">
             {new Date(document.uploadedAt).toLocaleDateString()}
           </p>
         )}
         <div className="flex gap-2 pt-2">
           <button
             onClick={onPreview}
-            className="flex-1 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 border border-blue-200 rounded hover:bg-blue-50 transition-colors"
+            className="flex-1 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-800 border border-blue-400/60 rounded hover:bg-blue-50 transition-colors"
           >
             View
           </button>
           <a
             href={document.url}
             download
-            className="flex-1 px-3 py-1.5 text-sm text-center text-gray-600 hover:text-gray-800 border border-gray-200 rounded hover:bg-gray-50 transition-colors"
+            className="flex-1 px-3 py-1.5 text-sm text-center ds-text-secondary hover:ds-text-primary border ds-border-subtle rounded hover:ds-bg-surface-muted transition-colors"
           >
             Download
           </a>
@@ -648,7 +652,7 @@ function DocumentCard({ document, canEdit, onPreview, onDelete, onEdit, getCateg
               </button>
               <button
                 onClick={onDelete}
-                className="px-3 py-1.5 text-sm text-red-600 hover:text-red-800 border border-red-200 rounded hover:bg-red-50 transition-colors"
+                className="px-3 py-1.5 text-sm text-red-600 hover:text-red-800 border border-red-400/60 rounded hover:bg-red-50 transition-colors"
                 title="Delete"
               >
                 🗑️
@@ -673,13 +677,13 @@ function UploadModal({ onClose, onUpload, uploading, uploadProgress, dragActive,
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="ds-bg-surface rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold text-gray-900">Upload Documents</h3>
+            <h3 className="text-xl font-semibold ds-text-primary">Upload Documents</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl"
+              className="ds-text-muted hover:ds-text-secondary text-2xl"
             >
               ×
             </button>
@@ -687,13 +691,13 @@ function UploadModal({ onClose, onUpload, uploading, uploadProgress, dragActive,
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Category
               </label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {documentCategories.map(cat => (
                   <option key={cat.value} value={cat.value}>
@@ -711,7 +715,7 @@ function UploadModal({ onClose, onUpload, uploading, uploadProgress, dragActive,
               className={`border-2 border-dashed rounded-lg p-8 text-center transition ${
                 dragActive
                   ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-300 bg-gray-50 hover:border-gray-400'
+                  : 'ds-border-subtle ds-bg-surface-muted hover:border-ds-border-strong'
               }`}
             >
               <input
@@ -727,11 +731,11 @@ function UploadModal({ onClose, onUpload, uploading, uploadProgress, dragActive,
               {uploading ? (
                 <div className="space-y-4">
                   <LoadingSpinner />
-                  <p className="text-sm text-gray-600">Uploading files...</p>
+                  <p className="text-sm ds-text-secondary">Uploading files...</p>
                   {Object.keys(uploadProgress).length > 0 && (
                     <div className="space-y-2">
                       {Object.entries(uploadProgress).map(([index, progress]) => (
-                        <div key={index} className="w-full bg-gray-200 rounded-full h-2">
+                        <div key={index} className="w-full ds-bg-surface-muted rounded-full h-2">
                           <div
                             className="bg-blue-600 h-2 rounded-full transition-all"
                             style={{ width: `${progress}%` }}
@@ -743,24 +747,24 @@ function UploadModal({ onClose, onUpload, uploading, uploadProgress, dragActive,
                 </div>
               ) : (
                 <div>
-                  <svg className="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="mx-auto h-12 w-12 ds-text-muted mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  <p className="text-sm text-gray-600 mb-2">
+                  <p className="text-sm ds-text-secondary mb-2">
                     Drag and drop files here, or click to select
                   </p>
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={currentCount >= maxFiles}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-500 disabled:cursor-not-allowed transition"
                   >
                     Select Files
                   </button>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs ds-text-muted mt-2">
                     {currentCount} / {maxFiles} files uploaded
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs ds-text-muted">
                     Accepted: PDF, Images, Word, Excel (Max {maxSizeMB}MB each)
                   </p>
                 </div>
@@ -773,7 +777,7 @@ function UploadModal({ onClose, onUpload, uploading, uploadProgress, dragActive,
               type="button"
               onClick={onClose}
               disabled={uploading}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors disabled:opacity-50"
             >
               Cancel
             </button>
@@ -791,12 +795,12 @@ function PreviewModal({ document, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4" onClick={onClose}>
-      <div className="relative bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+      <div className="relative ds-bg-surface rounded-lg shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <div className="flex justify-between items-center p-4 border-b">
-          <h3 className="text-lg font-semibold text-gray-900">{document.name}</h3>
+          <h3 className="text-lg font-semibold ds-text-primary">{document.name}</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 text-2xl"
+            className="ds-text-muted hover:ds-text-secondary text-2xl"
           >
             ×
           </button>
@@ -816,7 +820,7 @@ function PreviewModal({ document, onClose }) {
             />
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">Preview not available for this file type</p>
+              <p className="ds-text-muted mb-4">Preview not available for this file type</p>
               <a
                 href={document.url}
                 target="_blank"
@@ -856,13 +860,13 @@ function EditModal({ document, onClose, onSave, documentCategories }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+      <div className="ds-bg-surface rounded-lg shadow-xl max-w-md w-full">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Edit Document</h3>
+            <h3 className="text-lg font-semibold ds-text-primary">Edit Document</h3>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-2xl"
+              className="ds-text-muted hover:ds-text-secondary text-2xl"
             >
               ×
             </button>
@@ -870,38 +874,38 @@ function EditModal({ document, onClose, onSave, documentCategories }) {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Document Name <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Description
               </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Category
               </label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {documentCategories.map(cat => (
                   <option key={cat.value} value={cat.value}>
@@ -917,7 +921,7 @@ function EditModal({ document, onClose, onSave, documentCategories }) {
               type="button"
               onClick={onClose}
               disabled={saving}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors disabled:opacity-50"
             >
               Cancel
             </button>

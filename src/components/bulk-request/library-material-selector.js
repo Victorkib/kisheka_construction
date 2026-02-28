@@ -182,15 +182,15 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
       {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">Category</label>
           <select
             value={filters.categoryId}
             onChange={(e) => setFilters((prev) => ({ ...prev, categoryId: e.target.value }))}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="" className="text-gray-900">All Categories</option>
+            <option value="" className="ds-text-primary">All Categories</option>
             {categories.map((cat) => (
-              <option key={cat._id} value={cat._id} className="text-gray-900">
+              <option key={cat._id} value={cat._id} className="ds-text-primary">
                 {cat.name}
               </option>
             ))}
@@ -202,15 +202,15 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
               type="checkbox"
               checked={filters.isCommon === 'true'}
               onChange={(e) => setFilters((prev) => ({ ...prev, isCommon: e.target.checked ? 'true' : '' }))}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
             />
-            <span className="text-sm font-medium text-gray-700">Common Only</span>
+            <span className="text-sm font-medium ds-text-secondary">Common Only</span>
           </label>
         </div>
         <div className="flex items-end">
           <button
             onClick={() => setFilters({ categoryId: '', isCommon: '', isActive: 'true', search: '' })}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 text-sm"
+            className="w-full px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary text-sm"
           >
             Clear Filters
           </button>
@@ -219,7 +219,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg">
           <p className="text-sm font-medium">{error}</p>
           <button
             onClick={() => fetchMaterials(pagination.page, filterValues)}
@@ -234,14 +234,14 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-sm text-gray-600">Loading materials...</p>
+          <p className="mt-2 text-sm ds-text-secondary">Loading materials...</p>
         </div>
       ) : error ? (
         null // Error message already shown above
       ) : materials.length === 0 ? (
-        <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <p className="text-gray-600">No materials found</p>
-          <p className="text-sm text-gray-500 mt-1">Try adjusting your filters</p>
+        <div className="text-center py-8 ds-bg-surface-muted rounded-lg">
+          <p className="ds-text-secondary">No materials found</p>
+          <p className="text-sm ds-text-muted mt-1">Try adjusting your filters</p>
         </div>
       ) : (
         <>
@@ -252,9 +252,9 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                 type="checkbox"
                 checked={selectedIds.size > 0 && selectedIds.size === materials.length}
                 onChange={handleSelectAll}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
               />
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium ds-text-secondary">
                 Select All ({selectedIds.size} selected)
               </span>
             </label>
@@ -279,14 +279,14 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                     className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                       isSelected
                         ? 'border-blue-500 bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300 bg-white'
+                        : 'ds-border-subtle hover:ds-border-subtle ds-bg-surface'
                     }`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
-                        <h4 className="font-semibold text-gray-900 text-sm">{material.name}</h4>
+                        <h4 className="font-semibold ds-text-primary text-sm">{material.name}</h4>
                         {material.category && (
-                          <p className="text-xs text-gray-500 mt-1">{material.category}</p>
+                          <p className="text-xs ds-text-muted mt-1">{material.category}</p>
                         )}
                       </div>
                       <input
@@ -294,10 +294,10 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                         checked={isSelected}
                         onChange={() => handleToggleSelect(material._id.toString())}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
                       />
                     </div>
-                    <div className="mt-2 space-y-1 text-xs text-gray-600">
+                    <div className="mt-2 space-y-1 text-xs ds-text-secondary">
                       <div className="flex justify-between">
                         <span>Unit:</span>
                         <span className="font-medium">{material.defaultUnit}</span>
@@ -321,15 +321,15 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
 
             {/* Pagination Controls */}
             {pagination.pages > 1 && (
-              <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                <div className="text-sm text-gray-600">
+              <div className="flex items-center justify-between border-t ds-border-subtle pt-4">
+                <div className="text-sm ds-text-secondary">
                   Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} materials
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                     disabled={pagination.page === 1 || loading}
-                    className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="px-3 py-1 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     Previous
                   </button>
@@ -353,7 +353,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                           className={`px-3 py-1 rounded-lg text-sm ${
                             pagination.page === pageNum
                               ? 'bg-blue-600 text-white'
-                              : 'border border-gray-300 hover:bg-gray-50'
+                              : 'border ds-border-subtle hover:ds-bg-surface-muted'
                           } disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
                           {pageNum}
@@ -364,7 +364,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                     disabled={pagination.page === pagination.pages || loading}
-                    className="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="px-3 py-1 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
                     Next
                   </button>

@@ -13,14 +13,14 @@ function RegisterPageContent() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create Account</h1>
-        <p className="text-gray-600 mt-2">Join the Doshaki system</p>
+        <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Create Account</h1>
+        <p className="ds-text-secondary mt-2">Join the Doshaki system</p>
       </div>
 
       <RegisterForm />
 
       <div className="text-center text-sm">
-        <p className="text-gray-600">
+        <p className="ds-text-secondary">
           Already have an account?{' '}
           <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">
             Sign in

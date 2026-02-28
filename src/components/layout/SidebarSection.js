@@ -77,7 +77,7 @@ export function SidebarSection({
     // Show icon-only badge when collapsed
     if (badge && badge > 0) {
       return (
-        <div className="p-2 border-b border-gray-200">
+        <div className="p-2 border-b border-slate-600">
           <div className="relative flex items-center justify-center">
             <div className="text-xl">{icon}</div>
             <span
@@ -101,7 +101,7 @@ export function SidebarSection({
     // Show icon only when collapsed
     if (icon) {
       return (
-        <div className="p-2 border-b border-gray-200">
+        <div className="p-2 border-b border-slate-600">
           <div className="flex items-center justify-center" title={title}>
             <div className="text-xl">{icon}</div>
           </div>
@@ -116,17 +116,17 @@ export function SidebarSection({
     return null;
   }
 
-  // Variant styles
+  // Variant styles - use semantic sidebar section backgrounds
   const variantStyles = {
-    default: 'bg-white',
-    primary: 'bg-blue-50',
-    secondary: 'bg-gray-50',
+    default: 'ds-bg-sidebar-section-default',
+    primary: 'ds-bg-sidebar-section-primary',
+    secondary: 'ds-bg-sidebar-section-secondary',
   };
 
   const variantBorderStyles = {
-    default: 'border-gray-200',
-    primary: 'border-blue-200',
-    secondary: 'border-gray-200',
+    default: 'ds-border-sidebar',
+    primary: 'ds-border-sidebar',
+    secondary: 'ds-border-sidebar',
   };
 
   const badgeColorClasses = {
@@ -145,9 +145,9 @@ export function SidebarSection({
         <div className="px-4 py-3 pb-2">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              {icon && <div className="text-lg flex-shrink-0">{icon}</div>}
+              {icon && <div className="text-lg flex-shrink-0 text-white">{icon}</div>}
               {title && (
-                <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider truncate">
+                <h3 className="text-xs font-semibold text-slate-200 uppercase tracking-wider truncate">
                   {title}
                 </h3>
               )}
@@ -162,12 +162,12 @@ export function SidebarSection({
             {collapsible && (
               <button
                 onClick={handleToggle}
-                className="ml-2 p-1 rounded-md hover:bg-gray-200 transition-colors flex-shrink-0"
+                className="ml-2 p-1 rounded-md hover:bg-slate-600 transition-colors flex-shrink-0 text-slate-200"
                 aria-label={isSectionCollapsed ? `Expand ${title}` : `Collapse ${title}`}
                 aria-expanded={!isSectionCollapsed}
               >
                 <svg
-                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${isSectionCollapsed ? '' : 'rotate-180'}`}
+                  className={`w-4 h-4 ds-text-muted transition-transform duration-200 ${isSectionCollapsed ? '' : 'rotate-180'}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -187,7 +187,7 @@ export function SidebarSection({
 
       {/* Section Content */}
       {!isSectionCollapsed && (
-        <div className={title || collapsible ? 'px-4 pb-4' : 'p-4'}>
+        <div className={(title || collapsible) ? 'px-4 pb-4 text-white' : 'p-4 text-white'}>
           {children}
         </div>
       )}

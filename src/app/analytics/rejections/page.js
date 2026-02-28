@@ -181,8 +181,8 @@ const RejectionAnalyticsDashboard = () => {
       <AppLayout>
         <div className="p-6">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Rejection Analytics</h1>
-            <p className="text-gray-600 mt-2">Analyze supplier order rejection patterns and trends</p>
+            <h1 className="text-3xl font-bold ds-text-primary">Rejection Analytics</h1>
+            <p className="ds-text-secondary mt-2">Analyze supplier order rejection patterns and trends</p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -207,8 +207,8 @@ const RejectionAnalyticsDashboard = () => {
         <div className="p-6">
           <div className="text-center py-12">
             <AlertTriangle className="mx-auto h-12 w-12 text-red-500 mb-4" />
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Analytics</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
+            <h2 className="text-xl font-semibold ds-text-primary mb-2">Error Loading Analytics</h2>
+            <p className="ds-text-secondary mb-4">{error}</p>
             <Button onClick={handleRefresh} disabled={refreshing}>
               {refreshing ? (
                 <>
@@ -245,8 +245,8 @@ const RejectionAnalyticsDashboard = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Rejection Analytics</h1>
-            <p className="text-gray-600 mt-2">Analyze supplier order rejection patterns and trends</p>
+            <h1 className="text-3xl font-bold ds-text-primary">Rejection Analytics</h1>
+            <p className="ds-text-secondary mt-2">Analyze supplier order rejection patterns and trends</p>
           </div>
           
           <div className="flex items-center space-x-3 mt-4 sm:mt-0">
@@ -278,14 +278,14 @@ const RejectionAnalyticsDashboard = () => {
           <div className="p-4">
             <div className="flex flex-wrap items-center gap-4">
               <div className="flex items-center">
-                <Filter className="w-4 h-4 mr-2 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Filters:</span>
+                <Filter className="w-4 h-4 mr-2 ds-text-muted" />
+                <span className="text-sm font-medium ds-text-secondary">Filters:</span>
               </div>
               
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}
-                className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-1.5 border ds-border-subtle rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="7d">Last 7 days</option>
                 <option value="30d">Last 30 days</option>
@@ -297,7 +297,7 @@ const RejectionAnalyticsDashboard = () => {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-1.5 border ds-border-subtle rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Categories</option>
                 {categories?.map((cat) => (
@@ -310,7 +310,7 @@ const RejectionAnalyticsDashboard = () => {
               <select
                 value={selectedSupplier}
                 onChange={(e) => setSelectedSupplier(e.target.value)}
-                className="px-3 py-1.5 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-3 py-1.5 border ds-border-subtle rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Suppliers</option>
                 {suppliers?.slice(0, 20).map((supplier) => (
@@ -344,7 +344,7 @@ const RejectionAnalyticsDashboard = () => {
         {/* Recent Rejections Table */}
         <Card>
           <div className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Rejections</h3>
+            <h3 className="text-lg font-semibold ds-text-primary mb-4">Recent Rejections</h3>
             <RejectionDetailsTable rejections={recentRejections.slice(0, 20)} />
           </div>
         </Card>

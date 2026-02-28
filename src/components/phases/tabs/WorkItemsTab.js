@@ -82,7 +82,7 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
     : workItems.filter(item => item.status === filterStatus);
 
   const kanbanColumns = [
-    { id: 'not_started', title: 'Not Started', color: 'bg-gray-100' },
+    { id: 'not_started', title: 'Not Started', color: 'ds-bg-surface-muted' },
     { id: 'in_progress', title: 'In Progress', color: 'bg-blue-100' },
     { id: 'completed', title: 'Completed', color: 'bg-green-100' },
     { id: 'blocked', title: 'Blocked', color: 'bg-red-100' }
@@ -95,7 +95,7 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">Loading work items...</p>
+        <p className="ds-text-muted">Loading work items...</p>
       </div>
     );
   }
@@ -103,27 +103,27 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
   return (
     <div className="space-y-6">
       {/* Statistics */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
           <div>
-            <p className="text-sm text-gray-600">Total Items</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">{stats?.total || 0}</p>
+            <p className="text-sm ds-text-secondary">Total Items</p>
+            <p className="text-2xl font-bold ds-text-primary mt-1">{stats?.total || 0}</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Completion</p>
+            <p className="text-sm ds-text-secondary">Completion</p>
             <p className="text-2xl font-bold text-blue-600 mt-1">{stats?.completionPercentage || 0}%</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Estimated Hours</p>
-            <p className="text-xl font-semibold text-gray-900 mt-1">{stats?.totalEstimatedHours || 0}h</p>
+            <p className="text-sm ds-text-secondary">Estimated Hours</p>
+            <p className="text-xl font-semibold ds-text-primary mt-1">{stats?.totalEstimatedHours || 0}h</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Actual Hours</p>
+            <p className="text-sm ds-text-secondary">Actual Hours</p>
             <p className="text-xl font-semibold text-blue-600 mt-1">{stats?.totalActualHours || 0}h</p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Estimated Cost</p>
-            <p className="text-xl font-semibold text-gray-900 mt-1">{formatCurrency(stats?.totalEstimatedCost || 0)}</p>
+            <p className="text-sm ds-text-secondary">Estimated Cost</p>
+            <p className="text-xl font-semibold ds-text-primary mt-1">{formatCurrency(stats?.totalEstimatedCost || 0)}</p>
           </div>
         </div>
         <div className="flex items-center justify-between">
@@ -133,7 +133,7 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
                 <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(status)}`}>
                   {status.replace('_', ' ').toUpperCase()}
                 </span>
-                <span className="text-sm text-gray-600">{count}</span>
+                <span className="text-sm ds-text-secondary">{count}</span>
               </div>
             ))}
           </div>
@@ -147,7 +147,7 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
       </div>
 
       {/* View Mode Toggle */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="ds-bg-surface rounded-lg shadow p-4">
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
             <button
@@ -155,7 +155,7 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 viewMode === 'kanban'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
               }`}
             >
               Kanban
@@ -165,7 +165,7 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 viewMode === 'list'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
               }`}
             >
               List
@@ -174,7 +174,7 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border ds-border-subtle rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="all">All Statuses</option>
             {WORK_ITEM_STATUSES.map((status) => (
@@ -188,8 +188,8 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
 
       {/* Work Items Display */}
       {workItems.length === 0 ? (
-        <div className="bg-white rounded-lg shadow p-12 text-center">
-          <p className="text-gray-500 mb-4">No work items defined for this phase</p>
+        <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+          <p className="ds-text-muted mb-4">No work items defined for this phase</p>
           <Link
             href={`/work-items/new?projectId=${phase.projectId}&phaseId=${phase._id}`}
             className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -203,9 +203,9 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
           {kanbanColumns.map((column) => {
             const columnItems = getItemsForColumn(column.id);
             return (
-              <div key={column.id} className="bg-white rounded-lg shadow">
+              <div key={column.id} className="ds-bg-surface rounded-lg shadow">
                 <div className={`${column.color} p-4 rounded-t-lg`}>
-                  <h3 className="font-semibold text-gray-900">
+                  <h3 className="font-semibold ds-text-primary">
                     {column.title} ({columnItems.length})
                   </h3>
                 </div>
@@ -214,51 +214,51 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
                     <Link
                       key={item._id}
                       href={`/work-items/${item._id}`}
-                      className="block border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors"
+                      className="block border ds-border-subtle rounded-lg p-3 hover:ds-bg-surface-muted transition-colors"
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold text-gray-900 text-sm">{item.name}</h4>
+                        <h4 className="font-semibold ds-text-primary text-sm">{item.name}</h4>
                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getPriorityColor(item.priority)}`}>
                           {getPriorityLabel(item.priority)}
                         </span>
                       </div>
                       {item.description && (
-                        <p className="text-xs text-gray-600 mb-2 line-clamp-2">{item.description}</p>
+                        <p className="text-xs ds-text-secondary mb-2 line-clamp-2">{item.description}</p>
                       )}
-                      <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+                      <div className="flex items-center gap-2 text-xs ds-text-muted mb-2">
                         {item.estimatedHours > 0 && (
                           <span>{item.estimatedHours}h</span>
                         )}
                         {item.category && (
-                          <span className="px-2 py-0.5 bg-gray-100 rounded">
+                          <span className="px-2 py-0.5 ds-bg-surface-muted rounded">
                             {item.category.replace(/\b\w/g, l => l.toUpperCase())}
                           </span>
                         )}
                       </div>
                       {/* Labour Indicators */}
-                      <div className="border-t border-gray-200 pt-2 mt-2 space-y-1">
+                      <div className="border-t ds-border-subtle pt-2 mt-2 space-y-1">
                         <div className="flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-1 text-gray-600">
+                          <div className="flex items-center gap-1 ds-text-secondary">
                             <Clock className="w-3 h-3" />
                             <span>
                               {item.actualHours || 0}/{item.estimatedHours || 0} hrs
                             </span>
                           </div>
                           {item.estimatedHours > 0 && (
-                            <span className="text-gray-500">
+                            <span className="ds-text-muted">
                               {Math.min(100, Math.round(((item.actualHours || 0) / item.estimatedHours) * 100))}%
                             </span>
                           )}
                         </div>
                         {item.estimatedCost > 0 && (
-                          <div className="flex items-center gap-1 text-xs text-gray-600">
+                          <div className="flex items-center gap-1 text-xs ds-text-secondary">
                             <DollarSign className="w-3 h-3" />
                             <span>
                               {formatCurrency(item.actualCost || 0)} / {formatCurrency(item.estimatedCost)}
                             </span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
+                        <div className="flex items-center gap-2 mt-2 pt-2 border-t ds-border-subtle">
                           <Link
                             href={`/labour/entries?workItemId=${item._id}`}
                             className="text-xs text-blue-600 hover:text-blue-800 font-medium"
@@ -282,7 +282,7 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
                     </Link>
                   ))}
                   {columnItems.length === 0 && (
-                    <p className="text-sm text-gray-400 text-center py-8">No items</p>
+                    <p className="text-sm ds-text-muted text-center py-8">No items</p>
                   )}
                 </div>
               </div>
@@ -291,40 +291,40 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
         </div>
       ) : (
         /* List View */
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Work Item
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Priority
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Hours
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Cost
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Labour
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {filteredWorkItems.map((item) => (
-                  <tr key={item._id} className="hover:bg-gray-50">
+                  <tr key={item._id} className="hover:ds-bg-surface-muted">
                     <td className="px-6 py-4">
                       <Link
                         href={`/work-items/${item._id}`}
@@ -333,10 +333,10 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
                         {item.name}
                       </Link>
                       {item.description && (
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-1">{item.description}</p>
+                        <p className="text-xs ds-text-muted mt-1 line-clamp-1">{item.description}</p>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                       {item.category?.replace(/\b\w/g, l => l.toUpperCase()) || 'Other'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -344,14 +344,14 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
                         {getPriorityLabel(item.priority)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                       {item.actualHours > 0 ? (
                         <span>{item.actualHours} / {item.estimatedHours || 0}h</span>
                       ) : (
                         <span>{item.estimatedHours || 0}h</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                       {item.actualCost > 0 ? (
                         <span>{formatCurrency(item.actualCost)} / {formatCurrency(item.estimatedCost || 0)}</span>
                       ) : (
@@ -365,19 +365,19 @@ export function WorkItemsTab({ phase, canEdit, formatCurrency, formatDate }) {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col gap-1">
-                        <div className="flex items-center gap-1 text-xs text-gray-600">
+                        <div className="flex items-center gap-1 text-xs ds-text-secondary">
                           <Clock className="w-3 h-3" />
                           <span>
                             {item.actualHours || 0}/{item.estimatedHours || 0} hrs
                           </span>
                           {item.estimatedHours > 0 && (
-                            <span className="text-gray-500 ml-1">
+                            <span className="ds-text-muted ml-1">
                               ({Math.min(100, Math.round(((item.actualHours || 0) / item.estimatedHours) * 100))}%)
                             </span>
                           )}
                         </div>
                         {item.estimatedCost > 0 && (
-                          <div className="flex items-center gap-1 text-xs text-gray-600">
+                          <div className="flex items-center gap-1 text-xs ds-text-secondary">
                             <DollarSign className="w-3 h-3" />
                             <span>
                               {formatCurrency(item.actualCost || 0)} / {formatCurrency(item.estimatedCost)}

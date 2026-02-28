@@ -79,7 +79,7 @@ export function RestoreModal({
       <div className="p-8">
         {/* Icon and Title */}
         <div className="flex flex-col items-center text-center mb-6">
-          <div className="flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-2xl bg-gradient-to-br from-green-50/60 to-emerald-50/40 backdrop-blur-sm mb-4 border border-green-200/30 shadow-lg">
+          <div className="flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-2xl bg-gradient-to-br from-green-50/60 to-emerald-50/40 backdrop-blur-sm mb-4 border border-green-400/60/30 shadow-lg">
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-br from-green-400 to-emerald-600 rounded-full blur-sm opacity-50" />
               <svg
@@ -99,23 +99,23 @@ export function RestoreModal({
           </div>
           
           <h3
-            className="text-2xl font-bold leading-7 text-gray-900 mb-3"
+            className="text-2xl font-bold leading-7 ds-text-primary mb-3"
             id="modal-title"
           >
             {title}
           </h3>
           <div className="mt-2">
             {typeof message === 'string' ? (
-              <p className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">
+              <p className="text-sm ds-text-secondary whitespace-pre-line leading-relaxed">
                 {message}
               </p>
             ) : (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm ds-text-secondary">
                 {message}
               </div>
             )}
             {itemName && (
-              <p className="mt-3 text-sm font-semibold text-gray-900 bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-2 rounded-lg border border-green-200/50">
+              <p className="mt-3 text-sm font-semibold ds-text-primary bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-2 rounded-lg border border-green-400/60/50">
                 {itemName}
               </p>
             )}
@@ -123,12 +123,12 @@ export function RestoreModal({
         </div>
 
         {/* Actions */}
-        <div className="mt-8 pt-6 border-t border-gray-200/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+        <div className="mt-8 pt-6 border-t ds-border-subtle/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
           <button
             type="button"
             onClick={onClose}
             disabled={isLoading}
-            className="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-gray-700 bg-white/60 backdrop-blur-sm border border-gray-300/50 rounded-xl hover:bg-white/80 hover:border-gray-400/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+            className="w-full sm:w-auto px-6 py-3 text-sm font-semibold ds-text-secondary ds-bg-surface/60 backdrop-blur-sm border ds-border-subtle/50 rounded-xl hover:ds-bg-surface/80 hover:border-ds-border-strong/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
           >
             {cancelText}
           </button>

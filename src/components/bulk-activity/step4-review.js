@@ -103,7 +103,7 @@ export function Step4Review({ wizardData, user }) {
     return (
       <div className="text-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-2 text-sm text-gray-600">Loading review...</p>
+        <p className="mt-2 text-sm ds-text-secondary">Loading review...</p>
       </div>
     );
   }
@@ -111,25 +111,25 @@ export function Step4Review({ wizardData, user }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Review & Submit</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold ds-text-primary mb-4">Review & Submit</h2>
+        <p className="text-sm ds-text-secondary mb-6">
           Review all details before submitting. {willAutoApprove && 'As OWNER, these activities will be auto-approved.'}
         </p>
       </div>
 
       {/* Project & Professional Service Summary */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Project & Professional Service</h3>
+      <div className="ds-bg-surface rounded-lg border ds-border-subtle p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Project & Professional Service</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="text-sm text-gray-600">Project</p>
-            <p className="font-medium text-gray-900">
+            <p className="text-sm ds-text-secondary">Project</p>
+            <p className="font-medium ds-text-primary">
               {project ? `${project.projectCode} - ${project.projectName}` : 'Loading...'}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Professional Service</p>
-            <p className="font-medium text-gray-900">
+            <p className="text-sm ds-text-secondary">Professional Service</p>
+            <p className="font-medium ds-text-primary">
               {professionalService 
                 ? `${professionalService.library?.name || 'N/A'} (${professionalService.type === 'architect' ? 'Architect' : 'Engineer'})`
                 : 'Loading...'}
@@ -137,22 +137,22 @@ export function Step4Review({ wizardData, user }) {
           </div>
           {wizardData.defaultPhaseId && (
             <div>
-              <p className="text-sm text-gray-600">Default Phase</p>
-              <p className="font-medium text-gray-900">Applied to all activities</p>
+              <p className="text-sm ds-text-secondary">Default Phase</p>
+              <p className="font-medium ds-text-primary">Applied to all activities</p>
             </div>
           )}
           {wizardData.defaultFloorId && (
             <div>
-              <p className="text-sm text-gray-600">Default Floor</p>
-              <p className="font-medium text-gray-900">Applied to all activities</p>
+              <p className="text-sm ds-text-secondary">Default Floor</p>
+              <p className="font-medium ds-text-primary">Applied to all activities</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Activities Summary */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Activities Summary</h3>
+      <div className="ds-bg-surface rounded-lg border ds-border-subtle p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Activities Summary</h3>
         <div className="mb-4 p-4 bg-blue-50 rounded-lg">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
@@ -174,40 +174,40 @@ export function Step4Review({ wizardData, user }) {
             const fee = activity.feesCharged ? parseFloat(activity.feesCharged) : 0;
             const expense = activity.expensesIncurred ? parseFloat(activity.expensesIncurred) : 0;
             return (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div key={index} className="border ds-border-subtle rounded-lg p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold ds-text-primary">
                       {activity.activityType?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'N/A'}
                     </p>
                     <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                       <div>
-                        <span className="text-gray-600">Date: </span>
+                        <span className="ds-text-secondary">Date: </span>
                         <span className="font-medium">
                           {activity.activityDate ? new Date(activity.activityDate).toLocaleDateString() : 'N/A'}
                         </span>
                       </div>
                       {activity.visitPurpose && (
                         <div>
-                          <span className="text-gray-600">Purpose: </span>
+                          <span className="ds-text-secondary">Purpose: </span>
                           <span className="font-medium">{activity.visitPurpose}</span>
                         </div>
                       )}
                       {activity.inspectionType && (
                         <div>
-                          <span className="text-gray-600">Type: </span>
+                          <span className="ds-text-secondary">Type: </span>
                           <span className="font-medium">{activity.inspectionType}</span>
                         </div>
                       )}
                       {fee > 0 && (
                         <div>
-                          <span className="text-gray-600">Fee: </span>
+                          <span className="ds-text-secondary">Fee: </span>
                           <span className="font-medium">{formatCurrency(fee)}</span>
                         </div>
                       )}
                     </div>
                     {activity.notes && (
-                      <div className="mt-2 text-sm text-gray-600">
+                      <div className="mt-2 text-sm ds-text-secondary">
                         <span className="font-medium">Notes: </span>
                         {activity.notes}
                       </div>
@@ -222,7 +222,7 @@ export function Step4Review({ wizardData, user }) {
 
       {/* Approval Notice */}
       {willAutoApprove && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
           <div className="flex items-start">
             <svg className="w-5 h-5 text-green-600 mt-0.5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />

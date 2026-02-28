@@ -139,10 +139,10 @@ export function ProjectHealthDashboard({ projectId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6 border ds-border-subtle">
         <div className="flex items-center gap-3">
-          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-          <p className="text-sm text-gray-600">Loading health data...</p>
+          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+          <p className="text-sm ds-text-muted">Loading health data...</p>
         </div>
       </div>
     );
@@ -150,8 +150,8 @@ export function ProjectHealthDashboard({ projectId }) {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-        <p className="text-sm text-red-800">{error}</p>
+      <div className="ds-bg-surface rounded-lg border border-red-400/60/70 p-4">
+        <p className="text-sm text-red-500">{error}</p>
       </div>
     );
   }
@@ -164,10 +164,10 @@ export function ProjectHealthDashboard({ projectId }) {
 
   const getHealthColor = (status) => {
     const colors = {
-      excellent: 'bg-green-100 text-green-800 border-green-300',
-      good: 'bg-blue-100 text-blue-800 border-blue-300',
-      fair: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-      poor: 'bg-red-100 text-red-800 border-red-300',
+      excellent: 'bg-green-100 text-green-800 border-green-400/60',
+      good: 'bg-blue-100 text-blue-800 border-blue-400/60',
+      fair: 'bg-yellow-100 text-yellow-800 border-yellow-400/60',
+      poor: 'bg-red-100 text-red-800 border-red-400/60',
     };
     return colors[status] || colors.fair;
   };
@@ -180,13 +180,13 @@ export function ProjectHealthDashboard({ projectId }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
+    <div className="ds-bg-surface rounded-lg shadow p-6 mb-6 border ds-border-subtle">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold text-gray-900">Project Health</h2>
+        <h2 className="text-lg font-semibold ds-text-primary">Project Health</h2>
         <button
           onClick={fetchHealthData}
-          className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+          className="text-sm text-blue-500 hover:text-blue-400 font-medium"
           title="Refresh health data"
         >
           Refresh
@@ -199,19 +199,19 @@ export function ProjectHealthDashboard({ projectId }) {
           <div className="flex items-center gap-3">
             <span className="text-3xl">{getHealthIcon(healthStatus)}</span>
             <div>
-              <h3 className="text-xl font-bold capitalize">{healthStatus} Health</h3>
-              <p className="text-sm opacity-90">Overall project health score</p>
+              <h3 className="text-xl font-bold capitalize ds-text-primary">{healthStatus} Health</h3>
+              <p className="text-sm ds-text-muted">Overall project health score</p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-4xl font-bold">{healthScore}</div>
-            <div className="text-sm opacity-90">/ 100</div>
+            <div className="text-4xl font-bold ds-text-primary">{healthScore}</div>
+            <div className="text-sm ds-text-muted">/ 100</div>
           </div>
         </div>
         
         {/* Health Score Bar */}
         <div className="mt-4">
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className="w-full ds-bg-surface-muted rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all duration-300 ${
                 healthStatus === 'excellent' ? 'bg-green-600' :
@@ -227,10 +227,10 @@ export function ProjectHealthDashboard({ projectId }) {
 
       {/* Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600 mb-1">Budget Utilization</p>
-          <p className="text-2xl font-bold text-gray-900">{metrics.budgetUtilization.toFixed(1)}%</p>
-          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+        <div className="p-4 ds-bg-surface-muted rounded-lg border ds-border-subtle">
+          <p className="text-sm ds-text-muted mb-1">Budget Utilization</p>
+          <p className="text-2xl font-bold ds-text-primary">{metrics.budgetUtilization.toFixed(1)}%</p>
+          <div className="mt-2 w-full ds-bg-surface rounded-full h-2">
             <div
               className={`h-2 rounded-full ${
                 metrics.budgetUtilization > 90 ? 'bg-red-600' :
@@ -242,10 +242,10 @@ export function ProjectHealthDashboard({ projectId }) {
           </div>
         </div>
 
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600 mb-1">Capital Utilization</p>
-          <p className="text-2xl font-bold text-gray-900">{metrics.capitalUtilization.toFixed(1)}%</p>
-          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+        <div className="p-4 ds-bg-surface-muted rounded-lg border ds-border-subtle">
+          <p className="text-sm ds-text-muted mb-1">Capital Utilization</p>
+          <p className="text-2xl font-bold ds-text-primary">{metrics.capitalUtilization.toFixed(1)}%</p>
+          <div className="mt-2 w-full ds-bg-surface rounded-full h-2">
             <div
               className={`h-2 rounded-full ${
                 metrics.capitalUtilization > 90 ? 'bg-red-600' :
@@ -257,9 +257,9 @@ export function ProjectHealthDashboard({ projectId }) {
           </div>
         </div>
 
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600 mb-1">Available Capital</p>
-          <p className="text-2xl font-bold text-gray-900">
+        <div className="p-4 ds-bg-surface-muted rounded-lg border ds-border-subtle">
+          <p className="text-sm ds-text-muted mb-1">Available Capital</p>
+          <p className="text-2xl font-bold ds-text-primary">
             {new Intl.NumberFormat('en-KE', {
               style: 'currency',
               currency: 'KES',
@@ -267,48 +267,48 @@ export function ProjectHealthDashboard({ projectId }) {
             }).format(metrics.availableCapital)}
           </p>
           {metrics.availableCapital < 0 && (
-            <p className="text-xs text-red-600 mt-1">⚠️ Negative balance</p>
+            <p className="text-xs text-red-500 mt-1">⚠️ Negative balance</p>
           )}
         </div>
 
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <p className="text-sm text-gray-600 mb-1">Committed Costs</p>
-          <p className="text-2xl font-bold text-gray-900">
+        <div className="p-4 ds-bg-surface-muted rounded-lg border ds-border-subtle">
+          <p className="text-sm ds-text-muted mb-1">Committed Costs</p>
+          <p className="text-2xl font-bold ds-text-primary">
             {new Intl.NumberFormat('en-KE', {
               style: 'currency',
               currency: 'KES',
               minimumFractionDigits: 0,
             }).format(metrics.committedCost)}
           </p>
-          <p className="text-xs text-gray-500 mt-1">Pending purchase orders</p>
+          <p className="text-xs ds-text-muted mt-1">Pending purchase orders</p>
         </div>
       </div>
 
       {/* Recommendations */}
       {recommendations.length > 0 && (
-        <div className="border-t border-gray-200 pt-6">
-          <h3 className="text-base font-semibold text-gray-900 mb-4">Recommendations</h3>
+        <div className="border-t ds-border-subtle pt-6">
+          <h3 className="text-base font-semibold ds-text-primary mb-4">Recommendations</h3>
           <div className="space-y-3">
             {recommendations.map((rec, index) => (
               <div
                 key={index}
                 className={`p-4 rounded-lg border ${
                   rec.priority === 'high' 
-                    ? 'bg-red-50 border-red-200' 
+                    ? 'bg-red-500/5 border-red-400/60/70' 
                     : rec.priority === 'medium'
-                    ? 'bg-yellow-50 border-yellow-200'
-                    : 'bg-blue-50 border-blue-200'
+                    ? 'bg-amber-500/5 border-amber-300/70'
+                    : 'bg-blue-500/5 border-blue-400/60/70'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <span className="text-lg">{rec.icon}</span>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 mb-1">{rec.title}</h4>
-                    <p className="text-sm text-gray-700 mb-2">{rec.message}</p>
+                    <h4 className="font-semibold ds-text-primary mb-1">{rec.title}</h4>
+                    <p className="text-sm ds-text-secondary mb-2">{rec.message}</p>
                     {rec.actionUrl && (
                       <Link
                         href={rec.actionUrl}
-                        className="inline-block text-sm font-medium text-blue-600 hover:text-blue-800"
+                        className="inline-block text-sm font-medium text-blue-500 hover:text-blue-400"
                       >
                         {rec.actionLabel} →
                       </Link>

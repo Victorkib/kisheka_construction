@@ -25,11 +25,11 @@ export function NotificationFilters({ filters, onFilterChange, onClearFilters })
     filters.search;
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 mb-6">
+    <div className="ds-bg-surface rounded-lg shadow p-4 mb-6">
       <div className="flex flex-wrap items-center gap-4">
         {/* Read Status Filter */}
         <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-medium ds-text-secondary mb-1">
             Status
           </label>
           <select
@@ -41,7 +41,7 @@ export function NotificationFilters({ filters, onFilterChange, onClearFilters })
                   value === 'all' ? undefined : value === 'read',
               });
             }}
-            className="px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="all">All</option>
             <option value="unread">Unread</option>
@@ -51,7 +51,7 @@ export function NotificationFilters({ filters, onFilterChange, onClearFilters })
 
         {/* Type Filter */}
         <div>
-          <label className="block text-xs font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-medium ds-text-secondary mb-1">
             Type
           </label>
           <select
@@ -61,7 +61,7 @@ export function NotificationFilters({ filters, onFilterChange, onClearFilters })
                 type: e.target.value === 'all' ? undefined : e.target.value,
               });
             }}
-            className="px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             {notificationTypes.map((type) => (
               <option key={type.value} value={type.value}>
@@ -73,7 +73,7 @@ export function NotificationFilters({ filters, onFilterChange, onClearFilters })
 
         {/* Search */}
         <div className="flex-1 min-w-[200px]">
-          <label className="block text-xs font-medium text-gray-700 mb-1">
+          <label className="block text-xs font-medium ds-text-secondary mb-1">
             Search
           </label>
           <input
@@ -85,7 +85,7 @@ export function NotificationFilters({ filters, onFilterChange, onClearFilters })
                 search: e.target.value || undefined,
               });
             }}
-            className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+            className="w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
           />
         </div>
 
@@ -94,7 +94,7 @@ export function NotificationFilters({ filters, onFilterChange, onClearFilters })
           <div className="flex items-end">
             <button
               onClick={onClearFilters}
-              className="px-3 py-2 text-sm text-gray-700 hover:text-gray-900 font-medium"
+              className="px-3 py-2 text-sm ds-text-secondary hover:ds-text-primary font-medium"
             >
               Clear Filters
             </button>

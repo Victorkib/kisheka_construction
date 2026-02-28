@@ -28,7 +28,7 @@ export function LoadingProgress({
     'red-600': 'bg-red-600',
     'yellow-600': 'bg-yellow-600',
     'purple-600': 'bg-purple-600',
-    'gray-600': 'bg-gray-600',
+    'gray-600': 'bg-slate-600',
   };
 
   const bgColorClass = colorClasses[color] || 'bg-blue-600';
@@ -37,13 +37,13 @@ export function LoadingProgress({
     <div className={`w-full ${className}`}>
       {label && (
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">{label}</span>
+          <span className="text-sm font-medium ds-text-secondary">{label}</span>
           {showPercentage && (
-            <span className="text-sm text-gray-500">{Math.round(clampedProgress)}%</span>
+            <span className="text-sm ds-text-muted">{Math.round(clampedProgress)}%</span>
           )}
         </div>
       )}
-      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+      <div className="w-full ds-bg-surface-muted rounded-full h-2 overflow-hidden">
         <div
           className={`${bgColorClass} h-2 rounded-full transition-all duration-300 ease-out`}
           style={{ width: `${clampedProgress}%` }}

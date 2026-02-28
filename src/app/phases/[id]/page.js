@@ -204,13 +204,13 @@ export default function PhaseDetailPage() {
 
   const getStatusColor = (status) => {
     const colors = {
-      'not_started': 'bg-gray-100 text-gray-800',
+      'not_started': 'ds-bg-surface-muted ds-text-primary',
       'in_progress': 'bg-blue-100 text-blue-800',
       'completed': 'bg-green-100 text-green-800',
       'on_hold': 'bg-yellow-100 text-yellow-800',
       'cancelled': 'bg-red-100 text-red-800'
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const handleStatusChange = async (newStatus) => {
@@ -429,7 +429,7 @@ export default function PhaseDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm sm:text-base">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || 'Phase not found'}
           </div>
           <Link href="/phases" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
@@ -516,8 +516,8 @@ export default function PhaseDetailPage() {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">{phase.phaseName}</h1>
-              <p className="text-sm sm:text-base text-gray-600 mt-1 break-words">{phase.description || 'No description'}</p>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">{phase.phaseName}</h1>
+              <p className="text-sm sm:text-base ds-text-secondary mt-1 break-words">{phase.description || 'No description'}</p>
               {project && (
                 <Link 
                   href={`/projects/${project._id}`}
@@ -532,7 +532,7 @@ export default function PhaseDetailPage() {
               <button
                 onClick={handleRefresh}
                 disabled={refreshing || loading}
-                className="flex-1 sm:flex-none bg-gray-500 text-white px-4 py-2.5 rounded-lg hover:bg-gray-600 active:bg-gray-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm font-medium touch-manipulation"
+                className="flex-1 sm:flex-none ds-bg-surface-muted0 text-white px-4 py-2.5 rounded-lg hover:bg-slate-600 active:bg-slate-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 text-sm font-medium touch-manipulation"
                 title="Refresh phase data and financial information"
               >
                 {refreshing ? (
@@ -553,7 +553,7 @@ export default function PhaseDetailPage() {
                 <>
                   <Link
                     href={`/phases/${params.id}/dashboard`}
-                    className="flex-1 sm:flex-none bg-gray-600 text-white px-4 py-2.5 rounded-lg hover:bg-gray-700 active:bg-gray-800 transition-colors text-sm font-medium text-center touch-manipulation"
+                    className="flex-1 sm:flex-none bg-slate-600 text-white px-4 py-2.5 rounded-lg hover:bg-slate-700 active:bg-slate-800 transition-colors text-sm font-medium text-center touch-manipulation"
                   >
                     Dashboard
                   </Link>
@@ -594,13 +594,13 @@ export default function PhaseDetailPage() {
         {/* Edit Modal */}
         {showEditModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="ds-bg-surface rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="p-4 sm:p-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900">Edit Phase</h2>
+                  <h2 className="text-lg sm:text-xl font-bold ds-text-primary">Edit Phase</h2>
                   <button
                     onClick={() => setShowEditModal(false)}
-                    className="text-gray-400 hover:text-gray-600 active:text-gray-800 w-8 h-8 flex items-center justify-center touch-manipulation"
+                    className="ds-text-muted hover:ds-text-secondary active:ds-text-primary w-8 h-8 flex items-center justify-center touch-manipulation"
                     aria-label="Close"
                   >
                     ✕
@@ -608,14 +608,14 @@ export default function PhaseDetailPage() {
                 </div>
 
                 {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm sm:text-base">
+                  <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm sm:text-base">
                     {error}
                   </div>
                 )}
 
                 <form onSubmit={handleEditSubmit} className="space-y-4 sm:space-y-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium ds-text-secondary mb-2">
                       Phase Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -624,12 +624,12 @@ export default function PhaseDetailPage() {
                       value={formData.phaseName}
                       onChange={handleFormChange}
                       required
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
+                      className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium ds-text-secondary mb-2">
                       Phase Code
                     </label>
                     <input
@@ -637,12 +637,12 @@ export default function PhaseDetailPage() {
                       name="phaseCode"
                       value={formData.phaseCode}
                       onChange={handleFormChange}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
+                      className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium ds-text-secondary mb-2">
                       Description
                     </label>
                     <textarea
@@ -650,13 +650,13 @@ export default function PhaseDetailPage() {
                       value={formData.description}
                       onChange={handleFormChange}
                       rows={3}
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
+                      className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium ds-text-secondary mb-2">
                         Start Date
                       </label>
                       <input
@@ -664,12 +664,12 @@ export default function PhaseDetailPage() {
                         name="startDate"
                         value={formData.startDate}
                         onChange={handleFormChange}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
+                        className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium ds-text-secondary mb-2">
                         Planned End Date
                       </label>
                       <input
@@ -677,14 +677,14 @@ export default function PhaseDetailPage() {
                         name="plannedEndDate"
                         value={formData.plannedEndDate}
                         onChange={handleFormChange}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
+                        className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                       />
                     </div>
                   </div>
 
                   {phase.status === 'completed' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium ds-text-secondary mb-2">
                         Actual End Date
                       </label>
                       <input
@@ -692,7 +692,7 @@ export default function PhaseDetailPage() {
                         name="actualEndDate"
                         value={formData.actualEndDate}
                         onChange={handleFormChange}
-                        className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
+                        className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 touch-manipulation"
                       />
                     </div>
                   )}
@@ -701,7 +701,7 @@ export default function PhaseDetailPage() {
                     <button
                       type="button"
                       onClick={() => setShowEditModal(false)}
-                      className="w-full sm:w-auto px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 active:bg-gray-100 transition-colors text-sm font-medium touch-manipulation"
+                      className="w-full sm:w-auto px-6 py-2.5 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors text-sm font-medium touch-manipulation"
                     >
                       Cancel
                     </button>

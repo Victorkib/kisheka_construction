@@ -25,6 +25,7 @@ import {
  * @property {string} category - Work category (required)
  * @property {string} status - 'not_started' | 'in_progress' | 'completed' | 'blocked'
  * @property {Array<ObjectId>} [assignedTo] - Assigned workers or subcontractors (multiple)
+ * @property {string} [executionModel] - Execution model: 'direct_labour' | 'contract_based' (optional, mainly for finishing works)
  * @property {Array<Object>} [assignmentHistory] - History of assignment changes
  * @property {number} estimatedHours - Estimated hours (>= 0)
  * @property {number} actualHours - Actual hours (>= 0)
@@ -34,7 +35,8 @@ import {
  * @property {Date} [plannedEndDate] - Planned end date
  * @property {Date} [actualEndDate] - Actual end date
  * @property {Array<ObjectId>} dependencies - Other work items this depends on
- * @property {ObjectId} [floorId] - Floor ID (optional)
+ * @property {ObjectId} [floorId] - Floor ID (optional, required for finishing phases)
+ * @property {ObjectId} [subcontractorId] - Linked subcontractor (optional, for contract-based finishing works)
  * @property {ObjectId} [categoryId] - Category ID (optional)
  * @property {number} priority - Priority level (1-5, 1 = highest)
  * @property {string} [notes] - Additional notes
@@ -58,6 +60,7 @@ export const WORK_ITEM_SCHEMA = {
   description: String,
   category: String, // Required
   status: String, // Required: 'not_started' | 'in_progress' | 'completed' | 'blocked'
+  executionModel: String, // Optional: 'direct_labour' | 'contract_based'
   assignedTo: ['ObjectId'], // Optional - Array of worker IDs
   assignmentHistory: [Object], // Optional - History of assignment changes
   estimatedHours: Number, // Default: 0
@@ -69,6 +72,7 @@ export const WORK_ITEM_SCHEMA = {
   actualEndDate: Date,
   dependencies: ['ObjectId'], // Array of work item IDs
   floorId: 'ObjectId', // Optional
+  subcontractorId: 'ObjectId', // Optional
   categoryId: 'ObjectId', // Optional
   priority: Number, // 1-5, default: 3
   notes: String,
@@ -104,7 +108,9 @@ export function createWorkItem(input, projectId, phaseId, createdBy) {
     floorId,
     categoryId,
     priority,
-    notes
+    notes,
+    executionModel,
+    subcontractorId
   } = input;
 
   // Handle assignedTo as array (support both single and multiple)
@@ -137,6 +143,7 @@ export function createWorkItem(input, projectId, phaseId, createdBy) {
     description: description?.trim() || '',
     category: category || 'other',
     status: status || 'not_started',
+    executionModel: executionModel || null,
     assignedTo: assignedToArray,
     assignmentHistory: assignmentHistory,
     estimatedHours: parseFloat(estimatedHours) || 0,
@@ -151,6 +158,7 @@ export function createWorkItem(input, projectId, phaseId, createdBy) {
       : [],
     floorId: floorId && ObjectId.isValid(floorId) ? new ObjectId(floorId) : null,
     categoryId: categoryId && ObjectId.isValid(categoryId) ? new ObjectId(categoryId) : null,
+    subcontractorId: subcontractorId && ObjectId.isValid(subcontractorId) ? new ObjectId(subcontractorId) : null,
     priority: priority && WORK_ITEM_PRIORITIES.includes(parseInt(priority)) ? parseInt(priority) : 3,
     notes: notes?.trim() || '',
     createdBy: typeof createdBy === 'string' ? new ObjectId(createdBy) : createdBy,

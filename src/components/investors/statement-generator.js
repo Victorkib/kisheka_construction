@@ -132,7 +132,7 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 space-y-6 relative">
+    <div className="ds-bg-surface rounded-lg shadow-lg p-6 space-y-6 relative">
       <LoadingOverlay 
         isLoading={generating} 
         message={investorName ? `Generating statement for ${investorName}...` : 'Generating statement...'} 
@@ -141,15 +141,15 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Generate Statement</h2>
+          <h2 className="text-xl font-bold ds-text-primary">Generate Statement</h2>
           {investorName && (
-            <p className="text-sm text-gray-600 mt-1">For: {investorName}</p>
+            <p className="text-sm ds-text-secondary mt-1">For: {investorName}</p>
           )}
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition"
+            className="ds-text-muted hover:ds-text-secondary transition"
             aria-label="Close"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,26 +162,26 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
       {/* Date Range Selection */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+          <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
             Start Date (Optional)
           </label>
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             max={endDate || undefined}
           />
         </div>
         <div>
-          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+          <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
             End Date (Optional)
           </label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             min={startDate || undefined}
           />
         </div>
@@ -189,7 +189,7 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded">
           <p className="font-medium">Error</p>
           <p className="text-sm mt-1">{error}</p>
         </div>
@@ -227,7 +227,7 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
         <button
           onClick={() => handleDownload('json')}
           disabled={generating}
-          className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           Download JSON
         </button>
@@ -237,36 +237,36 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
       {showPreview && previewData && (
         <div className="border-t pt-6 mt-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Statement Preview</h3>
+            <h3 className="text-lg font-semibold ds-text-primary">Statement Preview</h3>
             <button
               onClick={() => setShowPreview(false)}
-              className="text-sm text-gray-600 hover:text-gray-900"
+              className="text-sm ds-text-secondary hover:ds-text-primary"
             >
               Hide Preview
             </button>
           </div>
 
-          <div className="bg-gray-50 rounded-lg p-4 space-y-4">
+          <div className="ds-bg-surface-muted rounded-lg p-4 space-y-4">
             {/* Investor Info */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2">Investor Information</h4>
+              <h4 className="font-semibold ds-text-primary mb-2">Investor Information</h4>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <span className="text-gray-700">Name:</span>{' '}
+                  <span className="ds-text-secondary">Name:</span>{' '}
                   <span className="font-medium">{previewData.investor.name}</span>
                 </div>
                 {previewData.investor.email && (
                   <div>
-                    <span className="text-gray-700">Email:</span>{' '}
+                    <span className="ds-text-secondary">Email:</span>{' '}
                     <span className="font-medium">{previewData.investor.email}</span>
                   </div>
                 )}
                 <div>
-                  <span className="text-gray-700">Type:</span>{' '}
+                  <span className="ds-text-secondary">Type:</span>{' '}
                   <span className="font-medium">{previewData.investor.investmentType}</span>
                 </div>
                 <div>
-                  <span className="text-gray-700">Status:</span>{' '}
+                  <span className="ds-text-secondary">Status:</span>{' '}
                   <span className="font-medium">{previewData.investor.status}</span>
                 </div>
               </div>
@@ -274,28 +274,28 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
 
             {/* Capital Usage */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2">Capital Usage</h4>
+              <h4 className="font-semibold ds-text-primary mb-2">Capital Usage</h4>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
-                  <span className="text-gray-700">Total Invested:</span>{' '}
+                  <span className="ds-text-secondary">Total Invested:</span>{' '}
                   <span className="font-medium text-green-600">
                     {formatCurrency(previewData.capitalUsage.totalInvested)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-700">Capital Used:</span>{' '}
+                  <span className="ds-text-secondary">Capital Used:</span>{' '}
                   <span className="font-medium text-red-600">
                     {formatCurrency(previewData.capitalUsage.capitalUsed)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-700">Remaining Balance:</span>{' '}
+                  <span className="ds-text-secondary">Remaining Balance:</span>{' '}
                   <span className="font-medium text-blue-600">
                     {formatCurrency(previewData.capitalUsage.capitalBalance)}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-700">Usage:</span>{' '}
+                  <span className="ds-text-secondary">Usage:</span>{' '}
                   <span className="font-medium">
                     {previewData.capitalUsage.usagePercentage}%
                   </span>
@@ -306,24 +306,24 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
             {/* Contributions Summary */}
             {previewData.contributions && previewData.contributions.list.length > 0 && (
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">
+                <h4 className="font-semibold ds-text-primary mb-2">
                   Contributions ({previewData.contributions.count})
                 </h4>
                 <div className="text-sm space-y-1">
                   <div>
-                    <span className="text-gray-700">Total:</span>{' '}
+                    <span className="ds-text-secondary">Total:</span>{' '}
                     <span className="font-medium">
                       {formatCurrency(previewData.contributions.totals.total)}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-700">Equity:</span>{' '}
+                    <span className="ds-text-secondary">Equity:</span>{' '}
                     <span className="font-medium">
                       {formatCurrency(previewData.contributions.totals.equity)}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-700">Loan:</span>{' '}
+                    <span className="ds-text-secondary">Loan:</span>{' '}
                     <span className="font-medium">
                       {formatCurrency(previewData.contributions.totals.loan)}
                     </span>
@@ -335,17 +335,17 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
             {/* Period */}
             {(previewData.period.startDate || previewData.period.endDate) && (
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Period</h4>
+                <h4 className="font-semibold ds-text-primary mb-2">Period</h4>
                 <div className="text-sm">
                   {previewData.period.startDate && (
                     <div>
-                      <span className="text-gray-700">From:</span>{' '}
+                      <span className="ds-text-secondary">From:</span>{' '}
                       {formatDate(previewData.period.startDate)}
                     </div>
                   )}
                   {previewData.period.endDate && (
                     <div>
-                      <span className="text-gray-700">To:</span>{' '}
+                      <span className="ds-text-secondary">To:</span>{' '}
                       {formatDate(previewData.period.endDate)}
                     </div>
                   )}
@@ -356,26 +356,26 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
             {/* Project Breakdown */}
             {previewData.capitalUsage?.projectBreakdown && previewData.capitalUsage.projectBreakdown.length > 0 && (
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Project Breakdown</h4>
+                <h4 className="font-semibold ds-text-primary mb-2">Project Breakdown</h4>
                 <div className="space-y-2 text-sm">
                   {previewData.capitalUsage.projectBreakdown.map((project, idx) => (
-                    <div key={idx} className="bg-white p-3 rounded border">
-                      <div className="font-medium text-gray-900">{project.projectName}</div>
+                    <div key={idx} className="ds-bg-surface p-3 rounded border">
+                      <div className="font-medium ds-text-primary">{project.projectName}</div>
                       <div className="grid grid-cols-2 gap-2 mt-2">
                         <div>
-                          <span className="text-gray-700">Allocated:</span>{' '}
+                          <span className="ds-text-secondary">Allocated:</span>{' '}
                           <span className="font-medium">{formatCurrency(project.allocatedAmount)}</span>
                         </div>
                         <div>
-                          <span className="text-gray-700">Used:</span>{' '}
+                          <span className="ds-text-secondary">Used:</span>{' '}
                           <span className="font-medium text-red-600">{formatCurrency(project.capitalUsed)}</span>
                         </div>
                         <div>
-                          <span className="text-gray-700">Balance:</span>{' '}
+                          <span className="ds-text-secondary">Balance:</span>{' '}
                           <span className="font-medium text-blue-600">{formatCurrency(project.capitalBalance)}</span>
                         </div>
                         <div>
-                          <span className="text-gray-700">Usage:</span>{' '}
+                          <span className="ds-text-secondary">Usage:</span>{' '}
                           <span className="font-medium">
                             {project.allocatedAmount > 0 
                               ? ((project.capitalUsed / project.allocatedAmount) * 100).toFixed(1)

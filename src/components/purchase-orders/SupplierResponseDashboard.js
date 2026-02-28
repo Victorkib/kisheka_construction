@@ -140,41 +140,41 @@ export function SupplierResponseDashboard({
         {/* Quick Stats */}
         {stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <div className="ds-bg-surface p-6 rounded-lg border ds-border-subtle">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Responses</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.totalResponses}</p>
+                  <p className="text-sm ds-text-muted">Total Responses</p>
+                  <p className="text-2xl font-bold ds-text-primary">{stats.totalResponses}</p>
                 </div>
                 <Activity className="w-8 h-8 text-blue-500" />
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <div className="ds-bg-surface p-6 rounded-lg border ds-border-subtle">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Avg Response Time</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.averageResponseTime}h</p>
+                  <p className="text-sm ds-text-muted">Avg Response Time</p>
+                  <p className="text-2xl font-bold ds-text-primary">{stats.averageResponseTime}h</p>
                 </div>
                 <Clock className="w-8 h-8 text-green-500" />
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <div className="ds-bg-surface p-6 rounded-lg border ds-border-subtle">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Acceptance Rate</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.acceptanceRate}%</p>
+                  <p className="text-sm ds-text-muted">Acceptance Rate</p>
+                  <p className="text-2xl font-bold ds-text-primary">{stats.acceptanceRate}%</p>
                 </div>
                 <CheckCircle className="w-8 h-8 text-green-500" />
               </div>
             </div>
 
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <div className="ds-bg-surface p-6 rounded-lg border ds-border-subtle">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Pending</p>
-                  <p className="text-2xl font-bold text-gray-900">{stats.pendingResponses}</p>
+                  <p className="text-sm ds-text-muted">Pending</p>
+                  <p className="text-2xl font-bold ds-text-primary">{stats.pendingResponses}</p>
                 </div>
                 <Clock className="w-8 h-8 text-orange-500" />
               </div>
@@ -184,13 +184,13 @@ export function SupplierResponseDashboard({
 
         {/* Response Trends */}
         {trends.length > 0 && (
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
+          <div className="ds-bg-surface p-6 rounded-lg border ds-border-subtle">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Response Trends</h3>
+              <h3 className="text-lg font-semibold ds-text-primary">Response Trends</h3>
               <select
                 value={timeFilter}
                 onChange={(e) => setTimeFilter(e.target.value)}
-                className="text-sm border border-gray-300 rounded-lg px-3 py-1"
+                className="text-sm border ds-border-subtle rounded-lg px-3 py-1 ds-bg-surface ds-text-primary"
               >
                 <option value="7d">Last 7 days</option>
                 <option value="30d">Last 30 days</option>
@@ -199,12 +199,12 @@ export function SupplierResponseDashboard({
               </select>
             </div>
             
-            <div className="space-y-3">
+            <div className="space-y-3 mt-2">
               {trends.map((trend, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 ds-bg-surface-muted rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <Calendar className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm font-medium">{trend.period}</span>
+                    <Calendar className="w-4 h-4 text-blue-400" />
+                    <span className="text-sm font-medium ds-text-secondary">{trend.period}</span>
                   </div>
                   <div className="flex items-center space-x-6 text-sm">
                     <div className="flex items-center space-x-1">
@@ -216,7 +216,7 @@ export function SupplierResponseDashboard({
                       <span>{trend.responseTime}h</span>
                     </div>
                     <div className="flex items-center space-x-1">
-                      <BarChart3 className="w-4 h-4 text-gray-500" />
+                      <BarChart3 className="w-4 h-4 ds-text-muted" />
                       <span>{trend.totalResponses}</span>
                     </div>
                   </div>
@@ -228,18 +228,18 @@ export function SupplierResponseDashboard({
 
         {/* Top Performing Suppliers */}
         {topPerformers.length > 0 && (
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Top Performing Suppliers</h3>
+          <div className="ds-bg-surface p-6 rounded-lg border ds-border-subtle">
+            <h3 className="text-lg font-semibold ds-text-primary mb-4">Top Performing Suppliers</h3>
             <div className="space-y-3">
               {topPerformers.map((supplier, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 ds-bg-surface-muted rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <div className="w-8 h-8 bg-blue-500/15 rounded-full flex items-center justify-center">
                       <Users className="w-4 h-4 text-blue-600" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-900">{supplier.name}</p>
-                      <p className="text-xs text-gray-500">{supplier.totalResponses} responses</p>
+                      <p className="text-sm font-medium ds-text-primary">{supplier.name}</p>
+                      <p className="text-xs ds-text-muted">{supplier.totalResponses} responses</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-4 text-sm">
@@ -260,8 +260,8 @@ export function SupplierResponseDashboard({
 
         {/* Recent Activity */}
         {recentActivity.length > 0 && (
-          <div className="bg-white p-6 rounded-lg border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
+          <div className="ds-bg-surface p-6 rounded-lg border ds-border-subtle">
+            <h3 className="text-lg font-semibold ds-text-primary mb-4">Recent Activity</h3>
             <div className="space-y-3">
               {recentActivity.map((activity, index) => {
                 const ActivityIcon = activity.type === 'accept' ? CheckCircle :
@@ -270,24 +270,24 @@ export function SupplierResponseDashboard({
                                    Clock;
                 
                 return (
-                  <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-start space-x-3 p-3 ds-bg-surface-muted rounded-lg">
                     <div className={`p-1 rounded mt-1 ${
-                      activity.type === 'accept' ? 'bg-green-100' :
-                      activity.type === 'reject' ? 'bg-red-100' :
-                      activity.type === 'modify' ? 'bg-blue-100' :
-                      'bg-gray-100'
+                      activity.type === 'accept' ? 'bg-emerald-500/15' :
+                      activity.type === 'reject' ? 'bg-red-500/15' :
+                      activity.type === 'modify' ? 'bg-blue-500/15' :
+                      'bg-slate-500/15'
                     }`}>
                       <ActivityIcon className={`w-4 h-4 ${
                         activity.type === 'accept' ? 'text-green-600' :
                         activity.type === 'reject' ? 'text-red-600' :
                         activity.type === 'modify' ? 'text-blue-600' :
-                        'text-gray-600'
+                        'ds-text-secondary'
                       }`} />
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-gray-900">{activity.title}</p>
-                      <p className="text-xs text-gray-500">{activity.description}</p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-sm font-medium ds-text-primary">{activity.title}</p>
+                      <p className="text-xs ds-text-muted">{activity.description}</p>
+                      <p className="text-xs ds-text-muted mt-1">
                         {new Date(activity.timestamp).toLocaleString()}
                       </p>
                     </div>
@@ -305,8 +305,8 @@ export function SupplierResponseDashboard({
     if (!order || !token) {
       return (
         <div className="text-center py-12">
-          <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No valid order or response token found</p>
+          <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+          <p className="ds-text-muted">No valid order or response token found</p>
         </div>
       );
     }
@@ -324,8 +324,8 @@ export function SupplierResponseDashboard({
     if (!order) {
       return (
         <div className="text-center py-12">
-          <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">No order data available</p>
+          <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+          <p className="ds-text-muted">No order data available</p>
         </div>
       );
     }
@@ -360,11 +360,11 @@ export function SupplierResponseDashboard({
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold ds-text-primary">
               {isSupplierView ? 'Supplier Response Portal' : 'Response Management Dashboard'}
             </h1>
             {order && (
-              <p className="text-gray-600 mt-1">
+              <p className="ds-text-secondary mt-1">
                 Purchase Order #{order.purchaseOrderNumber}
               </p>
             )}
@@ -374,7 +374,7 @@ export function SupplierResponseDashboard({
             <button
               onClick={onRefresh}
               disabled={loading}
-              className="flex items-center space-x-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center space-x-2 px-4 py-2 ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
@@ -384,7 +384,7 @@ export function SupplierResponseDashboard({
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 mb-6">
+      <div className="border-b ds-border-subtle mb-6">
         <nav className="flex space-x-8">
           {tabs.map((tab) => {
             const TabIcon = tab.icon;
@@ -394,8 +394,8 @@ export function SupplierResponseDashboard({
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-500'
+                    : 'border-transparent ds-text-muted hover:ds-text-secondary hover:border-slate-400'
                 }`}
               >
                 <TabIcon className="w-4 h-4" />

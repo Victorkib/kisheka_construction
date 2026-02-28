@@ -141,10 +141,10 @@ function CostManagementContent() {
 
         {/* Header */}
         <div className="mb-4 sm:mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <h1 className="text-2xl sm:text-3xl font-bold ds-text-primary">
             Cost Management
           </h1>
-          <p className="mt-2 text-xs sm:text-sm text-gray-600">
+          <p className="mt-2 text-xs sm:text-sm ds-text-secondary">
             Manage all cost categories, budgets, transfers, adjustments,
             analytics, and reports
           </p>
@@ -172,7 +172,7 @@ export default function CostManagementPage() {
           <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading cost management...</p>
+              <p className="mt-4 ds-text-secondary">Loading cost management...</p>
             </div>
           </div>
         </AppLayout>

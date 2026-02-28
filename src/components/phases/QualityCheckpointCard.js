@@ -17,12 +17,12 @@ export function QualityCheckpointCard({ checkpoint, canEdit, onEdit, onDelete, f
 
   const getStatusColor = (status) => {
     const colors = {
-      'pending': 'bg-gray-100 text-gray-800',
-      'passed': 'bg-green-100 text-green-800',
-      'failed': 'bg-red-100 text-red-800',
-      'waived': 'bg-yellow-100 text-yellow-800'
+      'pending': 'bg-slate-500/10 text-slate-200 border border-slate-400/60',
+      'passed': 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60',
+      'failed': 'bg-red-500/10 text-red-200 border border-red-400/60',
+      'waived': 'bg-amber-500/10 text-amber-200 border border-amber-400/60'
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'bg-slate-500/10 text-slate-200 border border-slate-400/60';
   };
 
   const handleInspection = async () => {
@@ -57,46 +57,46 @@ export function QualityCheckpointCard({ checkpoint, canEdit, onEdit, onDelete, f
   };
 
   return (
-    <div className={`border rounded-lg p-4 hover:bg-gray-50 transition-colors ${
-      checkpoint.status === 'failed' ? 'border-red-300 bg-red-50' : 
-      checkpoint.status === 'passed' ? 'border-green-300 bg-green-50' : 
-      'border-gray-200'
+    <div className={`border rounded-lg p-4 hover:ds-bg-surface-muted transition-colors ds-bg-surface ${
+      checkpoint.status === 'failed' ? 'border-red-400/60 bg-red-500/5' : 
+      checkpoint.status === 'passed' ? 'border-emerald-400/60 bg-emerald-500/5' : 
+      'ds-border-subtle'
     }`}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <h4 className="text-lg font-semibold text-gray-900">
+            <h4 className="text-lg font-semibold ds-text-primary">
               {checkpoint.name}
             </h4>
             <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(checkpoint.status)}`}>
               {checkpoint.status?.toUpperCase() || 'PENDING'}
             </span>
             {checkpoint.required && (
-              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-orange-100 text-orange-800">
+              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-orange-500/10 text-orange-200 border border-orange-400/60">
                 REQUIRED
               </span>
             )}
             {!checkpoint.required && (
-              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600">
+              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-slate-500/10 text-slate-200 border border-slate-400/60">
                 OPTIONAL
               </span>
             )}
           </div>
           {checkpoint.description && (
-            <p className="text-sm text-gray-600 mb-3">{checkpoint.description}</p>
+            <p className="text-sm ds-text-secondary mb-3">{checkpoint.description}</p>
           )}
         </div>
         {canEdit && (
           <div className="flex gap-2">
             <button
               onClick={() => onEdit && onEdit(checkpoint)}
-              className="px-3 py-1 text-sm text-blue-600 hover:text-blue-800"
+              className="px-3 py-1 text-sm text-blue-500 hover:text-blue-400"
             >
               Edit
             </button>
             <button
               onClick={() => onDelete && onDelete(checkpoint)}
-              className="px-3 py-1 text-sm text-red-600 hover:text-red-800"
+              className="px-3 py-1 text-sm text-red-500 hover:text-red-400"
             >
               Delete
             </button>
@@ -106,17 +106,17 @@ export function QualityCheckpointCard({ checkpoint, canEdit, onEdit, onDelete, f
 
       {/* Inspection Details */}
       {checkpoint.inspectedAt && (
-        <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm font-medium text-blue-900 mb-1">
+        <div className="mb-3 p-3 bg-blue-500/10 border border-blue-400/60 rounded-lg">
+          <p className="text-sm font-medium text-blue-200 mb-1">
             Inspected on {formatDate(checkpoint.inspectedAt)}
           </p>
           {checkpoint.inspectedBy && (
-            <p className="text-xs text-blue-700">
+            <p className="text-xs text-blue-300">
               Inspector ID: {checkpoint.inspectedBy}
             </p>
           )}
           {checkpoint.notes && (
-            <p className="text-xs text-blue-600 mt-2">{checkpoint.notes}</p>
+            <p className="text-xs text-blue-200 mt-2">{checkpoint.notes}</p>
           )}
         </div>
       )}
@@ -124,14 +124,14 @@ export function QualityCheckpointCard({ checkpoint, canEdit, onEdit, onDelete, f
       {/* Photos */}
       {checkpoint.photos && checkpoint.photos.length > 0 && (
         <div className="mb-3">
-          <p className="text-sm font-medium text-gray-700 mb-2">Photos:</p>
+          <p className="text-sm font-medium ds-text-secondary mb-2">Photos:</p>
           <div className="grid grid-cols-3 gap-2">
             {checkpoint.photos.map((photo, index) => (
               <img
                 key={index}
                 src={photo}
                 alt={`Checkpoint photo ${index + 1}`}
-                className="w-full h-24 object-cover rounded-lg border border-gray-200"
+                className="w-full h-24 object-cover rounded-lg border ds-border-subtle"
               />
             ))}
           </div>
@@ -151,13 +151,13 @@ export function QualityCheckpointCard({ checkpoint, canEdit, onEdit, onDelete, f
           ) : (
             <div className="space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Inspection Status <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={inspectionData.status}
                   onChange={(e) => setInspectionData({ ...inspectionData, status: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   <option value="pending">Pending</option>
                   <option value="passed">Passed</option>
@@ -166,21 +166,21 @@ export function QualityCheckpointCard({ checkpoint, canEdit, onEdit, onDelete, f
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Inspection Notes
                 </label>
                 <textarea
                   value={inspectionData.notes}
                   onChange={(e) => setInspectionData({ ...inspectionData, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   placeholder="Enter inspection notes..."
                 />
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={handleInspection}
-                  className="px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition-colors"
+                  className="px-4 py-2 bg-emerald-600 text-white text-sm font-medium rounded-lg hover:bg-emerald-500 transition-colors"
                 >
                   Save Inspection
                 </button>
@@ -193,7 +193,7 @@ export function QualityCheckpointCard({ checkpoint, canEdit, onEdit, onDelete, f
                       photos: checkpoint.photos || []
                     });
                   }}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                  className="px-4 py-2 border ds-border-subtle ds-text-secondary text-sm font-medium rounded-lg hover:ds-bg-surface-muted transition-colors"
                 >
                   Cancel
                 </button>

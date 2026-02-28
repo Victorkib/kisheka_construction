@@ -123,7 +123,7 @@ function ToastItem({ toast, onRemove }) {
   const variantStyles = {
     success: {
       bg: 'bg-green-50',
-      border: 'border-green-200',
+      border: 'border-green-400/60',
       iconBg: 'bg-green-100',
       iconColor: 'text-green-600',
       text: 'text-green-800',
@@ -131,7 +131,7 @@ function ToastItem({ toast, onRemove }) {
     },
     error: {
       bg: 'bg-red-50',
-      border: 'border-red-200',
+      border: 'border-red-400/60',
       iconBg: 'bg-red-100',
       iconColor: 'text-red-600',
       text: 'text-red-800',
@@ -139,7 +139,7 @@ function ToastItem({ toast, onRemove }) {
     },
     warning: {
       bg: 'bg-yellow-50',
-      border: 'border-yellow-200',
+      border: 'border-yellow-400/60',
       iconBg: 'bg-yellow-100',
       iconColor: 'text-yellow-600',
       text: 'text-yellow-800',
@@ -147,7 +147,7 @@ function ToastItem({ toast, onRemove }) {
     },
     info: {
       bg: 'bg-blue-50',
-      border: 'border-blue-200',
+      border: 'border-blue-400/60',
       iconBg: 'bg-blue-100',
       iconColor: 'text-blue-600',
       text: 'text-blue-800',
@@ -220,7 +220,7 @@ function ToastItem({ toast, onRemove }) {
       {/* Close button */}
       <button
         onClick={handleRemove}
-        className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+        className="flex-shrink-0 ds-text-muted hover:ds-text-secondary transition-colors"
         aria-label="Close notification"
       >
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

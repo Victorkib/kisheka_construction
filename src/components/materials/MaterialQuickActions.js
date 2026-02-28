@@ -88,9 +88,9 @@ export function MaterialQuickActions({ projectId = null }) {
 
   const getColorClasses = (color) => {
     const colors = {
-      blue: 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700',
-      green: 'bg-green-50 hover:bg-green-100 border-green-200 text-green-700',
-      purple: 'bg-purple-50 hover:bg-purple-100 border-purple-200 text-purple-700',
+      blue: 'bg-blue-50 hover:bg-blue-100 border-blue-400/60 text-blue-700',
+      green: 'bg-green-50 hover:bg-green-100 border-green-400/60 text-green-700',
+      purple: 'bg-purple-50 hover:bg-purple-100 border-purple-400/60 text-purple-700',
       indigo: 'bg-indigo-50 hover:bg-indigo-100 border-indigo-200 text-indigo-700',
       teal: 'bg-teal-50 hover:bg-teal-100 border-teal-200 text-teal-700',
       orange: 'bg-orange-50 hover:bg-orange-100 border-orange-200 text-orange-700',
@@ -103,8 +103,8 @@ export function MaterialQuickActions({ projectId = null }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+    <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-6 mb-6">
+      <h3 className="text-lg font-semibold ds-text-primary mb-4">Quick Actions</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredActions.map((action, index) => (
           <Link
@@ -118,7 +118,7 @@ export function MaterialQuickActions({ projectId = null }) {
                 <div className="flex items-center justify-between gap-2">
                   <h4 className="font-semibold text-sm leading-tight">{action.label}</h4>
                   {action.badge && (
-                    <span className="px-2 py-0.5 bg-white/50 rounded text-xs font-medium">
+                    <span className="px-2 py-0.5 ds-bg-surface/50 rounded text-xs font-medium">
                       {action.badge}
                     </span>
                   )}

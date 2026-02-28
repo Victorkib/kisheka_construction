@@ -30,8 +30,9 @@ export function DateInput({
     }
   };
 
-  // Base classes for the input
-  const baseInputClasses = 'w-full pr-10 pl-4 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all cursor-pointer';
+  // Base classes for the input (theme-aware)
+  const baseInputClasses =
+    'w-full pr-10 pl-4 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus transition-all cursor-pointer';
   
   // Combine with custom classes
   const inputClasses = `${baseInputClasses} ${className}`.trim();
@@ -58,12 +59,12 @@ export function DateInput({
         type="button"
         onClick={handleIconClick}
         disabled={disabled}
-        className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-ds-bg-surface-muted rounded-r-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Open date picker"
         tabIndex={-1}
       >
         <svg
-          className="w-5 h-5 text-gray-500 hover:text-blue-600 transition-colors"
+          className="w-5 h-5 ds-text-muted hover:text-blue-500 transition-colors"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

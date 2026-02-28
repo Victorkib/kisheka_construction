@@ -165,24 +165,24 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
   const overallProgress = prerequisites.readiness.completionPercentage;
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-6 mb-6 shadow-lg">
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-400/60 rounded-lg p-6 mb-6 shadow-lg">
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
             <div className="text-3xl">🎯</div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Project Setup Wizard</h2>
-              <p className="text-sm text-gray-600">Complete these steps to get your project ready</p>
+              <h2 className="text-xl font-bold ds-text-primary">Project Setup Wizard</h2>
+              <p className="text-sm ds-text-secondary">Complete these steps to get your project ready</p>
             </div>
           </div>
           
           {/* Overall Progress */}
           <div className="mt-4">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium text-gray-700">Overall Setup Progress</span>
+              <span className="text-sm font-medium ds-text-secondary">Overall Setup Progress</span>
               <span className="text-sm font-semibold text-blue-600">{overallProgress}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full ds-bg-surface-muted rounded-full h-2">
               <div
                 className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${overallProgress}%` }}
@@ -193,7 +193,7 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
         
         <button
           onClick={handleDismiss}
-          className="text-gray-400 hover:text-gray-600 transition"
+          className="ds-text-muted hover:ds-text-secondary transition"
           title="Dismiss wizard"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,7 +204,7 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
 
       {/* Current Step */}
       {currentStepData && (
-        <div className="bg-white rounded-lg p-5 mb-4 border border-blue-100">
+        <div className="ds-bg-surface rounded-lg p-5 mb-4 border border-blue-100">
           <div className="flex items-start gap-4">
             <div className={`text-4xl flex-shrink-0`}>
               {currentStepData.icon}
@@ -214,9 +214,9 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
                 <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded">
                   Step {currentStep + 1} of {steps.length}
                 </span>
-                <h3 className="text-lg font-bold text-gray-900">{currentStepData.title}</h3>
+                <h3 className="text-lg font-bold ds-text-primary">{currentStepData.title}</h3>
               </div>
-              <p className="text-sm text-gray-600 mb-4">{currentStepData.description}</p>
+              <p className="text-sm ds-text-secondary mb-4">{currentStepData.description}</p>
               
               <div className="flex gap-2">
                 {currentStepData.actionType === 'api_call' ? (
@@ -269,7 +269,7 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
                       handleComplete();
                     }
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition font-medium text-gray-700"
+                  className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition font-medium ds-text-secondary"
                 >
                   {currentStep < steps.length - 1 ? 'Skip for Now' : 'Complete Setup'}
                 </button>
@@ -280,14 +280,14 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
       )}
 
       {/* All Steps Overview */}
-      <div className="bg-white rounded-lg p-4 border border-blue-100">
-        <h4 className="text-sm font-semibold text-gray-700 mb-3">Setup Checklist</h4>
+      <div className="ds-bg-surface rounded-lg p-4 border border-blue-100">
+        <h4 className="text-sm font-semibold ds-text-secondary mb-3">Setup Checklist</h4>
         <div className="space-y-2">
           {steps.map((step, index) => (
             <div
               key={step.id}
               className={`flex items-center gap-3 p-2 rounded ${
-                index === currentStep ? 'bg-blue-50 border border-blue-200' : ''
+                index === currentStep ? 'bg-blue-50 border border-blue-400/60' : ''
               }`}
             >
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
@@ -295,13 +295,13 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
                   ? 'bg-green-100 text-green-700'
                   : index === currentStep
                   ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-400'
+                  : 'ds-bg-surface-muted ds-text-muted'
               }`}>
                 {index < currentStep ? '✓' : index + 1}
               </div>
               <div className="flex-1">
                 <p className={`text-sm font-medium ${
-                  index === currentStep ? 'text-blue-900' : 'text-gray-700'
+                  index === currentStep ? 'text-blue-900' : 'ds-text-secondary'
                 }`}>
                   {step.title}
                 </p>
@@ -322,7 +322,7 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
         >
           Refresh Status
         </button>
-        <span className="text-gray-300">|</span>
+        <span className="ds-text-muted">|</span>
         <Link
           href={`/projects/${projectId}`}
           className="text-sm text-blue-600 hover:text-blue-800 underline"

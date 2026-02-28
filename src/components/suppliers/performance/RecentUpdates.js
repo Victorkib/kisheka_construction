@@ -9,29 +9,29 @@ export default function RecentUpdates({ updates = [], onSupplierClick, getGradeC
   return (
     <Card className="p-6">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Recent Updates</h3>
-        <p className="text-sm text-gray-500">Latest performance updates</p>
+        <h3 className="text-lg font-semibold ds-text-primary">Recent Updates</h3>
+        <p className="text-sm ds-text-muted">Latest performance updates</p>
       </div>
 
       {updates.length === 0 ? (
-        <div className="text-sm text-gray-500">No recent updates available.</div>
+        <div className="text-sm ds-text-muted">No recent updates available.</div>
       ) : (
         <div className="space-y-3">
           {updates.map((update, index) => (
             <div
               key={update.supplierId || index}
-              className="flex items-center justify-between border border-gray-100 rounded-lg p-3"
+              className="flex items-center justify-between border ds-border-subtle rounded-lg p-3"
             >
               <div>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium ds-text-primary">
                   Supplier {update.supplierId}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs ds-text-muted">
                   Updated {update.updatedAt ? new Date(update.updatedAt).toLocaleString() : '--'}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-sm font-semibold text-gray-900">
+                <p className="text-sm font-semibold ds-text-primary">
                   {update.score ?? '--'}
                 </p>
                 <Badge variant="info" className={getGradeColor?.(update.grade)}>

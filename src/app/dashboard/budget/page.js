@@ -167,13 +167,13 @@ function BudgetDashboardContent() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'on_budget':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-100 text-green-800 border-green-400/60';
       case 'at_risk':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-400/60';
       case 'over_budget':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-100 text-red-800 border-red-400/60';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'ds-bg-surface-muted ds-text-primary ds-border-subtle';
     }
   };
 
@@ -203,7 +203,7 @@ function BudgetDashboardContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading budget variance data...</p>
+            <p className="mt-4 ds-text-secondary">Loading budget variance data...</p>
           </div>
         </div>
       </AppLayout>
@@ -218,8 +218,8 @@ function BudgetDashboardContent() {
           <div className="mb-6">
             <div className="flex justify-between items-start">
               <div>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Budget vs Actual</h1>
-                <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Compare budgeted costs with actual spending</p>
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Budget vs Actual</h1>
+                <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Compare budgeted costs with actual spending</p>
               </div>
               <Link
                 href="/financing"
@@ -229,10 +229,10 @@ function BudgetDashboardContent() {
               </Link>
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             {accessibleProjects.length > 0 ? (
               <div>
-                <p className="text-base text-gray-700 leading-normal mb-4">Please select a project to view budget variance.</p>
+                <p className="text-base ds-text-secondary leading-normal mb-4">Please select a project to view budget variance.</p>
                 <div className="mt-4">
                   <select
                     value={selectedProjectId || ''}
@@ -242,7 +242,7 @@ function BudgetDashboardContent() {
                         router.push(`/dashboard/budget?projectId=${e.target.value}`);
                       }
                     }}
-                    className="px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="">Select Project</option>
                     {accessibleProjects.map((project) => (
@@ -255,7 +255,7 @@ function BudgetDashboardContent() {
               </div>
             ) : (
               <div>
-                <p className="text-base text-gray-700 leading-normal mb-4">No projects available. Create a project to view budget variance.</p>
+                <p className="text-base ds-text-secondary leading-normal mb-4">No projects available. Create a project to view budget variance.</p>
                 <Link
                   href="/projects/new"
                   className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
@@ -277,7 +277,7 @@ function BudgetDashboardContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading budget variance data for project...</p>
+            <p className="mt-4 ds-text-secondary">Loading budget variance data for project...</p>
           </div>
         </div>
       </AppLayout>
@@ -331,8 +331,8 @@ function BudgetDashboardContent() {
           <div className="mb-6">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Budget vs Actual</h1>
-                <p className="text-gray-700 mt-2">Compare budgeted costs with actual spending</p>
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Budget vs Actual</h1>
+                <p className="ds-text-secondary mt-2">Compare budgeted costs with actual spending</p>
               </div>
               <div className="flex items-center gap-4">
                 <Link
@@ -359,7 +359,7 @@ function BudgetDashboardContent() {
                         router.push(`/dashboard/budget?projectId=${e.target.value}`);
                       }
                     }}
-                    className="px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   >
                     <option value="">Select Project</option>
                     {accessibleProjects.map((project) => (
@@ -396,8 +396,8 @@ function BudgetDashboardContent() {
                   key={index}
                   className={`p-4 rounded-lg border ${
                     warning.severity === 'error'
-                      ? 'bg-red-50 border-red-200 text-red-800'
-                      : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                      ? 'bg-red-50 border-red-400/60 text-red-800'
+                      : 'bg-yellow-50 border-yellow-400/60 text-yellow-800'
                   }`}
                 >
                   <p className="font-semibold">{warning.type.replace(/_/g, ' ').toUpperCase()}</p>
@@ -409,7 +409,7 @@ function BudgetDashboardContent() {
 
           {/* Financing Constraints Card */}
           {data.financing && data.financing.totalInvested > 0 && (
-            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="mb-6 bg-blue-50 border border-blue-400/60 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-blue-900">Financing Constraints</h2>
                 <div className="flex gap-3">
@@ -446,7 +446,7 @@ function BudgetDashboardContent() {
                   <p className="text-xl font-bold text-blue-900">{data.financing.capitalUtilization}%</p>
                 </div>
               </div>
-              <div className="mt-4 pt-4 border-t border-blue-200">
+              <div className="mt-4 pt-4 border-t border-blue-400/60">
                 <p className="text-sm text-blue-800">
                   <strong>Important:</strong> Your actual spending limit is based on available capital ({formatCurrency(data.financing.spendingLimit)}), not budget ({formatCurrency(data.budget.total)}). 
                   {data.financing.capitalBalance < 0 && (
@@ -459,15 +459,15 @@ function BudgetDashboardContent() {
 
           {/* Materials Financial Progression Card */}
           {data.materials && (
-            <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-6">
+            <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-400/60 rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-purple-900">Materials Financial Progression</h2>
                 <span className={`text-xs px-3 py-1 rounded-full border ${
                   data.materials.status === 'over_budget' || data.materials.status === 'committed_over_budget' || data.materials.status === 'estimated_over_budget'
-                    ? 'bg-red-100 text-red-800 border-red-200'
+                    ? 'bg-red-100 text-red-800 border-red-400/60'
                     : data.materials.status === 'approaching_budget'
-                    ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
-                    : 'bg-green-100 text-green-800 border-green-200'
+                    ? 'bg-yellow-100 text-yellow-800 border-yellow-400/60'
+                    : 'bg-green-100 text-green-800 border-green-400/60'
                 }`}>
                   {data.materials.status === 'over_budget' ? 'Over Budget' :
                    data.materials.status === 'committed_over_budget' ? 'Committed Over Budget' :
@@ -477,11 +477,11 @@ function BudgetDashboardContent() {
                 </span>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4">
-                <div className="bg-white rounded-lg p-4 border border-purple-100">
+                <div className="ds-bg-surface rounded-lg p-4 border border-purple-100">
                   <p className="text-sm text-purple-600 mb-1 font-medium">Budget</p>
                   <p className="text-xl font-bold text-purple-900">{formatCurrency(data.materials.budget)}</p>
                 </div>
-                <div className="bg-white rounded-lg p-4 border border-orange-100">
+                <div className="ds-bg-surface rounded-lg p-4 border border-orange-100">
                   <p className="text-sm text-orange-600 mb-1 font-medium">Estimated</p>
                   <p className="text-xl font-bold text-orange-900">{formatCurrency(data.materials.estimated)}</p>
                   {data.materials.estimated > 0 && (
@@ -490,7 +490,7 @@ function BudgetDashboardContent() {
                     </p>
                   )}
                 </div>
-                <div className="bg-white rounded-lg p-4 border border-amber-100">
+                <div className="ds-bg-surface rounded-lg p-4 border border-amber-100">
                   <p className="text-sm text-amber-600 mb-1 font-medium">Committed</p>
                   <p className="text-xl font-bold text-amber-900">{formatCurrency(data.materials.committed)}</p>
                   {data.materials.committed > 0 && (
@@ -499,7 +499,7 @@ function BudgetDashboardContent() {
                     </p>
                   )}
                 </div>
-                <div className="bg-white rounded-lg p-4 border border-green-100">
+                <div className="ds-bg-surface rounded-lg p-4 border border-green-100">
                   <p className="text-sm text-green-600 mb-1 font-medium">Actual</p>
                   <p className="text-xl font-bold text-green-900">{formatCurrency(data.materials.actual)}</p>
                   {data.materials.actual > 0 && (
@@ -508,9 +508,9 @@ function BudgetDashboardContent() {
                     </p>
                   )}
                 </div>
-                <div className="bg-white rounded-lg p-4 border border-gray-100">
-                  <p className="text-sm text-gray-700 mb-1 font-medium">Remaining</p>
-                  <p className={`text-xl font-bold ${data.materials.remaining < 0 ? 'text-red-600' : 'text-gray-900'}`}>
+                <div className="ds-bg-surface rounded-lg p-4 border ds-border-subtle">
+                  <p className="text-sm ds-text-secondary mb-1 font-medium">Remaining</p>
+                  <p className={`text-xl font-bold ${data.materials.remaining < 0 ? 'text-red-600' : 'ds-text-primary'}`}>
                     {formatCurrency(data.materials.remaining)}
                   </p>
                 </div>
@@ -518,8 +518,8 @@ function BudgetDashboardContent() {
               {/* Progress Bar Showing Progression */}
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-700 font-medium">Financial Progression</span>
-                  <span className="text-sm text-gray-700 font-medium">
+                  <span className="text-sm ds-text-secondary font-medium">Financial Progression</span>
+                  <span className="text-sm ds-text-secondary font-medium">
                     {(() => {
                       const materialsStatus = getBudgetStatus(
                         data.materials.budget || 0,
@@ -541,7 +541,7 @@ function BudgetDashboardContent() {
                   
                   if (materialsStatus.isOptional) {
                     return (
-                      <div className="w-full bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <div className="w-full bg-blue-50 border border-blue-400/60 rounded-lg p-3">
                         <p className="text-sm text-blue-800">{materialsStatus.message}</p>
                         <p className="text-xs text-blue-600 mt-1">Current Spending: {formatCurrency(data.materials.actual || 0)}</p>
                       </div>
@@ -553,7 +553,7 @@ function BudgetDashboardContent() {
                   const actualPercent = safePercentage(data.materials.actual || 0, data.materials.budget);
                   
                   return (
-                    <div className="w-full bg-gray-200 rounded-full h-4 relative overflow-hidden">
+                    <div className="w-full ds-bg-surface-muted rounded-full h-4 relative overflow-hidden">
                       {/* Budget baseline */}
                       <div className="absolute left-0 top-0 h-full w-full border-r-2 border-purple-500" style={{ width: '100%' }}></div>
                       {/* Estimated */}
@@ -602,7 +602,7 @@ function BudgetDashboardContent() {
                 
                 if (materialsStatus.status === 'over_budget' || materialsStatus.committedUtilization > 100 || materialsStatus.estimatedUtilization > 100) {
                   return (
-                    <div className="mt-4 pt-4 border-t border-purple-200">
+                    <div className="mt-4 pt-4 border-t border-purple-400/60">
                       {materialsStatus.committedUtilization > 100 && (
                         <p className="text-sm text-red-700 font-semibold mb-1">
                           ⚠️ Committed costs ({formatCurrency(data.materials.committed || 0)}) exceed budget ({formatCurrency(data.materials.budget || 0)}) by {formatCurrency((data.materials.committed || 0) - (data.materials.budget || 0))}
@@ -630,11 +630,11 @@ function BudgetDashboardContent() {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
             {/* Total Budget vs Actual */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-base font-semibold text-gray-700 mb-2 leading-normal">Total Budget</p>
-              <p className="text-2xl font-bold text-gray-900 mb-4">{formatCurrency(data.budget.total)}</p>
-              <p className="text-base text-gray-600 mb-1 leading-normal">Actual Spending</p>
-              <p className="text-xl font-semibold text-gray-900 mb-2">{formatCurrency(data.actual.total)}</p>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <p className="text-base font-semibold ds-text-secondary mb-2 leading-normal">Total Budget</p>
+              <p className="text-2xl font-bold ds-text-primary mb-4">{formatCurrency(data.budget.total)}</p>
+              <p className="text-base ds-text-secondary mb-1 leading-normal">Actual Spending</p>
+              <p className="text-xl font-semibold ds-text-primary mb-2">{formatCurrency(data.actual.total)}</p>
               <div className="flex items-center justify-between">
                 <span className={`text-base font-medium leading-normal ${getVarianceColor(data.variance.totalPercentage)}`}>
                   {data.variance.total >= 0 ? '+' : ''}
@@ -648,9 +648,9 @@ function BudgetDashboardContent() {
             </div>
 
             {/* Materials */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-base font-semibold text-gray-700 mb-2 leading-normal">Materials Budget</p>
-              <p className="text-2xl font-bold text-gray-900 mb-2">{formatCurrency(data.materials?.budget || data.budget.materials)}</p>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <p className="text-base font-semibold ds-text-secondary mb-2 leading-normal">Materials Budget</p>
+              <p className="text-2xl font-bold ds-text-primary mb-2">{formatCurrency(data.materials?.budget || data.budget.materials)}</p>
               {data.materials && (
                 <div className="mb-2 space-y-1">
                   {data.materials.estimated > 0 && (
@@ -667,8 +667,8 @@ function BudgetDashboardContent() {
                   )}
                 </div>
               )}
-              <p className="text-base text-gray-600 mb-1 leading-normal">Actual</p>
-              <p className="text-xl font-semibold text-gray-900 mb-2">{formatCurrency(data.materials?.actual || data.actual.materials)}</p>
+              <p className="text-base ds-text-secondary mb-1 leading-normal">Actual</p>
+              <p className="text-xl font-semibold ds-text-primary mb-2">{formatCurrency(data.materials?.actual || data.actual.materials)}</p>
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-medium ${getVarianceColor(data.variance.materials?.actual?.percentage || data.variance.materialsPercentage)}`}>
                   {data.variance.materials?.actual?.amount >= 0 ? '+' : ''}
@@ -682,11 +682,11 @@ function BudgetDashboardContent() {
             </div>
 
             {/* Labour */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-base text-gray-700 font-medium mb-2">Labour Budget</p>
-              <p className="text-2xl font-bold text-gray-900 mb-4">{formatCurrency(data.budget.labour)}</p>
-              <p className="text-base text-gray-700 mb-1 leading-normal">Actual</p>
-              <p className="text-xl font-semibold text-gray-900 mb-2">{formatCurrency(data.actual.labour)}</p>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <p className="text-base ds-text-secondary font-medium mb-2">Labour Budget</p>
+              <p className="text-2xl font-bold ds-text-primary mb-4">{formatCurrency(data.budget.labour)}</p>
+              <p className="text-base ds-text-secondary mb-1 leading-normal">Actual</p>
+              <p className="text-xl font-semibold ds-text-primary mb-2">{formatCurrency(data.actual.labour)}</p>
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-medium ${getVarianceColor(data.variance.labourPercentage)}`}>
                   {data.variance.labour >= 0 ? '+' : ''}
@@ -700,11 +700,11 @@ function BudgetDashboardContent() {
             </div>
 
             {/* Contingency */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <p className="text-base text-gray-700 font-medium mb-2">Contingency Budget</p>
-              <p className="text-2xl font-bold text-gray-900 mb-4">{formatCurrency(data.budget.contingency)}</p>
-              <p className="text-base text-gray-700 mb-1">Used</p>
-              <p className="text-xl font-semibold text-gray-900 mb-2">{formatCurrency(data.actual.contingency)}</p>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <p className="text-base ds-text-secondary font-medium mb-2">Contingency Budget</p>
+              <p className="text-2xl font-bold ds-text-primary mb-4">{formatCurrency(data.budget.contingency)}</p>
+              <p className="text-base ds-text-secondary mb-1">Used</p>
+              <p className="text-xl font-semibold ds-text-primary mb-2">{formatCurrency(data.actual.contingency)}</p>
               <div className="flex items-center justify-between">
                 <span className={`text-sm font-medium ${getVarianceColor(data.variance.contingencyPercentage)}`}>
                   {data.variance.contingency >= 0 ? '+' : ''}
@@ -735,8 +735,8 @@ function BudgetDashboardContent() {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Budget vs Actual Bar Chart */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget vs Actual (All Categories)</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Budget vs Actual (All Categories)</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={budgetVsActualData}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -758,8 +758,8 @@ function BudgetDashboardContent() {
 
             {/* Materials Financial Progression Chart */}
             {data.materials && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Materials Financial Progression</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold ds-text-primary mb-4">Materials Financial Progression</h2>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={[{ name: 'Materials', ...data.materials }]}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -777,8 +777,8 @@ function BudgetDashboardContent() {
             )}
 
             {/* Category Breakdown Pie Chart */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Categories by Actual Cost</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Top Categories by Actual Cost</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -802,39 +802,39 @@ function BudgetDashboardContent() {
           </div>
 
           {/* Category Breakdown Table */}
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Category Breakdown</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Category Breakdown</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Category
                     </th>
-                    <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Actual Cost
                     </th>
-                    <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Items
                     </th>
-                    <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       % of Total
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {data.categoryBreakdown.map((cat, index) => (
                     <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                         {cat.category}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right ds-text-primary">
                         {formatCurrency(cat.actual)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right ds-text-secondary">
                         {cat.count}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-700">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-right ds-text-secondary">
                         {data.actual.total > 0 ? ((cat.actual / data.actual.total) * 100).toFixed(2) : 0}%
                       </td>
                     </tr>
@@ -846,39 +846,39 @@ function BudgetDashboardContent() {
 
           {/* Floor Breakdown Table */}
           {data.floorBreakdown.length > 0 && (
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Floor Breakdown</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Floor Breakdown</h2>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Floor
                       </th>
-                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Budget
                       </th>
-                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Actual
                       </th>
-                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Variance
                       </th>
-                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Status
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {data.floorBreakdown.map((floor, index) => (
                       <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                           {floor.floorName}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right ds-text-primary">
                           {formatCurrency(floor.budget)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right ds-text-primary">
                           {formatCurrency(floor.actual)}
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${getVarianceColor(floor.variancePercentage)}`}>
@@ -905,48 +905,48 @@ function BudgetDashboardContent() {
 
           {/* Phase Breakdown Table */}
           {data.phaseBreakdown && data.phaseBreakdown.length > 0 && (
-            <div className="bg-white rounded-lg shadow p-6 mb-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Phase Breakdown</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Phase Breakdown</h2>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Phase
                       </th>
-                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Budget
                       </th>
-                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Actual
                       </th>
-                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Committed
                       </th>
-                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Variance
                       </th>
-                      <th className="px-6 py-3 text-right text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-right text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Status
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {data.phaseBreakdown.map((phase, index) => (
                       <tr key={index}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                           <div>
                             <div className="font-semibold">{phase.phaseName}</div>
-                            <div className="text-xs text-gray-500">{phase.phaseType} • {phase.completionPercentage}% Complete</div>
+                            <div className="text-xs ds-text-muted">{phase.phaseType} • {phase.completionPercentage}% Complete</div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right ds-text-primary">
                           {formatCurrency(phase.budget)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right ds-text-primary">
                           {formatCurrency(phase.actual)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-right ds-text-secondary">
                           {formatCurrency(phase.committed)}
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm text-right font-medium ${getVarianceColor(phase.variancePercentage)}`}>
@@ -977,8 +977,8 @@ function BudgetDashboardContent() {
 
           {/* Monthly Trend */}
           {data.monthlyTrend.length > 0 && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Monthly Spending Trend</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Monthly Spending Trend</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={data.monthlyTrend}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -1003,7 +1003,7 @@ export default function BudgetDashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading budget dashboard...</p>
+            <p className="mt-4 ds-text-secondary">Loading budget dashboard...</p>
           </div>
         </div>
       </AppLayout>

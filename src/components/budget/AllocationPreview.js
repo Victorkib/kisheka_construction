@@ -219,10 +219,10 @@ export function AllocationPreview({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+      <div className="ds-bg-surface rounded-lg shadow p-6 border ds-border-subtle">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-4 bg-gray-200 rounded w-full"></div>
+          <div className="h-6 ds-bg-surface-muted rounded w-1/3"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-full"></div>
         </div>
       </div>
     );
@@ -230,7 +230,7 @@ export function AllocationPreview({
 
   if (errors.length > 0) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
         <p className="text-red-700 text-sm font-semibold mb-2">Errors:</p>
         <ul className="list-disc list-inside text-sm text-red-600 space-y-1">
           {errors.map((error, index) => (
@@ -248,18 +248,18 @@ export function AllocationPreview({
   const { phaseData, floorData, totalPhaseAllocation, totalFloorAllocation } = previewData;
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 space-y-6">
+    <div className="ds-bg-surface rounded-lg shadow-lg border ds-border-subtle p-6 space-y-6">
       {/* Header */}
-      <div className="border-b border-gray-200 pb-4">
-        <h3 className="text-lg font-bold text-gray-900">Allocation Preview</h3>
-        <p className="text-sm text-gray-600 mt-1">
+      <div className="border-b ds-border-subtle pb-4">
+        <h3 className="text-lg font-bold ds-text-primary">Allocation Preview</h3>
+        <p className="text-sm ds-text-secondary mt-1">
           Review proposed allocations before confirming. Adjustments will be made automatically if allocations are insufficient.
         </p>
       </div>
 
       {/* Warnings */}
       {warnings.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-4">
           <p className="text-sm font-semibold text-yellow-900 mb-2">
             {warnings.length} Warning(s):
           </p>
@@ -273,28 +273,28 @@ export function AllocationPreview({
 
       {/* Phase Allocations */}
       <div>
-        <h4 className="text-md font-semibold text-gray-900 mb-3">Phase Allocations</h4>
+        <h4 className="text-md font-semibold ds-text-primary mb-3">Phase Allocations</h4>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-ds-border-subtle">
+            <thead className="ds-bg-surface-muted">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phase</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Proposed</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Spent</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Minimum</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Final</th>
+                <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Phase</th>
+                <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase">Proposed</th>
+                <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase">Spent</th>
+                <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase">Minimum</th>
+                <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase">Final</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
               {phaseData.map((phase) => (
                 <tr key={phase.phaseId} className={phase.isInsufficient ? 'bg-yellow-50' : ''}>
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                     {phase.phaseName}
                   </td>
-                  <td className="px-4 py-3 text-sm text-right text-gray-700">
+                  <td className="px-4 py-3 text-sm text-right ds-text-secondary">
                     {formatCurrency(phase.proposedAllocation)}
                   </td>
-                  <td className="px-4 py-3 text-sm text-right text-gray-700">
+                  <td className="px-4 py-3 text-sm text-right ds-text-secondary">
                     {formatCurrency(phase.actualSpending)}
                   </td>
                   <td className="px-4 py-3 text-sm text-right font-semibold text-red-600">
@@ -309,13 +309,13 @@ export function AllocationPreview({
                 </tr>
               ))}
             </tbody>
-            <tfoot className="bg-gray-50">
+            <tfoot className="ds-bg-surface-muted">
               <tr>
-                <td className="px-4 py-3 text-sm font-bold text-gray-900">Total</td>
-                <td className="px-4 py-3 text-sm text-right font-bold text-gray-900">
+                <td className="px-4 py-3 text-sm font-bold ds-text-primary">Total</td>
+                <td className="px-4 py-3 text-sm text-right font-bold ds-text-primary">
                   {formatCurrency(phaseData.reduce((sum, p) => sum + p.proposedAllocation, 0))}
                 </td>
-                <td className="px-4 py-3 text-sm text-right font-bold text-gray-900">
+                <td className="px-4 py-3 text-sm text-right font-bold ds-text-primary">
                   {formatCurrency(phaseData.reduce((sum, p) => sum + p.actualSpending, 0))}
                 </td>
                 <td className="px-4 py-3 text-sm text-right font-bold text-red-600">
@@ -333,28 +333,28 @@ export function AllocationPreview({
       {/* Floor Allocations (if applicable) */}
       {floorData.length > 0 && (
         <div>
-          <h4 className="text-md font-semibold text-gray-900 mb-3">Floor Allocations (Superstructure)</h4>
+          <h4 className="text-md font-semibold ds-text-primary mb-3">Floor Allocations (Superstructure)</h4>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Floor</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Proposed</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Spent</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Minimum</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Final</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Floor</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase">Proposed</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase">Spent</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase">Minimum</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase">Final</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {floorData.map((floor) => (
                   <tr key={floor.floorId} className={floor.isInsufficient ? 'bg-yellow-50' : ''}>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                       {floor.floorName}
                     </td>
-                    <td className="px-4 py-3 text-sm text-right text-gray-700">
+                    <td className="px-4 py-3 text-sm text-right ds-text-secondary">
                       {formatCurrency(floor.proposedAllocation)}
                     </td>
-                    <td className="px-4 py-3 text-sm text-right text-gray-700">
+                    <td className="px-4 py-3 text-sm text-right ds-text-secondary">
                       {formatCurrency(floor.actualSpending)}
                     </td>
                     <td className="px-4 py-3 text-sm text-right font-semibold text-red-600">
@@ -369,13 +369,13 @@ export function AllocationPreview({
                   </tr>
                 ))}
               </tbody>
-              <tfoot className="bg-gray-50">
+              <tfoot className="ds-bg-surface-muted">
                 <tr>
-                  <td className="px-4 py-3 text-sm font-bold text-gray-900">Total</td>
-                  <td className="px-4 py-3 text-sm text-right font-bold text-gray-900">
+                  <td className="px-4 py-3 text-sm font-bold ds-text-primary">Total</td>
+                  <td className="px-4 py-3 text-sm text-right font-bold ds-text-primary">
                     {formatCurrency(floorData.reduce((sum, f) => sum + f.proposedAllocation, 0))}
                   </td>
-                  <td className="px-4 py-3 text-sm text-right font-bold text-gray-900">
+                  <td className="px-4 py-3 text-sm text-right font-bold ds-text-primary">
                     {formatCurrency(floorData.reduce((sum, f) => sum + f.actualSpending, 0))}
                   </td>
                   <td className="px-4 py-3 text-sm text-right font-bold text-red-600">
@@ -395,7 +395,7 @@ export function AllocationPreview({
       <div className="flex justify-end gap-3 pt-4 border-t">
         <button
           onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+          className="px-6 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition"
         >
           Cancel
         </button>

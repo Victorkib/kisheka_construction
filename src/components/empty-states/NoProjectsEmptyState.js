@@ -72,13 +72,13 @@ export function NoProjectsEmptyState({ canCreate = false, userName, role }) {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg p-8 mb-8 text-center">
+    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-400/60 rounded-lg p-8 mb-8 text-center">
       <div className="max-w-2xl mx-auto">
         <div className="text-6xl mb-4">🏗️</div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+        <h2 className="text-2xl font-bold ds-text-primary mb-2">
           {userName ? `Welcome, ${userName}!` : 'Welcome to Doshaki Construction System!'}
         </h2>
-        <p className="text-lg text-gray-700 mb-6">
+        <p className="text-lg ds-text-secondary mb-6">
           {getRoleSpecificMessage()}
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -92,17 +92,17 @@ export function NoProjectsEmptyState({ canCreate = false, userName, role }) {
           )}
           <Link
             href="/projects"
-            className="inline-block bg-white hover:bg-gray-50 text-gray-700 font-semibold px-8 py-3 rounded-lg border-2 border-gray-300 transition-colors"
+            className="inline-block ds-bg-surface hover:ds-bg-surface-muted ds-text-secondary font-semibold px-8 py-3 rounded-lg border-2 ds-border-subtle transition-colors"
           >
             View All Projects
           </Link>
         </div>
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
           {getFeatureHighlights().map((feature, index) => (
-            <div key={index} className="bg-white rounded-lg p-4 shadow-sm">
+            <div key={index} className="ds-bg-surface rounded-lg p-4 shadow-sm">
               <div className="text-2xl mb-2">{feature.icon}</div>
-              <h3 className="font-semibold text-gray-900 mb-1">{feature.title}</h3>
-              <p className="text-sm text-gray-600">{feature.description}</p>
+              <h3 className="font-semibold ds-text-primary mb-1">{feature.title}</h3>
+              <p className="text-sm ds-text-secondary">{feature.description}</p>
             </div>
           ))}
         </div>

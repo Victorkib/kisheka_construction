@@ -108,14 +108,14 @@ export function CustomMaterialInput({ onAddMaterial }) {
   return (
     <div className="space-y-6">
       {/* Mode Toggle */}
-      <div className="flex gap-2 border-b border-gray-200">
+      <div className="flex gap-2 border-b ds-border-subtle">
         <button
           type="button"
           onClick={() => setMode('single')}
           className={`px-4 py-2 font-medium text-sm transition-colors ${
             mode === 'single'
               ? 'border-b-2 border-blue-600 text-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
+              : 'ds-text-secondary hover:ds-text-primary'
           }`}
         >
           Single Entry
@@ -126,7 +126,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
           className={`px-4 py-2 font-medium text-sm transition-colors ${
             mode === 'bulk'
               ? 'border-b-2 border-blue-600 text-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
+              : 'ds-text-secondary hover:ds-text-primary'
           }`}
         >
           Bulk Paste
@@ -137,7 +137,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
         <form onSubmit={handleSingleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Material Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -146,11 +146,11 @@ export function CustomMaterialInput({ onAddMaterial }) {
                 onChange={(e) => setSingleMaterial((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="e.g., Cement (50kg bag)"
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Quantity <span className="text-red-500">*</span>
               </label>
               <input
@@ -161,24 +161,24 @@ export function CustomMaterialInput({ onAddMaterial }) {
                 min="0.01"
                 step="0.01"
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Unit <span className="text-red-500">*</span>
               </label>
               <select
                 value={singleMaterial.unit}
                 onChange={(e) => setSingleMaterial((prev) => ({ ...prev, unit: e.target.value }))}
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 {VALID_UNITS.map((unit) => (
-                  <option key={unit} value={unit} className="text-gray-900">
+                  <option key={unit} value={unit} className="ds-text-primary">
                     {unit.charAt(0).toUpperCase() + unit.slice(1)}
                   </option>
                 ))}
@@ -186,7 +186,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
             </div>
             {singleMaterial.unit === 'others' && (
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold ds-text-secondary mb-1">
                   Custom Unit <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -195,12 +195,12 @@ export function CustomMaterialInput({ onAddMaterial }) {
                   onChange={(e) => setSingleMaterial((prev) => ({ ...prev, customUnit: e.target.value }))}
                   placeholder="Enter custom unit"
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
                 />
               </div>
             )}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Estimated Unit Cost (KES)
               </label>
               <input
@@ -210,7 +210,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
                 placeholder="0.00"
                 min="0"
                 step="0.01"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
               />
             </div>
           </div>
@@ -225,7 +225,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
       ) : (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Paste Materials (One per line)
             </label>
             <textarea
@@ -233,9 +233,9 @@ export function CustomMaterialInput({ onAddMaterial }) {
               onChange={(e) => setBulkText(e.target.value)}
               placeholder={`Format: Material Name, Quantity, Unit, Cost (optional)\n\nExample:\nCement, 500, bag, 850\nRebars 12mm, 600, piece\nSand, 20, lorry`}
               rows={10}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm placeholder:text-gray-400"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm placeholder:ds-text-muted"
             />
-            <p className="mt-1 text-xs text-gray-600">
+            <p className="mt-1 text-xs ds-text-secondary">
               Format: Material Name, Quantity, Unit, Cost (optional). One material per line.
             </p>
           </div>

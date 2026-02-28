@@ -149,14 +149,14 @@ export function Step2ActivitySelection({ wizardData, onUpdate, onValidationChang
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Activities</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold ds-text-primary mb-4">Select Activities</h2>
+        <p className="text-sm ds-text-secondary mb-6">
           Add activities to your bulk entry. You can use templates or add activities manually.
         </p>
       </div>
 
       {/* Activities Count */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-blue-900">
@@ -170,7 +170,7 @@ export function Step2ActivitySelection({ wizardData, onUpdate, onValidationChang
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b ds-border-subtle">
         <nav className="flex space-x-8">
           <button
             type="button"
@@ -178,7 +178,7 @@ export function Step2ActivitySelection({ wizardData, onUpdate, onValidationChang
             className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'template'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
             }`}
           >
             📋 Templates
@@ -189,7 +189,7 @@ export function Step2ActivitySelection({ wizardData, onUpdate, onValidationChang
             className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'manual'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
             }`}
           >
             ✏️ Manual Entry
@@ -202,37 +202,37 @@ export function Step2ActivitySelection({ wizardData, onUpdate, onValidationChang
         {activeTab === 'template' ? (
           <div>
             {!wizardData.professionalServiceId ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <p className="text-gray-600">Please select a professional service in Step 1</p>
+              <div className="text-center py-12 ds-bg-surface-muted rounded-lg">
+                <p className="ds-text-secondary">Please select a professional service in Step 1</p>
               </div>
             ) : loadingTemplates ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-2 text-sm text-gray-600">Loading templates...</p>
+                <p className="mt-2 text-sm ds-text-secondary">Loading templates...</p>
               </div>
             ) : templates.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <p className="text-gray-600">No templates available</p>
-                <p className="text-sm text-gray-500 mt-1">Create a template to reuse activity configurations</p>
+              <div className="text-center py-12 ds-bg-surface-muted rounded-lg">
+                <p className="ds-text-secondary">No templates available</p>
+                <p className="text-sm ds-text-muted mt-1">Create a template to reuse activity configurations</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {templates.map((template) => (
                   <div
                     key={template._id}
-                    className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all cursor-pointer"
+                    className="border ds-border-subtle rounded-lg p-4 hover:border-blue-400/60 hover:shadow-md transition-all cursor-pointer"
                     onClick={() => handleUseTemplate(template._id)}
                   >
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="font-semibold text-gray-900">{template.name}</h3>
+                      <h3 className="font-semibold ds-text-primary">{template.name}</h3>
                       <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
                         {template.type === 'architect_activity' ? 'Architect' : 'Engineer'}
                       </span>
                     </div>
                     {template.description && (
-                      <p className="text-sm text-gray-600 mb-2">{template.description}</p>
+                      <p className="text-sm ds-text-secondary mb-2">{template.description}</p>
                     )}
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs ds-text-muted">
                       <div>Type: {template.activityType.replace('_', ' ')}</div>
                       <div>Used {template.usageCount || 0} times</div>
                     </div>
@@ -255,13 +255,13 @@ export function Step2ActivitySelection({ wizardData, onUpdate, onValidationChang
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold ds-text-secondary mb-1">
                   Activity Type <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={manualActivity.activityType}
                   onChange={(e) => setManualActivity(prev => ({ ...prev, activityType: e.target.value }))}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Select Activity Type</option>
                   {getAvailableActivityTypes().map((type) => (
@@ -272,19 +272,19 @@ export function Step2ActivitySelection({ wizardData, onUpdate, onValidationChang
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold ds-text-secondary mb-1">
                   Activity Date <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="date"
                   value={manualActivity.activityDate}
                   onChange={(e) => setManualActivity(prev => ({ ...prev, activityDate: e.target.value }))}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Notes
               </label>
               <textarea
@@ -292,7 +292,7 @@ export function Step2ActivitySelection({ wizardData, onUpdate, onValidationChang
                 onChange={(e) => setManualActivity(prev => ({ ...prev, notes: e.target.value }))}
                 placeholder="Activity notes..."
                 rows={2}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <button
@@ -309,15 +309,15 @@ export function Step2ActivitySelection({ wizardData, onUpdate, onValidationChang
       {/* Activities List */}
       {activities.length > 0 && (
         <div className="mt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Added Activities</h3>
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">Added Activities</h3>
           <div className="space-y-2">
             {activities.map((activity, index) => (
-              <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={index} className="flex items-center justify-between p-3 ds-bg-surface-muted rounded-lg">
                 <div>
-                  <div className="font-medium text-gray-900">
+                  <div className="font-medium ds-text-primary">
                     {activity.activityType?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'N/A'}
                   </div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm ds-text-secondary">
                     {activity.activityDate ? new Date(activity.activityDate).toLocaleDateString() : 'N/A'}
                   </div>
                 </div>
@@ -336,7 +336,7 @@ export function Step2ActivitySelection({ wizardData, onUpdate, onValidationChang
 
       {/* Validation Warning */}
       {activities.length > 0 && !isValid && (
-        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="mt-6 bg-yellow-50 border border-yellow-400/60 rounded-lg p-4">
           <p className="text-sm text-yellow-800 font-medium mb-2">
             ⚠️ Some activities are incomplete. Please ensure all activities have:
           </p>

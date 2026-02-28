@@ -79,13 +79,13 @@ function FinancialOverviewContent() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'healthy':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-green-100 text-green-800 border-green-400/60';
       case 'at_risk':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-400/60';
       case 'critical':
-        return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-red-100 text-red-800 border-red-400/60';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'ds-bg-surface-muted ds-text-primary ds-border-subtle';
     }
   };
 
@@ -108,7 +108,7 @@ function FinancialOverviewContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading financial overview...</p>
+            <p className="mt-4 ds-text-secondary">Loading financial overview...</p>
           </div>
         </div>
       </AppLayout>
@@ -119,7 +119,7 @@ function FinancialOverviewContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
             <button
@@ -138,8 +138,8 @@ function FinancialOverviewContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600">No financial data available for this project.</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="ds-text-secondary">No financial data available for this project.</p>
           </div>
         </div>
       </AppLayout>
@@ -204,10 +204,10 @@ function FinancialOverviewContent() {
               >
                 ← Back to Project
               </Link>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
                 Financial Overview
               </h1>
-              <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+              <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">
                 {data.project.projectCode} - {data.project.projectName}
               </p>
             </div>
@@ -220,7 +220,7 @@ function FinancialOverviewContent() {
               </Link>
               <Link
                 href={`/dashboard/budget?projectId=${projectId}`}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition"
+                className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition"
               >
                 Budget vs Actual
               </Link>
@@ -242,8 +242,8 @@ function FinancialOverviewContent() {
                 key={index}
                 className={`p-4 rounded-lg border ${
                   warning.severity === 'error'
-                    ? 'bg-red-50 border-red-200 text-red-800'
-                    : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                    ? 'bg-red-50 border-red-400/60 text-red-800'
+                    : 'bg-yellow-50 border-yellow-400/60 text-yellow-800'
                 }`}
               >
                 <p className="font-semibold">{warning.type.replace(/_/g, ' ').toUpperCase()}</p>
@@ -256,41 +256,41 @@ function FinancialOverviewContent() {
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
           {/* Budget Card */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Budget (Planning)</h3>
+              <h3 className="text-lg font-semibold ds-text-primary">Budget (Planning)</h3>
               <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(data.status.budgetStatus)}`}>
                 {getStatusLabel(data.status.budgetStatus)}
               </span>
             </div>
-            <p className="text-3xl font-bold text-gray-900 mb-2">{formatCurrency(data.budget.total)}</p>
-            <div className="space-y-1 text-sm text-gray-700">
+            <p className="text-3xl font-bold ds-text-primary mb-2">{formatCurrency(data.budget.total)}</p>
+            <div className="space-y-1 text-sm ds-text-secondary">
               <p>Materials: {formatCurrency(data.budget.materials)}</p>
               <p>Labour: {formatCurrency(data.budget.labour)}</p>
               <p>Contingency: {formatCurrency(data.budget.contingency)}</p>
             </div>
             <div className="mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-700">Remaining</p>
-              <p className="text-xl font-semibold text-gray-900">{formatCurrency(data.budget.remaining)}</p>
+              <p className="text-sm ds-text-secondary">Remaining</p>
+              <p className="text-xl font-semibold ds-text-primary">{formatCurrency(data.budget.remaining)}</p>
             </div>
           </div>
 
           {/* Financing Card */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Financing (Reality)</h3>
+              <h3 className="text-lg font-semibold ds-text-primary">Financing (Reality)</h3>
               <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(data.status.capitalStatus === 'sufficient' ? 'healthy' : 'critical')}`}>
                 {data.status.capitalStatus === 'sufficient' ? 'Sufficient' : 'Insufficient'}
               </span>
             </div>
             <p className="text-3xl font-bold text-blue-600 mb-2">{formatCurrency(data.financing.totalInvested)}</p>
-            <div className="space-y-1 text-sm text-gray-700">
+            <div className="space-y-1 text-sm ds-text-secondary">
               <p>Loans: {formatCurrency(data.financing.totalLoans)}</p>
               <p>Equity: {formatCurrency(data.financing.totalEquity)}</p>
               <p>Used: {formatCurrency(data.financing.totalUsed)}</p>
             </div>
             <div className="mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-700">Available Capital</p>
+              <p className="text-sm ds-text-secondary">Available Capital</p>
               <p className="text-xl font-semibold text-blue-600">{formatCurrency(data.financing.capitalBalance)}</p>
             </div>
             <div className="mt-4">
@@ -304,30 +304,30 @@ function FinancialOverviewContent() {
           </div>
 
           {/* Actual Spending Card */}
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Actual Spending</h3>
+              <h3 className="text-lg font-semibold ds-text-primary">Actual Spending</h3>
               <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(data.status.overall)}`}>
                 {getStatusLabel(data.status.overall)}
               </span>
             </div>
             <p className="text-3xl font-bold text-red-600 mb-2">{formatCurrency(data.actual.total)}</p>
-            <div className="space-y-1 text-sm text-gray-700">
+            <div className="space-y-1 text-sm ds-text-secondary">
               <p>Materials: {formatCurrency(data.actual.materials)}</p>
               <p>Expenses: {formatCurrency(data.actual.expenses)}</p>
               <p>Initial: {formatCurrency(data.actual.initialExpenses)}</p>
             </div>
             <div className="mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-700">Spending Limit</p>
-              <p className="text-xl font-semibold text-gray-900">{formatCurrency(data.spendingLimit)}</p>
-              <p className="text-sm text-gray-600 mt-1">(Based on capital, not budget)</p>
+              <p className="text-sm ds-text-secondary">Spending Limit</p>
+              <p className="text-xl font-semibold ds-text-primary">{formatCurrency(data.spendingLimit)}</p>
+              <p className="text-sm ds-text-secondary mt-1">(Based on capital, not budget)</p>
             </div>
           </div>
         </div>
 
         {/* Comparison Chart */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget vs Capital vs Actual</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Budget vs Capital vs Actual</h2>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={comparisonData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -343,8 +343,8 @@ function FinancialOverviewContent() {
         {/* Breakdown Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Budget vs Actual Breakdown */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget vs Actual by Category</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Budget vs Actual by Category</h2>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={breakdownData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -359,8 +359,8 @@ function FinancialOverviewContent() {
           </div>
 
           {/* Spending Breakdown Pie */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Actual Spending Breakdown</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Actual Spending Breakdown</h2>
             <ResponsiveContainer width="100%" height={300}>
               <PieChart>
                 <Pie
@@ -384,8 +384,8 @@ function FinancialOverviewContent() {
         </div>
 
         {/* Key Insights */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Key Insights</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Key Insights</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 bg-blue-50 rounded-lg">
               <p className="text-sm font-semibold text-blue-900 mb-2">Spending Limit</p>
@@ -394,12 +394,12 @@ function FinancialOverviewContent() {
                 This is based on available capital ({formatCurrency(data.financing.totalInvested)}), not budget.
               </p>
             </div>
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm font-semibold text-gray-900 mb-2">Budget Variance</p>
-              <p className="text-lg font-bold text-gray-900">
+            <div className="p-4 ds-bg-surface-muted rounded-lg">
+              <p className="text-sm font-semibold ds-text-primary mb-2">Budget Variance</p>
+              <p className="text-lg font-bold ds-text-primary">
                 {formatCurrency(data.budget.total - data.actual.total)}
               </p>
-              <p className="text-sm text-gray-700 mt-1">
+              <p className="text-sm ds-text-secondary mt-1">
                 {data.budget.total >= data.actual.total ? 'Under budget' : 'Over budget'} by{' '}
                 {Math.abs(((data.actual.total / data.budget.total) * 100 - 100) || 0).toFixed(1)}%
               </p>
@@ -441,7 +441,7 @@ export default function FinancialOverviewPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading financial overview...</p>
+              <p className="mt-4 ds-text-secondary">Loading financial overview...</p>
             </div>
           </div>
         </AppLayout>

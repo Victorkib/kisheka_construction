@@ -71,11 +71,11 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
   const getStatusColor = (status) => {
     switch (status) {
       case 'sent':
-        return 'text-green-700 bg-green-50 border-green-200';
+        return 'text-green-700 bg-green-50 border-green-400/60';
       case 'failed':
-        return 'text-red-700 bg-red-50 border-red-200';
+        return 'text-red-700 bg-red-50 border-red-400/60';
       default:
-        return 'text-yellow-700 bg-yellow-50 border-yellow-200';
+        return 'text-yellow-700 bg-yellow-50 border-yellow-400/60';
     }
   };
 
@@ -102,18 +102,18 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-4">📧 Communication Status</h2>
+    <div className="ds-bg-surface rounded-lg shadow p-6">
+      <h2 className="text-xl font-bold ds-text-primary mb-4">📧 Communication Status</h2>
       
       <div className="space-y-4">
         {/* Email Status */}
         {emailEnabled && (
-          <div className={`border rounded-lg p-4 ${communicationStatus.email ? getStatusColor(communicationStatus.email.status) : 'border-gray-200 bg-gray-50'}`}>
+          <div className={`border rounded-lg p-4 ${communicationStatus.email ? getStatusColor(communicationStatus.email.status) : 'ds-border-subtle ds-bg-surface-muted'}`}>
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">📧</span>
-                  <h3 className="font-semibold text-gray-900">Email</h3>
+                  <h3 className="font-semibold ds-text-primary">Email</h3>
                   {communicationStatus.email && (
                     <span className="text-2xl">{getStatusIcon(communicationStatus.email.status)}</span>
                   )}
@@ -133,16 +133,16 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
                       </p>
                     )}
                     {communicationStatus.email.messageId && (
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs ds-text-muted mt-1">
                         Message ID: {communicationStatus.email.messageId}
                       </p>
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-600">No email sent yet</p>
+                  <p className="text-sm ds-text-secondary">No email sent yet</p>
                 )}
                 {supplier.email && (
-                  <p className="text-xs text-gray-500 mt-2">To: {supplier.email}</p>
+                  <p className="text-xs ds-text-muted mt-2">To: {supplier.email}</p>
                 )}
               </div>
               {canRetry && communicationStatus.email?.status === 'failed' && (
@@ -160,12 +160,12 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
 
         {/* SMS Status */}
         {smsEnabled && (
-          <div className={`border rounded-lg p-4 ${communicationStatus.sms ? getStatusColor(communicationStatus.sms.status) : 'border-gray-200 bg-gray-50'}`}>
+          <div className={`border rounded-lg p-4 ${communicationStatus.sms ? getStatusColor(communicationStatus.sms.status) : 'ds-border-subtle ds-bg-surface-muted'}`}>
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">📱</span>
-                  <h3 className="font-semibold text-gray-900">SMS</h3>
+                  <h3 className="font-semibold ds-text-primary">SMS</h3>
                   {communicationStatus.sms && (
                     <span className="text-2xl">{getStatusIcon(communicationStatus.sms.status)}</span>
                   )}
@@ -185,21 +185,21 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
                       </p>
                     )}
                     {communicationStatus.sms.messageId && (
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs ds-text-muted mt-1">
                         Message ID: {communicationStatus.sms.messageId}
                       </p>
                     )}
                     {communicationStatus.sms.subscriptionCount !== undefined && (
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs ds-text-muted mt-1">
                         Sent to {communicationStatus.sms.subscriptionCount} subscription(s)
                       </p>
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-600">No SMS sent yet</p>
+                  <p className="text-sm ds-text-secondary">No SMS sent yet</p>
                 )}
                 {supplier.phone && (
-                  <p className="text-xs text-gray-500 mt-2">To: {supplier.phone}</p>
+                  <p className="text-xs ds-text-muted mt-2">To: {supplier.phone}</p>
                 )}
               </div>
               {canRetry && communicationStatus.sms?.status === 'failed' && (
@@ -217,12 +217,12 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
 
         {/* Push Notification Status */}
         {pushEnabled && (
-          <div className={`border rounded-lg p-4 ${communicationStatus.push ? getStatusColor(communicationStatus.push.status) : 'border-gray-200 bg-gray-50'}`}>
+          <div className={`border rounded-lg p-4 ${communicationStatus.push ? getStatusColor(communicationStatus.push.status) : 'ds-border-subtle ds-bg-surface-muted'}`}>
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="text-lg">🔔</span>
-                  <h3 className="font-semibold text-gray-900">Push Notification</h3>
+                  <h3 className="font-semibold ds-text-primary">Push Notification</h3>
                   {communicationStatus.push && (
                     <span className="text-2xl">{getStatusIcon(communicationStatus.push.status)}</span>
                   )}
@@ -242,13 +242,13 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
                       </p>
                     )}
                     {communicationStatus.push.subscriptionCount !== undefined && (
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs ds-text-muted mt-1">
                         Sent to {communicationStatus.push.subscriptionCount} of {communicationStatus.push.totalSubscriptions || 0} subscription(s)
                       </p>
                     )}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-600">No push notification sent yet</p>
+                  <p className="text-sm ds-text-secondary">No push notification sent yet</p>
                 )}
               </div>
               {canRetry && communicationStatus.push?.status === 'failed' && (
@@ -266,8 +266,8 @@ export function CommunicationStatus({ order, onRetry, canRetry = false }) {
 
         {/* No Communications Message */}
         {!hasAnyCommunication && hasAnyEnabled && (
-          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-            <p className="text-sm text-gray-600">
+          <div className="border ds-border-subtle rounded-lg p-4 ds-bg-surface-muted">
+            <p className="text-sm ds-text-secondary">
               Communications will be sent when the purchase order is created. Check back after creating the order.
             </p>
           </div>

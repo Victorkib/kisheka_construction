@@ -288,7 +288,7 @@ export function MobileNav({ isOpen, onClose }) {
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 left-0 h-full h-[100dvh] w-64 sm:w-72 bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-out lg:hidden ${
+        className={`fixed top-0 left-0 h-full h-[100dvh] w-64 sm:w-72 ds-bg-surface shadow-2xl z-50 transform transition-transform duration-300 ease-out lg:hidden ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         role="dialog"
@@ -297,7 +297,7 @@ export function MobileNav({ isOpen, onClose }) {
       >
         <div className="flex flex-col h-full safe-area-inset">
           {/* Header */}
-          <div className="p-4 sm:p-5 border-b border-gray-200 flex items-center justify-between flex-shrink-0 bg-white">
+          <div className="p-4 sm:p-5 border-b ds-border-subtle flex items-center justify-between flex-shrink-0 ds-bg-surface">
             <Link
               href="/dashboard"
               className="text-lg sm:text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors"
@@ -307,7 +307,7 @@ export function MobileNav({ isOpen, onClose }) {
             </Link>
             <button
               onClick={onClose}
-              className="p-2 sm:p-2.5 rounded-md hover:bg-gray-100 active:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="p-2 sm:p-2.5 rounded-md hover:ds-bg-surface-muted active:ds-bg-surface-muted ds-text-muted hover:ds-text-secondary transition-colors touch-manipulation focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               aria-label="Close menu"
             >
               <svg
@@ -343,7 +343,7 @@ export function MobileNav({ isOpen, onClose }) {
                     className={`flex items-center px-3 sm:px-4 py-3 sm:py-3.5 text-base sm:text-base font-medium rounded-lg transition-all duration-200 touch-manipulation min-h-[44px] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                       isActive
                         ? 'bg-blue-50 text-blue-700 shadow-sm'
-                        : 'text-gray-700 hover:bg-gray-100 active:bg-gray-200'
+                        : 'ds-text-secondary hover:ds-bg-surface-muted active:ds-bg-surface-muted'
                     }`}
                     aria-current={isActive ? 'page' : undefined}
                   >
@@ -359,13 +359,13 @@ export function MobileNav({ isOpen, onClose }) {
           </nav>
 
           {/* User Info & Logout */}
-          <div className="p-4 sm:p-5 border-t border-gray-200 bg-white flex-shrink-0">
+          <div className="p-4 sm:p-5 border-t ds-border-subtle ds-bg-surface flex-shrink-0">
             {user && (
-              <div className="mb-4 pb-4 border-b border-gray-200">
-                <p className="font-medium text-gray-900 text-sm sm:text-base truncate">
+              <div className="mb-4 pb-4 border-b ds-border-subtle">
+                <p className="font-medium ds-text-primary text-sm sm:text-base truncate">
                   {user.firstName || user.email}
                 </p>
-                <p className="text-gray-500 capitalize text-xs sm:text-sm mt-0.5">
+                <p className="ds-text-muted capitalize text-xs sm:text-sm mt-0.5">
                   {user.role || 'User'}
                 </p>
               </div>

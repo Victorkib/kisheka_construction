@@ -61,52 +61,52 @@ export function ActivitySummary({ user }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
+      <div className="ds-bg-surface rounded-lg shadow p-6 mb-6 border ds-border-subtle">
+        <h2 className="text-xl font-semibold ds-text-primary mb-4">
           Activity Summary
         </h2>
         <div className="animate-pulse space-y-4">
-          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-3/4"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-1/2"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">
+    <div className="ds-bg-surface rounded-lg shadow p-6 mb-6 border ds-border-subtle">
+      <h2 className="text-xl font-semibold ds-text-primary mb-4">
         Activity Summary
       </h2>
 
       <div className="space-y-4">
         {/* Login Count */}
-        <div className="flex items-center justify-between py-3 border-b border-gray-200">
+        <div className="flex items-center justify-between py-3 border-b ds-border-subtle">
           <div>
-            <p className="text-sm font-medium text-gray-700">Total Logins</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-sm font-medium ds-text-secondary">Total Logins</p>
+            <p className="text-xs ds-text-muted mt-1">
               Number of times you've logged in
             </p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold ds-text-primary">
               {stats?.loginCount || 0}
             </p>
           </div>
         </div>
 
         {/* Last Login */}
-        <div className="flex items-center justify-between py-3 border-b border-gray-200">
+        <div className="flex items-center justify-between py-3 border-b ds-border-subtle">
           <div>
-            <p className="text-sm font-medium text-gray-700">Last Login</p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-sm font-medium ds-text-secondary">Last Login</p>
+            <p className="text-xs ds-text-muted mt-1">
               {user?.lastLogin
                 ? formatTimeAgo(user.lastLogin)
                 : 'Never logged in'}
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-900">
+            <p className="text-sm ds-text-primary">
               {user?.lastLogin ? formatDate(user.lastLogin) : 'N/A'}
             </p>
           </div>
@@ -116,13 +116,13 @@ export function ActivitySummary({ user }) {
         {stats?.lastActivityAt && (
           <div className="flex items-center justify-between py-3">
             <div>
-              <p className="text-sm font-medium text-gray-700">Last Activity</p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-sm font-medium ds-text-secondary">Last Activity</p>
+              <p className="text-xs ds-text-muted mt-1">
                 {formatTimeAgo(stats.lastActivityAt)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-900">
+              <p className="text-sm ds-text-primary">
                 {formatDate(stats.lastActivityAt)}
               </p>
             </div>
@@ -131,11 +131,11 @@ export function ActivitySummary({ user }) {
 
         {/* Account Age */}
         {user?.createdAt && (
-          <div className="pt-3 border-t border-gray-200">
-            <p className="text-sm font-medium text-gray-700 mb-2">
+          <div className="pt-3 border-t ds-border-subtle">
+            <p className="text-sm font-medium ds-text-secondary mb-2">
               Account Age
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm ds-text-secondary">
               Member since {formatDate(user.createdAt)}
             </p>
           </div>

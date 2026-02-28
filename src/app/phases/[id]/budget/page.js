@@ -229,7 +229,7 @@ function PhaseBudgetPageContent() {
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error}
           </div>
           <Link href="/phases" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
@@ -244,7 +244,7 @@ function PhaseBudgetPageContent() {
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
+          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded-lg">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to manage phase budgets. Only PM, OWNER, and ACCOUNTANT can manage phase budgets.</p>
           </div>
@@ -272,8 +272,8 @@ function PhaseBudgetPageContent() {
           <Link href={`/phases/${phaseId}`} className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
             ← Back to Phase
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Manage Phase Budget</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">Manage Phase Budget</h1>
+          <p className="ds-text-secondary mt-1">
             {phase?.phaseName} ({phase?.phaseCode})
           </p>
           {project && (
@@ -288,29 +288,29 @@ function PhaseBudgetPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
         {/* Current Budget Summary */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Current Budget Summary</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Current Budget Summary</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Budget Allocated</p>
-              <p className="text-xl font-bold text-gray-900 mt-1">
+              <p className="text-sm ds-text-secondary">Budget Allocated</p>
+              <p className="text-xl font-bold ds-text-primary mt-1">
                 {formatCurrency(financialSummary.budgetTotal)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Actual Spending</p>
+              <p className="text-sm ds-text-secondary">Actual Spending</p>
               <p className="text-xl font-bold text-blue-600 mt-1">
                 {formatCurrency(financialSummary.actualTotal)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Remaining</p>
+              <p className="text-sm ds-text-secondary">Remaining</p>
               <p className={`text-xl font-bold mt-1 ${
                 financialSummary.remaining < 0 ? 'text-red-600' : 'text-green-600'
               }`}>
@@ -318,8 +318,8 @@ function PhaseBudgetPageContent() {
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Available (Project)</p>
-              <p className="text-xl font-bold text-gray-700 mt-1">
+              <p className="text-sm ds-text-secondary">Available (Project)</p>
+              <p className="text-xl font-bold ds-text-secondary mt-1">
                 {formatCurrency(availableProjectBudget)}
               </p>
             </div>
@@ -327,12 +327,12 @@ function PhaseBudgetPageContent() {
         </div>
 
         {/* Budget Allocation Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget Allocation</h2>
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow p-6 space-y-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Budget Allocation</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Total Budget <span className="text-red-500">*</span>
               </label>
               <input
@@ -343,15 +343,15 @@ function PhaseBudgetPageContent() {
                 min={phase?.actualSpending?.total || 0}
                 step="0.01"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs ds-text-muted mt-1">
                 Minimum: {formatCurrency(phase?.actualSpending?.total || 0)} (actual spending)
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Materials
               </label>
               <input
@@ -361,12 +361,12 @@ function PhaseBudgetPageContent() {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Labour
               </label>
               <input
@@ -376,12 +376,12 @@ function PhaseBudgetPageContent() {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Equipment
               </label>
               <input
@@ -391,12 +391,12 @@ function PhaseBudgetPageContent() {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Subcontractors
               </label>
               <input
@@ -406,7 +406,7 @@ function PhaseBudgetPageContent() {
                 onChange={handleChange}
                 min="0"
                 step="0.01"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -414,8 +414,8 @@ function PhaseBudgetPageContent() {
           </div>
 
           {/* Budget Breakdown Summary */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-sm font-medium text-gray-700 mb-2">Breakdown Total</p>
+          <div className="ds-bg-surface-muted rounded-lg p-4">
+            <p className="text-sm font-medium ds-text-secondary mb-2">Breakdown Total</p>
             <p className={`text-lg font-bold ${
               (formData.materials + formData.labour + formData.equipment + formData.subcontractors) === formData.total
                 ? 'text-green-600'
@@ -435,19 +435,19 @@ function PhaseBudgetPageContent() {
 
           {/* Floor Allocation Options (available for all phases) */}
           {phase && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 space-y-4">
+            <div className="bg-green-50 border border-green-400/60 rounded-lg p-4 space-y-4">
               <label className="flex items-start cursor-pointer">
                 <input
                   type="checkbox"
                   checked={autoAllocateFloors}
                   onChange={(e) => setAutoAllocateFloors(e.target.checked)}
-                  className="mt-1 mr-3 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                  className="mt-1 mr-3 h-4 w-4 text-green-600 focus:ring-green-500 ds-border-subtle rounded"
                 />
                 <div className="flex-1">
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium ds-text-primary">
                     Automatically allocate budget to floors
                   </span>
-                  <p className="text-xs text-gray-600 mt-1">
+                  <p className="text-xs ds-text-secondary mt-1">
                     {phase.phaseCode === 'PHASE-01' && 'When enabled, the phase budget will be automatically distributed to basement floors only.'}
                     {phase.phaseCode === 'PHASE-02' && 'When enabled, the phase budget will be automatically distributed to ground and upper floors.'}
                     {(phase.phaseCode === 'PHASE-03' || phase.phaseCode === 'PHASE-04') && 'When enabled, the phase budget will be automatically distributed to all floors (basement, ground, and upper floors).'}
@@ -458,7 +458,7 @@ function PhaseBudgetPageContent() {
               
               {autoAllocateFloors && (
                 <div className="ml-7 space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium ds-text-secondary">
                     Distribution Strategy
                   </label>
                   <div className="space-y-2">
@@ -469,11 +469,11 @@ function PhaseBudgetPageContent() {
                         value="weighted"
                         checked={floorAllocationStrategy === 'weighted'}
                         onChange={(e) => setFloorAllocationStrategy(e.target.value)}
-                        className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                        className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 ds-border-subtle"
                       />
                       <div>
-                        <span className="text-sm text-gray-900">Weighted Distribution (Recommended)</span>
-                        <p className="text-xs text-gray-600">
+                        <span className="text-sm ds-text-primary">Weighted Distribution (Recommended)</span>
+                        <p className="text-xs ds-text-secondary">
                           {phase.phaseCode === 'PHASE-01' && 'Basement floors weighted by complexity.'}
                           {phase.phaseCode === 'PHASE-02' && 'Ground floor (1.2x), typical floors (1.0x), penthouse (1.5x) weighted differently.'}
                           {(phase.phaseCode === 'PHASE-03' || phase.phaseCode === 'PHASE-04') && 'Floor types weighted by complexity and phase requirements.'}
@@ -487,11 +487,11 @@ function PhaseBudgetPageContent() {
                         value="even"
                         checked={floorAllocationStrategy === 'even'}
                         onChange={(e) => setFloorAllocationStrategy(e.target.value)}
-                        className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300"
+                        className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 ds-border-subtle"
                       />
                       <div>
-                        <span className="text-sm text-gray-900">Even Distribution</span>
-                        <p className="text-xs text-gray-600">
+                        <span className="text-sm ds-text-primary">Even Distribution</span>
+                        <p className="text-xs ds-text-secondary">
                           Budget divided equally among all applicable floors
                         </p>
                       </div>
@@ -501,8 +501,8 @@ function PhaseBudgetPageContent() {
               )}
               
               {/* Manual Floor Allocation Link */}
-              <div className="ml-7 mt-4 pt-4 border-t border-green-300">
-                <p className="text-xs text-gray-600 mb-2">
+              <div className="ml-7 mt-4 pt-4 border-t border-green-400/60">
+                <p className="text-xs ds-text-secondary mb-2">
                   Want more control? Manually allocate budgets to specific floors:
                 </p>
                 <Link
@@ -522,7 +522,7 @@ function PhaseBudgetPageContent() {
           <div className="flex justify-end gap-4 pt-4 border-t">
             <Link
               href={`/phases/${phaseId}`}
-              className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="px-6 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
             >
               Cancel
             </Link>

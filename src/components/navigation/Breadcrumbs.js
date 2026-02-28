@@ -35,13 +35,13 @@ export function Breadcrumbs({ items, showHome = true }) {
               <li>
                 <Link
                   href="/dashboard"
-                  className="text-gray-500 hover:text-gray-700 transition"
+                  className="ds-text-muted hover:ds-text-secondary transition"
                 >
                   Home
                 </Link>
               </li>
               <li>
-                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-4 h-4 ds-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </li>
@@ -52,16 +52,16 @@ export function Breadcrumbs({ items, showHome = true }) {
             return (
               <li key={`${item.href}-${index}`} className="flex items-center">
                 {isLast || item.current ? (
-                  <span className="text-gray-900 font-medium">{item.label}</span>
+                  <span className="ds-text-primary font-medium">{item.label}</span>
                 ) : (
                   <>
                     <Link
                       href={item.href}
-                      className="text-gray-500 hover:text-gray-700 transition"
+                      className="ds-text-muted hover:ds-text-secondary transition"
                     >
                       {item.label}
                     </Link>
-                    <svg className="w-4 h-4 text-gray-400 mx-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 ds-text-muted mx-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </>
@@ -113,16 +113,16 @@ export function Breadcrumbs({ items, showHome = true }) {
           return (
             <li key={`${item.href}-${index}`} className="flex items-center">
               {isLast || item.current ? (
-                <span className="text-gray-900 font-medium">{item.label}</span>
+                <span className="ds-text-primary font-medium">{item.label}</span>
               ) : (
                 <>
                   <Link
                     href={item.href}
-                    className="text-gray-500 hover:text-gray-700 transition"
+                    className="ds-text-muted hover:ds-text-secondary transition"
                   >
                     {item.label}
                   </Link>
-                  <svg className="w-4 h-4 text-gray-400 mx-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 ds-text-muted mx-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </>
@@ -163,17 +163,17 @@ export function WorkflowBreadcrumbs({ steps, currentStep, links = {} }) {
                   >
                     {step}
                   </Link>
-                  <svg className="w-4 h-4 text-gray-400 mx-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 ds-text-muted mx-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </>
               ) : isCurrent ? (
-                <span className="text-gray-900 font-semibold">{step}</span>
+                <span className="ds-text-primary font-semibold">{step}</span>
               ) : (
                 <>
-                  <span className="text-gray-400">{step}</span>
+                  <span className="ds-text-muted">{step}</span>
                   {!isLast && (
-                    <svg className="w-4 h-4 text-gray-400 mx-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg className="w-4 h-4 ds-text-muted mx-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   )}

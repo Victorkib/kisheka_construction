@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePermissions, clearUserCache } from '@/hooks/use-permissions';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { ProjectSwitcher } from '@/components/project-switcher/ProjectSwitcher';
+import { useTheme } from '@/contexts/ThemeContext';
 
 /* ----------------------------------------
    Approvals Badge (DECLARED OUTSIDE RENDER)
@@ -35,7 +36,7 @@ function UserAvatar({ user, size = 'md' }) {
   };
 
   return (
-    <div className={`relative flex ${sizeClasses[size]} items-center justify-center overflow-hidden rounded-full bg-gray-200`}>
+    <div className={`relative flex ${sizeClasses[size]} items-center justify-center overflow-hidden rounded-full ds-bg-surface-muted`}>
       {user?.avatar ? (
         <img
           src={user.avatar}
@@ -43,7 +44,7 @@ function UserAvatar({ user, size = 'md' }) {
           className="h-full w-full object-cover"
         />
       ) : (
-        <span className={`font-bold text-gray-600 ${size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-lg' : 'text-base'}`}>
+        <span className={`font-bold ds-text-secondary ${size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-lg' : 'text-base'}`}>
           {user?.name
             ? user.name
                 .split(' ')
@@ -90,38 +91,27 @@ function MobileUserMenu({ user, onLogout, isOpen, onClose }) {
     <>
       {/* Glassmorphism Backdrop */}
       <div
-        className="fixed inset-0 bg-white/30 backdrop-blur-md z-40 md:hidden transition-opacity duration-300 ease-out"
+        className="fixed inset-0 bg-black/30 backdrop-blur-md z-40 md:hidden transition-opacity duration-300 ease-out"
         onClick={onClose}
         aria-hidden="true"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.2) 100%)',
-          backdropFilter: 'blur(12px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(12px) saturate(180%)',
-        }}
       />
       
       {/* Glassmorphism Dropdown Menu */}
       <div
         ref={menuRef}
-        className="absolute right-0 top-full mt-2 w-56 z-50 md:hidden rounded-xl animate-fadeInSlide"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.85) 100%)',
-          backdropFilter: 'blur(20px) saturate(180%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.3) inset',
-        }}
+        className="absolute right-0 top-full mt-2 w-56 z-50 md:hidden rounded-xl animate-fadeInSlide ds-bg-surface border ds-border-subtle shadow-xl"
       >
-        <div className="rounded-xl border border-white/20 overflow-hidden">
+        <div className="rounded-xl overflow-hidden">
           {/* User Info Header */}
-          <div className="p-4 border-b border-gray-200/50 bg-gradient-to-r from-white/50 to-white/30">
+          <div className="p-4 border-b ds-border-subtle/50 ds-bg-surface/50">
             <div className="flex items-center gap-3">
               <div className="relative">
                 <UserAvatar user={user} size="md" />
                 <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 truncate text-sm">{user.name}</p>
-                <p className="text-xs text-gray-600 capitalize truncate mt-0.5">
+                <p className="font-semibold ds-text-primary truncate text-sm">{user.name}</p>
+                <p className="text-xs ds-text-secondary capitalize truncate mt-0.5">
                   {user.role || 'User'}
                 </p>
               </div>
@@ -129,15 +119,15 @@ function MobileUserMenu({ user, onLogout, isOpen, onClose }) {
           </div>
           
           {/* Menu Items */}
-          <div className="py-2 bg-white/40">
+          <div className="py-2 ds-bg-surface/40">
             <Link
               href="/profile"
               onClick={onClose}
-              className="block px-4 py-3 text-sm text-gray-700 hover:bg-white/60 active:bg-white/80 transition-all duration-150 group"
+              className="block px-4 py-3 text-sm ds-text-secondary hover:ds-bg-surface-muted active:ds-bg-surface transition-all duration-150 group"
             >
               <div className="flex items-center gap-3">
                 <svg 
-                  className="w-4 h-4 text-gray-500 group-hover:text-blue-600 transition-colors" 
+                  className="w-4 h-4 ds-text-muted group-hover:ds-text-accent-primary transition-colors" 
                   fill="none" 
                   viewBox="0 0 24 24" 
                   stroke="currentColor"
@@ -153,7 +143,7 @@ function MobileUserMenu({ user, onLogout, isOpen, onClose }) {
                 onClose();
                 onLogout();
               }}
-              className="w-full text-left px-4 py-3 text-sm text-red-600 hover:bg-red-50/80 active:bg-red-100/80 transition-all duration-150 flex items-center gap-3 group touch-manipulation"
+              className="w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 active:bg-red-500/20 transition-all duration-150 flex items-center gap-3 group touch-manipulation"
             >
               <svg 
                 className="w-4 h-4 group-hover:scale-110 transition-transform" 
@@ -182,6 +172,7 @@ export function Header({ onMenuClick }) {
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
 
   /* Fetch pending approvals */
   useEffect(() => {
@@ -251,14 +242,14 @@ export function Header({ onMenuClick }) {
 
   return (
     <header
-      className="sticky top-0 z-50 flex w-full items-center justify-between bg-white px-2 sm:px-4 py-2 sm:py-3 shadow-lg transition-all duration-300 ease-out"
+      className="sticky top-0 z-50 flex w-full items-center justify-between ds-bg-surface px-2 sm:px-4 py-2 sm:py-3 shadow-lg transition-all duration-300 ease-out"
       role="banner"
       aria-label="Top Header"
     >
       {/* Left: Mobile Menu Button */}
       <button
         aria-label={menuOpen ? 'Close main menu' : 'Open main menu'}
-        className="flex-shrink-0 p-2 sm:p-2.5 rounded-md transition-colors hover:bg-gray-100 active:bg-gray-200 lg:hidden touch-manipulation"
+        className="flex-shrink-0 p-2 sm:p-2.5 rounded-md transition-colors hover:ds-bg-surface-muted active:ds-bg-surface lg:hidden touch-manipulation"
         onClick={() => {
           setMenuOpen(!menuOpen);
           onMenuClick?.();
@@ -311,8 +302,17 @@ export function Header({ onMenuClick }) {
         </div>
       </div>
 
-      {/* Right: Notifications & User */}
+      {/* Right: Theme toggle, Notifications & User */}
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4 flex-shrink-0">
+        {/* Theme Toggle */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="hidden sm:inline-flex items-center justify-center rounded-md px-2 py-1 text-xs font-medium border ds-border-subtle ds-text-secondary hover:ds-bg-surface-muted active:ds-bg-surface transition-colors"
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        >
+          {theme === 'dark' ? 'Light' : 'Dark'}
+        </button>
         {/* Notifications - Always visible */}
         <div className="relative">
           <NotificationBell />
@@ -326,16 +326,16 @@ export function Header({ onMenuClick }) {
             <div className="hidden md:flex items-center gap-2 lg:gap-3">
               <UserAvatar user={user} />
               <div className="hidden lg:flex flex-col">
-                <span className="font-medium text-gray-800 text-sm leading-tight">
+                <span className="font-medium ds-text-primary text-sm leading-tight">
                   {user.name}
                 </span>
-                <span className="text-xs text-gray-500 capitalize leading-tight">
+                <span className="text-xs ds-text-muted capitalize leading-tight">
                   {user.role || 'User'}
                 </span>
               </div>
               <Link
                 href="/profile"
-                className="hidden xl:block rounded-md px-3 py-1.5 text-sm text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-700 active:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="hidden xl:block rounded-md px-3 py-1.5 text-sm ds-text-accent-primary transition-colors hover:bg-blue-500/10 hover:text-blue-400 active:bg-blue-500/20 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 aria-label="View profile settings"
               >
                 Profile
@@ -353,7 +353,7 @@ export function Header({ onMenuClick }) {
             <div className="relative md:hidden">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="p-1.5 rounded-md transition-colors hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
+                className="p-1.5 rounded-md transition-colors hover:ds-bg-surface-muted active:ds-bg-surface touch-manipulation"
                 aria-label="User menu"
                 aria-expanded={userMenuOpen}
               >

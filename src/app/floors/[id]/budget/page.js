@@ -345,7 +345,7 @@ function FloorBudgetPageContent() {
     return (
       <AppLayout>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error}
           </div>
           <Link href="/floors" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
@@ -360,7 +360,7 @@ function FloorBudgetPageContent() {
     return (
       <AppLayout>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
+          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded-lg">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to manage floor budgets. Only PM, OWNER, and ACCOUNTANT can manage floor budgets.</p>
           </div>
@@ -402,8 +402,8 @@ function FloorBudgetPageContent() {
           <Link href={`/floors/${floorId}`} className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
             ← Back to Floor
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Manage Floor Budget</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">Manage Floor Budget</h1>
+          <p className="ds-text-secondary mt-1">
             {floor?.name} (Floor {floor?.floorNumber})
           </p>
           {project && (
@@ -418,35 +418,35 @@ function FloorBudgetPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
         {/* Current Budget Summary */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Current Budget Summary</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Current Budget Summary</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Total Budget</p>
-              <p className="text-xl font-bold text-gray-900 mt-1">
+              <p className="text-sm ds-text-secondary">Total Budget</p>
+              <p className="text-xl font-bold ds-text-primary mt-1">
                 {formatCurrency(totalBudget)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Actual Spending</p>
+              <p className="text-sm ds-text-secondary">Actual Spending</p>
               <p className="text-xl font-bold text-blue-600 mt-1">
                 {formatCurrency(actualSpending)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Committed Costs</p>
+              <p className="text-sm ds-text-secondary">Committed Costs</p>
               <p className="text-xl font-bold text-yellow-600 mt-1">
                 {formatCurrency(committedCosts)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Remaining</p>
+              <p className="text-sm ds-text-secondary">Remaining</p>
               <p className={`text-xl font-bold mt-1 ${
                 remaining < 0 ? 'text-red-600' : 'text-green-600'
               }`}>
@@ -455,7 +455,7 @@ function FloorBudgetPageContent() {
             </div>
           </div>
           {totalBudget < minimumRequired && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+            <div className="mt-4 p-3 bg-red-50 border border-red-400/60 rounded text-red-700 text-sm">
               <strong>Warning:</strong> Total budget ({formatCurrency(totalBudget)}) is less than minimum required ({formatCurrency(minimumRequired)}). 
               Please increase allocations to meet existing spending and committed costs.
             </div>
@@ -463,15 +463,15 @@ function FloorBudgetPageContent() {
         </div>
 
         {/* Capital Allocation Summary - Always visible */}
-        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-300 rounded-lg p-6 mb-6 shadow-md">
+        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-400/60 rounded-lg p-6 mb-6 shadow-md">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Capital Allocation</h2>
-              <p className="text-sm text-gray-600 mt-1">Manage capital allocation for this floor by phase</p>
+              <h2 className="text-xl font-bold ds-text-primary">Capital Allocation</h2>
+              <p className="text-sm ds-text-secondary mt-1">Manage capital allocation for this floor by phase</p>
             </div>
             <div className="flex items-center gap-3">
               {capitalTotal > 0 && (
-                <div className="text-sm font-medium text-gray-700 bg-white px-3 py-1.5 rounded-lg border border-purple-200">
+                <div className="text-sm font-medium ds-text-secondary ds-bg-surface px-3 py-1.5 rounded-lg border border-purple-400/60">
                   {capitalVsBudget.toFixed(1)}% of budget
                 </div>
               )}
@@ -503,25 +503,25 @@ function FloorBudgetPageContent() {
               <>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                   <div>
-                    <p className="text-sm text-gray-600">Total Capital</p>
+                    <p className="text-sm ds-text-secondary">Total Capital</p>
                     <p className="text-xl font-bold text-purple-700 mt-1">
                       {formatCurrency(capitalTotal)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Used</p>
+                    <p className="text-sm ds-text-secondary">Used</p>
                     <p className="text-xl font-bold text-blue-600 mt-1">
                       {formatCurrency(capitalUsed)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Committed</p>
+                    <p className="text-sm ds-text-secondary">Committed</p>
                     <p className="text-xl font-bold text-yellow-600 mt-1">
                       {formatCurrency(capitalCommitted)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Remaining</p>
+                    <p className="text-sm ds-text-secondary">Remaining</p>
                     <p className={`text-xl font-bold mt-1 ${
                       capitalRemaining < 0 ? 'text-red-600' : 'text-green-600'
                     }`}>
@@ -531,14 +531,14 @@ function FloorBudgetPageContent() {
                 </div>
                 {/* Capital vs Budget Comparison */}
                 {totalBudget > 0 && (
-                  <div className="mt-4 pt-4 border-t border-purple-200">
+                  <div className="mt-4 pt-4 border-t border-purple-400/60">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-700">Capital Coverage</span>
-                      <span className="text-sm text-gray-600">
+                      <span className="text-sm font-medium ds-text-secondary">Capital Coverage</span>
+                      <span className="text-sm ds-text-secondary">
                         {formatCurrency(capitalTotal)} / {formatCurrency(totalBudget)}
                       </span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className="w-full ds-bg-surface-muted rounded-full h-3">
                       <div
                         className={`h-3 rounded-full ${
                           capitalVsBudget >= 100
@@ -551,7 +551,7 @@ function FloorBudgetPageContent() {
                       />
                     </div>
                     {capitalVsBudget < 100 && (
-                      <p className="text-xs text-gray-600 mt-2">
+                      <p className="text-xs ds-text-secondary mt-2">
                         Capital covers {capitalVsBudget.toFixed(1)}% of budget. 
                         {capitalVsBudget < 80 && ' Consider allocating more capital to this floor.'}
                       </p>
@@ -560,7 +560,7 @@ function FloorBudgetPageContent() {
                 )}
               </>
             ) : (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <p className="text-sm font-semibold text-yellow-800 mb-2">
@@ -588,8 +588,8 @@ function FloorBudgetPageContent() {
               </div>
             )}
             {projectFinances && projectAvailableCapital > 0 && (
-              <div className="mt-4 pt-4 border-t border-purple-200">
-                <p className="text-xs text-gray-600">
+              <div className="mt-4 pt-4 border-t border-purple-400/60">
+                <p className="text-xs ds-text-secondary">
                   Project Available Capital: <span className="font-semibold text-purple-700">{formatCurrency(projectAvailableCapital)}</span>
                 </p>
               </div>
@@ -598,12 +598,12 @@ function FloorBudgetPageContent() {
 
           {/* Capital Allocation Form */}
           {showCapitalForm && projectAvailableCapital > 0 && (
-            <form onSubmit={handleCapitalSubmit} className="mt-6 pt-6 border-t border-purple-300 bg-white rounded-lg p-4">
-              <h3 className="text-md font-semibold text-gray-900 mb-4">Allocate Capital by Phase</h3>
+            <form onSubmit={handleCapitalSubmit} className="mt-6 pt-6 border-t border-purple-400/60 ds-bg-surface rounded-lg p-4">
+              <h3 className="text-md font-semibold ds-text-primary mb-4">Allocate Capital by Phase</h3>
               
               {/* Strategy Selection */}
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium ds-text-secondary mb-2">
                   Allocation Strategy
                 </label>
                 <div className="flex gap-4">
@@ -616,7 +616,7 @@ function FloorBudgetPageContent() {
                       onChange={(e) => setCapitalStrategy(e.target.value)}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700">Proportional (based on budget)</span>
+                    <span className="text-sm ds-text-secondary">Proportional (based on budget)</span>
                   </label>
                   <label className="flex items-center">
                     <input
@@ -627,7 +627,7 @@ function FloorBudgetPageContent() {
                       onChange={(e) => setCapitalStrategy(e.target.value)}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700">Even Distribution</span>
+                    <span className="text-sm ds-text-secondary">Even Distribution</span>
                   </label>
                   <label className="flex items-center">
                     <input
@@ -638,7 +638,7 @@ function FloorBudgetPageContent() {
                       onChange={(e) => setCapitalStrategy(e.target.value)}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700">Manual</span>
+                    <span className="text-sm ds-text-secondary">Manual</span>
                   </label>
                 </div>
               </div>
@@ -658,7 +658,7 @@ function FloorBudgetPageContent() {
 
                     return (
                       <div key={phaseCode} className="flex items-center gap-4">
-                        <label className="w-48 text-sm font-medium text-gray-700">
+                        <label className="w-48 text-sm font-medium ds-text-secondary">
                           {phaseNames[phaseCode]}:
                         </label>
                         <input
@@ -667,10 +667,10 @@ function FloorBudgetPageContent() {
                           onChange={(e) => handleCapitalAllocationChange(phaseCode, e.target.value)}
                           min="0"
                           step="0.01"
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                          className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                           placeholder="0"
                         />
-                        <span className="text-sm text-gray-500 w-12">KES</span>
+                        <span className="text-sm ds-text-muted w-12">KES</span>
                       </div>
                     );
                   })}
@@ -679,7 +679,7 @@ function FloorBudgetPageContent() {
 
               {/* Strategy Info */}
               {capitalStrategy !== 'manual' && (
-                <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mb-4 p-3 bg-blue-50 border border-blue-400/60 rounded-lg">
                   <p className="text-sm text-blue-800">
                     {capitalStrategy === 'proportional' 
                       ? 'Capital will be distributed proportionally based on each phase\'s budget share.'
@@ -702,7 +702,7 @@ function FloorBudgetPageContent() {
               {/* Total Capital Input for Proportional/Even */}
               {capitalStrategy !== 'manual' && (
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     Total Capital to Allocate
                   </label>
                   <input
@@ -741,21 +741,21 @@ function FloorBudgetPageContent() {
                     min="0"
                     max={projectAvailableCapital}
                     step="0.01"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                     placeholder="0"
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs ds-text-muted mt-1">
                     Available: {formatCurrency(projectAvailableCapital)}
                   </p>
                 </div>
               )}
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-purple-200">
+              <div className="flex justify-end gap-3 pt-4 border-t border-purple-400/60">
                 <button
                   type="button"
                   onClick={() => setShowCapitalForm(false)}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                  className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition text-sm font-medium"
                 >
                   Cancel
                 </button>
@@ -772,14 +772,14 @@ function FloorBudgetPageContent() {
           )}
 
         {/* Phase Budget Allocation Form - Always visible and prominent */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-6 mb-6 shadow-lg">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-400/60 rounded-lg p-6 mb-6 shadow-lg">
           <div className="mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Allocate Budget to Phases</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="text-2xl font-bold ds-text-primary mb-2">Allocate Budget to Phases</h2>
+            <p className="text-sm ds-text-secondary">
               Set budget allocations for each phase on this floor. Enter the total budget and breakdown (materials, labour) for each applicable phase.
             </p>
             {totalBudget === 0 && (
-              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="mt-3 p-3 bg-yellow-50 border border-yellow-400/60 rounded-lg">
                 <p className="text-sm text-yellow-800">
                   <strong>No budgets allocated yet.</strong> Enter budget amounts below to get started.
                 </p>
@@ -788,10 +788,10 @@ function FloorBudgetPageContent() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-lg border-2 border-blue-200 p-6 space-y-6">
-          <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-200">
-            <h3 className="text-xl font-semibold text-gray-900">Phase Budget Allocation</h3>
-            <div className="text-sm text-gray-600">
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow-lg border-2 border-blue-400/60 p-6 space-y-6">
+          <div className="flex items-center justify-between mb-4 pb-4 border-b ds-border-subtle">
+            <h3 className="text-xl font-semibold ds-text-primary">Phase Budget Allocation</h3>
+            <div className="text-sm ds-text-secondary">
               Total: <span className="font-semibold text-blue-600">{formatCurrency(totalBudget)}</span>
             </div>
           </div>
@@ -815,11 +815,11 @@ function FloorBudgetPageContent() {
                 : true; // PHASE-03 and PHASE-04 apply to all floors
 
               return (
-                <div key={phaseCode} className={`border-2 rounded-lg p-5 ${isApplicable ? 'border-blue-200 bg-blue-50' : 'border-gray-100 bg-gray-50 opacity-60'}`}>
+                <div key={phaseCode} className={`border-2 rounded-lg p-5 ${isApplicable ? 'border-blue-400/60 bg-blue-50' : 'ds-border-subtle ds-bg-surface-muted opacity-60'}`}>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-bold text-gray-900">
+                        <h3 className="text-lg font-bold ds-text-primary">
                           {phaseNames[phaseCode]}
                         </h3>
                         <span className="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded">
@@ -827,12 +827,12 @@ function FloorBudgetPageContent() {
                         </span>
                       </div>
                       {phase && phaseBudget > 0 && (
-                        <p className="text-sm text-gray-600 mb-1">
+                        <p className="text-sm ds-text-secondary mb-1">
                           <span className="font-medium">Phase Total Budget:</span> {formatCurrency(phaseBudget)}
                         </p>
                       )}
                       {!isApplicable && (
-                        <p className="text-xs text-gray-500 mt-1 italic">
+                        <p className="text-xs ds-text-muted mt-1 italic">
                           ⚠️ This phase does not apply to this floor type
                         </p>
                       )}
@@ -845,13 +845,13 @@ function FloorBudgetPageContent() {
                   </div>
 
                   {isApplicable && (
-                    <div className="bg-white rounded-lg p-4 border border-blue-100">
-                      <p className="text-xs text-gray-600 mb-4 font-medium">
+                    <div className="ds-bg-surface rounded-lg p-4 border border-blue-100">
+                      <p className="text-xs ds-text-secondary mb-4 font-medium">
                         Enter budget allocation for this phase on this floor:
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          <label className="block text-sm font-semibold ds-text-secondary mb-2">
                             Total Budget <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -861,12 +861,12 @@ function FloorBudgetPageContent() {
                             min="0"
                             step="0.01"
                             placeholder="0.00"
-                            className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-medium"
+                            className="w-full px-4 py-2.5 border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-lg font-medium"
                           />
-                          <p className="text-xs text-gray-500 mt-1">Total budget for this phase</p>
+                          <p className="text-xs ds-text-muted mt-1">Total budget for this phase</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          <label className="block text-sm font-semibold ds-text-secondary mb-2">
                             Materials
                           </label>
                           <input
@@ -876,12 +876,12 @@ function FloorBudgetPageContent() {
                             min="0"
                             step="0.01"
                             placeholder="0.00"
-                            className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2.5 border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          <p className="text-xs text-gray-500 mt-1">Materials cost</p>
+                          <p className="text-xs ds-text-muted mt-1">Materials cost</p>
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          <label className="block text-sm font-semibold ds-text-secondary mb-2">
                             Labour
                           </label>
                           <input
@@ -891,14 +891,14 @@ function FloorBudgetPageContent() {
                             min="0"
                             step="0.01"
                             placeholder="0.00"
-                            className="w-full px-4 py-2.5 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full px-4 py-2.5 border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                           />
-                          <p className="text-xs text-gray-500 mt-1">Labour cost</p>
+                          <p className="text-xs ds-text-muted mt-1">Labour cost</p>
                         </div>
                       </div>
                       {allocation.total > 0 && (
-                        <div className="mt-3 pt-3 border-t border-gray-200">
-                          <p className="text-xs text-gray-600">
+                        <div className="mt-3 pt-3 border-t ds-border-subtle">
+                          <p className="text-xs ds-text-secondary">
                             <span className="font-medium">Allocated:</span> {formatCurrency(allocation.total)} 
                             {phaseBudget > 0 && (
                               <span className="ml-2">
@@ -917,13 +917,13 @@ function FloorBudgetPageContent() {
 
           {/* Summary and Validation */}
           {totalBudget > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold text-blue-900">Total Floor Budget</span>
                 <span className="text-lg font-bold text-blue-700">{formatCurrency(totalBudget)}</span>
               </div>
               {totalBudget < minimumRequired && (
-                <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+                <div className="mt-2 p-2 bg-red-50 border border-red-400/60 rounded text-red-700 text-sm">
                   <strong>Warning:</strong> Total budget ({formatCurrency(totalBudget)}) is less than minimum required ({formatCurrency(minimumRequired)}). 
                   Please increase allocations to meet existing spending and committed costs.
                 </div>
@@ -932,8 +932,8 @@ function FloorBudgetPageContent() {
           )}
 
           {/* Actions */}
-          <div className="flex justify-between items-center gap-3 pt-4 border-t-2 border-gray-300">
-            <div className="text-sm text-gray-600">
+          <div className="flex justify-between items-center gap-3 pt-4 border-t-2 ds-border-subtle">
+            <div className="text-sm ds-text-secondary">
               {totalBudget === 0 ? (
                 <span className="text-yellow-700 font-medium">💡 Enter budget amounts above to get started</span>
               ) : (
@@ -943,7 +943,7 @@ function FloorBudgetPageContent() {
             <div className="flex gap-3">
               <Link
                 href={`/floors/${floorId}`}
-                className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                className="px-5 py-2.5 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition text-sm font-medium"
               >
                 Cancel
               </Link>

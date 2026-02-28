@@ -78,11 +78,11 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-4 bg-gray-200 rounded w-full"></div>
-          <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+          <div className="h-6 ds-bg-surface-muted rounded w-1/3"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-full"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-2/3"></div>
         </div>
       </div>
     );
@@ -90,7 +90,7 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
         <p className="text-red-700 text-sm">{error}</p>
         <button
           onClick={fetchSummary}
@@ -104,7 +104,7 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
 
   if (!data || !data.hasSpending) {
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
         <p className="text-blue-700 text-sm">
           No spending has been recorded yet. You can add a budget at any time.
         </p>
@@ -141,13 +141,13 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
     }));
 
   return (
-    <div className="bg-white rounded-lg shadow-lg border border-gray-200 p-6 space-y-6">
+    <div className="ds-bg-surface rounded-lg shadow-lg border ds-border-subtle p-6 space-y-6">
       {/* Header */}
-      <div className="border-b border-gray-200 pb-4">
+      <div className="border-b ds-border-subtle pb-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-gray-900">Existing Spending Summary</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <h2 className="text-xl font-bold ds-text-primary">Existing Spending Summary</h2>
+            <p className="text-sm ds-text-secondary mt-1">
               Review current spending before adding budget. Budget allocations will account for existing spending.
             </p>
           </div>
@@ -164,19 +164,19 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
           <p className="text-sm font-medium text-blue-900">Total Spent</p>
           <p className="text-2xl font-bold text-blue-700 mt-1">{formatCurrency(summary.totalSpent)}</p>
         </div>
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-4">
           <p className="text-sm font-medium text-yellow-900">Committed</p>
           <p className="text-2xl font-bold text-yellow-700 mt-1">{formatCurrency(summary.totalCommitted)}</p>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
           <p className="text-sm font-medium text-red-900">Minimum Required</p>
           <p className="text-2xl font-bold text-red-700 mt-1">{formatCurrency(summary.totalRequired)}</p>
         </div>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
           <p className="text-sm font-medium text-green-900">Recommended</p>
           <p className="text-2xl font-bold text-green-700 mt-1">{formatCurrency(summary.recommendedBudget)}</p>
           <p className="text-xs text-green-600 mt-1">+10% buffer</p>
@@ -186,7 +186,7 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
       {/* Spending by Category Chart */}
       {categoryData.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Spending by Category</h3>
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">Spending by Category</h3>
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={categoryData}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -204,7 +204,7 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
       {/* DCC Breakdown */}
       {dccBreakdownData.length > 0 && (
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">DCC Spending Breakdown</h3>
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">DCC Spending Breakdown</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -227,15 +227,15 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
             </ResponsiveContainer>
             <div className="space-y-2">
               {dccBreakdownData.map((item, index) => (
-                <div key={item.name} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                <div key={item.name} className="flex items-center justify-between p-2 ds-bg-surface-muted rounded">
                   <div className="flex items-center gap-2">
                     <div
                       className="w-4 h-4 rounded"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     ></div>
-                    <span className="text-sm font-medium text-gray-700">{item.name}</span>
+                    <span className="text-sm font-medium ds-text-secondary">{item.name}</span>
                   </div>
-                  <span className="text-sm font-semibold text-gray-900">{formatCurrency(item.value)}</span>
+                  <span className="text-sm font-semibold ds-text-primary">{formatCurrency(item.value)}</span>
                 </div>
               ))}
             </div>
@@ -248,7 +248,7 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
         <div>
           <button
             onClick={() => setExpandedSections(prev => ({ ...prev, phases: !prev.phases }))}
-            className="w-full flex items-center justify-between text-lg font-semibold text-gray-900 mb-4 hover:text-blue-600 transition"
+            className="w-full flex items-center justify-between text-lg font-semibold ds-text-primary mb-4 hover:text-blue-600 transition"
           >
             <span>Phase Spending Details</span>
             <svg
@@ -262,40 +262,40 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
           </button>
           {expandedSections.phases && (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Phase
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Spent
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Committed
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Minimum Required
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Recommended
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {phaseSpending
                     .filter(p => p.actualSpending > 0 || p.committedCost > 0)
                     .map((phase) => {
                       const recommendation = data.phaseRecommendations?.find(r => r.phaseId === phase.phaseId);
                       return (
-                        <tr key={phase.phaseId} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                        <tr key={phase.phaseId} className="hover:ds-bg-surface-muted">
+                          <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                             {phase.phaseName}
                           </td>
-                          <td className="px-4 py-3 text-sm text-right text-gray-700">
+                          <td className="px-4 py-3 text-sm text-right ds-text-secondary">
                             {formatCurrency(phase.actualSpending)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-right text-gray-700">
+                          <td className="px-4 py-3 text-sm text-right ds-text-secondary">
                             {formatCurrency(phase.committedCost)}
                           </td>
                           <td className="px-4 py-3 text-sm text-right font-semibold text-red-600">
@@ -319,7 +319,7 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
         <div>
           <button
             onClick={() => setExpandedSections(prev => ({ ...prev, floors: !prev.floors }))}
-            className="w-full flex items-center justify-between text-lg font-semibold text-gray-900 mb-4 hover:text-blue-600 transition"
+            className="w-full flex items-center justify-between text-lg font-semibold ds-text-primary mb-4 hover:text-blue-600 transition"
           >
             <span>Floor Spending Details</span>
             <svg
@@ -333,37 +333,37 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
           </button>
           {expandedSections.floors && (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Floor
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Spent
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Committed
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Minimum Required
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {floorSpending
                     .filter(f => f.actualSpending > 0 || f.committedCosts > 0)
                     .map((floor) => {
                       const recommendation = data.floorRecommendations?.find(r => r.floorId === floor.floorId);
                       return (
-                        <tr key={floor.floorId} className="hover:bg-gray-50">
-                          <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                        <tr key={floor.floorId} className="hover:ds-bg-surface-muted">
+                          <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                             {floor.floorName}
                           </td>
-                          <td className="px-4 py-3 text-sm text-right text-gray-700">
+                          <td className="px-4 py-3 text-sm text-right ds-text-secondary">
                             {formatCurrency(floor.actualSpending)}
                           </td>
-                          <td className="px-4 py-3 text-sm text-right text-gray-700">
+                          <td className="px-4 py-3 text-sm text-right ds-text-secondary">
                             {formatCurrency(floor.committedCosts)}
                           </td>
                           <td className="px-4 py-3 text-sm text-right font-semibold text-red-600">
@@ -380,7 +380,7 @@ export function PreBudgetSpendingSummary({ projectId, onRecommendationClick }) {
       )}
 
       {/* Recommendations Summary */}
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+      <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
         <h3 className="text-sm font-semibold text-green-900 mb-2">Recommended Budget Allocation</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
           <div>

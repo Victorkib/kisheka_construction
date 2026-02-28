@@ -181,10 +181,12 @@ export default function MaterialRequestDetailPage() {
     setIsApproving(true);
     try {
       const response = await fetch(`/api/material-requests/${requestId}/approve`, {
+          method: 'POST',
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
+            'Content-Type': 'application/json',
           },
         body: JSON.stringify({ approvalNotes: approvalNotes || 'Approved via UI' }),
       });
@@ -224,10 +226,12 @@ export default function MaterialRequestDetailPage() {
     setIsRejecting(true);
     try {
       const response = await fetch(`/api/material-requests/${requestId}/reject`, {
+          method: 'POST',
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
+            'Content-Type': 'application/json',
           },
         body: JSON.stringify({ rejectionReason: rejectionReason.trim() }),
       });
@@ -259,6 +263,7 @@ export default function MaterialRequestDetailPage() {
     try {
       // First mark as converted
       const convertResponse = await fetch(`/api/material-requests/${requestId}/convert-to-order`, {
+          method: 'POST',
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -283,14 +288,14 @@ export default function MaterialRequestDetailPage() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      requested: 'bg-gray-100 text-gray-800',
+      requested: 'ds-bg-surface-muted ds-text-primary',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
       converted_to_order: 'bg-blue-100 text-blue-800',
-      cancelled: 'bg-gray-100 text-gray-600',
+      cancelled: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getUrgencyBadgeColor = (urgency) => {
@@ -300,7 +305,7 @@ export default function MaterialRequestDetailPage() {
       high: 'bg-orange-100 text-orange-800',
       critical: 'bg-red-100 text-red-800',
     };
-    return colors[urgency] || 'bg-gray-100 text-gray-800';
+    return colors[urgency] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const formatDate = (date) => {
@@ -338,7 +343,7 @@ export default function MaterialRequestDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm sm:text-base">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || 'Material request not found'}
           </div>
           <Link href="/material-requests" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
@@ -382,7 +387,7 @@ export default function MaterialRequestDetailPage() {
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">
                   {request.requestNumber}
                 </h1>
                 <span className={`inline-flex px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${getStatusBadgeColor(request.status)}`}>
@@ -392,7 +397,7 @@ export default function MaterialRequestDetailPage() {
                   {request.urgency?.toUpperCase() || 'N/A'}
                 </span>
               </div>
-              <p className="text-sm sm:text-base text-gray-600 mt-2 break-words">{request.materialName}</p>
+              <p className="text-sm sm:text-base ds-text-secondary mt-2 break-words">{request.materialName}</p>
             </div>
             <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
               {canApprove && (
@@ -414,7 +419,7 @@ export default function MaterialRequestDetailPage() {
               {canConvert && (
                 <>
                   {request.status === 'converted_to_order' && !request.linkedPurchaseOrderId && (
-                    <div className="w-full mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="w-full mb-3 p-3 bg-blue-50 border border-blue-400/60 rounded-lg">
                       <p className="text-xs sm:text-sm text-blue-800">
                         <strong>Note:</strong> This request has been marked as converted but no purchase order has been created yet. Click below to create the purchase order.
                       </p>
@@ -443,7 +448,7 @@ export default function MaterialRequestDetailPage() {
 
         {/* Workflow Guidance Card */}
         {request && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6 mb-6">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 sm:p-6 mb-6">
             <h3 className="text-base sm:text-lg font-semibold text-blue-900 mb-2">📋 Workflow Status & Next Steps</h3>
             {request.status === 'requested' && (
               <div className="text-sm text-blue-800">
@@ -470,7 +475,7 @@ export default function MaterialRequestDetailPage() {
               </div>
             )}
             {request.status === 'converted_to_order' && request.linkedPurchaseOrderId && (
-              <div className="text-sm text-green-800 bg-green-50 border-green-200 rounded p-3">
+              <div className="text-sm text-green-800 bg-green-50 border-green-400/60 rounded p-3">
                 <p className="mb-2"><strong>Current Status:</strong> Purchase order has been created and sent to supplier.</p>
                 <p><strong>Next Step:</strong> Supplier will review and respond to the purchase order. You can track the order status in the Purchase Orders section.</p>
                 {linkedPurchaseOrder && (
@@ -481,7 +486,7 @@ export default function MaterialRequestDetailPage() {
               </div>
             )}
             {request.status === 'rejected' && (
-              <div className="text-sm text-red-800 bg-red-50 border-red-200 rounded p-3">
+              <div className="text-sm text-red-800 bg-red-50 border-red-400/60 rounded p-3">
                 <p className="mb-2"><strong>Current Status:</strong> Request has been rejected.</p>
                 {request.rejectionReason && (
                   <p className="mb-2"><strong>Reason:</strong> {request.rejectionReason}</p>
@@ -497,35 +502,35 @@ export default function MaterialRequestDetailPage() {
           {/* Left Column - Main Details */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Request Details */}
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Request Details</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Request Details</h2>
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <dt className="text-sm font-semibold text-gray-500">Material Name</dt>
-                  <dd className="mt-1 text-base text-gray-900">{request.materialName}</dd>
+                  <dt className="text-sm font-semibold ds-text-muted">Material Name</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{request.materialName}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-500">Quantity Needed</dt>
-                  <dd className="mt-1 text-base text-gray-900">
+                  <dt className="text-sm font-semibold ds-text-muted">Quantity Needed</dt>
+                  <dd className="mt-1 text-base ds-text-primary">
                     {request.quantityNeeded} {request.unit}
                   </dd>
                 </div>
                 {request.description && (
                   <div className="sm:col-span-2">
-                    <dt className="text-sm font-semibold text-gray-500">Description</dt>
-                    <dd className="mt-1 text-sm sm:text-base text-gray-900 break-words">{request.description}</dd>
+                    <dt className="text-sm font-semibold ds-text-muted">Description</dt>
+                    <dd className="mt-1 text-sm sm:text-base ds-text-primary break-words">{request.description}</dd>
                   </div>
                 )}
                 {request.reason && (
                   <div className="sm:col-span-2">
-                    <dt className="text-sm font-semibold text-gray-500">Reason</dt>
-                    <dd className="mt-1 text-sm sm:text-base text-gray-900 break-words">{request.reason}</dd>
+                    <dt className="text-sm font-semibold ds-text-muted">Reason</dt>
+                    <dd className="mt-1 text-sm sm:text-base ds-text-primary break-words">{request.reason}</dd>
                   </div>
                 )}
                 {request.notes && (
                   <div className="sm:col-span-2">
-                    <dt className="text-sm font-semibold text-gray-500">Notes</dt>
-                    <dd className="mt-1 text-sm sm:text-base text-gray-900 break-words">{request.notes}</dd>
+                    <dt className="text-sm font-semibold ds-text-muted">Notes</dt>
+                    <dd className="mt-1 text-sm sm:text-base ds-text-primary break-words">{request.notes}</dd>
                   </div>
                 )}
               </dl>
@@ -533,38 +538,38 @@ export default function MaterialRequestDetailPage() {
 
             {/* Financial Information */}
             {(request.estimatedCost || request.estimatedUnitCost || availableCapital !== null) && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Financial Information</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Financial Information</h2>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {request.estimatedUnitCost && (
                     <div>
-                      <dt className="text-sm font-semibold text-gray-500">Estimated Unit Cost</dt>
-                      <dd className="mt-1 text-base text-gray-900">
+                      <dt className="text-sm font-semibold ds-text-muted">Estimated Unit Cost</dt>
+                      <dd className="mt-1 text-base ds-text-primary">
                         {formatCurrency(request.estimatedUnitCost)}
                       </dd>
                     </div>
                   )}
                   {request.estimatedCost && (
                     <div>
-                      <dt className="text-sm font-semibold text-gray-500">Estimated Total Cost</dt>
-                      <dd className="mt-1 text-base font-semibold text-gray-900">
+                      <dt className="text-sm font-semibold ds-text-muted">Estimated Total Cost</dt>
+                      <dd className="mt-1 text-base font-semibold ds-text-primary">
                         {formatCurrency(request.estimatedCost)}
                       </dd>
                     </div>
                   )}
                   {availableCapital !== null && canAccess('view_financing') && (
                     <div>
-                      <dt className="text-sm font-semibold text-gray-500">Available Capital</dt>
-                      <dd className="mt-1 text-base text-gray-900">
+                      <dt className="text-sm font-semibold ds-text-muted">Available Capital</dt>
+                      <dd className="mt-1 text-base ds-text-primary">
                         {formatCurrency(availableCapital)}
                       </dd>
                     </div>
                   )}
                   {request.estimatedCost && availableCapital !== null && (
                     <div>
-                      <dt className="text-sm font-semibold text-gray-500">Remaining After This Request</dt>
+                      <dt className="text-sm font-semibold ds-text-muted">Remaining After This Request</dt>
                       <dd className={`mt-1 text-base font-semibold ${
-                        (availableCapital - request.estimatedCost) < 0 ? 'text-red-600' : 'text-gray-900'
+                        (availableCapital - request.estimatedCost) < 0 ? 'text-red-600' : 'ds-text-primary'
                       }`}>
                         {formatCurrency(availableCapital - request.estimatedCost)}
                       </dd>
@@ -572,19 +577,19 @@ export default function MaterialRequestDetailPage() {
                   )}
                 </dl>
                 {request.estimatedCost && availableCapital !== null && request.estimatedCost > availableCapital && (
-                  <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="mt-4 p-4 bg-red-50 border border-red-400/60 rounded-lg">
                     <p className="text-sm font-semibold text-red-800">
                       ⚠️ Warning: Estimated cost ({formatCurrency(request.estimatedCost)}) exceeds available capital ({formatCurrency(availableCapital)}) by {formatCurrency(request.estimatedCost - availableCapital)}
                     </p>
                   </div>
                 )}
                 {projectFinances && projectFinances.materialsBreakdown && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Materials Budget Context</h3>
+                  <div className="mt-4 pt-4 border-t ds-border-subtle">
+                    <h3 className="text-xs sm:text-sm font-semibold ds-text-secondary mb-2">Materials Budget Context</h3>
                     <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                       <div>
-                        <dt className="text-gray-500">Budget</dt>
-                        <dd className="font-semibold text-gray-900">{formatCurrency(projectFinances.materialsBreakdown.budget || 0)}</dd>
+                        <dt className="ds-text-muted">Budget</dt>
+                        <dd className="font-semibold ds-text-primary">{formatCurrency(projectFinances.materialsBreakdown.budget || 0)}</dd>
                       </div>
                       <div>
                         <dt className="text-orange-600">Estimated</dt>
@@ -606,21 +611,21 @@ export default function MaterialRequestDetailPage() {
 
             {/* Approval Information */}
             {request.approvedBy && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Approval Information</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Approval Information</h2>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <dt className="text-sm font-semibold text-gray-500">Approved By</dt>
-                    <dd className="mt-1 text-base text-gray-900">{request.approvedByName || 'N/A'}</dd>
+                    <dt className="text-sm font-semibold ds-text-muted">Approved By</dt>
+                    <dd className="mt-1 text-base ds-text-primary">{request.approvedByName || 'N/A'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-semibold text-gray-500">Approval Date</dt>
-                    <dd className="mt-1 text-base text-gray-900">{formatDate(request.approvalDate)}</dd>
+                    <dt className="text-sm font-semibold ds-text-muted">Approval Date</dt>
+                    <dd className="mt-1 text-base ds-text-primary">{formatDate(request.approvalDate)}</dd>
                   </div>
                   {request.approvalNotes && (
                     <div className="sm:col-span-2">
-                      <dt className="text-sm font-semibold text-gray-500">Approval Notes</dt>
-                      <dd className="mt-1 text-sm sm:text-base text-gray-900 break-words">{request.approvalNotes}</dd>
+                      <dt className="text-sm font-semibold ds-text-muted">Approval Notes</dt>
+                      <dd className="mt-1 text-sm sm:text-base ds-text-primary break-words">{request.approvalNotes}</dd>
                     </div>
                   )}
                 </dl>
@@ -629,19 +634,19 @@ export default function MaterialRequestDetailPage() {
 
             {/* Rejection Information */}
             {request.status === 'rejected' && request.rejectionReason && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6 border-l-4 border-red-500">
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 border-l-4 border-red-500">
                 <h2 className="text-lg sm:text-xl font-bold text-red-900 mb-4">Rejection Information</h2>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <dt className="text-sm font-semibold text-gray-500">Rejected By</dt>
-                    <dd className="mt-1 text-base text-gray-900">{request.approvedByName || 'N/A'}</dd>
+                    <dt className="text-sm font-semibold ds-text-muted">Rejected By</dt>
+                    <dd className="mt-1 text-base ds-text-primary">{request.approvedByName || 'N/A'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-semibold text-gray-500">Rejection Date</dt>
-                    <dd className="mt-1 text-base text-gray-900">{formatDate(request.approvalDate)}</dd>
+                    <dt className="text-sm font-semibold ds-text-muted">Rejection Date</dt>
+                    <dd className="mt-1 text-base ds-text-primary">{formatDate(request.approvalDate)}</dd>
                   </div>
                   <div className="sm:col-span-2">
-                    <dt className="text-sm font-semibold text-gray-500">Rejection Reason</dt>
+                    <dt className="text-sm font-semibold ds-text-muted">Rejection Reason</dt>
                     <dd className="mt-1 text-sm sm:text-base text-red-900 break-words">{request.rejectionReason}</dd>
                   </div>
                 </dl>
@@ -650,12 +655,12 @@ export default function MaterialRequestDetailPage() {
 
             {/* Linked Purchase Order */}
             {linkedPurchaseOrder && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Linked Purchase Order</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Linked Purchase Order</h2>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm sm:text-base font-semibold text-gray-900 break-words">{linkedPurchaseOrder.purchaseOrderNumber}</p>
-                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                    <p className="text-sm sm:text-base font-semibold ds-text-primary break-words">{linkedPurchaseOrder.purchaseOrderNumber}</p>
+                    <p className="text-xs sm:text-sm ds-text-secondary mt-1">
                       Status: <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(linkedPurchaseOrder.status)}`}>
                         {linkedPurchaseOrder.status?.replace(/_/g, ' ')}
                       </span>
@@ -674,7 +679,7 @@ export default function MaterialRequestDetailPage() {
             {/* Status Message for Converted but No PO */}
             {request.status === 'converted_to_order' && !request.linkedPurchaseOrderId && !linkedPurchaseOrder && (
               <div className="bg-amber-50 border border-amber-200 rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-2">Purchase Order Status</h2>
+                <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-2">Purchase Order Status</h2>
                 <p className="text-xs sm:text-sm text-amber-800 mb-3 break-words">
                   This request has been marked as converted to order, but the purchase order has not been created yet. 
                   Use the "Create Purchase Order" button above to proceed.
@@ -684,12 +689,12 @@ export default function MaterialRequestDetailPage() {
 
             {/* Linked Material */}
             {linkedMaterial && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Linked Material Entry</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Linked Material Entry</h2>
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm sm:text-base font-semibold text-gray-900 break-words">{linkedMaterial.name || linkedMaterial.materialName}</p>
-                    <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                    <p className="text-sm sm:text-base font-semibold ds-text-primary break-words">{linkedMaterial.name || linkedMaterial.materialName}</p>
+                    <p className="text-xs sm:text-sm ds-text-secondary mt-1">
                       Status: <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(linkedMaterial.status)}`}>
                         {linkedMaterial.status?.replace(/_/g, ' ')}
                       </span>
@@ -706,8 +711,8 @@ export default function MaterialRequestDetailPage() {
             )}
 
             {/* Audit Trail */}
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Activity Log</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Activity Log</h2>
               <AuditTrail
                 entityType="MATERIAL_REQUEST"
                 entityId={requestId}
@@ -719,36 +724,36 @@ export default function MaterialRequestDetailPage() {
           {/* Right Column - Metadata */}
           <div className="space-y-4 sm:space-y-6">
             {/* Request Information */}
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Request Information</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Request Information</h2>
               <dl className="space-y-3">
                 <div>
-                  <dt className="text-sm font-semibold text-gray-500">Request Number</dt>
-                  <dd className="mt-1 text-base text-gray-900">{request.requestNumber}</dd>
+                  <dt className="text-sm font-semibold ds-text-muted">Request Number</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{request.requestNumber}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-500">Requested By</dt>
-                  <dd className="mt-1 text-base text-gray-900">{request.requestedByName || 'N/A'}</dd>
+                  <dt className="text-sm font-semibold ds-text-muted">Requested By</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{request.requestedByName || 'N/A'}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-500">Submitted At</dt>
-                  <dd className="mt-1 text-base text-gray-900">{formatDate(request.submittedAt || request.createdAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-muted">Submitted At</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{formatDate(request.submittedAt || request.createdAt)}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-500">Created At</dt>
-                  <dd className="mt-1 text-base text-gray-900">{formatDate(request.createdAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-muted">Created At</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{formatDate(request.createdAt)}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-500">Last Updated</dt>
-                  <dd className="mt-1 text-base text-gray-900">{formatDate(request.updatedAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-muted">Last Updated</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{formatDate(request.updatedAt)}</dd>
                 </div>
               </dl>
             </div>
 
             {/* Project Information */}
             {request.projectId && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Project</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-xl font-bold ds-text-primary mb-4">Project</h2>
                 <Link
                   href={`/projects/${request.projectId}`}
                   className="text-blue-600 hover:text-blue-800 font-medium"
@@ -778,13 +783,13 @@ export default function MaterialRequestDetailPage() {
           isLoading={isApproving}
         >
           <div className="mt-4">
-            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal text-black">Approval Notes (Optional)</label>
+            <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal ds-text-primary">Approval Notes (Optional)</label>
             <textarea
               value={approvalNotes}
               onChange={(e) => setApprovalNotes(e.target.value)}
               rows={3}
               disabled={isApproving}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed text-black"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed ds-text-primary"
               placeholder="Add any notes about this approval..."
             />
           </div>
@@ -807,14 +812,14 @@ export default function MaterialRequestDetailPage() {
           isLoading={isRejecting}
         >
           <div className="mt-4">
-            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal text-black">Rejection Reason *</label>
+            <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal ds-text-primary">Rejection Reason *</label>
             <textarea
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               rows={3}
               required
               disabled={isRejecting}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed text-black"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 disabled:opacity-50 disabled:cursor-not-allowed ds-text-primary"
               placeholder="Explain why this request is being rejected..."
             />
           </div>

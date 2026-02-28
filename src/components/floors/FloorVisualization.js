@@ -23,19 +23,19 @@ export function FloorVisualization({ floors, projectId, compact = false }) {
 
   if (!floors || floors.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <p className="text-sm text-gray-500 text-center">No floors created yet</p>
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <p className="text-sm ds-text-muted text-center">No floors created yet</p>
       </div>
     );
   }
 
   const getStatusColor = (status) => {
     const colors = {
-      NOT_STARTED: 'bg-gray-200',
+      NOT_STARTED: 'ds-bg-surface-muted',
       IN_PROGRESS: 'bg-blue-400',
       COMPLETED: 'bg-green-400',
     };
-    return colors[status] || 'bg-gray-200';
+    return colors[status] || 'ds-bg-surface-muted';
   };
 
   const getFloorHeight = (floor) => {
@@ -46,9 +46,9 @@ export function FloorVisualization({ floors, projectId, compact = false }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="ds-bg-surface rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Building Structure</h3>
+        <h3 className="text-lg font-semibold ds-text-primary">Building Structure</h3>
         {projectId && (
           <Link
             href={`/floors?projectId=${projectId}`}
@@ -70,13 +70,13 @@ export function FloorVisualization({ floors, projectId, compact = false }) {
                 key={floor._id}
                 href={`/floors/${floor._id}`}
                 className={`${height} w-16 rounded-t-lg ${getStatusColor(floor.status)} hover:opacity-80 transition-all flex flex-col items-center justify-end p-2 cursor-pointer border-2 ${
-                  floorType === 'basement' ? 'border-purple-300' :
-                  floorType === 'ground' ? 'border-blue-300' :
-                  'border-gray-300'
+                  floorType === 'basement' ? 'border-purple-400/60' :
+                  floorType === 'ground' ? 'border-blue-400/60' :
+                  'ds-border-subtle'
                 }`}
                 title={getFloorDisplayName(floor.floorNumber, floor.name)}
               >
-                <span className="text-xs font-semibold text-gray-900 mb-1">
+                <span className="text-xs font-semibold ds-text-primary mb-1">
                   {floor.floorNumber < 0 ? `B${Math.abs(floor.floorNumber)}` :
                    floor.floorNumber === 0 ? 'G' :
                    floor.floorNumber}
@@ -84,7 +84,7 @@ export function FloorVisualization({ floors, projectId, compact = false }) {
                 <div className={`w-2 h-2 rounded-full ${
                   floor.status === 'COMPLETED' ? 'bg-green-600' :
                   floor.status === 'IN_PROGRESS' ? 'bg-blue-600' :
-                  'bg-gray-400'
+                  'ds-bg-surface-muted'
                 }`} />
               </Link>
             );
@@ -97,8 +97,8 @@ export function FloorVisualization({ floors, projectId, compact = false }) {
           <div className="flex-1">
             <div className="relative">
               {/* Ground Level Indicator */}
-              <div className="absolute left-0 right-0 h-0.5 bg-gray-400 z-10">
-                <div className="absolute left-0 -top-3 text-xs text-gray-600 font-semibold">Ground Level</div>
+              <div className="absolute left-0 right-0 h-0.5 ds-bg-surface-muted z-10">
+                <div className="absolute left-0 -top-3 text-xs ds-text-secondary font-semibold">Ground Level</div>
               </div>
 
               {/* Floors Stack */}
@@ -115,30 +115,30 @@ export function FloorVisualization({ floors, projectId, compact = false }) {
                       className={`w-full ${getFloorHeight(floor)} rounded-lg ${getStatusColor(floor.status)} hover:opacity-90 transition-all flex items-center justify-between px-4 cursor-pointer border-2 ${
                         isBasement ? 'border-purple-400 bg-purple-50' :
                         isGround ? 'border-blue-400 bg-blue-50' :
-                        'border-gray-300 bg-gray-50'
+                        'ds-border-subtle ds-bg-surface-muted'
                       }`}
                     >
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${
                           floor.status === 'COMPLETED' ? 'bg-green-600' :
                           floor.status === 'IN_PROGRESS' ? 'bg-blue-600' :
-                          'bg-gray-400'
+                          'ds-bg-surface-muted'
                         }`} />
                         <div>
                           <p className={`font-semibold ${getFloorColorClass(floor.floorNumber)}`}>
                             {getFloorDisplayName(floor.floorNumber, floor.name)}
                           </p>
                           {floor.floorNumber !== undefined && (
-                            <p className="text-xs text-gray-500">Floor #{floor.floorNumber}</p>
+                            <p className="text-xs ds-text-muted">Floor #{floor.floorNumber}</p>
                           )}
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs font-medium text-gray-700">
+                        <p className="text-xs font-medium ds-text-secondary">
                           {floor.status?.replace('_', ' ') || 'NOT_STARTED'}
                         </p>
                         {floor.usageCount !== undefined && floor.usageCount > 0 && (
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs ds-text-muted">
                             {floor.usageCount} material{floor.usageCount !== 1 ? 's' : ''}
                           </p>
                         )}
@@ -151,33 +151,33 @@ export function FloorVisualization({ floors, projectId, compact = false }) {
           </div>
 
           {/* Legend */}
-          <div className="w-48 bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <h4 className="text-sm font-semibold text-gray-700 mb-3">Legend</h4>
+          <div className="w-48 ds-bg-surface-muted rounded-lg p-4 border ds-border-subtle">
+            <h4 className="text-sm font-semibold ds-text-secondary mb-3">Legend</h4>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded bg-purple-200 border-2 border-purple-400"></div>
-                <span className="text-xs text-gray-700">Basement</span>
+                <span className="text-xs ds-text-secondary">Basement</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded bg-blue-200 border-2 border-blue-400"></div>
-                <span className="text-xs text-gray-700">Ground Floor</span>
+                <span className="text-xs ds-text-secondary">Ground Floor</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-4 h-4 rounded bg-gray-200 border-2 border-gray-300"></div>
-                <span className="text-xs text-gray-700">Above Ground</span>
+                <div className="w-4 h-4 rounded ds-bg-surface-muted border-2 ds-border-subtle"></div>
+                <span className="text-xs ds-text-secondary">Above Ground</span>
               </div>
-              <div className="pt-2 border-t border-gray-200 mt-2">
+              <div className="pt-2 border-t ds-border-subtle mt-2">
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-2 h-2 rounded-full bg-green-600"></div>
-                  <span className="text-xs text-gray-700">Completed</span>
+                  <span className="text-xs ds-text-secondary">Completed</span>
                 </div>
                 <div className="flex items-center gap-2 mb-1">
                   <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                  <span className="text-xs text-gray-700">In Progress</span>
+                  <span className="text-xs ds-text-secondary">In Progress</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-gray-400"></div>
-                  <span className="text-xs text-gray-700">Not Started</span>
+                  <div className="w-2 h-2 rounded-full ds-bg-surface-muted"></div>
+                  <span className="text-xs ds-text-secondary">Not Started</span>
                 </div>
               </div>
             </div>

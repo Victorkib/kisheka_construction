@@ -21,6 +21,7 @@ import { FloorActivityTab } from '@/components/floors/tabs/ActivityTab';
 import { FloorBudgetTab } from '@/components/floors/tabs/BudgetTab';
 import { FloorPhaseBreakdownTab } from '@/components/floors/tabs/PhaseBreakdownTab';
 import { FloorProgressSection } from '@/components/floors/FloorProgressSection';
+import { FinishingWorksTab } from '@/components/floors/tabs/FinishingWorksTab';
 
 export default function FloorDetailPage() {
   const router = useRouter();
@@ -576,11 +577,11 @@ export default function FloorDetailPage() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      NOT_STARTED: 'bg-gray-100 text-gray-800',
+      NOT_STARTED: 'ds-bg-surface-muted ds-text-primary',
       IN_PROGRESS: 'bg-blue-100 text-blue-800',
       COMPLETED: 'bg-green-100 text-green-800',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (loading) {
@@ -589,7 +590,7 @@ export default function FloorDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading floor...</p>
+            <p className="mt-4 ds-text-secondary">Loading floor...</p>
           </div>
         </div>
       </AppLayout>
@@ -600,7 +601,7 @@ export default function FloorDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
             {error}
           </div>
           <Link href="/floors" className="text-blue-600 hover:text-blue-900 active:text-blue-800 underline text-sm sm:text-base transition-colors touch-manipulation">
@@ -625,6 +626,7 @@ export default function FloorDetailPage() {
     { id: 'overview', label: 'Overview', icon: '📋' },
     { id: 'phases', label: 'Phase Breakdown', icon: '🏗️' },
     { id: 'budget', label: 'Budget by Phase', icon: '💵' },
+    { id: 'finishing', label: 'Finishing Works', icon: '🎨' },
     { id: 'costs', label: 'Costs', icon: '💰', badge: floorSummary.materials.count + floorSummary.labour.count },
     { id: 'activity', label: 'Activity', icon: '📊', badge: ledgerItems.length },
     { id: 'progress', label: 'Progress', icon: '📈' },
@@ -676,6 +678,13 @@ export default function FloorDetailPage() {
             formatCurrency={formatCurrency}
           />
         );
+      case 'finishing':
+        return (
+          <FinishingWorksTab
+            floor={floor}
+            formatCurrency={formatCurrency}
+          />
+        );
       case 'activity':
         return (
           <FloorActivityTab
@@ -721,7 +730,7 @@ export default function FloorDetailPage() {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">
                 {floor.name || (() => {
                   if (floor.floorNumber === undefined || floor.floorNumber === null) return 'N/A';
                   if (floor.floorNumber < 0) return `Basement ${Math.abs(floor.floorNumber)}`;
@@ -729,7 +738,7 @@ export default function FloorDetailPage() {
                   return `Floor ${floor.floorNumber}`;
                 })()}
               </h1>
-              <p className="text-sm sm:text-base text-gray-600 mt-1 break-words">
+              <p className="text-sm sm:text-base ds-text-secondary mt-1 break-words">
                 Floor Number: {floor.floorNumber !== undefined ? (
                   floor.floorNumber < 0 ? `Basement ${Math.abs(floor.floorNumber)} (${floor.floorNumber})` :
                   floor.floorNumber === 0 ? `Ground Floor (${floor.floorNumber})` :
@@ -755,7 +764,7 @@ export default function FloorDetailPage() {
                         setHasUnsavedChanges(false);
                         fetchFloor(); // Reset form
                       }}
-                      className="flex-1 sm:flex-none px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors text-sm font-medium touch-manipulation"
+                      className="flex-1 sm:flex-none px-4 py-2.5 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors text-sm font-medium touch-manipulation"
                     >
                       Cancel
                     </button>
@@ -815,7 +824,7 @@ export default function FloorDetailPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
             {error}
           </div>
         )}
@@ -868,17 +877,17 @@ export default function FloorDetailPage() {
 
         {/* Edit Mode Form (shown when editMode is true) */}
         {editMode && (
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Edit Floor Information</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
+            <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Edit Floor Information</h2>
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Status</label>
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">Status</label>
                   <select
                     name="status"
                     value={formData.status}
                     onChange={handleChange}
-                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted touch-manipulation"
                   >
                     <option value="NOT_STARTED">Not Started</option>
                     <option value="IN_PROGRESS">In Progress</option>
@@ -886,7 +895,7 @@ export default function FloorDetailPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Total Budget (KES)</label>
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">Total Budget (KES)</label>
                   <input
                     type="number"
                     name="totalBudget"
@@ -894,11 +903,11 @@ export default function FloorDetailPage() {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted touch-manipulation"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Actual Cost (KES)</label>
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">Actual Cost (KES)</label>
                   <input
                     type="number"
                     name="actualCost"
@@ -906,38 +915,38 @@ export default function FloorDetailPage() {
                     onChange={handleChange}
                     min="0"
                     step="0.01"
-                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted touch-manipulation"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Start Date</label>
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">Start Date</label>
                   <input
                     type="date"
                     name="startDate"
                     value={formData.startDate}
                     onChange={handleChange}
-                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted touch-manipulation"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Completion Date</label>
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">Completion Date</label>
                   <input
                     type="date"
                     name="completionDate"
                     value={formData.completionDate}
                     onChange={handleChange}
-                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted touch-manipulation"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Description</label>
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">Description</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted touch-manipulation"
                 />
               </div>
             </div>
@@ -947,17 +956,17 @@ export default function FloorDetailPage() {
 
         {/* Project Link */}
         {floor.projectId && project && (
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Related Project</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Related Project</h2>
             <div className="space-y-2">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm ds-text-secondary">
                 <span className="font-medium">Project Code:</span> {project.projectCode}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm ds-text-secondary">
                 <span className="font-medium">Project Name:</span> {project.projectName}
               </p>
               {project.location && (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   <span className="font-medium">Location:</span> {project.location}
                 </p>
               )}
@@ -988,7 +997,7 @@ export default function FloorDetailPage() {
                   Are you sure you want to delete <strong>{floor?.name || `Floor ${floor?.floorNumber}`}</strong>?
                 </p>
                 {dependencies && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mt-3">
+                  <div className="bg-yellow-50 border border-yellow-400/60 rounded p-3 mt-3">
                     <p className="text-sm text-yellow-800 font-semibold mb-1">Warning:</p>
                     <p className="text-sm text-yellow-700">
                       This floor is currently used by {dependencies.materials} material(s) and {dependencies.requests} material request(s).
@@ -997,11 +1006,11 @@ export default function FloorDetailPage() {
                   </div>
                 )}
                 {deleteError && (
-                  <div className="bg-red-50 border border-red-200 rounded p-3 mt-3">
+                  <div className="bg-red-50 border border-red-400/60 rounded p-3 mt-3">
                     <p className="text-sm text-red-800">{deleteError}</p>
                   </div>
                 )}
-                <p className="text-sm text-gray-600 mt-3">This action cannot be undone.</p>
+                <p className="text-sm ds-text-secondary mt-3">This action cannot be undone.</p>
               </div>
             }
             confirmText="Delete Floor"

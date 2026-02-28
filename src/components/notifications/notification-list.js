@@ -49,14 +49,14 @@ export function NotificationList({
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-8">
+      <div className="ds-bg-surface rounded-lg shadow p-8">
         <div className="animate-pulse space-y-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="flex gap-3">
-              <div className="h-10 w-10 bg-gray-200 rounded"></div>
+              <div className="h-10 w-10 ds-bg-surface-muted rounded"></div>
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                <div className="h-4 ds-bg-surface-muted rounded w-3/4"></div>
+                <div className="h-3 ds-bg-surface-muted rounded w-1/2"></div>
               </div>
             </div>
           ))}
@@ -67,12 +67,12 @@ export function NotificationList({
 
   if (notifications.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-12 text-center">
+      <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
         <div className="text-6xl mb-4">🔔</div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+        <h3 className="text-lg font-semibold ds-text-primary mb-2">
           No notifications
         </h3>
-        <p className="text-gray-700">
+        <p className="ds-text-secondary">
           You're all caught up! New notifications will appear here.
         </p>
       </div>
@@ -84,10 +84,10 @@ export function NotificationList({
 
     return (
       <div key={title} className="mb-6">
-        <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-2 px-4">
+        <h3 className="text-sm font-semibold ds-text-secondary uppercase tracking-wide mb-2 px-4">
           {title}
         </h3>
-        <div className="bg-white rounded-lg shadow divide-y divide-gray-200">
+        <div className="ds-bg-surface rounded-lg shadow divide-y divide-ds-border-subtle">
           {notifications.map((notification) => (
             <NotificationItem
               key={notification._id}

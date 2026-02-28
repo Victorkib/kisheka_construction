@@ -177,8 +177,8 @@ function FinancingPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Financing Dashboard</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">View and manage project finances</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Financing Dashboard</h1>
+            <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">View and manage project finances</p>
           </div>
           <NoProjectsEmptyState
             canCreate={false}
@@ -203,8 +203,8 @@ function FinancingPageContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-96"></div>
+              <div className="h-8 ds-bg-surface-muted rounded w-64 mb-2"></div>
+              <div className="h-4 ds-bg-surface-muted rounded w-96"></div>
             </div>
             <LoadingCard count={4} showHeader={true} lines={3} />
           </div>
@@ -217,7 +217,7 @@ function FinancingPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded">
             {error}
           </div>
         </div>
@@ -229,7 +229,7 @@ function FinancingPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {returnTo && (
-          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-blue-800">
+          <div className="mb-6 rounded-lg border border-blue-400/60 bg-blue-50 px-4 py-3 text-blue-800">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="text-sm">
                 <p className="font-semibold">Return to bulk material request</p>
@@ -239,14 +239,14 @@ function FinancingPageContent() {
                 {projectId && (
                   <Link
                     href={`/investors?projectId=${projectId}&returnTo=${encodeURIComponent(returnTo)}`}
-                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-400/60 ds-bg-surface text-blue-800 hover:bg-blue-100"
                   >
                     Allocate via Investors
                   </Link>
                 )}
                 <Link
                   href={returnTo}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-400/60 ds-bg-surface text-blue-800 hover:bg-blue-100"
                 >
                   Back to Bulk Request
                 </Link>
@@ -256,8 +256,8 @@ function FinancingPageContent() {
         )}
         <div className="mb-6 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Financing Dashboard</h1>
-            <p className="mt-2 text-base md:text-lg text-gray-700 leading-relaxed">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Financing Dashboard</h1>
+            <p className="mt-2 text-base md:text-lg ds-text-secondary leading-relaxed">
               Overview of capital raised, used, and remaining balance
             </p>
           </div>
@@ -283,37 +283,37 @@ function FinancingPageContent() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">Capital Raised</div>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <div className="text-base font-semibold ds-text-secondary leading-normal">Capital Raised</div>
             <div className="text-2xl font-bold text-green-600 mt-1">
               {formatCurrency(finances?.totalInvested || 0)}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">Capital Used</div>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <div className="text-base font-semibold ds-text-secondary leading-normal">Capital Used</div>
             <div className="text-2xl font-bold text-red-600 mt-1">
               {formatCurrency(finances?.totalUsed || 0)}
             </div>
             {finances?.totalInvested > 0 && (
-              <div className="text-sm text-gray-700 mt-1">
+              <div className="text-sm ds-text-secondary mt-1">
                 {((finances.totalUsed / finances.totalInvested) * 100).toFixed(1)}% utilized
               </div>
             )}
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">Remaining Balance</div>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <div className="text-base font-semibold ds-text-secondary leading-normal">Remaining Balance</div>
             <div className="text-2xl font-bold text-blue-600 mt-1">
               {formatCurrency(finances?.capitalBalance || 0)}
             </div>
             {finances?.totalInvested > 0 && (
-              <div className="text-sm text-gray-700 mt-1">
+              <div className="text-sm ds-text-secondary mt-1">
                 {((finances.capitalBalance / finances.totalInvested) * 100).toFixed(1)}% remaining
               </div>
             )}
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-base font-semibold text-gray-700 leading-normal">Investors</div>
-            <div className="text-2xl font-bold text-gray-900 mt-1">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <div className="text-base font-semibold ds-text-secondary leading-normal">Investors</div>
+            <div className="text-2xl font-bold ds-text-primary mt-1">
               {finances?.investors?.count || 0}
             </div>
           </div>
@@ -368,8 +368,8 @@ function FinancingPageContent() {
                     key={index}
                     className={`p-4 rounded-lg border ${
                       warning.severity === 'error'
-                        ? 'bg-red-50 border-red-200 text-red-800'
-                        : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                        ? 'bg-red-50 border-red-400/60 text-red-800'
+                        : 'bg-yellow-50 border-yellow-400/60 text-yellow-800'
                     }`}
                   >
                     <p className="font-semibold">{warning.type.replace(/_/g, ' ').toUpperCase()}</p>
@@ -383,9 +383,9 @@ function FinancingPageContent() {
 
         {/* Budget vs Capital Comparison */}
         {!projectId && projects.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Budget vs Capital Comparison</h2>
+              <h2 className="text-lg font-semibold ds-text-primary">Budget vs Capital Comparison</h2>
               <Link
                 href="/dashboard/budget"
                 className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -395,19 +395,19 @@ function FinancingPageContent() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <div className="text-sm text-gray-700 font-medium">Total Budget (Planning)</div>
-                <div className="text-xl font-semibold text-gray-900 mt-1">
+                <div className="text-sm ds-text-secondary font-medium">Total Budget (Planning)</div>
+                <div className="text-xl font-semibold ds-text-primary mt-1">
                   {formatCurrency(projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0))}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">Total Capital (Reality)</div>
+                <div className="text-sm ds-text-secondary font-medium">Total Capital (Reality)</div>
                 <div className="text-xl font-semibold text-blue-600 mt-1">
                   {formatCurrency(finances?.totalInvested || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">Difference</div>
+                <div className="text-sm ds-text-secondary font-medium">Difference</div>
                 <div className={`text-xl font-semibold mt-1 ${
                   (projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0) - (finances?.totalInvested || 0)) > 0
                     ? 'text-yellow-600'
@@ -417,7 +417,7 @@ function FinancingPageContent() {
                     projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0) - (finances?.totalInvested || 0)
                   )}
                 </div>
-                <div className="text-sm text-gray-700 mt-1">
+                <div className="text-sm ds-text-secondary mt-1">
                   {finances?.totalInvested > 0
                     ? `${(((projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0) - (finances?.totalInvested || 0)) / (finances?.totalInvested || 1)) * 100).toFixed(1)}% ${(projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0) - (finances?.totalInvested || 0)) > 0 ? 'over' : 'under'} capital`
                     : 'No capital'}
@@ -429,9 +429,9 @@ function FinancingPageContent() {
 
         {/* Projects Overview Table (when viewing all projects) */}
         {!projectId && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Projects Overview</h2>
+              <h2 className="text-lg font-semibold ds-text-primary">Projects Overview</h2>
               <Link
                 href="/projects"
                 className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -441,40 +441,40 @@ function FinancingPageContent() {
             </div>
             {projectsLoading ? (
               <div className="animate-pulse">
-                <div className="h-32 bg-gray-200 rounded"></div>
+                <div className="h-32 ds-bg-surface-muted rounded"></div>
               </div>
             ) : projects.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                         Project
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                         Budget
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                         Capital Raised
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                         Capital Used
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                         Remaining
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                         Utilization
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {projects.map((project) => {
                       const totalInvested = project.statistics?.totalInvested || 0;
                       const totalUsed = project.finances?.totalUsed || 0;
@@ -501,7 +501,7 @@ function FinancingPageContent() {
                       }
 
                       return (
-                        <tr key={project._id} className="hover:bg-gray-50">
+                        <tr key={project._id} className="hover:ds-bg-surface-muted">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div>
                               <Link
@@ -510,13 +510,13 @@ function FinancingPageContent() {
                               >
                                 {project.projectCode}
                               </Link>
-                              <div className="text-sm text-gray-700">{project.projectName}</div>
+                              <div className="text-sm ds-text-secondary">{project.projectName}</div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                             {formatCurrency(budget)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                             {formatCurrency(totalInvested)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
@@ -527,7 +527,7 @@ function FinancingPageContent() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <div className="w-16 bg-gray-200 rounded-full h-2 mr-2">
+                              <div className="w-16 ds-bg-surface-muted rounded-full h-2 mr-2">
                                 <div
                                   className={`h-2 rounded-full ${
                                     utilization > 90 ? 'bg-red-600' : utilization > 70 ? 'bg-yellow-600' : 'bg-green-600'
@@ -535,7 +535,7 @@ function FinancingPageContent() {
                                   style={{ width: `${Math.min(utilization, 100)}%` }}
                                 ></div>
                               </div>
-                              <span className="text-sm text-gray-900">{utilization.toFixed(1)}%</span>
+                              <span className="text-sm ds-text-primary">{utilization.toFixed(1)}%</span>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -558,7 +558,7 @@ function FinancingPageContent() {
                 </table>
               </div>
             ) : (
-              <p className="text-sm text-gray-600">No projects found</p>
+              <p className="text-sm ds-text-secondary">No projects found</p>
             )}
           </div>
         )}
@@ -567,8 +567,8 @@ function FinancingPageContent() {
         {!projectId && finances && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Capital Utilization Chart */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Capital Utilization</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Capital Utilization</h2>
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
@@ -594,8 +594,8 @@ function FinancingPageContent() {
 
             {/* Spending Breakdown Chart */}
             {finances.breakdown && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Spending Breakdown</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold ds-text-primary mb-4">Spending Breakdown</h2>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={[
                     { name: 'Materials', value: finances.breakdown.materials || 0 },
@@ -616,7 +616,7 @@ function FinancingPageContent() {
 
         {/* Single Project View Enhancement */}
         {projectId && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 mb-6">
             <div className="flex items-center justify-between">
               <p className="text-blue-800">
                 <strong>Viewing project-specific financing.</strong> For portfolio overview,{' '}
@@ -637,30 +637,30 @@ function FinancingPageContent() {
 
         {/* Breakdown */}
         {finances?.breakdown && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Expense Breakdown</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Expense Breakdown</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <div className="text-sm text-gray-700 font-medium">Materials</div>
-                <div className="text-xl font-semibold text-gray-900">
+                <div className="text-sm ds-text-secondary font-medium">Materials</div>
+                <div className="text-xl font-semibold ds-text-primary">
                   {formatCurrency(finances.breakdown.materials || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">Expenses</div>
-                <div className="text-xl font-semibold text-gray-900">
+                <div className="text-sm ds-text-secondary font-medium">Expenses</div>
+                <div className="text-xl font-semibold ds-text-primary">
                   {formatCurrency(finances.breakdown.expenses || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">Initial Expenses</div>
-                <div className="text-xl font-semibold text-gray-900">
+                <div className="text-sm ds-text-secondary font-medium">Initial Expenses</div>
+                <div className="text-xl font-semibold ds-text-primary">
                   {formatCurrency(finances.breakdown.initialExpenses || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">Total</div>
-                <div className="text-xl font-semibold text-gray-900">
+                <div className="text-sm ds-text-secondary font-medium">Total</div>
+                <div className="text-xl font-semibold ds-text-primary">
                   {formatCurrency(finances.breakdown.total || 0)}
                 </div>
               </div>
@@ -670,23 +670,23 @@ function FinancingPageContent() {
 
         {/* Investment Breakdown */}
         {finances?.investors && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Investment Breakdown</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Investment Breakdown</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <div className="text-sm text-gray-700 font-medium">Total Invested</div>
-                <div className="text-xl font-semibold text-gray-900">
+                <div className="text-sm ds-text-secondary font-medium">Total Invested</div>
+                <div className="text-xl font-semibold ds-text-primary">
                   {formatCurrency(finances.investors.totalInvested || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">Total Loans</div>
+                <div className="text-sm ds-text-secondary font-medium">Total Loans</div>
                 <div className="text-xl font-semibold text-purple-600">
                   {formatCurrency(finances.investors.totalLoans || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-700 font-medium">Total Equity</div>
+                <div className="text-sm ds-text-secondary font-medium">Total Equity</div>
                 <div className="text-xl font-semibold text-blue-600">
                   {formatCurrency(finances.investors.totalEquity || 0)}
                 </div>
@@ -697,36 +697,36 @@ function FinancingPageContent() {
 
         {/* Top Investors */}
         {investors.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Investors</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Top Investors</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Name
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Type
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Total Invested
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {investors
                     .sort((a, b) => (b.totalInvested || 0) - (a.totalInvested || 0))
                     .slice(0, 10)
                     .map((investor) => (
-                      <tr key={investor._id} className="hover:bg-gray-50">
+                      <tr key={investor._id} className="hover:ds-bg-surface-muted">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           {investor.name}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{investor.investmentType}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">{investor.investmentType}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold">
                           {formatCurrency(investor.totalInvested || 0)}
                         </td>

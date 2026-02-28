@@ -26,11 +26,11 @@ export function NoDataEmptyState({
   showAction = false,
 }) {
   return (
-    <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-200 rounded-lg p-8 text-center">
+    <div className="bg-gradient-to-r from-gray-50 to-gray-100 border-2 ds-border-subtle rounded-lg p-8 text-center">
       <div className="max-w-xl mx-auto">
         <div className="text-6xl mb-4">{icon}</div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
-        <p className="text-lg text-gray-700 mb-6">{message}</p>
+        <h2 className="text-2xl font-bold ds-text-primary mb-2">{title}</h2>
+        <p className="text-lg ds-text-secondary mb-6">{message}</p>
         {showAction && actionHref && (
           <Link
             href={actionHref}

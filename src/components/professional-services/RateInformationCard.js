@@ -70,10 +70,10 @@ export function RateInformationCard({
   }
 
   return (
-    <div className={`rounded-lg border border-blue-200 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-5 shadow-sm ${className}`}>
+    <div className={`rounded-lg border border-blue-400/60 bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-5 shadow-sm ${className}`}>
       <div className="flex items-center gap-2 mb-4">
         <DollarSign className="h-5 w-5 text-blue-600" />
-        <h3 className="text-base font-semibold text-gray-900">Professional Rates</h3>
+        <h3 className="text-base font-semibold ds-text-primary">Professional Rates</h3>
         {rates.source && (
           <span className="ml-auto text-xs font-medium px-2 py-1 rounded-full bg-blue-100 text-blue-700">
             {rates.source === 'assignment' ? 'From Assignment' : 'From Library'}
@@ -84,12 +84,12 @@ export function RateInformationCard({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Hourly Rate */}
         {rates.hourlyRate && (
-          <div className="bg-white/70 rounded-lg p-3 border border-blue-100">
+          <div className="ds-bg-surface/70 rounded-lg p-3 border border-blue-100">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="h-4 w-4 text-blue-600" />
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Hourly Rate</span>
+              <span className="text-xs font-medium ds-text-secondary uppercase tracking-wide">Hourly Rate</span>
             </div>
-            <p className="text-lg font-bold text-gray-900">
+            <p className="text-lg font-bold ds-text-primary">
               {rates.hourlyRate.toLocaleString('en-KE', { 
                 style: 'currency', 
                 currency: 'KES',
@@ -97,18 +97,18 @@ export function RateInformationCard({
                 maximumFractionDigits: 0,
               })}
             </p>
-            <p className="text-xs text-gray-500 mt-1">per hour</p>
+            <p className="text-xs ds-text-muted mt-1">per hour</p>
           </div>
         )}
 
         {/* Per-Visit Rate */}
         {rates.perVisitRate && (
-          <div className="bg-white/70 rounded-lg p-3 border border-blue-100">
+          <div className="ds-bg-surface/70 rounded-lg p-3 border border-blue-100">
             <div className="flex items-center gap-2 mb-2">
               <MapPin className="h-4 w-4 text-blue-600" />
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Per-Visit Rate</span>
+              <span className="text-xs font-medium ds-text-secondary uppercase tracking-wide">Per-Visit Rate</span>
             </div>
-            <p className="text-lg font-bold text-gray-900">
+            <p className="text-lg font-bold ds-text-primary">
               {rates.perVisitRate.toLocaleString('en-KE', { 
                 style: 'currency', 
                 currency: 'KES',
@@ -116,18 +116,18 @@ export function RateInformationCard({
                 maximumFractionDigits: 0,
               })}
             </p>
-            <p className="text-xs text-gray-500 mt-1">per visit</p>
+            <p className="text-xs ds-text-muted mt-1">per visit</p>
           </div>
         )}
 
         {/* Monthly Retainer */}
         {rates.monthlyRetainer && (
-          <div className="bg-white/70 rounded-lg p-3 border border-blue-100">
+          <div className="ds-bg-surface/70 rounded-lg p-3 border border-blue-100">
             <div className="flex items-center gap-2 mb-2">
               <Calendar className="h-4 w-4 text-blue-600" />
-              <span className="text-xs font-medium text-gray-600 uppercase tracking-wide">Monthly Retainer</span>
+              <span className="text-xs font-medium ds-text-secondary uppercase tracking-wide">Monthly Retainer</span>
             </div>
-            <p className="text-lg font-bold text-gray-900">
+            <p className="text-lg font-bold ds-text-primary">
               {rates.monthlyRetainer.toLocaleString('en-KE', { 
                 style: 'currency', 
                 currency: 'KES',
@@ -135,14 +135,14 @@ export function RateInformationCard({
                 maximumFractionDigits: 0,
               })}
             </p>
-            <p className="text-xs text-gray-500 mt-1">per month</p>
+            <p className="text-xs ds-text-muted mt-1">per month</p>
           </div>
         )}
       </div>
 
       {/* Info Note */}
-      <div className="mt-4 pt-4 border-t border-blue-200">
-        <p className="text-xs text-gray-600">
+      <div className="mt-4 pt-4 border-t border-blue-400/60">
+        <p className="text-xs ds-text-secondary">
           <Info className="h-3 w-3 inline mr-1 text-blue-500" />
           These rates are used to calculate suggested contract values and fees. You can override any calculated amounts.
         </p>

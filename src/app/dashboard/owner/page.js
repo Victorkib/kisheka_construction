@@ -88,8 +88,8 @@ export default function OwnerDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-96"></div>
+              <div className="h-8 ds-bg-surface-muted rounded w-64 mb-2"></div>
+              <div className="h-4 ds-bg-surface-muted rounded w-96"></div>
             </div>
             <LoadingCard count={4} showHeader={true} lines={3} />
           </div>
@@ -105,11 +105,11 @@ export default function OwnerDashboard() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
               Owner Dashboard
             </h1>
             {user && (
-              <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+              <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">
                 Welcome, {user.firstName || user.email}!
               </p>
             )}
@@ -150,13 +150,13 @@ export default function OwnerDashboard() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-8 text-center">
+          <div className="bg-yellow-50 border-2 border-yellow-400/60 rounded-lg p-8 text-center">
             <div className="max-w-2xl mx-auto">
               <div className="text-5xl mb-4">⏳</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold ds-text-primary mb-2">
                 Loading User Data
               </h2>
-              <p className="text-lg text-gray-700 mb-6">
+              <p className="text-lg ds-text-secondary mb-6">
                 Please wait while we load your information...
               </p>
               <LoadingSpinner />
@@ -185,10 +185,10 @@ export default function OwnerDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">
             Owner Dashboard
           </h1>
-          <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">
             Welcome back, {user?.firstName || user?.email}! Portfolio overview and insights.
           </p>
         </div>

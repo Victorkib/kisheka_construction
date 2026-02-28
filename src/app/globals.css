@@ -4,29 +4,165 @@
 @source "./**/*.{js,jsx,ts,tsx}";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Default to light theme before JS loads */
+  --ds-bg-app: #f3f4f6; /* gray-100 */
+  --ds-bg-surface: #ffffff;
+  --ds-bg-surface-muted: #e5e7eb; /* gray-200 */
+  --ds-bg-sidebar: #111827; /* gray-900 */
+
+  /* Sidebar section surfaces */
+  --ds-bg-sidebar-section-default: #1f2937; /* gray-800 */
+  --ds-bg-sidebar-section-primary: #1d4ed8; /* blue-700 tinted when mixed with text */
+  --ds-bg-sidebar-section-secondary: #111827; /* same as rail but can be tuned */
+
+  --ds-border-subtle: #e5e7eb;
+  --ds-border-strong: #d1d5db;
+  --ds-border-sidebar: #1f2937;
+
+  --ds-text-primary: #111827;
+  --ds-text-secondary: #4b5563;
+  --ds-text-muted: #6b7280;
+  --ds-text-inverse: #f9fafb;
+  --ds-text-sidebar-primary: #e5e7eb;
+  --ds-text-sidebar-secondary: #9ca3af;
+
+  --ds-accent-primary: #2563eb;
+  --ds-accent-sidebar: #38bdf8;
+  --ds-accent-focus: #3b82f6;
+}
+
+/* Light theme tokens */
+:root[data-theme='light'] {
+  --ds-bg-app: #f9faf5; /* soft off-white / creamish */
+  --ds-bg-surface: #ffffff;
+  --ds-bg-surface-muted: #f1f5f9; /* light slate */
+  --ds-bg-sidebar: #1f2937; /* gray-800, lighter than before */
+
+  --ds-bg-sidebar-section-default: #1f2937; /* gray-800 */
+  --ds-bg-sidebar-section-primary: #1d4ed8; /* blue-700 */
+  --ds-bg-sidebar-section-secondary: #111827; /* same as rail for now */
+
+  --ds-border-subtle: #e5e7eb;
+  --ds-border-strong: #d1d5db;
+  --ds-border-sidebar: #1f2937;
+
+  --ds-text-primary: #111827;
+  --ds-text-secondary: #4b5563;
+  --ds-text-muted: #6b7280;
+  --ds-text-inverse: #f9fafb;
+  --ds-text-sidebar-primary: #e5e7eb;
+  --ds-text-sidebar-secondary: #9ca3af;
+
+  --ds-accent-primary: #2563eb;
+  --ds-accent-sidebar: #38bdf8;
+  --ds-accent-focus: #3b82f6;
+}
+
+/* Dark theme tokens */
+:root[data-theme='dark'] {
+  --ds-bg-app: #020617; /* slate-950 */
+  --ds-bg-surface: #0f172a; /* slate-900 */
+  --ds-bg-surface-muted: #1e293b; /* slate-800 */
+  --ds-bg-sidebar: #020617; /* a bit darker than app background */
+
+  --ds-bg-sidebar-section-default: #111827; /* gray-900 */
+  --ds-bg-sidebar-section-primary: #1e3a8a; /* blue-800 */
+  --ds-bg-sidebar-section-secondary: #020617;
+
+  --ds-border-subtle: #1f2937;
+  --ds-border-strong: #4b5563;
+  --ds-border-sidebar: #111827;
+
+  --ds-text-primary: #f9fafb;
+  --ds-text-secondary: #e5e7eb;
+  --ds-text-muted: #9ca3af;
+  --ds-text-inverse: #020617;
+  --ds-text-sidebar-primary: #f9fafb;
+  --ds-text-sidebar-secondary: #9ca3af;
+
+  --ds-accent-primary: #38bdf8;
+  --ds-accent-sidebar: #14b8a6;
+  --ds-accent-focus: #38bdf8;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: var(--ds-bg-app);
+  --color-foreground: var(--ds-text-primary);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--ds-bg-app);
+  color: var(--ds-text-primary);
   font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
 }
+
+/* Utility classes for semantic tokens */
+.ds-bg-app {
+  background-color: var(--ds-bg-app);
+}
+
+.ds-bg-surface {
+  background-color: var(--ds-bg-surface);
+}
+
+.ds-bg-surface-muted {
+  background-color: var(--ds-bg-surface-muted);
+}
+
+.ds-bg-sidebar {
+  background-color: var(--ds-bg-sidebar);
+}
+
+.ds-bg-sidebar-section-default {
+  background-color: var(--ds-bg-sidebar-section-default);
+}
+
+.ds-bg-sidebar-section-primary {
+  background-color: var(--ds-bg-sidebar-section-primary);
+}
+
+.ds-bg-sidebar-section-secondary {
+  background-color: var(--ds-bg-sidebar-section-secondary);
+}
+
+.ds-text-primary {
+  color: var(--ds-text-primary);
+}
+
+.ds-text-secondary {
+  color: var(--ds-text-secondary);
+}
+
+.ds-text-muted {
+  color: var(--ds-text-muted);
+}
+
+.ds-text-inverse {
+  color: var(--ds-text-inverse);
+}
+
+.ds-text-sidebar-primary {
+  color: var(--ds-text-sidebar-primary);
+}
+
+.ds-text-sidebar-secondary {
+  color: var(--ds-text-sidebar-secondary);
+}
+
+.ds-border-subtle {
+  border-color: var(--ds-border-subtle);
+}
+
+.ds-border-strong {
+  border-color: var(--ds-border-strong);
+}
+
+.ds-border-sidebar {
+  border-color: var(--ds-border-sidebar);
+}
+
 
 /* Custom Scrollbar Styles */
 .scrollbar-thin {

@@ -150,8 +150,8 @@ function MaterialTemplatesPageContent() {
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Material Templates</h1>
-            <p className="text-gray-600 mt-2">Save and reuse common material combinations</p>
+            <h1 className="text-3xl font-bold ds-text-primary">Material Templates</h1>
+            <p className="ds-text-secondary mt-2">Save and reuse common material combinations</p>
           </div>
           {canCreate && (
             <Link
@@ -179,17 +179,17 @@ function MaterialTemplatesPageContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Filter by Creator</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Filter by Creator</label>
               <select
                 value={filters.createdBy}
                 onChange={(e) => {
                   setFilters((prev) => ({ ...prev, createdBy: e.target.value }));
                   setPagination((prev) => ({ ...prev, page: 1 }));
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Templates</option>
                 <option value="me">My Templates</option>
@@ -197,14 +197,14 @@ function MaterialTemplatesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Status</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Status</label>
               <select
                 value={filters.status}
                 onChange={(e) => {
                   setFilters((prev) => ({ ...prev, status: e.target.value }));
                   setPagination((prev) => ({ ...prev, page: 1 }));
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Statuses</option>
                 <option value={TEMPLATE_STATUS.OFFICIAL}>Official</option>
@@ -214,14 +214,14 @@ function MaterialTemplatesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Project Phase</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Project Phase</label>
               <select
                 value={filters.projectPhase}
                 onChange={(e) => {
                   setFilters((prev) => ({ ...prev, projectPhase: e.target.value }));
                   setPagination((prev) => ({ ...prev, page: 1 }));
                 }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Phases</option>
                 {PROJECT_PHASES.map((phase) => (
@@ -232,7 +232,7 @@ function MaterialTemplatesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Search</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Search</label>
               <input
                 type="text"
                 value={filters.search}
@@ -241,7 +241,7 @@ function MaterialTemplatesPageContent() {
                   setPagination((prev) => ({ ...prev, page: 1 }));
                 }}
                 placeholder="Search templates..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex items-end">
@@ -250,7 +250,7 @@ function MaterialTemplatesPageContent() {
                   setFilters({ createdBy: 'all', isPublic: 'all', status: '', projectPhase: '', search: '' });
                   setPagination((prev) => ({ ...prev, page: 1 }));
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+                className="w-full px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary"
               >
                 Clear Filters
               </button>
@@ -260,7 +260,7 @@ function MaterialTemplatesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -269,8 +269,8 @@ function MaterialTemplatesPageContent() {
         {loading ? (
           <LoadingTable rows={6} columns={4} />
         ) : templates.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <p className="text-gray-600">No templates found</p>
+          <div className="text-center py-12 ds-bg-surface-muted rounded-lg">
+            <p className="ds-text-secondary">No templates found</p>
             {canCreate && (
               <Link
                 href="/material-templates/new"
@@ -285,13 +285,13 @@ function MaterialTemplatesPageContent() {
             {templates.map((template) => (
               <div
                 key={template._id}
-                className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+                className="ds-bg-surface rounded-lg border ds-border-subtle p-6 hover:shadow-lg transition-shadow"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">{template.name}</h3>
+                    <h3 className="text-lg font-semibold ds-text-primary mb-1">{template.name}</h3>
                     {template.description && (
-                      <p className="text-sm text-gray-600 line-clamp-2">{template.description}</p>
+                      <p className="text-sm ds-text-secondary line-clamp-2">{template.description}</p>
                     )}
                   </div>
                   <div className="ml-2 flex flex-col gap-1">
@@ -299,7 +299,7 @@ function MaterialTemplatesPageContent() {
                       <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                         template.status === TEMPLATE_STATUS.OFFICIAL ? 'bg-blue-100 text-blue-800' :
                         template.status === TEMPLATE_STATUS.COMMUNITY ? 'bg-green-100 text-green-800' :
-                        template.status === TEMPLATE_STATUS.PRIVATE ? 'bg-gray-100 text-gray-800' :
+                        template.status === TEMPLATE_STATUS.PRIVATE ? 'ds-bg-surface-muted ds-text-primary' :
                         'bg-yellow-100 text-yellow-800'
                       }`}>
                         {template.status === TEMPLATE_STATUS.OFFICIAL ? 'Official' :
@@ -317,48 +317,48 @@ function MaterialTemplatesPageContent() {
 
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Materials:</span>
-                    <span className="font-medium text-gray-900">{template.materials?.length || 0}</span>
+                    <span className="ds-text-secondary">Materials:</span>
+                    <span className="font-medium ds-text-primary">{template.materials?.length || 0}</span>
                   </div>
                   {template.estimatedTotalCost && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Est. Cost:</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="ds-text-secondary">Est. Cost:</span>
+                      <span className="font-medium ds-text-primary">
                         {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(template.estimatedTotalCost)}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Used:</span>
-                    <span className="font-medium text-gray-900">{template.usageCount || 0} times</span>
+                    <span className="ds-text-secondary">Used:</span>
+                    <span className="font-medium ds-text-primary">{template.usageCount || 0} times</span>
                   </div>
                   {template.projectPhase && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Phase:</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="ds-text-secondary">Phase:</span>
+                      <span className="font-medium ds-text-primary">
                         {template.projectPhase.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Created by:</span>
-                    <span className="font-medium text-gray-900">{template.createdByName || 'Unknown'}</span>
+                    <span className="ds-text-secondary">Created by:</span>
+                    <span className="font-medium ds-text-primary">{template.createdByName || 'Unknown'}</span>
                   </div>
                   {template.lastUsedAt && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Last used:</span>
-                      <span className="font-medium text-gray-900">{formatDate(template.lastUsedAt)}</span>
+                      <span className="ds-text-secondary">Last used:</span>
+                      <span className="font-medium ds-text-primary">{formatDate(template.lastUsedAt)}</span>
                     </div>
                   )}
                   {template.tags && template.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
                       {template.tags.slice(0, 3).map((tag) => (
-                        <span key={tag} className="inline-flex px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700">
+                        <span key={tag} className="inline-flex px-2 py-0.5 text-xs rounded ds-bg-surface-muted ds-text-secondary">
                           {tag}
                         </span>
                       ))}
                       {template.tags.length > 3 && (
-                        <span className="inline-flex px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700">
+                        <span className="inline-flex px-2 py-0.5 text-xs rounded ds-bg-surface-muted ds-text-secondary">
                           +{template.tags.length - 3}
                         </span>
                       )}
@@ -366,7 +366,7 @@ function MaterialTemplatesPageContent() {
                   )}
                 </div>
 
-                <div className="flex gap-2 pt-4 border-t border-gray-200">
+                <div className="flex gap-2 pt-4 border-t ds-border-subtle">
                   <button
                     onClick={() => handleUseTemplate(template._id.toString())}
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
@@ -377,14 +377,14 @@ function MaterialTemplatesPageContent() {
                     <>
                       <Link
                         href={`/material-templates/${template._id}/edit`}
-                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 text-sm font-medium"
+                        className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary text-sm font-medium"
                       >
                         Edit
                       </Link>
                       {canValidate && template.status !== TEMPLATE_STATUS.OFFICIAL && (
                         <button
                           onClick={() => handleValidateTemplate(template._id.toString())}
-                          className="px-4 py-2 border border-green-300 rounded-lg hover:bg-green-50 text-green-700 text-sm font-medium"
+                          className="px-4 py-2 border border-green-400/60 rounded-lg hover:bg-green-50 text-green-700 text-sm font-medium"
                           title="Mark as official"
                         >
                           Validate
@@ -395,7 +395,7 @@ function MaterialTemplatesPageContent() {
                           setTemplateToDelete(template._id.toString());
                           setShowDeleteModal(true);
                         }}
-                        className="px-4 py-2 border border-red-300 rounded-lg hover:bg-red-50 text-red-700 text-sm font-medium"
+                        className="px-4 py-2 border border-red-400/60 rounded-lg hover:bg-red-50 text-red-700 text-sm font-medium"
                       >
                         Delete
                       </button>
@@ -413,11 +413,11 @@ function MaterialTemplatesPageContent() {
             <button
               onClick={() => setPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
               disabled={pagination.page === 1}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm ds-text-secondary">
               Page {pagination.page} of {pagination.pages}
             </span>
             <button
@@ -425,7 +425,7 @@ function MaterialTemplatesPageContent() {
                 setPagination((prev) => ({ ...prev, page: Math.min(pagination.pages, prev.page + 1) }))
               }
               disabled={pagination.page === pagination.pages}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>

@@ -164,10 +164,10 @@ export function CommandPalette() {
       
       {/* Command Palette - Desktop */}
       <div className="hidden lg:block fixed inset-x-0 top-20 mx-auto max-w-2xl z-50">
-        <div className="bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden">
+        <div className="ds-bg-surface rounded-lg shadow-2xl border ds-border-subtle overflow-hidden">
           {/* Search Input */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200">
-            <Search className="w-5 h-5 text-gray-400" />
+          <div className="flex items-center gap-3 px-4 py-3 border-b ds-border-subtle">
+            <Search className="w-5 h-5 ds-text-muted" />
             <input
               type="text"
               value={query}
@@ -176,10 +176,10 @@ export function CommandPalette() {
                 setSelectedIndex(0);
               }}
               placeholder="Search pages, actions, and features..."
-              className="flex-1 outline-none text-gray-900 placeholder-gray-400"
+              className="flex-1 outline-none ds-text-primary placeholder-gray-400"
               autoFocus
             />
-            <kbd className="hidden sm:flex items-center gap-1 px-2 py-1 text-xs font-semibold text-gray-500 bg-gray-100 rounded border border-gray-300">
+            <kbd className="hidden sm:flex items-center gap-1 px-2 py-1 text-xs font-semibold ds-text-muted ds-bg-surface-muted rounded border ds-border-subtle">
               <Command className="w-3 h-3" />
               <span>K</span>
             </kbd>
@@ -188,19 +188,19 @@ export function CommandPalette() {
           {/* Results */}
           <div className="max-h-96 overflow-y-auto">
             {filteredItems.length === 0 ? (
-              <div className="px-4 py-8 text-center text-gray-500">
+              <div className="px-4 py-8 text-center ds-text-muted">
                 <p>No results found</p>
                 <p className="text-sm mt-1">Try a different search term</p>
               </div>
             ) : (
               <div className="py-2">
                 {query && (
-                  <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <div className="px-4 py-2 text-xs font-semibold ds-text-muted uppercase tracking-wide">
                     Results
                   </div>
                 )}
                 {!query && (
-                  <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-2">
+                  <div className="px-4 py-2 text-xs font-semibold ds-text-muted uppercase tracking-wide flex items-center gap-2">
                     <Clock className="w-3 h-3" />
                     Recent
                   </div>
@@ -209,26 +209,26 @@ export function CommandPalette() {
                   <button
                     key={item.href || index}
                     onClick={() => handleSelect(item)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:ds-bg-surface-muted transition-colors ${
                       index === selectedIndex ? 'bg-blue-50 border-l-2 border-blue-600' : ''
                     }`}
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900 truncate">
+                        <span className="font-medium ds-text-primary truncate">
                           {item.label}
                         </span>
                         {item.isRecent && (
-                          <Clock className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                          <Clock className="w-3 h-3 ds-text-muted flex-shrink-0" />
                         )}
                       </div>
                       {item.href && (
-                        <p className="text-xs text-gray-500 truncate mt-0.5">
+                        <p className="text-xs ds-text-muted truncate mt-0.5">
                           {item.href}
                         </p>
                       )}
                     </div>
-                    <ArrowRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <ArrowRight className="w-4 h-4 ds-text-muted flex-shrink-0" />
                   </button>
                 ))}
               </div>
@@ -236,18 +236,18 @@ export function CommandPalette() {
           </div>
 
           {/* Footer - Desktop only */}
-          <div className="hidden lg:flex px-4 py-2 border-t border-gray-200 bg-gray-50 items-center justify-between text-xs text-gray-500">
+          <div className="hidden lg:flex px-4 py-2 border-t ds-border-subtle ds-bg-surface-muted items-center justify-between text-xs ds-text-muted">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded">↑↓</kbd>
+                <kbd className="px-1.5 py-0.5 ds-bg-surface border ds-border-subtle rounded">↑↓</kbd>
                 <span>Navigate</span>
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded">↵</kbd>
+                <kbd className="px-1.5 py-0.5 ds-bg-surface border ds-border-subtle rounded">↵</kbd>
                 <span>Select</span>
               </span>
               <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded">Esc</kbd>
+                <kbd className="px-1.5 py-0.5 ds-bg-surface border ds-border-subtle rounded">Esc</kbd>
                 <span>Close</span>
               </span>
             </div>

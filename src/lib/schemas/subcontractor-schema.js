@@ -13,6 +13,7 @@ import { SUBCONTRACTOR_TYPES, SUBCONTRACTOR_STATUSES, CONTRACT_TYPES, calculateT
  * @property {ObjectId} _id - Subcontractor ID
  * @property {ObjectId} projectId - Project ID (required, indexed)
  * @property {ObjectId} phaseId - Phase ID (required, indexed)
+ * @property {ObjectId} [floorId] - Floor ID (optional, indexed) - enables floor-specific contracts
  * @property {string} subcontractorName - Subcontractor name/company (required)
  * @property {string} subcontractorType - Subcontractor type (required)
  * @property {string} contactPerson - Contact person name
@@ -42,6 +43,7 @@ export { SUBCONTRACTOR_TYPES, SUBCONTRACTOR_STATUSES, CONTRACT_TYPES, calculateT
 export const SUBCONTRACTOR_SCHEMA = {
   projectId: 'ObjectId', // Required
   phaseId: 'ObjectId', // Required
+  floorId: 'ObjectId', // Optional: when set, this subcontractor is tied to a specific floor
   subcontractorName: String, // Required
   subcontractorType: String, // Required
   contactPerson: String, // Optional
@@ -96,12 +98,14 @@ export function createSubcontractor(input, projectId, phaseId, createdBy) {
     paymentSchedule,
     status,
     performance,
-    notes
+    notes,
+    floorId
   } = input;
 
   return {
     projectId: typeof projectId === 'string' ? new ObjectId(projectId) : projectId,
     phaseId: typeof phaseId === 'string' ? new ObjectId(phaseId) : phaseId,
+    floorId: floorId && ObjectId.isValid(floorId) ? new ObjectId(floorId) : null,
     subcontractorName: subcontractorName?.trim() || '',
     subcontractorType: subcontractorType || 'other',
     contactPerson: contactPerson?.trim() || '',
@@ -147,6 +151,11 @@ export function validateSubcontractor(data) {
   
   if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
     errors.push('Valid phaseId is required');
+  }
+
+  // floorId is optional but, if provided, must be a valid ObjectId
+  if (data.floorId && !ObjectId.isValid(data.floorId)) {
+    errors.push('If provided, floorId must be a valid ObjectId');
   }
   
   if (!data.subcontractorName || data.subcontractorName.trim().length < 2) {

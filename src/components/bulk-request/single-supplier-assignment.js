@@ -50,7 +50,7 @@ export function SingleSupplierAssignment({
 
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
         <p className="text-sm text-blue-700">
           All <strong>{materialRequests.length} material(s)</strong> will be ordered from a single supplier.
           One purchase order will be created.
@@ -60,29 +60,29 @@ export function SingleSupplierAssignment({
       <div className="space-y-4">
         {/* Supplier Selection */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Supplier <span className="text-red-500">*</span>
           </label>
           <select
             value={assignment.supplierId}
             onChange={(e) => handleChange('supplierId', e.target.value)}
             required
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="" className="text-gray-900">Select a supplier</option>
+            <option value="" className="ds-text-primary">Select a supplier</option>
             {suppliers.map((supplier) => {
               const supplierId = supplier._id?.toString() || supplier.id?.toString() || '';
               const displayName = supplier.name || supplier.contactPerson || supplier.email || 'Unknown Supplier';
               const contactInfo = supplier.contactPerson ? ` - ${supplier.contactPerson}` : '';
               return (
-                <option key={supplierId} value={supplierId} className="text-gray-900">
+                <option key={supplierId} value={supplierId} className="ds-text-primary">
                   {displayName}{contactInfo} {supplier.email ? `(${supplier.email})` : ''}
                 </option>
               );
             })}
           </select>
           {selectedSupplier && (
-            <div className="mt-2 text-sm text-gray-600">
+            <div className="mt-2 text-sm ds-text-secondary">
               <p>Contact: {selectedSupplier.email || 'N/A'}</p>
               {selectedSupplier.phone && <p>Phone: {selectedSupplier.phone}</p>}
             </div>
@@ -91,7 +91,7 @@ export function SingleSupplierAssignment({
 
         {/* Delivery Date */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Delivery Date <span className="text-red-500">*</span>
           </label>
           <input
@@ -100,13 +100,13 @@ export function SingleSupplierAssignment({
             onChange={(e) => handleChange('deliveryDate', e.target.value)}
             required
             min={new Date().toISOString().split('T')[0]}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
         {/* Terms */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Payment/Delivery Terms (Optional)
           </label>
           <textarea
@@ -114,13 +114,13 @@ export function SingleSupplierAssignment({
             onChange={(e) => handleChange('terms', e.target.value)}
             placeholder="e.g., Net 30, FOB, etc."
             rows={3}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
           />
         </div>
 
         {/* Notes */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Notes (Optional)
           </label>
           <textarea
@@ -128,21 +128,21 @@ export function SingleSupplierAssignment({
             onChange={(e) => handleChange('notes', e.target.value)}
             placeholder="Additional notes for this purchase order..."
             rows={3}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
           />
         </div>
       </div>
 
       {/* Preview */}
       {assignment.supplierId && selectedSupplier && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-900 mb-2">Preview</h4>
-          <p className="text-sm text-gray-700">
+        <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-4">
+          <h4 className="font-semibold ds-text-primary mb-2">Preview</h4>
+          <p className="text-sm ds-text-secondary">
             Purchase order will be created for <strong>{selectedSupplier.name || selectedSupplier.contactPerson}</strong> with{' '}
             <strong>{materialRequests.length} material(s)</strong>.
           </p>
           {assignment.deliveryDate && (
-            <p className="text-sm text-gray-700 mt-1">
+            <p className="text-sm ds-text-secondary mt-1">
               Delivery Date: <strong>{new Date(assignment.deliveryDate).toLocaleDateString('en-KE')}</strong>
             </p>
           )}

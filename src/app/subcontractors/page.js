@@ -157,7 +157,7 @@ function SubcontractorsPageContent() {
       'completed': 'bg-blue-100 text-blue-800',
       'terminated': 'bg-red-100 text-red-800'
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (isEmpty) {
@@ -174,8 +174,8 @@ function SubcontractorsPageContent() {
         {/* Header */}
         <div className="mb-6 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Subcontractors</h1>
-            <p className="text-gray-600 mt-1">Manage subcontractor assignments and contracts</p>
+            <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">Subcontractors</h1>
+            <p className="ds-text-secondary mt-1">Manage subcontractor assignments and contracts</p>
           </div>
           <Link
             href={`/subcontractors/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}`}
@@ -189,7 +189,7 @@ function SubcontractorsPageContent() {
         </div>
 
         {/* Information Card */}
-        <div className="bg-gradient-to-br from-purple-50 via-violet-50 to-purple-100 rounded-xl border-2 border-purple-200 p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
+        <div className="bg-gradient-to-br from-purple-50 via-violet-50 to-purple-100 rounded-xl border-2 border-purple-400/60 p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center shadow-md">
@@ -200,12 +200,12 @@ function SubcontractorsPageContent() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2 mb-2">
-                <h3 className="text-lg sm:text-xl font-bold text-gray-900 flex items-center gap-2">
+                <h3 className="text-lg sm:text-xl font-bold ds-text-primary flex items-center gap-2">
                   What are Subcontractors?
                 </h3>
                 <button
                   onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                  className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-white/80 hover:bg-white border border-purple-300 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 ds-bg-surface/80 hover:ds-bg-surface border border-purple-400/60 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
                   aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                   aria-expanded={isInfoExpanded}
                 >
@@ -222,35 +222,35 @@ function SubcontractorsPageContent() {
               
               {isInfoExpanded ? (
                 <div className="space-y-4 animate-fadeIn">
-                  <p className="text-sm sm:text-base text-gray-700 leading-relaxed">
+                  <p className="text-sm sm:text-base ds-text-secondary leading-relaxed">
                     Subcontractors are external contractors and service providers hired for specific work in construction phases. This includes construction labour (skilled, unskilled, supervisory), professional services (architects, engineers, surveyors, consultants), and specialized technicians (HVAC, lift technicians, fire safety, security).
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-white/60 rounded-lg p-4 border border-purple-200">
-                      <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+                    <div className="ds-bg-surface/60 rounded-lg p-4 border border-purple-400/60">
+                      <h4 className="font-semibold ds-text-primary mb-2 flex items-center gap-2 text-sm sm:text-base">
                         <svg className="w-5 h-5 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         Who uses this?
                       </h4>
-                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+                      <p className="text-xs sm:text-sm ds-text-secondary leading-relaxed">
                         <strong>Project Managers</strong> and <strong>Owners</strong> use subcontractor management to track contracts, payments, performance, and ensure proper contractor coordination. This helps manage multiple contractors working on the same project.
                       </p>
                     </div>
-                    <div className="bg-white/60 rounded-lg p-4 border border-purple-200">
-                      <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2 text-sm sm:text-base">
+                    <div className="ds-bg-surface/60 rounded-lg p-4 border border-purple-400/60">
+                      <h4 className="font-semibold ds-text-primary mb-2 flex items-center gap-2 text-sm sm:text-base">
                         <svg className="w-5 h-5 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         Why it's important?
                       </h4>
-                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+                      <p className="text-xs sm:text-sm ds-text-secondary leading-relaxed">
                         Subcontractor management ensures proper contract tracking, payment scheduling, performance monitoring, helps coordinate multiple contractors, and provides accountability for external work performed on your project.
                       </p>
                     </div>
                   </div>
-                  <div className="pt-4 border-t-2 border-purple-200">
-                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2 text-sm sm:text-base">
+                  <div className="pt-4 border-t-2 border-purple-400/60">
+                    <h4 className="font-semibold ds-text-primary mb-3 flex items-center gap-2 text-sm sm:text-base">
                       <svg className="w-5 h-5 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                       </svg>
@@ -258,7 +258,7 @@ function SubcontractorsPageContent() {
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {['Masons & Steel Fixers', 'Electricians & Plumbers', 'Architects & Engineers', 'Surveyors', 'HVAC Specialists', 'Lift Technicians', 'Site Supervisors'].map((example) => (
-                        <span key={example} className="px-2.5 sm:px-3 py-1 sm:py-1.5 bg-white rounded-full text-xs sm:text-sm font-medium text-gray-700 border border-purple-300 shadow-sm hover:shadow-md transition-shadow">
+                        <span key={example} className="px-2.5 sm:px-3 py-1 sm:py-1.5 ds-bg-surface rounded-full text-xs sm:text-sm font-medium ds-text-secondary border border-purple-400/60 shadow-sm hover:shadow-md transition-shadow">
                           {example}
                         </span>
                       ))}
@@ -266,7 +266,7 @@ function SubcontractorsPageContent() {
                   </div>
                 </div>
               ) : (
-                <p className="text-xs sm:text-sm text-gray-500 italic mt-1 animate-fadeIn">
+                <p className="text-xs sm:text-sm ds-text-muted italic mt-1 animate-fadeIn">
                   Click to expand for more information
                 </p>
               )}
@@ -275,18 +275,18 @@ function SubcontractorsPageContent() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 mb-6">
+        <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Project</label>
+              <label className="block text-sm font-semibold ds-text-primary mb-2">Project</label>
               <select
                 value={filters.projectId || ''}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
               >
-                <option value="" className="text-gray-500">All Projects</option>
+                <option value="" className="ds-text-muted">All Projects</option>
                 {accessibleProjects.map((project) => (
-                  <option key={project._id} value={project._id} className="text-gray-900">
+                  <option key={project._id} value={project._id} className="ds-text-primary">
                     {project.projectName || project.projectCode || 'Unnamed Project'}
                   </option>
                 ))}
@@ -298,30 +298,30 @@ function SubcontractorsPageContent() {
               onChange={(value) => handleFilterChange('phaseId', value)}
             />
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Status</label>
+              <label className="block text-sm font-semibold ds-text-primary mb-2">Status</label>
               <select
                 value={filters.status || ''}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
               >
-                <option value="" className="text-gray-500">All Statuses</option>
+                <option value="" className="ds-text-muted">All Statuses</option>
                 {SUBCONTRACTOR_STATUSES.map((status) => (
-                  <option key={status} value={status} className="text-gray-900">
+                  <option key={status} value={status} className="ds-text-primary">
                     {status.replace(/\b\w/g, l => l.toUpperCase())}
                   </option>
                 ))}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-2">Type</label>
+              <label className="block text-sm font-semibold ds-text-primary mb-2">Type</label>
               <select
                 value={filters.subcontractorType || ''}
                 onChange={(e) => handleFilterChange('subcontractorType', e.target.value)}
-                className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
               >
-                <option value="" className="text-gray-500">All Types</option>
+                <option value="" className="ds-text-muted">All Types</option>
                 {SUBCONTRACTOR_TYPES.map((type) => (
-                  <option key={type} value={type} className="text-gray-900">
+                  <option key={type} value={type} className="ds-text-primary">
                     {type.replace(/\b\w/g, l => l.toUpperCase())}
                   </option>
                 ))}
@@ -333,7 +333,7 @@ function SubcontractorsPageContent() {
                   setFilters({ projectId: '', phaseId: '', status: '', subcontractorType: '', search: '' });
                   router.push('/subcontractors', { scroll: false });
                 }}
-                className="w-full px-4 py-2.5 border-2 border-gray-300 hover:bg-gray-50 text-gray-700 font-semibold rounded-lg transition-all duration-200 hover:border-gray-400"
+                className="w-full px-4 py-2.5 border-2 ds-border-subtle hover:ds-bg-surface-muted ds-text-secondary font-semibold rounded-lg transition-all duration-200 hover:border-ds-border-strong"
               >
                 Clear Filters
               </button>
@@ -345,12 +345,12 @@ function SubcontractorsPageContent() {
         {loading ? (
           <LoadingTable />
         ) : error ? (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error}
           </div>
         ) : subcontractors.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-12 text-center">
-            <p className="text-gray-700 mb-4 font-semibold text-lg">No subcontractors found</p>
+          <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle p-12 text-center">
+            <p className="ds-text-secondary mb-4 font-semibold text-lg">No subcontractors found</p>
             <Link
               href={`/subcontractors/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}`}
               className="inline-block px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
@@ -359,9 +359,9 @@ function SubcontractorsPageContent() {
             </Link>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+          <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
                 <thead className="bg-gradient-to-r from-purple-600 to-purple-700">
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-bold text-white uppercase tracking-wider">
@@ -387,7 +387,7 @@ function SubcontractorsPageContent() {
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {subcontractors.map((sub) => {
                     const totalPaid = calculateTotalPaid(sub.paymentSchedule || []);
                     const totalUnpaid = calculateTotalUnpaid(sub.paymentSchedule || []);
@@ -396,27 +396,27 @@ function SubcontractorsPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <Link
                             href={`/subcontractors/${sub._id}`}
-                            className="text-sm font-bold text-gray-900 hover:text-purple-600 transition-colors"
+                            className="text-sm font-bold ds-text-primary hover:text-purple-600 transition-colors"
                           >
                             {sub.subcontractorName}
                           </Link>
                           {sub.contactPerson && (
-                            <p className="text-xs text-gray-600 mt-1 font-medium">{sub.contactPerson}</p>
+                            <p className="text-xs ds-text-secondary mt-1 font-medium">{sub.contactPerson}</p>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-secondary">
                           {sub.subcontractorType?.replace(/\b\w/g, l => l.toUpperCase()) || 'Other'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-700">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-secondary">
                           {sub.phaseName || 'N/A'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold ds-text-primary">
                           {formatCurrency(sub.contractValue || 0)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <div>
                             <span className="text-green-600 font-semibold">{formatCurrency(totalPaid)}</span>
-                            <span className="text-gray-400 mx-1">/</span>
+                            <span className="ds-text-muted mx-1">/</span>
                             <span className="text-orange-600 font-semibold">{formatCurrency(totalUnpaid)}</span>
                           </div>
                         </td>
@@ -442,22 +442,22 @@ function SubcontractorsPageContent() {
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-t-2 border-gray-200 flex items-center justify-between">
-                <div className="text-sm font-semibold text-gray-700">
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-t-2 ds-border-subtle flex items-center justify-between">
+                <div className="text-sm font-semibold ds-text-secondary">
                   Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} subcontractors
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                     disabled={pagination.page === 1}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-white hover:border-purple-500 hover:text-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    className="px-4 py-2 border-2 ds-border-subtle rounded-lg ds-text-secondary font-semibold hover:ds-bg-surface hover:border-purple-500 hover:text-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                     disabled={pagination.page === pagination.pages}
-                    className="px-4 py-2 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-white hover:border-purple-500 hover:text-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                    className="px-4 py-2 border-2 ds-border-subtle rounded-lg ds-text-secondary font-semibold hover:ds-bg-surface hover:border-purple-500 hover:text-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                   >
                     Next
                   </button>

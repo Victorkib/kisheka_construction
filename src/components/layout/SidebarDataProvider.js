@@ -9,13 +9,14 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { usePermissions } from '@/hooks/use-permissions';
+import { useProjectContext } from '@/contexts/ProjectContext';
 
 const SidebarDataContext = createContext(null);
 
 /**
  * Extract project ID from pathname or search params
  */
-function getProjectId(pathname, searchParams) {
+function getProjectIdFromUrl(pathname, searchParams) {
   const objectIdPattern = /^[a-f\d]{24}$/i;
   const projectMatch = pathname.match(/^\/projects\/([^/]+)/);
   if (projectMatch) {
@@ -29,11 +30,13 @@ function getProjectId(pathname, searchParams) {
 /**
  * Sidebar Data Provider Component
  * Fetches all sidebar-related data in one place
+ * Now uses ProjectContext to get current project, not just URL
  */
 export function SidebarDataProvider({ children }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user, canAccess } = usePermissions();
+  const { currentProject, currentProjectId } = useProjectContext();
   
   const [data, setData] = useState({
     project: null,
@@ -43,7 +46,13 @@ export function SidebarDataProvider({ children }) {
     error: null,
   });
 
-  const projectId = useMemo(() => getProjectId(pathname, searchParams), [pathname, searchParams]);
+  // Prioritize ProjectContext over URL - this ensures sidebar respects project selection
+  const projectIdFromUrl = useMemo(() => getProjectIdFromUrl(pathname, searchParams), [pathname, searchParams]);
+  const projectId = useMemo(() => {
+    // Use currentProjectId from context if available, otherwise fall back to URL
+    const contextProjectId = currentProjectId || (currentProject?._id?.toString() || currentProject?._id || null);
+    return contextProjectId || projectIdFromUrl;
+  }, [currentProjectId, currentProject, projectIdFromUrl]);
 
   useEffect(() => {
     if (!user) {
@@ -52,7 +61,7 @@ export function SidebarDataProvider({ children }) {
     }
 
     fetchAllSidebarData();
-  }, [user, pathname, searchParams, projectId, canAccess]);
+  }, [user, pathname, searchParams, projectId, canAccess, currentProject]);
 
   const fetchAllSidebarData = async () => {
     try {
@@ -61,8 +70,12 @@ export function SidebarDataProvider({ children }) {
       // Batch all API requests
       const promises = [];
 
-      // Fetch current project if projectId exists
-      if (projectId) {
+      // Use currentProject from context if available, otherwise fetch
+      if (currentProject && (currentProject._id?.toString() === projectId || currentProject._id === projectId)) {
+        // Use project from context - no need to fetch
+        promises.push(Promise.resolve({ type: 'project', data: { success: true, data: currentProject } }));
+      } else if (projectId) {
+        // Fetch project if not in context
         promises.push(
           fetch(`/api/projects/${projectId}`, {
             cache: 'no-store',
@@ -79,10 +92,13 @@ export function SidebarDataProvider({ children }) {
         promises.push(Promise.resolve({ type: 'project', data: null }));
       }
 
-      // Fetch pending actions
+      // Fetch pending actions - filter by project if available
       if (canAccess && canAccess('approve_material_request')) {
+        const summaryUrl = projectId 
+          ? `/api/dashboard/summary?projectId=${projectId}`
+          : '/api/dashboard/summary';
         promises.push(
-          fetch('/api/dashboard/summary', {
+          fetch(summaryUrl, {
             cache: 'no-store',
             headers: {
               'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -97,10 +113,13 @@ export function SidebarDataProvider({ children }) {
         promises.push(Promise.resolve({ type: 'approvals', data: null }));
       }
 
-      // Fetch ready to order count
+      // Fetch ready to order count - filter by project if available
       if (canAccess && (canAccess('create_purchase_order') || canAccess('view_material_requests'))) {
+        const readyToOrderUrl = projectId
+          ? `/api/material-requests?status=ready_to_order&limit=0&projectId=${projectId}`
+          : '/api/material-requests?status=ready_to_order&limit=0';
         promises.push(
-          fetch('/api/material-requests?status=ready_to_order&limit=0', {
+          fetch(readyToOrderUrl, {
             cache: 'no-store',
             headers: {
               'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -115,10 +134,13 @@ export function SidebarDataProvider({ children }) {
         promises.push(Promise.resolve({ type: 'readyToOrder', data: null }));
       }
 
-      // Fetch pending purchase orders for suppliers
+      // Fetch pending purchase orders for suppliers - filter by project if available
       if (user?.role?.toLowerCase() === 'supplier') {
+        const ordersUrl = projectId
+          ? `/api/purchase-orders?limit=0&projectId=${projectId}`
+          : '/api/purchase-orders?limit=0';
         promises.push(
-          fetch('/api/purchase-orders?limit=0', {
+          fetch(ordersUrl, {
             cache: 'no-store',
             headers: {
               'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -193,10 +215,13 @@ export function SidebarDataProvider({ children }) {
 
           case 'approvals':
             if (result.data?.success && result.data.data?.summary?.totalPendingApprovals > 0) {
+              const approvalsHref = projectId 
+                ? `/dashboard/approvals?projectId=${projectId}`
+                : '/dashboard/approvals';
               pendingActions.push({
                 type: 'approval',
                 label: `${result.data.data.summary.totalPendingApprovals} Material Request${result.data.data.summary.totalPendingApprovals !== 1 ? 's' : ''} Pending Approval`,
-                href: '/dashboard/approvals',
+                href: approvalsHref,
                 icon: '✅',
                 priority: 'high',
                 count: result.data.data.summary.totalPendingApprovals,
@@ -213,10 +238,13 @@ export function SidebarDataProvider({ children }) {
                 count = result.data.data.requests.length;
               }
               if (count > 0) {
+                const readyToOrderHref = projectId
+                  ? `/material-requests?status=ready_to_order&projectId=${projectId}`
+                  : '/material-requests?status=ready_to_order';
                 pendingActions.push({
                   type: 'ready_to_order',
                   label: `${count} Approved Request${count !== 1 ? 's' : ''} Ready to Order`,
-                  href: '/material-requests?status=ready_to_order',
+                  href: readyToOrderHref,
                   icon: '🛒',
                   priority: 'medium',
                   count,
@@ -231,10 +259,13 @@ export function SidebarDataProvider({ children }) {
                 (order) => order.status === 'order_sent' || order.status === 'order_modified'
               ).length;
               if (pendingCount > 0) {
+                const ordersHref = projectId
+                  ? `/purchase-orders?projectId=${projectId}`
+                  : '/purchase-orders';
                 pendingActions.push({
                   type: 'pending_order',
                   label: `${pendingCount} Purchase Order${pendingCount !== 1 ? 's' : ''} Awaiting Response`,
-                  href: '/purchase-orders',
+                  href: ordersHref,
                   icon: '📋',
                   priority: 'high',
                   count: pendingCount,

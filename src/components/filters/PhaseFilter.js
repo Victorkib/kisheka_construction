@@ -71,11 +71,11 @@ export function PhaseFilter({
     onChange(selectedValue);
   };
 
-  const defaultClassName = 'w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed';
+  const defaultClassName = 'w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50 disabled:cursor-not-allowed';
 
   return (
     <div className={className}>
-      <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+      <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
         {label}
       </label>
       <select

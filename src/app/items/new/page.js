@@ -670,9 +670,9 @@ function NewItemPageContent() {
           >
             ← Back to Materials
           </Link>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Add New Material</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-2">Create a new material entry</p>
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Add New Material</h1>
+          <p className="text-sm sm:text-base ds-text-secondary mt-2">Create a new material entry</p>
+          <div className="mt-4 bg-green-50 border border-green-400/60 rounded-lg p-3 sm:p-4">
             <p className="text-xs sm:text-sm text-green-800 font-semibold mb-1">💡 When to use Materials vs Expenses:</p>
             <ul className="text-xs sm:text-sm text-green-700 list-disc list-inside space-y-1">
               <li><strong>Use Materials</strong> for physical items you purchase with quantities (e.g., cement, steel bars, tiles, paint, electrical wires, plumbing pipes)</li>
@@ -684,10 +684,10 @@ function NewItemPageContent() {
 
         {/* Entry Type Selection */}
         {entryType === null && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Entry Type</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h2 className="text-xl font-semibold ds-text-primary mb-4">Select Entry Type</h2>
             <div className="space-y-4">
-              <div className="flex items-start gap-3 p-4 border-2 border-blue-200 rounded-lg hover:border-blue-400 cursor-pointer transition"
+              <div className="flex items-start gap-3 p-4 border-2 border-blue-400/60 rounded-lg hover:border-blue-400 cursor-pointer transition"
                 onClick={() => setEntryType('new_purchase')}>
                 <input
                   type="radio"
@@ -698,11 +698,11 @@ function NewItemPageContent() {
                   className="mt-1"
                 />
                 <div className="flex-1">
-                  <label className="font-semibold text-gray-900 cursor-pointer">New Purchase (Recommended)</label>
-                  <p className="text-sm text-gray-600 mt-1">For materials that need to be purchased. This will create a Material Request that goes through the approval and purchase order workflow.</p>
+                  <label className="font-semibold ds-text-primary cursor-pointer">New Purchase (Recommended)</label>
+                  <p className="text-sm ds-text-secondary mt-1">For materials that need to be purchased. This will create a Material Request that goes through the approval and purchase order workflow.</p>
                 </div>
               </div>
-              <div className="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-lg hover:border-gray-400 cursor-pointer transition"
+              <div className="flex items-start gap-3 p-4 border-2 ds-border-subtle rounded-lg hover:border-ds-border-strong cursor-pointer transition"
                 onClick={() => setEntryType('retroactive_entry')}>
                 <input
                   type="radio"
@@ -713,8 +713,8 @@ function NewItemPageContent() {
                   className="mt-1"
                 />
                 <div className="flex-1">
-                  <label className="font-semibold text-gray-900 cursor-pointer">Retroactive Entry</label>
-                  <p className="text-sm text-gray-600 mt-1">For materials already purchased or on-site. Documentation is optional. Use this for historical entries or materials with lost receipts.</p>
+                  <label className="font-semibold ds-text-primary cursor-pointer">Retroactive Entry</label>
+                  <p className="text-sm ds-text-secondary mt-1">For materials already purchased or on-site. Documentation is optional. Use this for historical entries or materials with lost receipts.</p>
                 </div>
               </div>
             </div>
@@ -723,7 +723,7 @@ function NewItemPageContent() {
 
         {/* New Purchase Selection - Redirect Message */}
         {entryType === 'new_purchase' && !showContinueAnyway && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-6 mb-6">
             <h2 className="text-lg font-semibold text-blue-900 mb-2">📋 New Purchase Workflow</h2>
             <p className="text-sm text-blue-800 mb-4">
               For new purchases, please create a Material Request first. This ensures proper approval and purchase order workflow.
@@ -738,7 +738,7 @@ function NewItemPageContent() {
                   value={formData.projectId}
                   onChange={handleChange}
                   disabled={loadingProjects || loading}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border border-blue-400/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loadingProjects ? (
                     <option>Loading projects...</option>
@@ -779,7 +779,7 @@ function NewItemPageContent() {
               <button
                 type="button"
                 onClick={() => setEntryType(null)}
-                className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition"
+                className="px-4 py-2 border ds-border-subtle ds-text-secondary hover:ds-bg-surface-muted font-medium rounded-lg transition"
               >
                 Change Selection
               </button>
@@ -789,7 +789,7 @@ function NewItemPageContent() {
 
         {/* Retroactive Entry Warning */}
         {entryType === 'retroactive_entry' && showContinueAnyway && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-4 mb-6">
             <p className="text-sm text-yellow-800 font-semibold mb-1">⚠️ Emergency Entry</p>
             <p className="text-sm text-yellow-700">You are creating a retroactive entry. This bypasses the normal purchase workflow. Use only in emergency cases.</p>
           </div>
@@ -798,10 +798,10 @@ function NewItemPageContent() {
         {/* Retroactive Entry Badge */}
         {entryType === 'retroactive_entry' && (
           <div className="mb-6">
-            <span className="inline-flex px-3 py-1 bg-gray-100 text-gray-800 text-sm font-semibold rounded-full">
+            <span className="inline-flex px-3 py-1 ds-bg-surface-muted ds-text-primary text-sm font-semibold rounded-full">
               📝 Retroactive Entry
             </span>
-            <p className="text-sm text-gray-600 mt-2">For materials already purchased or on-site. Documentation is optional.</p>
+            <p className="text-sm ds-text-secondary mt-2">For materials already purchased or on-site. Documentation is optional.</p>
           </div>
         )}
 
@@ -823,7 +823,7 @@ function NewItemPageContent() {
                             ? 'bg-green-500 text-white'
                             : isCurrent
                             ? 'bg-blue-600 text-white ring-2 ring-blue-300'
-                            : 'bg-gray-200 text-gray-600'
+                            : 'ds-bg-surface-muted ds-text-secondary'
                         }`}
                       >
                         {isComplete ? (
@@ -834,14 +834,14 @@ function NewItemPageContent() {
                           s
                         )}
                       </div>
-                      <span className={`text-xs mt-1 text-center ${isCurrent ? 'font-semibold text-blue-600' : 'text-gray-600'}`}>
+                      <span className={`text-xs mt-1 text-center ${isCurrent ? 'font-semibold text-blue-600' : 'ds-text-secondary'}`}>
                         {stepLabels[s - 1]}
                       </span>
                     </div>
                     {s < 5 && (
                       <div
                         className={`flex-1 h-1 mx-2 transition-all ${
-                          isComplete ? 'bg-green-500' : isCurrent ? 'bg-blue-300' : 'bg-gray-200'
+                          isComplete ? 'bg-green-500' : isCurrent ? 'bg-blue-300' : 'ds-bg-surface-muted'
                         }`}
                       />
                     )}
@@ -854,7 +854,7 @@ function NewItemPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 flex items-start gap-2">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6 flex items-start gap-2">
             <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -875,9 +875,9 @@ function NewItemPageContent() {
 
         {/* Form - Only show for retroactive entries */}
         {entryType === 'retroactive_entry' && (
-          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-4 sm:p-6 relative">
+          <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 relative">
             {changingStep && (
-              <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10 rounded-lg">
+              <div className="absolute inset-0 ds-bg-surface bg-opacity-75 flex items-center justify-center z-10 rounded-lg">
                 <LoadingSpinner size="md" color="blue-600" text="Loading step..." />
               </div>
             )}
@@ -887,7 +887,7 @@ function NewItemPageContent() {
               <h2 className="text-xl font-semibold mb-4">Basic Information</h2>
               
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Project <span className="text-red-500">*</span>
                 </label>
                 {projects.length > 0 ? (
@@ -897,7 +897,7 @@ function NewItemPageContent() {
                     onChange={handleChange}
                     required
                     disabled={loadingProjects || loading}
-                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                   >
                     {loadingProjects ? (
                       <option>Loading projects...</option>
@@ -914,7 +914,7 @@ function NewItemPageContent() {
                   </select>
                 ) : (
                   <div className="space-y-2">
-                    <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                    <div className="bg-yellow-50 border border-yellow-400/60 rounded p-3">
                       <p className="text-sm text-yellow-800 font-semibold mb-2">
                         ⚠️ No projects found
                       </p>
@@ -930,13 +930,13 @@ function NewItemPageContent() {
                         </Link>
                         <Link
                           href="/projects"
-                          className="inline-flex items-center px-3 py-1.5 bg-white text-blue-600 text-xs font-medium rounded border border-blue-600 hover:bg-blue-50 transition"
+                          className="inline-flex items-center px-3 py-1.5 ds-bg-surface text-blue-600 text-xs font-medium rounded border border-blue-600 hover:bg-blue-50 transition"
                         >
                           View All Projects
                         </Link>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600 leading-normal">
+                    <p className="text-sm ds-text-secondary leading-normal">
                       Or if you have a project ID, you can enter it manually:
                     </p>
                     <input
@@ -945,18 +945,18 @@ function NewItemPageContent() {
                       value={formData.projectId}
                       onChange={handleChange}
                       placeholder="Enter project ID (ObjectId)"
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                     />
                   </div>
                 )}
-                <p className="text-sm text-gray-600 mt-1 leading-normal">
+                <p className="text-sm ds-text-secondary mt-1 leading-normal">
                   Select the project this material belongs to
                 </p>
               </div>
 
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Select From Material Library (Optional)</h3>
-                <p className="text-xs text-gray-600 mb-3">
+              <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-4">
+                <h3 className="text-sm font-semibold ds-text-primary mb-2">Select From Material Library (Optional)</h3>
+                <p className="text-xs ds-text-secondary mb-3">
                   Use the library to prefill material name, unit, category, and estimated unit cost.
                 </p>
                 <MaterialLibraryPicker
@@ -966,7 +966,7 @@ function NewItemPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Material Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -981,19 +981,19 @@ function NewItemPageContent() {
                   }}
                   placeholder="e.g., Portland Cement"
                   required
-                  className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 placeholder:text-gray-400 ${
+                  className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 placeholder:ds-text-muted ${
                     step === 1 && !formData.name && error?.includes('name')
-                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                      : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                      ? 'border-red-400/60 focus:ring-red-500 focus:border-red-500'
+                      : 'ds-border-subtle focus:ring-blue-500 focus:border-blue-500'
                   }`}
                 />
                 {step === 1 && !formData.name && (
-                  <p className="text-sm text-gray-600 mt-1 leading-normal">Enter the name of the material</p>
+                  <p className="text-sm ds-text-secondary mt-1 leading-normal">Enter the name of the material</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Description
                 </label>
                 <textarea
@@ -1002,13 +1002,13 @@ function NewItemPageContent() {
                   onChange={handleChange}
                   rows={3}
                   placeholder="Material description..."
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Category
                   </label>
                   <select
@@ -1032,7 +1032,7 @@ function NewItemPageContent() {
                         }));
                       }
                     }}
-                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                     disabled={loadingCategories || loading}
                   >
                     {loadingCategories ? (
@@ -1053,23 +1053,23 @@ function NewItemPageContent() {
                     )}
                   </select>
                   {formData.categoryId && formData.category && (
-                    <p className="text-sm text-gray-600 mt-1 leading-normal">
+                    <p className="text-sm ds-text-secondary mt-1 leading-normal">
                       Selected: <span className="font-medium">{formData.category}</span>
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Floor
                   </label>
                   {!formData.projectId ? (
-                    <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
+                    <div className="px-3 py-2 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700 text-sm">
                       Please select a project first to see available floors
                     </div>
                   ) : floors.length === 0 ? (
                     <div className="space-y-2">
-                      <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
+                      <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-secondary text-sm">
                         No floors available for this project. Floors are automatically created when a project is set up.
                       </div>
                       <Link
@@ -1086,7 +1086,7 @@ function NewItemPageContent() {
                       value={formData.floor}
                       onChange={handleChange}
                       disabled={loadingFloors || loading || !formData.projectId}
-                      className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                      className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                     >
                       {loadingFloors ? (
                         <option>Loading floors...</option>
@@ -1115,16 +1115,16 @@ function NewItemPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Construction Phase <span className="text-red-500">*</span>
                 </label>
                 {!formData.projectId ? (
-                  <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
+                  <div className="px-3 py-2 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700 text-sm">
                     Please select a project first to see available phases
                   </div>
                 ) : phases.length === 0 ? (
                   <div className="space-y-2">
-                    <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
+                    <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-secondary text-sm">
                       No phases available for this project. Phases can be created in the project phases section.
                     </div>
                     <Link
@@ -1142,7 +1142,7 @@ function NewItemPageContent() {
                     onChange={handleChange}
                     disabled={loadingPhases || loading || !formData.projectId}
                     required
-                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                   >
                     {loadingPhases ? (
                       <option>Loading phases...</option>
@@ -1169,7 +1169,7 @@ function NewItemPageContent() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Quantity Purchased <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -1185,10 +1185,10 @@ function NewItemPageContent() {
                     min="0.01"
                     step="0.01"
                     required
-                    className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 placeholder:text-gray-400 ${
+                    className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 placeholder:ds-text-muted ${
                       step === 2 && (!formData.quantity || parseFloat(formData.quantity) <= 0) && error?.includes('quantity')
-                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                        ? 'border-red-400/60 focus:ring-red-500 focus:border-red-500'
+                        : 'ds-border-subtle focus:ring-blue-500 focus:border-blue-500'
                     }`}
                   />
                   {formData.quantity && parseFloat(formData.quantity) > 0 && (
@@ -1197,7 +1197,7 @@ function NewItemPageContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Unit <span className="text-red-500">*</span>
                   </label>
                   <select
@@ -1205,7 +1205,7 @@ function NewItemPageContent() {
                     value={formData.unit}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   >
                     {unitOptions.map((option) => (
                       <option key={option} value={option}>
@@ -1221,7 +1221,7 @@ function NewItemPageContent() {
                       onChange={handleChange}
                       required
                       placeholder="Enter custom unit name"
-                      className="w-full mt-2 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                      className="w-full mt-2 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                     />
                   )}
                 </div>
@@ -1236,7 +1236,7 @@ function NewItemPageContent() {
               
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Unit Cost (KES) {entryType === 'retroactive_entry' ? '(Optional)' : <span className="text-red-500">*</span>}
                   </label>
                   <input
@@ -1252,10 +1252,10 @@ function NewItemPageContent() {
                     min="0"
                     step="0.01"
                     required={entryType !== 'retroactive_entry'}
-                    className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 placeholder:text-gray-400 ${
+                    className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 placeholder:ds-text-muted ${
                       step === 3 && (!formData.unitCost || parseFloat(formData.unitCost) <= 0) && error?.includes('cost')
-                        ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
-                        : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                        ? 'border-red-400/60 focus:ring-red-500 focus:border-red-500'
+                        : 'ds-border-subtle focus:ring-blue-500 focus:border-blue-500'
                     }`}
                   />
                   {formData.unitCost && formData.quantity && (
@@ -1264,13 +1264,13 @@ function NewItemPageContent() {
                     </p>
                   )}
                   {entryType === 'retroactive_entry' && (
-                    <p className="text-xs text-gray-500 mt-1">Optional for retroactive entries</p>
+                    <p className="text-xs ds-text-muted mt-1">Optional for retroactive entries</p>
                   )}
                 </div>
                 {entryType === 'retroactive_entry' && (
                   <div>
-                    <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
-                      Estimated Unit Cost (KES) <span className="text-gray-500">(Optional)</span>
+                    <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
+                      Estimated Unit Cost (KES) <span className="ds-text-muted">(Optional)</span>
                     </label>
                     <input
                       type="number"
@@ -1279,22 +1279,22 @@ function NewItemPageContent() {
                       onChange={handleChange}
                       min="0"
                       step="0.01"
-                      className="w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 placeholder:text-gray-400 border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 placeholder:ds-text-muted ds-border-subtle focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs ds-text-muted mt-1">
                       Use this if the actual unit cost is unknown. The system will mark costs as estimated.
                     </p>
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Total Cost (KES)
                   </label>
-                  <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
+                  <div className="w-full px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg">
                     <span className="text-lg font-semibold">{calculateTotal()}</span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1 leading-normal">
+                  <p className="text-sm ds-text-secondary mt-1 leading-normal">
                     Auto-calculated {formData.unitCost ? '(actual)' : formData.estimatedUnitCost ? '(estimated)' : ''}
                   </p>
                 </div>
@@ -1313,7 +1313,7 @@ function NewItemPageContent() {
               )}
 
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Supplier Name {entryType === 'retroactive_entry' ? '(Optional)' : <span className="text-red-500">*</span>}
                 </label>
                 <input
@@ -1323,22 +1323,22 @@ function NewItemPageContent() {
                   onChange={handleChange}
                   placeholder="Supplier company name"
                   required={entryType !== 'retroactive_entry'}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
                 {entryType === 'retroactive_entry' && (
-                  <p className="text-xs text-gray-500 mt-1">Optional for retroactive entries</p>
+                  <p className="text-xs ds-text-muted mt-1">Optional for retroactive entries</p>
                 )}
               </div>
 
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Payment Method
                 </label>
                 <select
                   name="paymentMethod"
                   value={formData.paymentMethod}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 >
                   <option value="CASH">Cash</option>
                   <option value="M_PESA">M-Pesa</option>
@@ -1349,7 +1349,7 @@ function NewItemPageContent() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Invoice Number
                   </label>
                   <input
@@ -1358,12 +1358,12 @@ function NewItemPageContent() {
                     value={formData.invoiceNumber}
                     onChange={handleChange}
                     placeholder="Invoice #"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Invoice Date
                   </label>
                   <input
@@ -1371,13 +1371,13 @@ function NewItemPageContent() {
                     name="invoiceDate"
                     value={formData.invoiceDate}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Purchase Date
                 </label>
                 <div className="relative">
@@ -1387,7 +1387,7 @@ function NewItemPageContent() {
                     value={formData.datePurchased}
                     onChange={handleChange}
                     max={entryType === 'retroactive_entry' ? new Date().toISOString().split('T')[0] : undefined}
-                    className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer"
+                    className="w-full px-3 pr-12 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted cursor-pointer"
                   />
                   <button
                     type="button"
@@ -1399,27 +1399,27 @@ function NewItemPageContent() {
                         input.focus();
                       }
                     }}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:ds-bg-surface-muted rounded-r-lg transition-colors"
                     aria-label="Open date picker"
                     tabIndex={-1}
                   >
-                    <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 ds-text-secondary hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </button>
                 </div>
                 {entryType === 'retroactive_entry' && (
-                  <p className="text-xs text-gray-500 mt-1">Can be in the past for retroactive entries</p>
+                  <p className="text-xs ds-text-muted mt-1">Can be in the past for retroactive entries</p>
                 )}
               </div>
 
               {/* Retroactive Entry Specific Fields */}
               {entryType === 'retroactive_entry' && (
-                <div className="mt-6 pt-6 border-t border-gray-200 space-y-4">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Retroactive Entry Details</h3>
+                <div className="mt-6 pt-6 border-t ds-border-subtle space-y-4">
+                  <h3 className="text-lg font-semibold ds-text-primary mb-2">Retroactive Entry Details</h3>
                   
                   <div>
-                    <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                    <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                       Original Purchase Date
                     </label>
                     <div className="relative">
@@ -1429,7 +1429,7 @@ function NewItemPageContent() {
                         value={formData.originalPurchaseDate || formData.datePurchased}
                         onChange={(e) => setFormData(prev => ({ ...prev, originalPurchaseDate: e.target.value }))}
                         max={new Date().toISOString().split('T')[0]}
-                        className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
+                        className="w-full px-3 pr-12 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 cursor-pointer"
                       />
                       <button
                         type="button"
@@ -1441,28 +1441,28 @@ function NewItemPageContent() {
                             input.focus();
                           }
                         }}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:ds-bg-surface-muted rounded-r-lg transition-colors"
                         aria-label="Open date picker"
                         tabIndex={-1}
                       >
-                        <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-secondary hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </button>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">Date when the material was originally purchased (can be in the past)</p>
+                    <p className="text-xs ds-text-muted mt-1">Date when the material was originally purchased (can be in the past)</p>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                      <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                         Documentation Status
                       </label>
                       <select
                         name="documentationStatus"
                         value={formData.documentationStatus}
                         onChange={(e) => setFormData(prev => ({ ...prev, documentationStatus: e.target.value }))}
-                        className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="complete">Complete</option>
                         <option value="partial">Partial</option>
@@ -1471,14 +1471,14 @@ function NewItemPageContent() {
                     </div>
 
                     <div>
-                      <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                      <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                         Cost Status
                       </label>
                       <select
                         name="costStatus"
                         value={formData.costStatus}
                         onChange={(e) => setFormData(prev => ({ ...prev, costStatus: e.target.value }))}
-                        className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="actual">Actual</option>
                         <option value="estimated">Estimated</option>
@@ -1489,7 +1489,7 @@ function NewItemPageContent() {
                   </div>
 
                   <div>
-                    <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                    <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                       Retroactive Notes
                     </label>
                     <textarea
@@ -1498,9 +1498,9 @@ function NewItemPageContent() {
                       onChange={(e) => setFormData(prev => ({ ...prev, retroactiveNotes: e.target.value }))}
                       rows={3}
                       placeholder="Explain why this is a retroactive entry (e.g., material was on-site for a long time, receipt was lost, purchased before system implementation...)"
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Recommended: Explain the retroactive nature of this entry</p>
+                    <p className="text-xs ds-text-muted mt-1">Recommended: Explain the retroactive nature of this entry</p>
                   </div>
                 </div>
               )}
@@ -1509,11 +1509,11 @@ function NewItemPageContent() {
               {isFinishingCategory(formData.category) && (() => {
                 const finishingType = getFinishingCategoryType(formData.category);
                 return (
-                  <div className="mt-6 pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  <div className="mt-6 pt-6 border-t ds-border-subtle">
+                    <h3 className="text-lg font-semibold ds-text-primary mb-4">
                       Finishing Details
                     </h3>
-                    <p className="text-sm text-gray-600 mb-4">
+                    <p className="text-sm ds-text-secondary mb-4">
                       Additional information for {formData.category}
                     </p>
 
@@ -1521,7 +1521,7 @@ function NewItemPageContent() {
                     {finishingType === 'electrical' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Brand <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1530,11 +1530,11 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('brand', e.target.value)}
                             placeholder="e.g., Schneider, Legrand"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Technician Name <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1543,11 +1543,11 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('technicianName', e.target.value)}
                             placeholder="Name of electrician"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Installation Date
                           </label>
                           <div className="relative">
@@ -1555,7 +1555,7 @@ function NewItemPageContent() {
                               type="date"
                               value={formData.finishingDetails.installationDate}
                               onChange={(e) => handleFinishingChange('installationDate', e.target.value)}
-                              className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer"
+                              className="w-full px-3 pr-12 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted cursor-pointer"
                             />
                             <button
                               type="button"
@@ -1567,11 +1567,11 @@ function NewItemPageContent() {
                                   input.focus();
                                 }
                               }}
-                              className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                              className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:ds-bg-surface-muted rounded-r-lg transition-colors"
                               aria-label="Open date picker"
                               tabIndex={-1}
                             >
-                              <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-5 h-5 ds-text-secondary hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                             </button>
@@ -1584,7 +1584,7 @@ function NewItemPageContent() {
                     {finishingType === 'plumbing' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Brand <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1593,11 +1593,11 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('brand', e.target.value)}
                             placeholder="e.g., Grohe, Hansgrohe"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Technician Name <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1606,11 +1606,11 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('technicianName', e.target.value)}
                             placeholder="Name of plumber"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Installation Date
                           </label>
                           <div className="relative">
@@ -1618,7 +1618,7 @@ function NewItemPageContent() {
                               type="date"
                               value={formData.finishingDetails.installationDate}
                               onChange={(e) => handleFinishingChange('installationDate', e.target.value)}
-                              className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer"
+                              className="w-full px-3 pr-12 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted cursor-pointer"
                             />
                             <button
                               type="button"
@@ -1630,11 +1630,11 @@ function NewItemPageContent() {
                                   input.focus();
                                 }
                               }}
-                              className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                              className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:ds-bg-surface-muted rounded-r-lg transition-colors"
                               aria-label="Open date picker"
                               tabIndex={-1}
                             >
-                              <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-5 h-5 ds-text-secondary hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                             </button>
@@ -1647,7 +1647,7 @@ function NewItemPageContent() {
                     {finishingType === 'joinery' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Material Type <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1656,11 +1656,11 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('materialType', e.target.value)}
                             placeholder="e.g., Hardwood, MDF, Plywood"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Installation Team <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1669,11 +1669,11 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('installationTeam', e.target.value)}
                             placeholder="Team or company name"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Installation Date <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1681,7 +1681,7 @@ function NewItemPageContent() {
                             value={formData.finishingDetails.installationDate}
                             onChange={(e) => handleFinishingChange('installationDate', e.target.value)}
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                       </div>
@@ -1691,7 +1691,7 @@ function NewItemPageContent() {
                     {finishingType === 'paintwork' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Brand <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1700,11 +1700,11 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('brand', e.target.value)}
                             placeholder="e.g., Crown, Dulux"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Colour <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1713,11 +1713,11 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('colour', e.target.value)}
                             placeholder="e.g., White, Cream, Beige"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Team Leader
                           </label>
                           <input
@@ -1725,7 +1725,7 @@ function NewItemPageContent() {
                             value={formData.finishingDetails.teamLeader}
                             onChange={(e) => handleFinishingChange('teamLeader', e.target.value)}
                             placeholder="Name of team leader"
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                       </div>
@@ -1735,7 +1735,7 @@ function NewItemPageContent() {
                     {finishingType === 'tiling' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Tile Type <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1744,11 +1744,11 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('tileType', e.target.value)}
                             placeholder="e.g., Ceramic, Porcelain, Terrazzo"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Square Meters Covered <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1759,11 +1759,11 @@ function NewItemPageContent() {
                             min="0"
                             step="0.1"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Supplier <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1772,7 +1772,7 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('brand', e.target.value)}
                             placeholder="Tile supplier name"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                       </div>
@@ -1782,7 +1782,7 @@ function NewItemPageContent() {
                     {finishingType === 'lift' && (
                       <div className="space-y-4">
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Contract Number <span className="text-red-500">*</span>
                           </label>
                           <input
@@ -1791,11 +1791,11 @@ function NewItemPageContent() {
                             onChange={(e) => handleFinishingChange('contractNumber', e.target.value)}
                             placeholder="Lift installation contract number"
                             required
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Payment Schedule <span className="text-red-500">*</span>
                           </label>
                           <textarea
@@ -1804,11 +1804,11 @@ function NewItemPageContent() {
                             placeholder="Describe payment schedule (e.g., 30% upfront, 40% on delivery, 30% on completion)"
                             required
                             rows={3}
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                          <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                             Warranty Documents <span className="text-red-500">*</span>
                           </label>
                           <CloudinaryUploadWidget
@@ -1821,7 +1821,7 @@ function NewItemPageContent() {
                             maxSizeMB={10}
                             acceptedTypes={['image/*', 'application/pdf']}
                           />
-                          <p className="text-sm text-gray-600 mt-1 leading-normal">
+                          <p className="text-sm ds-text-secondary mt-1 leading-normal">
                             Upload warranty documents for the lift installation
                           </p>
                         </div>
@@ -1837,7 +1837,7 @@ function NewItemPageContent() {
           {step === 4 && (
             <div className="space-y-6">
               <h2 className="text-xl font-semibold mb-4">Documentation</h2>
-              <p className="text-gray-600 mb-4">
+              <p className="ds-text-secondary mb-4">
                 Upload receipts, invoices, and delivery notes. All files are securely stored in Cloudinary.
               </p>
 
@@ -1877,7 +1877,7 @@ function NewItemPageContent() {
                 acceptedTypes={['image/*', 'application/pdf']}
               />
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+              <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-3 text-sm text-blue-800">
                 <p className="font-semibold mb-1">📋 Upload Guidelines:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li>Receipts: Clear photos of purchase receipts (JPG, PNG)</li>
@@ -1894,7 +1894,7 @@ function NewItemPageContent() {
             <div className="space-y-4">
               <h2 className="text-xl font-semibold mb-4">Review & Submit</h2>
               
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+              <div className="ds-bg-surface-muted rounded-lg p-4 space-y-2">
                 <div className="flex justify-between">
                   <span className="font-medium">Material Name:</span>
                   <span>{formData.name}</span>
@@ -1921,7 +1921,7 @@ function NewItemPageContent() {
                 
                 {/* Uploaded Files Summary */}
                 {(formData.receiptFileUrl || formData.invoiceFileUrl || formData.deliveryNoteFileUrl) && (
-                  <div className="mt-4 pt-4 border-t border-gray-300">
+                  <div className="mt-4 pt-4 border-t ds-border-subtle">
                     <p className="font-medium mb-2">Uploaded Documents:</p>
                     <div className="space-y-1 text-sm">
                       {formData.receiptFileUrl && (
@@ -1954,7 +1954,7 @@ function NewItemPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Notes (Optional)
                 </label>
                 <textarea
@@ -1963,7 +1963,7 @@ function NewItemPageContent() {
                   onChange={handleChange}
                   rows={3}
                   placeholder="Additional notes..."
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
               </div>
             </div>
@@ -1976,7 +1976,7 @@ function NewItemPageContent() {
                 <button
                   type="button"
                   onClick={prevStep}
-                  className="w-full sm:w-auto px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 flex items-center justify-center gap-2 transition-colors touch-manipulation"
+                  className="w-full sm:w-auto px-6 py-2.5 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface-muted flex items-center justify-center gap-2 transition-colors touch-manipulation"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -2015,7 +2015,7 @@ function NewItemPageContent() {
                   <button
                     type="button"
                     onClick={() => setStep(4)}
-                    className="w-full sm:w-auto px-4 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 text-sm transition-colors touch-manipulation"
+                    className="w-full sm:w-auto px-4 py-2.5 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface-muted text-sm transition-colors touch-manipulation"
                   >
                     Edit
                   </button>

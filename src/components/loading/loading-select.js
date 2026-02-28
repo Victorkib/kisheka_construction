@@ -34,7 +34,7 @@ export function LoadingSelect({
       <select
         {...selectProps}
         disabled={isDisabled}
-        className={`${className} ${isDisabled ? 'opacity-50 cursor-not-allowed bg-gray-50' : ''} transition pr-8`}
+        className={`${className} ${isDisabled ? 'opacity-50 cursor-not-allowed ds-bg-surface-muted' : ''} transition pr-8`}
       >
         {isActuallyLoading ? (
           <option value="" disabled>

@@ -111,7 +111,8 @@ export async function PATCH(request, { params }) {
       paymentSchedule,
       status,
       performance,
-      notes
+      notes,
+      floorId
     } = body;
 
     const db = await getDatabase();
@@ -238,6 +239,17 @@ export async function PATCH(request, { params }) {
 
     if (notes !== undefined) {
       updateData.notes = notes?.trim() || '';
+    }
+
+    // Optional: allow moving a subcontractor between floors
+    if (floorId !== undefined) {
+      if (floorId === null || floorId === '') {
+        updateData.floorId = null;
+      } else if (!ObjectId.isValid(floorId)) {
+        return errorResponse('If provided, floorId must be a valid ObjectId', 400);
+      } else {
+        updateData.floorId = new ObjectId(floorId);
+      }
     }
 
     // Update subcontractor

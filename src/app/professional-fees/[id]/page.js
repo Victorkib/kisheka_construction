@@ -297,9 +297,9 @@ function ProfessionalFeeDetailPageContent() {
       APPROVED: 'bg-green-100 text-green-800',
       REJECTED: 'bg-red-100 text-red-800',
       PAID: 'bg-blue-100 text-blue-800',
-      ARCHIVED: 'bg-gray-100 text-gray-600',
+      ARCHIVED: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (loading) {
@@ -316,7 +316,7 @@ function ProfessionalFeeDetailPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Professional fee not found'}
           </div>
           <Link
@@ -355,7 +355,7 @@ function ProfessionalFeeDetailPageContent() {
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
                   {fee.feeCode || 'Professional Fee'}
                 </h1>
                 <span
@@ -371,7 +371,7 @@ function ProfessionalFeeDetailPageContent() {
                   </span>
                 )}
               </div>
-              <p className="text-gray-600 mt-2">
+              <p className="ds-text-secondary mt-2">
                 {formatCurrency(fee.amount, fee.currency || 'KES')} • {fee.feeType?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
               </p>
             </div>
@@ -424,26 +424,26 @@ function ProfessionalFeeDetailPageContent() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Fee Information */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="ds-bg-surface rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4">Fee Information</h2>
               <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Amount</dt>
-                  <dd className="mt-1 text-2xl font-bold text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Amount</dt>
+                  <dd className="mt-1 text-2xl font-bold ds-text-primary">
                     {formatCurrency(fee.amount, fee.currency || 'KES')}
                   </dd>
                 </div>
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Fee Type</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Fee Type</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {fee.feeType?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                   </dd>
                 </div>
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Professional Service</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Professional Service</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {fee.professionalService ? (
                       <Link
                         href={`/professional-services/${normalizeId(fee.professionalService._id)}`}
@@ -458,8 +458,8 @@ function ProfessionalFeeDetailPageContent() {
                 </div>
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Project</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Project</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {fee.project ? (
                       <Link
                         href={`/projects/${normalizeId(fee.project._id)}`}
@@ -475,8 +475,8 @@ function ProfessionalFeeDetailPageContent() {
 
                 {fee.activity && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Linked Activity</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Linked Activity</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       <Link
                         href={`/professional-activities/${normalizeId(fee.activity._id)}`}
                         className="text-blue-600 hover:text-blue-800"
@@ -489,8 +489,8 @@ function ProfessionalFeeDetailPageContent() {
 
                 {fee.expense && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Linked Expense</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Linked Expense</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       <Link
                         href={`/expenses/${normalizeId(fee.expense._id)}`}
                         className="text-blue-600 hover:text-blue-800"
@@ -503,29 +503,29 @@ function ProfessionalFeeDetailPageContent() {
 
                 {fee.invoiceNumber && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Invoice Number</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{fee.invoiceNumber}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Invoice Number</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">{fee.invoiceNumber}</dd>
                   </div>
                 )}
 
                 {fee.invoiceDate && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Invoice Date</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{formatDate(fee.invoiceDate)}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Invoice Date</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">{formatDate(fee.invoiceDate)}</dd>
                   </div>
                 )}
 
                 {fee.dueDate && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Due Date</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{formatDate(fee.dueDate)}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Due Date</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">{formatDate(fee.dueDate)}</dd>
                   </div>
                 )}
 
                 {fee.paymentMethod && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Payment Method</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Payment Method</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       {fee.paymentMethod?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                     </dd>
                   </div>
@@ -533,22 +533,22 @@ function ProfessionalFeeDetailPageContent() {
 
                 {fee.referenceNumber && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Reference Number</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{fee.referenceNumber}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Reference Number</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">{fee.referenceNumber}</dd>
                   </div>
                 )}
 
                 {fee.paymentDate && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Payment Date</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{formatDate(fee.paymentDate)}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Payment Date</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">{formatDate(fee.paymentDate)}</dd>
                   </div>
                 )}
 
                 {fee.description && (
                   <div className="md:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">Description</dt>
-                    <dd className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">{fee.description}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Description</dt>
+                    <dd className="mt-1 text-sm ds-text-primary whitespace-pre-wrap">{fee.description}</dd>
                   </div>
                 )}
               </dl>
@@ -556,7 +556,7 @@ function ProfessionalFeeDetailPageContent() {
 
             {/* Invoice Document */}
             {fee.invoiceUrl && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Invoice Document</h2>
                 <ImagePreview
                   url={fee.invoiceUrl}
@@ -568,7 +568,7 @@ function ProfessionalFeeDetailPageContent() {
 
             {/* Receipt Document */}
             {fee.receiptUrl && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Receipt Document</h2>
                 <ImagePreview
                   url={fee.receiptUrl}
@@ -580,21 +580,21 @@ function ProfessionalFeeDetailPageContent() {
 
             {/* Approval History */}
             {fee.approvalChain && fee.approvalChain.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Approval History</h2>
                 <div className="space-y-4">
                   {fee.approvalChain.map((approval, index) => (
                     <div key={index} className="border-l-4 border-blue-500 pl-4">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium ds-text-primary">
                             {approval.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
                           </p>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm ds-text-secondary mt-1">
                             {approval.approverName || 'N/A'} • {formatDateTime(approval.approvedAt || approval.timestamp)}
                           </p>
                           {approval.notes && (
-                            <p className="text-sm text-gray-700 mt-2">{approval.notes}</p>
+                            <p className="text-sm ds-text-secondary mt-2">{approval.notes}</p>
                           )}
                           {approval.reason && (
                             <p className="text-sm text-red-700 mt-2">{approval.reason}</p>
@@ -609,21 +609,21 @@ function ProfessionalFeeDetailPageContent() {
 
             {/* Payment History */}
             {fee.paymentHistory && fee.paymentHistory.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Payment History</h2>
                 <div className="space-y-4">
                   {fee.paymentHistory.map((payment, index) => (
                     <div key={index} className="border-l-4 border-green-500 pl-4">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium ds-text-primary">
                             {formatCurrency(payment.amount || fee.amount, fee.currency || 'KES')}
                           </p>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm ds-text-secondary mt-1">
                             {payment.paymentMethod?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'} • {formatDate(payment.paymentDate || payment.timestamp)}
                           </p>
                           {payment.referenceNumber && (
-                            <p className="text-sm text-gray-700 mt-1">Reference: {payment.referenceNumber}</p>
+                            <p className="text-sm ds-text-secondary mt-1">Reference: {payment.referenceNumber}</p>
                           )}
                         </div>
                       </div>
@@ -634,7 +634,7 @@ function ProfessionalFeeDetailPageContent() {
             )}
 
             {/* Activity Log */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="ds-bg-surface rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4">Activity Log</h2>
               <AuditTrail entityType="PROFESSIONAL_FEE" entityId={feeId} />
             </div>
@@ -644,12 +644,12 @@ function ProfessionalFeeDetailPageContent() {
           <div className="space-y-6">
             {/* Approval Actions */}
             {fee.status === 'PENDING' && (canApprove || canReject) && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h3 className="text-lg font-semibold mb-4">Actions</h3>
                 <div className="space-y-4">
                   {canApprove && (
                     <div>
-                      <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                      <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                         Approval Notes (Optional)
                       </label>
                       <textarea
@@ -657,13 +657,13 @@ function ProfessionalFeeDetailPageContent() {
                         onChange={(e) => setApprovalNotes(e.target.value)}
                         rows={3}
                         placeholder="Add notes for approval..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                   )}
                   {canReject && (
                     <div>
-                      <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                      <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                         Rejection Reason *
                       </label>
                       <textarea
@@ -671,7 +671,7 @@ function ProfessionalFeeDetailPageContent() {
                         onChange={(e) => setRejectionReason(e.target.value)}
                         rows={3}
                         placeholder="Explain why this fee is being rejected..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                       />
                     </div>
                   )}
@@ -703,7 +703,7 @@ function ProfessionalFeeDetailPageContent() {
 
             {/* Payment Action */}
             {canRecordPayment && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h3 className="text-lg font-semibold mb-4">Record Payment</h3>
                 <button
                   onClick={handlePaymentClick}
@@ -715,25 +715,25 @@ function ProfessionalFeeDetailPageContent() {
             )}
 
             {/* Quick Info */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="ds-bg-surface rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold mb-4">Quick Info</h3>
               <dl className="space-y-3">
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Created By</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{fee.createdByName || 'N/A'}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Created By</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{fee.createdByName || 'N/A'}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Created At</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{formatDateTime(fee.createdAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Created At</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{formatDateTime(fee.createdAt)}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Last Updated</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{formatDateTime(fee.updatedAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Last Updated</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{formatDateTime(fee.updatedAt)}</dd>
                 </div>
                 {fee.approvalChain && fee.approvalChain.length > 0 && (
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Approvals</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-semibold ds-text-secondary">Approvals</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       {fee.approvalChain.length} approval(s)
                     </dd>
                   </div>
@@ -757,13 +757,13 @@ function ProfessionalFeeDetailPageContent() {
         isLoading={isApproving}
       >
         <div className="mt-4">
-          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Approval Notes (Optional)</label>
+          <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Approval Notes (Optional)</label>
           <textarea
             value={approvalNotes}
             onChange={(e) => setApprovalNotes(e.target.value)}
             rows={3}
             disabled={isApproving}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="Add any notes about this approval..."
           />
         </div>
@@ -772,9 +772,9 @@ function ProfessionalFeeDetailPageContent() {
       {/* Rejection Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
+          <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
+            <div className="relative ds-bg-surface rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
               <div className="p-6">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
@@ -784,30 +784,30 @@ function ProfessionalFeeDetailPageContent() {
                   </div>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
+                  <h3 className="text-lg font-semibold leading-6 ds-text-primary mb-2" id="modal-title">
                     Reject Professional Fee
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm ds-text-muted mb-4">
                       Please provide a reason for rejecting this fee:
                     </p>
                     <textarea
                       value={rejectionReason}
                       onChange={(e) => setRejectionReason(e.target.value)}
                       placeholder="Enter rejection reason..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                       rows="4"
                       disabled={isRejecting}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-200">
+              <div className="ds-bg-surface-muted px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-400/60">
                 <button
                   type="button"
                   onClick={() => setShowRejectModal(false)}
                   disabled={isRejecting}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Cancel
                 </button>
@@ -828,22 +828,22 @@ function ProfessionalFeeDetailPageContent() {
       {/* Payment Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !isRecordingPayment && setShowPaymentModal(false)} />
+          <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={() => !isRecordingPayment && setShowPaymentModal(false)} />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
+            <div className="relative ds-bg-surface rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
               <div className="p-6">
-                <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-4" id="modal-title">
+                <h3 className="text-lg font-semibold leading-6 ds-text-primary mb-4" id="modal-title">
                   Record Payment
                 </h3>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium ds-text-secondary mb-1">
                       Payment Method *
                     </label>
                     <select
                       value={paymentData.paymentMethod}
                       onChange={(e) => setPaymentData({ ...paymentData, paymentMethod: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       disabled={isRecordingPayment}
                     >
                       <option value="">Select Payment Method</option>
@@ -855,19 +855,19 @@ function ProfessionalFeeDetailPageContent() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium ds-text-secondary mb-1">
                       Payment Date *
                     </label>
                     <input
                       type="date"
                       value={paymentData.paymentDate}
                       onChange={(e) => setPaymentData({ ...paymentData, paymentDate: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       disabled={isRecordingPayment}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium ds-text-secondary mb-1">
                       Reference Number
                     </label>
                     <input
@@ -875,18 +875,18 @@ function ProfessionalFeeDetailPageContent() {
                       value={paymentData.referenceNumber}
                       onChange={(e) => setPaymentData({ ...paymentData, referenceNumber: e.target.value })}
                       placeholder="e.g., Transaction ID, Cheque Number"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       disabled={isRecordingPayment}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-gray-200">
+              <div className="ds-bg-surface-muted px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t ds-border-subtle">
                 <button
                   type="button"
                   onClick={() => setShowPaymentModal(false)}
                   disabled={isRecordingPayment}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Cancel
                 </button>

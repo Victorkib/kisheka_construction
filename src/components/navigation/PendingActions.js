@@ -51,15 +51,15 @@ export function PendingActions({ isCollapsed = false }) {
             href={action.href}
             className={`block p-2 rounded-lg border transition-colors ${
               action.priority === 'high'
-                ? 'bg-red-50 border-red-200 hover:bg-red-100'
-                : 'bg-yellow-50 border-yellow-200 hover:bg-yellow-100'
+                ? 'bg-red-500/20 border-red-400/50 hover:bg-red-500/30'
+                : 'bg-amber-500/20 border-amber-400/50 hover:bg-amber-500/30'
             }`}
           >
             <div className="flex items-center gap-2">
               <span className="text-base flex-shrink-0">{action.icon}</span>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm font-medium truncate ${
-                  action.priority === 'high' ? 'text-red-900' : 'text-yellow-900'
+                  action.priority === 'high' ? 'text-red-50' : 'text-amber-50'
                 }`}>
                   {action.label}
                 </p>

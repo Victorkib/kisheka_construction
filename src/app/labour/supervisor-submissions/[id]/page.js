@@ -309,7 +309,7 @@ function SupervisorSubmissionReviewPageContent() {
     return (
       <AppLayout>
         <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded">
             Submission not found
           </div>
         </div>
@@ -350,16 +350,16 @@ function SupervisorSubmissionReviewPageContent() {
           </Link>
           <div className="flex items-center justify-between mt-2">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold ds-text-primary">
                 Review Submission {submission.submissionNumber}
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="ds-text-secondary mt-1">
                 Submitted via {submission.submissionChannel.replace('_', ' ')} by {submission.submittedBy}
               </p>
             </div>
             <div className="flex items-center gap-2">
               {getChannelIcon(submission.submissionChannel)}
-              <span className="px-3 py-1 bg-gray-100 text-gray-800 rounded-full text-sm capitalize">
+              <span className="px-3 py-1 ds-bg-surface-muted ds-text-primary rounded-full text-sm capitalize">
                 {submission.submissionChannel.replace('_', ' ')}
               </span>
             </div>
@@ -367,27 +367,27 @@ function SupervisorSubmissionReviewPageContent() {
         </div>
 
         {/* Submission Info */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Submission Details</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Submission Details</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">Submitted By:</span>
-              <p className="font-medium text-gray-900">{submission.submittedBy}</p>
+              <span className="ds-text-secondary">Submitted By:</span>
+              <p className="font-medium ds-text-primary">{submission.submittedBy}</p>
             </div>
             <div>
-              <span className="text-gray-600">Entry Date:</span>
-              <p className="font-medium text-gray-900">
+              <span className="ds-text-secondary">Entry Date:</span>
+              <p className="font-medium ds-text-primary">
                 {new Date(submission.entryDate).toLocaleDateString()}
               </p>
             </div>
             <div>
-              <span className="text-gray-600">Submitted At:</span>
-              <p className="font-medium text-gray-900">
+              <span className="ds-text-secondary">Submitted At:</span>
+              <p className="font-medium ds-text-primary">
                 {new Date(submission.submittedAt).toLocaleString()}
               </p>
             </div>
             <div>
-              <span className="text-gray-600">Status:</span>
+              <span className="ds-text-secondary">Status:</span>
               <p className="font-medium">
                 <span
                   className={`px-2 py-1 rounded-full text-xs ${
@@ -407,8 +407,8 @@ function SupervisorSubmissionReviewPageContent() {
           {/* Original Raw Text */}
           {submission.submissionData?.rawText && (
             <div className="mt-4 pt-4 border-t">
-              <h3 className="text-sm font-semibold text-gray-900 mb-2">Original Submission</h3>
-              <div className="bg-gray-50 p-3 rounded text-sm text-gray-700 whitespace-pre-wrap">
+              <h3 className="text-sm font-semibold ds-text-primary mb-2">Original Submission</h3>
+              <div className="ds-bg-surface-muted p-3 rounded text-sm ds-text-secondary whitespace-pre-wrap">
                 {submission.submissionData.rawText}
               </div>
             </div>
@@ -420,8 +420,8 @@ function SupervisorSubmissionReviewPageContent() {
           <div
             className={`p-4 rounded-lg border mb-6 ${
               budgetInfo.isValid
-                ? 'bg-green-50 border-green-200'
-                : 'bg-red-50 border-red-200'
+                ? 'bg-green-50 border-green-400/60'
+                : 'bg-red-50 border-red-400/60'
             }`}
           >
             <div className="flex items-start gap-3">
@@ -446,7 +446,7 @@ function SupervisorSubmissionReviewPageContent() {
                   {budgetInfo.message}
                 </p>
                 {budgetInfo.budget && (
-                  <div className="mt-2 text-xs text-gray-600 space-y-1">
+                  <div className="mt-2 text-xs ds-text-secondary space-y-1">
                     <p>
                       Budget: {budgetInfo.budget.toLocaleString()} KES | Available:{' '}
                       {budgetInfo.available.toLocaleString()} KES
@@ -460,13 +460,13 @@ function SupervisorSubmissionReviewPageContent() {
         )}
 
         {/* Summary */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Labour Entries</h2>
+            <h2 className="text-lg font-semibold ds-text-primary">Labour Entries</h2>
             {canEdit && !editing && (
               <button
                 onClick={() => setEditing(true)}
-                className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                className="flex items-center gap-2 px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted text-sm"
               >
                 <Edit2 className="w-4 h-4" />
                 Edit Entries
@@ -479,7 +479,7 @@ function SupervisorSubmissionReviewPageContent() {
                     setEditing(false);
                     setEditedEntries(submission.labourEntries || []);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                  className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted text-sm"
                 >
                   Cancel
                 </button>
@@ -493,7 +493,7 @@ function SupervisorSubmissionReviewPageContent() {
             )}
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 mb-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold text-blue-900">Work Item Linking</p>
@@ -505,7 +505,7 @@ function SupervisorSubmissionReviewPageContent() {
                 <select
                   value={selectedWorkItemId}
                   onChange={(e) => setSelectedWorkItemId(e.target.value)}
-                  className="px-3 py-2 border border-blue-200 rounded-lg text-sm bg-white"
+                  className="px-3 py-2 border border-blue-400/60 rounded-lg text-sm ds-bg-surface"
                   disabled={workItems.length === 0}
                 >
                   <option value="">{workItems.length === 0 ? 'No work items available' : 'Select work item'}</option>
@@ -530,28 +530,28 @@ function SupervisorSubmissionReviewPageContent() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Clock className="w-5 h-5 text-blue-600" />
-                <span className="text-sm font-medium text-gray-700">Total Hours</span>
+                <span className="text-sm font-medium ds-text-secondary">Total Hours</span>
               </div>
               <div className="text-2xl font-bold text-blue-600">{totals.totalHours.toFixed(1)}</div>
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="w-5 h-5 text-green-600" />
-                <span className="text-sm font-medium text-gray-700">Total Cost</span>
+                <span className="text-sm font-medium ds-text-secondary">Total Cost</span>
               </div>
               <div className="text-2xl font-bold text-green-600">
                 {totals.totalCost.toLocaleString()} KES
               </div>
             </div>
 
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="bg-purple-50 border border-purple-400/60 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <FileText className="w-5 h-5 text-purple-600" />
-                <span className="text-sm font-medium text-gray-700">Workers</span>
+                <span className="text-sm font-medium ds-text-secondary">Workers</span>
               </div>
               <div className="text-2xl font-bold text-purple-600">{totals.entryCount}</div>
             </div>
@@ -559,47 +559,47 @@ function SupervisorSubmissionReviewPageContent() {
 
           {/* Entries Table */}
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 border border-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle border ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase">
                     Worker Name
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase">
                     Work Item
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase">
                     Skill
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase">
                     Hours
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase">
                     Rate (KES)
                   </th>
-                  <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase">
                     Cost (KES)
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {entries.map((entry, index) => {
                   const hours = parseFloat(entry.hours || entry.totalHours) || 0;
                   const rate = parseFloat(entry.hourlyRate) || 0;
                   const cost = hours * rate;
 
                   return (
-                    <tr key={index} className="hover:bg-gray-50">
+                    <tr key={index} className="hover:ds-bg-surface-muted">
                       <td className="px-3 py-2 text-sm">
                         {editing ? (
                           <input
                             type="text"
                             value={entry.workerName || ''}
                             onChange={(e) => handleEditEntry(index, 'workerName', e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                            className="w-full px-2 py-1 border ds-border-subtle rounded text-sm"
                           />
                         ) : (
-                          <span className="font-medium text-gray-900">{entry.workerName}</span>
+                          <span className="font-medium ds-text-primary">{entry.workerName}</span>
                         )}
                       </td>
                       <td className="px-3 py-2 text-sm">
@@ -607,7 +607,7 @@ function SupervisorSubmissionReviewPageContent() {
                           <select
                             value={entry.workItemId || ''}
                             onChange={(e) => handleEditEntry(index, 'workItemId', e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                            className="w-full px-2 py-1 border ds-border-subtle rounded text-sm"
                           >
                             <option value="">Unlinked</option>
                             {workItems.map((item) => (
@@ -617,12 +617,12 @@ function SupervisorSubmissionReviewPageContent() {
                             ))}
                           </select>
                         ) : (
-                          <span className="text-gray-600">
+                          <span className="ds-text-secondary">
                             {entry.workItemName || 'Unlinked'}
                           </span>
                         )}
                       </td>
-                      <td className="px-3 py-2 text-sm text-gray-600">
+                      <td className="px-3 py-2 text-sm ds-text-secondary">
                         {entry.skillType?.replace(/_/g, ' ')}
                       </td>
                       <td className="px-3 py-2 text-sm">
@@ -633,10 +633,10 @@ function SupervisorSubmissionReviewPageContent() {
                             onChange={(e) => handleEditEntry(index, 'hours', e.target.value)}
                             min="0"
                             step="0.5"
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                            className="w-full px-2 py-1 border ds-border-subtle rounded text-sm"
                           />
                         ) : (
-                          <span className="text-gray-600">{hours} hrs</span>
+                          <span className="ds-text-secondary">{hours} hrs</span>
                         )}
                       </td>
                       <td className="px-3 py-2 text-sm">
@@ -647,29 +647,29 @@ function SupervisorSubmissionReviewPageContent() {
                             onChange={(e) => handleEditEntry(index, 'hourlyRate', e.target.value)}
                             min="0"
                             step="0.01"
-                            className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                            className="w-full px-2 py-1 border ds-border-subtle rounded text-sm"
                           />
                         ) : (
-                          <span className="text-gray-600">{rate.toLocaleString()}</span>
+                          <span className="ds-text-secondary">{rate.toLocaleString()}</span>
                         )}
                       </td>
-                      <td className="px-3 py-2 text-sm font-medium text-gray-900">
+                      <td className="px-3 py-2 text-sm font-medium ds-text-primary">
                         {cost.toLocaleString()}
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
-              <tfoot className="bg-gray-50">
+              <tfoot className="ds-bg-surface-muted">
                 <tr>
-                  <td colSpan="2" className="px-3 py-2 text-sm font-semibold text-gray-900 text-right">
+                  <td colSpan="2" className="px-3 py-2 text-sm font-semibold ds-text-primary text-right">
                     Totals:
                   </td>
-                  <td className="px-3 py-2 text-sm font-semibold text-gray-900">
+                  <td className="px-3 py-2 text-sm font-semibold ds-text-primary">
                     {totals.totalHours.toFixed(1)} hrs
                   </td>
                   <td className="px-3 py-2"></td>
-                  <td className="px-3 py-2 text-sm font-semibold text-gray-900">
+                  <td className="px-3 py-2 text-sm font-semibold ds-text-primary">
                     {totals.totalCost.toLocaleString()} KES
                   </td>
                 </tr>
@@ -680,7 +680,7 @@ function SupervisorSubmissionReviewPageContent() {
 
         {/* Corrections */}
         {submission.corrections && submission.corrections.length > 0 && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-4 mb-6">
             <h3 className="text-sm font-semibold text-yellow-900 mb-2">Corrections Made</h3>
             <ul className="space-y-1 text-xs text-yellow-800">
               {submission.corrections.map((correction, index) => (
@@ -694,8 +694,8 @@ function SupervisorSubmissionReviewPageContent() {
 
         {/* Actions */}
         {canApprove && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Actions</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Actions</h2>
             <div className="flex items-center gap-4">
               <LoadingButton
                 onClick={handleApprove}
@@ -713,7 +713,7 @@ function SupervisorSubmissionReviewPageContent() {
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
                   placeholder="Rejection reason (required)"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg mb-2"
                 />
                 <LoadingButton
                   onClick={handleReject}
@@ -731,7 +731,7 @@ function SupervisorSubmissionReviewPageContent() {
 
         {/* Already Processed */}
         {submission.status === 'approved' && submission.labourBatchId && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-600" />
               <div>
@@ -751,7 +751,7 @@ function SupervisorSubmissionReviewPageContent() {
         )}
 
         {submission.status === 'rejected' && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
             <div className="flex items-center gap-2">
               <XCircle className="w-5 h-5 text-red-600" />
               <div>

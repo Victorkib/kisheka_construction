@@ -221,8 +221,8 @@ function BatchApprovalPageContent() {
       <AppLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-            <p className="text-gray-600">You don't have permission to approve bulk material requests.</p>
+            <h1 className="text-2xl font-bold ds-text-primary mb-2">Access Denied</h1>
+            <p className="ds-text-secondary">You don't have permission to approve bulk material requests.</p>
             <Link href="/material-requests" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
               ← Back to Material Requests
             </Link>
@@ -246,7 +246,7 @@ function BatchApprovalPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error || 'Batch not found'}
           </div>
           <Link href="/material-requests" className="text-blue-600 hover:text-blue-800">
@@ -288,8 +288,8 @@ function BatchApprovalPageContent() {
           >
             ← Back to Batch Details
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Approve Bulk Material Request</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold ds-text-primary">Approve Bulk Material Request</h1>
+          <p className="ds-text-secondary mt-2">
             Batch: <span className="font-medium">{batch.batchNumber}</span>
             {batch.batchName && ` - ${batch.batchName}`}
           </p>
@@ -297,7 +297,7 @@ function BatchApprovalPageContent() {
 
         {/* Auto-Approved Notice (OWNER) */}
         {isAutoApproved && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+          <div className="bg-green-50 border border-green-400/60 rounded-lg p-6 mb-6">
             <div className="flex items-start gap-3">
               <svg className="w-6 h-6 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -335,7 +335,7 @@ function BatchApprovalPageContent() {
 
         {/* Approval Table */}
         {!isAutoApproved && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             <BatchApprovalTable
               materialRequests={materialRequests}
               onApprove={handleApprove}
@@ -350,7 +350,7 @@ function BatchApprovalPageContent() {
 
         {/* Actions */}
         {!isAutoApproved && pendingRequests.length === 0 && (
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="mt-6 bg-blue-50 border border-blue-400/60 rounded-lg p-6">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-blue-900 mb-2">All Requests Processed</h3>

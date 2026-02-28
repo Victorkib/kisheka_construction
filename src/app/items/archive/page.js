@@ -174,7 +174,7 @@ function ArchivedMaterialsPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
           <Link href="/items" className="text-blue-600 hover:text-blue-900 underline">
@@ -197,8 +197,8 @@ function ArchivedMaterialsPageContent() {
           </Link>
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Archived Materials</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">Archived Materials</h1>
+              <p className="ds-text-secondary mt-1">
                 {materials.length} archived material{materials.length !== 1 ? 's' : ''}
               </p>
             </div>
@@ -206,9 +206,9 @@ function ArchivedMaterialsPageContent() {
         </div>
 
         {materials.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className="mx-auto h-12 w-12 ds-text-muted"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -220,37 +220,37 @@ function ArchivedMaterialsPageContent() {
                 d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
               />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No archived materials</h3>
-            <p className="mt-1 text-sm text-gray-500">There are no archived materials at this time.</p>
+            <h3 className="mt-2 text-sm font-medium ds-text-primary">No archived materials</h3>
+            <p className="mt-1 text-sm ds-text-muted">There are no archived materials at this time.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Material
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Total Cost
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Status
                     </th>
                     {canManage && (
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                         Actions
                       </th>
                     )}
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {materials.map((material) => (
-                    <tr key={material._id} className="hover:bg-gray-50">
+                    <tr key={material._id} className="hover:ds-bg-surface-muted">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Link
                           href={`/items/${material._id}`}
@@ -262,10 +262,10 @@ function ArchivedMaterialsPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <ArchiveBadge />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                         {formatCurrency(material.totalCost || 0)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {material.status}
                       </td>
                       {canManage && (
@@ -340,7 +340,7 @@ export default function ArchivedMaterialsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <LoadingSpinner />
-            <p className="mt-4 text-gray-600">Loading archived materials...</p>
+            <p className="mt-4 ds-text-secondary">Loading archived materials...</p>
           </div>
         </div>
       </AppLayout>

@@ -47,11 +47,11 @@ export default function PrerequisiteGuide({
 
   // Determine card styling based on state
   const cardClasses = isFullyBlocked
-    ? 'mb-6 border-2 border-red-200 bg-gradient-to-br from-red-50 to-orange-50'
+    ? 'mb-6 border-2 border-red-400/60 bg-gradient-to-br from-red-50 to-orange-50'
     : isReady
-    ? 'mb-6 border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50'
+    ? 'mb-6 border border-green-400/60 bg-gradient-to-br from-green-50 to-emerald-50'
     : hasWarnings
-    ? 'mb-6 border border-yellow-200 bg-gradient-to-br from-yellow-50 to-amber-50'
+    ? 'mb-6 border border-yellow-400/60 bg-gradient-to-br from-yellow-50 to-amber-50'
     : 'mb-6 border border-blue-100 bg-blue-50/60';
 
   const headerColor = isFullyBlocked
@@ -102,8 +102,8 @@ export default function PrerequisiteGuide({
 
         {/* Enhanced Prerequisites Display */}
         {Object.keys(prerequisiteDetails).length > 0 ? (
-          <div className="mt-4 bg-white rounded-lg p-4 border border-gray-200">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-700 mb-3">
+          <div className="mt-4 ds-bg-surface rounded-lg p-4 border ds-border-subtle">
+            <p className="text-xs font-semibold uppercase tracking-wide ds-text-secondary mb-3">
               Prerequisites Status
             </p>
             <ul className="space-y-2">
@@ -127,7 +127,7 @@ export default function PrerequisiteGuide({
                           d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
-                      <span className="text-gray-700">{item.message}</span>
+                      <span className="ds-text-secondary">{item.message}</span>
                     </>
                   ) : (
                     <>
@@ -145,7 +145,7 @@ export default function PrerequisiteGuide({
                         />
                       </svg>
                       <div className="flex-1">
-                        <span className="text-gray-700">{item.message}</span>
+                        <span className="ds-text-secondary">{item.message}</span>
                         {item.actionUrl && (
                           <Link
                             href={item.actionUrl}
@@ -163,13 +163,13 @@ export default function PrerequisiteGuide({
           </div>
         ) : prerequisites.length > 0 ? (
           <div className="mt-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-700 mb-2">
+            <p className="text-xs font-semibold uppercase tracking-wide ds-text-secondary mb-2">
               Prerequisites
             </p>
-            <ul className="mt-2 grid gap-1 text-sm text-gray-700">
+            <ul className="mt-2 grid gap-1 text-sm ds-text-secondary">
               {prerequisites.map((item, index) => (
                 <li key={index} className="flex items-center gap-2">
-                  <span className="text-gray-400">•</span>
+                  <span className="ds-text-muted">•</span>
                   <span>{item}</span>
                 </li>
               ))}
@@ -187,8 +187,8 @@ export default function PrerequisiteGuide({
                   href={action.href}
                   className={`inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium shadow-sm ring-1 transition ${
                     isDisabled
-                      ? 'bg-gray-100 text-gray-400 ring-gray-200 cursor-not-allowed'
-                      : 'bg-white text-blue-700 ring-blue-200 hover:bg-blue-50'
+                      ? 'ds-bg-surface-muted ds-text-muted ring-gray-200 cursor-not-allowed'
+                      : 'ds-bg-surface text-blue-700 ring-blue-200 hover:bg-blue-50'
                   }`}
                   onClick={(e) => isDisabled && e.preventDefault()}
                   title={isDisabled ? 'Complete prerequisites first' : ''}

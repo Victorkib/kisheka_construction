@@ -79,13 +79,13 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-6 ds-bg-surface-muted rounded w-1/3"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-1/2"></div>
           <div className="space-y-2">
-            <div className="h-3 bg-gray-200 rounded"></div>
-            <div className="h-3 bg-gray-200 rounded"></div>
+            <div className="h-3 ds-bg-surface-muted rounded"></div>
+            <div className="h-3 ds-bg-surface-muted rounded"></div>
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 border-2 border-red-200">
+      <div className="ds-bg-surface rounded-lg shadow p-6 border-2 border-red-400/60">
         <div className="text-red-600">
           <p className="font-semibold mb-2">Error loading details</p>
           <p className="text-sm">{error}</p>
@@ -119,22 +119,22 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
           const percentage = combinedTotal > 0 ? (amount / combinedTotal) * 100 : 0;
           
           return (
-            <div key={category} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border border-gray-200">
+            <div key={category} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-4 border ds-border-subtle">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-sm font-semibold text-gray-900">
+                <span className="text-sm font-semibold ds-text-primary">
                   {categoryLabels[category] || category}
                 </span>
                 <span className="text-lg font-bold text-blue-600">
                   {formatCurrency(amount)}
                 </span>
               </div>
-              <div className="w-full bg-gray-300 rounded-full h-2 mb-2">
+              <div className="w-full ds-bg-surface-muted rounded-full h-2 mb-2">
                 <div
                   className="bg-gradient-to-r from-blue-600 to-blue-400 h-2 rounded-full transition-all"
                   style={{ width: `${Math.min(100, percentage)}%` }}
                 ></div>
               </div>
-              <p className="text-xs text-gray-600">
+              <p className="text-xs ds-text-secondary">
                 {percentage.toFixed(1)}% of total indirect costs {info.count && `(${info.count} items)`}
               </p>
             </div>
@@ -148,34 +148,34 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-600">
-          <p className="text-xs text-gray-600 uppercase tracking-wide mb-1">Expenses</p>
-          <p className="text-2xl font-bold text-gray-900">{formatCurrency(expensesTotal)}</p>
-          <p className="text-xs text-gray-500 mt-2">From approved indirect cost expenses</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4 border-l-4 border-blue-600">
+          <p className="text-xs ds-text-secondary uppercase tracking-wide mb-1">Expenses</p>
+          <p className="text-2xl font-bold ds-text-primary">{formatCurrency(expensesTotal)}</p>
+          <p className="text-xs ds-text-muted mt-2">From approved indirect cost expenses</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-600">
-          <p className="text-xs text-gray-600 uppercase tracking-wide mb-1">Labour</p>
-          <p className="text-2xl font-bold text-gray-900">{formatCurrency(labourTotal)}</p>
-          <p className="text-xs text-gray-500 mt-2">From {data.labour?.summary?.entryCount || 0} indirect labour entries ({data.labour?.summary?.totalHours || 0} hrs)</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4 border-l-4 border-green-600">
+          <p className="text-xs ds-text-secondary uppercase tracking-wide mb-1">Labour</p>
+          <p className="text-2xl font-bold ds-text-primary">{formatCurrency(labourTotal)}</p>
+          <p className="text-xs ds-text-muted mt-2">From {data.labour?.summary?.entryCount || 0} indirect labour entries ({data.labour?.summary?.totalHours || 0} hrs)</p>
         </div>
 
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow p-4 border-l-4 border-blue-800">
-          <p className="text-xs text-gray-700 uppercase tracking-wide font-semibold mb-1">Total Indirect</p>
+          <p className="text-xs ds-text-secondary uppercase tracking-wide font-semibold mb-1">Total Indirect</p>
           <p className="text-2xl font-bold text-blue-900">{formatCurrency(combinedTotal)}</p>
-          <p className="text-xs text-gray-600 mt-2">Combined expenses + labour</p>
+          <p className="text-xs ds-text-secondary mt-2">Combined expenses + labour</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="flex border-b border-gray-200">
+      <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
+        <div className="flex border-b ds-border-subtle">
           <button
             onClick={() => setActiveTab('combined')}
             className={`flex-1 px-4 py-3 text-sm font-medium transition ${
               activeTab === 'combined'
                 ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'ds-text-secondary hover:ds-text-primary'
             }`}
           >
             Combined View
@@ -185,7 +185,7 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
             className={`flex-1 px-4 py-3 text-sm font-medium transition ${
               activeTab === 'expenses'
                 ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'ds-text-secondary hover:ds-text-primary'
             }`}
           >
             Expenses Only
@@ -195,7 +195,7 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
             className={`flex-1 px-4 py-3 text-sm font-medium transition ${
               activeTab === 'labour'
                 ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'ds-text-secondary hover:ds-text-primary'
             }`}
           >
             Labour Entries
@@ -206,7 +206,7 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
           {/* Combined View */}
           {activeTab === 'combined' && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold ds-text-primary mb-4">
                 Indirect Costs by Category (Expenses + Labour)
               </h3>
               {renderCategoryBreakdown({
@@ -234,7 +234,7 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
           {activeTab === 'expenses' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Expenses by Category</h3>
+                <h3 className="text-lg font-semibold ds-text-primary">Expenses by Category</h3>
                 <Link
                   href={`/expenses?isIndirectCost=true`}
                   className="text-sm text-blue-600 hover:text-blue-800"
@@ -250,7 +250,7 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
           {activeTab === 'labour' && (
             <div>
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">Labour Entries by Category</h3>
+                <h3 className="text-lg font-semibold ds-text-primary">Labour Entries by Category</h3>
                 <Link
                   href="/labour/entries"
                   className="text-sm text-blue-600 hover:text-blue-800"
@@ -262,7 +262,7 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
                 renderCategoryBreakdown(data.labour.byCategory)
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-gray-600 mb-4">No indirect labour entries recorded yet</p>
+                  <p className="ds-text-secondary mb-4">No indirect labour entries recorded yet</p>
                   <Link
                     href="/labour/entries/new"
                     className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
@@ -277,7 +277,7 @@ export function IndirectCostsDetailBreakdown({ projectId }) {
       </div>
 
       {/* Info Banner */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
         <p className="text-sm text-blue-900">
           <span className="font-semibold">💡 Tip:</span> Both expense transactions and labour entries are tracked against your indirect costs budget. Use categories to organize and control spending by type.
         </p>

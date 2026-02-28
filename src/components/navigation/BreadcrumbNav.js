@@ -68,7 +68,7 @@ export function BreadcrumbNav({ customBreadcrumbs = null }) {
 
       {/* Desktop Version */}
       <nav 
-        className="hidden lg:flex items-center gap-2 text-sm text-gray-600 mb-4" 
+        className="hidden lg:flex items-center gap-2 text-sm ds-text-secondary mb-4" 
         aria-label="Breadcrumb"
       >
       {breadcrumbs.map((crumb, index) => {
@@ -78,17 +78,17 @@ export function BreadcrumbNav({ customBreadcrumbs = null }) {
         return (
           <div key={crumb.href || index} className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             {index > 0 && (
-              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-gray-400 flex-shrink-0" />
+              <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 ds-text-muted flex-shrink-0" />
             )}
             {isLast ? (
-              <span className="font-medium text-gray-900 flex items-center gap-1 truncate max-w-[150px] sm:max-w-none">
+              <span className="font-medium ds-text-primary flex items-center gap-1 truncate max-w-[150px] sm:max-w-none">
                 {Icon && <Icon className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />}
                 <span className="truncate">{crumb.label}</span>
               </span>
             ) : (
               <Link
                 href={crumb.href}
-                className="hover:text-gray-900 transition-colors flex items-center gap-1 truncate max-w-[120px] sm:max-w-none"
+                className="hover:ds-text-primary transition-colors flex items-center gap-1 truncate max-w-[120px] sm:max-w-none"
               >
                 {Icon && <Icon className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />}
                 <span className="truncate">{crumb.label}</span>

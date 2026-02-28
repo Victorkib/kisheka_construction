@@ -82,10 +82,10 @@ export function getStatusColor(status) {
   const colors = {
     'assigned': 'bg-blue-100 text-blue-800',
     'in_use': 'bg-green-100 text-green-800',
-    'returned': 'bg-gray-100 text-gray-800',
+    'returned': 'ds-bg-surface-muted ds-text-primary',
     'maintenance': 'bg-yellow-100 text-yellow-800'
   };
-  return colors[status] || 'bg-gray-100 text-gray-800';
+  return colors[status] || 'ds-bg-surface-muted ds-text-primary';
 }
 
 

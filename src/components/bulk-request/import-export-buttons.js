@@ -95,9 +95,9 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
       {/* Import Modal */}
       {showImportModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="ds-bg-surface rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Import Materials from CSV</h3>
+              <h3 className="text-lg font-semibold ds-text-primary">Import Materials from CSV</h3>
               <button
                 onClick={() => {
                   setShowImportModal(false);
@@ -105,7 +105,7 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
                   setImportError(null);
                   setImportResults(null);
                 }}
-                className="text-gray-400 hover:text-gray-600"
+                className="ds-text-muted hover:ds-text-secondary"
               >
                 ✕
               </button>
@@ -113,7 +113,7 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">
                   Paste CSV Content
                 </label>
                 <textarea
@@ -121,21 +121,21 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
                   onChange={(e) => setCsvText(e.target.value)}
                   placeholder={`Format: Material Name, Quantity, Unit, Category, Cost\nExample:\nCement, 500, bag, Structural Materials, 850\nRebars, 600, piece, Structural Materials, 1200`}
                   rows={10}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
                 />
-                <p className="text-xs text-gray-600 mt-1">
+                <p className="text-xs ds-text-secondary mt-1">
                   CSV format: Material Name, Quantity, Unit, Category (optional), Cost (optional)
                 </p>
               </div>
 
               {importError && (
-                <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg">
                   {importError}
                 </div>
               )}
 
               {importResults && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
                   <p className="text-sm font-medium text-blue-900 mb-2">Import Results:</p>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>Total parsed: {importResults.totalParsed}</li>
@@ -168,7 +168,7 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
                     setImportError(null);
                     setImportResults(null);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+                  className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary"
                 >
                   Cancel
                 </button>

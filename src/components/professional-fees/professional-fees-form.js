@@ -203,7 +203,7 @@ export function ProfessionalFeesForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2">
+        <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2">
           <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -216,10 +216,10 @@ export function ProfessionalFeesForm({
 
       {/* Basic Information */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Basic Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Professional Service <span className="text-red-500">*</span>
             </label>
             <select
@@ -228,9 +228,9 @@ export function ProfessionalFeesForm({
               onChange={handleChange}
               required
               disabled={isEdit}
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.professionalServiceId ? 'border-red-300' : 'border-gray-300'
-              } ${isEdit ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.professionalServiceId ? 'border-red-400/60' : 'ds-border-subtle'
+              } ${isEdit ? 'ds-bg-surface-muted cursor-not-allowed' : ''}`}
             >
               <option value="">Select Professional Service</option>
               {professionalServices
@@ -247,17 +247,17 @@ export function ProfessionalFeesForm({
             {selectedProfessional && (
               <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                 <div className="text-sm">
-                  <div className="font-medium text-gray-900">
+                  <div className="font-medium ds-text-primary">
                     {selectedProfessional.library?.name || 'N/A'} ({selectedProfessional.type === 'architect' ? 'Architect' : 'Engineer'})
                   </div>
-                  <div className="text-gray-600">Project: {selectedProfessional.project?.projectName || 'N/A'}</div>
+                  <div className="ds-text-secondary">Project: {selectedProfessional.project?.projectName || 'N/A'}</div>
                 </div>
               </div>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Fee Type <span className="text-red-500">*</span>
             </label>
             <select
@@ -265,8 +265,8 @@ export function ProfessionalFeesForm({
               value={formData.feeType}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.feeType ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.feeType ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             >
               <option value="">Select Fee Type</option>
@@ -282,7 +282,7 @@ export function ProfessionalFeesForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Amount (KES) <span className="text-red-500">*</span>
             </label>
             <div className="flex gap-2">
@@ -295,8 +295,8 @@ export function ProfessionalFeesForm({
                 min="0.01"
                 step="0.01"
                 required
-                className={`flex-1 px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
-                  validationErrors.amount ? 'border-red-300' : 'border-gray-300'
+                className={`flex-1 px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted ${
+                  validationErrors.amount ? 'border-red-400/60' : 'ds-border-subtle'
                 }`}
               />
               {suggestedAmount && (
@@ -318,21 +318,21 @@ export function ProfessionalFeesForm({
               <p className="mt-1 text-sm text-red-600">{validationErrors.amount}</p>
             )}
             {suggestedAmount && !formData.amount && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs ds-text-muted">
                 Suggested: {suggestedAmount.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Currency
             </label>
             <select
               name="currency"
               value={formData.currency}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {CURRENCIES.map((curr) => (
                 <option key={curr} value={curr}>
@@ -344,14 +344,14 @@ export function ProfessionalFeesForm({
 
           {formData.projectId && availablePhases.length > 0 && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Phase (Optional)
               </label>
               <select
                 name="phaseId"
                 value={formData.phaseId}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Phase (Optional)</option>
                 {availablePhases.map((phase) => (
@@ -365,14 +365,14 @@ export function ProfessionalFeesForm({
 
           {formData.professionalServiceId && availableActivities.length > 0 && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Related Activity (Optional)
               </label>
               <select
                 name="activityId"
                 value={formData.activityId}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Activity (Optional)</option>
                 {availableActivities.map((activity) => (
@@ -386,7 +386,7 @@ export function ProfessionalFeesForm({
         </div>
 
         <div className="mt-4">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Description
           </label>
           <textarea
@@ -395,7 +395,7 @@ export function ProfessionalFeesForm({
             onChange={handleChange}
             placeholder="Fee description..."
             rows={2}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
@@ -416,10 +416,10 @@ export function ProfessionalFeesForm({
 
       {/* Invoice Information */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Invoice Information (Optional)</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Invoice Information (Optional)</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Invoice Number
             </label>
             <input
@@ -428,11 +428,11 @@ export function ProfessionalFeesForm({
               value={formData.invoiceNumber}
               onChange={handleChange}
               placeholder="Invoice number"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Invoice Date
             </label>
             <input
@@ -440,11 +440,11 @@ export function ProfessionalFeesForm({
               name="invoiceDate"
               value={formData.invoiceDate}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Due Date
             </label>
             <input
@@ -452,8 +452,8 @@ export function ProfessionalFeesForm({
               name="dueDate"
               value={formData.dueDate}
               onChange={handleChange}
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.dueDate ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.dueDate ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
             {validationErrors.dueDate && (
@@ -462,7 +462,7 @@ export function ProfessionalFeesForm({
           </div>
         </div>
         <div className="mt-4">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Invoice Document (Optional)
           </label>
           <CloudinaryUploadWidget
@@ -480,17 +480,17 @@ export function ProfessionalFeesForm({
 
       {/* Payment Information (Optional) */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Information (Optional)</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Payment Information (Optional)</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Payment Method
             </label>
             <select
               name="paymentMethod"
               value={formData.paymentMethod}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Payment Method (Optional)</option>
               {PAYMENT_METHODS.map((method) => (
@@ -501,7 +501,7 @@ export function ProfessionalFeesForm({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Payment Date
             </label>
             <input
@@ -509,11 +509,11 @@ export function ProfessionalFeesForm({
               name="paymentDate"
               value={formData.paymentDate}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Reference Number
             </label>
             <input
@@ -522,12 +522,12 @@ export function ProfessionalFeesForm({
               value={formData.referenceNumber}
               onChange={handleChange}
               placeholder="Payment reference"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
         <div className="mt-4">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Receipt Document (Optional)
           </label>
           <CloudinaryUploadWidget
@@ -546,16 +546,16 @@ export function ProfessionalFeesForm({
       {/* Status (Edit Mode Only) */}
       {isEdit && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Status</h2>
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Status</h2>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Status
             </label>
             <select
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="PENDING">Pending</option>
               <option value="APPROVED">Approved</option>
@@ -572,7 +572,7 @@ export function ProfessionalFeesForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+          className="px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary"
         >
           Cancel
         </button>
@@ -608,13 +608,13 @@ export function ProfessionalFeesForm({
       </div>
 
       {!isEdit && canAutoApprove && (
-        <div className="flex items-center justify-end gap-2 text-sm text-gray-600">
+        <div className="flex items-center justify-end gap-2 text-sm ds-text-secondary">
           <input
             type="checkbox"
             id="autoApproveFee"
             checked={autoApprove}
             onChange={(e) => setAutoApprove(e.target.checked)}
-            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
           />
           <label htmlFor="autoApproveFee">Auto-approve on create (Owner/PM/Accountant)</label>
         </div>

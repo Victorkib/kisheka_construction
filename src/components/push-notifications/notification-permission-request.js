@@ -248,7 +248,7 @@ export function NotificationPermissionRequest() {
   // Render different states based on permission status
   if (permissionStatus === 'granted' && isSubscribed) {
     return (
-      <div className="bg-green-50 border-b border-green-200 px-4 py-3">
+      <div className="bg-green-50 border-b border-green-400/60 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <CheckCircle2 className="w-5 h-5 text-green-600" />
@@ -271,7 +271,7 @@ export function NotificationPermissionRequest() {
 
   if (permissionStatus === 'granted' && !isSubscribed) {
     return (
-      <div className="bg-blue-50 border-b border-blue-200 px-4 py-3">
+      <div className="bg-blue-50 border-b border-blue-400/60 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1">
             <Bell className="w-5 h-5 text-blue-600 flex-shrink-0" />
@@ -296,7 +296,7 @@ export function NotificationPermissionRequest() {
             <button
               onClick={subscribeToPushNotifications}
               disabled={isSubscribing}
-              className="px-4 py-1 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+              className="px-4 py-1 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-slate-500 disabled:cursor-not-allowed transition"
             >
               {isSubscribing ? 'Enabling...' : 'Enable'}
             </button>
@@ -351,7 +351,7 @@ export function NotificationPermissionRequest() {
 
   // Default: permission not determined yet
   return (
-    <div className="bg-blue-50 border-b border-blue-200 px-4 py-3">
+    <div className="bg-blue-50 border-b border-blue-400/60 px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1">
           <Bell className="w-5 h-5 text-blue-600 flex-shrink-0" />
@@ -377,7 +377,7 @@ export function NotificationPermissionRequest() {
           <button
             onClick={handleRequestPermission}
             disabled={isSubscribing}
-            className="px-4 py-1 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+            className="px-4 py-1 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-slate-500 disabled:cursor-not-allowed transition"
           >
             {isSubscribing ? 'Enabling...' : 'Enable'}
           </button>

@@ -25,7 +25,7 @@ export function NavbarV2({ children }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen ds-bg-surface-muted flex">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <Sidebar

@@ -1,9 +1,9 @@
 /**
  * Subcontractors API Route
- * GET: List subcontractors (optionally filtered by project, phase, status, type)
+ * GET: List subcontractors (optionally filtered by project, phase, floor, status, type)
  * POST: Create new subcontractor assignment (PM, OWNER only)
  * 
- * GET /api/subcontractors?projectId=xxx&phaseId=xxx&status=xxx&subcontractorType=xxx
+ * GET /api/subcontractors?projectId=xxx&phaseId=xxx&floorId=xxx&status=xxx&subcontractorType=xxx
  * POST /api/subcontractors
  */
 
@@ -23,9 +23,9 @@ export const dynamic = 'force-dynamic';
 
 /**
  * GET /api/subcontractors
- * Returns subcontractors, optionally filtered by projectId, phaseId, status, subcontractorType
+ * Returns subcontractors, optionally filtered by projectId, phaseId, floorId, status, subcontractorType
  * Auth: All authenticated users
- * Query params: projectId (optional), phaseId (optional), status (optional), subcontractorType (optional), page (optional), limit (optional)
+ * Query params: projectId (optional), phaseId (optional), floorId (optional), status (optional), subcontractorType (optional), page (optional), limit (optional)
  */
 export async function GET(request) {
   try {
@@ -44,6 +44,7 @@ export async function GET(request) {
     // Filters
     const projectId = searchParams.get('projectId');
     const phaseId = searchParams.get('phaseId');
+    const floorId = searchParams.get('floorId');
     const status = searchParams.get('status');
     const subcontractorType = searchParams.get('subcontractorType');
 
@@ -53,6 +54,10 @@ export async function GET(request) {
 
     if (phaseId && ObjectId.isValid(phaseId)) {
       query.phaseId = new ObjectId(phaseId);
+    }
+
+    if (floorId && ObjectId.isValid(floorId)) {
+      query.floorId = new ObjectId(floorId);
     }
 
     if (status && SUBCONTRACTOR_STATUSES.includes(status)) {
@@ -146,6 +151,7 @@ export async function POST(request) {
     const {
       projectId,
       phaseId,
+      floorId,
       subcontractorName,
       subcontractorType,
       contactPerson,
@@ -195,6 +201,7 @@ export async function POST(request) {
     const subcontractorData = {
       projectId,
       phaseId,
+      floorId,
       subcontractorName,
       subcontractorType,
       contactPerson,
@@ -231,7 +238,8 @@ export async function POST(request) {
         paymentSchedule: paymentSchedule || [],
         status: status || 'pending',
         performance,
-        notes
+        notes,
+        floorId
       },
       projectId,
       phaseId,

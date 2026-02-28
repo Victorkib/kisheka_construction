@@ -70,7 +70,7 @@ export function BreadcrumbNavMobile({ customBreadcrumbs = null }) {
 
   return (
     <nav 
-      className="lg:hidden flex items-center gap-1 text-xs text-gray-600 mb-3 overflow-x-auto scrollbar-hide touch-pan-x"
+      className="lg:hidden flex items-center gap-1 text-xs ds-text-secondary mb-3 overflow-x-auto scrollbar-hide touch-pan-x"
       ref={scrollRef}
       aria-label="Breadcrumb"
     >
@@ -78,7 +78,7 @@ export function BreadcrumbNavMobile({ customBreadcrumbs = null }) {
       {breadcrumbs.length > 1 && (
         <Link
           href={breadcrumbs[breadcrumbs.length - 2]?.href || '/dashboard'}
-          className="flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-colors flex-shrink-0 touch-manipulation"
+          className="flex items-center gap-1 px-2 py-1.5 rounded-md hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors flex-shrink-0 touch-manipulation"
         >
           <ChevronLeft className="w-4 h-4" />
           <span className="font-medium">Back</span>
@@ -89,7 +89,7 @@ export function BreadcrumbNavMobile({ customBreadcrumbs = null }) {
       {hasMore && (
         <button
           onClick={() => setShowAll(!showAll)}
-          className="px-2 py-1.5 rounded-md hover:bg-gray-100 active:bg-gray-200 transition-colors flex-shrink-0 text-gray-500 touch-manipulation"
+          className="px-2 py-1.5 rounded-md hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors flex-shrink-0 ds-text-muted touch-manipulation"
         >
           ...
         </button>
@@ -104,17 +104,17 @@ export function BreadcrumbNavMobile({ customBreadcrumbs = null }) {
         return (
           <div key={crumb.href || actualIndex} className="flex items-center gap-1 flex-shrink-0">
             {actualIndex > 0 && (
-              <ChevronRight className="w-3 h-3 text-gray-400 flex-shrink-0" />
+              <ChevronRight className="w-3 h-3 ds-text-muted flex-shrink-0" />
             )}
             {isLast ? (
-              <span className="font-medium text-gray-900 flex items-center gap-1 px-2 py-1.5 rounded-md bg-gray-50">
+              <span className="font-medium ds-text-primary flex items-center gap-1 px-2 py-1.5 rounded-md ds-bg-surface-muted">
                 {Icon && <Icon className="w-3 h-3 flex-shrink-0" />}
                 <span className="truncate max-w-[120px]">{crumb.label}</span>
               </span>
             ) : (
               <Link
                 href={crumb.href}
-                className="hover:text-gray-900 transition-colors flex items-center gap-1 px-2 py-1.5 rounded-md hover:bg-gray-100 active:bg-gray-200 touch-manipulation"
+                className="hover:ds-text-primary transition-colors flex items-center gap-1 px-2 py-1.5 rounded-md hover:ds-bg-surface-muted active:ds-bg-surface-muted touch-manipulation"
               >
                 {Icon && <Icon className="w-3 h-3 flex-shrink-0" />}
                 <span className="truncate max-w-[100px]">{crumb.label}</span>

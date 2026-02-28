@@ -653,13 +653,13 @@ function NewMaterialRequestPageContent() {
               { label: 'Create Request', href: '/material-requests/new', current: true },
             ]}
           />
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create Material Request</h1>
-          <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Request materials needed for your project</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Create Material Request</h1>
+          <p className="text-sm sm:text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Request materials needed for your project</p>
         </div>
 
         {/* Financial Warning */}
         {formData.estimatedCost && availableCapital !== null && parseFloat(formData.estimatedCost) > availableCapital && (
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-800 px-4 py-3 rounded-lg mb-6">
             <p className="font-semibold text-sm sm:text-base">⚠️ Financial Warning</p>
             <p className="text-xs sm:text-sm mt-1">
               Estimated cost ({formatCurrency(parseFloat(formData.estimatedCost))}) exceeds available capital ({formatCurrency(availableCapital)}).
@@ -670,7 +670,7 @@ function NewMaterialRequestPageContent() {
 
         {/* Available Capital Display */}
         {formData.projectId && availableCapital !== null && canAccess('view_financing') && (
-          <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-blue-500/10 border border-blue-400/60 text-blue-200 px-4 py-3 rounded-lg mb-6">
             <p className="text-xs sm:text-sm">
               <span className="font-semibold">Available Capital:</span> {formatCurrency(availableCapital)}
             </p>
@@ -679,14 +679,14 @@ function NewMaterialRequestPageContent() {
 
         {/* Prerequisites Warning */}
         {formData.projectId && prerequisites && !prerequisites.readiness.readyForMaterials && (
-          <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
+          <div className="bg-amber-500/10 border border-amber-400/60 rounded-lg p-4 mb-6">
             <div className="flex items-start gap-3">
-              <svg className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="w-5 h-5 text-amber-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <div className="flex-1">
-                <h3 className="font-semibold text-yellow-900 mb-2">Project Setup Incomplete</h3>
-                <p className="text-sm text-yellow-800 mb-3">
+                <h3 className="font-semibold text-amber-200 mb-2">Project Setup Incomplete</h3>
+                <p className="text-sm text-amber-200/90 mb-3">
                   This project is missing required setup items. Please complete them before creating material requests.
                 </p>
                 <div className="space-y-2">
@@ -694,14 +694,14 @@ function NewMaterialRequestPageContent() {
                     .filter(([_, item]) => item.required && !item.completed)
                     .map(([key, item]) => (
                       <div key={key} className="flex items-center gap-2 text-sm">
-                        <svg className="w-4 h-4 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg className="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                        <span className="text-yellow-800">{item.message}</span>
+                        <span className="text-amber-200">{item.message}</span>
                         {item.actionUrl && (
                           <Link
                             href={item.actionUrl}
-                            className="ml-auto text-yellow-700 hover:text-yellow-900 underline text-xs font-medium"
+                            className="ml-auto text-amber-300 hover:text-amber-200 underline text-xs font-medium"
                           >
                             {item.actionLabel} →
                           </Link>
@@ -711,7 +711,7 @@ function NewMaterialRequestPageContent() {
                 </div>
                 <Link
                   href={`/projects/${formData.projectId}`}
-                  className="mt-3 inline-block text-sm font-medium text-yellow-700 hover:text-yellow-900 underline"
+                  className="mt-3 inline-block text-sm font-medium text-amber-300 hover:text-amber-200 underline"
                 >
                   View full project setup checklist →
                 </Link>
@@ -722,7 +722,7 @@ function NewMaterialRequestPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-500/10 border border-red-400/60 text-red-200 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -731,19 +731,19 @@ function NewMaterialRequestPageContent() {
         <WorkflowGuide projectId={formData.projectId} compact={true} />
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-4 sm:p-6">
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow border ds-border-subtle p-4 sm:p-6">
           <div className="space-y-4 sm:space-y-6">
             {/* Project Selection */}
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Project <span className="text-red-500">*</span>
                 <HelpIcon 
-                  content="Select the project for which you're requesting materials. The project must have capital allocated. Budget is optional - spending will be tracked even without a budget set."
+                  content="Select the project for which you're requesting materials. Phase and (optionally) floor budgets will be enforced if configured. Capital is tracked for this project and is strictly validated later when you create purchase orders."
                   position="right"
                 />
               </label>
               <FieldHelp>
-                Choose the project that needs these materials. Ensure the project has been set up with budget and capital.
+                Choose the project that needs these materials. Budgets (when set) are enforced here; capital is shown for context and strictly enforced at purchase order stage.
               </FieldHelp>
               <select
                 name="projectId"
@@ -751,15 +751,15 @@ function NewMaterialRequestPageContent() {
                 onChange={handleChange}
                 required
                 disabled={loadingProjects || loading}
-                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
               >
                 {loadingProjects ? (
                   <option>Loading projects...</option>
                 ) : (
                   <>
-                    <option value="" className="text-gray-900">Select a project</option>
-                    {projects.map((project) => (
-                      <option key={project._id} value={project._id} className="text-gray-900">
+                    <option value="" className="ds-text-primary">Select a project</option>
+                      {projects.map((project) => (
+                        <option key={project._id} value={project._id} className="ds-text-primary">
                         {project.projectName} {project.projectCode && `(${project.projectCode})`}
                       </option>
                     ))}
@@ -771,7 +771,7 @@ function NewMaterialRequestPageContent() {
             {/* Floor Selection (Optional) */}
             {formData.projectId && floors.length > 0 && (
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Floor (Optional)
                   <HelpIcon 
                     content="Select the specific floor if this material is for a particular floor. This helps with organization and tracking."
@@ -786,13 +786,13 @@ function NewMaterialRequestPageContent() {
                   value={formData.floorId}
                   onChange={handleChange}
                   disabled={loadingFloors || loadingApplicableFloors || loading || !formData.projectId}
-                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                 >
                   {loadingFloors || loadingApplicableFloors ? (
                     <option>Loading floors...</option>
                   ) : (
                     <>
-                      <option value="" className="text-gray-900">Select a floor (optional)</option>
+                      <option value="" className="ds-text-primary">Select a floor (optional)</option>
                       {/* Show applicable floors first */}
                       {applicableFloors.length > 0 && (
                         <>
@@ -805,7 +805,7 @@ function NewMaterialRequestPageContent() {
                               return `Floor ${floorNumber}`;
                             };
                             return (
-                              <option key={floor._id} value={floor._id} className="text-gray-900">
+                              <option key={floor._id} value={floor._id} className="ds-text-primary">
                                 {getFloorDisplay(floor.floorNumber, floor.name)} ✓
                               </option>
                             );
@@ -815,7 +815,7 @@ function NewMaterialRequestPageContent() {
                       {/* Show non-applicable floors (disabled) if phase is selected */}
                       {formData.phaseId && nonApplicableFloors.length > 0 && (
                         <>
-                          <optgroup label={`Not applicable to ${selectedPhaseInfo?.phaseName || 'selected phase'}`} className="text-gray-500">
+                          <optgroup label={`Not applicable to ${selectedPhaseInfo?.phaseName || 'selected phase'}`} className="ds-text-muted">
                             {nonApplicableFloors.map((floor) => {
                               const getFloorDisplay = (floorNumber, name) => {
                                 if (name) return name;
@@ -825,7 +825,7 @@ function NewMaterialRequestPageContent() {
                                 return `Floor ${floorNumber}`;
                               };
                               return (
-                                <option key={floor._id} value={floor._id} disabled className="text-gray-400 italic">
+                                <option key={floor._id} value={floor._id} disabled className="ds-text-muted italic">
                                   {getFloorDisplay(floor.floorNumber, floor.name)} ✗
                                 </option>
                               );
@@ -845,7 +845,7 @@ function NewMaterialRequestPageContent() {
                               return `Floor ${floorNumber}`;
                             };
                             return (
-                              <option key={floor._id} value={floor._id} className="text-gray-900">
+                              <option key={floor._id} value={floor._id} className="ds-text-primary">
                                 {getFloorDisplay(floor.floorNumber, floor.name)}
                               </option>
                             );
@@ -868,7 +868,7 @@ function NewMaterialRequestPageContent() {
             {/* Phase Selection (Required) */}
             {formData.projectId && (
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Construction Phase <span className="text-red-500">*</span>
                   <HelpIcon 
                     content="Select the construction phase for this material. This is required for phase-based budget tracking and financial management."
@@ -879,12 +879,12 @@ function NewMaterialRequestPageContent() {
                   Required: Specify which construction phase these materials are for. Helps track phase-based spending and budget allocation.
                 </FieldHelp>
                 {!formData.projectId ? (
-                  <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
+                  <div className="px-3 py-2 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700 text-sm">
                     Please select a project first to see available phases
                   </div>
                 ) : phases.length === 0 ? (
                   <div className="space-y-2">
-                    <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
+                    <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-secondary text-sm">
                       No phases available for this project. Phases can be created in the project phases section.
                     </div>
                     <Link
@@ -901,15 +901,15 @@ function NewMaterialRequestPageContent() {
                     value={formData.phaseId}
                     onChange={handleChange}
                     disabled={loadingPhases || loading || !formData.projectId}
-                    className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
                   >
                     {loadingPhases ? (
                       <option>Loading phases...</option>
                     ) : (
                       <>
-                        <option value="" className="text-gray-900">Select phase</option>
+                        <option value="" className="ds-text-primary">Select phase</option>
                         {phases.map((phase) => (
-                          <option key={phase._id} value={phase._id} className="text-gray-900">
+                          <option key={phase._id} value={phase._id} className="ds-text-primary">
                             {phase.phaseName || phase.name} {phase.status ? `(${phase.status.replace('_', ' ')})` : ''}
                           </option>
                         ))}
@@ -922,7 +922,7 @@ function NewMaterialRequestPageContent() {
 
             {/* Category Selection (Optional) */}
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Category (Optional)
               </label>
               <select
@@ -930,15 +930,15 @@ function NewMaterialRequestPageContent() {
                 value={formData.categoryId}
                 onChange={handleChange}
                 disabled={loadingCategories || loading}
-                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
               >
                 {loadingCategories ? (
                   <option>Loading categories...</option>
                 ) : (
                   <>
-                    <option value="" className="text-gray-900">Select a category</option>
+                    <option value="" className="ds-text-primary">Select a category</option>
                     {categories.map((category) => (
-                      <option key={category._id} value={category._id} className="text-gray-900">
+                      <option key={category._id} value={category._id} className="ds-text-primary">
                         {category.name}
                       </option>
                     ))}
@@ -947,9 +947,9 @@ function NewMaterialRequestPageContent() {
               </select>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4">
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2">Select From Material Library (Optional)</h3>
-              <p className="text-xs text-gray-600 mb-3">
+            <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-3 sm:p-4">
+              <h3 className="text-xs sm:text-sm font-semibold ds-text-primary mb-2">Select From Material Library (Optional)</h3>
+              <p className="text-xs ds-text-secondary mb-3">
                 Use the library to prefill material name, unit, category, and estimated unit cost.
               </p>
               <MaterialLibraryPicker
@@ -960,7 +960,7 @@ function NewMaterialRequestPageContent() {
 
             {/* Material Name */}
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Material Name <span className="text-red-500">*</span>
                 <HelpIcon 
                   content="Enter the name of the material you need. Be specific and clear (e.g., 'Portland Cement Grade 42.5' instead of just 'Cement')."
@@ -979,13 +979,13 @@ function NewMaterialRequestPageContent() {
                 minLength={2}
                 placeholder="e.g., Cement, Steel Bars, etc."
                 disabled={loading}
-                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Description (Optional)
               </label>
               <textarea
@@ -995,14 +995,14 @@ function NewMaterialRequestPageContent() {
                 rows={3}
                 placeholder="Additional details about the material..."
                 disabled={loading}
-                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
               />
             </div>
 
             {/* Quantity and Unit */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Quantity Needed <span className="text-red-500">*</span>
                   <HelpIcon 
                     content="Enter the total quantity needed. This should match the unit you select (e.g., if unit is 'bags', enter number of bags)."
@@ -1021,11 +1021,11 @@ function NewMaterialRequestPageContent() {
                   min="0.01"
                   step="0.01"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted touch-manipulation"
                 />
               </div>
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Unit <span className="text-red-500">*</span>
                   <HelpIcon 
                     content="Select the unit of measurement. Choose from common units or select 'Others' to enter a custom unit name."
@@ -1040,10 +1040,10 @@ function NewMaterialRequestPageContent() {
                   value={formData.unit}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   {unitOptions.map((option) => (
-                    <option key={option} value={option} className="text-gray-900">
+                    <option key={option} value={option} className="ds-text-primary">
                       {option.charAt(0).toUpperCase() + option.slice(1)}
                     </option>
                   ))}
@@ -1056,7 +1056,7 @@ function NewMaterialRequestPageContent() {
                     onChange={handleChange}
                     required
                     placeholder="Enter custom unit name"
-                    className="w-full mt-2 px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                    className="w-full mt-2 px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted touch-manipulation"
                   />
                 )}
               </div>
@@ -1064,7 +1064,7 @@ function NewMaterialRequestPageContent() {
 
             {/* Urgency */}
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Urgency <span className="text-red-500">*</span>
                 <HelpIcon 
                   content="Select how urgent this material request is. High urgency requests are prioritized for approval and procurement."
@@ -1079,19 +1079,19 @@ function NewMaterialRequestPageContent() {
                 value={formData.urgency}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
               >
-                <option value="low" className="text-gray-900">Low</option>
-                <option value="medium" className="text-gray-900">Medium</option>
-                <option value="high" className="text-gray-900">High</option>
-                <option value="critical" className="text-gray-900">Critical</option>
+                <option value="low" className="ds-text-primary">Low</option>
+                <option value="medium" className="ds-text-primary">Medium</option>
+                <option value="high" className="ds-text-primary">High</option>
+                <option value="critical" className="ds-text-primary">Critical</option>
               </select>
             </div>
 
             {/* Estimated Cost (Optional) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Estimated Unit Cost (Optional)
                   <HelpIcon 
                     content="Enter the estimated cost per unit. The total estimated cost will be calculated automatically (Quantity × Unit Cost)."
@@ -1109,11 +1109,11 @@ function NewMaterialRequestPageContent() {
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted touch-manipulation"
                 />
               </div>
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Estimated Total Cost (Optional)
                   <HelpIcon 
                     content="Enter the total estimated cost. If you enter this, the unit cost will be calculated automatically (Total Cost ÷ Quantity)."
@@ -1131,7 +1131,7 @@ function NewMaterialRequestPageContent() {
                   min="0"
                   step="0.01"
                   placeholder="0.00"
-                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted touch-manipulation"
                 />
               </div>
             </div>
@@ -1150,7 +1150,7 @@ function NewMaterialRequestPageContent() {
 
             {/* Reason */}
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Reason for Request (Optional)
                 <HelpIcon 
                   content="Explain why this material is needed. This helps approvers understand the context and make informed decisions."
@@ -1166,13 +1166,13 @@ function NewMaterialRequestPageContent() {
                 onChange={handleChange}
                 rows={3}
                 placeholder="Why is this material needed?"
-                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted touch-manipulation"
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Additional Notes (Optional)
                 <HelpIcon 
                   content="Add any additional information, specifications, or special requirements for this material request."
@@ -1188,15 +1188,15 @@ function NewMaterialRequestPageContent() {
                 onChange={handleChange}
                 rows={3}
                 placeholder="Any additional information..."
-                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted touch-manipulation"
               />
             </div>
 
             {/* Submit Buttons */}
-            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t border-gray-200">
+            <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t ds-border-subtle">
               <Link
                 href="/material-requests"
-                className="w-full sm:w-auto px-6 py-2.5 border border-gray-300 hover:bg-gray-50 active:bg-gray-100 text-gray-700 font-medium rounded-lg transition-colors touch-manipulation text-center"
+                className="w-full sm:w-auto px-6 py-2.5 border ds-border-subtle hover:ds-bg-surface-muted active:ds-bg-surface ds-text-secondary font-medium rounded-lg transition-colors touch-manipulation text-center"
               >
                 Cancel
               </Link>

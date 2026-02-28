@@ -17,20 +17,20 @@ import Link from 'next/link';
 export function ProjectHealthStrip({ statuses = [], summary, link, projectId }) {
   const getStatusColor = (status) => {
     const colors = {
-      ok: 'bg-green-100 text-green-800 border-green-200',
-      healthy: 'bg-green-100 text-green-800 border-green-200',
-      on_budget: 'bg-green-100 text-green-800 border-green-200',
-      sufficient: 'bg-green-100 text-green-800 border-green-200',
-      on_track: 'bg-green-100 text-green-800 border-green-200',
-      at_risk: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      low: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      delayed: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      critical: 'bg-red-100 text-red-800 border-red-200',
-      over_budget: 'bg-red-100 text-red-800 border-red-200',
-      insufficient: 'bg-red-100 text-red-800 border-red-200',
-      negative: 'bg-red-100 text-red-800 border-red-200',
+      ok: 'bg-green-100 text-green-800 border-green-400/60',
+      healthy: 'bg-green-100 text-green-800 border-green-400/60',
+      on_budget: 'bg-green-100 text-green-800 border-green-400/60',
+      sufficient: 'bg-green-100 text-green-800 border-green-400/60',
+      on_track: 'bg-green-100 text-green-800 border-green-400/60',
+      at_risk: 'bg-yellow-100 text-yellow-800 border-yellow-400/60',
+      low: 'bg-yellow-100 text-yellow-800 border-yellow-400/60',
+      delayed: 'bg-yellow-100 text-yellow-800 border-yellow-400/60',
+      critical: 'bg-red-100 text-red-800 border-red-400/60',
+      over_budget: 'bg-red-100 text-red-800 border-red-400/60',
+      insufficient: 'bg-red-100 text-red-800 border-red-400/60',
+      negative: 'bg-red-100 text-red-800 border-red-400/60',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800 border-gray-200';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary ds-border-subtle';
   };
 
   const getStatusLabel = (status) => {
@@ -69,12 +69,12 @@ export function ProjectHealthStrip({ statuses = [], summary, link, projectId }) 
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
+    <div className="ds-bg-surface rounded-lg shadow-sm p-4 border ds-border-subtle">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         {/* Status Chips */}
         {statuses.length > 0 && (
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-sm font-medium text-gray-700">Status:</span>
+            <span className="text-sm font-medium ds-text-secondary">Status:</span>
             {statuses.map((statusItem, index) => (
               <span
                 key={index}
@@ -90,7 +90,7 @@ export function ProjectHealthStrip({ statuses = [], summary, link, projectId }) 
         
         {/* Summary Text */}
         {summary && (
-          <p className="text-sm text-gray-600 flex-1">
+          <p className="text-sm ds-text-secondary flex-1">
             {summary}
           </p>
         )}

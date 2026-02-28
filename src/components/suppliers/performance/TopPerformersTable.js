@@ -15,19 +15,19 @@ export default function TopPerformersTable({
     <Card className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Top Performers</h3>
-          <p className="text-sm text-gray-500">Category: {category}</p>
+          <h3 className="text-lg font-semibold ds-text-primary">Top Performers</h3>
+          <p className="text-sm ds-text-muted">Category: {category}</p>
         </div>
       </div>
 
       {suppliers.length === 0 ? (
-        <div className="text-center text-sm text-gray-500 py-8">
+        <div className="text-center text-sm ds-text-muted py-8">
           No top performers available.
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm">
-            <thead className="text-left text-gray-500">
+            <thead className="text-left ds-text-muted">
               <tr>
                 <th className="pb-2">Supplier</th>
                 <th className="pb-2">Score</th>
@@ -35,11 +35,11 @@ export default function TopPerformersTable({
                 <th className="pb-2">Orders</th>
               </tr>
             </thead>
-            <tbody className="text-gray-700">
+            <tbody className="ds-text-secondary">
               {suppliers.map((supplier) => (
                 <tr
                   key={supplier.supplierId || supplier._id || supplier.name}
-                  className="border-t border-gray-100 hover:bg-gray-50 cursor-pointer"
+                  className="border-t ds-border-subtle hover:bg-ds-bg-surface-muted cursor-pointer"
                   onClick={() => onSupplierClick?.(supplier.supplierId || supplier._id)}
                 >
                   <td className="py-3">

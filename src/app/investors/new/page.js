@@ -160,29 +160,29 @@ function NewInvestorPageContent() {
         <div className="mb-6">
           <Link
             href="/investors"
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-4 inline-block"
+            className="text-blue-400 hover:text-blue-300 text-sm font-medium mb-4 inline-block"
           >
             ← Back to Investors
           </Link>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Add New Investor</h1>
-          <p className="mt-2 text-sm text-gray-700">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Add New Investor</h1>
+          <p className="mt-2 text-sm ds-text-secondary">
             Enter investor details and initial contribution
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-4">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow p-6 space-y-6">
           {/* Basic Information */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Basic Information</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -191,27 +191,27 @@ function NewInvestorPageContent() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Email</label>
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Email</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Phone</label>
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Phone</label>
                 <input
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 />
               </div>
             </div>
@@ -219,10 +219,10 @@ function NewInvestorPageContent() {
 
           {/* Investment Details */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Investment Details</h2>
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Investment Details</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Investment Type <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -230,7 +230,7 @@ function NewInvestorPageContent() {
                   value={formData.investmentType}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   <option value="EQUITY">Equity</option>
                   <option value="LOAN">Loan</option>
@@ -238,7 +238,7 @@ function NewInvestorPageContent() {
                 </select>
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Total Invested (KES) <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -249,7 +249,7 @@ function NewInvestorPageContent() {
                   required
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 />
               </div>
             </div>
@@ -258,11 +258,11 @@ function NewInvestorPageContent() {
           {/* Loan Terms (if applicable) */}
           {needsLoanTerms && (
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Loan Terms</h2>
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Loan Terms</h2>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                    <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                       Interest Rate (%)
                     </label>
                     <input
@@ -272,11 +272,11 @@ function NewInvestorPageContent() {
                       onChange={handleLoanTermsChange}
                       min="0"
                       step="0.01"
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                     />
                   </div>
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                    <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                       Repayment Period (months)
                     </label>
                     <input
@@ -285,12 +285,12 @@ function NewInvestorPageContent() {
                       value={formData.loanTerms.repaymentPeriod}
                       onChange={handleLoanTermsChange}
                       min="0"
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Repayment Schedule
                   </label>
                   <input
@@ -299,12 +299,12 @@ function NewInvestorPageContent() {
                     value={formData.loanTerms.repaymentSchedule}
                     onChange={handleLoanTermsChange}
                     placeholder="e.g., Monthly, Quarterly, Annually"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                    <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                       Start Date
                     </label>
                     <input
@@ -312,17 +312,17 @@ function NewInvestorPageContent() {
                       name="startDate"
                       value={formData.loanTerms.startDate}
                       onChange={handleLoanTermsChange}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                     />
                   </div>
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">End Date</label>
+                    <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">End Date</label>
                     <input
                       type="date"
                       name="endDate"
                       value={formData.loanTerms.endDate}
                       onChange={handleLoanTermsChange}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                     />
                   </div>
                 </div>
@@ -332,11 +332,11 @@ function NewInvestorPageContent() {
 
           {/* Initial Contribution */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Initial Contribution</h2>
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Initial Contribution</h2>
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Amount (KES)
                   </label>
                   <input
@@ -347,27 +347,27 @@ function NewInvestorPageContent() {
                     min="0"
                     step="0.01"
                     placeholder={formData.totalInvested || 'Auto-filled from total'}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   />
                 </div>
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Date</label>
+                  <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Date</label>
                   <input
                     type="date"
                     name="date"
                     value={formData.initialContribution.date}
                     onChange={handleInitialContributionChange}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Type</label>
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Type</label>
                 <select
                   name="type"
                   value={formData.initialContribution.type}
                   onChange={handleInitialContributionChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   <option value="EQUITY">Equity</option>
                   <option value="LOAN">Loan</option>
@@ -375,17 +375,17 @@ function NewInvestorPageContent() {
                 </select>
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Notes</label>
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Notes</label>
                 <textarea
                   name="notes"
                   value={formData.initialContribution.notes}
                   onChange={handleInitialContributionChange}
                   rows="3"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Receipt/Proof of Payment
                 </label>
                 <CloudinaryUploadWidget
@@ -414,7 +414,7 @@ function NewInvestorPageContent() {
                       href={formData.initialContribution.receiptUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-blue-600 hover:text-blue-800"
+                      className="text-sm text-blue-400 hover:text-blue-300"
                     >
                       View uploaded receipt
                     </a>
@@ -426,7 +426,7 @@ function NewInvestorPageContent() {
 
           {/* Documents */}
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Documents</h2>
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Documents</h2>
             <CloudinaryUploadWidget
               uploadPreset="Construction_Accountability_System"
               folder="Kisheka_construction/investors/documents"
@@ -437,12 +437,12 @@ function NewInvestorPageContent() {
             {documents.length > 0 && (
               <div className="mt-4 space-y-2">
                 {documents.map((doc, idx) => (
-                  <div key={idx} className="text-sm text-gray-600">
+                  <div key={idx} className="text-sm ds-text-secondary">
                     <a
                       href={doc.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-blue-400 hover:text-blue-300"
                     >
                       {doc.fileName}
                     </a>
@@ -456,7 +456,7 @@ function NewInvestorPageContent() {
           <div className="flex justify-end gap-4 pt-4 border-t">
             <Link
               href="/investors"
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
+              className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition"
             >
               Cancel
             </Link>
@@ -478,7 +478,7 @@ function NewInvestorPageContent() {
 export default function NewInvestorPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center ds-bg-surface-muted">
         <div className="text-center">
           <LoadingSpinner size="lg" text="Loading..." />
         </div>

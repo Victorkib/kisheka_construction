@@ -73,17 +73,17 @@ export function OAuthButtons({ mode = 'login' }) {
   return (
     <div className="space-y-3">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+        <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm">
           {error}
         </div>
       )}
 
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-300"></div>
+          <div className="w-full border-t ds-border-subtle"></div>
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white text-gray-500">Or continue with</span>
+          <span className="px-2 ds-bg-surface ds-text-muted">Or continue with</span>
         </div>
       </div>
 
@@ -93,10 +93,10 @@ export function OAuthButtons({ mode = 'login' }) {
           type="button"
           onClick={() => handleOAuthLogin('google')}
           disabled={loading !== null}
-          className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed transition"
+          className="flex items-center justify-center gap-2 px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:ds-bg-surface-muted disabled:cursor-not-allowed transition"
         >
           {loading === 'google' ? (
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-slate-600"></div>
           ) : (
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -117,7 +117,7 @@ export function OAuthButtons({ mode = 'login' }) {
               />
             </svg>
           )}
-          <span className="text-sm font-medium text-gray-700">Google</span>
+          <span className="text-sm font-medium ds-text-secondary">Google</span>
         </button>
 
         {/* Discord OAuth Button */}
@@ -125,7 +125,7 @@ export function OAuthButtons({ mode = 'login' }) {
           type="button"
           onClick={() => handleOAuthLogin('discord')}
           disabled={loading !== null}
-          className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed transition bg-[#5865F2] border-[#5865F2] hover:bg-[#4752C4]"
+          className="flex items-center justify-center gap-2 px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:ds-bg-surface-muted disabled:cursor-not-allowed transition bg-[#5865F2] border-[#5865F2] hover:bg-[#4752C4]"
         >
           {loading === 'discord' ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>

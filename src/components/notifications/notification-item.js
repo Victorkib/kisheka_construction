@@ -133,7 +133,7 @@ export function NotificationItem({ notification, onMarkRead, onMarkUnread, onDel
 
   return (
     <div
-      className={`p-4 border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors cursor-pointer ${
+      className={`p-4 border-b ds-border-subtle last:border-b-0 hover:ds-bg-surface-muted transition-colors cursor-pointer ${
         !notification.isRead ? 'bg-blue-50' : ''
       } ${loading ? 'opacity-50 pointer-events-none' : ''}`}
       onClick={handleClick}
@@ -151,16 +151,16 @@ export function NotificationItem({ notification, onMarkRead, onMarkUnread, onDel
               <p
                 className={`text-sm font-medium ${
                   !notification.isRead
-                    ? 'text-gray-900'
-                    : 'text-gray-700'
+                    ? 'ds-text-primary'
+                    : 'ds-text-secondary'
                 }`}
               >
                 {notification.title}
               </p>
-              <p className="text-sm text-gray-700 mt-1 line-clamp-2">
+              <p className="text-sm ds-text-secondary mt-1 line-clamp-2">
                 {notification.message}
               </p>
-              <p className="text-sm text-gray-600 mt-1">
+              <p className="text-sm ds-text-secondary mt-1">
                 {formatTimeAgo(notification.createdAt)}
               </p>
             </div>
@@ -177,7 +177,7 @@ export function NotificationItem({ notification, onMarkRead, onMarkUnread, onDel
               <button
                 onClick={(e) => handleAction('read', e)}
                 disabled={loading}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium disabled:text-gray-400"
+                className="text-sm text-blue-600 hover:text-blue-800 font-medium disabled:ds-text-muted"
               >
                 Mark as read
               </button>
@@ -185,16 +185,16 @@ export function NotificationItem({ notification, onMarkRead, onMarkUnread, onDel
               <button
                 onClick={(e) => handleAction('unread', e)}
                 disabled={loading}
-                className="text-sm text-gray-700 hover:text-gray-900 font-medium disabled:text-gray-400"
+                className="text-sm ds-text-secondary hover:ds-text-primary font-medium disabled:ds-text-muted"
               >
                 Mark as unread
               </button>
             )}
-            <span className="text-gray-300">•</span>
+            <span className="ds-text-muted">•</span>
             <button
               onClick={(e) => handleAction('delete', e)}
               disabled={loading}
-              className="text-sm text-red-600 hover:text-red-800 font-medium disabled:text-gray-400"
+              className="text-sm text-red-600 hover:text-red-800 font-medium disabled:ds-text-muted"
             >
               Delete
             </button>

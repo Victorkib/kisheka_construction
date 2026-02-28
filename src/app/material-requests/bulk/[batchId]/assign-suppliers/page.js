@@ -333,8 +333,8 @@ function SupplierAssignmentPageContent() {
       <AppLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-            <p className="text-gray-600">You don't have permission to assign suppliers.</p>
+            <h1 className="text-2xl font-bold ds-text-primary mb-2">Access Denied</h1>
+            <p className="ds-text-secondary">You don't have permission to assign suppliers.</p>
             <Link href="/material-requests" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
               ← Back to Material Requests
             </Link>
@@ -358,7 +358,7 @@ function SupplierAssignmentPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
           <Link href="/material-requests" className="text-blue-600 hover:text-blue-800">
@@ -403,13 +403,13 @@ function SupplierAssignmentPageContent() {
           >
             ← Back to Batch Details
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Assign Suppliers</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold ds-text-primary">Assign Suppliers</h1>
+          <p className="ds-text-secondary mt-2">
             Batch: <span className="font-medium">{batch?.batchNumber}</span>
             {batch?.batchName && ` - ${batch.batchName}`}
           </p>
           {batch?.project && (
-            <p className="text-gray-600 mt-1">
+            <p className="ds-text-secondary mt-1">
               Project: <span className="font-medium">{batch.project.projectName}</span>
               {batch.project.projectCode && ` (${batch.project.projectCode})`}
             </p>
@@ -420,14 +420,14 @@ function SupplierAssignmentPageContent() {
         {(financeLoading || projectFinances || financeError) && (
           <div className={`mb-6 rounded-lg border px-4 py-3 ${
             financeError
-              ? 'bg-red-50 border-red-200 text-red-700'
+              ? 'bg-red-50 border-red-400/60 text-red-700'
               : capitalNotSet
-                ? 'bg-blue-50 border-blue-200 text-blue-800'
+                ? 'bg-blue-50 border-blue-400/60 text-blue-800'
                 : !hasCapital
                   ? 'bg-amber-50 border-amber-200 text-amber-800'
                   : isCapitalShort
-                    ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                    : 'bg-green-50 border-green-200 text-green-800'
+                    ? 'bg-yellow-50 border-yellow-400/60 text-yellow-800'
+                    : 'bg-green-50 border-green-400/60 text-green-800'
           }`}>
             {financeLoading ? (
               <p className="text-sm">Checking project capital availability...</p>
@@ -483,13 +483,13 @@ function SupplierAssignmentPageContent() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Link
                       href={`/financing?projectId=${projectId}&returnTo=${encodeURIComponent(returnTo)}`}
-                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-400/60 ds-bg-surface text-blue-800 hover:bg-blue-100"
                     >
                       Open Financing
                     </Link>
                     <Link
                       href={`/investors?projectId=${projectId}&returnTo=${encodeURIComponent(returnTo)}`}
-                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-400/60 ds-bg-surface text-blue-800 hover:bg-blue-100"
                     >
                       Allocate Funds (Investors)
                     </Link>
@@ -502,22 +502,22 @@ function SupplierAssignmentPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
         {/* Mode Selection */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Assignment Mode</h2>
-          <div className="flex gap-4 border-b border-gray-200">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Assignment Mode</h2>
+          <div className="flex gap-4 border-b ds-border-subtle">
             <button
               type="button"
               onClick={() => setMode('single')}
               className={`px-6 py-3 font-medium transition-colors ${
                 mode === 'single'
                   ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'ds-text-secondary hover:ds-text-primary'
               }`}
             >
               Single Supplier
@@ -528,7 +528,7 @@ function SupplierAssignmentPageContent() {
               className={`px-6 py-3 font-medium transition-colors ${
                 mode === 'multiple'
                   ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'ds-text-secondary hover:ds-text-primary'
               }`}
             >
               Multiple Suppliers
@@ -550,11 +550,11 @@ function SupplierAssignmentPageContent() {
 
         {/* Empty Suppliers State */}
         {suppliers.length === 0 && !loading && (
-          <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-8 mb-6 text-center">
+          <div className="bg-yellow-50 border-2 border-yellow-400/60 rounded-lg p-8 mb-6 text-center">
             <div className="max-w-md mx-auto">
               <div className="text-6xl mb-4">📦</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No Suppliers Found</h3>
-              <p className="text-gray-700 mb-6">
+              <h3 className="text-xl font-bold ds-text-primary mb-2">No Suppliers Found</h3>
+              <p className="ds-text-secondary mb-6">
                 You need to add suppliers before you can assign them to materials. 
                 Your assignment progress will be saved automatically.
               </p>
@@ -567,12 +567,12 @@ function SupplierAssignmentPageContent() {
                 </Link>
                 <Link
                   href="/suppliers"
-                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium inline-block"
+                  className="px-6 py-3 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted font-medium inline-block"
                 >
                   View All Suppliers
                 </Link>
               </div>
-              <p className="text-sm text-gray-600 mt-4">
+              <p className="text-sm ds-text-secondary mt-4">
                 💡 Tip: You can also use the sidebar to navigate to Suppliers. Your work here will be saved.
               </p>
             </div>
@@ -581,7 +581,7 @@ function SupplierAssignmentPageContent() {
 
         {/* Assignment Form */}
         {suppliers.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
             {mode === 'single' ? (
               <SingleSupplierAssignment
                 materialRequests={materialRequests}
@@ -602,7 +602,7 @@ function SupplierAssignmentPageContent() {
 
         {/* Quick Add Supplier Link (when suppliers exist but user wants to add more) */}
         {suppliers.length > 0 && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-5 mb-6 shadow-sm">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-400/60 rounded-lg p-5 mb-6 shadow-sm">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
@@ -678,7 +678,7 @@ function SupplierAssignmentPageContent() {
         <div className="flex justify-between items-center">
           <Link
             href={`/material-requests/bulk/${params.batchId}`}
-            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
+            className="px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium"
           >
             Cancel
           </Link>

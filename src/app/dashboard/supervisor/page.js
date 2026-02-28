@@ -83,8 +83,8 @@ export default function SupervisorDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-96"></div>
+              <div className="h-8 ds-bg-surface-muted rounded w-64 mb-2"></div>
+              <div className="h-4 ds-bg-surface-muted rounded w-96"></div>
             </div>
             <LoadingCard count={4} showHeader={true} lines={3} />
           </div>
@@ -99,9 +99,9 @@ export default function SupervisorDashboard() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Supervisor Dashboard</h1>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Supervisor Dashboard</h1>
             {user && (
-              <p className="text-gray-600 mt-2">Welcome, {user.firstName || user.email}!</p>
+              <p className="ds-text-secondary mt-2">Welcome, {user.firstName || user.email}!</p>
             )}
           </div>
 
@@ -140,11 +140,11 @@ export default function SupervisorDashboard() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-8 text-center">
+          <div className="bg-yellow-50 border-2 border-yellow-400/60 rounded-lg p-8 text-center">
             <div className="max-w-2xl mx-auto">
               <div className="text-5xl mb-4">⏳</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Loading User Data</h2>
-              <p className="text-lg text-gray-700 mb-6">Please wait while we load your information...</p>
+              <h2 className="text-2xl font-bold ds-text-primary mb-2">Loading User Data</h2>
+              <p className="text-lg ds-text-secondary mb-6">Please wait while we load your information...</p>
               <LoadingSpinner />
             </div>
           </div>
@@ -157,20 +157,20 @@ export default function SupervisorDashboard() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">Supervisor Dashboard</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-2">Welcome back, {user.firstName || user.email}!</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">Supervisor Dashboard</h1>
+          <p className="text-sm sm:text-base ds-text-secondary mt-2">Welcome back, {user.firstName || user.email}!</p>
         </div>
 
         {/* Overview Cards */}
         {summary && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Total Projects</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-xs sm:text-base font-semibold ds-text-secondary mb-2 leading-normal">Total Projects</h2>
               <p className="text-2xl sm:text-3xl font-bold text-blue-600">{summary.totalProjects || 0}</p>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Total Cost</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-xs sm:text-base font-semibold ds-text-secondary mb-2 leading-normal">Total Cost</h2>
               <p className="text-2xl sm:text-3xl font-bold text-green-600 break-words">
                 {new Intl.NumberFormat('en-KE', {
                   style: 'currency',
@@ -179,15 +179,15 @@ export default function SupervisorDashboard() {
                   maximumFractionDigits: 0,
                 }).format(summary.totalOverallCost || 0)}
               </p>
-              <p className="text-xs sm:text-sm text-gray-700 mt-1 leading-normal break-words">
+              <p className="text-xs sm:text-sm ds-text-secondary mt-1 leading-normal break-words">
                 Materials: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(summary.totalMaterialsCost || 0)} | 
                 Expenses: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(summary.totalExpensesCost || 0)} | 
                 Labour: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(summary.totalLabourCost || 0)}
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Approved Materials</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-xs sm:text-base font-semibold ds-text-secondary mb-2 leading-normal">Approved Materials</h2>
               <p className="text-2xl sm:text-3xl font-bold text-purple-600 break-words">
                 {summary.totalMaterialsCost ? 
                   new Intl.NumberFormat('en-KE', {
@@ -199,8 +199,8 @@ export default function SupervisorDashboard() {
             </div>
 
             {summary.capital && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-xs sm:text-base font-semibold text-gray-700 mb-2 leading-normal">Capital Used</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-xs sm:text-base font-semibold ds-text-secondary mb-2 leading-normal">Capital Used</h2>
                 <p className="text-2xl sm:text-3xl font-bold text-orange-600 break-words">
                   {new Intl.NumberFormat('en-KE', {
                     style: 'currency',
@@ -215,35 +215,35 @@ export default function SupervisorDashboard() {
         )}
 
         {/* View & Verify Section */}
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6 sm:mb-8">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">View & Verify</h2>
-          <p className="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">
+        <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6 sm:mb-8">
+          <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-3 sm:mb-4">View & Verify</h2>
+          <p className="text-xs sm:text-sm ds-text-secondary mb-3 sm:mb-4">
             As a supervisor, you can view materials, expenses, and projects for verification purposes.
             Labour log approval functionality will be available in Phase 3.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             <Link
               href="/items"
-              className="p-3 sm:p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 active:border-blue-600 hover:bg-blue-50 active:bg-blue-100 transition-colors touch-manipulation"
+              className="p-3 sm:p-4 border-2 border-blue-400/60 rounded-lg hover:border-blue-500 active:border-blue-600 hover:bg-blue-50 active:bg-blue-100 transition-colors touch-manipulation"
             >
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="text-xl sm:text-2xl flex-shrink-0">📦</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Materials</h3>
-                  <p className="text-xs sm:text-sm text-gray-600">View all materials</p>
+                  <h3 className="font-semibold ds-text-primary text-sm sm:text-base">Materials</h3>
+                  <p className="text-xs sm:text-sm ds-text-secondary">View all materials</p>
                 </div>
               </div>
             </Link>
 
             <Link
               href="/expenses"
-              className="p-3 sm:p-4 border-2 border-red-200 rounded-lg hover:border-red-500 active:border-red-600 hover:bg-red-50 active:bg-red-100 transition-colors touch-manipulation"
+              className="p-3 sm:p-4 border-2 border-red-400/60 rounded-lg hover:border-red-500 active:border-red-600 hover:bg-red-50 active:bg-red-100 transition-colors touch-manipulation"
             >
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="text-xl sm:text-2xl flex-shrink-0">💸</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Expenses</h3>
-                  <p className="text-xs sm:text-sm text-gray-600">View all expenses</p>
+                  <h3 className="font-semibold ds-text-primary text-sm sm:text-base">Expenses</h3>
+                  <p className="text-xs sm:text-sm ds-text-secondary">View all expenses</p>
                 </div>
               </div>
             </Link>
@@ -255,8 +255,8 @@ export default function SupervisorDashboard() {
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="text-xl sm:text-2xl flex-shrink-0">🏗️</div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 text-sm sm:text-base">Projects</h3>
-                  <p className="text-xs sm:text-sm text-gray-600">View project details</p>
+                  <h3 className="font-semibold ds-text-primary text-sm sm:text-base">Projects</h3>
+                  <p className="text-xs sm:text-sm ds-text-secondary">View project details</p>
                 </div>
               </div>
             </Link>
@@ -264,7 +264,7 @@ export default function SupervisorDashboard() {
         </div>
 
         {/* Information Section */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
+        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 sm:p-6">
           <h3 className="text-sm sm:text-base font-semibold text-blue-900 mb-2">ℹ️ Supervisor Role Information</h3>
           <ul className="text-xs sm:text-sm text-blue-800 space-y-1">
             <li>• You have view-only access to materials, expenses, and projects</li>

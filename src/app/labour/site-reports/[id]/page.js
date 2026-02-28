@@ -146,7 +146,7 @@ export default function SiteReportDetailPage() {
     return (
       <AppLayout>
         <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded">
             Site report not found
           </div>
         </div>
@@ -164,17 +164,17 @@ export default function SiteReportDetailPage() {
             <Link href="/labour/site-reports" className="text-sm text-blue-600 hover:text-blue-800">
               ← Back to Site Reports
             </Link>
-            <h1 className="text-3xl font-bold text-gray-900 mt-2">
+            <h1 className="text-3xl font-bold ds-text-primary mt-2">
               {report.reportNumber}
             </h1>
-            <p className="text-gray-600">
+            <p className="ds-text-secondary">
               {report.projectName || 'Project'} · {report.phaseName || 'Phase'}
             </p>
           </div>
           {canEdit && !editing && (
             <button
               onClick={() => setEditing(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="inline-flex items-center gap-2 px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted"
             >
               <Edit2 className="w-4 h-4" />
               Edit
@@ -182,82 +182,82 @@ export default function SiteReportDetailPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <p className="text-sm text-gray-500">Reported By</p>
-              <p className="font-medium text-gray-900">{report.reportedByName}</p>
+              <p className="text-sm ds-text-muted">Reported By</p>
+              <p className="font-medium ds-text-primary">{report.reportedByName}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Work Date</p>
-              <p className="font-medium text-gray-900">
+              <p className="text-sm ds-text-muted">Work Date</p>
+              <p className="font-medium ds-text-primary">
                 {new Date(report.entryDate).toLocaleDateString()}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Status</p>
-              <p className="font-medium text-gray-900 capitalize">
+              <p className="text-sm ds-text-muted">Status</p>
+              <p className="font-medium ds-text-primary capitalize">
                 {report.status?.replace('_', ' ')}
               </p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Summary</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Summary</h2>
           {editing ? (
             <textarea
               rows={3}
               value={editedReport.summary}
               onChange={(e) => setEditedReport((prev) => ({ ...prev, summary: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
             />
           ) : (
-            <p className="text-gray-700">{report.summary || 'No summary provided.'}</p>
+            <p className="ds-text-secondary">{report.summary || 'No summary provided.'}</p>
           )}
           <div className="mt-4">
-            <h3 className="text-sm font-medium text-gray-700 mb-2">Notes</h3>
+            <h3 className="text-sm font-medium ds-text-secondary mb-2">Notes</h3>
             {editing ? (
               <textarea
                 rows={4}
                 value={editedReport.notes}
                 onChange={(e) => setEditedReport((prev) => ({ ...prev, notes: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
               />
             ) : (
-              <p className="text-gray-700">{report.notes || 'No additional notes.'}</p>
+              <p className="ds-text-secondary">{report.notes || 'No additional notes.'}</p>
             )}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Labour Entries</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Labour Entries</h2>
           {entries.length === 0 ? (
-            <p className="text-sm text-gray-500">No labour entries recorded.</p>
+            <p className="text-sm ds-text-muted">No labour entries recorded.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Worker</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Work Item</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Skill</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Hours</th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Rate</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium ds-text-muted uppercase">Worker</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium ds-text-muted uppercase">Work Item</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium ds-text-muted uppercase">Skill</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium ds-text-muted uppercase">Hours</th>
+                    <th className="px-4 py-2 text-left text-xs font-medium ds-text-muted uppercase">Rate</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {entries.map((entry, index) => (
                     <tr key={index}>
-                      <td className="px-4 py-2 text-sm text-gray-700">
+                      <td className="px-4 py-2 text-sm ds-text-secondary">
                         {entry.workerName}
                       </td>
-                      <td className="px-4 py-2 text-sm text-gray-700">
+                      <td className="px-4 py-2 text-sm ds-text-secondary">
                         {editing ? (
                           <select
                             value={entry.workItemId || ''}
                             onChange={(e) => updateEntry(index, 'workItemId', e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded"
+                            className="w-full px-2 py-1 border ds-border-subtle rounded"
                           >
                             <option value="">Select work item</option>
                             {(report.workItems || []).map((item) => (
@@ -270,25 +270,25 @@ export default function SiteReportDetailPage() {
                           entry.workItemName || 'Unlinked'
                         )}
                       </td>
-                      <td className="px-4 py-2 text-sm text-gray-700">
+                      <td className="px-4 py-2 text-sm ds-text-secondary">
                         {editing ? (
                           <input
                             type="text"
                             value={entry.skillType || ''}
                             onChange={(e) => updateEntry(index, 'skillType', e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded"
+                            className="w-full px-2 py-1 border ds-border-subtle rounded"
                           />
                         ) : (
                           entry.skillType
                         )}
                       </td>
-                      <td className="px-4 py-2 text-sm text-gray-700">
+                      <td className="px-4 py-2 text-sm ds-text-secondary">
                         {editing ? (
                           <input
                             type="number"
                             value={entry.hours}
                             onChange={(e) => updateEntry(index, 'hours', e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded"
+                            className="w-full px-2 py-1 border ds-border-subtle rounded"
                             min="0"
                             step="0.5"
                           />
@@ -296,13 +296,13 @@ export default function SiteReportDetailPage() {
                           entry.hours
                         )}
                       </td>
-                      <td className="px-4 py-2 text-sm text-gray-700">
+                      <td className="px-4 py-2 text-sm ds-text-secondary">
                         {editing ? (
                           <input
                             type="number"
                             value={entry.hourlyRate}
                             onChange={(e) => updateEntry(index, 'hourlyRate', e.target.value)}
-                            className="w-full px-2 py-1 border border-gray-300 rounded"
+                            className="w-full px-2 py-1 border ds-border-subtle rounded"
                             min="0"
                             step="0.01"
                           />
@@ -318,8 +318,8 @@ export default function SiteReportDetailPage() {
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Attachments</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Attachments</h2>
           {report.attachments?.length ? (
             <ul className="space-y-2 text-sm">
               {report.attachments.map((file, index) => (
@@ -332,7 +332,7 @@ export default function SiteReportDetailPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-500">No attachments uploaded.</p>
+            <p className="text-sm ds-text-muted">No attachments uploaded.</p>
           )}
         </div>
 
@@ -341,7 +341,7 @@ export default function SiteReportDetailPage() {
             <>
               <button
                 onClick={() => setEditing(false)}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="inline-flex items-center gap-2 px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted"
               >
                 <XCircle className="w-4 h-4" />
                 Cancel

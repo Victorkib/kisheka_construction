@@ -335,13 +335,13 @@ export default function UserDetailPage() {
       pm: 'bg-green-100 text-green-800',
       project_manager: 'bg-green-100 text-green-800',
       supervisor: 'bg-yellow-100 text-yellow-800',
-      site_clerk: 'bg-gray-100 text-gray-800',
+      site_clerk: 'ds-bg-surface-muted ds-text-primary',
       accountant: 'bg-indigo-100 text-indigo-800',
       supplier: 'bg-orange-100 text-orange-800',
     };
 
     const normalizedRole = role?.toLowerCase() || 'unknown';
-    const colorClass = colors[normalizedRole] || 'bg-gray-100 text-gray-800';
+    const colorClass = colors[normalizedRole] || 'ds-bg-surface-muted ds-text-primary';
     const displayRole = normalizedRole === 'pm' || normalizedRole === 'project_manager' 
       ? 'Project Manager' 
       : normalizedRole === 'site_clerk' 
@@ -362,7 +362,7 @@ export default function UserDetailPage() {
       suspended: 'bg-yellow-100 text-yellow-800',
     };
 
-    const colorClass = colors[status] || 'bg-gray-100 text-gray-800';
+    const colorClass = colors[status] || 'ds-bg-surface-muted ds-text-primary';
     const displayStatus = status?.charAt(0).toUpperCase() + status?.slice(1) || 'Unknown';
 
     return (
@@ -407,7 +407,7 @@ export default function UserDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error}
           </div>
           <Link href="/dashboard/users" className="mt-4 text-blue-600 hover:underline">
@@ -437,12 +437,12 @@ export default function UserDetailPage() {
           </Link>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
                 {userData.firstName || userData.lastName
                   ? `${userData.firstName || ''} ${userData.lastName || ''}`.trim()
                   : 'User Details'}
               </h1>
-              <p className="text-gray-700 mt-2">{userData.email}</p>
+              <p className="ds-text-secondary mt-2">{userData.email}</p>
             </div>
             <div className="flex gap-2">
               {userData.status === 'active' ? (
@@ -472,7 +472,7 @@ export default function UserDetailPage() {
 
         {/* Error Messages */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -493,7 +493,7 @@ export default function UserDetailPage() {
           <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   First Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -502,11 +502,11 @@ export default function UserDetailPage() {
                   value={formData.firstName || ''}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Last Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -515,11 +515,11 @@ export default function UserDetailPage() {
                   value={formData.lastName || ''}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Role <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -528,7 +528,7 @@ export default function UserDetailPage() {
                   onChange={handleInputChange}
                   required
                   disabled={userData.role?.toLowerCase() === 'owner'}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-700"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:cursor-not-allowed disabled:ds-text-secondary"
                 >
                   <option value="site_clerk">Clerk</option>
                   <option value="pm">Project Manager</option>
@@ -539,11 +539,11 @@ export default function UserDetailPage() {
                   {userData.role?.toLowerCase() === 'owner' && <option value="owner">Owner</option>}
                 </select>
                 {userData.role?.toLowerCase() === 'owner' && (
-                  <p className="text-sm text-gray-700 mt-1">Owner role cannot be changed</p>
+                  <p className="text-sm ds-text-secondary mt-1">Owner role cannot be changed</p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Status <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -552,7 +552,7 @@ export default function UserDetailPage() {
                   onChange={handleInputChange}
                   required
                   disabled={userData.role?.toLowerCase() === 'owner'}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-700"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:cursor-not-allowed disabled:ds-text-secondary"
                 >
                   <option value="active">Active</option>
                   <option value="inactive">Inactive</option>
@@ -560,7 +560,7 @@ export default function UserDetailPage() {
                 </select>
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Reason for Change (optional)
                 </label>
                 <textarea
@@ -569,7 +569,7 @@ export default function UserDetailPage() {
                   onChange={handleInputChange}
                   rows={3}
                   placeholder="Enter reason for role/status change..."
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
               </div>
             </div>
@@ -578,16 +578,16 @@ export default function UserDetailPage() {
 
         {/* User Info Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-base font-semibold text-gray-700 mb-2 leading-normal">Role</h3>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h3 className="text-base font-semibold ds-text-secondary mb-2 leading-normal">Role</h3>
             <div className="mt-2">{getRoleBadge(userData.role)}</div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-base font-semibold text-gray-700 mb-2 leading-normal">Status</h3>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h3 className="text-base font-semibold ds-text-secondary mb-2 leading-normal">Status</h3>
             <div className="mt-2">{getStatusBadge(userData.status)}</div>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-base font-semibold text-gray-700 mb-2 leading-normal">Email Verified</h3>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h3 className="text-base font-semibold ds-text-secondary mb-2 leading-normal">Email Verified</h3>
             <div className="mt-2">
               {userData.isVerified ? (
                 <span className="text-green-600 font-medium">Yes</span>
@@ -599,32 +599,32 @@ export default function UserDetailPage() {
         </div>
 
         {/* User Details */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">User Information</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold ds-text-primary mb-4">User Information</h2>
           <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <dt className="text-sm font-medium text-gray-700">Email</dt>
-              <dd className="mt-1 text-sm text-gray-900">{userData.email}</dd>
+              <dt className="text-sm font-medium ds-text-secondary">Email</dt>
+              <dd className="mt-1 text-sm ds-text-primary">{userData.email}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-700">First Name</dt>
-              <dd className="mt-1 text-sm text-gray-900">{userData.firstName || 'N/A'}</dd>
+              <dt className="text-sm font-medium ds-text-secondary">First Name</dt>
+              <dd className="mt-1 text-sm ds-text-primary">{userData.firstName || 'N/A'}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-700">Last Name</dt>
-              <dd className="mt-1 text-sm text-gray-900">{userData.lastName || 'N/A'}</dd>
+              <dt className="text-sm font-medium ds-text-secondary">Last Name</dt>
+              <dd className="mt-1 text-sm ds-text-primary">{userData.lastName || 'N/A'}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-700">Created At</dt>
-              <dd className="mt-1 text-sm text-gray-900">{formatDate(userData.createdAt)}</dd>
+              <dt className="text-sm font-medium ds-text-secondary">Created At</dt>
+              <dd className="mt-1 text-sm ds-text-primary">{formatDate(userData.createdAt)}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-700">Last Login</dt>
-              <dd className="mt-1 text-sm text-gray-900">{formatDate(userData.lastLogin)}</dd>
+              <dt className="text-sm font-medium ds-text-secondary">Last Login</dt>
+              <dd className="mt-1 text-sm ds-text-primary">{formatDate(userData.lastLogin)}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-700">Last Activity</dt>
-              <dd className="mt-1 text-sm text-gray-900">
+              <dt className="text-sm font-medium ds-text-secondary">Last Activity</dt>
+              <dd className="mt-1 text-sm ds-text-primary">
                 {formatDate(userData.metadata?.lastActivityAt)}
               </dd>
             </div>
@@ -634,56 +634,56 @@ export default function UserDetailPage() {
         {/* Activity Statistics */}
         {activityStats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-base font-semibold text-gray-700 mb-1 leading-normal">Total Logins</h3>
-              <p className="text-2xl font-bold text-gray-900">{activityStats.totalLogins || 0}</p>
+            <div className="ds-bg-surface rounded-lg shadow p-4">
+              <h3 className="text-base font-semibold ds-text-secondary mb-1 leading-normal">Total Logins</h3>
+              <p className="text-2xl font-bold ds-text-primary">{activityStats.totalLogins || 0}</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-base font-semibold text-gray-700 mb-1 leading-normal">Role Changes</h3>
-              <p className="text-2xl font-bold text-gray-900">{activityStats.totalRoleChanges || 0}</p>
+            <div className="ds-bg-surface rounded-lg shadow p-4">
+              <h3 className="text-base font-semibold ds-text-secondary mb-1 leading-normal">Role Changes</h3>
+              <p className="text-2xl font-bold ds-text-primary">{activityStats.totalRoleChanges || 0}</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-base font-semibold text-gray-700 mb-1 leading-normal">Total Actions</h3>
-              <p className="text-2xl font-bold text-gray-900">{activityStats.totalActions || 0}</p>
+            <div className="ds-bg-surface rounded-lg shadow p-4">
+              <h3 className="text-base font-semibold ds-text-secondary mb-1 leading-normal">Total Actions</h3>
+              <p className="text-2xl font-bold ds-text-primary">{activityStats.totalActions || 0}</p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-base font-semibold text-gray-700 mb-1 leading-normal">Unread Notifications</h3>
-              <p className="text-2xl font-bold text-gray-900">{activityStats.unreadNotifications || 0}</p>
+            <div className="ds-bg-surface rounded-lg shadow p-4">
+              <h3 className="text-base font-semibold ds-text-secondary mb-1 leading-normal">Unread Notifications</h3>
+              <p className="text-2xl font-bold ds-text-primary">{activityStats.unreadNotifications || 0}</p>
             </div>
           </div>
         )}
 
         {/* Role Change History */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Role Change History</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold ds-text-primary mb-4">Role Change History</h2>
           {roleHistory.length === 0 ? (
-            <p className="text-gray-700">No role changes recorded</p>
+            <p className="ds-text-secondary">No role changes recorded</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       From
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       To
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Changed By
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Reason
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {roleHistory.map((change) => (
                     <tr key={change.id}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-secondary">
                         {formatDate(change.timestamp)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -692,10 +692,10 @@ export default function UserDetailPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getRoleBadge(change.newRole)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-secondary">
                         {change.changedBy?.name || change.changedBy?.email || 'System'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-700">
+                      <td className="px-6 py-4 text-sm ds-text-secondary">
                         {change.reason || 'N/A'}
                       </td>
                     </tr>
@@ -707,15 +707,15 @@ export default function UserDetailPage() {
         </div>
 
         {/* User Activity Timeline */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Activity Timeline</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h2 className="text-xl font-semibold ds-text-primary mb-4">Activity Timeline</h2>
           {loadingActivity ? (
             <div className="text-center py-8">
               <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-sm text-gray-700">Loading activity...</p>
+              <p className="mt-2 text-sm ds-text-secondary">Loading activity...</p>
             </div>
           ) : userActivity.length === 0 ? (
-            <p className="text-gray-700">No activity recorded</p>
+            <p className="ds-text-secondary">No activity recorded</p>
           ) : (
             <div className="space-y-4">
               {userActivity.map((activity, index) => {
@@ -735,22 +735,22 @@ export default function UserDetailPage() {
                     login: 'bg-blue-100 text-blue-800',
                     account_created: 'bg-green-100 text-green-800',
                     role_change: 'bg-purple-100 text-purple-800',
-                    action: 'bg-gray-100 text-gray-800',
+                    action: 'ds-bg-surface-muted ds-text-primary',
                     notification: 'bg-yellow-100 text-yellow-800',
                   };
-                  return colors[type] || 'bg-gray-100 text-gray-800';
+                  return colors[type] || 'ds-bg-surface-muted ds-text-primary';
                 };
 
                 return (
-                  <div key={activity.id || index} className="flex items-start gap-4 pb-4 border-b border-gray-200 last:border-0">
+                  <div key={activity.id || index} className="flex items-start gap-4 pb-4 border-b ds-border-subtle last:border-0">
                     <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg ${getActivityColor(activity.type)}`}>
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{activity.description}</p>
-                      <p className="text-sm text-gray-700 mt-1 leading-normal">{formatDate(activity.timestamp)}</p>
+                      <p className="text-sm font-medium ds-text-primary">{activity.description}</p>
+                      <p className="text-sm ds-text-secondary mt-1 leading-normal">{formatDate(activity.timestamp)}</p>
                       {activity.metadata && Object.keys(activity.metadata).length > 0 && (
-                        <div className="mt-2 text-sm text-gray-700">
+                        <div className="mt-2 text-sm ds-text-secondary">
                           {activity.metadata.reason && (
                             <p className="italic">Reason: {activity.metadata.reason}</p>
                           )}

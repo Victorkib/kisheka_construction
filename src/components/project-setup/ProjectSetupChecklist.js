@@ -137,10 +137,10 @@ export function ProjectSetupChecklist({ projectId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex items-center gap-3">
           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-          <p className="text-sm text-gray-600">Loading setup status...</p>
+          <p className="text-sm ds-text-secondary">Loading setup status...</p>
         </div>
       </div>
     );
@@ -148,7 +148,7 @@ export function ProjectSetupChecklist({ projectId }) {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
         <p className="text-sm text-red-800">{error}</p>
       </div>
     );
@@ -176,31 +176,31 @@ export function ProjectSetupChecklist({ projectId }) {
       );
     }
     return (
-      <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-5 h-5 ds-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
       </svg>
     );
   };
 
   const getStatusColor = (status, completed) => {
-    if (completed) return 'bg-green-50 border-green-200';
-    if (status === 'low' || status === 'depleted') return 'bg-yellow-50 border-yellow-200';
-    return 'bg-gray-50 border-gray-200';
+    if (completed) return 'bg-green-50 border-green-400/60';
+    if (status === 'low' || status === 'depleted') return 'bg-yellow-50 border-yellow-400/60';
+    return 'ds-bg-surface-muted ds-border-subtle';
   };
 
   const getStatusTextColor = (status, completed) => {
     if (completed) return 'text-green-800';
     if (status === 'low' || status === 'depleted') return 'text-yellow-800';
-    return 'text-gray-800';
+    return 'ds-text-primary';
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
+    <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Project Setup Checklist</h2>
-          <p className="text-sm text-gray-600 mt-1">
+          <h2 className="text-lg font-semibold ds-text-primary">Project Setup Checklist</h2>
+          <p className="text-sm ds-text-secondary mt-1">
             {readiness.completionPercentage}% complete • {summary.completedItems} of {summary.totalItems} items
           </p>
         </div>
@@ -216,10 +216,10 @@ export function ProjectSetupChecklist({ projectId }) {
       {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">Setup Progress</span>
-          <span className="text-sm font-semibold text-gray-900">{readiness.completionPercentage}%</span>
+          <span className="text-sm font-medium ds-text-secondary">Setup Progress</span>
+          <span className="text-sm font-semibold ds-text-primary">{readiness.completionPercentage}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2.5">
+        <div className="w-full ds-bg-surface-muted rounded-full h-2.5">
           <div
             className="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
             style={{ width: `${readiness.completionPercentage}%` }}
@@ -231,8 +231,8 @@ export function ProjectSetupChecklist({ projectId }) {
       <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className={`p-4 rounded-lg border-2 ${
           readiness.readyForMaterials 
-            ? 'bg-green-50 border-green-300' 
-            : 'bg-yellow-50 border-yellow-300'
+            ? 'bg-green-50 border-green-400/60' 
+            : 'bg-yellow-50 border-yellow-400/60'
         }`}>
           <div className="flex items-center gap-2 mb-2">
             {readiness.readyForMaterials ? (
@@ -250,7 +250,7 @@ export function ProjectSetupChecklist({ projectId }) {
               Ready for Material Requests
             </span>
           </div>
-          <p className="text-sm text-gray-700">
+          <p className="text-sm ds-text-secondary">
             {readiness.readyForMaterials 
               ? 'All required items are set up. You can create material requests.'
               : 'Complete required items to enable material requests.'}
@@ -259,8 +259,8 @@ export function ProjectSetupChecklist({ projectId }) {
 
         <div className={`p-4 rounded-lg border-2 ${
           readiness.readyForPurchaseOrders 
-            ? 'bg-green-50 border-green-300' 
-            : 'bg-yellow-50 border-yellow-300'
+            ? 'bg-green-50 border-green-400/60' 
+            : 'bg-yellow-50 border-yellow-400/60'
         }`}>
           <div className="flex items-center gap-2 mb-2">
             {readiness.readyForPurchaseOrders ? (
@@ -278,7 +278,7 @@ export function ProjectSetupChecklist({ projectId }) {
               Ready for Purchase Orders
             </span>
           </div>
-          <p className="text-sm text-gray-700">
+          <p className="text-sm ds-text-secondary">
             {readiness.readyForPurchaseOrders 
               ? 'All items are set up. You can create purchase orders.'
               : 'Complete all items including suppliers to enable purchase orders.'}
@@ -309,7 +309,7 @@ export function ProjectSetupChecklist({ projectId }) {
                       </span>
                     )}
                     {!item.required && (
-                      <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full font-medium">
+                      <span className="text-xs px-2 py-0.5 ds-bg-surface-muted ds-text-secondary rounded-full font-medium">
                         Optional
                       </span>
                     )}
@@ -318,12 +318,12 @@ export function ProjectSetupChecklist({ projectId }) {
                     {item.message}
                   </p>
                   {item.warning && (
-                    <div className="mt-2 p-2 bg-yellow-100 border border-yellow-300 rounded text-sm text-yellow-800">
+                    <div className="mt-2 p-2 bg-yellow-100 border border-yellow-400/60 rounded text-sm text-yellow-800">
                       ⚠️ {item.warning}
                     </div>
                   )}
                   {item.details && Object.keys(item.details).length > 0 && (
-                    <div className="mt-2 text-xs text-gray-600">
+                    <div className="mt-2 text-xs ds-text-secondary">
                       {key === 'budget' && (
                         <div className="grid grid-cols-2 gap-2">
                           <span>Total: {item.details.total.toLocaleString()} KES</span>
@@ -374,7 +374,7 @@ export function ProjectSetupChecklist({ projectId }) {
 
       {/* Quick Actions */}
       {!readiness.readyForMaterials && (
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="mt-6 p-4 bg-blue-50 border border-blue-400/60 rounded-lg">
           <p className="text-sm font-semibold text-blue-900 mb-2">Quick Actions</p>
           <div className="flex flex-wrap gap-2">
             {!prerequisites.budget.completed && (
@@ -417,7 +417,7 @@ export function ProjectSetupChecklist({ projectId }) {
         loadingMessage="Creating floors..."
         preventCloseDuringLoading={true}
       >
-        <div className="px-8 py-6 border-b border-gray-200/50">
+        <div className="px-8 py-6 border-b ds-border-subtle/50">
           <div className="flex items-center gap-3">
             <div className="bg-indigo-600/90 text-white rounded-xl p-3 shadow-lg shadow-indigo-500/30">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -425,22 +425,22 @@ export function ProjectSetupChecklist({ projectId }) {
               </svg>
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-gray-900">Auto-create Floors</h3>
-              <p className="text-sm text-gray-600">Generate a default floor stack for this project.</p>
+              <h3 className="text-2xl font-bold ds-text-primary">Auto-create Floors</h3>
+              <p className="text-sm ds-text-secondary">Generate a default floor stack for this project.</p>
             </div>
           </div>
         </div>
 
         <div className="px-8 py-6 space-y-6">
           {floorInitError && (
-            <div className="bg-red-50/80 border border-red-200/70 text-red-700 px-4 py-3 rounded-xl">
+            <div className="bg-red-50/80 border border-red-400/60/70 text-red-700 px-4 py-3 rounded-xl">
               {floorInitError}
             </div>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold ds-text-secondary mb-2">
                 Number of Floors
               </label>
               <input
@@ -449,27 +449,27 @@ export function ProjectSetupChecklist({ projectId }) {
                 max="50"
                 value={floorInitForm.floorCount}
                 onChange={(e) => handleFloorInitChange('floorCount', e.target.value)}
-                className="w-full px-4 py-3 bg-white/80 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-black"
+                className="w-full px-4 py-3 ds-bg-surface/80 border ds-border-subtle rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition ds-text-primary"
               />
-              <p className="text-xs text-gray-500 mt-2">Includes ground floor. Range: 0-50.</p>
+              <p className="text-xs ds-text-muted mt-2">Includes ground floor. Range: 0-50.</p>
             </div>
 
             <div className="bg-gradient-to-br from-indigo-50/70 to-blue-50/70 border border-indigo-200/50 rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">Include Basements</p>
-                  <p className="text-xs text-gray-600">Optional underground floors</p>
+                  <p className="text-sm font-semibold ds-text-primary">Include Basements</p>
+                  <p className="text-xs ds-text-secondary">Optional underground floors</p>
                 </div>
                 <input
                   type="checkbox"
                   checked={floorInitForm.includeBasements}
                   onChange={(e) => handleFloorInitChange('includeBasements', e.target.checked)}
-                  className="h-5 w-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                  className="h-5 w-5 text-indigo-600 ds-border-subtle rounded focus:ring-indigo-500"
                 />
               </div>
               {floorInitForm.includeBasements && (
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     Basement Count
                   </label>
                   <input
@@ -478,21 +478,21 @@ export function ProjectSetupChecklist({ projectId }) {
                     max="10"
                     value={floorInitForm.basementCount}
                     onChange={(e) => handleFloorInitChange('basementCount', e.target.value)}
-                    className="w-full px-4 py-2.5 bg-white/90 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition text-black"
+                    className="w-full px-4 py-2.5 ds-bg-surface/90 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition ds-text-primary"
                   />
-                  <p className="text-xs text-gray-500 mt-2">Range: 0-10.</p>
+                  <p className="text-xs ds-text-muted mt-2">Range: 0-10.</p>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        <div className="px-8 py-6 border-t border-gray-200/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 bg-gradient-to-br from-gray-50/60 to-transparent">
+        <div className="px-8 py-6 border-t ds-border-subtle/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 bg-gradient-to-br from-gray-50/60 to-transparent">
           <button
             type="button"
             onClick={() => setShowFloorInitModal(false)}
             disabled={initializingFloors}
-            className="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-gray-700 bg-white/70 backdrop-blur-sm border border-gray-300/50 rounded-xl hover:bg-white/90 hover:border-gray-400/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto px-6 py-3 text-sm font-semibold ds-text-secondary ds-bg-surface/70 backdrop-blur-sm border ds-border-subtle/50 rounded-xl hover:ds-bg-surface/90 hover:border-ds-border-strong/60 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>

@@ -14,9 +14,9 @@ export function ResourcesTab({ phase, formatCurrency }) {
   return (
     <div className="space-y-6">
       {/* Professional Services Section */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Professional Services</h3>
+          <h3 className="text-lg font-semibold ds-text-primary">Professional Services</h3>
           <Link
             href={`/professional-services?projectId=${phase.projectId}&phaseId=${phase._id}`}
             className="text-sm text-blue-600 hover:text-blue-800 font-medium"
@@ -26,27 +26,27 @@ export function ResourcesTab({ phase, formatCurrency }) {
         </div>
         {phase.professionalServices && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600">Total Fees</p>
-              <p className="text-xl font-bold text-gray-900 mt-1">
+            <div className="border ds-border-subtle rounded-lg p-4">
+              <p className="text-sm ds-text-secondary">Total Fees</p>
+              <p className="text-xl font-bold ds-text-primary mt-1">
                 {formatCurrency(phase.professionalServices.totalFees || 0)}
               </p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600">Architect Fees</p>
-              <p className="text-lg font-semibold text-gray-900 mt-1">
+            <div className="border ds-border-subtle rounded-lg p-4">
+              <p className="text-sm ds-text-secondary">Architect Fees</p>
+              <p className="text-lg font-semibold ds-text-primary mt-1">
                 {formatCurrency(phase.professionalServices.architectFees || 0)}
               </p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600">Engineer Fees</p>
-              <p className="text-lg font-semibold text-gray-900 mt-1">
+            <div className="border ds-border-subtle rounded-lg p-4">
+              <p className="text-sm ds-text-secondary">Engineer Fees</p>
+              <p className="text-lg font-semibold ds-text-primary mt-1">
                 {formatCurrency(phase.professionalServices.engineerFees || 0)}
               </p>
             </div>
           </div>
         )}
-        <p className="text-sm text-gray-600 mt-4">
+        <p className="text-sm ds-text-secondary mt-4">
           Professional services (Architects & Engineers) assigned to this phase.
         </p>
         <Link

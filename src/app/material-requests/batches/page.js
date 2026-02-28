@@ -142,7 +142,7 @@ function BatchesPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       submitted: 'bg-blue-100 text-blue-800',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
@@ -150,7 +150,7 @@ function BatchesPageContent() {
       fully_ordered: 'bg-purple-100 text-purple-800',
       cancelled: 'bg-red-100 text-red-800',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getProjectName = (projectId) => {
@@ -165,8 +165,8 @@ function BatchesPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Bulk Material Request Batches</h1>
-            <p className="text-gray-600 mt-2">View and manage all bulk material request batches</p>
+            <h1 className="text-3xl font-bold ds-text-primary">Bulk Material Request Batches</h1>
+            <p className="ds-text-secondary mt-2">View and manage all bulk material request batches</p>
           </div>
           <NoProjectsEmptyState />
         </div>
@@ -198,8 +198,8 @@ function BatchesPageContent() {
         <div className="mb-8">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Bulk Material Request Batches</h1>
-              <p className="text-gray-600 mt-2">View and manage all bulk material request batches</p>
+              <h1 className="text-3xl font-bold ds-text-primary">Bulk Material Request Batches</h1>
+              <p className="ds-text-secondary mt-2">View and manage all bulk material request batches</p>
             </div>
             <div className="flex gap-3">
               <Link
@@ -210,7 +210,7 @@ function BatchesPageContent() {
               </Link>
               <Link
                 href="/material-requests"
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
+                className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium"
               >
                 View Requests
               </Link>
@@ -220,20 +220,20 @@ function BatchesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Project</label>
               <select
                 value={filters.projectId}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Projects</option>
                 {accessibleProjects.map((project) => (
@@ -244,11 +244,11 @@ function BatchesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Status</label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Statuses</option>
                 <option value="draft">Draft</option>
@@ -260,13 +260,13 @@ function BatchesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Search</label>
               <input
                 type="text"
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Batch number or name..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div className="flex items-end">
@@ -276,7 +276,7 @@ function BatchesPageContent() {
                   setPagination((prev) => ({ ...prev, page: 1 }));
                   router.push('/material-requests/batches', { scroll: false });
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
+                className="w-full px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium"
               >
                 Clear Filters
               </button>
@@ -285,10 +285,10 @@ function BatchesPageContent() {
         </div>
 
         {/* Batches Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
           {batches.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-600 mb-4">No batches found</p>
+              <p className="ds-text-secondary mb-4">No batches found</p>
               <Link
                 href="/material-requests/bulk"
                 className="text-blue-600 hover:text-blue-800 font-medium"
@@ -299,35 +299,35 @@ function BatchesPageContent() {
           ) : (
             <>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Batch Number
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Project
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Materials
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Estimated Cost
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Created
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {batches.map((batch) => (
-                      <tr key={batch._id} className="hover:bg-gray-50">
+                      <tr key={batch._id} className="hover:ds-bg-surface-muted">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <Link
                             href={`/material-requests/bulk/${batch._id}`}
@@ -336,16 +336,16 @@ function BatchesPageContent() {
                             {batch.batchNumber}
                           </Link>
                           {batch.batchName && (
-                            <div className="text-sm text-gray-500">{batch.batchName}</div>
+                            <div className="text-sm ds-text-muted">{batch.batchName}</div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {getProjectName(batch.projectId)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {batch.totalMaterials || 0} material(s)
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {formatCurrency(batch.totalEstimatedCost || 0)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -357,7 +357,7 @@ function BatchesPageContent() {
                             {batch.status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Unknown'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                           {formatDate(batch.createdAt)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -386,8 +386,8 @@ function BatchesPageContent() {
 
               {/* Pagination */}
               {pagination.pages > 1 && (
-                <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-                  <div className="text-sm text-gray-700">
+                <div className="ds-bg-surface-muted px-6 py-4 border-t ds-border-subtle flex items-center justify-between">
+                  <div className="text-sm ds-text-secondary">
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
                     {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
                     {pagination.total} batches
@@ -396,14 +396,14 @@ function BatchesPageContent() {
                     <button
                       onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
                       disabled={pagination.page === 1}
-                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                      className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                     >
                       Previous
                     </button>
                     <button
                       onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
                       disabled={pagination.page >= pagination.pages}
-                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                      className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                     >
                       Next
                     </button>

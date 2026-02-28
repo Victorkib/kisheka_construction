@@ -119,9 +119,9 @@ export function ProfileInfo({ user, onUpdate }) {
   }[formData.role?.toLowerCase()] || formData.role;
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
+    <div className="ds-bg-surface rounded-lg shadow p-6 mb-6 border ds-border-subtle">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-900">Profile Information</h2>
+        <h2 className="text-xl font-semibold ds-text-primary">Profile Information</h2>
         {!isEditing && (
           <button
             onClick={() => setIsEditing(true)}
@@ -133,7 +133,7 @@ export function ProfileInfo({ user, onUpdate }) {
       </div>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+        <div className="mb-4 bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm">
           {error}
         </div>
       )}
@@ -141,7 +141,7 @@ export function ProfileInfo({ user, onUpdate }) {
       <div className="space-y-4">
         {/* First Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             First Name
           </label>
           {isEditing ? (
@@ -151,17 +151,17 @@ export function ProfileInfo({ user, onUpdate }) {
               value={formData.firstName}
               onChange={handleChange}
               disabled={loading}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted"
               required
             />
           ) : (
-            <p className="text-gray-900">{formData.firstName || 'N/A'}</p>
+            <p className="ds-text-primary">{formData.firstName || 'N/A'}</p>
           )}
         </div>
 
         {/* Last Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Last Name
           </label>
           {isEditing ? (
@@ -171,74 +171,74 @@ export function ProfileInfo({ user, onUpdate }) {
               value={formData.lastName}
               onChange={handleChange}
               disabled={loading}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted"
               required
             />
           ) : (
-            <p className="text-gray-900">{formData.lastName || 'N/A'}</p>
+            <p className="ds-text-primary">{formData.lastName || 'N/A'}</p>
           )}
         </div>
 
         {/* Email (Read-only) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Email
           </label>
-          <p className="text-gray-900">{formData.email || 'N/A'}</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="ds-text-primary">{formData.email || 'N/A'}</p>
+          <p className="text-xs ds-text-muted mt-1">
             Email cannot be changed. Contact administrator if you need to update your email.
           </p>
         </div>
 
         {/* Role (Read-only) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Role
           </label>
-          <p className="text-gray-900">{roleDisplay || 'N/A'}</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="ds-text-primary">{roleDisplay || 'N/A'}</p>
+          <p className="text-xs ds-text-muted mt-1">
             Role is managed by system administrators.
           </p>
         </div>
 
         {/* Status (Read-only) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Status
           </label>
-          <p className="text-gray-900 capitalize">{formData.status || 'N/A'}</p>
+          <p className="ds-text-primary capitalize">{formData.status || 'N/A'}</p>
         </div>
 
         {/* Created At (Read-only) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Account Created
           </label>
-          <p className="text-gray-900">{formatDate(formData.createdAt)}</p>
+          <p className="ds-text-primary">{formatDate(formData.createdAt)}</p>
         </div>
 
         {/* Last Login (Read-only) */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Last Login
           </label>
-          <p className="text-gray-900">{formatDate(formData.lastLogin)}</p>
+          <p className="ds-text-primary">{formatDate(formData.lastLogin)}</p>
         </div>
 
         {/* Action Buttons */}
         {isEditing && (
-          <div className="flex gap-3 pt-4 border-t border-gray-200">
+          <div className="flex gap-3 pt-4 border-t ds-border-subtle">
             <button
               onClick={handleSave}
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-slate-500 disabled:cursor-not-allowed"
             >
               {loading ? 'Saving...' : 'Save Changes'}
             </button>
             <button
               onClick={handleCancel}
               disabled={loading}
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition font-medium disabled:ds-bg-surface-muted disabled:cursor-not-allowed"
             >
               Cancel
             </button>

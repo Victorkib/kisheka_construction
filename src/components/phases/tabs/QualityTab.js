@@ -138,7 +138,7 @@ export function QualityTab({ phase, canEdit, formatDate }) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">Loading quality checkpoints...</p>
+        <p className="ds-text-muted">Loading quality checkpoints...</p>
       </div>
     );
   }
@@ -147,46 +147,46 @@ export function QualityTab({ phase, canEdit, formatDate }) {
     <div className="space-y-6">
       {/* Statistics */}
       {stats && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
             <div>
-              <p className="text-sm text-gray-600">Total Checkpoints</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{stats.total}</p>
+              <p className="text-sm ds-text-secondary">Total Checkpoints</p>
+              <p className="text-2xl font-bold ds-text-primary mt-1">{stats.total}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Passed</p>
+              <p className="text-sm ds-text-secondary">Passed</p>
               <p className="text-2xl font-bold text-green-600 mt-1">{stats.passed}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Failed</p>
+              <p className="text-sm ds-text-secondary">Failed</p>
               <p className="text-2xl font-bold text-red-600 mt-1">{stats.failed}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Pending</p>
+              <p className="text-sm ds-text-secondary">Pending</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">{stats.pending}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Pass Rate</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{stats.passRate}%</p>
+              <p className="text-sm ds-text-secondary">Pass Rate</p>
+              <p className="text-2xl font-bold ds-text-primary mt-1">{stats.passRate}%</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Required</p>
+              <p className="text-sm ds-text-secondary">Required</p>
               <p className="text-lg font-semibold text-orange-600 mt-1">{stats.required}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Optional</p>
-              <p className="text-lg font-semibold text-gray-600 mt-1">{stats.optional}</p>
+              <p className="text-sm ds-text-secondary">Optional</p>
+              <p className="text-lg font-semibold ds-text-secondary mt-1">{stats.optional}</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Quality Checkpoints Header */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold ds-text-primary">
             Quality Checkpoints ({checkpoints.length})
           </h3>
           {canEdit && (
@@ -209,7 +209,7 @@ export function QualityTab({ phase, canEdit, formatDate }) {
 
         {checkpoints.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-500 mb-4">No quality checkpoints defined for this phase</p>
+            <p className="ds-text-muted mb-4">No quality checkpoints defined for this phase</p>
             {canEdit && (
               <button
                 onClick={() => {
@@ -246,10 +246,10 @@ export function QualityTab({ phase, canEdit, formatDate }) {
       {/* Add/Edit Quality Checkpoint Modal */}
       {showAddModal && canEdit && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+          <div className="ds-bg-surface rounded-lg shadow-xl max-w-md w-full mx-4">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold ds-text-primary">
                   {editingCheckpoint ? 'Edit Quality Checkpoint' : 'Add Quality Checkpoint'}
                 </h3>
                 <button
@@ -262,7 +262,7 @@ export function QualityTab({ phase, canEdit, formatDate }) {
                       required: true
                     });
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="ds-text-muted hover:ds-text-secondary"
                 >
                   ✕
                 </button>
@@ -270,7 +270,7 @@ export function QualityTab({ phase, canEdit, formatDate }) {
 
               <form onSubmit={handleSaveCheckpoint} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     Checkpoint Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -279,19 +279,19 @@ export function QualityTab({ phase, canEdit, formatDate }) {
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
                     minLength={2}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     Description
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
@@ -301,11 +301,11 @@ export function QualityTab({ phase, canEdit, formatDate }) {
                       type="checkbox"
                       checked={formData.required}
                       onChange={(e) => setFormData({ ...formData, required: e.target.checked })}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm font-medium text-gray-700">Required Checkpoint</span>
+                    <span className="text-sm font-medium ds-text-secondary">Required Checkpoint</span>
                   </label>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs ds-text-muted mt-1">
                     Required checkpoints must be inspected before phase completion
                   </p>
                 </div>
@@ -322,7 +322,7 @@ export function QualityTab({ phase, canEdit, formatDate }) {
                         required: true
                       });
                     }}
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
                   >
                     Cancel
                   </button>

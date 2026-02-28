@@ -39,7 +39,7 @@ function BulkWorkerCreationPageContent() {
     return (
       <AppLayout>
         <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <div className="bg-red-50 border border-red-400/60 rounded-lg p-6 text-center">
             <p className="text-red-800">You do not have permission to create worker profiles.</p>
             <Link href="/labour/workers" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
               ← Back to Workers
@@ -238,22 +238,22 @@ function BulkWorkerCreationPageContent() {
         <div className="mb-6">
           <Link
             href="/labour/workers"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="inline-flex items-center gap-2 ds-text-secondary hover:ds-text-primary mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Workers
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Bulk Create Workers</h1>
-          <p className="text-gray-600 mt-1">Create multiple worker profiles at once</p>
+          <h1 className="text-3xl font-bold ds-text-primary">Bulk Create Workers</h1>
+          <p className="ds-text-secondary mt-1">Create multiple worker profiles at once</p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow">
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow">
           {/* Header Actions */}
-          <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+          <div className="border-b ds-border-subtle px-6 py-4 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Worker Profiles</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 className="text-lg font-semibold ds-text-primary">Worker Profiles</h2>
+              <p className="text-sm ds-text-secondary mt-1">
                 Add worker information below. All fields marked with * are required.
               </p>
             </div>
@@ -269,39 +269,39 @@ function BulkWorkerCreationPageContent() {
 
           {/* Workers Table */}
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Worker Name *
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Employee ID *
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Type
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Hourly Rate *
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Daily Rate
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Phone
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Email
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-20">
+                  <th className="px-4 py-3 text-center text-xs font-medium ds-text-muted uppercase tracking-wider w-20">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {workers.map((worker, index) => (
                   <tr key={index} className={errors[index] ? 'bg-red-50' : ''}>
                     <td className="px-4 py-3">
@@ -310,8 +310,8 @@ function BulkWorkerCreationPageContent() {
                         value={worker.workerName}
                         onChange={(e) => updateWorker(index, 'workerName', e.target.value)}
                         placeholder="John Doe"
-                        className={`w-full px-3 py-2 text-sm bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
-                          errors[index]?.workerName ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted ${
+                          errors[index]?.workerName ? 'border-red-500' : 'ds-border-subtle'
                         }`}
                       />
                       {errors[index]?.workerName && (
@@ -324,8 +324,8 @@ function BulkWorkerCreationPageContent() {
                         value={worker.employeeId}
                         onChange={(e) => updateWorker(index, 'employeeId', e.target.value)}
                         placeholder="EMP001"
-                        className={`w-full px-3 py-2 text-sm bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
-                          errors[index]?.employeeId ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted ${
+                          errors[index]?.employeeId ? 'border-red-500' : 'ds-border-subtle'
                         }`}
                       />
                       {errors[index]?.employeeId && (
@@ -336,7 +336,7 @@ function BulkWorkerCreationPageContent() {
                       <select
                         value={worker.workerType}
                         onChange={(e) => updateWorker(index, 'workerType', e.target.value)}
-                        className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         {VALID_WORKER_TYPES.map((type) => (
                           <option key={type} value={type}>
@@ -353,8 +353,8 @@ function BulkWorkerCreationPageContent() {
                         value={worker.defaultHourlyRate}
                         onChange={(e) => updateWorker(index, 'defaultHourlyRate', e.target.value)}
                         placeholder="500"
-                        className={`w-full px-3 py-2 text-sm bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
-                          errors[index]?.defaultHourlyRate ? 'border-red-500' : 'border-gray-300'
+                        className={`w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted ${
+                          errors[index]?.defaultHourlyRate ? 'border-red-500' : 'ds-border-subtle'
                         }`}
                       />
                       {errors[index]?.defaultHourlyRate && (
@@ -369,7 +369,7 @@ function BulkWorkerCreationPageContent() {
                         value={worker.defaultDailyRate}
                         onChange={(e) => updateWorker(index, 'defaultDailyRate', e.target.value)}
                         placeholder="4000"
-                        className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </td>
                     <td className="px-4 py-3">
@@ -378,7 +378,7 @@ function BulkWorkerCreationPageContent() {
                         value={worker.phoneNumber}
                         onChange={(e) => updateWorker(index, 'phoneNumber', e.target.value)}
                         placeholder="+254 700 000 000"
-                        className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </td>
                     <td className="px-4 py-3">
@@ -387,14 +387,14 @@ function BulkWorkerCreationPageContent() {
                         value={worker.email}
                         onChange={(e) => updateWorker(index, 'email', e.target.value)}
                         placeholder="worker@example.com"
-                        className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </td>
                     <td className="px-4 py-3">
                       <select
                         value={worker.status}
                         onChange={(e) => updateWorker(index, 'status', e.target.value)}
-                        className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         {VALID_WORKER_STATUSES.map((status) => (
                           <option key={status} value={status}>
@@ -408,7 +408,7 @@ function BulkWorkerCreationPageContent() {
                         type="button"
                         onClick={() => removeWorker(index)}
                         disabled={workers.length === 1}
-                        className="text-red-600 hover:text-red-900 disabled:text-gray-400 disabled:cursor-not-allowed"
+                        className="text-red-600 hover:text-red-900 disabled:ds-text-muted disabled:cursor-not-allowed"
                         title="Remove worker"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -421,20 +421,20 @@ function BulkWorkerCreationPageContent() {
           </div>
 
           {/* Additional Fields Section (Collapsible) */}
-          <div className="border-t border-gray-200 px-6 py-4">
+          <div className="border-t ds-border-subtle px-6 py-4">
             <details className="space-y-4">
-              <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900">
+              <summary className="cursor-pointer text-sm font-medium ds-text-secondary hover:ds-text-primary">
                 Additional Fields (Optional) - Click to expand
               </summary>
               <div className="mt-4 space-y-4">
                 {workers.map((worker, index) => (
-                  <div key={index} className="border border-gray-200 rounded-lg p-4">
+                  <div key={index} className="border ds-border-subtle rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="font-medium text-gray-900">{worker.workerName || `Worker ${index + 1}`}</span>
+                      <span className="font-medium ds-text-primary">{worker.workerName || `Worker ${index + 1}`}</span>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium ds-text-secondary mb-1">
                           National ID
                         </label>
                         <input
@@ -442,17 +442,17 @@ function BulkWorkerCreationPageContent() {
                           value={worker.nationalId}
                           onChange={(e) => updateWorker(index, 'nationalId', e.target.value)}
                           placeholder="12345678"
-                          className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium ds-text-secondary mb-1">
                           Employment Type
                         </label>
                         <select
                           value={worker.employmentType}
                           onChange={(e) => updateWorker(index, 'employmentType', e.target.value)}
-                          className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                           {VALID_EMPLOYMENT_TYPES.map((type) => (
                             <option key={type} value={type}>
@@ -462,7 +462,7 @@ function BulkWorkerCreationPageContent() {
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium ds-text-secondary mb-1">
                           Overtime Multiplier
                         </label>
                         <input
@@ -471,25 +471,25 @@ function BulkWorkerCreationPageContent() {
                           min="1"
                           value={worker.overtimeMultiplier}
                           onChange={(e) => updateWorker(index, 'overtimeMultiplier', e.target.value)}
-                          className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-gray-700 mb-1">
+                        <label className="block text-xs font-medium ds-text-secondary mb-1">
                           Hire Date
                         </label>
                         <input
                           type="date"
                           value={worker.hireDate}
                           onChange={(e) => updateWorker(index, 'hireDate', e.target.value)}
-                          className="w-full px-3 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-full px-3 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-xs font-medium text-gray-700 mb-2">
+                        <label className="block text-xs font-medium ds-text-secondary mb-2">
                           Skills
                         </label>
-                        <div className="border border-gray-300 rounded-lg p-3 max-h-32 overflow-y-auto">
+                        <div className="border ds-border-subtle rounded-lg p-3 max-h-32 overflow-y-auto">
                           <div className="grid grid-cols-3 gap-2">
                             {VALID_SKILL_TYPES.map((skill) => (
                               <label key={skill} className="flex items-center gap-2 cursor-pointer text-xs">
@@ -497,9 +497,9 @@ function BulkWorkerCreationPageContent() {
                                   type="checkbox"
                                   checked={worker.skillTypes?.includes(skill) || false}
                                   onChange={() => updateWorker(index, 'skillTypes', skill)}
-                                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                  className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                                 />
-                                <span className="text-gray-700">{getSkillTypeLabel(skill)}</span>
+                                <span className="ds-text-secondary">{getSkillTypeLabel(skill)}</span>
                               </label>
                             ))}
                           </div>
@@ -513,16 +513,16 @@ function BulkWorkerCreationPageContent() {
           </div>
 
           {/* Summary */}
-          <div className="border-t border-gray-200 px-6 py-4 bg-gray-50">
+          <div className="border-t ds-border-subtle px-6 py-4 ds-bg-surface-muted">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-gray-700">
+              <div className="flex items-center gap-2 ds-text-secondary">
                 <Users className="w-5 h-5" />
                 <span className="font-medium">{workers.length} worker{workers.length !== 1 ? 's' : ''} to create</span>
               </div>
               <div className="flex items-center gap-3">
                 <Link
                   href="/labour/workers"
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
                 >
                   Cancel
                 </Link>
@@ -555,7 +555,7 @@ function BulkWorkerCreationPageContent() {
 export default function BulkWorkerCreationPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center ds-bg-surface-muted">
         <div className="text-center">
           <LoadingSpinner size="lg" text="Loading..." />
         </div>

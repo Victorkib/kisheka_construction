@@ -72,11 +72,11 @@ export function AuditTrail({ entityType, entityId }) {
       case 'REJECTED':
         return 'bg-red-100 text-red-800';
       case 'DELETED':
-        return 'bg-gray-100 text-gray-800';
+        return 'ds-bg-surface-muted ds-text-primary';
       case 'SUBMITTED':
         return 'bg-purple-100 text-purple-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'ds-bg-surface-muted ds-text-primary';
     }
   };
 
@@ -154,14 +154,14 @@ export function AuditTrail({ entityType, entityId }) {
 
       if (allChanges.length === 0) {
         return (
-          <div className="text-xs text-gray-600 mt-1">
+          <div className="text-xs ds-text-secondary mt-1">
             <span className="italic">Status or details updated</span>
           </div>
         );
       }
 
       return allChanges.map((change, index) => (
-        <div key={`${change.field}-${index}`} className="text-xs text-gray-600 mt-1">
+        <div key={`${change.field}-${index}`} className="text-xs ds-text-secondary mt-1">
           <span className="font-medium">{change.field}:</span>{' '}
           <span className="text-red-600 line-through">{String(change.oldValue)}</span>{' '}
           → <span className="text-green-600">{String(change.newValue)}</span>
@@ -181,7 +181,7 @@ export function AuditTrail({ entityType, entityId }) {
         const newValue = change.newValue !== undefined ? change.newValue : 'N/A';
 
         return (
-          <div key={field} className="text-xs text-gray-600 mt-1">
+          <div key={field} className="text-xs ds-text-secondary mt-1">
             <span className="font-medium">{field}:</span>{' '}
             <span className="text-red-600 line-through">{String(oldValue)}</span>{' '}
             → <span className="text-green-600">{String(newValue)}</span>
@@ -219,7 +219,7 @@ export function AuditTrail({ entityType, entityId }) {
         }
 
         return (
-          <div key={`info-${field}`} className="text-xs text-gray-600 mt-1">
+          <div key={`info-${field}`} className="text-xs ds-text-secondary mt-1">
             <span className="font-medium">{field}:</span>{' '}
             <span className="text-blue-600">{String(displayValue)}</span>
           </div>
@@ -241,8 +241,8 @@ export function AuditTrail({ entityType, entityId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Audit Trail</h3>
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Audit Trail</h3>
         <div className="flex items-center justify-center py-8">
           <LoadingSpinner size="sm" text="Loading audit trail..." />
         </div>
@@ -252,9 +252,9 @@ export function AuditTrail({ entityType, entityId }) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Audit Trail</h3>
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Audit Trail</h3>
+        <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded">
           Error: {error}
         </div>
       </div>
@@ -263,9 +263,9 @@ export function AuditTrail({ entityType, entityId }) {
 
   if (logs.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Audit Trail</h3>
-        <div className="text-center py-8 text-gray-500">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Audit Trail</h3>
+        <div className="text-center py-8 ds-text-muted">
           <p>No audit logs found</p>
         </div>
       </div>
@@ -273,13 +273,13 @@ export function AuditTrail({ entityType, entityId }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Audit Trail</h3>
+    <div className="ds-bg-surface rounded-lg shadow p-6">
+      <h3 className="text-lg font-semibold ds-text-primary mb-4">Audit Trail</h3>
       <div className="space-y-4">
         {logs.map((log, index) => (
           <div
             key={log._id || index}
-            className="border-l-4 border-gray-200 pl-4 py-2 hover:bg-gray-50 transition-colors"
+            className="border-l-4 ds-border-subtle pl-4 py-2 hover:ds-bg-surface-muted transition-colors"
           >
             <div className="flex items-start justify-between">
               <div className="flex-1">
@@ -293,12 +293,12 @@ export function AuditTrail({ entityType, entityId }) {
                     {log.action}
                   </span>
                   {log.userName && (
-                    <span className="text-sm text-gray-600">by {log.userName}</span>
+                    <span className="text-sm ds-text-secondary">by {log.userName}</span>
                   )}
                 </div>
                 {log.changes && formatChanges(log.changes)}
                 {log.reason && (
-                  <div className="text-xs text-gray-600 mt-1">
+                  <div className="text-xs ds-text-secondary mt-1">
                     <span className="font-medium">Reason:</span> {log.reason}
                   </div>
                 )}
@@ -308,7 +308,7 @@ export function AuditTrail({ entityType, entityId }) {
                   </div>
                 )}
               </div>
-              <div className="text-xs text-gray-500 ml-4">
+              <div className="text-xs ds-text-muted ml-4">
                 {formatDate(log.timestamp || log.createdAt)}
               </div>
             </div>

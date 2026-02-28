@@ -137,27 +137,27 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
     const baseColors = {
       blue: {
         bg: 'bg-blue-50',
-        border: 'border-blue-200',
+        border: 'border-blue-400/60',
         text: 'text-blue-700',
         active: 'bg-blue-100 border-blue-400 text-blue-900',
-        completed: 'bg-blue-50 border-blue-300 text-blue-800',
-        upcoming: 'bg-gray-50 border-gray-200 text-gray-400',
+        completed: 'bg-blue-50 border-blue-400/60 text-blue-800',
+        upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       green: {
         bg: 'bg-green-50',
-        border: 'border-green-200',
+        border: 'border-green-400/60',
         text: 'text-green-700',
         active: 'bg-green-100 border-green-400 text-green-900',
-        completed: 'bg-green-50 border-green-300 text-green-800',
-        upcoming: 'bg-gray-50 border-gray-200 text-gray-400',
+        completed: 'bg-green-50 border-green-400/60 text-green-800',
+        upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       purple: {
         bg: 'bg-purple-50',
-        border: 'border-purple-200',
+        border: 'border-purple-400/60',
         text: 'text-purple-700',
         active: 'bg-purple-100 border-purple-400 text-purple-900',
-        completed: 'bg-purple-50 border-purple-300 text-purple-800',
-        upcoming: 'bg-gray-50 border-gray-200 text-gray-400',
+        completed: 'bg-purple-50 border-purple-400/60 text-purple-800',
+        upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       orange: {
         bg: 'bg-orange-50',
@@ -165,15 +165,15 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
         text: 'text-orange-700',
         active: 'bg-orange-100 border-orange-400 text-orange-900',
         completed: 'bg-orange-50 border-orange-300 text-orange-800',
-        upcoming: 'bg-gray-50 border-gray-200 text-gray-400',
+        upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       yellow: {
         bg: 'bg-yellow-50',
-        border: 'border-yellow-200',
+        border: 'border-yellow-400/60',
         text: 'text-yellow-700',
         active: 'bg-yellow-100 border-yellow-400 text-yellow-900',
-        completed: 'bg-yellow-50 border-yellow-300 text-yellow-800',
-        upcoming: 'bg-gray-50 border-gray-200 text-gray-400',
+        completed: 'bg-yellow-50 border-yellow-400/60 text-yellow-800',
+        upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       indigo: {
         bg: 'bg-indigo-50',
@@ -181,7 +181,7 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
         text: 'text-indigo-700',
         active: 'bg-indigo-100 border-indigo-400 text-indigo-900',
         completed: 'bg-indigo-50 border-indigo-300 text-indigo-800',
-        upcoming: 'bg-gray-50 border-gray-200 text-gray-400',
+        upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       pink: {
         bg: 'bg-pink-50',
@@ -189,7 +189,7 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
         text: 'text-pink-700',
         active: 'bg-pink-100 border-pink-400 text-pink-900',
         completed: 'bg-pink-50 border-pink-300 text-pink-800',
-        upcoming: 'bg-gray-50 border-gray-200 text-gray-400',
+        upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
     };
 
@@ -203,8 +203,8 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
 
   if (compact) {
     return (
-      <div className="bg-white rounded-lg shadow p-4 mb-6">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">Workflow</h3>
+      <div className="ds-bg-surface rounded-lg shadow p-4 mb-6">
+        <h3 className="text-sm font-semibold ds-text-primary mb-3">Workflow</h3>
         <div className="flex items-center gap-2 overflow-x-auto pb-2">
           {WORKFLOW_STEPS.map((step, index) => {
             const isActive = step.id === currentStepId;
@@ -221,7 +221,7 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
                   <span>{step.label}</span>
                 </Link>
                 {index < WORKFLOW_STEPS.length - 1 && (
-                  <svg className="w-4 h-4 text-gray-400 mx-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-4 h-4 ds-text-muted mx-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 )}
@@ -234,10 +234,10 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
+    <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold text-gray-900">Workflow Guide</h2>
-        <span className="text-sm text-gray-500">
+        <h2 className="text-lg font-semibold ds-text-primary">Workflow Guide</h2>
+        <span className="text-sm ds-text-muted">
           Step {currentStepIndex !== -1 ? currentStepIndex + 1 : '?'} of {WORKFLOW_STEPS.length}
         </span>
       </div>
@@ -257,8 +257,8 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
                   : isCompleted
                     ? 'bg-green-100 border-green-500 text-green-900'
                     : isUpcoming
-                      ? 'bg-gray-100 border-gray-300 text-gray-400'
-                      : 'bg-gray-50 border-gray-200 text-gray-500'
+                      ? 'ds-bg-surface-muted ds-border-subtle ds-text-muted'
+                      : 'ds-bg-surface-muted ds-border-subtle ds-text-muted'
               }`}>
                 {isCompleted ? (
                   <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -277,21 +277,21 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
                     isActive
                       ? 'bg-blue-50 border-blue-400 shadow-md'
                       : isCompleted
-                        ? 'bg-green-50 border-green-300 hover:bg-green-100'
+                        ? 'bg-green-50 border-green-400/60 hover:bg-green-100'
                         : isUpcoming
-                          ? 'bg-gray-50 border-gray-200 opacity-60'
-                          : 'bg-white border-gray-200 hover:bg-gray-50'
+                          ? 'ds-bg-surface-muted ds-border-subtle opacity-60'
+                          : 'ds-bg-surface ds-border-subtle hover:ds-bg-surface-muted'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className={`font-semibold ${
-                        isActive ? 'text-blue-900' : isCompleted ? 'text-green-900' : 'text-gray-700'
+                        isActive ? 'text-blue-900' : isCompleted ? 'text-green-900' : 'ds-text-secondary'
                       }`}>
                         {step.label}
                       </h3>
                       <p className={`text-sm mt-1 ${
-                        isActive ? 'text-blue-700' : isCompleted ? 'text-green-700' : 'text-gray-600'
+                        isActive ? 'text-blue-700' : isCompleted ? 'text-green-700' : 'ds-text-secondary'
                       }`}>
                         {step.description}
                       </p>
@@ -310,7 +310,7 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
       </div>
       
       {/* Help Text */}
-      <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+      <div className="mt-4 p-3 bg-blue-50 border border-blue-400/60 rounded-lg">
         <p className="text-sm text-blue-800">
           <strong>Tip:</strong> Follow the workflow steps in order. Each step builds on the previous one. 
           {currentStepId && currentStepIndex !== -1 && currentStepIndex < WORKFLOW_STEPS.length - 1 && (

@@ -184,7 +184,7 @@ export function BulkDocumentUpload({
         className={`border-2 border-dashed rounded-lg p-6 text-center transition ${
           dragActive
             ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-300 bg-gray-50 hover:border-gray-400'
+            : 'ds-border-subtle ds-bg-surface-muted hover:border-ds-border-strong'
         }`}
       >
         <input
@@ -200,11 +200,11 @@ export function BulkDocumentUpload({
         {uploading ? (
           <div className="space-y-2">
             <LoadingSpinner />
-            <p className="text-sm text-gray-600">Uploading files...</p>
+            <p className="text-sm ds-text-secondary">Uploading files...</p>
             {Object.keys(uploadProgress).length > 0 && (
               <div className="space-y-1">
                 {Object.entries(uploadProgress).map(([index, progress]) => (
-                  <div key={index} className="w-full bg-gray-200 rounded-full h-2">
+                  <div key={index} className="w-full ds-bg-surface-muted rounded-full h-2">
                     <div
                       className="bg-blue-600 h-2 rounded-full transition-all"
                       style={{ width: `${progress}%` }}
@@ -216,21 +216,21 @@ export function BulkDocumentUpload({
           </div>
         ) : (
           <div>
-            <p className="text-sm text-gray-600 mb-2">
+            <p className="text-sm ds-text-secondary mb-2">
               Drag and drop files here, or click to select
             </p>
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={documents.length >= maxFiles}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-slate-500 disabled:cursor-not-allowed transition"
             >
               Select Files
             </button>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs ds-text-muted mt-2">
               {documents.length} / {maxFiles} files uploaded
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs ds-text-muted">
               Accepted: PDF, Images, Word Documents (Max {maxSizeMB}MB each)
             </p>
           </div>
@@ -240,9 +240,9 @@ export function BulkDocumentUpload({
       {/* Documents List */}
       {documents.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-semibold text-gray-700">Uploaded Documents</h4>
+          <h4 className="text-sm font-semibold ds-text-secondary">Uploaded Documents</h4>
           {documents.map((doc, index) => (
-            <div key={index} className="bg-white border border-gray-200 rounded-lg p-4">
+            <div key={index} className="ds-bg-surface border ds-border-subtle rounded-lg p-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex-1">
                   <a
@@ -264,34 +264,34 @@ export function BulkDocumentUpload({
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Document Type</label>
+                  <label className="block text-xs font-medium ds-text-secondary mb-1">Document Type</label>
                   <input
                     type="text"
                     value={doc.documentType || ''}
                     onChange={(e) => updateDocument(index, 'documentType', e.target.value)}
                     placeholder="e.g., inspection_report, design_drawing"
-                    className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">Version</label>
+                  <label className="block text-xs font-medium ds-text-secondary mb-1">Version</label>
                   <input
                     type="text"
                     value={doc.documentVersion || ''}
                     onChange={(e) => updateDocument(index, 'documentVersion', e.target.value)}
                     placeholder="e.g., 1.0"
-                    className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                   />
                 </div>
               </div>
               <div className="mt-2">
-                <label className="block text-xs font-medium text-gray-600 mb-1">Description (Optional)</label>
+                <label className="block text-xs font-medium ds-text-secondary mb-1">Description (Optional)</label>
                 <textarea
                   value={doc.description || ''}
                   onChange={(e) => updateDocument(index, 'description', e.target.value)}
                   placeholder="Document description..."
                   rows={2}
-                  className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
                 />
               </div>
             </div>

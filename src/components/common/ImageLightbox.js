@@ -94,7 +94,7 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
       {/* Close Button */}
       <button
         onClick={onClose}
-        className="absolute top-4 right-4 z-10 text-white hover:text-gray-300 active:text-gray-400 transition-colors bg-black/50 rounded-full p-2.5 hover:bg-black/75 active:bg-black/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
+        className="absolute top-4 right-4 z-10 text-white hover:ds-text-muted active:ds-text-muted transition-colors bg-black/50 rounded-full p-2.5 hover:bg-black/75 active:bg-black/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
         aria-label="Close lightbox"
       >
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,7 +109,7 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
             e.stopPropagation();
             handlePrevious();
           }}
-          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-gray-300 active:text-gray-400 transition-colors bg-black/50 rounded-full p-3 hover:bg-black/75 active:bg-black/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
+          className="absolute left-4 top-1/2 -translate-y-1/2 z-10 text-white hover:ds-text-muted active:ds-text-muted transition-colors bg-black/50 rounded-full p-3 hover:bg-black/75 active:bg-black/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
           aria-label="Previous image"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -125,7 +125,7 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
             e.stopPropagation();
             handleNext();
           }}
-          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white hover:text-gray-300 active:text-gray-400 transition-colors bg-black/50 rounded-full p-3 hover:bg-black/75 active:bg-black/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
+          className="absolute right-4 top-1/2 -translate-y-1/2 z-10 text-white hover:ds-text-muted active:ds-text-muted transition-colors bg-black/50 rounded-full p-3 hover:bg-black/75 active:bg-black/90 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-black touch-manipulation"
           aria-label="Next image"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -168,7 +168,7 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
               <p className="text-lg font-medium mb-2">{currentImage.description}</p>
             )}
             {currentImage.uploadedAt && (
-              <p className="text-sm text-gray-300">
+              <p className="text-sm ds-text-muted">
                 {new Date(currentImage.uploadedAt).toLocaleDateString('en-US', {
                   year: 'numeric',
                   month: 'long',

@@ -177,7 +177,7 @@ export function NotificationBell() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-400 hover:text-gray-500 hover:bg-gray-100 rounded-md transition-colors"
+        className="relative p-2 ds-text-muted hover:ds-text-muted hover:ds-bg-surface-muted rounded-md transition-colors"
         aria-label="Notifications"
       >
         <svg
@@ -205,10 +205,10 @@ export function NotificationBell() {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden flex flex-col">
+        <div className="absolute right-0 mt-2 w-80 ds-bg-surface rounded-lg shadow-lg border ds-border-subtle z-50 max-h-96 overflow-hidden flex flex-col">
           {/* Header */}
-          <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
+          <div className="px-4 py-3 border-b ds-border-subtle flex items-center justify-between">
+            <h3 className="text-sm font-semibold ds-text-primary">Notifications</h3>
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllAsRead}
@@ -226,7 +226,7 @@ export function NotificationBell() {
                 <LoadingSpinner size="sm" text="Loading..." />
               </div>
             ) : notifications.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
+              <div className="p-8 text-center ds-text-muted">
                 <p className="text-sm">No notifications</p>
               </div>
             ) : (
@@ -235,7 +235,7 @@ export function NotificationBell() {
                   <button
                     key={notification._id}
                     onClick={() => handleNotificationClick(notification)}
-                    className={`w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors ${
+                    className={`w-full text-left px-4 py-3 hover:ds-bg-surface-muted transition-colors ${
                       !notification.isRead ? 'bg-blue-50' : ''
                     }`}
                   >
@@ -247,16 +247,16 @@ export function NotificationBell() {
                         <p
                           className={`text-sm font-medium ${
                             !notification.isRead
-                              ? 'text-gray-900'
-                              : 'text-gray-700'
+                              ? 'ds-text-primary'
+                              : 'ds-text-secondary'
                           }`}
                         >
                           {notification.title}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                        <p className="text-xs ds-text-muted mt-1 line-clamp-2">
                           {notification.message}
                         </p>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs ds-text-muted mt-1">
                           {formatTimeAgo(notification.createdAt)}
                         </p>
                       </div>
@@ -272,7 +272,7 @@ export function NotificationBell() {
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-4 py-3 border-t border-gray-200">
+            <div className="px-4 py-3 border-t ds-border-subtle">
               <Link
                 href="/dashboard/notifications"
                 className="text-xs text-blue-600 hover:text-blue-800 font-medium text-center block"

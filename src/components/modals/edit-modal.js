@@ -96,10 +96,10 @@ export function EditModal({
         preventCloseDuringLoading={true}
       >
         {/* Modal header */}
-        <div className="px-8 py-6 border-b border-gray-200/50">
+        <div className="px-8 py-6 border-b ds-border-subtle/50">
           <div className="flex items-center justify-between">
             <h3
-              className="text-2xl font-bold leading-7 text-gray-900"
+              className="text-2xl font-bold leading-7 ds-text-primary"
               id="modal-title"
             >
               {title}
@@ -109,7 +109,7 @@ export function EditModal({
 
         {/* Warnings */}
         {showRoleChangeWarning && (
-          <div className="px-8 py-4 bg-gradient-to-br from-yellow-50/80 to-orange-50/80 backdrop-blur-sm border-b border-yellow-200/50">
+          <div className="px-8 py-4 bg-gradient-to-br from-yellow-50/80 to-orange-50/80 backdrop-blur-sm border-b border-yellow-400/60/50">
             <div className="flex items-start">
               <div className="flex-shrink-0 p-2 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg mr-3">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -124,7 +124,7 @@ export function EditModal({
         )}
 
         {showBudgetChangeWarning && (
-          <div className="px-8 py-4 bg-gradient-to-br from-yellow-50/80 to-orange-50/80 backdrop-blur-sm border-b border-yellow-200/50">
+          <div className="px-8 py-4 bg-gradient-to-br from-yellow-50/80 to-orange-50/80 backdrop-blur-sm border-b border-yellow-400/60/50">
             <div className="flex items-start">
               <div className="flex-shrink-0 p-2 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg mr-3">
                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -147,12 +147,12 @@ export function EditModal({
         </div>
 
         {/* Modal footer */}
-        <div className="px-8 py-6 border-t border-gray-200/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 bg-gradient-to-br from-gray-50/50 to-transparent">
+        <div className="px-8 py-6 border-t ds-border-subtle/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 bg-gradient-to-br from-gray-50/50 to-transparent">
           <button
             type="button"
             onClick={handleCloseAttempt}
             disabled={isLoading}
-            className="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-gray-700 bg-white/60 backdrop-blur-sm border border-gray-300/50 rounded-xl hover:bg-white/80 hover:border-gray-400/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+            className="w-full sm:w-auto px-6 py-3 text-sm font-semibold ds-text-secondary ds-bg-surface/60 backdrop-blur-sm border ds-border-subtle/50 rounded-xl hover:ds-bg-surface/80 hover:border-ds-border-strong/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
           >
             Cancel
           </button>
@@ -184,7 +184,7 @@ export function EditModal({
         >
           <div className="p-8">
             <div className="flex flex-col items-center text-center mb-6">
-              <div className="flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-2xl bg-gradient-to-br from-yellow-50/60 to-orange-50/40 backdrop-blur-sm mb-4 border border-yellow-200/30 shadow-lg">
+              <div className="flex-shrink-0 flex items-center justify-center h-16 w-16 rounded-2xl bg-gradient-to-br from-yellow-50/60 to-orange-50/40 backdrop-blur-sm mb-4 border border-yellow-400/60/30 shadow-lg">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full blur-sm opacity-50" />
                   <svg className="relative w-7 h-7 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -192,18 +192,18 @@ export function EditModal({
                   </svg>
                 </div>
               </div>
-              <h3 className="text-2xl font-bold leading-7 text-gray-900 mb-3" id="warning-title">
+              <h3 className="text-2xl font-bold leading-7 ds-text-primary mb-3" id="warning-title">
                 Unsaved Changes
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
+              <p className="text-sm ds-text-secondary leading-relaxed">
                 You have unsaved changes. Are you sure you want to close without saving?
               </p>
             </div>
-            <div className="mt-8 pt-6 border-t border-gray-200/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
+            <div className="mt-8 pt-6 border-t ds-border-subtle/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3">
               <button
                 type="button"
                 onClick={handleCancelClose}
-                className="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-gray-700 bg-white/60 backdrop-blur-sm border border-gray-300/50 rounded-xl hover:bg-white/80 hover:border-gray-400/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
+                className="w-full sm:w-auto px-6 py-3 text-sm font-semibold ds-text-secondary ds-bg-surface/60 backdrop-blur-sm border ds-border-subtle/50 rounded-xl hover:ds-bg-surface/80 hover:border-ds-border-strong/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-all duration-200 shadow-sm hover:shadow-md"
               >
                 Continue Editing
               </button>

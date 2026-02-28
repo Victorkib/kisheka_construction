@@ -122,15 +122,15 @@ export function CommandPaletteMobile({ isOpen, onClose }) {
       
       {/* Bottom Sheet */}
       <div className="fixed inset-x-0 bottom-0 z-50 lg:hidden">
-        <div className="bg-white rounded-t-2xl shadow-2xl border-t border-gray-200 max-h-[85vh] flex flex-col">
+        <div className="ds-bg-surface rounded-t-2xl shadow-2xl border-t ds-border-subtle max-h-[85vh] flex flex-col">
           {/* Handle */}
           <div className="flex justify-center pt-2 pb-1">
-            <div className="w-12 h-1 bg-gray-300 rounded-full" />
+            <div className="w-12 h-1 ds-bg-surface-muted rounded-full" />
           </div>
 
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200">
-            <Search className="w-5 h-5 text-gray-400 flex-shrink-0" />
+          <div className="flex items-center gap-3 px-4 py-3 border-b ds-border-subtle">
+            <Search className="w-5 h-5 ds-text-muted flex-shrink-0" />
             <input
               type="text"
               value={query}
@@ -139,34 +139,34 @@ export function CommandPaletteMobile({ isOpen, onClose }) {
                 setSelectedIndex(0);
               }}
               placeholder="Search pages, actions, and features..."
-              className="flex-1 outline-none text-gray-900 placeholder-gray-400 text-base"
+              className="flex-1 outline-none ds-text-primary placeholder-gray-400 text-base"
               autoFocus
             />
             <button
               onClick={onClose}
-              className="p-1.5 rounded-md hover:bg-gray-100 transition-colors flex-shrink-0"
+              className="p-1.5 rounded-md hover:ds-bg-surface-muted transition-colors flex-shrink-0"
               aria-label="Close"
             >
-              <X className="w-5 h-5 text-gray-400" />
+              <X className="w-5 h-5 ds-text-muted" />
             </button>
           </div>
 
           {/* Results */}
           <div className="flex-1 overflow-y-auto overscroll-contain">
             {filteredItems.length === 0 ? (
-              <div className="px-4 py-12 text-center text-gray-500">
+              <div className="px-4 py-12 text-center ds-text-muted">
                 <p className="text-base">No results found</p>
                 <p className="text-sm mt-1">Try a different search term</p>
               </div>
             ) : (
               <div className="py-2">
                 {query && (
-                  <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <div className="px-4 py-2 text-xs font-semibold ds-text-muted uppercase tracking-wide">
                     Results
                   </div>
                 )}
                 {!query && (
-                  <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wide flex items-center gap-2">
+                  <div className="px-4 py-2 text-xs font-semibold ds-text-muted uppercase tracking-wide flex items-center gap-2">
                     <Clock className="w-3 h-3" />
                     Recent
                   </div>
@@ -175,26 +175,26 @@ export function CommandPaletteMobile({ isOpen, onClose }) {
                   <button
                     key={item.href || index}
                     onClick={() => handleSelect(item)}
-                    className={`w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation ${
+                    className={`w-full flex items-center gap-3 px-4 py-4 text-left hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors touch-manipulation ${
                       index === selectedIndex ? 'bg-blue-50 border-l-4 border-blue-600' : ''
                     }`}
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-medium text-gray-900 truncate text-base">
+                        <span className="font-medium ds-text-primary truncate text-base">
                           {item.label}
                         </span>
                         {item.isRecent && (
-                          <Clock className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                          <Clock className="w-4 h-4 ds-text-muted flex-shrink-0" />
                         )}
                       </div>
                       {item.href && (
-                        <p className="text-xs text-gray-500 truncate mt-0.5">
+                        <p className="text-xs ds-text-muted truncate mt-0.5">
                           {item.href}
                         </p>
                       )}
                     </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                    <ArrowRight className="w-5 h-5 ds-text-muted flex-shrink-0" />
                   </button>
                 ))}
               </div>

@@ -160,7 +160,7 @@ function BatchDetailPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       submitted: 'bg-blue-100 text-blue-800',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
@@ -168,7 +168,7 @@ function BatchDetailPageContent() {
       fully_ordered: 'bg-purple-100 text-purple-800',
       cancelled: 'bg-red-100 text-red-800',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (loading) {
@@ -185,7 +185,7 @@ function BatchDetailPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error || 'Batch not found'}
           </div>
           <Link href="/material-requests" className="text-blue-600 hover:text-blue-800">
@@ -231,12 +231,12 @@ function BatchDetailPageContent() {
           {(financeLoading || projectFinances || financeError) && (
             <div className={`mb-4 rounded-lg border px-4 py-3 ${
               financeError
-                ? 'bg-red-50 border-red-200 text-red-700'
+                ? 'bg-red-50 border-red-400/60 text-red-700'
                 : !hasCapital
-                  ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
+                  ? 'bg-yellow-50 border-yellow-400/60 text-yellow-800'
                   : isCapitalShort
                     ? 'bg-amber-50 border-amber-200 text-amber-800'
-                    : 'bg-green-50 border-green-200 text-green-800'
+                    : 'bg-green-50 border-green-400/60 text-green-800'
             }`}>
               {financeLoading ? (
                 <p className="text-sm">Checking project capital availability...</p>
@@ -265,13 +265,13 @@ function BatchDetailPageContent() {
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Link
                         href={`/financing?projectId=${batch.projectId.toString()}&returnTo=${encodeURIComponent(returnTo)}`}
-                        className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 bg-white text-amber-800 hover:bg-amber-100"
+                        className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 ds-bg-surface text-amber-800 hover:bg-amber-100"
                       >
                         Open Financing
                       </Link>
                       <Link
                         href={`/investors?projectId=${batch.projectId.toString()}&returnTo=${encodeURIComponent(returnTo)}`}
-                        className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 bg-white text-amber-800 hover:bg-amber-100"
+                        className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 ds-bg-surface text-amber-800 hover:bg-amber-100"
                       >
                         Allocate Funds (Investors)
                       </Link>
@@ -284,7 +284,7 @@ function BatchDetailPageContent() {
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
                   {batch.batchNumber}
                 </h1>
                 <span
@@ -296,7 +296,7 @@ function BatchDetailPageContent() {
                 </span>
               </div>
               {batch.batchName && (
-                <p className="text-gray-600 mt-2">{batch.batchName}</p>
+                <p className="ds-text-secondary mt-2">{batch.batchName}</p>
               )}
             </div>
             <div className="flex gap-2 items-center">
@@ -312,7 +312,7 @@ function BatchDetailPageContent() {
                 <button
                   disabled
                   title="Batch must be approved before you can assign suppliers"
-                  className="px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-medium"
+                  className="px-4 py-2 ds-bg-surface-muted ds-text-muted rounded-lg cursor-not-allowed font-medium"
                 >
                   Assign Suppliers
                 </button>
@@ -338,11 +338,11 @@ function BatchDetailPageContent() {
                   <button
                     disabled
                     title={`Debug: Batch status: ${batch.status}, Your role: ${userRole || 'unknown'}, Has permission: ${hasPermission}, Is Owner: ${isOwner}, Is PM: ${isPM}`}
-                    className="px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed font-medium"
+                    className="px-4 py-2 ds-bg-surface-muted ds-text-muted rounded-lg cursor-not-allowed font-medium"
                   >
                     Assign Suppliers
                   </button>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs ds-text-muted">
                     Status: {batch.status} | Role: {userRole || 'unknown'}
                   </span>
                 </div>
@@ -361,49 +361,49 @@ function BatchDetailPageContent() {
         </div>
 
         {/* Batch Information */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Batch Information</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Batch Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p className="text-sm text-gray-600">Project</p>
-              <p className="text-base font-medium text-gray-900 mt-1">
+              <p className="text-sm ds-text-secondary">Project</p>
+              <p className="text-base font-medium ds-text-primary mt-1">
                 {project ? `${project.projectCode} - ${project.projectName}` : 'Loading...'}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Created By</p>
-              <p className="text-base font-medium text-gray-900 mt-1">{batch.createdByName || 'N/A'}</p>
+              <p className="text-sm ds-text-secondary">Created By</p>
+              <p className="text-base font-medium ds-text-primary mt-1">{batch.createdByName || 'N/A'}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Created At</p>
-              <p className="text-base font-medium text-gray-900 mt-1">{formatDate(batch.createdAt)}</p>
+              <p className="text-sm ds-text-secondary">Created At</p>
+              <p className="text-base font-medium ds-text-primary mt-1">{formatDate(batch.createdAt)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Total Materials</p>
-              <p className="text-base font-medium text-gray-900 mt-1">{batch.totalMaterials || 0}</p>
+              <p className="text-sm ds-text-secondary">Total Materials</p>
+              <p className="text-base font-medium ds-text-primary mt-1">{batch.totalMaterials || 0}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Total Estimated Cost</p>
-              <p className="text-base font-medium text-gray-900 mt-1">
+              <p className="text-sm ds-text-secondary">Total Estimated Cost</p>
+              <p className="text-base font-medium ds-text-primary mt-1">
                 {formatCurrency(batch.totalEstimatedCost || 0)}
               </p>
             </div>
             {batch.approvedAt && (
               <div>
-                <p className="text-sm text-gray-600">Approved At</p>
-                <p className="text-base font-medium text-gray-900 mt-1">{formatDate(batch.approvedAt)}</p>
+                <p className="text-sm ds-text-secondary">Approved At</p>
+                <p className="text-base font-medium ds-text-primary mt-1">{formatDate(batch.approvedAt)}</p>
               </div>
             )}
             {batch.approvedByName && (
               <div>
-                <p className="text-sm text-gray-600">Approved By</p>
-                <p className="text-base font-medium text-gray-900 mt-1">{batch.approvedByName}</p>
+                <p className="text-sm ds-text-secondary">Approved By</p>
+                <p className="text-base font-medium ds-text-primary mt-1">{batch.approvedByName}</p>
               </div>
             )}
             {batch.approvalNotes && (
               <div className="md:col-span-2">
-                <p className="text-sm text-gray-600">Approval Notes</p>
-                <p className="text-base text-gray-900 mt-1">{batch.approvalNotes}</p>
+                <p className="text-sm ds-text-secondary">Approval Notes</p>
+                <p className="text-base ds-text-primary mt-1">{batch.approvalNotes}</p>
               </div>
             )}
           </div>
@@ -411,7 +411,7 @@ function BatchDetailPageContent() {
 
         {/* Workflow Guidance Card */}
         {batch && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-6 mb-6">
             <h3 className="text-lg font-semibold text-blue-900 mb-3">📋 Workflow Status & Next Steps</h3>
             {batch.status === 'draft' && (
               <div className="text-sm text-blue-800">
@@ -489,9 +489,9 @@ function BatchDetailPageContent() {
         </div>
 
         {/* Material Requests List */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Material Requests</h2>
+            <h2 className="text-lg font-semibold ds-text-primary">Material Requests</h2>
             {batch.status === 'approved' && canAssignSuppliers && (
               <Link
                 href={`/material-requests/bulk/${params.batchId}/assign-suppliers`}
@@ -501,44 +501,44 @@ function BatchDetailPageContent() {
               </Link>
             )}
             {batch.status === 'approved' && !canAssignSuppliers && (
-              <span className="text-sm text-gray-500">Supplier assignment requires permission</span>
+              <span className="text-sm ds-text-muted">Supplier assignment requires permission</span>
             )}
           </div>
           {materialRequests.length === 0 ? (
-            <div className="text-center py-12 text-gray-600">No material requests in this batch</div>
+            <div className="text-center py-12 ds-text-secondary">No material requests in this batch</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase">
                       Request Number
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase">
                       Material
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase">
                       Quantity
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase">
                       Estimated Cost
                     </th>
                     {batch.status === 'approved' && (
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                      <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase">
                         Supplier Assignment
                       </th>
                     )}
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">
+                    <th className="px-4 py-3 text-right text-xs font-semibold ds-text-secondary uppercase">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {materialRequests.map((request) => (
-                    <tr key={request._id} className="hover:bg-gray-50">
+                    <tr key={request._id} className="hover:ds-bg-surface-muted">
                       <td className="px-4 py-3">
                         <Link
                           href={`/material-requests/${request._id}`}
@@ -548,15 +548,15 @@ function BatchDetailPageContent() {
                         </Link>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="text-sm font-medium text-gray-900">{request.materialName}</div>
+                        <div className="text-sm font-medium ds-text-primary">{request.materialName}</div>
                         {request.description && (
-                          <div className="text-xs text-gray-500 truncate max-w-xs">{request.description}</div>
+                          <div className="text-xs ds-text-muted truncate max-w-xs">{request.description}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">
+                      <td className="px-4 py-3 text-sm ds-text-primary">
                         {request.quantityNeeded} {request.unit}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-900">
+                      <td className="px-4 py-3 text-sm ds-text-primary">
                         {formatCurrency(request.estimatedCost)}
                       </td>
                       {batch.status === 'approved' && (
@@ -603,7 +603,7 @@ function BatchDetailPageContent() {
             </div>
           )}
           {batch.status === 'approved' && materialRequests.length > 0 && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mt-4 p-4 bg-blue-50 border border-blue-400/60 rounded-lg">
               <div className="flex items-start gap-3">
                 <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -629,17 +629,17 @@ function BatchDetailPageContent() {
 
         {/* Purchase Orders (if any) */}
         {batch.purchaseOrderIds && batch.purchaseOrderIds.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Purchase Orders</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Purchase Orders</h2>
             <div className="space-y-2">
               {batch.purchaseOrderIds.map((poId, index) => (
                 <Link
                   key={poId}
                   href={`/purchase-orders/${poId}`}
-                  className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+                  className="block p-3 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium ds-text-primary">
                       Purchase Order #{index + 1}
                     </span>
                     <span className="text-blue-600 hover:text-blue-800 text-sm">View →</span>

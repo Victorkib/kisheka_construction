@@ -32,8 +32,8 @@ export function CurrentProjectContext({ isCollapsed = false }) {
         collapsible={false}
       >
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-3/4 mb-2"></div>
+          <div className="h-3 ds-bg-surface-muted rounded w-1/2"></div>
         </div>
       </SidebarSection>
     );
@@ -46,15 +46,15 @@ export function CurrentProjectContext({ isCollapsed = false }) {
   const getStatusColor = (status) => {
     switch (status) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-emerald-500/20 text-emerald-100 border border-emerald-400/60';
       case 'planning':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-blue-500/20 text-blue-100 border border-blue-400/60';
       case 'paused':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'bg-amber-500/20 text-amber-100 border border-amber-400/60';
       case 'completed':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-purple-500/20 text-purple-100 border border-purple-400/60';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-slate-500/20 text-slate-100 border border-slate-400/60';
     }
   };
   
@@ -73,11 +73,11 @@ export function CurrentProjectContext({ isCollapsed = false }) {
             href={`/projects/${projectId}`}
             className="block group"
           >
-            <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition truncate">
+            <h3 className="text-sm font-semibold ds-text-sidebar-primary group-hover:text-blue-300 transition truncate">
               {project.projectName}
             </h3>
             {project.projectCode && (
-              <p className="text-xs text-gray-600 mt-0.5">
+              <p className="text-xs ds-text-sidebar-secondary mt-0.5">
                 {project.projectCode}
               </p>
             )}
@@ -92,16 +92,16 @@ export function CurrentProjectContext({ isCollapsed = false }) {
         </div>
         
         {/* Quick Project Actions */}
-        <div className="space-y-1 pt-1 border-t border-blue-200">
+        <div className="space-y-1 pt-1 border-t border-slate-500/40">
           <Link
             href={`/projects/${projectId}`}
-            className="block text-xs text-blue-600 hover:text-blue-800 font-medium transition"
+            className="block text-xs text-blue-300 hover:text-blue-200 font-medium transition"
           >
             View Details →
           </Link>
           <Link
             href={`/material-requests/new?projectId=${projectId}`}
-            className="block text-xs text-blue-600 hover:text-blue-800 font-medium transition"
+            className="block text-xs text-blue-300 hover:text-blue-200 font-medium transition"
           >
             Create Material Request →
           </Link>

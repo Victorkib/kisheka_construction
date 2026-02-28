@@ -20,11 +20,11 @@ export function DomainTile({ icon, title, metrics = [], link, onClick, children 
   const isClickable = link || onClick;
   
   const content = (
-    <div className={`bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-6 border border-gray-200 h-full flex flex-col group ${isClickable ? 'cursor-pointer' : ''}`}>
+    <div className={`ds-bg-surface rounded-lg shadow-sm hover:shadow-md transition-all duration-200 p-6 border ds-border-subtle h-full flex flex-col group ${isClickable ? 'cursor-pointer' : ''}`}>
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         {icon && <span className="text-2xl flex-shrink-0">{icon}</span>}
-        <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+        <h3 className="text-lg font-semibold ds-text-primary group-hover:text-blue-600 transition-colors">
           {title}
         </h3>
       </div>
@@ -34,8 +34,8 @@ export function DomainTile({ icon, title, metrics = [], link, onClick, children 
         <div className="space-y-2 mb-4 flex-grow">
           {metrics.map((metric, index) => (
             <div key={index} className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">{metric.label}</span>
-              <span className="text-sm font-medium text-gray-900 text-right">
+              <span className="text-sm ds-text-secondary">{metric.label}</span>
+              <span className="text-sm font-medium ds-text-primary text-right">
                 {metric.value}
               </span>
             </div>
@@ -48,8 +48,8 @@ export function DomainTile({ icon, title, metrics = [], link, onClick, children 
       
       {/* Action Link/Button - Only show if tile itself is not clickable */}
       {!isClickable && (
-        <div className="mt-auto pt-4 border-t border-gray-100">
-          <span className="inline-flex items-center text-sm font-medium text-gray-500">
+        <div className="mt-auto pt-4 border-t ds-border-subtle">
+          <span className="inline-flex items-center text-sm font-medium ds-text-muted">
             No action available
           </span>
         </div>
@@ -57,7 +57,7 @@ export function DomainTile({ icon, title, metrics = [], link, onClick, children 
       
       {/* Clickable indicator when tile is clickable */}
       {isClickable && (
-        <div className="mt-auto pt-4 border-t border-gray-100">
+        <div className="mt-auto pt-4 border-t ds-border-subtle">
           <span className="inline-flex items-center text-sm font-medium text-blue-600 group-hover:text-blue-800 transition-colors">
             View {title}
             <svg 

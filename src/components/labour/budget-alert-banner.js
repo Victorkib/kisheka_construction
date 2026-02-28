@@ -64,22 +64,22 @@ export function BudgetAlertBanner({ projectId, phaseId, onDismiss }) {
 
   const severityStyles = {
     critical: {
-      bg: 'bg-red-50',
-      border: 'border-red-200',
-      text: 'text-red-800',
-      icon: 'text-red-600',
+      bg: 'bg-red-500/10',
+      border: 'border-red-400/60',
+      text: 'text-red-200',
+      icon: 'text-red-400',
     },
     high: {
-      bg: 'bg-orange-50',
-      border: 'border-orange-200',
-      text: 'text-orange-800',
-      icon: 'text-orange-600',
+      bg: 'bg-orange-500/10',
+      border: 'border-orange-400/60',
+      text: 'text-orange-200',
+      icon: 'text-orange-400',
     },
     medium: {
-      bg: 'bg-yellow-50',
-      border: 'border-yellow-200',
-      text: 'text-yellow-800',
-      icon: 'text-yellow-600',
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-400/60',
+      text: 'text-amber-200',
+      icon: 'text-amber-400',
     },
   };
 
@@ -199,16 +199,16 @@ export function BudgetAlertList({ projectId, phaseId, compact = false }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-4">
-        <p className="text-sm text-gray-600">Loading alerts...</p>
+      <div className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
+        <p className="text-sm ds-text-muted">Loading alerts...</p>
       </div>
     );
   }
 
   if (alerts.length === 0) {
     return (
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <p className="text-sm text-green-800">
+      <div className="bg-emerald-500/10 border border-emerald-400/60 rounded-lg p-4">
+        <p className="text-sm text-emerald-200">
           ✓ No labour budget alerts. All budgets are within acceptable limits.
         </p>
       </div>
@@ -217,42 +217,42 @@ export function BudgetAlertList({ projectId, phaseId, compact = false }) {
 
   const severityStyles = {
     critical: {
-      bg: 'bg-red-50',
-      border: 'border-red-200',
-      text: 'text-red-800',
-      icon: 'text-red-600',
-      badge: 'bg-red-100 text-red-800',
+      bg: 'bg-red-500/10',
+      border: 'border-red-400/60',
+      text: 'text-red-200',
+      icon: 'text-red-400',
+      badge: 'bg-red-500/20 text-red-200 border border-red-400/60',
     },
     high: {
-      bg: 'bg-orange-50',
-      border: 'border-orange-200',
-      text: 'text-orange-800',
-      icon: 'text-orange-600',
-      badge: 'bg-orange-100 text-orange-800',
+      bg: 'bg-orange-500/10',
+      border: 'border-orange-400/60',
+      text: 'text-orange-200',
+      icon: 'text-orange-400',
+      badge: 'bg-orange-500/20 text-orange-200 border border-orange-400/60',
     },
     medium: {
-      bg: 'bg-yellow-50',
-      border: 'border-yellow-200',
-      text: 'text-yellow-800',
-      icon: 'text-yellow-600',
-      badge: 'bg-yellow-100 text-yellow-800',
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-400/60',
+      text: 'text-amber-200',
+      icon: 'text-amber-400',
+      badge: 'bg-amber-500/20 text-amber-200 border border-amber-400/60',
     },
   };
 
   return (
-    <div className="bg-white rounded-lg shadow">
+    <div className="ds-bg-surface rounded-lg shadow border ds-border-subtle">
       {!compact && (
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900">Budget Alerts</h3>
+        <div className="px-4 py-3 border-b ds-border-subtle">
+          <h3 className="text-lg font-semibold ds-text-primary">Budget Alerts</h3>
           {summary && (
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm ds-text-secondary mt-1">
               {summary.totalAlerts} alert{summary.totalAlerts !== 1 ? 's' : ''} found
             </p>
           )}
         </div>
       )}
 
-      <div className="divide-y divide-gray-200">
+      <div className="divide-y ds-border-subtle">
         {alerts.map((alert, index) => {
           const style = severityStyles[alert.severity] || severityStyles.medium;
 
@@ -271,7 +271,7 @@ export function BudgetAlertList({ projectId, phaseId, compact = false }) {
                       {alert.severity.toUpperCase()}
                     </span>
                     {alert.level && (
-                      <span className="text-xs text-gray-600">
+                      <span className="text-xs ds-text-muted">
                         {alert.level === 'project' ? 'Project' : 'Phase'} Level
                       </span>
                     )}
@@ -280,12 +280,12 @@ export function BudgetAlertList({ projectId, phaseId, compact = false }) {
                     {alert.message}
                   </p>
                   {alert.phaseName && (
-                    <p className="text-xs text-gray-600 mb-2">
+                    <p className="text-xs ds-text-muted mb-2">
                       Phase: {alert.phaseName}
                     </p>
                   )}
                   {alert.projectName && !alert.phaseName && (
-                    <p className="text-xs text-gray-600 mb-2">
+                    <p className="text-xs ds-text-muted mb-2">
                       Project: {alert.projectName}
                     </p>
                   )}

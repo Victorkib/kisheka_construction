@@ -285,8 +285,8 @@ export default function NewInitialExpensePage() {
           >
             ← Back to Initial Expenses
           </Link>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Add Initial Expense</h1>
-          <p className="text-gray-600 mt-2">Track pre-construction expenses</p>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Add Initial Expense</h1>
+          <p className="ds-text-secondary mt-2">Track pre-construction expenses</p>
         </div>
 
         {/* Progress Steps */}
@@ -299,12 +299,12 @@ export default function NewInitialExpensePage() {
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                       currentStep >= step
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 text-gray-600'
+                        : 'ds-bg-surface-muted ds-text-secondary'
                     }`}
                   >
                     {step}
                   </div>
-                  <div className="mt-2 text-xs text-center text-gray-600">
+                  <div className="mt-2 text-xs text-center ds-text-secondary">
                     {step === 1 && 'Project & Category'}
                     {step === 2 && 'Details'}
                     {step === 3 && 'Documents'}
@@ -314,7 +314,7 @@ export default function NewInitialExpensePage() {
                 {step < 4 && (
                   <div
                     className={`h-1 flex-1 mx-2 ${
-                      currentStep > step ? 'bg-blue-600' : 'bg-gray-200'
+                      currentStep > step ? 'bg-blue-600' : 'ds-bg-surface-muted'
                     }`}
                   />
                 )}
@@ -325,20 +325,20 @@ export default function NewInitialExpensePage() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow border ds-border-subtle p-6 space-y-6">
           {/* Step 1: Project & Category */}
           {currentStep === 1 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900">Step 1: Project & Category</h2>
+              <h2 className="text-xl font-semibold mb-4 ds-text-primary">Step 1: Project & Category</h2>
               
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Project <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -346,7 +346,7 @@ export default function NewInitialExpensePage() {
                   value={formData.projectId}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                 >
                   <option value="">Select a project</option>
                   {projects.map((project) => (
@@ -356,14 +356,14 @@ export default function NewInitialExpensePage() {
                   ))}
                 </select>
                 {projects.length === 0 && (
-                  <p className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded p-2 mt-2">
+                  <p className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-400/60 rounded p-2 mt-2">
                     ⚠️ No projects found. Please <Link href="/projects/new" className="underline font-medium">create a project first</Link>.
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Category <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -371,7 +371,7 @@ export default function NewInitialExpensePage() {
                   value={formData.category}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                 >
                   <option value="">Select a category</option>
                   {initialExpenseCategories.map((cat) => (
@@ -397,10 +397,10 @@ export default function NewInitialExpensePage() {
           {/* Step 2: Item Details */}
           {currentStep === 2 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900">Step 2: Item Details</h2>
+              <h2 className="text-xl font-semibold mb-4 ds-text-primary">Step 2: Item Details</h2>
               
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Item Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -410,12 +410,12 @@ export default function NewInitialExpensePage() {
                   onChange={handleChange}
                   placeholder="e.g., Land Purchase - Plot 123"
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                 />
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Amount (KES) <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -427,14 +427,14 @@ export default function NewInitialExpensePage() {
                   min="0"
                   step="0.01"
                   required
-                  className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 ${
-                    budgetInfo?.exceeded ? 'border-red-300 focus:ring-red-500' : 'border-gray-300'
+                  className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted ${
+                    budgetInfo?.exceeded ? 'border-red-400/60 focus:ring-red-500' : 'ds-border-subtle'
                   }`}
                 />
                 
                 {/* Budget Validation Info */}
                 {budgetLoading && (
-                  <div className="mt-2 text-sm text-gray-600">
+                  <div className="mt-2 text-sm ds-text-secondary">
                     <span className="inline-flex items-center">
                       <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -448,12 +448,12 @@ export default function NewInitialExpensePage() {
                 {budgetInfo && !budgetLoading && (
                   <div className={`mt-2 p-3 rounded-lg border ${
                     budgetInfo.budgetNotSet
-                      ? 'bg-blue-50 border-blue-200'
+                      ? 'bg-blue-50 border-blue-400/60'
                       : budgetInfo.exceeded 
-                        ? 'bg-red-50 border-red-200' 
+                        ? 'bg-red-50 border-red-400/60' 
                         : budgetInfo.warning 
-                          ? 'bg-yellow-50 border-yellow-200' 
-                          : 'bg-green-50 border-green-200'
+                          ? 'bg-yellow-50 border-yellow-400/60' 
+                          : 'bg-green-50 border-green-400/60'
                   }`}>
                     <div className="flex items-start justify-between mb-2">
                       <div>
@@ -474,7 +474,7 @@ export default function NewInitialExpensePage() {
                                 ? '⚠️ Budget Warning' 
                                 : '✓ Budget Available'}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">
+                        <p className="text-xs ds-text-secondary mt-1">
                           {budgetInfo.budgetNotSet
                             ? 'Operation allowed - spending will be tracked. Set budget later to enable budget validation.'
                             : `Available: ${new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(budgetInfo.available)}`}
@@ -500,20 +500,20 @@ export default function NewInitialExpensePage() {
                 )}
 
                 {budgetError && (
-                  <div className="mt-2 p-2 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
+                  <div className="mt-2 p-2 ds-bg-surface-muted border ds-border-subtle rounded text-xs ds-text-secondary">
                     Could not validate budget: {budgetError}
                   </div>
                 )}
 
                 {needsApproval && (
-                  <p className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-200 rounded p-2 mt-2">
+                  <p className="text-xs text-yellow-600 bg-yellow-50 border border-yellow-400/60 rounded p-2 mt-2">
                     ⚠️ This expense requires approval (amount &gt;= 100,000 KES)
                   </p>
                 )}
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Supplier/Agency
                 </label>
                 <input
@@ -522,12 +522,12 @@ export default function NewInitialExpensePage() {
                   value={formData.supplier}
                   onChange={handleChange}
                   placeholder="e.g., County Government"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                 />
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Receipt Number
                 </label>
                 <input
@@ -536,12 +536,12 @@ export default function NewInitialExpensePage() {
                   value={formData.receiptNumber}
                   onChange={handleChange}
                   placeholder="e.g., REC-2024-001"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                 />
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Date Paid <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
@@ -551,7 +551,7 @@ export default function NewInitialExpensePage() {
                     value={formData.datePaid}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer"
+                    className="w-full px-3 pr-12 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted cursor-pointer"
                   />
                   <button
                     type="button"
@@ -563,11 +563,11 @@ export default function NewInitialExpensePage() {
                         input.focus();
                       }
                     }}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:ds-bg-surface-muted rounded-r-lg transition-colors"
                     aria-label="Open date picker"
                     tabIndex={-1}
                   >
-                    <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 ds-text-secondary hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </button>
@@ -575,7 +575,7 @@ export default function NewInitialExpensePage() {
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Notes
                 </label>
                 <textarea
@@ -584,7 +584,7 @@ export default function NewInitialExpensePage() {
                   onChange={handleChange}
                   rows={3}
                   placeholder="Additional notes..."
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                 />
               </div>
 
@@ -592,7 +592,7 @@ export default function NewInitialExpensePage() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-lg transition"
+                  className="ds-bg-surface-muted hover:ds-bg-surface ds-text-primary font-medium px-6 py-2 rounded-lg transition"
                 >
                   ← Back
                 </button>
@@ -610,10 +610,10 @@ export default function NewInitialExpensePage() {
           {/* Step 3: Documents */}
           {currentStep === 3 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900">Step 3: Documents</h2>
+              <h2 className="text-xl font-semibold mb-4 ds-text-primary">Step 3: Documents</h2>
               
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                   Receipt/Invoice
                 </label>
                 <CloudinaryUploadWidget
@@ -629,10 +629,10 @@ export default function NewInitialExpensePage() {
               </div>
 
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                   Supporting Documents (Optional)
                 </label>
-                <p className="text-sm text-gray-600 mb-2 leading-normal">
+                <p className="text-sm ds-text-secondary mb-2 leading-normal">
                   Upload additional documents like contracts, agreements, etc.
                 </p>
                 <CloudinaryUploadWidget
@@ -650,8 +650,8 @@ export default function NewInitialExpensePage() {
                 {supportingDocuments.length > 0 && (
                   <div className="mt-4 space-y-2">
                     {supportingDocuments.map((doc, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
-                        <span className="text-sm text-gray-700">Document {index + 1}</span>
+                      <div key={index} className="flex items-center justify-between ds-bg-surface-muted p-2 rounded">
+                        <span className="text-sm ds-text-secondary">Document {index + 1}</span>
                         <button
                           type="button"
                           onClick={() => {
@@ -671,7 +671,7 @@ export default function NewInitialExpensePage() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-lg transition"
+                  className="ds-bg-surface-muted hover:ds-bg-surface ds-text-primary font-medium px-6 py-2 rounded-lg transition"
                 >
                   ← Back
                 </button>
@@ -689,29 +689,29 @@ export default function NewInitialExpensePage() {
           {/* Step 4: Review & Submit */}
           {currentStep === 4 && (
             <div className="space-y-6">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900">Step 4: Review & Submit</h2>
+              <h2 className="text-xl font-semibold mb-4 ds-text-primary">Step 4: Review & Submit</h2>
               
-              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+              <div className="ds-bg-surface-muted rounded-lg p-4 space-y-3">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-600">Project</p>
-                    <p className="font-medium text-gray-900">
+                    <p className="text-sm ds-text-secondary">Project</p>
+                    <p className="font-medium ds-text-primary">
                       {projects.find((p) => p._id === formData.projectId)?.projectName || 'N/A'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Category</p>
-                    <p className="font-medium text-gray-900">
+                    <p className="text-sm ds-text-secondary">Category</p>
+                    <p className="font-medium ds-text-primary">
                       {initialExpenseCategories.find((c) => c.value === formData.category)?.label || 'N/A'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Item Name</p>
-                    <p className="font-medium text-gray-900">{formData.itemName}</p>
+                    <p className="text-sm ds-text-secondary">Item Name</p>
+                    <p className="font-medium ds-text-primary">{formData.itemName}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Amount</p>
-                    <p className="font-medium text-lg text-gray-900">
+                    <p className="text-sm ds-text-secondary">Amount</p>
+                    <p className="font-medium text-lg ds-text-primary">
                       {new Intl.NumberFormat('en-KE', {
                         style: 'currency',
                         currency: 'KES',
@@ -719,18 +719,18 @@ export default function NewInitialExpensePage() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Supplier</p>
-                    <p className="font-medium text-gray-900">{formData.supplier || 'N/A'}</p>
+                    <p className="text-sm ds-text-secondary">Supplier</p>
+                    <p className="font-medium ds-text-primary">{formData.supplier || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Date Paid</p>
-                    <p className="font-medium text-gray-900">
+                    <p className="text-sm ds-text-secondary">Date Paid</p>
+                    <p className="font-medium ds-text-primary">
                       {new Date(formData.datePaid).toLocaleDateString('en-KE')}
                     </p>
                   </div>
                 </div>
                 {needsApproval && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                  <div className="bg-yellow-50 border border-yellow-400/60 rounded p-3">
                     <p className="text-sm text-yellow-800">
                       ⚠️ This expense will require approval (amount &gt;= 100,000 KES)
                     </p>
@@ -742,7 +742,7 @@ export default function NewInitialExpensePage() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-6 py-2 rounded-lg transition"
+                  className="ds-bg-surface-muted hover:ds-bg-surface ds-text-primary font-medium px-6 py-2 rounded-lg transition"
                 >
                   ← Back
                 </button>
@@ -750,7 +750,7 @@ export default function NewInitialExpensePage() {
                   type="submit"
                   isLoading={loading}
                   loadingText="Creating..."
-                  className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg transition"
+                  className="bg-green-600 hover:bg-green-700 disabled:bg-slate-500 text-white font-medium px-6 py-2 rounded-lg transition"
                 >
                   Create Initial Expense
                 </LoadingButton>

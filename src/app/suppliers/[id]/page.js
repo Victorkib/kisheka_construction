@@ -100,7 +100,7 @@ function SupplierDetailPageContent() {
   const getStatusBadge = (status) => {
     const badges = {
       active: 'bg-green-100 text-green-900 font-semibold',
-      inactive: 'bg-gray-100 text-gray-900 font-semibold',
+      inactive: 'ds-bg-surface-muted ds-text-primary font-semibold',
       suspended: 'bg-red-100 text-red-900 font-semibold'
     };
     return badges[status] || badges.inactive;
@@ -110,9 +110,9 @@ function SupplierDetailPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-900 font-medium">Loading supplier...</p>
+            <p className="mt-4 ds-text-primary font-medium">Loading supplier...</p>
           </div>
         </div>
       </AppLayout>
@@ -123,7 +123,7 @@ function SupplierDetailPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border-2 border-red-300 text-red-900 px-4 py-3 rounded mb-6 font-medium text-sm sm:text-base">
+          <div className="bg-red-50 border-2 border-red-400/60 text-red-900 px-4 py-3 rounded mb-6 font-medium text-sm sm:text-base">
             {error || 'Supplier not found'}
           </div>
           <Link href="/suppliers" className="text-blue-600 hover:text-blue-800 active:text-blue-900 underline font-semibold text-sm sm:text-base transition-colors touch-manipulation">
@@ -143,10 +143,10 @@ function SupplierDetailPageContent() {
             <Link href="/suppliers" className="text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm mb-4 inline-block font-semibold underline transition-colors touch-manipulation">
               ← Back to Suppliers
             </Link>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">
               {supplier.name}
             </h1>
-            <p className="text-sm sm:text-base text-gray-700 mt-2 font-medium">Supplier Details</p>
+            <p className="text-sm sm:text-base ds-text-secondary mt-2 font-medium">Supplier Details</p>
           </div>
           <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
             {canAccess('edit_supplier') && (
@@ -172,39 +172,39 @@ function SupplierDetailPageContent() {
           {/* Main Details */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Basic Information */}
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Basic Information</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Status</p>
+                  <p className="text-sm font-semibold ds-text-primary">Status</p>
                   <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full mt-1 ${getStatusBadge(supplier.status)}`}>
                     {supplier.status}
                   </span>
                 </div>
                 {supplier.contactPerson && (
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Contact Person</p>
-                    <p className="font-semibold text-gray-900">{supplier.contactPerson}</p>
+                    <p className="text-sm font-semibold ds-text-primary">Contact Person</p>
+                    <p className="font-semibold ds-text-primary">{supplier.contactPerson}</p>
                   </div>
                 )}
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Email</p>
-                  <p className="font-semibold text-gray-900">{supplier.email}</p>
+                  <p className="text-sm font-semibold ds-text-primary">Email</p>
+                  <p className="font-semibold ds-text-primary">{supplier.email}</p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Phone</p>
-                  <p className="font-semibold text-gray-900">{supplier.phone}</p>
+                  <p className="text-sm font-semibold ds-text-primary">Phone</p>
+                  <p className="font-semibold ds-text-primary">{supplier.phone}</p>
                 </div>
                 {supplier.alternateEmail && (
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Alternate Email</p>
-                    <p className="font-semibold text-gray-900">{supplier.alternateEmail}</p>
+                    <p className="text-sm font-semibold ds-text-primary">Alternate Email</p>
+                    <p className="font-semibold ds-text-primary">{supplier.alternateEmail}</p>
                   </div>
                 )}
                 {supplier.alternatePhone && (
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Alternate Phone</p>
-                    <p className="font-semibold text-gray-900">{supplier.alternatePhone}</p>
+                    <p className="text-sm font-semibold ds-text-primary">Alternate Phone</p>
+                    <p className="font-semibold ds-text-primary">{supplier.alternatePhone}</p>
                   </div>
                 )}
               </div>
@@ -212,25 +212,25 @@ function SupplierDetailPageContent() {
 
             {/* Business Details */}
             {(supplier.businessType || supplier.taxId || supplier.address) && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Business Details</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Business Details</h2>
                 <div className="space-y-4">
                   {supplier.businessType && (
                     <div>
-                      <p className="text-sm font-semibold text-gray-900">Business Type</p>
-                      <p className="font-semibold text-gray-900">{supplier.businessType}</p>
+                      <p className="text-sm font-semibold ds-text-primary">Business Type</p>
+                      <p className="font-semibold ds-text-primary">{supplier.businessType}</p>
                     </div>
                   )}
                   {supplier.taxId && (
                     <div>
-                      <p className="text-sm font-semibold text-gray-900">Tax ID</p>
-                      <p className="font-semibold text-gray-900">{supplier.taxId}</p>
+                      <p className="text-sm font-semibold ds-text-primary">Tax ID</p>
+                      <p className="font-semibold ds-text-primary">{supplier.taxId}</p>
                     </div>
                   )}
                   {supplier.address && (
                     <div>
-                      <p className="text-sm font-semibold text-gray-900">Address</p>
-                      <p className="font-semibold text-gray-900">{supplier.address}</p>
+                      <p className="text-sm font-semibold ds-text-primary">Address</p>
+                      <p className="font-semibold ds-text-primary">{supplier.address}</p>
                     </div>
                   )}
                 </div>
@@ -238,32 +238,32 @@ function SupplierDetailPageContent() {
             )}
 
             {/* Communication Preferences */}
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Communication Preferences</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Communication Preferences</h2>
               <div className="space-y-2">
                 <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${supplier.emailEnabled ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                  <span className="text-sm font-semibold text-gray-900">Email Notifications</span>
+                  <span className={`w-3 h-3 rounded-full ${supplier.emailEnabled ? 'bg-green-500' : 'ds-bg-surface-muted'}`}></span>
+                  <span className="text-sm font-semibold ds-text-primary">Email Notifications</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${supplier.smsEnabled ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                  <span className="text-sm font-semibold text-gray-900">SMS Notifications</span>
+                  <span className={`w-3 h-3 rounded-full ${supplier.smsEnabled ? 'bg-green-500' : 'ds-bg-surface-muted'}`}></span>
+                  <span className="text-sm font-semibold ds-text-primary">SMS Notifications</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className={`w-3 h-3 rounded-full ${supplier.pushNotificationsEnabled ? 'bg-green-500' : 'bg-gray-300'}`}></span>
-                  <span className="text-sm font-semibold text-gray-900">Push Notifications</span>
+                  <span className={`w-3 h-3 rounded-full ${supplier.pushNotificationsEnabled ? 'bg-green-500' : 'ds-bg-surface-muted'}`}></span>
+                  <span className="text-sm font-semibold ds-text-primary">Push Notifications</span>
                 </div>
                 <div className="mt-4">
-                  <p className="text-sm font-semibold text-gray-900">Preferred Method</p>
-                  <p className="font-semibold text-gray-900 capitalize">{supplier.preferredContactMethod?.replace(/_/g, ' ')}</p>
+                  <p className="text-sm font-semibold ds-text-primary">Preferred Method</p>
+                  <p className="font-semibold ds-text-primary capitalize">{supplier.preferredContactMethod?.replace(/_/g, ' ')}</p>
                 </div>
               </div>
             </div>
 
             {/* Specialties */}
             {supplier.specialties && supplier.specialties.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Specialties</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Specialties</h2>
                 <div className="flex flex-wrap gap-2">
                   {supplier.specialties.map((specialty, index) => (
                     <span
@@ -279,9 +279,9 @@ function SupplierDetailPageContent() {
 
             {/* Notes */}
             {supplier.notes && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Notes</h2>
-                <p className="text-sm sm:text-base text-gray-900 whitespace-pre-wrap font-medium break-words">{supplier.notes}</p>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Notes</h2>
+                <p className="text-sm sm:text-base ds-text-primary whitespace-pre-wrap font-medium break-words">{supplier.notes}</p>
               </div>
             )}
           </div>
@@ -289,22 +289,22 @@ function SupplierDetailPageContent() {
           {/* Sidebar */}
           <div className="space-y-4 sm:space-y-6">
             {/* Statistics */}
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Statistics</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Statistics</h2>
               <div className="space-y-4">
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Total Purchase Orders</p>
-                  <p className="text-2xl font-bold text-gray-900">{orderCount}</p>
+                  <p className="text-sm font-semibold ds-text-primary">Total Purchase Orders</p>
+                  <p className="text-2xl font-bold ds-text-primary">{orderCount}</p>
                 </div>
                 {supplier.rating && (
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">Rating</p>
-                    <p className="text-2xl font-bold text-gray-900">{supplier.rating}/5</p>
+                    <p className="text-sm font-semibold ds-text-primary">Rating</p>
+                    <p className="text-2xl font-bold ds-text-primary">{supplier.rating}/5</p>
                   </div>
                 )}
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">Created</p>
-                  <p className="text-sm font-semibold text-gray-900">
+                  <p className="text-sm font-semibold ds-text-primary">Created</p>
+                  <p className="text-sm font-semibold ds-text-primary">
                     {supplier.createdAt ? new Date(supplier.createdAt).toLocaleDateString() : 'N/A'}
                   </p>
                 </div>
@@ -313,18 +313,18 @@ function SupplierDetailPageContent() {
 
             {/* Recent Orders */}
             {recentOrders.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Recent Orders</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Recent Orders</h2>
                 <div className="space-y-3">
                   {recentOrders.map((order) => (
                     <Link
                       key={order._id}
                       href={`/purchase-orders/${order._id}`}
-                      className="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
+                      className="block p-3 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors touch-manipulation"
                     >
-                      <p className="font-semibold text-gray-900 text-sm break-words">{order.purchaseOrderNumber}</p>
-                      <p className="text-xs text-gray-700 mt-1 font-medium break-words">{order.materialName}</p>
-                      <p className="text-xs text-gray-700 mt-1 font-medium">
+                      <p className="font-semibold ds-text-primary text-sm break-words">{order.purchaseOrderNumber}</p>
+                      <p className="text-xs ds-text-secondary mt-1 font-medium break-words">{order.materialName}</p>
+                      <p className="text-xs ds-text-secondary mt-1 font-medium">
                         {new Date(order.createdAt).toLocaleDateString()}
                       </p>
                     </Link>
@@ -352,9 +352,9 @@ export default function SupplierDetailPage() {
     <Suspense fallback={
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-900 font-medium">Loading...</p>
+            <p className="mt-4 ds-text-primary font-medium">Loading...</p>
           </div>
         </div>
       </AppLayout>

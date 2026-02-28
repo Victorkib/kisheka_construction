@@ -263,10 +263,10 @@ export function Step4Review({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl font-semibold ds-text-primary mb-2">
           Review & Submit
         </h2>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm ds-text-secondary">
           Review all details before submitting. This batch will be auto-approved
           and budget will be updated.
         </p>
@@ -274,20 +274,20 @@ export function Step4Review({
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-5 h-5 text-blue-600" />
-            <span className="text-sm font-medium text-gray-700">Workers</span>
+            <span className="text-sm font-medium ds-text-secondary">Workers</span>
           </div>
           <div className="text-2xl font-bold text-blue-600">
             {totals.totalWorkers}
           </div>
         </div>
 
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-5 h-5 text-green-600" />
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium ds-text-secondary">
               Total Hours
             </span>
           </div>
@@ -296,10 +296,10 @@ export function Step4Review({
           </div>
         </div>
 
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+        <div className="bg-purple-50 border border-purple-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign className="w-5 h-5 text-purple-600" />
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium ds-text-secondary">
               Total Cost
             </span>
           </div>
@@ -308,12 +308,12 @@ export function Step4Review({
           </div>
         </div>
 
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
-            <CheckCircle className="w-5 h-5 text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">Status</span>
+            <CheckCircle className="w-5 h-5 ds-text-secondary" />
+            <span className="text-sm font-medium ds-text-secondary">Status</span>
           </div>
-          <div className="text-sm font-semibold text-gray-600">
+          <div className="text-sm font-semibold ds-text-secondary">
             Auto-Approved
           </div>
         </div>
@@ -323,7 +323,7 @@ export function Step4Review({
       {(totals.directCost > 0 || totals.indirectCost > 0) && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {totals.directCost > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
               <h4 className="text-sm font-semibold text-blue-900 mb-3">
                 Direct Labour (Phase Budget)
               </h4>
@@ -340,7 +340,7 @@ export function Step4Review({
                     {totals.directHours.toFixed(1)}
                   </span>
                 </div>
-                <div className="flex justify-between border-t border-blue-200 pt-2">
+                <div className="flex justify-between border-t border-blue-400/60 pt-2">
                   <span className="text-blue-700">Cost:</span>
                   <span className="font-medium text-blue-900">
                     {totals.directCost.toLocaleString()} KES
@@ -384,7 +384,7 @@ export function Step4Review({
       {(budgetValidation || indirectBudgetValidation || validatingBudget || validatingIndirectBudget) && (
         <div className="space-y-3">
           {validatingBudget && (
-            <div className="p-3 rounded-lg border bg-blue-50 border-blue-200 text-sm text-blue-800">
+            <div className="p-3 rounded-lg border bg-blue-50 border-blue-400/60 text-sm text-blue-800">
               Validating direct labour budget...
             </div>
           )}
@@ -392,8 +392,8 @@ export function Step4Review({
             <div
               className={`p-4 rounded-lg border ${
                 budgetValidation.isValid
-                  ? 'bg-green-50 border-green-200'
-                  : 'bg-red-50 border-red-200'
+                  ? 'bg-green-50 border-green-400/60'
+                  : 'bg-red-50 border-red-400/60'
               }`}
             >
               <div className="flex items-start gap-3">
@@ -424,7 +424,7 @@ export function Step4Review({
                     {budgetValidation.message}
                   </p>
                   {budgetValidation.budget && (
-                    <div className="mt-2 text-xs text-gray-600 space-y-1">
+                    <div className="mt-2 text-xs ds-text-secondary space-y-1">
                       <p>
                         Budget: {budgetValidation.budget.toLocaleString()} KES |
                         Available: {budgetValidation.available.toLocaleString()} KES
@@ -449,7 +449,7 @@ export function Step4Review({
               className={`p-4 rounded-lg border ${
                 indirectBudgetValidation.isValid
                   ? 'bg-amber-50 border-amber-200'
-                  : 'bg-red-50 border-red-200'
+                  : 'bg-red-50 border-red-400/60'
               }`}
             >
               <div className="flex items-start gap-3">
@@ -471,7 +471,7 @@ export function Step4Review({
                       : '⚠️ Indirect Costs Budget Warning'}
                   </p>
                   {indirectBudgetValidation.byCategory && (
-                    <div className="mt-2 space-y-2 text-xs text-gray-700">
+                    <div className="mt-2 space-y-2 text-xs ds-text-secondary">
                       {Object.entries(indirectBudgetValidation.byCategory).map(
                         ([category, info]) => (
                           <div key={category} className="flex justify-between">
@@ -494,19 +494,19 @@ export function Step4Review({
       )}
 
       {/* Batch Details */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">
+      <div className="ds-bg-surface border ds-border-subtle rounded-lg p-4">
+        <h3 className="text-sm font-semibold ds-text-primary mb-3">
           Batch Details
         </h3>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
-            <span className="text-gray-600">Project:</span>
-            <span className="ml-2 font-medium text-gray-900">
+            <span className="ds-text-secondary">Project:</span>
+            <span className="ml-2 font-medium ds-text-primary">
               {wizardData.projectId ? 'Selected' : 'Not selected'}
             </span>
           </div>
           <div>
-            <span className="text-gray-600">Labour Type:</span>
+            <span className="ds-text-secondary">Labour Type:</span>
             <span
               className={`ml-2 font-medium ${
                 wizardData.isIndirectLabour ? 'text-amber-700' : 'text-blue-700'
@@ -518,8 +518,8 @@ export function Step4Review({
             </span>
           </div>
           <div>
-            <span className="text-gray-600">Phase:</span>
-            <span className="ml-2 font-medium text-gray-900">
+            <span className="ds-text-secondary">Phase:</span>
+            <span className="ml-2 font-medium ds-text-primary">
               {wizardData.isIndirectLabour
                 ? 'N/A (Project-level)'
                 : wizardData.defaultPhaseId
@@ -529,7 +529,7 @@ export function Step4Review({
           </div>
           {wizardData.isIndirectLabour && (
             <div>
-              <span className="text-gray-600">Indirect Category:</span>
+              <span className="ds-text-secondary">Indirect Category:</span>
               <span className="ml-2 font-medium text-amber-700">
                 {wizardData.indirectCostCategory
                   ?.replace(/([A-Z])/g, ' $1')
@@ -538,41 +538,41 @@ export function Step4Review({
             </div>
           )}
           <div>
-            <span className="text-gray-600">Entry Date:</span>
-            <span className="ml-2 font-medium text-gray-900">
+            <span className="ds-text-secondary">Entry Date:</span>
+            <span className="ml-2 font-medium ds-text-primary">
               {new Date(wizardData.defaultDate).toLocaleDateString()}
             </span>
           </div>
           <div>
-            <span className="text-gray-600">Entry Type:</span>
-            <span className="ml-2 font-medium text-gray-900">
+            <span className="ds-text-secondary">Entry Type:</span>
+            <span className="ml-2 font-medium ds-text-primary">
               {wizardData.entryType?.replace(/_/g, ' ')}
             </span>
           </div>
           {wizardData.batchName && (
             <div className="col-span-2">
-              <span className="text-gray-600">Batch Name:</span>
-              <span className="ml-2 font-medium text-gray-900">
+              <span className="ds-text-secondary">Batch Name:</span>
+              <span className="ml-2 font-medium ds-text-primary">
                 {wizardData.batchName}
               </span>
             </div>
           )}
           {wizardData.workItemId && (
             <div className="col-span-2">
-              <span className="text-gray-600">Work Item:</span>
+              <span className="ds-text-secondary">Work Item:</span>
               {loadingWorkItem ? (
-                <span className="ml-2 text-gray-500">Loading...</span>
+                <span className="ml-2 ds-text-muted">Loading...</span>
               ) : workItem ? (
                 <div className="ml-2">
-                  <span className="font-medium text-gray-900">
+                  <span className="font-medium ds-text-primary">
                     {workItem.name}
                   </span>
-                  <span className="ml-2 text-xs text-gray-500">
+                  <span className="ml-2 text-xs ds-text-muted">
                     ({workItem.category || 'Other'}) -{' '}
                     {workItem.status?.replace('_', ' ') || 'Not Started'}
                   </span>
                   {workItem.estimatedHours > 0 && (
-                    <div className="mt-1 text-xs text-gray-600">
+                    <div className="mt-1 text-xs ds-text-secondary">
                       Progress: {workItem.actualHours || 0}/
                       {workItem.estimatedHours} hrs (
                       {Math.min(
@@ -588,7 +588,7 @@ export function Step4Review({
                   )}
                 </div>
               ) : (
-                <span className="ml-2 text-gray-500">Work item not found</span>
+                <span className="ml-2 ds-text-muted">Work item not found</span>
               )}
             </div>
           )}
@@ -596,8 +596,8 @@ export function Step4Review({
       </div>
 
       {/* Entries Summary */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4">
-        <h3 className="text-sm font-semibold text-gray-900 mb-3">
+      <div className="ds-bg-surface border ds-border-subtle rounded-lg p-4">
+        <h3 className="text-sm font-semibold ds-text-primary mb-3">
           Workers ({wizardData.labourEntries.length})
         </h3>
         <div className="space-y-2 max-h-64 overflow-y-auto">
@@ -625,13 +625,13 @@ export function Step4Review({
             return (
               <div
                 key={index}
-                className={`flex items-center justify-between py-2 border-b border-gray-100 last:border-0 ${
+                className={`flex items-center justify-between py-2 border-b ds-border-subtle last:border-0 ${
                   isNewWorker ? 'bg-blue-50 rounded px-2' : ''
                 }`}
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium ds-text-primary">
                       {entry.workerName}
                     </p>
                     {isNewWorker ? (
@@ -646,12 +646,12 @@ export function Step4Review({
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">
+                  <p className="text-xs ds-text-secondary mt-1">
                     {entry.skillType?.replace(/_/g, ' ')} • {entry.totalHours}{' '}
                     hrs @ {hourlyRate.toLocaleString()} KES/hr
                   </p>
                 </div>
-                <div className="text-sm font-semibold text-gray-900">
+                <div className="text-sm font-semibold ds-text-primary">
                   {totalCost.toLocaleString()} KES
                 </div>
               </div>

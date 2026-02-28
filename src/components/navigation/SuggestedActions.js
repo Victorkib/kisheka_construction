@@ -45,14 +45,14 @@ export function SuggestedActions({ isCollapsed = false }) {
             href={suggestion.href}
             className={`block p-2 rounded-lg border transition-colors ${
               suggestion.priority === 'high'
-                ? 'bg-blue-50 border-blue-200 hover:bg-blue-100'
-                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                ? 'bg-blue-500/20 border-blue-400/50 hover:bg-blue-500/30'
+                : 'bg-slate-600/40 border-slate-500/50 hover:bg-slate-600/60'
             }`}
           >
             <div className="flex items-center gap-2">
               <span className="text-base flex-shrink-0">{suggestion.icon}</span>
               <p className={`text-sm font-medium truncate ${
-                suggestion.priority === 'high' ? 'text-blue-900' : 'text-gray-900'
+                suggestion.priority === 'high' ? 'text-blue-50' : 'text-white'
               }`}>
                 {suggestion.label}
               </p>

@@ -64,7 +64,7 @@ export default function NewProfessionalServicesLibraryPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-6">
+          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded mb-6">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to manage the professional services library. Only Owners can add professionals.</p>
           </div>
@@ -84,14 +84,14 @@ export default function NewProfessionalServicesLibraryPage() {
           <Link href="/professional-services-library" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
             ← Back to Library
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-2xl md:text-3xl font-bold ds-text-primary leading-tight">
             Add New Professional to Library
           </h1>
-          <p className="text-gray-600 mt-2">Create a new professional entry for quick assignment to projects</p>
+          <p className="ds-text-secondary mt-2">Create a new professional entry for quick assignment to projects</p>
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <ProfessionalServicesLibraryForm
             onSubmit={handleSubmit}
             onCancel={handleCancel}

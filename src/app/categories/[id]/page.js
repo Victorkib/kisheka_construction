@@ -179,7 +179,7 @@ export default function EditCategoryPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-6">
+          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded mb-6">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to edit categories. Only Owners can edit categories.</p>
           </div>
@@ -199,15 +199,15 @@ export default function EditCategoryPage() {
           <Link href="/categories" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
             ← Back to Categories
           </Link>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
             Edit Category
           </h1>
-          <p className="text-gray-600 mt-2">Update category details</p>
+          <p className="ds-text-secondary mt-2">Update category details</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 flex items-start gap-2">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6 flex items-start gap-2">
             <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -228,18 +228,18 @@ export default function EditCategoryPage() {
 
         {/* Loading State */}
         {loading ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading category...</p>
+            <p className="mt-4 ds-text-secondary">Loading category...</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+          <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow p-6 space-y-6">
             {/* Basic Information */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Basic Information</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                  <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                     Category Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -248,30 +248,30 @@ export default function EditCategoryPage() {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Description</label>
+                  <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Description</label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
                     rows={3}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Icon (Emoji)</label>
+                  <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Icon (Emoji)</label>
                   <input
                     type="text"
                     name="icon"
                     value={formData.icon}
                     onChange={handleChange}
                     maxLength={2}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   />
                 </div>
               </div>
@@ -279,7 +279,7 @@ export default function EditCategoryPage() {
 
             {/* Subcategories */}
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Subcategories</h2>
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Subcategories</h2>
               <div className="space-y-4">
                 <div className="flex gap-2">
                   <input
@@ -293,12 +293,12 @@ export default function EditCategoryPage() {
                       }
                     }}
                     placeholder="Enter subcategory name"
-                    className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   />
                   <button
                     type="button"
                     onClick={handleAddSubcategory}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                    className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
                   >
                     Add
                   </button>
@@ -328,7 +328,7 @@ export default function EditCategoryPage() {
 
             {/* Submit Buttons */}
             <div className="flex justify-end gap-4 pt-4 border-t">
-              <Link href="/categories" className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+              <Link href="/categories" className="px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted">
                 Cancel
               </Link>
               <button

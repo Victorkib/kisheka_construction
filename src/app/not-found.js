@@ -27,59 +27,59 @@ function NotFoundContent() {
               404
             </div>
             <div className="text-6xl mb-4">🏗️</div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold ds-text-primary mb-4">
               Page Not Found
             </h1>
-            <p className="text-xl text-gray-700 mb-2">
+            <p className="text-xl ds-text-secondary mb-2">
               Looks like this construction site is still under development!
             </p>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg ds-text-secondary">
               The page you're looking for doesn't exist or has been moved.
             </p>
           </div>
 
           {/* Helpful Actions */}
-          <div className="bg-white rounded-xl shadow-lg p-8 mb-8 border border-gray-200">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+          <div className="ds-bg-surface rounded-xl shadow-lg p-8 mb-8 border ds-border-subtle">
+            <h2 className="text-2xl font-semibold ds-text-primary mb-6">
               Where would you like to go?
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <Link
                 href="/dashboard/owner"
-                className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition-all group"
+                className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400/60 hover:border-blue-400 hover:shadow-md transition-all group"
               >
                 <div className="text-3xl mb-2">📊</div>
-                <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                <h3 className="font-semibold ds-text-primary mb-1 group-hover:text-blue-600 transition-colors">
                   Dashboard
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   Return to your main dashboard
                 </p>
               </Link>
 
               <Link
                 href="/projects"
-                className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border-2 border-purple-200 hover:border-purple-400 hover:shadow-md transition-all group"
+                className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border-2 border-purple-400/60 hover:border-purple-400 hover:shadow-md transition-all group"
               >
                 <div className="text-3xl mb-2">🏗️</div>
-                <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-purple-600 transition-colors">
+                <h3 className="font-semibold ds-text-primary mb-1 group-hover:text-purple-600 transition-colors">
                   Projects
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   View all construction projects
                 </p>
               </Link>
 
               <Link
                 href="/items"
-                className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border-2 border-green-200 hover:border-green-400 hover:shadow-md transition-all group"
+                className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border-2 border-green-400/60 hover:border-green-400 hover:shadow-md transition-all group"
               >
                 <div className="text-3xl mb-2">📦</div>
-                <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-green-600 transition-colors">
+                <h3 className="font-semibold ds-text-primary mb-1 group-hover:text-green-600 transition-colors">
                   Materials
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   Manage materials and inventory
                 </p>
               </Link>
@@ -89,20 +89,20 @@ function NotFoundContent() {
                 className="p-6 bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg border-2 border-orange-200 hover:border-orange-400 hover:shadow-md transition-all group"
               >
                 <div className="text-3xl mb-2">📋</div>
-                <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-orange-600 transition-colors">
+                <h3 className="font-semibold ds-text-primary mb-1 group-hover:text-orange-600 transition-colors">
                   Phases
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   View project phases
                 </p>
               </Link>
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 border-t border-gray-200">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4 border-t ds-border-subtle">
               <button
                 onClick={() => router.back()}
-                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold rounded-lg transition-colors"
+                className="px-6 py-3 ds-bg-surface-muted hover:ds-bg-surface-muted ds-text-secondary font-semibold rounded-lg transition-colors"
               >
                 ← Go Back
               </button>
@@ -116,7 +116,7 @@ function NotFoundContent() {
           </div>
 
           {/* Helpful Information */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-6">
             <h3 className="font-semibold text-blue-900 mb-2">
               Need Help?
             </h3>
@@ -124,7 +124,7 @@ function NotFoundContent() {
               If you believe this is an error, please contact your system administrator or check the URL for typos.
             </p>
             <div className="flex flex-wrap gap-2 justify-center">
-              <span className="px-3 py-1 bg-white rounded-full text-xs text-gray-700 border border-gray-200">
+              <span className="px-3 py-1 ds-bg-surface rounded-full text-xs ds-text-secondary border ds-border-subtle">
                 Common pages: Projects, Phases, Materials, Expenses
               </span>
             </div>
@@ -138,7 +138,7 @@ function NotFoundContent() {
 export default function NotFound() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center ds-bg-surface-muted">
         <div className="text-center">
           <LoadingSpinner size="lg" text="Loading..." />
         </div>

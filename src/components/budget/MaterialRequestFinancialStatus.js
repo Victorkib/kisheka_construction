@@ -207,13 +207,13 @@ export function MaterialRequestFinancialStatus({
   const getStatusColor = (status) => {
     switch (status) {
       case 'sufficient':
-        return 'text-green-700 bg-green-50 border-green-200';
+        return 'text-green-700 bg-green-50 border-green-400/60';
       case 'insufficient':
-        return 'text-red-700 bg-red-50 border-red-200';
+        return 'text-red-700 bg-red-50 border-red-400/60';
       case 'not_set':
-        return 'text-blue-700 bg-blue-50 border-blue-200';
+        return 'text-blue-700 bg-blue-50 border-blue-400/60';
       default:
-        return 'text-gray-700 bg-gray-50 border-gray-200';
+        return 'ds-text-secondary ds-bg-surface-muted ds-border-subtle';
     }
   };
 
@@ -232,8 +232,8 @@ export function MaterialRequestFinancialStatus({
 
   if (externalLoading || loading) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-4">
-        <div className="flex items-center gap-2 text-sm text-gray-600">
+      <div className="ds-bg-surface rounded-lg border ds-border-subtle p-4">
+        <div className="flex items-center gap-2 text-sm ds-text-secondary">
           <LoadingSpinner size="sm" />
           <span>Loading financial status...</span>
         </div>
@@ -243,7 +243,7 @@ export function MaterialRequestFinancialStatus({
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
         <p className="text-sm text-red-700">Error loading financial status: {error}</p>
       </div>
     );
@@ -256,8 +256,8 @@ export function MaterialRequestFinancialStatus({
   const { phase, capital, floor } = financialData;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
-      <h3 className="text-sm font-semibold text-gray-900">Financial Status</h3>
+    <div className="ds-bg-surface rounded-lg border ds-border-subtle p-4 space-y-4">
+      <h3 className="text-sm font-semibold ds-text-primary">Financial Status</h3>
       
       {/* Phase Budget Status */}
       <div className={`rounded-lg border p-3 ${getStatusColor(phase.status)}`}>
@@ -285,14 +285,14 @@ export function MaterialRequestFinancialStatus({
             <span className="font-semibold">{formatCurrency(estimatedCost)}</span>
           </div>
           {phase.status === 'insufficient' && (
-            <div className="mt-2 pt-2 border-t border-red-300">
+            <div className="mt-2 pt-2 border-t border-red-400/60">
               <span className="text-red-800 font-medium">
                 Shortfall: {formatCurrency(estimatedCost - phase.available)}
               </span>
             </div>
           )}
           {phase.status === 'not_set' && (
-            <div className="mt-2 pt-2 border-t border-blue-300">
+            <div className="mt-2 pt-2 border-t border-blue-400/60">
               <span className="text-blue-800 text-xs">
                 No budget set. Spending will be tracked. Set budget later to enable validation.
               </span>
@@ -331,7 +331,7 @@ export function MaterialRequestFinancialStatus({
             <span className="font-semibold">{formatCurrency(estimatedCost)}</span>
           </div>
           {capital.status === 'insufficient' && (
-            <div className="mt-2 pt-2 border-t border-red-300">
+            <div className="mt-2 pt-2 border-t border-red-400/60">
               <span className="text-red-800 font-medium">
                 Shortfall: {formatCurrency(estimatedCost - capital.available)}
               </span>
@@ -341,7 +341,7 @@ export function MaterialRequestFinancialStatus({
             </div>
           )}
           {capital.status === 'not_set' && (
-            <div className="mt-2 pt-2 border-t border-blue-300">
+            <div className="mt-2 pt-2 border-t border-blue-400/60">
               <span className="text-blue-800 text-xs">
                 No capital invested. Capital validation will occur when converting to purchase order.
               </span>
@@ -373,7 +373,7 @@ export function MaterialRequestFinancialStatus({
               <span className="font-semibold">{formatCurrency(floor.available)}</span>
             </div>
             {floor.status === 'not_set' && (
-              <div className="mt-2 pt-2 border-t border-blue-300">
+              <div className="mt-2 pt-2 border-t border-blue-400/60">
                 <span className="text-blue-800 text-xs">
                   No floor budget set. Phase budget validation applies.
                 </span>
@@ -384,7 +384,7 @@ export function MaterialRequestFinancialStatus({
       )}
 
       {/* Summary Message */}
-      <div className="pt-2 border-t border-gray-200">
+      <div className="pt-2 border-t ds-border-subtle">
         {phase.status === 'sufficient' && capital.status === 'sufficient' && (
           <p className="text-xs text-green-700 font-medium">
             ✓ Budget and capital validation passed. Request can proceed.

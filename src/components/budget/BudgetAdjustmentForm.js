@@ -187,12 +187,12 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="ds-bg-surface rounded-lg shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-gray-900">Request Budget Adjustment</h3>
+          <h3 className="text-xl font-semibold ds-text-primary">Request Budget Adjustment</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition"
+            className="ds-text-muted hover:ds-text-secondary transition"
             disabled={loading}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -202,7 +202,7 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-4 text-sm">
             {error}
           </div>
         )}
@@ -210,7 +210,7 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Category <span className="text-red-500">*</span>
               </label>
               <select
@@ -221,7 +221,7 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
                 }}
                 required
                 disabled={loading}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
               >
                 <option value="">Select category</option>
                 {categories.map((cat) => (
@@ -233,7 +233,7 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Adjustment Type <span className="text-red-500">*</span>
               </label>
               <select
@@ -244,7 +244,7 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
                 }}
                 required
                 disabled={loading}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
               >
                 <option value="increase">Increase Budget</option>
                 <option value="decrease">Decrease Budget</option>
@@ -253,7 +253,7 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Adjustment Amount (KES) <span className="text-red-500">*</span>
             </label>
             <input
@@ -265,13 +265,13 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
               step="0.01"
               required
               disabled={loading}
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                budgetInfo?.wouldBeNegative ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                budgetInfo?.wouldBeNegative ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
             {budgetInfo && (
               <div className="mt-2 space-y-1">
-                <div className="text-xs text-gray-600">
+                <div className="text-xs ds-text-secondary">
                   Current Budget: {formatCurrency(budgetInfo.currentBudget)}
                 </div>
                 <div className={`text-xs font-semibold ${
@@ -285,7 +285,7 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Reason <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -295,11 +295,11 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
               placeholder="Explain why this budget adjustment is needed..."
               required
               disabled={loading}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             />
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-3 text-sm text-blue-800">
             <p className="font-semibold mb-1">⚠️ Important Notes:</p>
             <ul className="list-disc list-inside space-y-1 text-xs">
               <li>Budget adjustments require owner approval</li>
@@ -314,7 +314,7 @@ export function BudgetAdjustmentForm({ projectId, onClose, onSuccess, initialDat
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+              className="flex-1 px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition disabled:opacity-50"
             >
               Cancel
             </button>

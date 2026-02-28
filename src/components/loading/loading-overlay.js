@@ -38,13 +38,13 @@ export function LoadingOverlay({
 
   return (
     <div
-      className={`${overlayClasses} bg-white bg-opacity-90 backdrop-blur-sm flex ${alignmentClasses} ${className}`}
+      className={`${overlayClasses} ds-bg-surface bg-opacity-90 backdrop-blur-sm flex ${alignmentClasses} ${className}`}
       role="status"
       aria-label="Loading overlay"
     >
       <div className="relative max-w-md w-full mx-4">
         {/* Glassmorphic card with construction accent */}
-        <div className="relative overflow-hidden rounded-2xl border border-white/60 bg-white/80 shadow-xl shadow-blue-500/10 backdrop-blur-xl">
+        <div className="relative overflow-hidden rounded-2xl border border-white/60 ds-bg-surface/80 shadow-xl shadow-blue-500/10 backdrop-blur-xl">
           {/* Subtle animated gradient beams */}
           <div className="pointer-events-none absolute inset-0 opacity-60">
             <div className="absolute -inset-x-10 -top-24 h-40 bg-gradient-to-r from-blue-500/20 via-indigo-500/20 to-amber-500/20 blur-3xl animate-pulse" />
@@ -61,7 +61,7 @@ export function LoadingOverlay({
                 <p className="text-sm font-semibold tracking-wide text-blue-900 uppercase">
                   Doshaki Construction
                 </p>
-                <p className="text-xs text-gray-600">
+                <p className="text-xs ds-text-secondary">
                   Aligning your project data and finances
                 </p>
               </div>
@@ -76,7 +76,7 @@ export function LoadingOverlay({
               </div>
 
               {message && (
-                <p className="text-sm font-medium text-gray-800 text-center leading-snug">
+                <p className="text-sm font-medium ds-text-primary text-center leading-snug">
                   {message}
                 </p>
               )}
@@ -84,13 +84,13 @@ export function LoadingOverlay({
               {/* Optional progress bar */}
               {progress !== null && (
                 <div className="w-full pt-1">
-                  <div className="w-full rounded-full bg-gray-200/80 h-1.5 overflow-hidden">
+                  <div className="w-full rounded-full ds-bg-surface-muted/80 h-1.5 overflow-hidden">
                     <div
                       className="h-1.5 rounded-full bg-gradient-to-r from-blue-500 via-indigo-500 to-amber-400 transition-all duration-300 ease-out"
                       style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
                     />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500 text-center">
+                  <p className="mt-1 text-xs ds-text-muted text-center">
                     {Math.round(progress)}% complete
                   </p>
                 </div>
@@ -99,7 +99,7 @@ export function LoadingOverlay({
 
             {/* Construction microcopy */}
             <div className="border-t border-white/70 pt-3 mt-1">
-              <p className="text-[11px] leading-relaxed text-gray-500 text-center">
+              <p className="text-[11px] leading-relaxed ds-text-muted text-center">
                 We’re loading structural details for this project — materials, floors, finances and more —
                 so everything lines up before you start building.
               </p>
@@ -110,7 +110,7 @@ export function LoadingOverlay({
               <div className="flex justify-center pt-1.5">
                 <button
                   onClick={onCancel}
-                  className="px-4 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 border border-gray-300/80 rounded-full bg-white/70 hover:bg-white transition-colors"
+                  className="px-4 py-1.5 text-xs font-medium ds-text-secondary hover:ds-text-primary border ds-border-subtle/80 rounded-full ds-bg-surface/70 hover:ds-bg-surface transition-colors"
                 >
                   Cancel
                 </button>

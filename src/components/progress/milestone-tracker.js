@@ -200,13 +200,13 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
     if (percentage >= 100) return 'bg-green-500';
     if (percentage >= 75) return 'bg-blue-500';
     if (percentage >= 50) return 'bg-yellow-500';
-    return 'bg-gray-300';
+    return 'ds-bg-surface-muted';
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="ds-bg-surface rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Milestones</h3>
+        <h3 className="text-lg font-semibold ds-text-primary">Milestones</h3>
         <button
           onClick={handleAdd}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
@@ -216,7 +216,7 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded text-sm">
+        <div className="mb-4 p-3 bg-red-50 border border-red-400/60 text-red-700 rounded text-sm">
           {error}
         </div>
       )}
@@ -237,7 +237,7 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
         <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
           <div className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Milestone Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -246,37 +246,37 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., Foundation Complete"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Target Date
                 </label>
                 <input
                   type="date"
                   value={formData.targetDate || ''}
                   onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Completed Date
                 </label>
                 <input
                   type="date"
                   value={formData.completedDate || ''}
                   onChange={(e) => setFormData({ ...formData, completedDate: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Completion Percentage: {formData.completionPercentage}%
               </label>
               <input
@@ -290,7 +290,7 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Notes
               </label>
               <textarea
@@ -298,7 +298,7 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
                 onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                 placeholder="Additional notes..."
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -306,7 +306,7 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
       </EditModal>
 
       {milestonesList.length === 0 ? (
-        <p className="text-sm text-gray-500 text-center py-8">No milestones added yet</p>
+        <p className="text-sm ds-text-muted text-center py-8">No milestones added yet</p>
       ) : (
         <div className="space-y-3">
           {milestonesList.map((milestone, index) => {
@@ -316,13 +316,13 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
             return (
               <div
                 key={milestoneId}
-                className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
+                className="p-4 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted"
               >
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900">{milestone.name}</h4>
+                    <h4 className="font-medium ds-text-primary">{milestone.name}</h4>
                     {milestone.targetDate && (
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs ds-text-muted mt-1">
                         Target: {new Date(milestone.targetDate).toLocaleDateString()}
                       </p>
                     )}
@@ -350,12 +350,12 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
 
                 <div className="mb-2">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs text-gray-600">Progress</span>
-                    <span className="text-xs font-medium text-gray-900">
+                    <span className="text-xs ds-text-secondary">Progress</span>
+                    <span className="text-xs font-medium ds-text-primary">
                       {completionPercentage}%
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full ds-bg-surface-muted rounded-full h-2">
                     <div
                       className={`h-2 rounded-full transition-all ${getCompletionColor(completionPercentage)}`}
                       style={{ width: `${completionPercentage}%` }}
@@ -364,7 +364,7 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
                 </div>
 
                 {milestone.notes && (
-                  <p className="text-sm text-gray-600 mt-2">{milestone.notes}</p>
+                  <p className="text-sm ds-text-secondary mt-2">{milestone.notes}</p>
                 )}
               </div>
             );

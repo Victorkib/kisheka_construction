@@ -65,19 +65,19 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
     <div className="space-y-6">
       {/* Floor Status and Info Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Status</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Status</p>
           {canEdit ? (
             <select
               value={floor.status}
               onChange={(e) => onStatusChange(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ds-text-primary"
             >
-              <option value="NOT_STARTED" className="text-gray-900">Not Started</option>
-              <option value="IN_PROGRESS" className="text-gray-900">In Progress</option>
-              <option value="COMPLETED" className="text-gray-900">Completed</option>
-              <option value="ON_HOLD" className="text-gray-900">On Hold</option>
-              <option value="CANCELLED" className="text-gray-900">Cancelled</option>
+              <option value="NOT_STARTED" className="ds-text-primary">Not Started</option>
+              <option value="IN_PROGRESS" className="ds-text-primary">In Progress</option>
+              <option value="COMPLETED" className="ds-text-primary">Completed</option>
+              <option value="ON_HOLD" className="ds-text-primary">On Hold</option>
+              <option value="CANCELLED" className="ds-text-primary">Cancelled</option>
             </select>
           ) : (
             <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(floor.status)}`}>
@@ -86,27 +86,27 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Floor Number</p>
-          <p className="text-lg font-semibold text-gray-900">{floor.floorNumber}</p>
-          <p className="text-sm text-gray-600 mt-4">Type</p>
-          <p className="text-sm font-semibold text-gray-900">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Floor Number</p>
+          <p className="text-lg font-semibold ds-text-primary">{floor.floorNumber}</p>
+          <p className="text-sm ds-text-secondary mt-4">Type</p>
+          <p className="text-sm font-semibold ds-text-primary">
             {floor.floorNumber < 0 ? 'Basement' : floor.floorNumber === 0 ? 'Ground' : 'Upper'}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Timeline</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Timeline</p>
           <div className="space-y-2 text-sm">
             {floor.startDate && (
               <div>
-                <span className="text-gray-500">Start:</span>{' '}
-                <span className="font-medium text-gray-900">{formatDate(floor.startDate)}</span>
+                <span className="ds-text-muted">Start:</span>{' '}
+                <span className="font-medium ds-text-primary">{formatDate(floor.startDate)}</span>
               </div>
             )}
             {floor.completionDate && (
               <div>
-                <span className="text-gray-500">Completed:</span>{' '}
+                <span className="ds-text-muted">Completed:</span>{' '}
                 <span className="font-medium text-green-600">{formatDate(floor.completionDate)}</span>
               </div>
             )}
@@ -116,25 +116,25 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-xs text-gray-600">Materials</p>
-          <p className="text-lg font-bold text-gray-900 mt-1">{floorSummary?.materials?.count || 0}</p>
-          <p className="text-xs text-gray-500">{formatCurrency(floorSummary?.materials?.totalCost || 0)}</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-xs ds-text-secondary">Materials</p>
+          <p className="text-lg font-bold ds-text-primary mt-1">{floorSummary?.materials?.count || 0}</p>
+          <p className="text-xs ds-text-muted">{formatCurrency(floorSummary?.materials?.totalCost || 0)}</p>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-xs text-gray-600">Labour</p>
-          <p className="text-lg font-bold text-gray-900 mt-1">{floorSummary?.labour?.count || 0}</p>
-          <p className="text-xs text-gray-500">{formatCurrency(floorSummary?.labour?.totalCost || 0)}</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-xs ds-text-secondary">Labour</p>
+          <p className="text-lg font-bold ds-text-primary mt-1">{floorSummary?.labour?.count || 0}</p>
+          <p className="text-xs ds-text-muted">{formatCurrency(floorSummary?.labour?.totalCost || 0)}</p>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-xs text-gray-600">Work Items</p>
-          <p className="text-lg font-bold text-gray-900 mt-1">{floorSummary?.workItems?.count || 0}</p>
-          <p className="text-xs text-gray-500">{formatCurrency(floorSummary?.workItems?.totalCost || 0)}</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-xs ds-text-secondary">Work Items</p>
+          <p className="text-lg font-bold ds-text-primary mt-1">{floorSummary?.workItems?.count || 0}</p>
+          <p className="text-xs ds-text-muted">{formatCurrency(floorSummary?.workItems?.totalCost || 0)}</p>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-xs text-gray-600">Budget Used</p>
-          <p className="text-lg font-bold text-gray-900 mt-1">{budgetUtilization.toFixed(1)}%</p>
-          <p className="text-xs text-gray-500">{formatCurrency(floor.actualCost || 0)} / {formatCurrency(floorBudget)}</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-xs ds-text-secondary">Budget Used</p>
+          <p className="text-lg font-bold ds-text-primary mt-1">{budgetUtilization.toFixed(1)}%</p>
+          <p className="text-xs ds-text-muted">{formatCurrency(floor.actualCost || 0)} / {formatCurrency(floorBudget)}</p>
         </div>
       </div>
 
@@ -145,9 +145,9 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
         const capitalRemaining = capitalAllocation.remaining || 0;
         
         return (
-          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-4">
+          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-400/60 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-gray-900">Capital Allocation</h3>
+              <h3 className="text-sm font-semibold ds-text-primary">Capital Allocation</h3>
               {canEdit && (
                 <Link
                   href={`/floors/${floor._id}/budget`}
@@ -159,25 +159,25 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
-                <p className="text-xs text-gray-600">Total Capital</p>
+                <p className="text-xs ds-text-secondary">Total Capital</p>
                 <p className="text-base font-bold text-purple-700 mt-1">
                   {formatCurrency(capitalTotal)}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">Used</p>
+                <p className="text-xs ds-text-secondary">Used</p>
                 <p className="text-base font-bold text-blue-600 mt-1">
                   {formatCurrency(capitalAllocation.used || 0)}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">Committed</p>
+                <p className="text-xs ds-text-secondary">Committed</p>
                 <p className="text-base font-bold text-yellow-600 mt-1">
                   {formatCurrency(capitalAllocation.committed || 0)}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-gray-600">Remaining</p>
+                <p className="text-xs ds-text-secondary">Remaining</p>
                 <p className={`text-base font-bold mt-1 ${
                   capitalRemaining < 0 ? 'text-red-600' : 'text-green-600'
                 }`}>
@@ -186,7 +186,7 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
               </div>
             </div>
             {capitalTotal === 0 && canEdit && (
-              <div className="mt-3 pt-3 border-t border-purple-200">
+              <div className="mt-3 pt-3 border-t border-purple-400/60">
                 <p className="text-xs text-purple-700 mb-2">No capital allocated yet.</p>
                 <Link
                   href={`/floors/${floor._id}/budget`}
@@ -211,9 +211,9 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
         }
 
         return (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-400/60 rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Phase Budget Summary</h3>
+              <h3 className="text-lg font-semibold ds-text-primary">Phase Budget Summary</h3>
               <Link
                 href={`/floors/${floor._id}?tab=phases`}
                 className="text-sm text-blue-700 hover:text-blue-900 font-medium underline"
@@ -226,18 +226,18 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
                 const phaseBudget = byPhase[phaseCode] || { total: 0 };
                 // Note: Actual spending would need to be fetched separately or passed as prop
                 return (
-                  <div key={phaseCode} className="bg-white rounded-lg p-3 border border-blue-200">
-                    <p className="text-xs text-gray-600 font-medium">{phaseCode}</p>
-                    <p className="text-sm font-bold text-gray-900 mt-1">
+                  <div key={phaseCode} className="ds-bg-surface rounded-lg p-3 border border-blue-400/60">
+                    <p className="text-xs ds-text-secondary font-medium">{phaseCode}</p>
+                    <p className="text-sm font-bold ds-text-primary mt-1">
                       {formatCurrency(phaseBudget.total)}
                     </p>
-                    <p className="text-xs text-gray-500 mt-1">Budget allocated</p>
+                    <p className="text-xs ds-text-muted mt-1">Budget allocated</p>
                   </div>
                 );
               })}
             </div>
             {phasesWithBudget.length === 0 && (
-              <p className="text-sm text-gray-600 text-center py-2">
+              <p className="text-sm ds-text-secondary text-center py-2">
                 No phase budgets allocated yet. Allocate budgets from the Budget tab.
               </p>
             )}
@@ -247,9 +247,9 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
 
       {/* Phases Working on This Floor */}
       {!phasesLoading && phases.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Phases Working on This Floor</h3>
+            <h3 className="text-lg font-semibold ds-text-primary">Phases Working on This Floor</h3>
             <Link
               href={`/floors/${floor._id}?tab=phases`}
               className="text-sm text-blue-600 hover:text-blue-800 font-medium"
@@ -262,12 +262,12 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
               <Link
                 key={phase._id}
                 href={`/phases/${phase._id}`}
-                className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="p-3 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition-colors"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-gray-900">{phase.phaseName}</p>
-                    <p className="text-xs text-gray-500">{phase.phaseCode}</p>
+                    <p className="font-medium ds-text-primary">{phase.phaseName}</p>
+                    <p className="text-xs ds-text-muted">{phase.phaseCode}</p>
                   </div>
                   <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(phase.status)}`}>
                     {phase.status?.replace('_', ' ')}
@@ -281,15 +281,15 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
 
       {/* Floor Description */}
       {floor.description && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-          <p className="text-gray-700 whitespace-pre-wrap">{floor.description}</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold ds-text-primary mb-2">Description</h3>
+          <p className="ds-text-secondary whitespace-pre-wrap">{floor.description}</p>
         </div>
       )}
 
       {/* Project Link */}
       {project && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
           <p className="text-sm text-blue-900">
             <span className="font-medium">Project:</span>{' '}
             <Link

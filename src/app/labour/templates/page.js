@@ -132,8 +132,8 @@ function LabourTemplatesPageContent() {
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Labour Templates</h1>
-            <p className="text-gray-600 mt-1">Save and reuse common labour entry patterns</p>
+            <h1 className="text-3xl font-bold ds-text-primary">Labour Templates</h1>
+            <p className="ds-text-secondary mt-1">Save and reuse common labour entry patterns</p>
           </div>
           <Link
             href="/labour/templates/new"
@@ -145,24 +145,24 @@ function LabourTemplatesPageContent() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Search</label>
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by name, description, or tags..."
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Status</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">All Statuses</option>
                 <option value="official">Official</option>
@@ -175,8 +175,8 @@ function LabourTemplatesPageContent() {
 
         {/* Templates Grid */}
         {filteredTemplates.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-gray-600 mb-4">No templates found</p>
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <p className="ds-text-secondary mb-4">No templates found</p>
             <Link
               href="/labour/templates/new"
               className="text-blue-600 hover:text-blue-800 font-medium"
@@ -193,13 +193,13 @@ function LabourTemplatesPageContent() {
               return (
                 <div
                   key={template._id}
-                  className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
+                  className="ds-bg-surface rounded-lg shadow hover:shadow-lg transition-shadow p-6"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-1">{template.name}</h3>
+                      <h3 className="text-lg font-semibold ds-text-primary mb-1">{template.name}</h3>
                       {template.description && (
-                        <p className="text-sm text-gray-600 line-clamp-2">{template.description}</p>
+                        <p className="text-sm ds-text-secondary line-clamp-2">{template.description}</p>
                       )}
                     </div>
                     <span
@@ -208,7 +208,7 @@ function LabourTemplatesPageContent() {
                           ? 'bg-green-100 text-green-800'
                           : template.status === 'community'
                           ? 'bg-blue-100 text-blue-800'
-                          : 'bg-gray-100 text-gray-800'
+                          : 'ds-bg-surface-muted ds-text-primary'
                       }`}
                     >
                       {template.status}
@@ -217,11 +217,11 @@ function LabourTemplatesPageContent() {
 
                   {/* Stats */}
                   <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 text-sm ds-text-secondary">
                       <Clock className="w-4 h-4" />
                       <span>{entryCount} workers</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <div className="flex items-center gap-2 text-sm ds-text-secondary">
                       <DollarSign className="w-4 h-4" />
                       <span>{totalCost.toLocaleString()} KES</span>
                     </div>
@@ -233,13 +233,13 @@ function LabourTemplatesPageContent() {
                       {template.tags.slice(0, 3).map((tag, index) => (
                         <span
                           key={index}
-                          className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
+                          className="px-2 py-1 ds-bg-surface-muted ds-text-secondary text-xs rounded"
                         >
                           {tag}
                         </span>
                       ))}
                       {template.tags.length > 3 && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded">
+                        <span className="px-2 py-1 ds-bg-surface-muted ds-text-secondary text-xs rounded">
                           +{template.tags.length - 3}
                         </span>
                       )}
@@ -248,7 +248,7 @@ function LabourTemplatesPageContent() {
 
                   {/* Usage Stats */}
                   {template.usageCount > 0 && (
-                    <div className="mb-4 text-xs text-gray-500">
+                    <div className="mb-4 text-xs ds-text-muted">
                       Used {template.usageCount} time{template.usageCount !== 1 ? 's' : ''}
                       {template.lastUsedAt && (
                         <span className="ml-2">
@@ -268,14 +268,14 @@ function LabourTemplatesPageContent() {
                     </button>
                     <Link
                       href={`/labour/templates/${template._id}`}
-                      className="px-3 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50"
+                      className="px-3 py-2 border ds-border-subtle ds-text-secondary text-sm rounded-lg hover:ds-bg-surface-muted"
                     >
                       <Edit className="w-4 h-4" />
                     </Link>
                     <button
                       onClick={() => handleDelete(template._id)}
                       disabled={deletingId === template._id}
-                      className="px-3 py-2 border border-red-300 text-red-700 text-sm rounded-lg hover:bg-red-50 disabled:opacity-50"
+                      className="px-3 py-2 border border-red-400/60 text-red-700 text-sm rounded-lg hover:bg-red-50 disabled:opacity-50"
                     >
                       {deletingId === template._id ? (
                         <LoadingSpinner size="sm" />

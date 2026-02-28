@@ -24,11 +24,11 @@ export function ErrorState({
   icon = '⚠️',
 }) {
   return (
-    <div className="bg-red-50 border-2 border-red-200 rounded-lg p-8 text-center">
+    <div className="bg-red-50 border-2 border-red-400/60 rounded-lg p-8 text-center">
       <div className="max-w-2xl mx-auto">
         <div className="text-5xl mb-4">{icon}</div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
-        <p className="text-lg text-gray-700 mb-6">{message}</p>
+        <h2 className="text-2xl font-bold ds-text-primary mb-2">{title}</h2>
+        <p className="text-lg ds-text-secondary mb-6">{message}</p>
         {onRetry && (
           <button
             onClick={onRetry}

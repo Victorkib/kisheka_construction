@@ -50,9 +50,9 @@ function NewWorkerPageContent() {
     return (
       <AppLayout>
         <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-            <p className="text-red-800">You do not have permission to create worker profiles.</p>
-            <Link href="/labour/workers" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+          <div className="bg-red-500/10 border border-red-400/60 rounded-lg p-6 text-center">
+            <p className="text-red-200">You do not have permission to create worker profiles.</p>
+            <Link href="/labour/workers" className="text-blue-400 hover:text-blue-300 mt-4 inline-block">
               ← Back to Workers
             </Link>
           </div>
@@ -121,23 +121,23 @@ function NewWorkerPageContent() {
         <div className="mb-6">
           <Link
             href="/labour/workers"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="inline-flex items-center gap-2 ds-text-secondary hover:ds-text-primary mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Workers
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Add New Worker</h1>
-          <p className="text-gray-600 mt-1">Create a new worker profile</p>
+          <h1 className="text-3xl font-bold ds-text-primary">Add New Worker</h1>
+          <p className="ds-text-secondary mt-1">Create a new worker profile</p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow border ds-border-subtle p-6 space-y-6">
           {/* Basic Information */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Basic Information</h2>
+            <h2 className="text-xl font-semibold ds-text-primary mb-4">Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Worker Name *
                 </label>
                 <input
@@ -146,13 +146,13 @@ function NewWorkerPageContent() {
                   onChange={(e) => setFormData(prev => ({ ...prev, workerName: e.target.value }))}
                   required
                   minLength={2}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   placeholder="John Doe"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Employee ID *
                 </label>
                 <input
@@ -160,20 +160,20 @@ function NewWorkerPageContent() {
                   value={formData.employeeId}
                   onChange={(e) => setFormData(prev => ({ ...prev, employeeId: e.target.value }))}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   placeholder="EMP001"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Worker Type *
                 </label>
                 <select
                   value={formData.workerType}
                   onChange={(e) => setFormData(prev => ({ ...prev, workerType: e.target.value }))}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   {VALID_WORKER_TYPES.map((type) => (
                     <option key={type} value={type}>
@@ -184,14 +184,14 @@ function NewWorkerPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Status *
                 </label>
                 <select
                   value={formData.status}
                   onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   {VALID_WORKER_STATUSES.map((status) => (
                     <option key={status} value={status}>
@@ -202,53 +202,53 @@ function NewWorkerPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Phone Number
                 </label>
                 <input
                   type="tel"
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData(prev => ({ ...prev, phoneNumber: e.target.value }))}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   placeholder="+254 700 000 000"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Email
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   placeholder="worker@example.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   National ID
                 </label>
                 <input
                   type="text"
                   value={formData.nationalId}
                   onChange={(e) => setFormData(prev => ({ ...prev, nationalId: e.target.value }))}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   placeholder="12345678"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Hire Date
                 </label>
                 <input
                   type="date"
                   value={formData.hireDate}
                   onChange={(e) => setFormData(prev => ({ ...prev, hireDate: e.target.value }))}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 />
               </div>
             </div>
@@ -256,17 +256,17 @@ function NewWorkerPageContent() {
 
           {/* Employment Details */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Employment Details</h2>
+            <h2 className="text-xl font-semibold ds-text-primary mb-4">Employment Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Employment Type *
                 </label>
                 <select
                   value={formData.employmentType}
                   onChange={(e) => setFormData(prev => ({ ...prev, employmentType: e.target.value }))}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   {VALID_EMPLOYMENT_TYPES.map((type) => (
                     <option key={type} value={type}>
@@ -280,10 +280,10 @@ function NewWorkerPageContent() {
 
           {/* Rates */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Rates</h2>
+            <h2 className="text-xl font-semibold ds-text-primary mb-4">Rates</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Hourly Rate (KES) *
                 </label>
                 <input
@@ -293,13 +293,13 @@ function NewWorkerPageContent() {
                   value={formData.defaultHourlyRate}
                   onChange={(e) => setFormData(prev => ({ ...prev, defaultHourlyRate: parseFloat(e.target.value) || 0 }))}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   placeholder="500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Daily Rate (KES)
                 </label>
                 <input
@@ -308,13 +308,13 @@ function NewWorkerPageContent() {
                   min="0"
                   value={formData.defaultDailyRate}
                   onChange={(e) => setFormData(prev => ({ ...prev, defaultDailyRate: e.target.value ? parseFloat(e.target.value) : '' }))}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   placeholder="4000"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Overtime Multiplier
                 </label>
                 <input
@@ -323,7 +323,7 @@ function NewWorkerPageContent() {
                   min="1"
                   value={formData.overtimeMultiplier}
                   onChange={(e) => setFormData(prev => ({ ...prev, overtimeMultiplier: parseFloat(e.target.value) || 1.5 }))}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   placeholder="1.5"
                 />
               </div>
@@ -332,24 +332,24 @@ function NewWorkerPageContent() {
 
           {/* Skills */}
           <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Skills</h2>
-            <div className="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto">
+            <h2 className="text-xl font-semibold ds-text-primary mb-4">Skills</h2>
+            <div className="border ds-border-subtle rounded-lg p-4 max-h-64 overflow-y-auto">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {VALID_SKILL_TYPES.map((skill) => (
-                  <label key={skill} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                  <label key={skill} className="flex items-center gap-2 cursor-pointer hover:ds-bg-surface-muted p-2 rounded">
                     <input
                       type="checkbox"
                       checked={formData.skillTypes.includes(skill)}
                       onChange={() => toggleSkill(skill)}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded ds-border-subtle text-blue-500 focus:ring-blue-500"
                     />
-                    <span className="text-sm text-gray-700">{getSkillTypeLabel(skill)}</span>
+                    <span className="text-sm ds-text-secondary">{getSkillTypeLabel(skill)}</span>
                   </label>
                 ))}
               </div>
             </div>
             {formData.skillTypes.length > 0 && (
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 text-sm ds-text-secondary">
                 {formData.skillTypes.length} skill{formData.skillTypes.length !== 1 ? 's' : ''} selected
               </p>
             )}
@@ -359,7 +359,7 @@ function NewWorkerPageContent() {
           <div className="flex items-center justify-end gap-3 pt-4 border-t">
             <Link
               href="/labour/workers"
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
             >
               Cancel
             </Link>
@@ -390,7 +390,7 @@ function NewWorkerPageContent() {
 export default function NewWorkerPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center ds-bg-app">
         <div className="text-center">
           <LoadingSpinner size="lg" text="Loading..." />
         </div>

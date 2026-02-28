@@ -102,16 +102,16 @@ function InvestorsPageContent() {
       LOAN: 'bg-purple-100 text-purple-800',
       MIXED: 'bg-indigo-100 text-indigo-800',
     };
-    return colors[type] || 'bg-gray-100 text-gray-800';
+    return colors[type] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getStatusBadge = (status) => {
     const colors = {
       ACTIVE: 'bg-green-100 text-green-800',
       INACTIVE: 'bg-yellow-100 text-yellow-800',
-      ARCHIVED: 'bg-gray-100 text-gray-800',
+      ARCHIVED: 'ds-bg-surface-muted ds-text-primary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const formatCurrency = (amount) => {
@@ -126,7 +126,7 @@ function InvestorsPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {returnTo && (
-          <div className="mb-6 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-blue-800">
+          <div className="mb-6 rounded-lg border border-blue-400/60 bg-blue-50 px-4 py-3 text-blue-800">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="text-sm">
                 <p className="font-semibold">Return to bulk material request</p>
@@ -139,14 +139,14 @@ function InvestorsPageContent() {
                 {returnProjectId && (
                   <Link
                     href={`/financing?projectId=${returnProjectId}&returnTo=${encodeURIComponent(returnTo)}`}
-                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                    className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-400/60 ds-bg-surface text-blue-800 hover:bg-blue-100"
                   >
                     View Financing
                   </Link>
                 )}
                 <Link
                   href={returnTo}
-                  className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                  className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-400/60 ds-bg-surface text-blue-800 hover:bg-blue-100"
                 >
                   Back to Bulk Request
                 </Link>
@@ -157,10 +157,10 @@ function InvestorsPageContent() {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
                 Investors
               </h1>
-              <p className="mt-2 text-sm sm:text-base text-gray-700">
+              <p className="mt-2 text-sm sm:text-base ds-text-secondary">
                 Manage investors and track contributions
               </p>
             </div>
@@ -175,32 +175,32 @@ function InvestorsPageContent() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-            <div className="text-xs sm:text-sm md:text-base font-semibold text-gray-700 leading-normal">
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm md:text-base font-semibold ds-text-secondary leading-normal">
               Total Investors
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">
+            <div className="text-xl sm:text-2xl font-bold ds-text-primary mt-1">
               {summary.count}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-            <div className="text-xs sm:text-sm md:text-base font-semibold text-gray-700 leading-normal">
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm md:text-base font-semibold ds-text-secondary leading-normal">
               Total Invested
             </div>
             <div className="text-xl sm:text-2xl font-bold text-green-600 mt-1 truncate">
               {formatCurrency(summary.totalInvested)}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-            <div className="text-xs sm:text-sm md:text-base font-semibold text-gray-700 leading-normal">
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm md:text-base font-semibold ds-text-secondary leading-normal">
               Total Loans
             </div>
             <div className="text-xl sm:text-2xl font-bold text-purple-600 mt-1 truncate">
               {formatCurrency(summary.totalLoans)}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-            <div className="text-xs sm:text-sm md:text-base font-semibold text-gray-700 leading-normal">
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+            <div className="text-xs sm:text-sm md:text-base font-semibold ds-text-secondary leading-normal">
               Total Equity
             </div>
             <div className="text-xl sm:text-2xl font-bold text-blue-600 mt-1 truncate">
@@ -210,10 +210,10 @@ function InvestorsPageContent() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Investment Type
               </label>
               <select
@@ -221,7 +221,7 @@ function InvestorsPageContent() {
                 onChange={(e) =>
                   handleFilterChange('investmentType', e.target.value)
                 }
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Types</option>
                 <option value="EQUITY">Equity</option>
@@ -230,13 +230,13 @@ function InvestorsPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Status
               </label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Statuses</option>
                 <option value="ACTIVE">Active</option>
@@ -245,7 +245,7 @@ function InvestorsPageContent() {
               </select>
             </div>
             <div className="sm:col-span-2 lg:col-span-2">
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Search
               </label>
               <div className="relative">
@@ -254,7 +254,7 @@ function InvestorsPageContent() {
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   placeholder="Search by name, email, or phone..."
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
                 {loading && searchInput && (
                   <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
@@ -268,7 +268,7 @@ function InvestorsPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-4">
             {error}
           </div>
         )}
@@ -277,8 +277,8 @@ function InvestorsPageContent() {
         {loading ? (
           <LoadingTable rows={10} columns={6} showHeader={true} />
         ) : investors.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <div className="text-gray-600">No investors found</div>
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <div className="ds-text-secondary">No investors found</div>
             <Link
               href="/investors/new"
               className="mt-4 inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation"
@@ -289,35 +289,35 @@ function InvestorsPageContent() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <div className="hidden md:block ds-bg-surface rounded-lg shadow overflow-hidden">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                  <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                  <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                     Contact
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                  <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                     Type
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                  <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                     Total Invested
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                  <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                  <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {investors &&
                   investors.length > 0 &&
                   investors?.map((investor) => (
-                    <tr key={investor._id} className="hover:bg-gray-50">
+                    <tr key={investor._id} className="hover:ds-bg-surface-muted">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Link
                           href={`/investors/${investor._id}${returnTo ? `?returnTo=${encodeURIComponent(returnTo)}${returnProjectId ? `&projectId=${returnProjectId}` : ''}` : ''}`}
@@ -327,11 +327,11 @@ function InvestorsPageContent() {
                         </Link>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm ds-text-primary">
                           {investor.email || 'N/A'}
                         </div>
                         {investor.phone && (
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm ds-text-secondary">
                             {investor.phone}
                           </div>
                         )}
@@ -345,7 +345,7 @@ function InvestorsPageContent() {
                           {investor.investmentType}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                         {formatCurrency(investor.totalInvested || 0)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -378,7 +378,7 @@ function InvestorsPageContent() {
                 investors?.map((investor) => (
                   <div
                     key={investor._id}
-                    className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                    className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle"
                   >
                     {/* Header Row */}
                     <div className="flex items-start justify-between mb-3">
@@ -409,17 +409,17 @@ function InvestorsPageContent() {
                     </div>
 
                     {/* Contact Details */}
-                    <div className="space-y-2 mb-3 pb-3 border-b border-gray-200">
+                    <div className="space-y-2 mb-3 pb-3 border-b ds-border-subtle">
                       <div className="flex items-start gap-2">
-                        <span className="text-xs text-gray-500 w-16 flex-shrink-0">Email:</span>
-                        <p className="text-sm text-gray-900 font-medium truncate flex-1">
+                        <span className="text-xs ds-text-muted w-16 flex-shrink-0">Email:</span>
+                        <p className="text-sm ds-text-primary font-medium truncate flex-1">
                           {investor.email || 'N/A'}
                         </p>
                       </div>
                       {investor.phone && (
                         <div className="flex items-start gap-2">
-                          <span className="text-xs text-gray-500 w-16 flex-shrink-0">Phone:</span>
-                          <p className="text-sm text-gray-900 font-medium">
+                          <span className="text-xs ds-text-muted w-16 flex-shrink-0">Phone:</span>
+                          <p className="text-sm ds-text-primary font-medium">
                             {investor.phone}
                           </p>
                         </div>
@@ -427,9 +427,9 @@ function InvestorsPageContent() {
                     </div>
 
                     {/* Investment Details */}
-                    <div className="mb-3 pb-3 border-b border-gray-200">
-                      <p className="text-xs text-gray-500 mb-0.5">Total Invested</p>
-                      <p className="text-lg font-bold text-gray-900">
+                    <div className="mb-3 pb-3 border-b ds-border-subtle">
+                      <p className="text-xs ds-text-muted mb-0.5">Total Invested</p>
+                      <p className="text-lg font-bold ds-text-primary">
                         {formatCurrency(investor.totalInvested || 0)}
                       </p>
                     </div>

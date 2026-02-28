@@ -192,8 +192,8 @@ function ProfessionalServicesReportsContent() {
         {/* Header */}
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
-            <p className="text-sm text-gray-600 mt-1">Activity and financial overview</p>
+            <h1 className="text-2xl font-bold ds-text-primary">Reports</h1>
+            <p className="text-sm ds-text-secondary mt-1">Activity and financial overview</p>
           </div>
           <div className="flex gap-2">
             <button
@@ -229,15 +229,15 @@ function ProfessionalServicesReportsContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Filters</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Filters</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Project</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-2">Project</label>
               <select
                 value={filters.projectId}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Projects</option>
                 {projects.map((project) => (
@@ -248,11 +248,11 @@ function ProfessionalServicesReportsContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Type</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-2">Type</label>
               <select
                 value={filters.type}
                 onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="all">All Types</option>
                 <option value="architect">Architects</option>
@@ -260,21 +260,21 @@ function ProfessionalServicesReportsContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-2">Start Date</label>
               <input
                 type="date"
                 value={filters.startDate}
                 onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">End Date</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-2">End Date</label>
               <input
                 type="date"
                 value={filters.endDate}
                 onChange={(e) => handleFilterChange('endDate', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -282,14 +282,14 @@ function ProfessionalServicesReportsContent() {
 
         {/* Loading State */}
         {loading && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             <LoadingSpinner />
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
             <p className="text-red-800">{error}</p>
           </div>
         )}
@@ -299,35 +299,35 @@ function ProfessionalServicesReportsContent() {
           <div className="space-y-6">
             {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-sm font-medium text-gray-600">Total Assignments</h3>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{reportData.summary?.totalAssignments || 0}</p>
-                <p className="text-xs text-gray-500 mt-1">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-sm font-medium ds-text-secondary">Total Assignments</h3>
+                <p className="text-2xl font-bold ds-text-primary mt-2">{reportData.summary?.totalAssignments || 0}</p>
+                <p className="text-xs ds-text-muted mt-1">
                   {reportData.summary?.architectsCount || 0} Architects, {reportData.summary?.engineersCount || 0} Engineers
                 </p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-sm font-medium text-gray-600">Total Activities</h3>
-                <p className="text-2xl font-bold text-gray-900 mt-2">{reportData.summary?.totalActivities || 0}</p>
-                <p className="text-xs text-gray-500 mt-1">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-sm font-medium ds-text-secondary">Total Activities</h3>
+                <p className="text-2xl font-bold ds-text-primary mt-2">{reportData.summary?.totalActivities || 0}</p>
+                <p className="text-xs ds-text-muted mt-1">
                   {reportData.summary?.siteVisits || 0} Visits, {reportData.summary?.inspections || 0} Inspections
                 </p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-sm font-medium text-gray-600">Total Fees</h3>
-                <p className="text-2xl font-bold text-gray-900 mt-2">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-sm font-medium ds-text-secondary">Total Fees</h3>
+                <p className="text-2xl font-bold ds-text-primary mt-2">
                   KES {((reportData.summary?.totalFees || 0) / 1000).toFixed(0)}K
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs ds-text-muted mt-1">
                   {((reportData.summary?.paidFees || 0) / 1000).toFixed(0)}K Paid, {((reportData.summary?.pendingFees || 0) / 1000).toFixed(0)}K Pending
                 </p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-sm font-medium text-gray-600">Fees by Type</h3>
-                <p className="text-lg font-semibold text-gray-900 mt-2">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-sm font-medium ds-text-secondary">Fees by Type</h3>
+                <p className="text-lg font-semibold ds-text-primary mt-2">
                   Arch: KES {((reportData.summary?.architectFees || 0) / 1000).toFixed(0)}K
                 </p>
-                <p className="text-lg font-semibold text-gray-900">
+                <p className="text-lg font-semibold ds-text-primary">
                   Eng: KES {((reportData.summary?.engineerFees || 0) / 1000).toFixed(0)}K
                 </p>
               </div>
@@ -336,8 +336,8 @@ function ProfessionalServicesReportsContent() {
             {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Activities by Month */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Activities by Month</h3>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold ds-text-primary mb-4">Activities by Month</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={reportData.activitiesByMonth || []}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -354,8 +354,8 @@ function ProfessionalServicesReportsContent() {
               </div>
 
               {/* Fees by Month */}
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Fees by Month</h3>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold ds-text-primary mb-4">Fees by Month</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={reportData.feesByMonth || []}>
                     <CartesianGrid strokeDasharray="3 3" />
@@ -372,34 +372,34 @@ function ProfessionalServicesReportsContent() {
             </div>
 
             {/* Breakdown Table */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Breakdown by Assignment</h3>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h3 className="text-lg font-semibold ds-text-primary mb-4">Breakdown by Assignment</h3>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Professional</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Activities</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total Fees</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paid</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Code</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Type</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Professional</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Activities</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Total Fees</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Paid</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Status</th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {reportData.breakdown?.map((item) => (
                       <tr key={item.assignmentId}>
-                        <td className="px-4 py-3 text-sm text-gray-900">{item.professionalCode}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900 capitalize">{item.type}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
+                        <td className="px-4 py-3 text-sm ds-text-primary">{item.professionalCode}</td>
+                        <td className="px-4 py-3 text-sm ds-text-primary capitalize">{item.type}</td>
+                        <td className="px-4 py-3 text-sm ds-text-primary">
                           {item.library?.name || item.library?.companyName || 'N/A'}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">{item.activitiesCount}</td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
+                        <td className="px-4 py-3 text-sm ds-text-primary">{item.activitiesCount}</td>
+                        <td className="px-4 py-3 text-sm ds-text-primary">
                           KES {((item.totalFees || 0) / 1000).toFixed(0)}K
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-900">
+                        <td className="px-4 py-3 text-sm ds-text-primary">
                           KES {((item.paidFees || 0) / 1000).toFixed(0)}K
                         </td>
                         <td className="px-4 py-3 text-sm">
@@ -407,7 +407,7 @@ function ProfessionalServicesReportsContent() {
                             item.status === 'active' ? 'bg-green-100 text-green-800' :
                             item.status === 'completed' ? 'bg-blue-100 text-blue-800' :
                             item.status === 'terminated' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
+                            'ds-bg-surface-muted ds-text-primary'
                           }`}>
                             {item.status}
                           </span>
@@ -429,7 +429,7 @@ export default function ProfessionalServicesReportsPage() {
   return (
     <Suspense fallback={
       <AppLayout>
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <LoadingSpinner />
         </div>
       </AppLayout>

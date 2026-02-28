@@ -77,9 +77,9 @@ export function getPriorityColor(priority) {
     2: 'bg-orange-100 text-orange-800',
     3: 'bg-yellow-100 text-yellow-800',
     4: 'bg-blue-100 text-blue-800',
-    5: 'bg-gray-100 text-gray-800'
+    5: 'ds-bg-surface-muted ds-text-primary'
   };
-  return colors[priority] || 'bg-gray-100 text-gray-800';
+  return colors[priority] || 'ds-bg-surface-muted ds-text-primary';
 }
 
 /**
@@ -89,12 +89,12 @@ export function getPriorityColor(priority) {
  */
 export function getStatusColor(status) {
   const colors = {
-    'not_started': 'bg-gray-100 text-gray-800',
+    'not_started': 'ds-bg-surface-muted ds-text-primary',
     'in_progress': 'bg-blue-100 text-blue-800',
     'completed': 'bg-green-100 text-green-800',
     'blocked': 'bg-red-100 text-red-800'
   };
-  return colors[status] || 'bg-gray-100 text-gray-800';
+  return colors[status] || 'ds-bg-surface-muted ds-text-primary';
 }
 
 

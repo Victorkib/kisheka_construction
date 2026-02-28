@@ -20,7 +20,7 @@ export function Step7SuccessSummary({ batchId, purchaseOrders = [], summary = {}
   return (
     <div className="space-y-6">
       {/* Success Message */}
-      <div className="bg-green-50 border border-green-200 rounded-lg p-8 text-center">
+      <div className="bg-green-50 border border-green-400/60 rounded-lg p-8 text-center">
         <div className="flex justify-center mb-4">
           <svg
             className="w-16 h-16 text-green-600"
@@ -44,33 +44,33 @@ export function Step7SuccessSummary({ batchId, purchaseOrders = [], summary = {}
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-sm text-gray-600">Purchase Orders</p>
-          <p className="text-3xl font-bold text-gray-900">{summary.totalPOs || purchaseOrders.length}</p>
+        <div className="ds-bg-surface rounded-lg border ds-border-subtle p-4">
+          <p className="text-sm ds-text-secondary">Purchase Orders</p>
+          <p className="text-3xl font-bold ds-text-primary">{summary.totalPOs || purchaseOrders.length}</p>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-sm text-gray-600">Suppliers</p>
-          <p className="text-3xl font-bold text-gray-900">{summary.totalSuppliers || 0}</p>
+        <div className="ds-bg-surface rounded-lg border ds-border-subtle p-4">
+          <p className="text-sm ds-text-secondary">Suppliers</p>
+          <p className="text-3xl font-bold ds-text-primary">{summary.totalSuppliers || 0}</p>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-sm text-gray-600">Materials</p>
-          <p className="text-3xl font-bold text-gray-900">{summary.totalMaterials || 0}</p>
+        <div className="ds-bg-surface rounded-lg border ds-border-subtle p-4">
+          <p className="text-sm ds-text-secondary">Materials</p>
+          <p className="text-3xl font-bold ds-text-primary">{summary.totalMaterials || 0}</p>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <p className="text-sm text-gray-600">Total Cost</p>
-          <p className="text-3xl font-bold text-gray-900">{formatCurrency(summary.totalCost || 0)}</p>
+        <div className="ds-bg-surface rounded-lg border ds-border-subtle p-4">
+          <p className="text-sm ds-text-secondary">Total Cost</p>
+          <p className="text-3xl font-bold ds-text-primary">{formatCurrency(summary.totalCost || 0)}</p>
         </div>
       </div>
 
       {/* Purchase Orders List */}
       {purchaseOrders.length > 0 && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Created Purchase Orders</h3>
+        <div className="ds-bg-surface rounded-lg border ds-border-subtle p-6">
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">Created Purchase Orders</h3>
           <div className="space-y-3">
             {purchaseOrders.map((po) => (
               <div
                 key={po.purchaseOrderId}
-                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                className="border ds-border-subtle rounded-lg p-4 hover:ds-bg-surface-muted transition-colors"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
@@ -85,10 +85,10 @@ export function Step7SuccessSummary({ batchId, purchaseOrders = [], summary = {}
                         {po.status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Sent'}
                       </span>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm ds-text-secondary mt-1">
                       Supplier: <span className="font-medium">{po.supplierName}</span>
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm ds-text-secondary">
                       Materials: <span className="font-medium">{po.materialCount}</span> | Total:{' '}
                       <span className="font-medium">{formatCurrency(po.totalCost)}</span>
                     </p>
@@ -116,7 +116,7 @@ export function Step7SuccessSummary({ batchId, purchaseOrders = [], summary = {}
         </Link>
         <Link
           href="/purchase-orders"
-          className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium text-center"
+          className="flex-1 px-6 py-3 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted font-medium text-center"
         >
           View All Purchase Orders
         </Link>

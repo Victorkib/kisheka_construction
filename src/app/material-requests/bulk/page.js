@@ -261,8 +261,8 @@ function BulkRequestPageContent() {
       <AppLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-            <p className="text-gray-600">You don't have permission to create bulk material requests.</p>
+            <h1 className="text-2xl font-bold ds-text-primary mb-2">Access Denied</h1>
+            <p className="ds-text-secondary">You don't have permission to create bulk material requests.</p>
             <Link href="/material-requests" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
               ← Back to Material Requests
             </Link>
@@ -280,8 +280,8 @@ function BulkRequestPageContent() {
           <Link href="/material-requests" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
             ← Back to Material Requests
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Bulk Material Request</h1>
-          <p className="text-gray-600 mt-2">Create multiple material requests at once</p>
+          <h1 className="text-3xl font-bold ds-text-primary">Bulk Material Request</h1>
+          <p className="ds-text-secondary mt-2">Create multiple material requests at once</p>
         </div>
 
         {/* Progress Indicator */}
@@ -289,13 +289,13 @@ function BulkRequestPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
         {/* Step Content */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           {renderStep()}
         </div>
 

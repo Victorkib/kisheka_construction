@@ -204,17 +204,17 @@ export function TemplateForm({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+        <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg">
           {error}
         </div>
       )}
 
       {/* Basic Information */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+      <div className="ds-bg-surface rounded-lg border ds-border-subtle p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Basic Information</h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Template Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -223,17 +223,17 @@ export function TemplateForm({
               onChange={(e) => handleChange('name', e.target.value)}
               required
               placeholder="e.g., Foundation Materials, Roofing Supplies"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Description</label>
             <textarea
               value={formData.description}
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder="Describe when to use this template..."
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div className="flex items-center">
@@ -250,9 +250,9 @@ export function TemplateForm({
                   handleChange('status', TEMPLATE_STATUS.PRIVATE);
                 }
               }}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
             />
-            <label htmlFor="isPublic" className="ml-2 text-sm text-gray-700">
+            <label htmlFor="isPublic" className="ml-2 text-sm ds-text-secondary">
               Make this template public (others can use it)
             </label>
           </div>
@@ -260,15 +260,15 @@ export function TemplateForm({
       </div>
 
       {/* Template Organization */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Template Organization</h3>
+      <div className="ds-bg-surface rounded-lg border ds-border-subtle p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Template Organization</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Template Category</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Template Category</label>
             <select
               value={formData.templateCategory}
               onChange={(e) => handleChange('templateCategory', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">None</option>
               <option value={TEMPLATE_CATEGORY_TYPES.CONSTRUCTION_PHASE}>Construction Phase</option>
@@ -277,21 +277,21 @@ export function TemplateForm({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Template Type</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Template Type</label>
             <input
               type="text"
               value={formData.templateType}
               onChange={(e) => handleChange('templateType', e.target.value)}
               placeholder="e.g., Foundation, Electrical, Roofing"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Project Phase</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Project Phase</label>
             <select
               value={formData.projectPhase}
               onChange={(e) => handleChange('projectPhase', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">None</option>
               {PROJECT_PHASES.map((phase) => (
@@ -302,7 +302,7 @@ export function TemplateForm({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Applicable Floors</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Applicable Floors</label>
             <select
               multiple
               value={Array.isArray(formData.applicableFloors) ? formData.applicableFloors.map(f => f.toString()) : []}
@@ -310,7 +310,7 @@ export function TemplateForm({
                 const selected = Array.from(e.target.selectedOptions, option => parseInt(option.value, 10));
                 handleChange('applicableFloors', selected.length > 0 ? selected : []);
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               size="4"
             >
               <option value="all">All Floors</option>
@@ -320,10 +320,10 @@ export function TemplateForm({
                 </option>
               ))}
             </select>
-            <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple floors</p>
+            <p className="text-xs ds-text-muted mt-1">Hold Ctrl/Cmd to select multiple floors</p>
           </div>
           <div className="md:col-span-2">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Tags</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Tags</label>
             <div className="flex gap-2 mb-2">
               <input
                 type="text"
@@ -331,12 +331,12 @@ export function TemplateForm({
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyPress={handleTagInputKeyPress}
                 placeholder="Add a tag and press Enter"
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="button"
                 onClick={handleAddTag}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm font-medium"
+                className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 text-sm font-medium"
               >
                 Add Tag
               </button>
@@ -362,24 +362,24 @@ export function TemplateForm({
             )}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Expiration Date (Optional)</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Expiration Date (Optional)</label>
             <input
               type="date"
               value={formData.expiresAt ? new Date(formData.expiresAt).toISOString().split('T')[0] : ''}
               onChange={(e) => handleChange('expiresAt', e.target.value ? new Date(e.target.value).toISOString() : '')}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            <p className="text-xs text-gray-500 mt-1">For cost-sensitive templates that may become outdated</p>
+            <p className="text-xs ds-text-muted mt-1">For cost-sensitive templates that may become outdated</p>
           </div>
         </div>
       </div>
 
       {/* Default Project Settings */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Default Project Settings</h3>
+      <div className="ds-bg-surface rounded-lg border ds-border-subtle p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Default Project Settings</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Default Urgency</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Default Urgency</label>
             <select
               value={formData.defaultProjectSettings.defaultUrgency}
               onChange={(e) =>
@@ -388,7 +388,7 @@ export function TemplateForm({
                   defaultUrgency: e.target.value,
                 })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -397,7 +397,7 @@ export function TemplateForm({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Default Reason</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Default Reason</label>
             <input
               type="text"
               value={formData.defaultProjectSettings.defaultReason}
@@ -408,11 +408,11 @@ export function TemplateForm({
                 })
               }
               placeholder="e.g., Foundation construction"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Default Category</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Default Category</label>
             <select
               value={formData.defaultProjectSettings.defaultCategoryId || ''}
               onChange={(e) => {
@@ -422,7 +422,7 @@ export function TemplateForm({
                   defaultCategoryId: e.target.value,
                 });
               }}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">None</option>
               {categories.map((cat) => (
@@ -433,7 +433,7 @@ export function TemplateForm({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Default Floor</label>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">Default Floor</label>
             <select
               value={formData.defaultProjectSettings.defaultFloorId || ''}
               onChange={(e) =>
@@ -442,7 +442,7 @@ export function TemplateForm({
                   defaultFloorId: e.target.value,
                 })
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">None</option>
               {floors.map((floor) => (
@@ -456,9 +456,9 @@ export function TemplateForm({
       </div>
 
       {/* Materials */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="ds-bg-surface rounded-lg border ds-border-subtle p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Materials</h3>
+          <h3 className="text-lg font-semibold ds-text-primary">Materials</h3>
           <button
             type="button"
             onClick={handleAddMaterial}
@@ -469,8 +469,8 @@ export function TemplateForm({
         </div>
 
         {formData.materials.length === 0 ? (
-          <div className="text-center py-8 bg-gray-50 rounded-lg">
-            <p className="text-gray-600">No materials added</p>
+          <div className="text-center py-8 ds-bg-surface-muted rounded-lg">
+            <p className="ds-text-secondary">No materials added</p>
             <button
               type="button"
               onClick={handleAddMaterial}
@@ -482,9 +482,9 @@ export function TemplateForm({
         ) : (
           <div className="space-y-4">
             {formData.materials.map((material, index) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div key={index} className="border ds-border-subtle rounded-lg p-4">
                 <div className="flex justify-between items-start mb-3">
-                  <h4 className="font-medium text-gray-900">Material {index + 1}</h4>
+                  <h4 className="font-medium ds-text-primary">Material {index + 1}</h4>
                   <button
                     type="button"
                     onClick={() => handleRemoveMaterial(index)}
@@ -495,7 +495,7 @@ export function TemplateForm({
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold ds-text-secondary mb-1">
                       Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -504,11 +504,11 @@ export function TemplateForm({
                       onChange={(e) => handleMaterialChange(index, 'name', e.target.value)}
                       required
                       placeholder="Material name"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold ds-text-secondary mb-1">
                       Quantity <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -518,18 +518,18 @@ export function TemplateForm({
                       required
                       min="0.01"
                       step="0.01"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold ds-text-secondary mb-1">
                       Unit <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={material.unit}
                       onChange={(e) => handleMaterialChange(index, 'unit', e.target.value)}
                       required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                     >
                       {VALID_UNITS.map((unit) => (
                         <option key={unit} value={unit}>
@@ -539,7 +539,7 @@ export function TemplateForm({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Category</label>
+                    <label className="block text-sm font-semibold ds-text-secondary mb-1">Category</label>
                     <select
                       value={material.categoryId || ''}
                       onChange={(e) => {
@@ -549,7 +549,7 @@ export function TemplateForm({
                           handleMaterialChange(index, 'category', category.name);
                         }
                       }}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="">None</option>
                       {categories.map((cat) => (
@@ -560,7 +560,7 @@ export function TemplateForm({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold ds-text-secondary mb-1">
                       Estimated Unit Cost (KES)
                     </label>
                     <input
@@ -570,23 +570,23 @@ export function TemplateForm({
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Total Cost</label>
-                    <div className="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
+                    <label className="block text-sm font-semibold ds-text-secondary mb-1">Total Cost</label>
+                    <div className="w-full px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg">
                       <span className="text-sm font-medium">
                         {formatCurrency(material.estimatedCost || (material.estimatedUnitCost && material.quantityNeeded ? material.estimatedUnitCost * material.quantityNeeded : 0))}
                       </span>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1">Scaling Factor</label>
+                    <label className="block text-sm font-semibold ds-text-secondary mb-1">Scaling Factor</label>
                     <select
                       value={material.scalingFactor || 'fixed'}
                       onChange={(e) => handleMaterialChange(index, 'scalingFactor', e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                     >
                       <option value="fixed">Fixed Quantity</option>
                       <option value="per_floor">Per Floor</option>
@@ -595,7 +595,7 @@ export function TemplateForm({
                   </div>
                   {material.scalingFactor !== 'fixed' && (
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-1">Quantity Per Unit</label>
+                      <label className="block text-sm font-semibold ds-text-secondary mb-1">Quantity Per Unit</label>
                       <input
                         type="number"
                         value={material.quantityPerUnit || ''}
@@ -603,9 +603,9 @@ export function TemplateForm({
                         min="0.01"
                         step="0.01"
                         placeholder="e.g., 10"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs ds-text-muted mt-1">
                         Quantity per {material.scalingFactor === 'per_floor' ? 'floor' : 'square meter'}
                       </p>
                     </div>
@@ -619,16 +619,16 @@ export function TemplateForm({
 
       {/* Usage Statistics (Edit Mode) */}
       {showUsageStats && initialData && (
-        <div className="bg-gray-50 rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Usage Statistics</h3>
+        <div className="ds-bg-surface-muted rounded-lg border ds-border-subtle p-6">
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">Usage Statistics</h3>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Times Used</p>
-              <p className="text-2xl font-bold text-gray-900">{initialData.usageCount || 0}</p>
+              <p className="text-sm ds-text-secondary">Times Used</p>
+              <p className="text-2xl font-bold ds-text-primary">{initialData.usageCount || 0}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Last Used</p>
-              <p className="text-lg font-medium text-gray-900">
+              <p className="text-sm ds-text-secondary">Last Used</p>
+              <p className="text-lg font-medium ds-text-primary">
                 {initialData.lastUsedAt
                   ? new Date(initialData.lastUsedAt).toLocaleDateString('en-KE')
                   : 'Never'}
@@ -643,7 +643,7 @@ export function TemplateForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
+          className="px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium"
         >
           Cancel
         </button>

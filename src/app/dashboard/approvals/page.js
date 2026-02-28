@@ -609,10 +609,10 @@ export default function ApprovalsPage() {
         />
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
             Approval Queue
           </h1>
-          <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+          <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">
             Review and approve pending submissions ({materials.length}{' '}
             materials, {expenses.length} expenses, {initialExpenses.length}{' '}
             initial expenses)
@@ -620,14 +620,14 @@ export default function ApprovalsPage() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 border-b border-gray-200">
+        <div className="mb-6 border-b ds-border-subtle">
           <nav className="-mb-px flex space-x-8">
             <button
               onClick={() => setActiveTab('materials')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'materials'
                   ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
               Materials ({materials.length})
@@ -637,7 +637,7 @@ export default function ApprovalsPage() {
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'expenses'
                   ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
               Expenses ({expenses.length})
@@ -647,7 +647,7 @@ export default function ApprovalsPage() {
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'initial-expenses'
                   ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
               Initial Expenses ({initialExpenses.length})
@@ -659,7 +659,7 @@ export default function ApprovalsPage() {
         {canApproveMaterials &&
           activeTab === 'materials' &&
           selectedMaterials.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex justify-between items-center">
+            <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 mb-6 flex justify-between items-center">
               <span className="text-blue-800 font-medium">
                 {selectedMaterials.length} material(s) selected
               </span>
@@ -688,7 +688,7 @@ export default function ApprovalsPage() {
         {canApproveExpenses &&
           activeTab === 'expenses' &&
           selectedExpenses.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex justify-between items-center">
+            <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 mb-6 flex justify-between items-center">
               <span className="text-blue-800 font-medium">
                 {selectedExpenses.length} expense(s) selected
               </span>
@@ -713,7 +713,7 @@ export default function ApprovalsPage() {
         {canApproveInitialExpenses &&
           activeTab === 'initial-expenses' &&
           selectedInitialExpenses.length > 0 && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 flex justify-between items-center">
+            <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 mb-6 flex justify-between items-center">
               <span className="text-blue-800 font-medium">
                 {selectedInitialExpenses.length} initial expense(s) selected
               </span>
@@ -736,7 +736,7 @@ export default function ApprovalsPage() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
@@ -770,18 +770,18 @@ export default function ApprovalsPage() {
             {loading ? (
               <LoadingTable rows={10} columns={6} showHeader={true} />
             ) : materials.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-12 text-center">
-                <p className="text-gray-600 mb-4">
+              <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+                <p className="ds-text-secondary mb-4">
                   No pending material approvals
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm ds-text-muted">
                   All materials have been reviewed
                 </p>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+              <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
                       {canApproveMaterials && (
                         <th className="px-6 py-3 text-left">
@@ -792,40 +792,40 @@ export default function ApprovalsPage() {
                               materials.length > 0
                             }
                             onChange={toggleSelectAllMaterials}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                           />
                         </th>
                       )}
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Material
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Submitted By
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Quantity
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Total Cost
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Supplier
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Submitted
                       </th>
                       {canApproveMaterials && (
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Actions
                         </th>
                       )}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {materials.map((material) => (
                       <tr
                         key={material._id}
-                        className={`hover:bg-gray-50 ${
+                        className={`hover:ds-bg-surface-muted ${
                           selectedMaterials.includes(material._id)
                             ? 'bg-blue-50'
                             : ''
@@ -839,7 +839,7 @@ export default function ApprovalsPage() {
                               onChange={() =>
                                 toggleSelectMaterial(material._id)
                               }
-                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                             />
                           </td>
                         )}
@@ -852,22 +852,22 @@ export default function ApprovalsPage() {
                               {material.name || material.materialName}
                             </Link>
                             {material.description && (
-                              <div className="text-sm text-gray-600 truncate max-w-xs mt-1 leading-normal">
+                              <div className="text-sm ds-text-secondary truncate max-w-xs mt-1 leading-normal">
                                 {material.description}
                               </div>
                             )}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm ds-text-primary">
                             {material.submittedBy?.name || 'Unknown'}
                           </div>
-                          <div className="text-sm text-gray-600 leading-normal">
+                          <div className="text-sm ds-text-secondary leading-normal">
                             {material.submittedBy?.email || ''}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">
+                          <span className="text-sm ds-text-primary">
                             {material.quantity ||
                               material.quantityPurchased ||
                               0}{' '}
@@ -875,19 +875,19 @@ export default function ApprovalsPage() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium ds-text-primary">
                             KES {material.totalCost?.toLocaleString() || '0.00'}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">
+                          <span className="text-sm ds-text-primary">
                             {material.supplierName ||
                               material.supplier ||
                               'N/A'}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm ds-text-muted">
                             {material.createdAt
                               ? new Date(
                                   material.createdAt,
@@ -955,18 +955,18 @@ export default function ApprovalsPage() {
             {loading ? (
               <LoadingTable rows={10} columns={6} showHeader={true} />
             ) : expenses.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-12 text-center">
-                <p className="text-gray-600 mb-4">
+              <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+                <p className="ds-text-secondary mb-4">
                   No pending expense approvals
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm ds-text-muted">
                   All expenses have been reviewed
                 </p>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+              <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
                       {canApproveExpenses && (
                         <th className="px-6 py-3 text-left">
@@ -977,40 +977,40 @@ export default function ApprovalsPage() {
                               expenses.length > 0
                             }
                             onChange={toggleSelectAllExpenses}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                           />
                         </th>
                       )}
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Expense Code
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Description
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Category
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Amount
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Submitted By
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Date
                       </th>
                       {canApproveMaterials && (
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Actions
                         </th>
                       )}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {expenses.map((expense) => (
                       <tr
                         key={expense._id}
-                        className={`hover:bg-gray-50 ${
+                        className={`hover:ds-bg-surface-muted ${
                           selectedExpenses.includes(expense._id)
                             ? 'bg-blue-50'
                             : ''
@@ -1022,7 +1022,7 @@ export default function ApprovalsPage() {
                               type="checkbox"
                               checked={selectedExpenses.includes(expense._id)}
                               onChange={() => toggleSelectExpense(expense._id)}
-                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                             />
                           </td>
                         )}
@@ -1035,29 +1035,29 @@ export default function ApprovalsPage() {
                           </Link>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 max-w-xs truncate">
+                          <div className="text-sm ds-text-primary max-w-xs truncate">
                             {expense.description || 'N/A'}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">
+                          <span className="text-sm ds-text-primary">
                             {expense.category?.replace('_', ' ') || 'N/A'}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium ds-text-primary">
                             {formatCurrency(expense.amount, expense.currency)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm ds-text-primary">
                             {expense.submittedBy?.name ||
                               expense.submittedBy?.email ||
                               'Unknown'}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm ds-text-muted">
                             {expense.date
                               ? new Date(expense.date).toLocaleDateString()
                               : 'N/A'}
@@ -1125,18 +1125,18 @@ export default function ApprovalsPage() {
             {loading ? (
               <LoadingTable rows={10} columns={6} showHeader={true} />
             ) : initialExpenses.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-12 text-center">
-                <p className="text-gray-600 mb-4">
+              <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+                <p className="ds-text-secondary mb-4">
                   No pending initial expense approvals
                 </p>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm ds-text-muted">
                   All initial expenses have been reviewed
                 </p>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow overflow-hidden">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+              <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
                       {canApproveInitialExpenses && (
                         <th className="px-6 py-3 text-left">
@@ -1148,37 +1148,37 @@ export default function ApprovalsPage() {
                               initialExpenses.length > 0
                             }
                             onChange={toggleSelectAllInitialExpenses}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                           />
                         </th>
                       )}
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Expense Code
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Item Name
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Category
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Amount
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Date Paid
                       </th>
                       {canApproveMaterials && (
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Actions
                         </th>
                       )}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {initialExpenses.map((expense) => (
                       <tr
                         key={expense._id}
-                        className={`hover:bg-gray-50 ${
+                        className={`hover:ds-bg-surface-muted ${
                           selectedInitialExpenses.includes(expense._id)
                             ? 'bg-blue-50'
                             : ''
@@ -1194,7 +1194,7 @@ export default function ApprovalsPage() {
                               onChange={() =>
                                 toggleSelectInitialExpense(expense._id)
                               }
-                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                              className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                             />
                           </td>
                         )}
@@ -1207,22 +1207,22 @@ export default function ApprovalsPage() {
                           </Link>
                         </td>
                         <td className="px-6 py-4">
-                          <div className="text-sm text-gray-900 max-w-xs truncate">
+                          <div className="text-sm ds-text-primary max-w-xs truncate">
                             {expense.itemName || 'N/A'}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">
+                          <span className="text-sm ds-text-primary">
                             {expense.category?.replace('_', ' ') || 'N/A'}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium ds-text-primary">
                             {formatCurrency(expense.amount)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm ds-text-muted">
                             {expense.datePaid
                               ? new Date(expense.datePaid).toLocaleDateString()
                               : 'N/A'}
@@ -1264,55 +1264,55 @@ export default function ApprovalsPage() {
           expenses.length > 0 ||
           initialExpenses.length > 0) && (
           <div className="mt-6 grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
+            <div className="ds-bg-surface rounded-lg shadow p-4">
+              <h3 className="text-sm font-medium ds-text-muted">
                 Pending Materials
               </h3>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-2xl font-bold ds-text-primary mt-1">
                 {materials.length}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
+            <div className="ds-bg-surface rounded-lg shadow p-4">
+              <h3 className="text-sm font-medium ds-text-muted">
                 Pending Expenses
               </h3>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-2xl font-bold ds-text-primary mt-1">
                 {expenses.length}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
+            <div className="ds-bg-surface rounded-lg shadow p-4">
+              <h3 className="text-sm font-medium ds-text-muted">
                 Total Value (Materials)
               </h3>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-2xl font-bold ds-text-primary mt-1">
                 {formatCurrency(
                   materials.reduce((sum, m) => sum + (m.totalCost || 0), 0),
                 )}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
+            <div className="ds-bg-surface rounded-lg shadow p-4">
+              <h3 className="text-sm font-medium ds-text-muted">
                 Total Value (Expenses)
               </h3>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-2xl font-bold ds-text-primary mt-1">
                 {formatCurrency(
                   expenses.reduce((sum, e) => sum + (e.amount || 0), 0),
                 )}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
+            <div className="ds-bg-surface rounded-lg shadow p-4">
+              <h3 className="text-sm font-medium ds-text-muted">
                 Pending Initial Expenses
               </h3>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-2xl font-bold ds-text-primary mt-1">
                 {initialExpenses.length}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4">
-              <h3 className="text-sm font-medium text-gray-500">
+            <div className="ds-bg-surface rounded-lg shadow p-4">
+              <h3 className="text-sm font-medium ds-text-muted">
                 Total Value (Initial Expenses)
               </h3>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-2xl font-bold ds-text-primary mt-1">
                 {formatCurrency(
                   initialExpenses.reduce((sum, e) => sum + (e.amount || 0), 0),
                 )}
@@ -1331,12 +1331,12 @@ export default function ApprovalsPage() {
           aria-modal="true"
         >
           <div
-            className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity"
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
             onClick={() => !bulkProcessing && setShowBulkApproveModal(false)}
           />
           <div className="flex min-h-full items-center justify-center p-4">
             <div
-              className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all"
+              className="relative ds-bg-surface rounded-lg shadow-xl max-w-md w-full transform transition-all"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
@@ -1359,39 +1359,39 @@ export default function ApprovalsPage() {
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
                   <h3
-                    className="text-lg font-semibold leading-6 text-gray-900 mb-2"
+                    className="text-lg font-semibold leading-6 ds-text-primary mb-2"
                     id="modal-title"
                   >
                     Approve Items
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm ds-text-muted mb-4">
                       {bulkActionType === 'materials-approve'
                         ? `Approve ${selectedMaterials.length} material(s)?`
                         : bulkActionType === 'expenses-approve'
                           ? `Approve ${selectedExpenses.length} expense(s)?`
                           : `Approve ${selectedInitialExpenses.length} initial expense(s)?`}
                     </p>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium ds-text-secondary mb-2">
                       Approval Notes (Optional)
                     </label>
                     <textarea
                       value={approvalNotes}
                       onChange={(e) => setApprovalNotes(e.target.value)}
                       placeholder="Add approval notes..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       rows="3"
                       disabled={bulkProcessing}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-blue-200">
+              <div className="ds-bg-surface-muted px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-blue-400/60">
                 <button
                   type="button"
                   onClick={() => setShowBulkApproveModal(false)}
                   disabled={bulkProcessing}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Cancel
                 </button>
@@ -1426,12 +1426,12 @@ export default function ApprovalsPage() {
           aria-modal="true"
         >
           <div
-            className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity"
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
             onClick={() => !bulkProcessing && setShowBulkRejectModal(false)}
           />
           <div className="flex min-h-full items-center justify-center p-4">
             <div
-              className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all"
+              className="relative ds-bg-surface rounded-lg shadow-xl max-w-md w-full transform transition-all"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
@@ -1454,39 +1454,39 @@ export default function ApprovalsPage() {
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
                   <h3
-                    className="text-lg font-semibold leading-6 text-gray-900 mb-2"
+                    className="text-lg font-semibold leading-6 ds-text-primary mb-2"
                     id="modal-title"
                   >
                     Reject Items
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm ds-text-muted mb-4">
                       {bulkActionType === 'materials-reject'
                         ? `Reject ${selectedMaterials.length} material(s)?`
                         : bulkActionType === 'expenses-reject'
                           ? `Reject ${selectedExpenses.length} expense(s)?`
                           : `Reject ${selectedInitialExpenses.length} initial expense(s)?`}
                     </p>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium ds-text-secondary mb-2">
                       Reason for Rejection (Required)
                     </label>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Enter rejection reason..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                       rows="4"
                       disabled={bulkProcessing}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-200">
+              <div className="ds-bg-surface-muted px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-400/60">
                 <button
                   type="button"
                   onClick={() => setShowBulkRejectModal(false)}
                   disabled={bulkProcessing}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Cancel
                 </button>
@@ -1521,12 +1521,12 @@ export default function ApprovalsPage() {
           aria-modal="true"
         >
           <div
-            className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity"
+            className="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
             onClick={() => setShowRejectModal(false)}
           />
           <div className="flex min-h-full items-center justify-center p-4">
             <div
-              className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all"
+              className="relative ds-bg-surface rounded-lg shadow-xl max-w-md w-full transform transition-all"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6">
@@ -1549,7 +1549,7 @@ export default function ApprovalsPage() {
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
                   <h3
-                    className="text-lg font-semibold leading-6 text-gray-900 mb-2"
+                    className="text-lg font-semibold leading-6 ds-text-primary mb-2"
                     id="modal-title"
                   >
                     Reject{' '}
@@ -1560,20 +1560,20 @@ export default function ApprovalsPage() {
                         : 'Initial Expense'}
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm ds-text-muted mb-4">
                       Please provide a reason for rejection:
                     </p>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Enter rejection reason..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                       rows="4"
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-200">
+              <div className="ds-bg-surface-muted px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-400/60">
                 <button
                   type="button"
                   onClick={() => {
@@ -1582,7 +1582,7 @@ export default function ApprovalsPage() {
                     setRejectItemId(null);
                     setRejectItemType(null);
                   }}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
                 >
                   Cancel
                 </button>

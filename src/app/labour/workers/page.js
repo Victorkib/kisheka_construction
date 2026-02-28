@@ -44,8 +44,8 @@ function ActionMenu({ canAccess }) {
       <div className="hidden md:flex items-center gap-4">
         {/* Worker Management Section */}
         {hasWorkerAccess && (
-          <div className="flex items-center gap-2 pl-3 border-l border-gray-300">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Workers</span>
+          <div className="flex items-center gap-2 pl-3 border-l ds-border-subtle">
+            <span className="text-xs font-semibold ds-text-muted uppercase tracking-wide">Workers</span>
             <Link
               href="/labour/workers/new"
               className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
@@ -67,8 +67,8 @@ function ActionMenu({ canAccess }) {
 
         {/* Labour Operations Section */}
         {(hasEntryAccess || hasBatchAccess) && (
-          <div className="flex items-center gap-2 pl-3 border-l border-gray-300">
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Labour</span>
+          <div className="flex items-center gap-2 pl-3 border-l ds-border-subtle">
+            <span className="text-xs font-semibold ds-text-muted uppercase tracking-wide">Labour</span>
             {hasEntryAccess && (
               <Link
                 href="/labour/entries/new"
@@ -97,7 +97,7 @@ function ActionMenu({ canAccess }) {
       <div className="md:hidden relative">
         <button
           onClick={() => setShowMobileMenu(!showMobileMenu)}
-          className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          className="flex items-center gap-2 px-3 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span className="text-sm font-medium">Add / Create</span>
@@ -105,12 +105,12 @@ function ActionMenu({ canAccess }) {
         </button>
 
         {showMobileMenu && (
-          <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+          <div className="absolute right-0 mt-2 w-56 ds-bg-surface rounded-lg shadow-lg border ds-border-subtle z-50">
             {/* Worker Management */}
             {hasWorkerAccess && (
               <>
-                <div className="px-4 py-2 border-b border-gray-100">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Worker Management</p>
+                <div className="px-4 py-2 border-b ds-border-subtle">
+                  <p className="text-xs font-semibold ds-text-muted uppercase tracking-wide">Worker Management</p>
                 </div>
                 <Link
                   href="/labour/workers/new"
@@ -119,19 +119,19 @@ function ActionMenu({ canAccess }) {
                 >
                   <Plus className="w-5 h-5 text-blue-600" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Add Single Worker</p>
-                    <p className="text-xs text-gray-600">Register one worker</p>
+                    <p className="text-sm font-medium ds-text-primary">Add Single Worker</p>
+                    <p className="text-xs ds-text-secondary">Register one worker</p>
                   </div>
                 </Link>
                 <Link
                   href="/labour/workers/bulk/new"
                   onClick={() => setShowMobileMenu(false)}
-                  className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors border-b border-gray-100"
+                  className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors border-b ds-border-subtle"
                 >
                   <Users className="w-5 h-5 text-blue-600" />
                   <div>
-                    <p className="text-sm font-medium text-gray-900">Bulk Import Workers</p>
-                    <p className="text-xs text-gray-600">Import multiple workers</p>
+                    <p className="text-sm font-medium ds-text-primary">Bulk Import Workers</p>
+                    <p className="text-xs ds-text-secondary">Import multiple workers</p>
                   </div>
                 </Link>
               </>
@@ -140,8 +140,8 @@ function ActionMenu({ canAccess }) {
             {/* Labour Operations */}
             {(hasEntryAccess || hasBatchAccess) && (
               <>
-                <div className="px-4 py-2 border-b border-gray-100">
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Labour Operations</p>
+                <div className="px-4 py-2 border-b ds-border-subtle">
+                  <p className="text-xs font-semibold ds-text-muted uppercase tracking-wide">Labour Operations</p>
                 </div>
                 {hasEntryAccess && (
                   <Link
@@ -151,8 +151,8 @@ function ActionMenu({ canAccess }) {
                   >
                     <Plus className="w-5 h-5 text-green-600" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">Log Work Hours</p>
-                      <p className="text-xs text-gray-600">Record hours for a worker</p>
+                      <p className="text-sm font-medium ds-text-primary">Log Work Hours</p>
+                      <p className="text-xs ds-text-secondary">Record hours for a worker</p>
                     </div>
                   </Link>
                 )}
@@ -164,8 +164,8 @@ function ActionMenu({ canAccess }) {
                   >
                     <Users className="w-5 h-5 text-green-600" />
                     <div>
-                      <p className="text-sm font-medium text-gray-900">Batch Log Hours</p>
-                      <p className="text-xs text-gray-600">Record hours for multiple workers</p>
+                      <p className="text-sm font-medium ds-text-primary">Batch Log Hours</p>
+                      <p className="text-xs ds-text-secondary">Record hours for multiple workers</p>
                     </div>
                   </Link>
                 )}
@@ -351,8 +351,8 @@ function WorkersPageContent() {
         <div className="mb-8">
           {/* Title Section */}
           <div className="mb-6">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Workers Registry</h1>
-            <p className="text-gray-600 mt-2 text-sm md:text-base">Manage worker profiles and track performance</p>
+            <h1 className="text-3xl md:text-4xl font-bold ds-text-primary">Workers Registry</h1>
+            <p className="ds-text-secondary mt-2 text-sm md:text-base">Manage worker profiles and track performance</p>
           </div>
 
           {/* Action Controls - Redesigned for clarity */}
@@ -366,7 +366,7 @@ function WorkersPageContent() {
               loading={exporting}
               loadingText="Exporting..."
               disabled={exporting}
-              className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+              className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition-colors text-sm font-medium"
             >
               <Download className="w-4 h-4" />
               <span>Export Workers</span>
@@ -389,12 +389,12 @@ function WorkersPageContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+            <h2 className="text-lg font-semibold ds-text-primary">Filters</h2>
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm"
+              className="flex items-center gap-2 ds-text-secondary hover:ds-text-primary text-sm"
             >
               <Filter className="w-4 h-4" />
               {showFilters ? "Hide" : "Show"} Filters
@@ -404,25 +404,25 @@ function WorkersPageContent() {
           {showFilters && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Search</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted" />
                   <input
                     type="text"
                     value={filters.search}
                     onChange={(e) => handleFilterChange("search", e.target.value)}
                     placeholder="Search by name, ID, phone..."
-                    className="w-full pl-10 pr-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                    className="w-full pl-10 pr-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Worker Type</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Worker Type</label>
                 <select
                   value={filters.workerType}
                   onChange={(e) => handleFilterChange("workerType", e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Types</option>
                   {VALID_WORKER_TYPES.map((type) => (
@@ -434,11 +434,11 @@ function WorkersPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Status</label>
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange("status", e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Statuses</option>
                   {VALID_WORKER_STATUSES.map((status) => (
@@ -450,11 +450,11 @@ function WorkersPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Skill Type</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Skill Type</label>
                 <select
                   value={filters.skillType}
                   onChange={(e) => handleFilterChange("skillType", e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Skills</option>
                   {VALID_SKILL_TYPES.map((skill) => (
@@ -478,7 +478,7 @@ function WorkersPageContent() {
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="bg-red-50 border border-red-400/60 rounded-lg p-4 mb-6">
             <p className="text-red-800 text-sm">{error}</p>
           </div>
         )}
@@ -487,9 +487,9 @@ function WorkersPageContent() {
         {loading && workers.length === 0 ? (
           <LoadingTable rows={5} columns={8} />
         ) : workers.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 md:p-12 text-center">
-            <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-4 font-medium">No workers found</p>
+          <div className="ds-bg-surface rounded-lg shadow p-8 md:p-12 text-center">
+            <Users className="w-16 h-16 ds-text-muted mx-auto mb-4" />
+            <p className="ds-text-secondary mb-4 font-medium">No workers found</p>
             {canAccess("create_worker_profile") && (
               <Link href="/labour/workers/new" className="text-blue-600 hover:text-blue-800 font-medium text-sm">
                 Add your first worker
@@ -497,54 +497,54 @@ function WorkersPageContent() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Worker
                     </th>
-                    <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden sm:table-cell px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Type
                     </th>
-                    <th className="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Skills
                     </th>
-                    <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Rate
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden lg:table-cell px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Hours (Month)
                     </th>
-                    <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="hidden md:table-cell px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Total Earned
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {workers.map((worker) => {
                     const stats = worker.statistics || {}
                     const thisMonthHours = 0 // TODO: Calculate this month's hours
 
                     return (
-                      <tr key={worker._id} className="hover:bg-gray-50">
+                      <tr key={worker._id} className="hover:ds-bg-surface-muted">
                         <td className="px-4 py-3">
                           <div>
-                            <div className="font-medium text-gray-900 text-sm">{worker.workerName}</div>
-                            <div className="text-xs text-gray-500">{worker.employeeId}</div>
+                            <div className="font-medium ds-text-primary text-sm">{worker.workerName}</div>
+                            <div className="text-xs ds-text-muted">{worker.employeeId}</div>
                           </div>
                         </td>
-                        <td className="hidden sm:table-cell px-4 py-3 text-sm text-gray-600">
+                        <td className="hidden sm:table-cell px-4 py-3 text-sm ds-text-secondary">
                           {getWorkerTypeLabel(worker.workerType)}
                         </td>
-                        <td className="hidden lg:table-cell px-4 py-3 text-sm text-gray-600">
+                        <td className="hidden lg:table-cell px-4 py-3 text-sm ds-text-secondary">
                           <div className="flex flex-wrap gap-1">
                             {(worker.skillTypes || []).slice(0, 2).map((skill, idx) => (
                               <span key={idx} className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">
@@ -552,17 +552,17 @@ function WorkersPageContent() {
                               </span>
                             ))}
                             {(worker.skillTypes || []).length > 2 && (
-                              <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                              <span className="px-2 py-1 ds-bg-surface-muted ds-text-secondary text-xs rounded">
                                 +{(worker.skillTypes || []).length - 2}
                               </span>
                             )}
                           </div>
                         </td>
-                        <td className="hidden md:table-cell px-4 py-3 text-sm text-gray-600">
+                        <td className="hidden md:table-cell px-4 py-3 text-sm ds-text-secondary">
                           <div>
                             <div>{worker.defaultHourlyRate?.toLocaleString()} KES/hr</div>
                             {worker.defaultDailyRate && (
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs ds-text-muted">
                                 {worker.defaultDailyRate.toLocaleString()} KES/day
                               </div>
                             )}
@@ -574,7 +574,7 @@ function WorkersPageContent() {
                               worker.status === "active"
                                 ? "bg-green-100 text-green-800"
                                 : worker.status === "inactive"
-                                  ? "bg-gray-100 text-gray-800"
+                                  ? "ds-bg-surface-muted ds-text-primary"
                                   : worker.status === "terminated"
                                     ? "bg-red-100 text-red-800"
                                     : "bg-yellow-100 text-yellow-800"
@@ -583,10 +583,10 @@ function WorkersPageContent() {
                             {worker.status?.charAt(0).toUpperCase() + worker.status?.slice(1).replace(/_/g, " ")}
                           </span>
                         </td>
-                        <td className="hidden lg:table-cell px-4 py-3 text-sm text-gray-600">
+                        <td className="hidden lg:table-cell px-4 py-3 text-sm ds-text-secondary">
                           {thisMonthHours.toFixed(1)} hrs
                         </td>
-                        <td className="hidden md:table-cell px-4 py-3 text-sm font-medium text-gray-900">
+                        <td className="hidden md:table-cell px-4 py-3 text-sm font-medium ds-text-primary">
                           {stats.totalEarned?.toLocaleString() || "0"} KES
                         </td>
                         <td className="px-4 py-3 text-right text-sm font-medium">
@@ -644,8 +644,8 @@ function WorkersPageContent() {
 
             {/* Pagination */}
             {pagination.totalPages > 1 && (
-              <div className="bg-gray-50 px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t border-gray-200 text-sm">
-                <div className="text-gray-700">
+              <div className="ds-bg-surface-muted px-4 py-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-t ds-border-subtle text-sm">
+                <div className="ds-text-secondary">
                   Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
                   {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} workers
                 </div>
@@ -653,17 +653,17 @@ function WorkersPageContent() {
                   <button
                     onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
                     disabled={pagination.page === 1}
-                    className="px-3 py-1 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-sm"
+                    className="px-3 py-1 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted text-sm"
                   >
                     Previous
                   </button>
-                  <span className="text-gray-700 text-sm">
+                  <span className="ds-text-secondary text-sm">
                     Page {pagination.page} of {pagination.totalPages}
                   </span>
                   <button
                     onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
                     disabled={pagination.page >= pagination.totalPages}
-                    className="px-3 py-1 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 text-sm"
+                    className="px-3 py-1 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted text-sm"
                   >
                     Next
                   </button>

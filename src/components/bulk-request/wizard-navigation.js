@@ -23,14 +23,14 @@ export function WizardNavigation({
   isLastStep = false,
 }) {
   return (
-    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 border-t border-gray-200">
+    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4 pt-4 sm:pt-6 border-t ds-border-subtle">
       <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
         {canGoBack && currentStep > 1 && (
           <button
             type="button"
             onClick={onBack}
             disabled={isLoading}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
           >
             {backText}
           </button>
@@ -40,7 +40,7 @@ export function WizardNavigation({
             type="button"
             onClick={onSaveDraft}
             disabled={isLoading}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
           >
             Save as Draft
           </button>

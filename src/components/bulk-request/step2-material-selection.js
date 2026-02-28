@@ -66,15 +66,15 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Select Materials</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold ds-text-primary mb-4">Select Materials</h2>
+        <p className="text-sm ds-text-secondary mb-6">
           Add materials to your bulk request. You can select from the library or add custom materials.
           You can add materials from both modes.
         </p>
       </div>
 
       {/* Materials Count */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-blue-900">
@@ -105,7 +105,7 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b ds-border-subtle">
         <nav className="flex space-x-8">
           <button
             type="button"
@@ -113,7 +113,7 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
             className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'library'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
             }`}
           >
             📚 Library Mode
@@ -124,7 +124,7 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
             className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'custom'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
             }`}
           >
             ✏️ Custom Mode
@@ -135,7 +135,7 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
             className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'template'
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
             }`}
           >
             📋 Templates
@@ -179,7 +179,7 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
 
       {/* Validation Warning */}
       {materials.length > 0 && !isValid && (
-        <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+        <div className="mt-6 bg-yellow-50 border border-yellow-400/60 rounded-lg p-4">
           <p className="text-sm text-yellow-800 font-medium mb-2">
             ⚠️ Some materials are incomplete. Please ensure all materials have:
           </p>
@@ -212,9 +212,9 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
 
       {/* Added Materials Preview */}
       {materials.length > 0 && (
-        <div className="mt-8 border-t border-gray-200 pt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Added Materials Preview</h3>
-          <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto">
+        <div className="mt-8 border-t ds-border-subtle pt-6">
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">Added Materials Preview</h3>
+          <div className="ds-bg-surface-muted rounded-lg p-4 max-h-64 overflow-y-auto">
             <div className="space-y-2">
               {materials.map((material, index) => {
                 const materialName = material.name || material.materialName || '';
@@ -228,15 +228,15 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
                 return (
                   <div
                     key={index}
-                    className={`flex items-center justify-between bg-white p-3 rounded border ${
-                      isMaterialValid ? 'border-gray-200' : 'border-yellow-300 bg-yellow-50'
+                    className={`flex items-center justify-between ds-bg-surface p-3 rounded border ${
+                      isMaterialValid ? 'ds-border-subtle' : 'border-yellow-400/60 bg-yellow-50'
                     }`}
                   >
                     <div className="flex-1">
-                      <p className={`font-medium text-sm ${isMaterialValid ? 'text-gray-900' : 'text-yellow-800'}`}>
+                      <p className={`font-medium text-sm ${isMaterialValid ? 'ds-text-primary' : 'text-yellow-800'}`}>
                         {materialName || 'Missing name'}
                       </p>
-                      <p className={`text-xs mt-1 ${isMaterialValid ? 'text-gray-600' : 'text-yellow-700'}`}>
+                      <p className={`text-xs mt-1 ${isMaterialValid ? 'ds-text-secondary' : 'text-yellow-700'}`}>
                         {quantityValid && unitValid ? `${quantity} ${unit}` : 'Missing quantity/unit'}
                         {material.estimatedUnitCost && (
                           <span className="ml-2">

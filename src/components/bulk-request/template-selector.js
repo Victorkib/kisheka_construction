@@ -99,16 +99,16 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
     return (
       <div className="text-center py-8">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-2 text-sm text-gray-600">Loading templates...</p>
+        <p className="mt-2 text-sm ds-text-secondary">Loading templates...</p>
       </div>
     );
   }
 
   if (templates.length === 0) {
     return (
-      <div className="text-center py-8 bg-gray-50 rounded-lg">
-        <p className="text-gray-600">No templates available</p>
-        <p className="text-sm text-gray-500 mt-1">Create a template to reuse material combinations</p>
+      <div className="text-center py-8 ds-bg-surface-muted rounded-lg">
+        <p className="ds-text-secondary">No templates available</p>
+        <p className="text-sm ds-text-muted mt-1">Create a template to reuse material combinations</p>
       </div>
     );
   }
@@ -126,7 +126,7 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
     const badges = {
       [TEMPLATE_STATUS.OFFICIAL]: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Official' },
       [TEMPLATE_STATUS.COMMUNITY]: { bg: 'bg-green-100', text: 'text-green-800', label: 'Community' },
-      [TEMPLATE_STATUS.PRIVATE]: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Private' },
+      [TEMPLATE_STATUS.PRIVATE]: { bg: 'ds-bg-surface-muted', text: 'ds-text-primary', label: 'Private' },
       [TEMPLATE_STATUS.DEPRECATED]: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Deprecated' },
     };
     const badge = badges[status] || badges[TEMPLATE_STATUS.COMMUNITY];
@@ -141,15 +141,15 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Use a Template</h3>
-          <p className="text-sm text-gray-600">
+          <h3 className="text-lg font-semibold ds-text-primary mb-2">Use a Template</h3>
+          <p className="text-sm ds-text-secondary">
             Select a template to quickly create a bulk request with pre-filled materials.
           </p>
         </div>
         <button
           type="button"
           onClick={() => setShowFilters(!showFilters)}
-          className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+          className="px-3 py-1.5 text-sm border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary"
         >
           {showFilters ? 'Hide' : 'Show'} Filters
         </button>
@@ -157,14 +157,14 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
 
       {/* Filters */}
       {showFilters && (
-        <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <div className="ds-bg-surface-muted rounded-lg p-4 border ds-border-subtle">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Status</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Status</label>
               <select
                 value={filters.status}
                 onChange={(e) => setFilters((prev) => ({ ...prev, status: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               >
                 <option value="">All Statuses</option>
                 <option value={TEMPLATE_STATUS.OFFICIAL}>Official</option>
@@ -173,11 +173,11 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Project Phase</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Project Phase</label>
               <select
                 value={filters.projectPhase}
                 onChange={(e) => setFilters((prev) => ({ ...prev, projectPhase: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               >
                 <option value="">All Phases</option>
                 {PROJECT_PHASES.map((phase) => (
@@ -188,13 +188,13 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Search</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Search</label>
               <input
                 type="text"
                 value={filters.search}
                 onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
                 placeholder="Search templates..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               />
             </div>
           </div>
@@ -213,12 +213,12 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
       {loading ? (
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-sm text-gray-600">Loading templates...</p>
+          <p className="mt-2 text-sm ds-text-secondary">Loading templates...</p>
         </div>
       ) : templates.length === 0 ? (
-        <div className="text-center py-8 bg-gray-50 rounded-lg">
-          <p className="text-gray-600">No templates found</p>
-          <p className="text-sm text-gray-500 mt-1">
+        <div className="text-center py-8 ds-bg-surface-muted rounded-lg">
+          <p className="ds-text-secondary">No templates found</p>
+          <p className="text-sm ds-text-muted mt-1">
             {filters.search || filters.status || filters.projectPhase
               ? 'Try adjusting your filters'
               : 'Create a template to reuse material combinations'}
@@ -229,13 +229,13 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
           {templates.map((template) => (
             <div
               key={template._id}
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition-all bg-white"
+              className="border ds-border-subtle rounded-lg p-4 hover:border-blue-400/60 hover:shadow-md transition-all ds-bg-surface"
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
-                  <h4 className="font-semibold text-gray-900">{template.name}</h4>
+                  <h4 className="font-semibold ds-text-primary">{template.name}</h4>
                   {template.description && (
-                    <p className="text-xs text-gray-600 mt-1 line-clamp-2">{template.description}</p>
+                    <p className="text-xs ds-text-secondary mt-1 line-clamp-2">{template.description}</p>
                   )}
                 </div>
                 <div className="ml-2 flex flex-col gap-1">
@@ -249,24 +249,24 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
               </div>
 
               <div className="space-y-2 mb-3">
-                <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="flex items-center justify-between text-sm ds-text-secondary">
                   <span>Materials:</span>
-                  <span className="font-medium text-gray-900">{template.materials?.length || 0}</span>
+                  <span className="font-medium ds-text-primary">{template.materials?.length || 0}</span>
                 </div>
                 {template.estimatedTotalCost && (
-                  <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center justify-between text-sm ds-text-secondary">
                     <span>Est. Cost:</span>
-                    <span className="font-medium text-gray-900">{formatCurrency(template.estimatedTotalCost)}</span>
+                    <span className="font-medium ds-text-primary">{formatCurrency(template.estimatedTotalCost)}</span>
                   </div>
                 )}
-                <div className="flex items-center justify-between text-sm text-gray-600">
+                <div className="flex items-center justify-between text-sm ds-text-secondary">
                   <span>Used:</span>
-                  <span className="font-medium text-gray-900">{template.usageCount || 0} times</span>
+                  <span className="font-medium ds-text-primary">{template.usageCount || 0} times</span>
                 </div>
                 {template.projectPhase && (
-                  <div className="flex items-center justify-between text-sm text-gray-600">
+                  <div className="flex items-center justify-between text-sm ds-text-secondary">
                     <span>Phase:</span>
-                    <span className="font-medium text-gray-900">
+                    <span className="font-medium ds-text-primary">
                       {template.projectPhase.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                     </span>
                   </div>
@@ -274,12 +274,12 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
                 {template.tags && template.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {template.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} className="inline-flex px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700">
+                      <span key={tag} className="inline-flex px-2 py-0.5 text-xs rounded ds-bg-surface-muted ds-text-secondary">
                         {tag}
                       </span>
                     ))}
                     {template.tags.length > 3 && (
-                      <span className="inline-flex px-2 py-0.5 text-xs rounded bg-gray-100 text-gray-700">
+                      <span className="inline-flex px-2 py-0.5 text-xs rounded ds-bg-surface-muted ds-text-secondary">
                         +{template.tags.length - 3}
                       </span>
                     )}

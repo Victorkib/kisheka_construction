@@ -239,7 +239,7 @@ function ProfessionalServicesPageContent() {
       terminated: 'bg-red-100 text-red-800',
       on_hold: 'bg-yellow-100 text-yellow-800',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const formatCurrency = (amount) => {
@@ -262,10 +262,10 @@ function ProfessionalServicesPageContent() {
         <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Left Section: Heading and Description */}
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
               Assignments
             </h1>
-            <p className="text-sm sm:text-base text-gray-600 mt-2">
+            <p className="text-sm sm:text-base ds-text-secondary mt-2">
               Manage architect and engineer assignments to projects
             </p>
         </div>
@@ -275,7 +275,7 @@ function ProfessionalServicesPageContent() {
             {canAccess('assign_professional_service') && (
               <Link
                 href="/professional-services-library"
-                className="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 active:bg-gray-800 transition-colors touch-manipulation text-sm sm:text-base"
+                className="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 bg-slate-600 text-white rounded-lg hover:bg-slate-700 active:bg-slate-800 transition-colors touch-manipulation text-sm sm:text-base"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path 
@@ -295,7 +295,7 @@ function ProfessionalServicesPageContent() {
                 className={`inline-flex items-center justify-center px-4 sm:px-6 py-2.5 rounded-lg transition-all touch-manipulation text-sm sm:text-base ${
                   canCreateAssignment
                     ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+                    : 'ds-bg-surface-muted ds-text-muted cursor-not-allowed opacity-60'
                 }`}
                 onClick={(e) => {
                   if (!canCreateAssignment) {
@@ -350,17 +350,17 @@ function ProfessionalServicesPageContent() {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             {/* Project Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Project
               </label>
               <select
                 value={filters.projectId}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black touch-manipulation"
+                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ds-text-primary touch-manipulation"
               >
                 <option value="">All Projects</option>
                 {projects.map((project) => (
@@ -373,13 +373,13 @@ function ProfessionalServicesPageContent() {
 
             {/* Type Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Type
               </label>
               <select
                 value={filters.type}
                 onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black touch-manipulation"
+                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ds-text-primary touch-manipulation"
               >
                 <option value="">All Types</option>
                 <option value="architect">Architects</option>
@@ -389,13 +389,13 @@ function ProfessionalServicesPageContent() {
 
             {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Status
               </label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black touch-manipulation"
+                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ds-text-primary touch-manipulation"
               >
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
@@ -407,7 +407,7 @@ function ProfessionalServicesPageContent() {
 
             {/* Search */}
             <div className="sm:col-span-2 lg:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Search
               </label>
               <input
@@ -415,7 +415,7 @@ function ProfessionalServicesPageContent() {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search by professional name..."
-                className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black touch-manipulation"
+                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ds-text-primary touch-manipulation"
               />
             </div>
           </div>
@@ -423,7 +423,7 @@ function ProfessionalServicesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
           </div>
@@ -433,12 +433,12 @@ function ProfessionalServicesPageContent() {
         {loading ? (
           <LoadingTable rows={5} columns={7} />
         ) : assignments.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <svg className="mx-auto h-12 w-12 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No assignments found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <h3 className="mt-2 text-sm font-medium ds-text-primary">No assignments found</h3>
+            <p className="mt-1 text-sm ds-text-muted">
               {canAccess('assign_professional_service') 
                 ? 'Get started by assigning a professional to a project.'
                 : 'No professional service assignments have been created yet.'}
@@ -450,7 +450,7 @@ function ProfessionalServicesPageContent() {
                   className={`inline-flex items-center justify-center px-4 sm:px-6 py-2.5 rounded-lg transition-all touch-manipulation text-sm sm:text-base ${
                     canCreateAssignment
                       ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+                      : 'ds-bg-surface-muted ds-text-muted cursor-not-allowed opacity-60'
                   }`}
                   onClick={(e) => {
                     if (!canCreateAssignment) {
@@ -475,50 +475,50 @@ function ProfessionalServicesPageContent() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+            <div className="hidden md:block ds-bg-surface rounded-lg shadow overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Professional
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Project
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Contract
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Financials
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Statistics
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {assignments.map((assignment) => {
                     const assignmentId = normalizeId(assignment._id);
                     return (
-                      <tr key={assignmentId || assignment._id} className="hover:bg-gray-50">
+                      <tr key={assignmentId || assignment._id} className="hover:ds-bg-surface-muted">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium ds-text-primary">
                               {assignment.library?.name || 'N/A'}
                             </div>
                             <div className="flex items-center gap-2 mt-1">
                               <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeBadgeColor(assignment.type)}`}>
                                 {getTypeLabel(assignment.type)}
                               </span>
-                              <span className="text-xs text-gray-500">
+                              <span className="text-xs ds-text-muted">
                                 {assignment.professionalCode}
                               </span>
                             </div>
@@ -526,29 +526,29 @@ function ProfessionalServicesPageContent() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium ds-text-primary">
                           {assignment.project?.projectName || 'N/A'}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs ds-text-muted">
                           {assignment.project?.projectCode || ''}
                         </div>
                         {assignment.phase && (
-                          <div className="text-xs text-gray-400 mt-1">
+                          <div className="text-xs ds-text-muted mt-1">
                             Phase: {assignment.phase.phaseName}
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         <div>Type: {assignment.contractType?.replace('_', ' ') || 'N/A'}</div>
                         <div>Value: {formatCurrency(assignment.contractValue)}</div>
                         <div className="text-xs">Schedule: {assignment.paymentSchedule?.replace('_', ' ') || 'N/A'}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         <div>Total: {formatCurrency(assignment.totalFees)}</div>
                         <div>Paid: {formatCurrency(assignment.feesPaid)}</div>
                         <div className="text-xs text-red-600">Pending: {formatCurrency(assignment.feesPending)}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         <div>Activities: {assignment.totalActivities || 0}</div>
                         {assignment.type === 'architect' && (
                           <div className="text-xs">Visits: {assignment.totalSiteVisits || 0}</div>
@@ -597,26 +597,26 @@ function ProfessionalServicesPageContent() {
 
             {/* Desktop Pagination */}
             {pagination.pages > 1 && (
-              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="ds-bg-surface px-4 py-3 flex items-center justify-between border-t ds-border-subtle sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                     disabled={pagination.page === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 transition-colors touch-manipulation"
+                    className="relative inline-flex items-center px-4 py-2 border ds-border-subtle text-sm font-medium rounded-md ds-text-secondary ds-bg-surface hover:ds-bg-surface-muted active:ds-bg-surface-muted disabled:opacity-50 transition-colors touch-manipulation"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                     disabled={pagination.page === pagination.pages}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 transition-colors touch-manipulation"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border ds-border-subtle text-sm font-medium rounded-md ds-text-secondary ds-bg-surface hover:ds-bg-surface-muted active:ds-bg-surface-muted disabled:opacity-50 transition-colors touch-manipulation"
                   >
                     Next
                   </button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm ds-text-secondary">
                       Showing <span className="font-medium">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
                       <span className="font-medium">
                         {Math.min(pagination.page * pagination.limit, pagination.total)}
@@ -629,7 +629,7 @@ function ProfessionalServicesPageContent() {
                       <button
                         onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                         disabled={pagination.page === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 transition-colors touch-manipulation"
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border ds-border-subtle ds-bg-surface text-sm font-medium ds-text-muted hover:ds-bg-surface-muted active:ds-bg-surface-muted disabled:opacity-50 transition-colors touch-manipulation"
                       >
                         Previous
                       </button>
@@ -647,21 +647,21 @@ function ProfessionalServicesPageContent() {
                               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors touch-manipulation ${
                                 page === pagination.page
                                   ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50 active:bg-gray-100'
+                                  : 'ds-bg-surface ds-border-subtle ds-text-muted hover:ds-bg-surface-muted active:ds-bg-surface-muted'
                               }`}
                             >
                               {page}
                             </button>
                           );
                         } else if (page === pagination.page - 2 || page === pagination.page + 2) {
-                          return <span key={page} className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>;
+                          return <span key={page} className="relative inline-flex items-center px-4 py-2 border ds-border-subtle ds-bg-surface text-sm font-medium ds-text-secondary">...</span>;
                         }
                         return null;
                       })}
                       <button
                         onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                         disabled={pagination.page === pagination.pages}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 transition-colors touch-manipulation"
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border ds-border-subtle ds-bg-surface text-sm font-medium ds-text-muted hover:ds-bg-surface-muted active:ds-bg-surface-muted disabled:opacity-50 transition-colors touch-manipulation"
                       >
                         Next
                       </button>
@@ -679,19 +679,19 @@ function ProfessionalServicesPageContent() {
                 return (
                   <div
                     key={assignmentId || assignment._id}
-                    className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                    className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle"
                   >
                     {/* Header Row */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-semibold text-gray-900 truncate">
+                        <h3 className="text-base font-semibold ds-text-primary truncate">
                           {assignment.library?.name || 'N/A'}
                         </h3>
                         <div className="flex items-center gap-2 mt-1">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getTypeBadgeColor(assignment.type)}`}>
                             {getTypeLabel(assignment.type)}
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs ds-text-muted">
                             {assignment.professionalCode}
                           </span>
                         </div>
@@ -702,55 +702,55 @@ function ProfessionalServicesPageContent() {
                     </div>
 
                     {/* Project Info */}
-                    <div className="mb-3 pb-3 border-b border-gray-200">
-                      <p className="text-xs text-gray-500 mb-0.5">Project</p>
-                      <p className="text-sm font-medium text-gray-900">
+                    <div className="mb-3 pb-3 border-b ds-border-subtle">
+                      <p className="text-xs ds-text-muted mb-0.5">Project</p>
+                      <p className="text-sm font-medium ds-text-primary">
                         {assignment.project?.projectName || 'N/A'}
                       </p>
                       {assignment.project?.projectCode && (
-                        <p className="text-xs text-gray-600 mt-0.5">
+                        <p className="text-xs ds-text-secondary mt-0.5">
                           {assignment.project.projectCode}
                         </p>
                       )}
                       {assignment.phase && (
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs ds-text-muted mt-1">
                           Phase: {assignment.phase.phaseName}
                         </p>
                       )}
                     </div>
 
                     {/* Contract Details */}
-                    <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-200">
+                    <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b ds-border-subtle">
                       <div>
-                        <p className="text-xs text-gray-500 mb-0.5">Contract Type</p>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-xs ds-text-muted mb-0.5">Contract Type</p>
+                        <p className="text-sm font-medium ds-text-primary">
                           {assignment.contractType?.replace('_', ' ') || 'N/A'}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-0.5">Contract Value</p>
-                        <p className="text-sm font-semibold text-gray-900">
+                        <p className="text-xs ds-text-muted mb-0.5">Contract Value</p>
+                        <p className="text-sm font-semibold ds-text-primary">
                           {formatCurrency(assignment.contractValue)}
                         </p>
                       </div>
                     </div>
 
                     {/* Financials */}
-                    <div className="grid grid-cols-3 gap-2 mb-3 pb-3 border-b border-gray-200">
+                    <div className="grid grid-cols-3 gap-2 mb-3 pb-3 border-b ds-border-subtle">
                       <div>
-                        <p className="text-xs text-gray-500 mb-0.5">Total</p>
-                        <p className="text-sm font-semibold text-gray-900">
+                        <p className="text-xs ds-text-muted mb-0.5">Total</p>
+                        <p className="text-sm font-semibold ds-text-primary">
                           {formatCurrency(assignment.totalFees)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-0.5">Paid</p>
+                        <p className="text-xs ds-text-muted mb-0.5">Paid</p>
                         <p className="text-sm font-semibold text-green-600">
                           {formatCurrency(assignment.feesPaid)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-0.5">Pending</p>
+                        <p className="text-xs ds-text-muted mb-0.5">Pending</p>
                         <p className="text-sm font-semibold text-red-600">
                           {formatCurrency(assignment.feesPending)}
                         </p>
@@ -758,19 +758,19 @@ function ProfessionalServicesPageContent() {
                     </div>
 
                     {/* Statistics */}
-                    <div className="mb-3 pb-3 border-b border-gray-200">
-                      <p className="text-xs text-gray-500 mb-1">Statistics</p>
+                    <div className="mb-3 pb-3 border-b ds-border-subtle">
+                      <p className="text-xs ds-text-muted mb-1">Statistics</p>
                       <div className="flex flex-wrap gap-2">
-                        <span className="text-xs text-gray-700">
+                        <span className="text-xs ds-text-secondary">
                           Activities: <strong>{assignment.totalActivities || 0}</strong>
                         </span>
                         {assignment.type === 'architect' && (
-                          <span className="text-xs text-gray-700">
+                          <span className="text-xs ds-text-secondary">
                             Visits: <strong>{assignment.totalSiteVisits || 0}</strong>
                           </span>
                         )}
                         {assignment.type === 'engineer' && (
-                          <span className="text-xs text-gray-700">
+                          <span className="text-xs ds-text-secondary">
                             Inspections: <strong>{assignment.totalInspections || 0}</strong>
                           </span>
                         )}
@@ -808,25 +808,25 @@ function ProfessionalServicesPageContent() {
 
               {/* Mobile Pagination */}
               {pagination.pages > 1 && (
-                <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                  <div className="text-sm text-gray-700 text-center mb-3">
+                <div className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
+                  <div className="text-sm ds-text-secondary text-center mb-3">
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <button
                       onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                       disabled={pagination.page === 1}
-                      className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold transition-all duration-200 touch-manipulation"
+                      className="flex-1 px-4 py-2.5 border-2 ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted active:ds-bg-surface-muted ds-text-primary font-semibold transition-all duration-200 touch-manipulation"
                     >
                       Previous
                     </button>
-                    <span className="px-4 py-2.5 text-sm text-gray-700 font-medium">
+                    <span className="px-4 py-2.5 text-sm ds-text-secondary font-medium">
                       {pagination.page} / {pagination.pages}
                     </span>
                     <button
                       onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                       disabled={pagination.page === pagination.pages}
-                      className="flex-1 px-4 py-2.5 border-2 border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-semibold transition-all duration-200 touch-manipulation"
+                      className="flex-1 px-4 py-2.5 border-2 ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted active:ds-bg-surface-muted ds-text-primary font-semibold transition-all duration-200 touch-manipulation"
                     >
                       Next
                     </button>
@@ -860,7 +860,7 @@ function ProfessionalServicesPageContent() {
 export default function ProfessionalServicesPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center ds-bg-surface-muted">
         <div className="text-center">
           <LoadingSpinner size="lg" text="Loading..." />
         </div>

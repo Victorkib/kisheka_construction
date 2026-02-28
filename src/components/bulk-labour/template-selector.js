@@ -91,7 +91,7 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
     return (
       <div className="text-center py-8">
         <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="mt-2 text-sm text-gray-600">Loading templates...</p>
+        <p className="mt-2 text-sm ds-text-secondary">Loading templates...</p>
       </div>
     );
   }
@@ -99,8 +99,8 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">Select Template</h3>
-        <p className="text-sm text-gray-600 mb-4">
+        <h3 className="text-lg font-semibold ds-text-primary mb-2">Select Template</h3>
+        <p className="text-sm ds-text-secondary mb-4">
           Choose a template to quickly populate workers. You can edit the entries after applying.
         </p>
 
@@ -110,13 +110,13 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search templates..."
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
+          className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 mb-4"
         />
       </div>
 
       {/* Templates List */}
       {filteredTemplates.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 ds-text-muted">
           <p>No templates found</p>
           <p className="text-sm mt-2">
             <a href="/labour/templates/new" className="text-blue-600 hover:text-blue-800">
@@ -138,19 +138,19 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
                 className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                   isSelected
                     ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                    : 'ds-border-subtle hover:border-blue-400/60 hover:ds-bg-surface-muted'
                 }`}
               >
                 <div className="flex items-start justify-between mb-2">
-                  <h4 className="font-semibold text-gray-900">{template.name}</h4>
+                  <h4 className="font-semibold ds-text-primary">{template.name}</h4>
                   {isSelected && <CheckCircle className="w-5 h-5 text-blue-600" />}
                 </div>
 
                 {template.description && (
-                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{template.description}</p>
+                  <p className="text-sm ds-text-secondary mb-3 line-clamp-2">{template.description}</p>
                 )}
 
-                <div className="flex items-center gap-4 text-sm text-gray-600">
+                <div className="flex items-center gap-4 text-sm ds-text-secondary">
                   <div className="flex items-center gap-1">
                     <Users className="w-4 h-4" />
                     <span>{entryCount}</span>
@@ -166,7 +166,7 @@ export function TemplateSelector({ onTemplateSelected, currentProjectId, current
                     {template.tags.slice(0, 3).map((tag, index) => (
                       <span
                         key={index}
-                        className="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded"
+                        className="px-2 py-0.5 ds-bg-surface-muted ds-text-secondary text-xs rounded"
                       >
                         {tag}
                       </span>

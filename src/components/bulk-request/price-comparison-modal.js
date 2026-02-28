@@ -86,7 +86,7 @@ export function PriceComparisonModal({
         return 'bg-yellow-100 text-yellow-800';
       case 'low':
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'ds-bg-surface-muted ds-text-primary';
     }
   };
 
@@ -128,10 +128,10 @@ export function PriceComparisonModal({
     >
       <div className="max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl border-b border-gray-200/50 px-8 py-6 flex justify-between items-center shadow-sm">
+        <div className="sticky top-0 z-10 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl border-b ds-border-subtle/50 px-8 py-6 flex justify-between items-center shadow-sm">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Price Comparison</h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <h2 className="text-2xl font-bold ds-text-primary">Price Comparison</h2>
+            <p className="text-sm ds-text-secondary mt-1">
               Compare prices across {comparisons.length} supplier(s) for {materials.length} material(s)
             </p>
           </div>
@@ -140,7 +140,7 @@ export function PriceComparisonModal({
         {/* Content */}
         <div className="p-8">
           {error ? (
-            <div className="bg-gradient-to-br from-red-50/80 to-red-100/80 backdrop-blur-sm border border-red-200/50 text-red-800 px-6 py-4 rounded-xl shadow-lg">
+            <div className="bg-gradient-to-br from-red-50/80 to-red-100/80 backdrop-blur-sm border border-red-400/60/50 text-red-800 px-6 py-4 rounded-xl shadow-lg">
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0 p-2 bg-gradient-to-br from-red-400 to-red-600 rounded-lg">
                   <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -153,17 +153,17 @@ export function PriceComparisonModal({
           ) : comparisons.length === 0 ? (
             <div className="text-center py-16">
               <div className="inline-block p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl mb-4">
-                <svg className="w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-12 h-12 ds-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
               </div>
-              <p className="text-gray-600 font-medium">No suppliers found for comparison</p>
+              <p className="ds-text-secondary font-medium">No suppliers found for comparison</p>
             </div>
           ) : (
             <>
               {/* Summary */}
               {summary && (
-                <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 backdrop-blur-sm border border-blue-200/50 rounded-xl p-6 mb-6 shadow-lg">
+                <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 backdrop-blur-sm border border-blue-400/60/50 rounded-xl p-6 mb-6 shadow-lg">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm font-semibold text-blue-900 uppercase tracking-wide mb-1">
@@ -177,7 +177,7 @@ export function PriceComparisonModal({
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="inline-block px-4 py-2 bg-white/60 backdrop-blur-sm rounded-lg border border-blue-200/50">
+                      <div className="inline-block px-4 py-2 ds-bg-surface/60 backdrop-blur-sm rounded-lg border border-blue-400/60/50">
                         <p className="text-sm font-semibold text-blue-900">
                           {summary.suppliersWithData} of {summary.totalSuppliers}
                         </p>
@@ -191,35 +191,35 @@ export function PriceComparisonModal({
               )}
 
               {/* Comparison Table */}
-              <div className="overflow-x-auto rounded-xl border border-gray-200/50 shadow-lg">
-                <table className="min-w-full divide-y divide-gray-200/50">
+              <div className="overflow-x-auto rounded-xl border ds-border-subtle/50 shadow-lg">
+                <table className="min-w-full divide-y divide-ds-border-subtle/50">
                   <thead className="bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm sticky top-0">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold ds-text-secondary uppercase tracking-wider">
                         Supplier
                       </th>
                       {materials.map((material, index) => (
                         <th
                           key={index}
-                          className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider"
+                          className="px-6 py-4 text-left text-xs font-bold ds-text-secondary uppercase tracking-wider"
                         >
                           <div>
-                            <div className="font-bold text-gray-900">{material.name || material.materialName}</div>
-                            <div className="text-xs font-normal text-gray-500 mt-1">
+                            <div className="font-bold ds-text-primary">{material.name || material.materialName}</div>
+                            <div className="text-xs font-normal ds-text-muted mt-1">
                               {material.quantity || material.quantityNeeded} {material.unit}
                             </div>
                           </div>
                         </th>
                       ))}
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold ds-text-secondary uppercase tracking-wider">
                         Total Cost
                       </th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-4 text-left text-xs font-bold ds-text-secondary uppercase tracking-wider">
                         Action
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white/50 backdrop-blur-sm divide-y divide-gray-200/30">
+                  <tbody className="ds-bg-surface/50 backdrop-blur-sm divide-y divide-ds-border-subtle/30">
                     {comparisons.map((comparison, supplierIndex) => {
                       const isCheapest =
                         cheapestSupplier &&
@@ -232,12 +232,12 @@ export function PriceComparisonModal({
                           className={`transition-all duration-200 ${
                             isCheapest 
                               ? 'bg-gradient-to-r from-green-50/80 to-emerald-50/80 border-l-4 border-green-500 shadow-sm' 
-                              : 'hover:bg-gray-50/80'
+                              : 'hover:ds-bg-surface-muted/80'
                           } ${!hasData ? 'opacity-75' : ''}`}
                         >
                           <td className="px-6 py-5 whitespace-nowrap">
                             <div>
-                              <div className="text-sm font-semibold text-gray-900 flex items-center gap-2">
+                              <div className="text-sm font-semibold ds-text-primary flex items-center gap-2">
                                 {comparison.supplierName}
                                 {isCheapest && (
                                   <span className="inline-flex px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md">
@@ -246,7 +246,7 @@ export function PriceComparisonModal({
                                 )}
                               </div>
                               {comparison.supplierEmail && (
-                                <div className="text-xs text-gray-500 mt-1">{comparison.supplierEmail}</div>
+                                <div className="text-xs ds-text-muted mt-1">{comparison.supplierEmail}</div>
                               )}
                               {!hasData && (
                                 <div className="text-xs text-yellow-700 mt-1 font-medium">
@@ -259,10 +259,10 @@ export function PriceComparisonModal({
                             <td key={matIndex} className="px-6 py-5">
                               {material.estimatedUnitCost ? (
                                 <div>
-                                  <div className="text-sm font-bold text-gray-900">
+                                  <div className="text-sm font-bold ds-text-primary">
                                     {formatCurrency(material.estimatedTotalCost)}
                                   </div>
-                                  <div className="text-xs text-gray-600 mt-1 font-medium">
+                                  <div className="text-xs ds-text-secondary mt-1 font-medium">
                                     {formatCurrency(material.estimatedUnitCost)}/{material.unit}
                                   </div>
                                   {material.confidence && (
@@ -277,13 +277,13 @@ export function PriceComparisonModal({
                                     </div>
                                   )}
                                   {material.historicalData && (
-                                    <div className="text-xs text-gray-500 mt-1 font-medium">
+                                    <div className="text-xs ds-text-muted mt-1 font-medium">
                                       {material.historicalData.dataPoints} data point(s)
                                     </div>
                                   )}
                                 </div>
                               ) : (
-                                <div className="text-sm text-gray-400 font-medium">N/A</div>
+                                <div className="text-sm ds-text-muted font-medium">N/A</div>
                               )}
                             </td>
                           ))}
@@ -308,9 +308,9 @@ export function PriceComparisonModal({
               </div>
 
               {/* Legend */}
-              <div className="mt-8 p-5 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm border border-gray-200/50 rounded-xl shadow-lg">
-                <p className="text-xs font-bold text-gray-700 uppercase tracking-wide mb-4">Legend</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
+              <div className="mt-8 p-5 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm border ds-border-subtle/50 rounded-xl shadow-lg">
+                <p className="text-xs font-bold ds-text-secondary uppercase tracking-wide mb-4">Legend</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm ds-text-secondary">
                   <div className="flex items-center gap-3">
                     <span className="w-5 h-5 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg border-2 border-green-500 shadow-sm"></span>
                     <span className="font-medium">Best Price</span>
@@ -328,7 +328,7 @@ export function PriceComparisonModal({
                     <span className="text-xs">Medium confidence (2-4 data points)</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="inline-flex px-3 py-1 text-xs font-bold rounded-full bg-gray-100 text-gray-800 shadow-sm">
+                    <span className="inline-flex px-3 py-1 text-xs font-bold rounded-full ds-bg-surface-muted ds-text-primary shadow-sm">
                       Low
                     </span>
                     <span className="text-xs">Low confidence (1 data point or estimated)</span>
@@ -340,10 +340,10 @@ export function PriceComparisonModal({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl border-t border-gray-200/50 px-8 py-5 flex justify-end shadow-lg">
+        <div className="sticky bottom-0 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl border-t ds-border-subtle/50 px-8 py-5 flex justify-end shadow-lg">
           <button
             onClick={onClose}
-            className="px-6 py-3 text-sm font-semibold text-gray-700 bg-white/60 backdrop-blur-sm border border-gray-300/50 rounded-xl hover:bg-white/80 hover:border-gray-400/50 transition-all duration-200 shadow-sm hover:shadow-md"
+            className="px-6 py-3 text-sm font-semibold ds-text-secondary ds-bg-surface/60 backdrop-blur-sm border ds-border-subtle/50 rounded-xl hover:ds-bg-surface/80 hover:border-ds-border-strong/50 transition-all duration-200 shadow-sm hover:shadow-md"
           >
             Close
           </button>

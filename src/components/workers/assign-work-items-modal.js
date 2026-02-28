@@ -202,37 +202,37 @@ export function AssignWorkItemsModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col border border-gray-200">
+      <div className="ds-bg-surface rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col border ds-border-subtle">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+        <div className="p-6 border-b ds-border-subtle flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+            <h2 className="text-2xl font-bold ds-text-primary flex items-center gap-2">
               <Users className="w-6 h-6 text-blue-600" />
               Assign Work Items to {workerName}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm ds-text-secondary mt-1">
               Select work items to assign to this worker
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg hover:bg-gray-100"
+            className="ds-text-muted hover:ds-text-secondary transition-colors p-1 rounded-lg hover:ds-bg-surface-muted"
           >
             <X className="w-6 h-6" />
           </button>
         </div>
 
         {/* Filters */}
-        <div className="p-6 border-b border-gray-200 bg-gray-50">
+        <div className="p-6 border-b ds-border-subtle ds-bg-surface-muted">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Project
               </label>
               <select
                 value={filters.projectId}
                 onChange={(e) => setFilters(prev => ({ ...prev, projectId: e.target.value, phaseId: '' }))}
-                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Projects</option>
                 {projects.map(project => (
@@ -244,14 +244,14 @@ export function AssignWorkItemsModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Phase
               </label>
               <select
                 value={filters.phaseId}
                 onChange={(e) => setFilters(prev => ({ ...prev, phaseId: e.target.value }))}
                 disabled={!filters.projectId}
-                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-100"
+                className="w-full px-3 py-2 ds-bg-surface border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:ds-bg-surface-muted"
               >
                 <option value="">All Phases</option>
                 {phases.map(phase => (
@@ -263,13 +263,13 @@ export function AssignWorkItemsModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Status
               </label>
               <select
                 value={filters.status}
                 onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-                className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Statuses</option>
                 <option value="not_started">Not Started</option>
@@ -285,9 +285,9 @@ export function AssignWorkItemsModal({
                   type="checkbox"
                   checked={filters.unassigned}
                   onChange={(e) => setFilters(prev => ({ ...prev, unassigned: e.target.checked }))}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
                 />
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-sm font-medium ds-text-secondary">
                   Unassigned Only
                 </span>
               </label>
@@ -296,13 +296,13 @@ export function AssignWorkItemsModal({
 
           <div className="mt-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ds-text-muted" />
               <input
                 type="text"
                 value={filters.search}
                 onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                 placeholder="Search work items..."
-                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 ds-bg-surface border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -315,8 +315,8 @@ export function AssignWorkItemsModal({
               <Loader className="w-8 h-8 animate-spin text-blue-600" />
             </div>
           ) : filteredWorkItems.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+            <div className="text-center py-12 ds-text-muted">
+              <Briefcase className="w-12 h-12 mx-auto mb-3 ds-text-muted" />
               <p className="font-medium">No work items found</p>
               <p className="text-sm mt-1">Try adjusting your filters</p>
             </div>
@@ -330,11 +330,11 @@ export function AssignWorkItemsModal({
                   >
                     {selectedWorkItems.size === filteredWorkItems.length ? 'Deselect All' : 'Select All'}
                   </button>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm ds-text-secondary">
                     ({selectedWorkItems.size} selected)
                   </span>
                 </div>
-                <span className="text-sm text-gray-600">
+                <span className="text-sm ds-text-secondary">
                   {filteredWorkItems.length} work item(s) available
                 </span>
               </div>
@@ -349,7 +349,7 @@ export function AssignWorkItemsModal({
                       className={`border rounded-lg p-4 cursor-pointer transition-colors ${
                         isSelected
                           ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                          : 'ds-border-subtle hover:ds-border-subtle hover:ds-bg-surface-muted'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -357,22 +357,22 @@ export function AssignWorkItemsModal({
                           {isSelected ? (
                             <CheckCircle className="w-5 h-5 text-blue-600" />
                           ) : (
-                            <div className="w-5 h-5 border-2 border-gray-300 rounded-full" />
+                            <div className="w-5 h-5 border-2 ds-border-subtle rounded-full" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-semibold text-gray-900">{workItem.name}</h3>
+                            <h3 className="font-semibold ds-text-primary">{workItem.name}</h3>
                             <span className={`px-2 py-0.5 text-xs font-bold rounded-full ${
                               workItem.status === 'completed' ? 'bg-green-100 text-green-800' :
                               workItem.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
                               workItem.status === 'blocked' ? 'bg-red-100 text-red-800' :
-                              'bg-gray-100 text-gray-800'
+                              'ds-bg-surface-muted ds-text-primary'
                             }`}>
                               {workItem.status?.replace('_', ' ').toUpperCase()}
                             </span>
                           </div>
-                          <div className="text-sm text-gray-600 space-y-1">
+                          <div className="text-sm ds-text-secondary space-y-1">
                             {workItem.phaseName && (
                               <p>Phase: {workItem.phaseName}</p>
                             )}
@@ -396,10 +396,10 @@ export function AssignWorkItemsModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200 flex items-center justify-end gap-3">
+        <div className="p-6 border-t ds-border-subtle flex items-center justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+            className="px-4 py-2 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted font-medium"
           >
             Cancel
           </button>

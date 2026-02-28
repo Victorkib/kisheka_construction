@@ -128,8 +128,8 @@ export default function SiteReportsPage() {
       <AppLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Site Reports</h1>
-            <p className="text-gray-600 mt-1">Capture site updates with photos and labour details</p>
+            <h1 className="text-3xl font-bold ds-text-primary">Site Reports</h1>
+            <p className="ds-text-secondary mt-1">Capture site updates with photos and labour details</p>
           </div>
           <NoProjectsEmptyState />
         </div>
@@ -154,8 +154,8 @@ export default function SiteReportsPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Site Reports</h1>
-            <p className="text-gray-600 mt-1">Capture site updates with photos and labour details</p>
+            <h1 className="text-3xl font-bold ds-text-primary">Site Reports</h1>
+            <p className="ds-text-secondary mt-1">Capture site updates with photos and labour details</p>
           </div>
           <Link
             href="/labour/site-reports/new"
@@ -166,10 +166,10 @@ export default function SiteReportsPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Project</label>
               <LoadingSelect
                 value={filters.projectId}
                 onChange={(e) => {
@@ -191,7 +191,7 @@ export default function SiteReportsPage() {
               </LoadingSelect>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phase</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Phase</label>
               <LoadingSelect
                 value={filters.phaseId}
                 onChange={(e) => setFilters({ ...filters, phaseId: e.target.value })}
@@ -206,7 +206,7 @@ export default function SiteReportsPage() {
               </LoadingSelect>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Status</label>
               <LoadingSelect
                 value={filters.status}
                 onChange={(e) => setFilters({ ...filters, status: e.target.value })}
@@ -220,63 +220,63 @@ export default function SiteReportsPage() {
               </LoadingSelect>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Search</label>
               <input
                 type="text"
                 value={filters.search}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
                 placeholder="Search by report or name"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
               />
             </div>
           </div>
         </div>
 
         {filteredReports.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <FileText className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-            <p className="text-gray-600 mb-2">No site reports found</p>
-            <p className="text-sm text-gray-500">Create a report to capture site progress.</p>
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <FileText className="w-10 h-10 ds-text-muted mx-auto mb-3" />
+            <p className="ds-text-secondary mb-2">No site reports found</p>
+            <p className="text-sm ds-text-muted">Create a report to capture site progress.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+          <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Project</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phase</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reported By</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Entries</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Report</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Project</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Phase</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Reported By</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Entries</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {filteredReports.map((report) => (
-                  <tr key={report._id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <tr key={report._id} className="hover:ds-bg-surface-muted">
+                    <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                       {report.reportNumber}
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs ds-text-muted">
                         {new Date(report.entryDate).toLocaleDateString()}
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
                       {report.projectName || '—'}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
                       {report.phaseName || '—'}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
                       {report.reportedByName}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
                       {report.labourEntries?.length || 0} workers
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs ds-text-muted">
                         {report.attachments?.length || 0} files
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 capitalize">
+                    <td className="px-4 py-3 text-sm ds-text-secondary capitalize">
                       {report.status?.replace('_', ' ')}
                     </td>
                     <td className="px-4 py-3 text-sm">

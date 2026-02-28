@@ -37,10 +37,10 @@ export function MaterialLibraryTable({
 
   if (materials.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-12 text-center">
+      <div className="ds-bg-surface rounded-lg shadow p-12 text-center border ds-border-subtle">
         <div className="text-6xl mb-4">📚</div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">No materials found</h3>
-        <p className="text-gray-600">
+        <h3 className="text-xl font-semibold ds-text-primary mb-2">No materials found</h3>
+        <p className="ds-text-secondary">
           {canManage
             ? 'Get started by adding your first material to the library'
             : 'No materials have been added to the library yet.'}
@@ -50,71 +50,71 @@ export function MaterialLibraryTable({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="ds-bg-surface rounded-lg shadow overflow-hidden border ds-border-subtle">
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y ds-border-subtle">
+          <thead className="ds-bg-surface-muted">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                 Category
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                 Unit
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                 Default Cost
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                 Usage
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                 Created
               </th>
               {canManage && (
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                   Actions
                 </th>
               )}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="ds-bg-surface divide-y ds-border-subtle">
             {materials.map((material) => (
-              <tr key={material._id} className="hover:bg-gray-50">
+              <tr key={material._id} className="hover:bg-ds-bg-surface-muted/60">
                 <td className="px-6 py-4">
-                  <div className="text-sm font-medium text-gray-900">{material.name}</div>
+                  <div className="text-sm font-medium ds-text-primary">{material.name}</div>
                   {material.description && (
-                    <div className="text-sm text-gray-500 truncate max-w-xs">
+                    <div className="text-sm ds-text-muted truncate max-w-xs">
                       {material.description}
                     </div>
                   )}
                   {material.specifications && (
-                    <div className="text-xs text-gray-400 mt-1">
+                    <div className="text-xs ds-text-muted mt-1">
                       {material.specifications}
                     </div>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-900">{material.category || 'Other'}</span>
+                  <span className="text-sm ds-text-primary">{material.category || 'Other'}</span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-900">{material.defaultUnit}</span>
+                  <span className="text-sm ds-text-primary">{material.defaultUnit}</span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-900">
+                  <span className="text-sm ds-text-primary">
                     {formatCurrency(material.defaultUnitCost)}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-900">{material.usageCount || 0}</span>
+                    <span className="text-sm ds-text-primary">{material.usageCount || 0}</span>
                     {material.isCommon && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-500/15 text-amber-100 border border-amber-400/60">
                         Common
                       </span>
                     )}
@@ -124,14 +124,14 @@ export function MaterialLibraryTable({
                   <span
                     className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                       material.isActive
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-gray-100 text-gray-800'
+                        ? 'bg-emerald-500/15 text-emerald-100 border border-emerald-400/60'
+                        : 'bg-slate-500/15 text-slate-100 border border-slate-400/60'
                     }`}
                   >
                     {material.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                   {formatDate(material.createdAt)}
                 </td>
                 {canManage && (
@@ -139,7 +139,7 @@ export function MaterialLibraryTable({
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => onEdit(material._id)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-blue-400 hover:text-blue-300"
                         title="Edit material"
                       >
                         Edit
@@ -148,7 +148,7 @@ export function MaterialLibraryTable({
                         <button
                           onClick={() => onDuplicate(material._id)}
                           disabled={duplicatingId === material._id}
-                          className="text-purple-600 hover:text-purple-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="text-purple-400 hover:text-purple-300 disabled:opacity-50 disabled:cursor-not-allowed"
                           title="Duplicate material"
                         >
                           {duplicatingId === material._id ? '...' : '📋'}
@@ -158,8 +158,8 @@ export function MaterialLibraryTable({
                         onClick={() => onToggleCommon(material._id, material.isCommon)}
                         className={`${
                           material.isCommon
-                            ? 'text-yellow-600 hover:text-yellow-800'
-                            : 'text-gray-600 hover:text-gray-800'
+                            ? 'text-amber-300 hover:text-amber-200'
+                            : 'ds-text-muted hover:ds-text-secondary'
                         }`}
                         title={material.isCommon ? 'Remove from common' : 'Mark as common'}
                       >
@@ -169,8 +169,8 @@ export function MaterialLibraryTable({
                         onClick={() => onToggleActive(material._id, material.isActive)}
                         className={`${
                           material.isActive
-                            ? 'text-green-600 hover:text-green-800'
-                            : 'text-gray-600 hover:text-gray-800'
+                            ? 'text-emerald-300 hover:text-emerald-200'
+                            : 'ds-text-muted hover:ds-text-secondary'
                         }`}
                         title={material.isActive ? 'Deactivate' : 'Activate'}
                       >
@@ -178,7 +178,7 @@ export function MaterialLibraryTable({
                       </button>
                       <button
                         onClick={() => onDelete(material._id, material.name)}
-                        className="text-red-600 hover:text-red-800"
+                        className="text-red-400 hover:text-red-300"
                         title="Delete material"
                       >
                         Delete

@@ -191,7 +191,7 @@ const NavSection = memo(function NavSection({ section, pathname, isCollapsed, on
                 name="chevron"
                 className={`w-4 h-4 transition-transform duration-200 flex-shrink-0 ${
                   isExpanded ? 'transform rotate-90' : ''
-                } ${isActive || isParentActive ? colors.icon.split(' ')[0] : 'text-gray-400'}`}
+                } ${isActive || isParentActive ? colors.icon.split(' ')[0] : 'ds-text-muted'}`}
               />
             )}
             {!isCollapsed && section.badge && <Badge count={section.badge} />}
@@ -336,14 +336,14 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
   if (loading || !user) {
     return (
       <aside
-        className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen ${
-          isCollapsed ? 'w-16' : 'w-64'
+        className={`ds-bg-sidebar ds-border-sidebar border-r shadow-xl transition-all duration-300 flex flex-col h-screen ${
+          isCollapsed ? 'w-16 lg:w-20' : 'w-64 lg:w-72'
         }`}
       >
         <div className="p-4">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="animate-pulse space-y-3">
+            <div className="h-4 bg-slate-500 rounded w-3/4"></div>
+            <div className="h-4 bg-slate-500 rounded w-1/2"></div>
           </div>
         </div>
       </aside>
@@ -456,26 +456,33 @@ const SidebarContent = memo(function SidebarContent({
 
   return (
     <aside
-      className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen ${
+      className={`ds-bg-sidebar ds-border-sidebar border-r shadow-xl transition-all duration-300 flex flex-col h-screen ${
         isCollapsed ? 'w-16 lg:w-20' : 'w-64 lg:w-72'
       }`}
     >
       {/* Logo/Brand - Sticky Top */}
-      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white z-10">
+      <div className="p-4 border-b ds-border-sidebar flex-shrink-0 ds-bg-sidebar-section-secondary z-10">
         <div className="flex items-center justify-between gap-2">
           {!isCollapsed && (
-            <Link href="/dashboard" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors truncate">
+            <Link
+              href="/dashboard"
+              className="text-xl font-bold text-white hover:text-slate-50 transition-colors truncate"
+            >
               Doshaki
             </Link>
           )}
           {isCollapsed && (
-            <Link href="/dashboard" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors" title="Doshaki">
+            <Link
+              href="/dashboard"
+              className="text-xl font-bold text-white hover:text-slate-50 transition-colors"
+              title="Doshaki"
+            >
               K
             </Link>
           )}
           <button
             onClick={onToggleCollapse}
-            className="p-1.5 sm:p-2 rounded-md hover:bg-gray-100 active:bg-gray-200 text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="p-1.5 sm:p-2 rounded-md hover:bg-slate-600 active:bg-slate-500 text-slate-200 hover:text-white transition-colors flex-shrink-0 touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -532,16 +539,16 @@ const SidebarContent = memo(function SidebarContent({
       </div>
 
       {/* Bottom Sections - Sticky */}
-      <div className="flex-shrink-0 border-t border-gray-200 bg-white">
+      <div className="flex-shrink-0 border-t ds-border-sidebar ds-bg-sidebar-section-secondary">
         {/* Contextual Quick Actions */}
         <ContextualQuickActions isCollapsed={isCollapsed} />
 
         {/* User Info (when not collapsed) */}
         {!isCollapsed && user && (
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-slate-600">
             <div className="text-sm">
-              <p className="font-medium text-gray-900 truncate">{user.firstName || user.email}</p>
-              <p className="text-gray-500 capitalize text-xs truncate">{user.role || 'User'}</p>
+              <p className="font-medium text-white truncate">{user.firstName || user.email}</p>
+              <p className="text-slate-200 capitalize text-xs truncate">{user.role || 'User'}</p>
             </div>
           </div>
         )}
