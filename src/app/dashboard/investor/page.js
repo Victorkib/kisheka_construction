@@ -301,7 +301,7 @@ export default function InvestorDashboardPage() {
               </div>
               <div>
                 <div className="text-sm ds-text-secondary">My Remaining Balance</div>
-                <div className="text-xl font-semibold text-blue-600 mt-1">
+                <div className="text-xl font-semibold ds-text-accent-primary mt-1">
                   {formatCurrency(investorCapitalBalance)}
                 </div>
               </div>
@@ -346,13 +346,13 @@ export default function InvestorDashboardPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
                         {formatCurrency(project.capitalUsed)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-accent-primary">
                         {formatCurrency(project.capitalBalance)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <Link
                           href={`/projects/${project.projectId}/finances`}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="ds-text-accent-primary hover:text-blue-900"
                         >
                           View Details →
                         </Link>
@@ -402,7 +402,7 @@ export default function InvestorDashboardPage() {
           </p>
           <Link
             href="/projects"
-            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-block px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover"
           >
             View Projects
           </Link>

@@ -19,11 +19,11 @@ function NotFoundContent() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
+      <div className="min-h-screen flex items-center justify-center ds-bg-app px-4">
         <div className="max-w-2xl w-full text-center">
           {/* Large 404 Display */}
           <div className="mb-8">
-            <div className="text-9xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 mb-4">
+            <div className="text-9xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 mb-4">
               404
             </div>
             <div className="text-6xl mb-4">🏗️</div>
@@ -50,7 +50,7 @@ function NotFoundContent() {
                 className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400/60 hover:border-blue-400 hover:shadow-md transition-all group"
               >
                 <div className="text-3xl mb-2">📊</div>
-                <h3 className="font-semibold ds-text-primary mb-1 group-hover:text-blue-600 transition-colors">
+                <h3 className="font-semibold ds-text-primary mb-1 group-hover:ds-text-accent-primary transition-colors">
                   Dashboard
                 </h3>
                 <p className="text-sm ds-text-secondary">
@@ -108,7 +108,7 @@ function NotFoundContent() {
               </button>
               <Link
                 href="/"
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg text-center"
+                className="px-6 py-3 ds-bg-accent-primary hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors shadow-md hover:shadow-lg text-center"
               >
                 Go to Homepage
               </Link>
@@ -116,11 +116,11 @@ function NotFoundContent() {
           </div>
 
           {/* Helpful Information */}
-          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-6">
-            <h3 className="font-semibold text-blue-900 mb-2">
+          <div className="bg-blue-500/10 border border-blue-400/60 rounded-lg p-6">
+            <h3 className="font-semibold ds-text-accent-primary mb-2">
               Need Help?
             </h3>
-            <p className="text-sm text-blue-800 mb-4">
+            <p className="text-sm ds-text-accent-primary mb-4">
               If you believe this is an error, please contact your system administrator or check the URL for typos.
             </p>
             <div className="flex flex-wrap gap-2 justify-center">

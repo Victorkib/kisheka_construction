@@ -454,7 +454,7 @@ export default function StockPage() {
       );
     }
     return (
-      <span className="ml-1 text-blue-600">
+      <span className="ml-1 ds-text-accent-primary">
         {sortConfig.direction === 'asc' ? (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -633,7 +633,7 @@ export default function StockPage() {
                     type="checkbox"
                     checked={filters.lowStockOnly}
                     onChange={(e) => handleFilterChange('lowStockOnly', e.target.checked)}
-                    className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500 w-4 h-4"
+                    className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus w-4 h-4"
                   />
                   <span className="ml-2 text-sm ds-text-secondary">Low stock only (&lt;20%)</span>
                 </label>
@@ -764,7 +764,7 @@ export default function StockPage() {
                           <td className="px-4 py-4 whitespace-nowrap">
                             <Link
                               href={`/items/${material._id}`}
-                              className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                              className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               {material.name || material.materialName}
                             </Link>
@@ -802,7 +802,7 @@ export default function StockPage() {
                               <div className="flex flex-col">
                                 <Link
                                   href={`/purchase-orders/${material.purchaseOrderId || material.linkedPurchaseOrderId}`}
-                                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                                  className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                                 >
                                   {material.purchaseOrderNumber}
                                 </Link>
@@ -862,7 +862,7 @@ export default function StockPage() {
                             <div className="flex flex-col gap-2">
                               <Link
                                 href={`/items/${material._id}`}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 View
                               </Link>
@@ -935,7 +935,7 @@ export default function StockPage() {
                     <div className="flex justify-between items-start mb-3">
                       <Link
                         href={`/items/${material._id}`}
-                        className="text-base font-semibold text-blue-600 hover:text-blue-900 flex-1"
+                        className="text-base font-semibold ds-text-accent-primary hover:ds-text-accent-hover flex-1"
                       >
                         {material.name || material.materialName}
                       </Link>
@@ -975,7 +975,7 @@ export default function StockPage() {
                         {material.purchaseOrderNumber ? (
                           <Link
                             href={`/purchase-orders/${material.purchaseOrderId || material.linkedPurchaseOrderId}`}
-                            className="ml-1 text-blue-600 hover:text-blue-800 font-medium text-sm"
+                            className="ml-1 ds-text-accent-primary hover:ds-text-accent-hover font-medium text-sm"
                           >
                             {material.purchaseOrderNumber}
                             {material.isBulkOrder && <span className="text-xs text-purple-600 ml-1">(Bulk)</span>}
@@ -1025,7 +1025,7 @@ export default function StockPage() {
                     <div className="flex flex-col gap-2 pt-3 border-t ds-border-subtle">
                       <Link
                         href={`/items/${material._id}`}
-                        className="text-sm text-blue-600 hover:text-blue-900 font-medium text-center py-2"
+                        className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium text-center py-2"
                       >
                         View Details →
                       </Link>
@@ -1128,7 +1128,7 @@ export default function StockPage() {
                             onClick={() => handlePageChange(pageNum)}
                             className={`px-3 py-2 rounded-lg text-sm font-medium ${
                               pagination.page === pageNum
-                                ? 'bg-blue-600 text-white'
+                                ? 'ds-bg-accent-primary text-white'
                                 : 'ds-bg-surface ds-text-secondary border ds-border-subtle hover:ds-bg-surface-muted'
                             }`}
                           >

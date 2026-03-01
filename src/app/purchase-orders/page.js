@@ -254,7 +254,7 @@ function PurchaseOrdersPageContent() {
           {canAccess('create_purchase_order') && (
             <Link
               href="/purchase-orders/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              className="ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
             >
               + New Order
             </Link>
@@ -382,7 +382,7 @@ function PurchaseOrdersPageContent() {
             {canAccess('create_purchase_order') && (
               <Link
                 href="/purchase-orders/new"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="inline-block ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
               >
                 Create Your First Order
               </Link>
@@ -440,7 +440,7 @@ function PurchaseOrdersPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <Link
                             href={`/purchase-orders/${order._id}`}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                           >
                             {order.purchaseOrderNumber}
                           </Link>
@@ -455,7 +455,7 @@ function PurchaseOrdersPageContent() {
                           {order.phaseName ? (
                             <Link
                               href={`/phases/${order.phaseId}`}
-                              className="text-blue-600 hover:text-blue-800 font-medium"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                             >
                               {order.phaseName}
                             </Link>
@@ -492,7 +492,7 @@ function PurchaseOrdersPageContent() {
                             {canView && (
                               <Link
                                 href={`/purchase-orders/${order._id}`}
-                                className="text-blue-600 hover:text-blue-800"
+                                className="ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 View
                               </Link>

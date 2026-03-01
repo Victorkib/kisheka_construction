@@ -253,7 +253,7 @@ export default function EquipmentDetailPage() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || 'Equipment not found'}
           </div>
-          <Link href="/equipment" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/equipment" className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Equipment
           </Link>
         </div>
@@ -266,7 +266,7 @@ export default function EquipmentDetailPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/equipment" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block font-medium text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/equipment" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active mb-4 inline-block font-medium text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Equipment
           </Link>
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
@@ -279,14 +279,14 @@ export default function EquipmentDetailPage() {
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
                   <Link 
                     href={`/projects/${project._id}`}
-                    className="text-blue-600 hover:text-blue-800 active:text-blue-900 transition-colors touch-manipulation"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active transition-colors touch-manipulation"
                   >
                     Project: {project.projectName}
                   </Link>
                   <span className="ds-text-muted">•</span>
                   <Link 
                     href={`/phases/${phase._id}`}
-                    className="text-blue-600 hover:text-blue-800 active:text-blue-900 transition-colors touch-manipulation"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active transition-colors touch-manipulation"
                   >
                     Phase: {phase.phaseName}
                   </Link>
@@ -397,7 +397,7 @@ export default function EquipmentDetailPage() {
                   <span className="font-semibold">End:</span> {formatDate(equipment.endDate)}
                 </p>
               ) : (
-                <p className="text-sm font-semibold text-blue-600">Ongoing</p>
+                <p className="text-sm font-semibold ds-text-accent-primary">Ongoing</p>
               )}
             </div>
             {equipment.startDate && equipment.endDate && (
@@ -411,7 +411,7 @@ export default function EquipmentDetailPage() {
         {/* Utilization */}
         <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle p-4 sm:p-6 mb-6">
           <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4 sm:mb-6 flex items-center gap-2">
-            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 ds-text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
             Utilization
@@ -426,7 +426,7 @@ export default function EquipmentDetailPage() {
             <div className="bg-blue-50 rounded-lg p-4 border border-blue-400/60">
               <p className="text-sm font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Actual Hours</p>
               <p className="text-2xl font-bold text-blue-700">
-                {equipment.utilization?.actualHours || 0} <span className="text-base font-normal text-blue-600">hrs</span>
+                {equipment.utilization?.actualHours || 0} <span className="text-base font-normal ds-text-accent-primary">hrs</span>
               </p>
             </div>
             <div className="bg-green-50 rounded-lg p-4 border border-green-400/60">
@@ -459,7 +459,7 @@ export default function EquipmentDetailPage() {
               <div className="flex-1 min-w-0">
                 <Link
                   href={`/suppliers/${supplier._id}`}
-                  className="text-base sm:text-lg font-bold text-blue-600 hover:text-blue-800 active:text-blue-900 transition-colors break-words touch-manipulation"
+                  className="text-base sm:text-lg font-bold ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active transition-colors break-words touch-manipulation"
                 >
                   {supplier.supplierName || supplier.name}
                 </Link>
@@ -509,7 +509,7 @@ export default function EquipmentDetailPage() {
               <div className="p-4 sm:p-8">
                 <div className="flex justify-between items-center mb-4 sm:mb-6 pb-4 border-b ds-border-subtle">
                   <h2 className="text-lg sm:text-2xl font-bold ds-text-primary flex items-center gap-2">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 ds-text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                     Edit Equipment

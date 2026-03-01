@@ -139,7 +139,7 @@ export default function NewCategoryPage() {
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to create categories. Only Owners can create categories.</p>
           </div>
-          <Link href="/categories" className="text-blue-600 hover:text-blue-900 active:text-blue-800 underline text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/categories" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover underline text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Categories
           </Link>
         </div>
@@ -152,7 +152,7 @@ export default function NewCategoryPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/categories" className="text-blue-600 hover:text-blue-900 active:text-blue-800 text-sm sm:text-base mb-4 inline-block transition-colors touch-manipulation">
+          <Link href="/categories" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover text-sm sm:text-base mb-4 inline-block transition-colors touch-manipulation">
             ← Back to Categories
           </Link>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Create New Category</h1>
@@ -288,7 +288,7 @@ export default function NewCategoryPage() {
                       <button
                         type="button"
                         onClick={() => handleRemoveSubcategory(index)}
-                        className="text-blue-600 hover:text-blue-800 active:text-blue-900 flex-shrink-0 touch-manipulation min-w-[24px] min-h-[24px] flex items-center justify-center"
+                        className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover flex-shrink-0 touch-manipulation min-w-[24px] min-h-[24px] flex items-center justify-center"
                       >
                         ×
                       </button>
@@ -307,7 +307,7 @@ export default function NewCategoryPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
+              className="w-full sm:w-auto px-6 py-2.5 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
             >
               {loading ? 'Creating...' : 'Create Category'}
             </button>

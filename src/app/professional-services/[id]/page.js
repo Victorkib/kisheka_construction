@@ -200,7 +200,7 @@ function ProfessionalServiceDetailPageContent() {
           </div>
           <Link
             href="/professional-services"
-            className="mt-4 inline-block text-blue-600 hover:text-blue-800"
+            className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover"
           >
             ← Back to Assignments
           </Link>
@@ -216,7 +216,7 @@ function ProfessionalServiceDetailPageContent() {
         <div className="mb-8">
           <Link
             href="/professional-services"
-            className="text-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block"
           >
             ← Back to Assignments
           </Link>
@@ -242,7 +242,7 @@ function ProfessionalServiceDetailPageContent() {
               {canAccess('edit_professional_service_assignment') && assignment.status !== 'terminated' && (
                 <Link
                   href={`/professional-services/${assignmentId}/edit`}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
+                  className="px-4 py-2 ds-bg-accent-primary hover:ds-bg-accent-hover text-white font-medium rounded-lg transition"
                 >
                   Edit
                 </Link>
@@ -286,7 +286,7 @@ function ProfessionalServiceDetailPageContent() {
                     {assignment.project ? (
                       <Link
                         href={`/projects/${assignment.project._id}`}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="ds-text-accent-primary hover:ds-text-accent-hover"
                       >
                         {assignment.project.projectCode} - {assignment.project.projectName}
                       </Link>
@@ -411,7 +411,7 @@ function ProfessionalServiceDetailPageContent() {
                 <h2 className="text-xl font-semibold">Recent Activities</h2>
                 <Link
                   href={`/professional-activities?professionalServiceId=${assignmentId}`}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  className="ds-text-accent-primary hover:ds-text-accent-hover text-sm"
                 >
                   View All →
                 </Link>
@@ -461,7 +461,7 @@ function ProfessionalServiceDetailPageContent() {
                 <h2 className="text-xl font-semibold">Recent Fees</h2>
                 <Link
                   href={`/professional-fees?professionalServiceId=${assignmentId}`}
-                  className="text-blue-600 hover:text-blue-800 text-sm"
+                  className="ds-text-accent-primary hover:ds-text-accent-hover text-sm"
                 >
                   View All →
                 </Link>

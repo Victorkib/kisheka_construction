@@ -1059,7 +1059,7 @@ function NewPurchaseOrderPageContent() {
                   <button
                     type="button"
                     onClick={() => setShowSupplierModal(true)}
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                    className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                   >
                     + Create New Supplier
                   </button>
@@ -1283,7 +1283,7 @@ function NewPurchaseOrderPageContent() {
                 isLoading={loading || validatingCapital}
                 loadingText={loading ? "Creating Purchase Order..." : "Validating..."}
                 disabled={capitalValidation && !capitalValidation.isValid}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 ds-bg-accent-primary hover:bg-blue-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Create Purchase Order
               </LoadingButton>
@@ -1455,7 +1455,7 @@ function NewPurchaseOrderPageContent() {
             type="submit"
             isLoading={loading}
             loadingText="Creating..."
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700"
           >
             Create Supplier
           </LoadingButton>

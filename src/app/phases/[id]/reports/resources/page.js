@@ -91,7 +91,7 @@ export default function ResourcesReportPage() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Failed to load resource report'}
           </div>
-          <Link href={`/phases/${params.id}`} className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href={`/phases/${params.id}`} className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Phase
           </Link>
         </div>
@@ -106,7 +106,7 @@ export default function ResourcesReportPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href={`/phases/${params.id}/dashboard`} className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href={`/phases/${params.id}/dashboard`} className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Dashboard
           </Link>
           <div className="flex justify-between items-center">
@@ -143,7 +143,7 @@ export default function ResourcesReportPage() {
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Total Resource Cost</p>
-              <p className="text-2xl font-bold text-blue-600">{formatCurrency(summary.totalResourceCost)}</p>
+              <p className="text-2xl font-bold ds-text-accent-primary">{formatCurrency(summary.totalResourceCost)}</p>
             </div>
           </div>
         </div>
@@ -158,7 +158,7 @@ export default function ResourcesReportPage() {
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Average Utilization</p>
-              <p className="text-xl font-bold text-blue-600">{equipment.averageUtilization}%</p>
+              <p className="text-xl font-bold ds-text-accent-primary">{equipment.averageUtilization}%</p>
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Total Items</p>
@@ -207,7 +207,7 @@ export default function ResourcesReportPage() {
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Average Performance</p>
-              <p className="text-xl font-bold text-blue-600">{subcontractors.averagePerformance}/5</p>
+              <p className="text-xl font-bold ds-text-accent-primary">{subcontractors.averagePerformance}/5</p>
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Total Contracts</p>
@@ -232,7 +232,7 @@ export default function ResourcesReportPage() {
                       <td className="px-4 py-3 text-sm font-medium ds-text-primary">{item.subcontractorName}</td>
                       <td className="px-4 py-3 text-sm ds-text-secondary capitalize">{item.subcontractorType}</td>
                       <td className="px-4 py-3 text-sm font-semibold ds-text-primary">{formatCurrency(item.contractValue)}</td>
-                      <td className="px-4 py-3 text-sm text-blue-600">{formatCurrency(item.totalPaid)}</td>
+                      <td className="px-4 py-3 text-sm ds-text-accent-primary">{formatCurrency(item.totalPaid)}</td>
                       <td className="px-4 py-3 text-sm ds-text-secondary">{item.performance.average}/5</td>
                     </tr>
                   ))}

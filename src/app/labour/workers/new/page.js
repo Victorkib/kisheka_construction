@@ -52,7 +52,7 @@ function NewWorkerPageContent() {
         <div className="container mx-auto px-4 py-8">
           <div className="bg-red-500/10 border border-red-400/60 rounded-lg p-6 text-center">
             <p className="text-red-200">You do not have permission to create worker profiles.</p>
-            <Link href="/labour/workers" className="text-blue-400 hover:text-blue-300 mt-4 inline-block">
+            <Link href="/labour/workers" className="ds-text-accent-primary hover:ds-text-accent-hover mt-4 inline-block">
               ← Back to Workers
             </Link>
           </div>
@@ -366,7 +366,7 @@ function NewWorkerPageContent() {
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
             >
               {loading ? (
                 <>

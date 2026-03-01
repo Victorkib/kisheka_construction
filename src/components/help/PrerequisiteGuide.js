@@ -47,28 +47,28 @@ export default function PrerequisiteGuide({
 
   // Determine card styling based on state
   const cardClasses = isFullyBlocked
-    ? 'mb-6 border-2 border-red-400/60 bg-gradient-to-br from-red-50 to-orange-50'
+    ? 'mb-6 border-2 border-red-400/60 bg-red-500/10'
     : isReady
-    ? 'mb-6 border border-green-400/60 bg-gradient-to-br from-green-50 to-emerald-50'
+    ? 'mb-6 border border-green-400/60 bg-green-500/10'
     : hasWarnings
-    ? 'mb-6 border border-yellow-400/60 bg-gradient-to-br from-yellow-50 to-amber-50'
-    : 'mb-6 border border-blue-100 bg-blue-50/60';
+    ? 'mb-6 border border-yellow-400/60 bg-yellow-500/10'
+    : 'mb-6 border ds-border-accent-subtle ds-bg-accent-subtle';
 
   const headerColor = isFullyBlocked
-    ? 'text-red-900'
+    ? 'text-red-200'
     : isReady
-    ? 'text-green-900'
+    ? 'text-emerald-200'
     : hasWarnings
-    ? 'text-yellow-900'
-    : 'text-blue-900';
+    ? 'text-amber-200'
+    : 'ds-text-accent-primary';
 
   const textColor = isFullyBlocked
-    ? 'text-red-800'
+    ? 'text-red-200'
     : isReady
-    ? 'text-green-800'
+    ? 'text-emerald-200'
     : hasWarnings
-    ? 'text-yellow-800'
-    : 'text-blue-900/80';
+    ? 'text-amber-200'
+    : 'ds-text-accent-primary';
 
   // Get badge variant
   const badgeVariant = isFullyBlocked
@@ -115,7 +115,7 @@ export default function PrerequisiteGuide({
                   {item.completed ? (
                     <>
                       <svg
-                        className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5"
+                        className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -132,7 +132,7 @@ export default function PrerequisiteGuide({
                   ) : (
                     <>
                       <svg
-                        className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5"
+                        className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -149,7 +149,7 @@ export default function PrerequisiteGuide({
                         {item.actionUrl && (
                           <Link
                             href={item.actionUrl}
-                            className="ml-2 inline-flex items-center text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                            className="ml-2 inline-flex items-center text-xs font-medium ds-text-accent-primary hover:ds-text-accent-hover transition-colors"
                           >
                             {item.actionLabel || 'Fix'} →
                           </Link>
@@ -187,8 +187,8 @@ export default function PrerequisiteGuide({
                   href={action.href}
                   className={`inline-flex items-center rounded-md px-3 py-1.5 text-sm font-medium shadow-sm ring-1 transition ${
                     isDisabled
-                      ? 'ds-bg-surface-muted ds-text-muted ring-gray-200 cursor-not-allowed'
-                      : 'ds-bg-surface text-blue-700 ring-blue-200 hover:bg-blue-50'
+                      ? 'ds-bg-surface-muted ds-text-muted ds-border-subtle cursor-not-allowed'
+                      : 'ds-bg-surface ds-text-accent-primary ds-border-accent-subtle hover:ds-bg-accent-subtle'
                   }`}
                   onClick={(e) => isDisabled && e.preventDefault()}
                   title={isDisabled ? 'Complete prerequisites first' : ''}

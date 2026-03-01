@@ -612,7 +612,7 @@ function RejectionsDashboardContent() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <a
                           href={`/purchase-orders/${order._id}`}
-                          className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                          className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                         >
                           {order.purchaseOrderNumber}
                         </a>
@@ -666,7 +666,7 @@ function RejectionsDashboardContent() {
                           <button
                             onClick={() => handleAutoReassign(order._id, 'simple')}
                             disabled={reassigningOrderId === order._id}
-                            className="text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Find alternative suppliers"
                           >
                             <RefreshCw className={`w-4 h-4 ${reassigningOrderId === order._id ? 'animate-spin' : ''}`} />

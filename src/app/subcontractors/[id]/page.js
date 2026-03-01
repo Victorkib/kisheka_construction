@@ -116,7 +116,7 @@ export default function SubcontractorDetailPage() {
       
       // Fetch phase
       if (data.data.phaseId) {
-        const response = await fetch(`/api/phases/${data.data.phaseId}`, {
+        const phaseResponse = await fetch(`/api/phases/${data.data.phaseId}`, {
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -129,7 +129,7 @@ export default function SubcontractorDetailPage() {
           
           // Fetch project
           if (phaseData.data.projectId) {
-            const response = await fetch(`/api/projects/${phaseData.data.projectId}`, {
+            const projectResponse = await fetch(`/api/projects/${phaseData.data.projectId}`, {
               cache: 'no-store',
               headers: {
                 'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -303,7 +303,7 @@ export default function SubcontractorDetailPage() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Subcontractor not found'}
           </div>
-          <Link href="/subcontractors" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href="/subcontractors" className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Subcontractors
           </Link>
         </div>
@@ -322,7 +322,7 @@ export default function SubcontractorDetailPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/subcontractors" className="text-blue-600 hover:text-blue-800 mb-4 inline-block font-medium">
+          <Link href="/subcontractors" className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block font-medium">
             ← Back to Subcontractors
           </Link>
           <div className="flex justify-between items-start">
@@ -335,14 +335,14 @@ export default function SubcontractorDetailPage() {
                 <div className="mt-2 space-x-4 text-sm">
                   <Link 
                     href={`/projects/${project._id}`}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover"
                   >
                     Project: {project.projectName}
                   </Link>
                   <span className="ds-text-muted">•</span>
                   <Link 
                     href={`/phases/${phase._id}`}
-                    className="text-blue-600 hover:text-blue-800"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover"
                   >
                     Phase: {phase.phaseName}
                   </Link>

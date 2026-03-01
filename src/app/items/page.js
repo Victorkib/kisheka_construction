@@ -532,7 +532,7 @@ function ItemsPageContent() {
       );
     }
     return (
-      <span className="ml-1 text-blue-600">
+      <span className="ml-1 ds-text-accent-primary">
         {sortConfig.direction === 'asc' ? (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -604,7 +604,7 @@ function ItemsPageContent() {
             {canAccess('create_material') && (
               <Link
                 href={`/items/new${filters.projectId ? `?projectId=${filters.projectId}&entryType=retroactive_entry` : '?entryType=retroactive_entry'}`}
-                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
+                className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
               >
                 + Add Material
               </Link>
@@ -803,7 +803,7 @@ function ItemsPageContent() {
             {canAccess('create_material') && (
               <Link
                 href={`/items/new${filters.projectId ? `?projectId=${filters.projectId}&entryType=retroactive_entry` : '?entryType=retroactive_entry'}`}
-                className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition"
+                className="mt-4 inline-block px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 font-medium transition"
               >
                 + Add Material
               </Link>
@@ -822,7 +822,7 @@ function ItemsPageContent() {
                           type="checkbox"
                           checked={selectedMaterials.length === materials.length && materials.length > 0}
                           onChange={toggleSelectAll}
-                          className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                          className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                         />
                       </th>
                       <th
@@ -898,7 +898,7 @@ function ItemsPageContent() {
                             type="checkbox"
                             checked={selectedMaterials.includes(material._id)}
                             onChange={() => toggleSelectMaterial(material._id)}
-                            className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                            className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                           />
                         </td>
                         <td className="px-4 py-4">
@@ -914,7 +914,7 @@ function ItemsPageContent() {
                             {material.purchaseOrderId && (
                               <Link
                                 href={`/purchase-orders/${material.purchaseOrderId}`}
-                                className="text-xs text-blue-600 hover:text-blue-800"
+                                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 📦 PO
                               </Link>
@@ -1000,7 +1000,7 @@ function ItemsPageContent() {
                           <div className="flex flex-col gap-1">
                             <Link
                               href={`/items/${material._id}`}
-                              className="text-blue-600 hover:text-blue-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               View
                             </Link>
@@ -1040,11 +1040,11 @@ function ItemsPageContent() {
                           type="checkbox"
                           checked={selectedMaterials.includes(material._id)}
                           onChange={() => toggleSelectMaterial(material._id)}
-                          className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                          className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                         />
                         <Link
                           href={`/items/${material._id}`}
-                          className="text-base font-semibold text-blue-600 hover:text-blue-900 flex-1"
+                          className="text-base font-semibold ds-text-accent-primary hover:ds-text-accent-hover flex-1"
                         >
                           {material.name || material.materialName}
                         </Link>

@@ -426,7 +426,7 @@ function FloorBudgetAllocationContent() {
             <div className="mt-4">
               <button
                 onClick={handleApplySuggestions}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition text-sm font-medium"
               >
                 Apply Suggestions
               </button>
@@ -533,7 +533,7 @@ function FloorBudgetAllocationContent() {
           <button
             onClick={handleSave}
             disabled={isSaving || isOverAllocated}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
+            className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
           >
             {isSaving ? 'Saving...' : 'Save Allocations'}
           </button>

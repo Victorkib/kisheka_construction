@@ -258,7 +258,7 @@ function BudgetDashboardContent() {
                 <p className="text-base ds-text-secondary leading-normal mb-4">No projects available. Create a project to view budget variance.</p>
                 <Link
                   href="/projects/new"
-                  className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                  className="inline-block px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
                 >
                   Create Project
                 </Link>
@@ -344,7 +344,7 @@ function BudgetDashboardContent() {
                 {selectedProjectId && (
                   <Link
                     href={`/projects/${selectedProjectId}/finances`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                    className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
                   >
                     Financial Overview
                   </Link>
@@ -371,7 +371,7 @@ function BudgetDashboardContent() {
                 ) : (
                   <Link
                     href="/projects/new"
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                    className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
                   >
                     Create Project
                   </Link>
@@ -415,14 +415,14 @@ function BudgetDashboardContent() {
                 <div className="flex gap-3">
                   <Link
                     href={`/projects/${selectedProjectId}/finances`}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
                   >
                     Financial Overview →
                   </Link>
                   <span className="text-blue-300">|</span>
                   <Link
                     href={`/financing${selectedProjectId ? `?projectId=${selectedProjectId}` : ''}`}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
                   >
                     Financing Dashboard →
                   </Link>
@@ -543,7 +543,7 @@ function BudgetDashboardContent() {
                     return (
                       <div className="w-full bg-blue-50 border border-blue-400/60 rounded-lg p-3">
                         <p className="text-sm text-blue-800">{materialsStatus.message}</p>
-                        <p className="text-xs text-blue-600 mt-1">Current Spending: {formatCurrency(data.materials.actual || 0)}</p>
+                        <p className="text-xs ds-text-accent-primary mt-1">Current Spending: {formatCurrency(data.materials.actual || 0)}</p>
                       </div>
                     );
                   }

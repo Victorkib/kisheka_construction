@@ -312,7 +312,7 @@ function WorkItemsPageContent() {
                   aria-expanded={isInfoExpanded}
                 >
                   <svg 
-                    className={`w-5 h-5 sm:w-6 sm:h-6 text-blue-600 transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ds-text-accent-primary transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -330,7 +330,7 @@ function WorkItemsPageContent() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="ds-bg-surface/60 rounded-lg p-4 border border-blue-400/60">
                       <h4 className="font-semibold ds-text-primary mb-2 flex items-center gap-2 text-sm sm:text-base">
-                        <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         Who uses this?
@@ -341,7 +341,7 @@ function WorkItemsPageContent() {
                     </div>
                     <div className="ds-bg-surface/60 rounded-lg p-4 border border-blue-400/60">
                       <h4 className="font-semibold ds-text-primary mb-2 flex items-center gap-2 text-sm sm:text-base">
-                        <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         Why it's important?
@@ -465,7 +465,7 @@ function WorkItemsPageContent() {
                   type="checkbox"
                   checked={filters.unassigned}
                   onChange={(e) => handleFilterChange('unassigned', e.target.checked)}
-                  className="w-5 h-5 text-blue-600 ds-border-subtle rounded focus:ring-blue-500 touch-manipulation"
+                  className="w-5 h-5 ds-text-accent-primary ds-border-subtle rounded focus:ring-ds-accent-focus touch-manipulation"
                 />
                 <span className="text-sm font-semibold ds-text-primary">
                   Unassigned Only
@@ -562,7 +562,7 @@ function WorkItemsPageContent() {
                             <div>
                               <Link
                                 href={`/work-items/${item._id}`}
-                                className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                                className="text-sm font-semibold ds-text-accent-primary hover:ds-text-accent-hover transition-colors"
                               >
                                 {item.name}
                               </Link>
@@ -577,14 +577,14 @@ function WorkItemsPageContent() {
                             {item.phaseName ? (
                               <Link
                                 href={`/phases/${item.phaseId}`}
-                                className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover transition-colors"
                               >
                                 {item.phaseName}
                               </Link>
                             ) : item.phaseId ? (
                               <Link
                                 href={`/phases/${item.phaseId}`}
-                                className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover transition-colors"
                               >
                                 View Phase
                               </Link>
@@ -599,7 +599,7 @@ function WorkItemsPageContent() {
                                   <Link
                                     key={worker._id?.toString()}
                                     href={`/labour/workers/${worker._id}`}
-                                    className="text-xs font-medium text-blue-600 hover:text-blue-800 transition-colors"
+                                    className="text-xs font-medium ds-text-accent-primary hover:ds-text-accent-hover transition-colors"
                                     title={worker.workerName}
                                   >
                                     {worker.workerName}

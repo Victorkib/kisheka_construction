@@ -156,7 +156,7 @@ function MaterialTemplatesPageContent() {
           {canCreate && (
             <Link
               href="/material-templates/new"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ds-bg-accent-primary hover:ds-bg-accent-hover"
             >
               + Create Template
             </Link>
@@ -274,7 +274,7 @@ function MaterialTemplatesPageContent() {
             {canCreate && (
               <Link
                 href="/material-templates/new"
-                className="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium"
+                className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover font-medium"
               >
                 Create your first template →
               </Link>

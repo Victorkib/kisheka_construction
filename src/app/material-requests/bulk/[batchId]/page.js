@@ -188,7 +188,7 @@ function BatchDetailPageContent() {
           <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error || 'Batch not found'}
           </div>
-          <Link href="/material-requests" className="text-blue-600 hover:text-blue-800">
+          <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Material Requests
           </Link>
         </div>
@@ -225,7 +225,7 @@ function BatchDetailPageContent() {
         />
         {/* Header */}
         <div className="mb-8">
-          <Link href="/material-requests" className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
+          <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block">
             ← Back to Material Requests
           </Link>
           {(financeLoading || projectFinances || financeError) && (
@@ -328,7 +328,7 @@ function BatchDetailPageContent() {
               {canAssignSuppliers && (
                 <Link
                   href={`/material-requests/bulk/${params.batchId}/assign-suppliers`}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium"
                 >
                   Assign Suppliers
                 </Link>
@@ -440,7 +440,7 @@ function BatchDetailPageContent() {
                 {canAssignSuppliers && (
                   <Link
                     href={`/material-requests/bulk/${params.batchId}/assign-suppliers`}
-                    className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                    className="inline-block px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium"
                   >
                     Assign Suppliers →
                   </Link>
@@ -495,7 +495,7 @@ function BatchDetailPageContent() {
             {batch.status === 'approved' && canAssignSuppliers && (
               <Link
                 href={`/material-requests/bulk/${params.batchId}/assign-suppliers`}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+                className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium text-sm"
               >
                 📋 Assign Suppliers →
               </Link>
@@ -542,7 +542,7 @@ function BatchDetailPageContent() {
                       <td className="px-4 py-3">
                         <Link
                           href={`/material-requests/${request._id}`}
-                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover font-medium text-sm"
                         >
                           {request.requestNumber}
                         </Link>
@@ -570,7 +570,7 @@ function BatchDetailPageContent() {
                             <div className="mt-1">
                               <Link
                                 href={`/material-requests/bulk/${params.batchId}/assign-suppliers`}
-                                className="text-xs text-blue-600 hover:text-blue-800 underline"
+                                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover underline"
                               >
                                 Assign Supplier →
                               </Link>
@@ -591,7 +591,7 @@ function BatchDetailPageContent() {
                       <td className="px-4 py-3 text-right">
                         <Link
                           href={`/material-requests/${request._id}`}
-                          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
                         >
                           View →
                         </Link>
@@ -616,7 +616,7 @@ function BatchDetailPageContent() {
                   {canAssignSuppliers && (
                     <Link
                       href={`/material-requests/bulk/${params.batchId}/assign-suppliers`}
-                      className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm"
+                      className="inline-block px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium text-sm"
                     >
                       Go to Supplier Assignment Page →
                     </Link>
@@ -642,7 +642,7 @@ function BatchDetailPageContent() {
                     <span className="text-sm font-medium ds-text-primary">
                       Purchase Order #{index + 1}
                     </span>
-                    <span className="text-blue-600 hover:text-blue-800 text-sm">View →</span>
+                    <span className="ds-text-accent-primary hover:ds-text-accent-hover text-sm">View →</span>
                   </div>
                 </Link>
               ))}

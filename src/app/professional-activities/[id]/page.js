@@ -253,7 +253,7 @@ function ProfessionalActivityDetailPageContent() {
           </div>
           <Link
             href="/professional-activities"
-            className="mt-4 inline-block text-blue-600 hover:text-blue-800"
+            className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover"
           >
             ← Back to Professional Activities
           </Link>
@@ -289,7 +289,7 @@ function ProfessionalActivityDetailPageContent() {
         <div className="mb-8">
           <Link
             href="/professional-activities"
-            className="text-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block"
           >
             ← Back to Professional Activities
           </Link>
@@ -339,7 +339,7 @@ function ProfessionalActivityDetailPageContent() {
               {canEdit && (
                 <Link
                   href={`/professional-activities/${activityId}/edit`}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
+                  className="px-4 py-2 ds-bg-accent-primary hover:ds-bg-accent-hover text-white font-medium rounded-lg transition"
                 >
                   Edit
                 </Link>
@@ -381,7 +381,7 @@ function ProfessionalActivityDetailPageContent() {
                     {activity.professionalService ? (
                       <Link
                         href={`/professional-services/${normalizeId(activity.professionalService._id)}`}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="ds-text-accent-primary hover:ds-text-accent-hover"
                       >
                         {activity.professionalService.professionalCode || 'N/A'}
                       </Link>
@@ -397,7 +397,7 @@ function ProfessionalActivityDetailPageContent() {
                     {activity.project ? (
                       <Link
                         href={`/projects/${normalizeId(activity.project._id)}`}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="ds-text-accent-primary hover:ds-text-accent-hover"
                       >
                         {activity.project.projectCode} - {activity.project.projectName}
                       </Link>
@@ -556,7 +556,7 @@ function ProfessionalActivityDetailPageContent() {
                               href={test.testReportUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-sm mt-1 inline-block"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mt-1 inline-block"
                             >
                               View Report →
                             </a>
@@ -645,7 +645,7 @@ function ProfessionalActivityDetailPageContent() {
                   </div>
                   <Link
                     href={`/professional-fees/${activity.fee._id}`}
-                    className="text-blue-600 hover:text-blue-800 font-medium"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                   >
                     View Fee →
                   </Link>

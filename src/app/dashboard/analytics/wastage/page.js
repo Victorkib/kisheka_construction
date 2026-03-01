@@ -763,7 +763,7 @@ function WastageAnalyticsPageContent() {
             <p className="ds-text-secondary mb-4">You need to have at least one project to view wastage analytics.</p>
             <Link
               href="/projects/new"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="inline-flex items-center px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
             >
               Create Your First Project
             </Link>
@@ -816,7 +816,7 @@ function WastageAnalyticsPageContent() {
                 onClick={handleExportCSV}
                 isLoading={exporting.csv}
                 loadingText="Exporting..."
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 📋 CSV
               </LoadingButton>
@@ -837,7 +837,7 @@ function WastageAnalyticsPageContent() {
                     setComparisonData([]);
                   }
                 }}
-                className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
               />
               <span className="text-base font-semibold ds-text-secondary leading-normal">Compare Multiple Projects</span>
             </label>
@@ -878,7 +878,7 @@ function WastageAnalyticsPageContent() {
                             setSelectedProjects(selectedProjects.filter((id) => id !== project._id));
                           }
                         }}
-                        className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                        className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                       />
                       <span className="text-sm ds-text-primary">{project.projectName || project.projectCode}</span>
                     </label>
@@ -921,7 +921,7 @@ function WastageAnalyticsPageContent() {
                         setDateRange({ startDate: '', endDate: '' });
                       }
                     }}
-                    className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                    className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                   />
                   <span className="text-sm ds-text-secondary">All Time</span>
                 </label>
@@ -1339,7 +1339,7 @@ function WastageAnalyticsPageContent() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <Link
                               href={`/items/${discrepancy.materialId}`}
-                              className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                              className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               {discrepancy.materialName}
                             </Link>
@@ -1386,7 +1386,7 @@ function WastageAnalyticsPageContent() {
                             <div className="flex gap-2">
                               <Link
                                 href={`/items/${discrepancy.materialId}`}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 View
                               </Link>
@@ -1662,7 +1662,7 @@ function WastageAnalyticsPageContent() {
                   <LoadingButton
                     onClick={handleSaveResolution}
                     isLoading={false}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
                   >
                     Save Resolution
                   </LoadingButton>
@@ -1805,7 +1805,7 @@ function WastageAnalyticsPageContent() {
                     onClick={handleSaveThresholds}
                     isLoading={savingThresholds}
                     loadingText="Saving..."
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
                   >
                     Save Thresholds
                   </LoadingButton>

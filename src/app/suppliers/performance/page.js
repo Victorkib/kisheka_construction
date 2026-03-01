@@ -195,7 +195,7 @@ function SupplierPerformanceDashboard() {
 
   const getPerformanceGradeColor = (grade) => {
     if (grade.startsWith('A')) return 'text-green-600 bg-green-100';
-    if (grade.startsWith('B')) return 'text-blue-600 bg-blue-100';
+    if (grade.startsWith('B')) return 'ds-text-accent-primary bg-blue-500/10 border border-blue-400/60';
     if (grade.startsWith('C')) return 'text-yellow-600 bg-yellow-100';
     if (grade.startsWith('D')) return 'text-orange-600 bg-orange-100';
     return 'text-red-600 bg-red-100';
@@ -258,7 +258,7 @@ function SupplierPerformanceDashboard() {
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+                className="ds-bg-accent-primary text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
               >
                 {refreshing ? 'Refreshing...' : 'Refresh'}
               </button>

@@ -263,7 +263,7 @@ function BulkRequestPageContent() {
           <div className="text-center">
             <h1 className="text-2xl font-bold ds-text-primary mb-2">Access Denied</h1>
             <p className="ds-text-secondary">You don't have permission to create bulk material requests.</p>
-            <Link href="/material-requests" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+            <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover mt-4 inline-block">
               ← Back to Material Requests
             </Link>
           </div>
@@ -277,7 +277,7 @@ function BulkRequestPageContent() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/material-requests" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
+          <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block">
             ← Back to Material Requests
           </Link>
           <h1 className="text-3xl font-bold ds-text-primary">Bulk Material Request</h1>

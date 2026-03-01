@@ -447,6 +447,27 @@ export async function POST(request) {
       subcontractorId,
     };
 
+    // Validate executionModel and subcontractorId consistency
+    if (executionModel === 'contract_based' && subcontractorId) {
+      // Verify subcontractor exists and belongs to the same project/phase
+      const subcontractor = await db.collection('subcontractors').findOne({
+        _id: new ObjectId(subcontractorId),
+        projectId: new ObjectId(projectId),
+        phaseId: new ObjectId(phaseId),
+        deletedAt: null
+      });
+      if (!subcontractor) {
+        return errorResponse('Subcontractor not found or does not belong to this project/phase', 404);
+      }
+      
+      // For finishing phases, verify subcontractor is linked to the same floor if floorId is provided
+      if (phase.phaseType === 'finishing' && floorId && subcontractor.floorId) {
+        if (subcontractor.floorId.toString() !== floorId.toString()) {
+          return errorResponse('Subcontractor is assigned to a different floor. Please select a subcontractor assigned to this floor.', 400);
+        }
+      }
+    }
+    
     // Validate using schema
     const validation = validateWorkItem(workItemData);
     if (!validation.isValid) {

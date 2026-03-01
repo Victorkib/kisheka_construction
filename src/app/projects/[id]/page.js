@@ -104,10 +104,10 @@ function PhasesSection({ projectId, canEdit }) {
   const getStatusColor = (status) => {
     const colors = {
       'not_started': 'ds-bg-surface-muted ds-text-primary',
-      'in_progress': 'bg-blue-100 text-blue-800',
-      'completed': 'bg-green-100 text-green-800',
-      'on_hold': 'bg-yellow-100 text-yellow-800',
-      'cancelled': 'bg-red-100 text-red-800'
+      'in_progress': 'bg-blue-500/10 text-blue-200 border border-blue-400/60',
+      'completed': 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60',
+      'on_hold': 'bg-amber-500/10 text-amber-200 border border-amber-400/60',
+      'cancelled': 'bg-red-500/10 text-red-200 border border-red-400/60'
     };
     return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
@@ -147,7 +147,7 @@ function PhasesSection({ projectId, canEdit }) {
               }
             }}
             disabled={initializing}
-            className="mt-4 w-full sm:w-auto bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-medium transition-colors touch-manipulation"
+            className="mt-4 w-full sm:w-auto ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-medium transition-colors touch-manipulation"
           >
             {initializing ? 'Initializing...' : 'Initialize Default Phases'}
           </button>
@@ -163,7 +163,7 @@ function PhasesSection({ projectId, canEdit }) {
         <div className="flex flex-wrap gap-2">
           <Link
             href={`/phases?projectId=${projectId}`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
           >
             View All
           </Link>
@@ -172,7 +172,7 @@ function PhasesSection({ projectId, canEdit }) {
               <span className="ds-text-muted">|</span>
               <Link
                 href={`/phases/new?projectId=${projectId}`}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
               >
                 + New Phase
               </Link>
@@ -208,7 +208,7 @@ function PhasesSection({ projectId, canEdit }) {
                 }
               }}
               disabled={initializing}
-              className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-medium transition-colors touch-manipulation"
+              className="w-full sm:w-auto ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 disabled:bg-blue-400 disabled:cursor-not-allowed text-white px-6 py-2.5 rounded-lg font-medium transition-colors touch-manipulation"
             >
               {initializing ? 'Initializing...' : 'Initialize Default Phases'}
             </button>
@@ -240,7 +240,7 @@ function PhasesSection({ projectId, canEdit }) {
                   </div>
                   <div>
                     <p className="text-xs ds-text-secondary mb-1">Allocated to Phases</p>
-                    <p className="text-sm font-semibold text-blue-600">{formatCurrency(totalPhaseBudgets)}</p>
+                    <p className="text-sm font-semibold ds-text-accent-primary">{formatCurrency(totalPhaseBudgets)}</p>
                   </div>
                   <div>
                     <p className="text-xs ds-text-secondary mb-1">Unallocated</p>
@@ -298,7 +298,7 @@ function PhasesSection({ projectId, canEdit }) {
                       </div>
                       <div>
                         <p className="ds-text-secondary">Spent</p>
-                        <p className="font-semibold text-blue-600">{formatCurrency(financialSummary.actualTotal)}</p>
+                        <p className="font-semibold ds-text-accent-primary">{formatCurrency(financialSummary.actualTotal)}</p>
                       </div>
                       <div>
                         <p className="ds-text-secondary">Remaining</p>
@@ -336,7 +336,7 @@ function PhasesSection({ projectId, canEdit }) {
           {phases.length > 5 && (
             <Link
               href={`/phases?projectId=${projectId}`}
-              className="block text-center text-blue-600 hover:text-blue-800 text-sm font-medium py-2"
+              className="block text-center ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium py-2"
             >
               View all {phases.length} phases →
             </Link>
@@ -390,9 +390,9 @@ function BudgetVsActualSection({ projectId }) {
       case 'on_budget':
         return 'bg-green-100 text-green-800 border-green-400/60';
       case 'at_risk':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-400/60';
+        return 'bg-amber-500/10 text-amber-200 border border-amber-400/60';
       case 'over_budget':
-        return 'bg-red-100 text-red-800 border-red-400/60';
+        return 'bg-red-500/10 text-red-200 border border-red-400/60';
       default:
         return 'ds-bg-surface-muted ds-text-primary ds-border-subtle';
     }
@@ -436,7 +436,7 @@ function BudgetVsActualSection({ projectId }) {
         <h2 className="text-lg font-semibold ds-text-primary">Budget vs Actual</h2>
         <Link
           href={`/dashboard/budget?projectId=${projectId}`}
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
         >
           View Full Report →
         </Link>
@@ -513,9 +513,9 @@ function BudgetVsActualSection({ projectId }) {
           if (totalStatus.isOptional) {
             return (
               <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-3">
-                <p className="text-sm text-blue-800 font-medium mb-1">Budget Not Set</p>
-                <p className="text-xs text-blue-700">{totalStatus.message}</p>
-                <p className="text-xs text-blue-600 mt-2">Current Spending: {formatCurrency(budgetData.actual.total)}</p>
+                <p className="text-sm ds-text-accent-primary font-medium mb-1">Budget Not Set</p>
+                <p className="text-xs ds-text-accent-primary">{totalStatus.message}</p>
+                <p className="text-xs ds-text-accent-primary mt-2">Current Spending: {formatCurrency(budgetData.actual.total)}</p>
               </div>
             );
           }
@@ -620,7 +620,7 @@ function ExpensesSection({ projectId }) {
         <h2 className="text-lg font-semibold ds-text-primary">Expenses</h2>
         <Link
           href={`/expenses?projectId=${projectId}`}
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
         >
           View All →
         </Link>
@@ -636,7 +636,7 @@ function ExpensesSection({ projectId }) {
           <p className="text-sm ds-text-muted mb-2">No expenses recorded</p>
           <Link
             href={`/expenses/new?projectId=${projectId}`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
           >
             Add Expense
           </Link>
@@ -668,7 +668,7 @@ function ExpensesSection({ projectId }) {
           {expenses.length > 5 && (
             <Link
               href={`/expenses?projectId=${projectId}`}
-              className="block text-center text-sm text-blue-600 hover:text-blue-800 pt-2"
+              className="block text-center text-sm ds-text-accent-primary hover:ds-text-accent-hover pt-2"
             >
               View {expenses.length - 5} more...
             </Link>
@@ -725,7 +725,7 @@ function InitialExpensesSection({ projectId }) {
         <h2 className="text-lg font-semibold ds-text-primary">Initial Expenses</h2>
         <Link
           href={`/initial-expenses?projectId=${projectId}`}
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
         >
           View All →
         </Link>
@@ -741,7 +741,7 @@ function InitialExpensesSection({ projectId }) {
           <p className="text-sm ds-text-muted mb-2">No initial expenses recorded</p>
           <Link
             href={`/initial-expenses/new?projectId=${projectId}`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
           >
             Add Initial Expense
           </Link>
@@ -775,7 +775,7 @@ function InitialExpensesSection({ projectId }) {
           {initialExpenses.length > 5 && (
             <Link
               href={`/initial-expenses?projectId=${projectId}`}
-              className="block text-center text-sm text-blue-600 hover:text-blue-800 pt-2"
+              className="block text-center text-sm ds-text-accent-primary hover:ds-text-accent-hover pt-2"
             >
               View {initialExpenses.length - 5} more...
             </Link>
@@ -855,21 +855,21 @@ function ProjectFinancesSection({ projectId }) {
           <span className="ds-text-muted">|</span>
           <Link
             href={`/projects/${projectId}/budget`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
           >
             Budget Management →
           </Link>
           <span className="ds-text-muted">|</span>
           <Link
             href={`/projects/${projectId}/finances`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
           >
             Financial Overview →
           </Link>
           <span className="ds-text-muted">|</span>
           <Link
             href={`/financing?projectId=${projectId}`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
           >
             Financing Details →
           </Link>
@@ -886,7 +886,7 @@ function ProjectFinancesSection({ projectId }) {
             </p>
             <Link
               href={`/investors?projectId=${projectId}`}
-              className="mt-2 inline-block text-xs text-blue-600 hover:text-blue-800 font-medium"
+              className="mt-2 inline-block text-xs ds-text-accent-primary hover:ds-text-accent-hover font-medium"
             >
               Manage Capital →
             </Link>
@@ -950,7 +950,7 @@ function ProgressSection({ projectId }) {
         <h2 className="text-lg font-semibold ds-text-primary">Progress Documentation</h2>
         <Link
           href={`/projects/${projectId}/progress`}
-          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
         >
           View Full Progress →
         </Link>

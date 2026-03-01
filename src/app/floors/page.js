@@ -320,7 +320,7 @@ function FloorsPageContent() {
     <div className="flex items-center gap-3">
       <Link
         href={`/floors/${floor._id}`}
-        className="text-blue-600 hover:text-blue-900 active:text-blue-950 transition-colors touch-manipulation"
+        className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover transition-colors touch-manipulation"
       >
         {canEdit ? 'Edit/View' : 'View'}
       </Link>
@@ -376,7 +376,7 @@ function FloorsPageContent() {
               )}
               <Link
                 href={selectedProjectId ? `/floors/new?projectId=${selectedProjectId}` : '/floors/new'}
-                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
+                className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
               >
                 + Create Floor
               </Link>
@@ -441,7 +441,7 @@ function FloorsPageContent() {
                     </button>
                     <Link
                       href={`/floors/new?projectId=${selectedProjectId}`}
-                      className="inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-center"
+                      className="inline-block ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-center"
                     >
                       Create Floor Manually
                     </Link>
@@ -473,7 +473,7 @@ function FloorsPageContent() {
                     </button>
                     <Link
                       href="/floors/new"
-                      className="inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-center"
+                      className="inline-block ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-center"
                     >
                       Create First Floor
                     </Link>
@@ -535,7 +535,7 @@ function FloorsPageContent() {
                         <td className="px-6 py-4">
                           <Link
                             href={`/floors/${floor._id}`}
-                            className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                            className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             <div>
                               <div>{getFloorDisplayName(floor.floorNumber, floor.name)}</div>
@@ -571,7 +571,7 @@ function FloorsPageContent() {
                             {floor.projectId ? (
                               <Link
                                 href={`/projects/${floor.projectId}`}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 {getProjectName(floor.projectId)}
                               </Link>
@@ -606,7 +606,7 @@ function FloorsPageContent() {
                         <div className="flex-1 min-w-0">
                           <Link
                             href={`/floors/${floor._id}`}
-                            className="text-base font-semibold text-blue-600 hover:text-blue-800 block truncate"
+                            className="text-base font-semibold ds-text-accent-primary hover:ds-text-accent-hover block truncate"
                           >
                             {getFloorDisplayName(floor.floorNumber, floor.name)}
                           </Link>
@@ -639,7 +639,7 @@ function FloorsPageContent() {
                           <p className="text-xs ds-text-muted mb-0.5">Project</p>
                           <Link
                             href={`/projects/${floor.projectId}`}
-                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                            className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                           >
                             {getProjectName(floor.projectId)}
                           </Link>
@@ -652,7 +652,7 @@ function FloorsPageContent() {
                       <div className="flex flex-wrap gap-2 pt-3">
                         <Link
                           href={`/floors/${floor._id}`}
-                          className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                          className="flex-1 px-3 py-2 bg-blue-500/10 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation text-center border border-blue-400/60"
                         >
                           {canEdit ? 'Edit/View' : 'View'}
                         </Link>
@@ -723,7 +723,7 @@ function FloorsPageContent() {
                         <td className="px-6 py-4">
                           <Link
                             href={`/floors/${floor._id}`}
-                            className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                            className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             <div>
                               <div>{getFloorDisplayName(floor.floorNumber, floor.name)}</div>
@@ -759,7 +759,7 @@ function FloorsPageContent() {
                             {floor.projectId ? (
                               <Link
                                 href={`/projects/${floor.projectId}`}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 {getProjectName(floor.projectId)}
                               </Link>
@@ -794,7 +794,7 @@ function FloorsPageContent() {
                         <div className="flex-1 min-w-0">
                           <Link
                             href={`/floors/${floor._id}`}
-                            className="text-base font-semibold text-blue-600 hover:text-blue-800 block truncate"
+                            className="text-base font-semibold ds-text-accent-primary hover:ds-text-accent-hover block truncate"
                           >
                             {getFloorDisplayName(floor.floorNumber, floor.name)}
                           </Link>
@@ -827,7 +827,7 @@ function FloorsPageContent() {
                           <p className="text-xs ds-text-muted mb-0.5">Project</p>
                           <Link
                             href={`/projects/${floor.projectId}`}
-                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                            className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                           >
                             {getProjectName(floor.projectId)}
                           </Link>
@@ -840,7 +840,7 @@ function FloorsPageContent() {
                       <div className="flex flex-wrap gap-2 pt-3">
                         <Link
                           href={`/floors/${floor._id}`}
-                          className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                          className="flex-1 px-3 py-2 bg-blue-500/10 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation text-center border border-blue-400/60"
                         >
                           {canEdit ? 'Edit/View' : 'View'}
                         </Link>
@@ -911,7 +911,7 @@ function FloorsPageContent() {
                         <td className="px-6 py-4">
                           <Link
                             href={`/floors/${floor._id}`}
-                            className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                            className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             <div>
                               <div>{getFloorDisplayName(floor.floorNumber, floor.name)}</div>
@@ -947,7 +947,7 @@ function FloorsPageContent() {
                             {floor.projectId ? (
                               <Link
                                 href={`/projects/${floor.projectId}`}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 {getProjectName(floor.projectId)}
                               </Link>
@@ -982,7 +982,7 @@ function FloorsPageContent() {
                         <div className="flex-1 min-w-0">
                           <Link
                             href={`/floors/${floor._id}`}
-                            className="text-base font-semibold text-blue-600 hover:text-blue-800 block truncate"
+                            className="text-base font-semibold ds-text-accent-primary hover:ds-text-accent-hover block truncate"
                           >
                             {getFloorDisplayName(floor.floorNumber, floor.name)}
                           </Link>
@@ -1015,7 +1015,7 @@ function FloorsPageContent() {
                           <p className="text-xs ds-text-muted mb-0.5">Project</p>
                           <Link
                             href={`/projects/${floor.projectId}`}
-                            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                            className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                           >
                             {getProjectName(floor.projectId)}
                           </Link>
@@ -1028,7 +1028,7 @@ function FloorsPageContent() {
                       <div className="flex flex-wrap gap-2 pt-3">
                         <Link
                           href={`/floors/${floor._id}`}
-                          className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                          className="flex-1 px-3 py-2 bg-blue-500/10 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation text-center border border-blue-400/60"
                         >
                           {canEdit ? 'Edit/View' : 'View'}
                         </Link>
@@ -1059,7 +1059,7 @@ function FloorsPageContent() {
             </div>
             <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
               <p className="text-xs sm:text-sm ds-text-secondary">In Progress</p>
-              <p className="text-xl sm:text-2xl font-bold text-blue-600">
+              <p className="text-xl sm:text-2xl font-bold ds-text-accent-primary">
                 {floors.filter((f) => f.status === 'IN_PROGRESS').length}
               </p>
             </div>

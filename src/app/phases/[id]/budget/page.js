@@ -232,7 +232,7 @@ function PhaseBudgetPageContent() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error}
           </div>
-          <Link href="/phases" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href="/phases" className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Phases
           </Link>
         </div>
@@ -248,7 +248,7 @@ function PhaseBudgetPageContent() {
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to manage phase budgets. Only PM, OWNER, and ACCOUNTANT can manage phase budgets.</p>
           </div>
-          <Link href={`/phases/${phaseId}`} className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href={`/phases/${phaseId}`} className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Phase
           </Link>
         </div>
@@ -269,7 +269,7 @@ function PhaseBudgetPageContent() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href={`/phases/${phaseId}`} className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href={`/phases/${phaseId}`} className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Phase
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">Manage Phase Budget</h1>
@@ -279,7 +279,7 @@ function PhaseBudgetPageContent() {
           {project && (
             <Link 
               href={`/projects/${project._id}`}
-              className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block"
+              className="text-sm ds-text-accent-primary hover:ds-text-accent-hover mt-2 inline-block"
             >
               Project: {project.projectName}
             </Link>
@@ -529,7 +529,7 @@ function PhaseBudgetPageContent() {
             <LoadingButton
               type="submit"
               loading={saving}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition-colors"
             >
               Update Budget
             </LoadingButton>

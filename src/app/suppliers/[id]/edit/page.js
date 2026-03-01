@@ -216,7 +216,7 @@ function EditSupplierPageContent() {
             <p className="font-bold">Access Denied</p>
             <p className="font-medium">You do not have permission to edit suppliers. Only OWNER and PM can edit suppliers.</p>
           </div>
-          <Link href="/suppliers" className="text-blue-600 hover:text-blue-800 underline font-semibold">
+          <Link href="/suppliers" className="ds-text-accent-primary hover:ds-text-accent-hover underline font-semibold">
             ← Back to Suppliers
           </Link>
         </div>
@@ -229,7 +229,7 @@ function EditSupplierPageContent() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link href={`/suppliers/${supplierId}`} className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block font-semibold underline">
+          <Link href={`/suppliers/${supplierId}`} className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block font-semibold underline">
             ← Back to Supplier
           </Link>
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Edit Supplier</h1>
@@ -424,7 +424,7 @@ function EditSupplierPageContent() {
                     name="emailEnabled"
                     checked={formData.emailEnabled}
                     onChange={handleChange}
-                    className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                    className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                   />
                   <span className="text-sm font-semibold ds-text-primary">Enable Email Notifications</span>
                 </label>
@@ -434,7 +434,7 @@ function EditSupplierPageContent() {
                     name="smsEnabled"
                     checked={formData.smsEnabled}
                     onChange={handleChange}
-                    className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                    className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                   />
                   <span className="text-sm font-semibold ds-text-primary">Enable SMS Notifications</span>
                 </label>
@@ -444,7 +444,7 @@ function EditSupplierPageContent() {
                     name="pushNotificationsEnabled"
                     checked={formData.pushNotificationsEnabled}
                     onChange={handleChange}
-                    className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                    className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                   />
                   <span className="text-sm font-semibold ds-text-primary">Enable Push Notifications</span>
                 </label>
@@ -562,7 +562,7 @@ function EditSupplierPageContent() {
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md"
+              className="px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md"
             >
               {submitting ? 'Updating...' : 'Update Supplier'}
             </button>

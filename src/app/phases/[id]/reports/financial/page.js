@@ -82,7 +82,7 @@ export default function FinancialReportPage() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Failed to load financial report'}
           </div>
-          <Link href={`/phases/${params.id}`} className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href={`/phases/${params.id}`} className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Phase
           </Link>
         </div>
@@ -97,7 +97,7 @@ export default function FinancialReportPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href={`/phases/${params.id}/dashboard`} className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href={`/phases/${params.id}/dashboard`} className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Dashboard
           </Link>
           <div className="flex justify-between items-center">
@@ -128,7 +128,7 @@ export default function FinancialReportPage() {
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Actual Spending</p>
-              <p className="text-2xl font-bold text-blue-600">{formatCurrency(financialSummary.actualTotal)}</p>
+              <p className="text-2xl font-bold ds-text-accent-primary">{formatCurrency(financialSummary.actualTotal)}</p>
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Committed</p>
@@ -310,7 +310,7 @@ export default function FinancialReportPage() {
                   </div>
                   <div>
                     <p className="ds-text-secondary">Actual</p>
-                    <p className="font-semibold text-blue-600">{formatCurrency(data.actual)}</p>
+                    <p className="font-semibold ds-text-accent-primary">{formatCurrency(data.actual)}</p>
                   </div>
                   <div>
                     <p className="ds-text-secondary">Variance</p>

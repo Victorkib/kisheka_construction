@@ -244,7 +244,7 @@ function ArchivedProjectsPageContent() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
-          <Link href="/projects" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/projects" className="ds-text-accent-primary hover:ds-text-accent-hover underline">
             ← Back to Projects
           </Link>
         </div>
@@ -259,7 +259,7 @@ function ArchivedProjectsPageContent() {
         <div className="mb-6">
           <Link
             href="/projects"
-            className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block"
           >
             ← Back to Projects
           </Link>
@@ -328,7 +328,7 @@ function ArchivedProjectsPageContent() {
                           <div>
                             <Link
                               href={`/projects/${project._id}`}
-                              className="text-sm font-semibold ds-text-primary hover:text-blue-600"
+                              className="text-sm font-semibold ds-text-primary hover:ds-text-accent-primary"
                             >
                               {project.projectName}
                             </Link>
@@ -381,7 +381,7 @@ function ArchivedProjectsPageContent() {
                     <div className="flex-1">
                       <Link
                         href={`/projects/${project._id}`}
-                        className="text-base font-semibold ds-text-primary hover:text-blue-600 block"
+                        className="text-base font-semibold ds-text-primary hover:ds-text-accent-primary block"
                       >
                         {project.projectName}
                       </Link>

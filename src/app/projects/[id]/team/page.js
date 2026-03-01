@@ -286,7 +286,7 @@ export default function ProjectTeamPage() {
             {canAccess && canAccess('manage_project_team') && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 font-medium"
               >
                 + Add Team Member
               </button>
@@ -304,7 +304,7 @@ export default function ProjectTeamPage() {
               {canAccess && canAccess('manage_project_team') && (
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                  className="inline-block ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
                 >
                   Add First Team Member
                 </button>
@@ -418,7 +418,7 @@ export default function ProjectTeamPage() {
             onConfirm={handleAddMember}
             title="Add Team Member"
             confirmText="Add Member"
-            confirmButtonClass="bg-blue-600 hover:bg-blue-700"
+            confirmButtonClass="ds-bg-accent-primary hover:bg-blue-700"
             isLoading={addingMember}
             showCancel={true}
           >

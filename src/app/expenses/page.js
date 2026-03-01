@@ -237,7 +237,7 @@ function ExpensesPageContent() {
           {canAccess('create_expense') && (
             <Link
               href="/expenses/new"
-              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base"
+              className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base"
             >
               + Add Expense
             </Link>
@@ -380,7 +380,7 @@ function ExpensesPageContent() {
                   aria-label="Open date picker"
                   tabIndex={-1}
                 >
-                  <svg className="w-5 h-5 ds-text-secondary hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 ds-text-secondary hover:ds-text-accent-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </button>
@@ -410,7 +410,7 @@ function ExpensesPageContent() {
                   aria-label="Open date picker"
                   tabIndex={-1}
                 >
-                  <svg className="w-5 h-5 ds-text-secondary hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 ds-text-secondary hover:ds-text-accent-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </button>
@@ -436,7 +436,7 @@ function ExpensesPageContent() {
             {canAccess('create_expense') && (
               <Link
                 href="/expenses/new"
-                className="inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation"
+                className="inline-block ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation"
               >
                 Create Your First Expense
               </Link>
@@ -516,7 +516,7 @@ function ExpensesPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap text-base leading-normal font-medium">
                           <Link
                             href={`/expenses/${expense._id}`}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View
                           </Link>
@@ -616,7 +616,7 @@ function ExpensesPageContent() {
                   <div className="pt-3 border-t ds-border-subtle">
                     <Link
                       href={`/expenses/${expense._id}`}
-                      className="block text-center px-4 py-2.5 bg-blue-50 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation"
+                      className="block text-center px-4 py-2.5 bg-blue-500/10 ds-text-accent-primary text-sm font-medium rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation border border-blue-400/60"
                     >
                       View Details →
                     </Link>

@@ -432,7 +432,7 @@ export default function PhaseDetailPage() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || 'Phase not found'}
           </div>
-          <Link href="/phases" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/phases" className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Phases
           </Link>
         </div>
@@ -521,7 +521,7 @@ export default function PhaseDetailPage() {
               {project && (
                 <Link 
                   href={`/projects/${project._id}`}
-                  className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 active:text-blue-900 mt-2 inline-block transition-colors touch-manipulation"
+                  className="text-xs sm:text-sm ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mt-2 inline-block transition-colors touch-manipulation"
                 >
                   Project: {project.projectName} →
                 </Link>
@@ -569,7 +569,7 @@ export default function PhaseDetailPage() {
                   )}
                   <button
                     onClick={() => setShowEditModal(true)}
-                    className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium touch-manipulation"
+                    className="flex-1 sm:flex-none ds-bg-accent-primary text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Edit Phase
                   </button>
@@ -708,7 +708,7 @@ export default function PhaseDetailPage() {
                     <LoadingButton
                       type="submit"
                       loading={saving}
-                      className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium touch-manipulation"
+                      className="w-full sm:w-auto px-6 py-2.5 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium touch-manipulation"
                     >
                       Save Changes
                     </LoadingButton>

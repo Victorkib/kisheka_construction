@@ -131,7 +131,7 @@ export default function PhaseDashboardPage() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Failed to load dashboard'}
           </div>
-          <Link href={`/phases/${params.id}`} className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href={`/phases/${params.id}`} className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Phase
           </Link>
         </div>
@@ -162,7 +162,7 @@ export default function PhaseDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href={`/phases/${params.id}`} className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href={`/phases/${params.id}`} className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Phase Details
           </Link>
           <div className="flex justify-between items-start">
@@ -208,7 +208,7 @@ export default function PhaseDashboardPage() {
             <div className="mt-2">
               <div className="w-full ds-bg-surface-muted rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full"
+                  className="ds-bg-accent-primary h-2 rounded-full"
                   style={{ width: `${phase.completionPercentage || 0}%` }}
                 />
               </div>
@@ -296,7 +296,7 @@ export default function PhaseDashboardPage() {
             <div className="mt-4">
               <Link
                 href={`/phases/${params.id}?tab=floors`}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm ds-text-accent-primary hover:ds-text-accent-hover"
               >
                 View floor breakdown →
               </Link>
@@ -339,7 +339,7 @@ export default function PhaseDashboardPage() {
             </div>
             <Link
               href={`/phases/${params.id}?tab=work-items`}
-              className="mt-4 inline-block text-sm text-blue-600 hover:text-blue-800"
+              className="mt-4 inline-block text-sm ds-text-accent-primary hover:ds-text-accent-hover"
             >
               View All Work Items →
             </Link>
@@ -374,7 +374,7 @@ export default function PhaseDashboardPage() {
             </div>
             <Link
               href={`/phases/${params.id}?tab=milestones`}
-              className="mt-4 inline-block text-sm text-blue-600 hover:text-blue-800"
+              className="mt-4 inline-block text-sm ds-text-accent-primary hover:ds-text-accent-hover"
             >
               View All Milestones →
             </Link>
@@ -409,7 +409,7 @@ export default function PhaseDashboardPage() {
             </div>
             <Link
               href={`/phases/${params.id}?tab=quality`}
-              className="mt-4 inline-block text-sm text-blue-600 hover:text-blue-800"
+              className="mt-4 inline-block text-sm ds-text-accent-primary hover:ds-text-accent-hover"
             >
               View All Checkpoints →
             </Link>

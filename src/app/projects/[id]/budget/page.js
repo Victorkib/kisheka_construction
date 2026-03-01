@@ -637,7 +637,7 @@ function BudgetManagementContent() {
           </div>
           <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-4">
             <p className="text-sm ds-text-secondary mb-1">DCC</p>
-            <p className="text-2xl font-bold text-blue-600">{formatCurrency(dcc)}</p>
+            <p className="text-2xl font-bold ds-text-accent-primary">{formatCurrency(dcc)}</p>
           </div>
           <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-4">
             <p className="text-sm ds-text-secondary mb-1">Pre-Construction</p>
@@ -723,7 +723,7 @@ function BudgetManagementContent() {
                 }
                 setShowEditBudget(!showEditBudget);
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+              className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
             >
               {showEditBudget ? 'Cancel Edit' : 'Edit Budget'}
             </button>
@@ -821,7 +821,7 @@ function BudgetManagementContent() {
                         type="checkbox"
                         checked={reallocatePhases}
                         onChange={(e) => setReallocatePhases(e.target.checked)}
-                        className="mt-1 mr-3 h-4 w-4 text-blue-600 focus:ring-blue-500 ds-border-subtle rounded"
+                        className="mt-1 mr-3 h-4 w-4 ds-text-accent-primary focus:ring-ds-accent-focus ds-border-subtle rounded"
                       />
                       <div className="flex-1">
                         <span className="text-sm font-medium ds-text-primary">
@@ -840,7 +840,7 @@ function BudgetManagementContent() {
                 <button
                   onClick={handleSaveBudget}
                   disabled={isSaving}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                 >
                   {isSaving ? 'Saving...' : 'Save Budget'}
                 </button>
@@ -989,7 +989,7 @@ function BudgetManagementContent() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <Link
                             href={`/phases/${phase._id}/budget`}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             Manage →
                           </Link>
@@ -1005,7 +1005,7 @@ function BudgetManagementContent() {
               <p>No phases found for this project</p>
               <Link
                 href={`/phases/new?projectId=${projectId}`}
-                className="text-blue-600 hover:text-blue-900 text-sm mt-2 inline-block"
+                className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mt-2 inline-block"
               >
                 Create phases →
               </Link>

@@ -216,7 +216,7 @@ export function DCCTab({ projectId }) {
             <p className="text-sm sm:text-base">No phases configured yet.</p>
             <Link
               href={`/projects/${projectId}`}
-              className="mt-2 text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="mt-2 text-xs sm:text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
             >
               Configure phases →
             </Link>
@@ -239,7 +239,7 @@ export function DCCTab({ projectId }) {
                   </div>
                   <Link
                     href={`/projects/${projectId}?phase=${phase.phaseId}`}
-                    className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap"
+                    className="text-xs sm:text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium whitespace-nowrap"
                   >
                     View Details →
                   </Link>

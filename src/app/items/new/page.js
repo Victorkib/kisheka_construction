@@ -666,7 +666,7 @@ function NewItemPageContent() {
         <div className="mb-6 sm:mb-8">
           <Link
             href="/items"
-            className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation"
+            className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation"
           >
             ← Back to Materials
           </Link>
@@ -760,7 +760,7 @@ function NewItemPageContent() {
             <div className="flex gap-3">
               <Link
                 href={`/material-requests/new${formData.projectId ? `?projectId=${formData.projectId}` : ''}`}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
+                className="px-4 py-2 ds-bg-accent-primary hover:bg-blue-700 text-white font-medium rounded-lg transition"
               >
                 Create Material Request →
               </Link>
@@ -771,7 +771,7 @@ function NewItemPageContent() {
                     setShowContinueAnyway(true);
                     setEntryType('retroactive_entry'); // Switch to retroactive for emergency cases
                   }}
-                  className="px-4 py-2 border border-blue-600 text-blue-600 hover:bg-blue-50 font-medium rounded-lg transition"
+                  className="px-4 py-2 border border-ds-accent-primary ds-text-accent-primary hover:bg-blue-500/10 font-medium rounded-lg transition"
                 >
                   Continue Anyway (Emergency)
                 </button>
@@ -822,7 +822,7 @@ function NewItemPageContent() {
                           isComplete
                             ? 'bg-green-500 text-white'
                             : isCurrent
-                            ? 'bg-blue-600 text-white ring-2 ring-blue-300'
+                            ? 'ds-bg-accent-primary text-white ring-2 ring-blue-300'
                             : 'ds-bg-surface-muted ds-text-secondary'
                         }`}
                       >
@@ -834,7 +834,7 @@ function NewItemPageContent() {
                           s
                         )}
                       </div>
-                      <span className={`text-xs mt-1 text-center ${isCurrent ? 'font-semibold text-blue-600' : 'ds-text-secondary'}`}>
+                      <span className={`text-xs mt-1 text-center ${isCurrent ? 'font-semibold ds-text-accent-primary' : 'ds-text-secondary'}`}>
                         {stepLabels[s - 1]}
                       </span>
                     </div>
@@ -924,13 +924,13 @@ function NewItemPageContent() {
                       <div className="flex gap-2">
                         <Link
                           href="/projects/new"
-                          className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded hover:bg-blue-700 transition"
+                          className="inline-flex items-center px-3 py-1.5 ds-bg-accent-primary text-white text-xs font-medium rounded hover:bg-blue-700 transition"
                         >
                           Create New Project
                         </Link>
                         <Link
                           href="/projects"
-                          className="inline-flex items-center px-3 py-1.5 ds-bg-surface text-blue-600 text-xs font-medium rounded border border-blue-600 hover:bg-blue-50 transition"
+                          className="inline-flex items-center px-3 py-1.5 ds-bg-surface ds-text-accent-primary text-xs font-medium rounded border border-ds-accent-primary hover:bg-blue-500/10 transition"
                         >
                           View All Projects
                         </Link>
@@ -1074,7 +1074,7 @@ function NewItemPageContent() {
                       </div>
                       <Link
                         href={`/floors?projectId=${formData.projectId}`}
-                        className="text-sm text-blue-600 hover:underline"
+                        className="text-sm ds-text-accent-primary hover:underline"
                         target="_blank"
                       >
                         View floors for this project →
@@ -1259,7 +1259,7 @@ function NewItemPageContent() {
                     }`}
                   />
                   {formData.unitCost && formData.quantity && (
-                    <p className="text-xs text-blue-600 mt-1">
+                    <p className="text-xs ds-text-accent-primary mt-1">
                       Total: KES {calculateTotal()}
                     </p>
                   )}
@@ -1403,7 +1403,7 @@ function NewItemPageContent() {
                     aria-label="Open date picker"
                     tabIndex={-1}
                   >
-                    <svg className="w-5 h-5 ds-text-secondary hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 ds-text-secondary hover:ds-text-accent-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </button>
@@ -1445,7 +1445,7 @@ function NewItemPageContent() {
                         aria-label="Open date picker"
                         tabIndex={-1}
                       >
-                        <svg className="w-5 h-5 ds-text-secondary hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-secondary hover:ds-text-accent-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </button>
@@ -1571,7 +1571,7 @@ function NewItemPageContent() {
                               aria-label="Open date picker"
                               tabIndex={-1}
                             >
-                              <svg className="w-5 h-5 ds-text-secondary hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-5 h-5 ds-text-secondary hover:ds-text-accent-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                             </button>
@@ -1634,7 +1634,7 @@ function NewItemPageContent() {
                               aria-label="Open date picker"
                               tabIndex={-1}
                             >
-                              <svg className="w-5 h-5 ds-text-secondary hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-5 h-5 ds-text-secondary hover:ds-text-accent-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                               </svg>
                             </button>

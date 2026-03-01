@@ -210,7 +210,7 @@ function NewPhaseTemplatePageContent() {
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <Link href="/phase-templates" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href="/phase-templates" className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Templates
           </Link>
           <h1 className="text-2xl font-bold ds-text-primary">Create Phase Template</h1>
@@ -239,7 +239,7 @@ function NewPhaseTemplatePageContent() {
                   onChange={handleChange}
                   required
                   minLength={2}
-                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                 />
               </div>
 
@@ -253,7 +253,7 @@ function NewPhaseTemplatePageContent() {
                   value={formData.templateType}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                 >
                   {TEMPLATE_TYPES.map((type) => (
                     <option key={type} value={type}>
@@ -273,7 +273,7 @@ function NewPhaseTemplatePageContent() {
                   value={formData.description}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                 />
               </div>
             </div>
@@ -297,7 +297,7 @@ function NewPhaseTemplatePageContent() {
                     min="0"
                     max="100"
                     step="0.1"
-                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                   />
                 </div>
               ))}
@@ -354,7 +354,7 @@ function NewPhaseTemplatePageContent() {
                       name="phaseName"
                       value={newPhase.phaseName}
                       onChange={handlePhaseChange}
-                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                     />
                   </div>
                   <div>
@@ -368,7 +368,7 @@ function NewPhaseTemplatePageContent() {
                       value={newPhase.phaseCode}
                       onChange={handlePhaseChange}
                       placeholder="Auto-generated if empty"
-                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                     />
                   </div>
                 </div>
@@ -383,7 +383,7 @@ function NewPhaseTemplatePageContent() {
                       name="phaseType"
                       value={newPhase.phaseType}
                       onChange={handlePhaseChange}
-                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                     >
                       {Object.values(PHASE_TYPE_CONSTANTS).map((type) => (
                         <option key={type} value={type}>
@@ -406,7 +406,7 @@ function NewPhaseTemplatePageContent() {
                       max="100"
                       step="0.1"
                       required
-                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                     />
                   </div>
                 </div>
@@ -421,7 +421,7 @@ function NewPhaseTemplatePageContent() {
                     value={newPhase.description}
                     onChange={handlePhaseChange}
                     rows={2}
-                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                   />
                 </div>
 
@@ -442,7 +442,7 @@ function NewPhaseTemplatePageContent() {
                         }
                       }}
                       placeholder="Enter work item name..."
-                      className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                     />
                     <button
                       type="button"
@@ -463,7 +463,7 @@ function NewPhaseTemplatePageContent() {
                           <button
                             type="button"
                             onClick={() => removeWorkItem(index)}
-                            className="ml-2 text-blue-600 hover:text-blue-800"
+                            className="ml-2 ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             ×
                           </button>
@@ -490,7 +490,7 @@ function NewPhaseTemplatePageContent() {
                         }
                       }}
                       placeholder="Enter milestone name..."
-                      className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
                     />
                     <button
                       type="button"
@@ -524,7 +524,7 @@ function NewPhaseTemplatePageContent() {
                 <button
                   type="button"
                   onClick={addPhase}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="w-full px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition-colors"
                 >
                   Add Phase to Template
                 </button>
@@ -543,7 +543,7 @@ function NewPhaseTemplatePageContent() {
               type="submit"
               isLoading={loading}
               disabled={formData.phases.length === 0 || Math.abs(budgetTotal - 100) > 0.01}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+              className="px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ds-accent-focus disabled:opacity-50"
             >
               Create Template
             </LoadingButton>

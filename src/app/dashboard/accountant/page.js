@@ -213,7 +213,7 @@ export default function AccountantDashboard() {
                 </div>
                 <div>
                   <p className="text-xs sm:text-sm ds-text-secondary">Capital Balance</p>
-                  <p className="text-lg sm:text-xl font-bold text-blue-600 mt-1 break-words">
+                  <p className="text-lg sm:text-xl font-bold ds-text-accent-primary mt-1 break-words">
                     {summary.capital ? (
                       new Intl.NumberFormat('en-KE', {
                         style: 'currency',

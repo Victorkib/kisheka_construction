@@ -193,7 +193,7 @@ function NewPhasePageContent() {
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6 sm:mb-8">
-          <Link href="/phases" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/phases" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Phases
           </Link>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary">Create New Phase</h1>
@@ -491,7 +491,7 @@ function NewPhasePageContent() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+              className="w-full sm:w-auto px-6 py-2.5 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               {submitting ? 'Creating...' : 'Create Phase'}
             </button>

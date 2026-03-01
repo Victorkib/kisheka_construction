@@ -121,7 +121,7 @@ export default function ErrorReportPage() {
               <div className="flex flex-wrap gap-3 justify-center">
                 <Link
                   href="/dashboard"
-                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 ds-bg-accent-primary text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Go to Dashboard
                 </Link>

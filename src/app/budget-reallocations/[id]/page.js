@@ -178,7 +178,7 @@ function BudgetReallocationDetailPageContent() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error || 'Budget reallocation not found'}
           </div>
-          <Link href="/budget-reallocations" className="text-blue-600 hover:text-blue-800">
+          <Link href="/budget-reallocations" className="ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Budget Reallocations
           </Link>
         </div>
@@ -196,7 +196,7 @@ function BudgetReallocationDetailPageContent() {
         />
         {/* Header */}
         <div className="mb-8">
-          <Link href="/budget-reallocations" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href="/budget-reallocations" className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Budget Reallocations
           </Link>
           <div className="flex items-center justify-between">
@@ -220,7 +220,7 @@ function BudgetReallocationDetailPageContent() {
             </div>
             <div>
               <label className="block text-sm font-semibold ds-text-secondary mb-1">Amount</label>
-              <p className="text-2xl font-bold text-blue-600">{formatCurrency(reallocation.amount)}</p>
+              <p className="text-2xl font-bold ds-text-accent-primary">{formatCurrency(reallocation.amount)}</p>
             </div>
             <div>
               <label className="block text-sm font-semibold ds-text-secondary mb-1">From</label>

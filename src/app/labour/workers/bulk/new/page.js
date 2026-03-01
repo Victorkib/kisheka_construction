@@ -41,7 +41,7 @@ function BulkWorkerCreationPageContent() {
         <div className="container mx-auto px-4 py-8">
           <div className="bg-red-50 border border-red-400/60 rounded-lg p-6 text-center">
             <p className="text-red-800">You do not have permission to create worker profiles.</p>
-            <Link href="/labour/workers" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+            <Link href="/labour/workers" className="ds-text-accent-primary hover:ds-text-accent-hover mt-4 inline-block">
               ← Back to Workers
             </Link>
           </div>
@@ -260,7 +260,7 @@ function BulkWorkerCreationPageContent() {
             <button
               type="button"
               onClick={addWorker}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition-colors"
             >
               <Plus className="w-4 h-4" />
               Add Worker
@@ -497,7 +497,7 @@ function BulkWorkerCreationPageContent() {
                                   type="checkbox"
                                   checked={worker.skillTypes?.includes(skill) || false}
                                   onChange={() => updateWorker(index, 'skillTypes', skill)}
-                                  className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                                  className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                                 />
                                 <span className="ds-text-secondary">{getSkillTypeLabel(skill)}</span>
                               </label>
@@ -529,7 +529,7 @@ function BulkWorkerCreationPageContent() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+                  className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 flex items-center gap-2"
                 >
                   {loading ? (
                     <>

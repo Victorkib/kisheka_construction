@@ -342,7 +342,7 @@ function NewExpensePageContent() {
         <div className="mb-6 sm:mb-8">
           <Link
             href="/expenses"
-            className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation"
+            className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation"
           >
             ← Back to Expenses
           </Link>
@@ -431,7 +431,7 @@ function NewExpensePageContent() {
                   {budgetLoading && (
                     <div className="mt-2 text-sm ds-text-secondary">
                       <span className="inline-flex items-center">
-                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 ds-text-accent-primary" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
@@ -545,7 +545,7 @@ function NewExpensePageContent() {
                 </div>
                 <Link
                   href={`/phases?projectId=${formData.projectId}`}
-                  className="text-sm text-blue-600 hover:underline"
+                  className="text-sm ds-text-accent-primary hover:underline"
                   target="_blank"
                 >
                   Create phases for this project →
@@ -558,7 +558,7 @@ function NewExpensePageContent() {
                 </div>
                 <Link
                   href={`/phases?projectId=${formData.projectId}`}
-                  className="text-sm text-blue-600 hover:underline"
+                  className="text-sm ds-text-accent-primary hover:underline"
                   target="_blank"
                 >
                   Create phases for this project →

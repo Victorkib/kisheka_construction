@@ -9,7 +9,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppLayout } from '@/components/layout/app-layout';
-import { LoadingCard } from '@/components/loading';
+import { LoadingCard, LoadingSpinner } from '@/components/loading';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { NoProjectsEmptyState, ErrorState } from '@/components/empty-states';
 import { fetchNoCache } from '@/lib/fetch-helpers';
@@ -150,7 +150,7 @@ export default function OwnerDashboard() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border-2 border-yellow-400/60 rounded-lg p-8 text-center">
+          <div className="bg-amber-500/10 border-2 border-amber-400/60 rounded-lg p-8 text-center">
             <div className="max-w-2xl mx-auto">
               <div className="text-5xl mb-4">⏳</div>
               <h2 className="text-2xl font-bold ds-text-primary mb-2">

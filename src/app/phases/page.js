@@ -262,7 +262,7 @@ function PhasesPageContent() {
             {canCreate && (
               <Link
                 href={`/phases/new${selectedProjectId ? `?projectId=${selectedProjectId}` : ''}`}
-                className="bg-blue-600 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation text-sm sm:text-base text-center font-medium"
+                className="ds-bg-accent-primary text-white px-4 sm:px-6 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation text-sm sm:text-base text-center font-medium"
               >
                 + New Phase
               </Link>
@@ -441,7 +441,7 @@ function PhasesPageContent() {
             {canCreate && (
               <Link
                 href={`/phases/new${selectedProjectId ? `?projectId=${selectedProjectId}` : ''}`}
-                className="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation font-medium"
+                className="mt-4 inline-block ds-bg-accent-primary text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation font-medium"
               >
                 Create First Phase
               </Link>
@@ -584,7 +584,7 @@ function PhasesPageContent() {
                             </Link>
                             <Link
                               href={`/phases/${phase._id}`}
-                              className="text-blue-600 hover:text-blue-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               View
                             </Link>
@@ -707,7 +707,7 @@ function PhasesPageContent() {
                       </Link>
                       <Link
                         href={`/phases/${phase._id}`}
-                        className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                        className="flex-1 px-3 py-2 bg-blue-500/10 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation text-center border border-blue-400/60"
                       >
                         View
                       </Link>

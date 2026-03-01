@@ -182,7 +182,7 @@ export default function LabourDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <Link
             href="/labour/entries/new"
-            className="flex items-center gap-3 p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-3 p-4 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-6 h-6" />
             <div>
@@ -247,12 +247,12 @@ export default function LabourDashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="p-4 bg-blue-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-5 h-5 text-blue-600" />
+                  <Clock className="w-5 h-5 ds-text-accent-primary" />
                   <span className="text-sm font-medium ds-text-secondary">
                     Total Hours
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold ds-text-accent-primary">
                   {(summary.today.totalHours || 0).toFixed(1)} hrs
                 </div>
               </div>
@@ -321,7 +321,7 @@ export default function LabourDashboardPage() {
             </h2>
             <Link
               href="/labour/entries"
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
             >
               View All →
             </Link>

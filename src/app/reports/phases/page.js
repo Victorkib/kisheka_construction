@@ -262,7 +262,7 @@ function PhaseReportsPageContent() {
               </div>
               <div className="flex justify-between">
                 <span className="ds-text-secondary">In Progress</span>
-                <span className="font-semibold text-blue-600">{statistics.inProgress}</span>
+                <span className="font-semibold ds-text-accent-primary">{statistics.inProgress}</span>
               </div>
               <div className="flex justify-between">
                 <span className="ds-text-secondary">Not Started</span>
@@ -277,7 +277,7 @@ function PhaseReportsPageContent() {
             <div className="mt-4 space-y-1 text-sm">
               <div className="flex justify-between">
                 <span className="ds-text-secondary">Actual</span>
-                <span className="font-semibold text-blue-600">{formatCurrency(statistics.totalActual)}</span>
+                <span className="font-semibold ds-text-accent-primary">{formatCurrency(statistics.totalActual)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="ds-text-secondary">Committed</span>
@@ -298,7 +298,7 @@ function PhaseReportsPageContent() {
             <div className="mt-4">
               <div className="w-full ds-bg-surface-muted rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full"
+                  className="ds-bg-accent-primary h-2 rounded-full"
                   style={{ width: `${statistics.averageCompletion}%` }}
                 />
               </div>
@@ -352,7 +352,7 @@ function PhaseReportsPageContent() {
             <h2 className="text-lg font-semibold ds-text-primary">All Phases</h2>
             <Link
               href="/phases"
-              className="text-blue-600 hover:text-blue-800 text-sm"
+              className="ds-text-accent-primary hover:text-blue-800 text-sm"
             >
               View All →
             </Link>
@@ -381,7 +381,7 @@ function PhaseReportsPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap">
                           <Link
                             href={`/phases/${phase._id}`}
-                            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                            className="text-sm font-medium ds-text-accent-primary hover:text-blue-800"
                           >
                             {phase.phaseCode}: {phase.phaseName}
                           </Link>
@@ -399,7 +399,7 @@ function PhaseReportsPageContent() {
                           <div className="flex items-center">
                             <div className="w-16 ds-bg-surface-muted rounded-full h-2 mr-2">
                               <div
-                                className="bg-blue-600 h-2 rounded-full"
+                                className="ds-bg-accent-primary h-2 rounded-full"
                                 style={{ width: `${phase.completionPercentage || 0}%` }}
                               />
                             </div>
@@ -409,7 +409,7 @@ function PhaseReportsPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {formatCurrency(financial.budgetTotal || 0)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-accent-primary">
                           {formatCurrency(financial.actualTotal || 0)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -420,7 +420,7 @@ function PhaseReportsPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <Link
                             href={`/phases/${phase._id}/dashboard`}
-                            className="text-blue-600 hover:text-blue-800 mr-3"
+                            className="ds-text-accent-primary hover:text-blue-800 mr-3"
                           >
                             Dashboard
                           </Link>

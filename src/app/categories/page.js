@@ -198,7 +198,7 @@ function CategoriesPageContent() {
           {canCreate && (
             <Link
               href="/categories/new"
-              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
+              className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
             >
               + Create Category
             </Link>
@@ -253,7 +253,7 @@ function CategoriesPageContent() {
             {canCreate && (
               <Link
                 href="/categories/new"
-                className="inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation"
+                className="inline-block ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation"
               >
                 Create First Category
               </Link>
@@ -284,7 +284,7 @@ function CategoriesPageContent() {
                         <button
                           type="button"
                           onClick={() => toggleUsageExpansion(category._id)}
-                          className="text-xs text-blue-600 hover:text-blue-800 active:text-blue-900 font-medium flex items-center gap-1 touch-manipulation min-h-[44px] py-2"
+                          className="text-xs ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover font-medium flex items-center gap-1 touch-manipulation min-h-[44px] py-2"
                         >
                             <span>
                               Used by{' '}
@@ -354,7 +354,7 @@ function CategoriesPageContent() {
                       <div className="flex flex-wrap gap-2">
                         <Link
                           href={`/categories/${category._id}`}
-                          className="px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 active:bg-blue-200 text-xs font-medium rounded-lg transition-colors touch-manipulation"
+                          className="px-3 py-1.5 bg-blue-500/10 ds-text-accent-primary hover:bg-blue-500/20 active:bg-blue-500/30 text-xs font-medium rounded-lg transition-colors touch-manipulation border border-blue-400/60"
                         >
                           Edit
                         </Link>

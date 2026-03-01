@@ -175,7 +175,7 @@ export function CostOverviewTab({ projectId }) {
             </h3>
             <Link
               href={`/projects/${projectId}/costs?tab=dcc`}
-              className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap"
+              className="text-xs sm:text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium whitespace-nowrap"
             >
               View Details →
             </Link>
@@ -223,7 +223,7 @@ export function CostOverviewTab({ projectId }) {
             </h3>
             <Link
               href={`/projects/${projectId}/costs?tab=preconstruction`}
-              className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap"
+              className="text-xs sm:text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium whitespace-nowrap"
             >
               View Details →
             </Link>
@@ -240,7 +240,7 @@ export function CostOverviewTab({ projectId }) {
             </h3>
             <Link
               href={`/projects/${projectId}/costs?tab=indirect`}
-              className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap"
+              className="text-xs sm:text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium whitespace-nowrap"
             >
               View Details →
             </Link>
@@ -257,7 +257,7 @@ export function CostOverviewTab({ projectId }) {
             </h3>
             <Link
               href={`/projects/${projectId}/costs?tab=contingency`}
-              className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap"
+              className="text-xs sm:text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium whitespace-nowrap"
             >
               View Details →
             </Link>

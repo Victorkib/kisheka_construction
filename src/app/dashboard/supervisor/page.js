@@ -166,7 +166,7 @@ export default function SupervisorDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
             <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
               <h2 className="text-xs sm:text-base font-semibold ds-text-secondary mb-2 leading-normal">Total Projects</h2>
-              <p className="text-2xl sm:text-3xl font-bold text-blue-600">{summary.totalProjects || 0}</p>
+              <p className="text-2xl sm:text-3xl font-bold ds-text-accent-primary">{summary.totalProjects || 0}</p>
             </div>
 
             <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">

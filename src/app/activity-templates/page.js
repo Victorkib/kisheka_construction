@@ -200,7 +200,7 @@ function ActivityTemplatesPageContent() {
           {canAccess('create_activity_template') && (
             <Link
               href="/activity-templates/new"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -318,7 +318,7 @@ function ActivityTemplatesPageContent() {
               <div className="mt-6">
                 <Link
                   href="/activity-templates/new"
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="inline-flex items-center px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -421,7 +421,7 @@ function ActivityTemplatesPageContent() {
                           {canAccess('manage_activity_templates') && (
                             <Link
                               href={`/activity-templates/${template._id}/edit`}
-                              className="text-blue-600 hover:text-blue-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               Edit
                             </Link>
@@ -493,7 +493,7 @@ function ActivityTemplatesPageContent() {
                               onClick={() => setPagination(prev => ({ ...prev, page }))}
                               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                 page === pagination.page
-                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                  ? 'z-10 ds-bg-accent-subtle ds-border-accent-primary ds-text-accent-primary'
                                   : 'ds-bg-surface ds-border-subtle ds-text-muted hover:ds-bg-surface-muted'
                               }`}
                             >

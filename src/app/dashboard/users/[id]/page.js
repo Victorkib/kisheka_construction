@@ -410,7 +410,7 @@ export default function UserDetailPage() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error}
           </div>
-          <Link href="/dashboard/users" className="mt-4 text-blue-600 hover:underline">
+          <Link href="/dashboard/users" className="mt-4 ds-text-accent-primary hover:underline">
             ← Back to Users
           </Link>
         </div>
@@ -432,7 +432,7 @@ export default function UserDetailPage() {
         />
         {/* Header */}
         <div className="mb-8">
-          <Link href="/dashboard/users" className="text-blue-600 hover:underline mb-4 inline-block">
+          <Link href="/dashboard/users" className="ds-text-accent-primary hover:underline mb-4 inline-block">
             ← Back to Users
           </Link>
           <div className="flex items-center justify-between">
@@ -462,7 +462,7 @@ export default function UserDetailPage() {
               )}
               <button
                 onClick={handleEditClick}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
               >
                 Edit
               </button>

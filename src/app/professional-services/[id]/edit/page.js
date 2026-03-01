@@ -154,7 +154,7 @@ function EditProfessionalServicePageContent() {
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to edit professional service assignments. Only OWNER and PM can edit assignments.</p>
           </div>
-          <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/professional-services" className="ds-text-accent-primary hover:ds-text-accent-hover underline">
             ← Back to Assignments
           </Link>
         </div>
@@ -182,7 +182,7 @@ function EditProfessionalServicePageContent() {
             <p className="font-semibold">Error</p>
             <p>{error}</p>
           </div>
-          <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/professional-services" className="ds-text-accent-primary hover:ds-text-accent-hover underline">
             ← Back to Assignments
           </Link>
         </div>
@@ -195,7 +195,7 @@ function EditProfessionalServicePageContent() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/professional-services" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
+          <Link href="/professional-services" className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block">
             ← Back to Assignments
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold ds-text-primary leading-tight">

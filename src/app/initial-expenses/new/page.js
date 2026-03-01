@@ -281,7 +281,7 @@ export default function NewInitialExpensePage() {
         <div className="mb-8">
           <Link
             href="/initial-expenses"
-            className="text-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block"
           >
             ← Back to Initial Expenses
           </Link>
@@ -298,7 +298,7 @@ export default function NewInitialExpensePage() {
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
                       currentStep >= step
-                        ? 'bg-blue-600 text-white'
+                        ? 'ds-bg-accent-primary text-white'
                         : 'ds-bg-surface-muted ds-text-secondary'
                     }`}
                   >
@@ -314,7 +314,7 @@ export default function NewInitialExpensePage() {
                 {step < 4 && (
                   <div
                     className={`h-1 flex-1 mx-2 ${
-                      currentStep > step ? 'bg-blue-600' : 'ds-bg-surface-muted'
+                      currentStep > step ? 'ds-bg-accent-primary' : 'ds-bg-surface-muted'
                     }`}
                   />
                 )}
@@ -386,7 +386,7 @@ export default function NewInitialExpensePage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                  className="ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
                 >
                   Next →
                 </button>
@@ -436,7 +436,7 @@ export default function NewInitialExpensePage() {
                 {budgetLoading && (
                   <div className="mt-2 text-sm ds-text-secondary">
                     <span className="inline-flex items-center">
-                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-600" fill="none" viewBox="0 0 24 24">
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 ds-text-accent-primary" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
@@ -599,7 +599,7 @@ export default function NewInitialExpensePage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                  className="ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
                 >
                   Next →
                 </button>
@@ -678,7 +678,7 @@ export default function NewInitialExpensePage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                  className="ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
                 >
                   Next →
                 </button>

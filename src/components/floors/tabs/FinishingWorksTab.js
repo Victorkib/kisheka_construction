@@ -199,6 +199,12 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
       setPlannerError('Please select a finishing category.');
       return;
     }
+    
+    // Validate executionModel and subcontractorId consistency
+    if (effectiveExecutionModel === 'contract_based' && !plannerForm.subcontractorId) {
+      // Warn but don't block - subcontractor can be assigned later
+      console.warn('Contract-based work item created without subcontractor. Subcontractor can be assigned later.');
+    }
 
     const categoryLabel = selectedCategory?.name || plannerForm.categoryCode;
     const name =
@@ -242,7 +248,20 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
 
       const data = await response.json();
       if (!data.success) {
-        throw new Error(data.error || 'Failed to create finishing work item');
+        // Provide user-friendly error messages
+        let errorMessage = data.error || 'Failed to create finishing work item';
+        
+        // Enhance budget-related error messages
+        if (errorMessage.includes('exceed') || errorMessage.includes('budget')) {
+          errorMessage = `Budget exceeded: ${errorMessage}. Please reduce the estimated cost or allocate more budget to PHASE-03 for this floor.`;
+        }
+        
+        // Enhance subcontractor-related error messages
+        if (errorMessage.includes('Subcontractor') || errorMessage.includes('subcontractor')) {
+          errorMessage = `${errorMessage}. Please ensure the subcontractor is assigned to the same floor.`;
+        }
+        
+        throw new Error(errorMessage);
       }
 
       // Reset minimal fields for next entry
@@ -427,7 +446,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               value={plannerForm.phaseId}
               onChange={handlePlannerChange}
               disabled={plannerLoading || creating}
-              className="w-full px-2 py-1.5 border ds-border-subtle rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
             >
               <option value="">Select finishing phase</option>
               {phases.map((p) => (
@@ -444,7 +463,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               value={plannerForm.categoryCode}
               onChange={plannerLoading || creating ? undefined : handlePlannerChange}
               disabled={plannerLoading || creating}
-              className="w-full px-2 py-1.5 border ds-border-subtle rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
             >
               <option value="">Select category</option>
               {finishingCategories.map((cat) => (
@@ -461,7 +480,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               value={effectiveExecutionModel}
               onChange={plannerLoading || creating ? undefined : handlePlannerChange}
               disabled={plannerLoading || creating}
-              className="w-full px-2 py-1.5 border ds-border-subtle rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
             >
               {FINISHING_EXECUTION_MODELS.map((mode) => (
                 <option key={mode} value={mode}>
@@ -477,7 +496,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                 {subcontractors.length === 0 && (
                   <Link
                     href={`/subcontractors/new?projectId=${floor.projectId}&phaseId=${plannerForm.phaseId || ''}&floorId=${floor._id}`}
-                    className="text-xs text-blue-600 hover:text-blue-800 underline"
+                    className="text-xs text-purple-600 hover:text-purple-800 underline font-medium"
                   >
                     Create new
                   </Link>
@@ -488,7 +507,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                 value={plannerForm.subcontractorId}
                 onChange={plannerLoading || creating ? undefined : handlePlannerChange}
                 disabled={plannerLoading || creating || subcontractors.length === 0}
-                className="w-full px-2 py-1.5 border ds-border-subtle rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
               >
                 <option value="">Select subcontractor (optional)</option>
                 {subcontractors.map((sub) => (
@@ -499,7 +518,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               </select>
               {subcontractors.length === 0 && (
                 <p className="text-xs ds-text-muted mt-1">
-                  No subcontractors found. <Link href={`/subcontractors/new?projectId=${floor.projectId}&phaseId=${plannerForm.phaseId || ''}&floorId=${floor._id}`} className="text-blue-600 hover:text-blue-800 underline">Create one</Link> to link to this work.
+                  No subcontractors found. <Link href={`/subcontractors/new?projectId=${floor.projectId}&phaseId=${plannerForm.phaseId || ''}&floorId=${floor._id}`} className="text-purple-600 hover:text-purple-800 underline font-medium">Create one</Link> to link to this work.
                 </p>
               )}
             </div>
@@ -512,7 +531,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               value={plannerForm.name}
               onChange={handlePlannerChange}
               disabled={creating}
-              className="w-full px-2 py-1.5 border ds-border-subtle rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
               placeholder="e.g. Electrical - Floor 2"
             />
           </div>
@@ -524,7 +543,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               value={plannerForm.estimatedCost}
               onChange={handlePlannerChange}
               disabled={creating}
-              className="w-full px-2 py-1.5 border ds-border-subtle rounded text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
               min="0"
               step="0.01"
             />
@@ -533,7 +552,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
             <button
               type="submit"
               disabled={creating || plannerLoading}
-              className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded shadow hover:bg-blue-700 disabled:opacity-50"
+              className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white text-xs font-semibold rounded-lg shadow-lg hover:from-purple-700 hover:to-purple-800 hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {creating ? 'Adding…' : 'Add Finishing Work'}
             </button>
@@ -592,7 +611,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/work-items/${item._id}`}
-                      className="text-sm font-semibold ds-text-primary truncate hover:text-blue-600 hover:underline"
+                      className="text-sm font-semibold ds-text-primary truncate hover:text-purple-600 hover:underline transition-colors"
                     >
                       {item.name || 'Work Item'}
                     </Link>

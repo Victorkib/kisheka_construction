@@ -215,6 +215,21 @@ function ToastItem({ toast, onRemove }) {
           </h4>
         )}
         <p className={`text-sm ${styles.text}`}>{toast.message}</p>
+        {toast.action && (
+          <div className="mt-2">
+            <button
+              onClick={() => {
+                if (toast.action.onClick) {
+                  toast.action.onClick();
+                }
+                handleRemove();
+              }}
+              className={`text-xs font-medium ${styles.title} hover:underline focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-transparent rounded px-1`}
+            >
+              {toast.action.label}
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Close button */}

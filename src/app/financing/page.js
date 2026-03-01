@@ -264,7 +264,7 @@ function FinancingPageContent() {
           <button
             onClick={() => fetchFinances(true)}
             disabled={refreshing || loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             title="Refresh financial data"
           >
             {refreshing ? (
@@ -302,7 +302,7 @@ function FinancingPageContent() {
           </div>
           <div className="ds-bg-surface rounded-lg shadow p-6">
             <div className="text-base font-semibold ds-text-secondary leading-normal">Remaining Balance</div>
-            <div className="text-2xl font-bold text-blue-600 mt-1">
+            <div className="text-2xl font-bold ds-text-accent-primary mt-1">
               {formatCurrency(finances?.capitalBalance || 0)}
             </div>
             {finances?.totalInvested > 0 && (
@@ -388,7 +388,7 @@ function FinancingPageContent() {
               <h2 className="text-lg font-semibold ds-text-primary">Budget vs Capital Comparison</h2>
               <Link
                 href="/dashboard/budget"
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
               >
                 View Budget vs Actual →
               </Link>
@@ -402,7 +402,7 @@ function FinancingPageContent() {
               </div>
               <div>
                 <div className="text-sm ds-text-secondary font-medium">Total Capital (Reality)</div>
-                <div className="text-xl font-semibold text-blue-600 mt-1">
+                <div className="text-xl font-semibold ds-text-accent-primary mt-1">
                   {formatCurrency(finances?.totalInvested || 0)}
                 </div>
               </div>
@@ -434,7 +434,7 @@ function FinancingPageContent() {
               <h2 className="text-lg font-semibold ds-text-primary">Projects Overview</h2>
               <Link
                 href="/projects"
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
               >
                 View All Projects →
               </Link>
@@ -506,7 +506,7 @@ function FinancingPageContent() {
                             <div>
                               <Link
                                 href={`/projects/${project._id}`}
-                                className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                                className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 {project.projectCode}
                               </Link>
@@ -522,7 +522,7 @@ function FinancingPageContent() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
                             {formatCurrency(totalUsed)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-accent-primary">
                             {formatCurrency(capitalBalance)}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -546,7 +546,7 @@ function FinancingPageContent() {
                           <td className="px-6 py-4 whitespace-nowrap text-sm">
                             <Link
                               href={`/projects/${project._id}/finances`}
-                              className="text-blue-600 hover:text-blue-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               View Details →
                             </Link>
@@ -627,7 +627,7 @@ function FinancingPageContent() {
               </p>
               <Link
                 href={`/projects/${projectId}/finances`}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
               >
                 View Full Financial Overview →
               </Link>

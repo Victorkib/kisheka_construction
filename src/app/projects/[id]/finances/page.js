@@ -79,11 +79,11 @@ function FinancialOverviewContent() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'healthy':
-        return 'bg-green-100 text-green-800 border-green-400/60';
+        return 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60';
       case 'at_risk':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-400/60';
+        return 'bg-amber-500/10 text-amber-200 border border-amber-400/60';
       case 'critical':
-        return 'bg-red-100 text-red-800 border-red-400/60';
+        return 'bg-red-500/10 text-red-200 border border-red-400/60';
       default:
         return 'ds-bg-surface-muted ds-text-primary ds-border-subtle';
     }
@@ -124,7 +124,7 @@ function FinancialOverviewContent() {
             <p>{error}</p>
             <button
               onClick={() => router.back()}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
             >
               Go Back
             </button>
@@ -200,7 +200,7 @@ function FinancialOverviewContent() {
             <div>
               <Link
                 href={`/projects/${projectId}`}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-2 inline-block"
+                className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium mb-2 inline-block"
               >
                 ← Back to Project
               </Link>
@@ -226,7 +226,7 @@ function FinancialOverviewContent() {
               </Link>
               <Link
                 href={`/financing?projectId=${projectId}`}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 transition"
               >
                 Financing Details
               </Link>
@@ -283,7 +283,7 @@ function FinancialOverviewContent() {
                 {data.status.capitalStatus === 'sufficient' ? 'Sufficient' : 'Insufficient'}
               </span>
             </div>
-            <p className="text-3xl font-bold text-blue-600 mb-2">{formatCurrency(data.financing.totalInvested)}</p>
+            <p className="text-3xl font-bold ds-text-accent-primary mb-2">{formatCurrency(data.financing.totalInvested)}</p>
             <div className="space-y-1 text-sm ds-text-secondary">
               <p>Loans: {formatCurrency(data.financing.totalLoans)}</p>
               <p>Equity: {formatCurrency(data.financing.totalEquity)}</p>
@@ -291,12 +291,12 @@ function FinancialOverviewContent() {
             </div>
             <div className="mt-4 pt-4 border-t">
               <p className="text-sm ds-text-secondary">Available Capital</p>
-              <p className="text-xl font-semibold text-blue-600">{formatCurrency(data.financing.capitalBalance)}</p>
+              <p className="text-xl font-semibold ds-text-accent-primary">{formatCurrency(data.financing.capitalBalance)}</p>
             </div>
             <div className="mt-4">
               <Link
                 href={`/investors?projectId=${projectId}`}
-                className="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition"
+                className="inline-flex items-center px-3 py-2 ds-bg-accent-primary text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition"
               >
                 Manage Capital Allocations →
               </Link>
@@ -389,7 +389,7 @@ function FinancialOverviewContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-4 bg-blue-50 rounded-lg">
               <p className="text-sm font-semibold text-blue-900 mb-2">Spending Limit</p>
-              <p className="text-lg font-bold text-blue-600">{formatCurrency(data.spendingLimit)}</p>
+              <p className="text-lg font-bold ds-text-accent-primary">{formatCurrency(data.spendingLimit)}</p>
               <p className="text-xs text-blue-700 mt-1">
                 This is based on available capital ({formatCurrency(data.financing.totalInvested)}), not budget.
               </p>

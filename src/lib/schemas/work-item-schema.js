@@ -234,6 +234,20 @@ export function validateWorkItem(data) {
     }
   }
   
+  // Validate executionModel and subcontractorId consistency
+  if (data.executionModel === 'contract_based' && data.subcontractorId) {
+    // Contract-based work items should have a valid subcontractorId
+    if (!ObjectId.isValid(data.subcontractorId)) {
+      errors.push('For contract-based work items, subcontractorId must be a valid ObjectId');
+    }
+  }
+  
+  // Warn (but don't block) if contract_based without subcontractorId
+  // This is handled at API level for better UX
+  
+  // If direct_labour, subcontractorId should ideally be null (but not strictly enforced)
+  // This allows flexibility for work items that might transition between models
+  
   return { isValid: errors.length === 0, errors };
 }
 

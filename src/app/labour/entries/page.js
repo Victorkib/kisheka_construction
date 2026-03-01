@@ -409,7 +409,7 @@ function LabourEntriesPageContent() {
           </div>
           <Link
             href="/labour/entries/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition-colors"
           >
             <Plus className="w-5 h-5" />
             New Entry
@@ -430,7 +430,7 @@ function LabourEntriesPageContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <div className="ds-bg-surface rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Clock className="w-5 h-5 text-blue-600" />
+              <Clock className="w-5 h-5 ds-text-accent-primary" />
               <span className="text-sm font-medium ds-text-secondary">Total Hours</span>
             </div>
             <div className="text-2xl font-bold ds-text-primary">
@@ -622,7 +622,7 @@ function LabourEntriesPageContent() {
               <p className="ds-text-secondary mb-2">No labour entries found</p>
               <Link
                 href="/labour/entries/new"
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                className="ds-text-accent-primary hover:text-blue-800 text-sm font-medium"
               >
                 Create your first entry →
               </Link>
@@ -697,7 +697,7 @@ function LabourEntriesPageContent() {
                         {entry.batchId ? (
                           <Link
                             href={`/labour/batches/${entry.batchId}`}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
+                            className="ds-text-accent-primary hover:text-blue-800 font-medium"
                           >
                             {entry.batchNumber || 'View Batch'}
                           </Link>
@@ -709,7 +709,7 @@ function LabourEntriesPageContent() {
                         {entry.workItemId && entry.workItemName ? (
                           <Link
                             href={`/work-items/${entry.workItemId}`}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
+                            className="ds-text-accent-primary hover:text-blue-800 font-medium"
                             title={entry.workItemCategory || 'Work Item'}
                           >
                             {entry.workItemName}
@@ -731,7 +731,7 @@ function LabourEntriesPageContent() {
                         <div className="flex items-center gap-2">
                           <Link
                             href={`/labour/entries/${entry._id}`}
-                            className="text-blue-600 hover:text-blue-800"
+                            className="ds-text-accent-primary hover:text-blue-800"
                             title="View Details"
                           >
                             <Eye className="w-4 h-4" />

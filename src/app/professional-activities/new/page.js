@@ -152,7 +152,7 @@ export default function NewProfessionalActivityPage() {
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to create professional activities. Only OWNER, PM, and CLERK can log activities.</p>
           </div>
-          <Link href="/professional-activities" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/professional-activities" className="ds-text-accent-primary hover:ds-text-accent-hover underline">
             ← Back to Professional Activities
           </Link>
         </div>
@@ -199,7 +199,7 @@ export default function NewProfessionalActivityPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/professional-activities" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
+          <Link href="/professional-activities" className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block">
             ← Back to Professional Activities
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold ds-text-primary leading-tight">

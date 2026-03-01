@@ -53,6 +53,16 @@ export function initGlobalErrorHandlers() {
 function storeErrorForReporting(errorData) {
   try {
     sessionStorage.setItem('lastError', JSON.stringify(errorData));
+    
+    // Dispatch notification event for UI to show toast
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('error-notification', {
+        detail: {
+          errorType: errorData.type,
+          errorMessage: errorData.message,
+        },
+      }));
+    }
   } catch (e) {
     console.error('Failed to store error data:', e);
   }

@@ -144,7 +144,7 @@ export default function InviteUserPage() {
   return (
     <AppLayout>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard/users" className="text-blue-600 hover:underline mb-4 inline-block">
+        <Link href="/dashboard/users" className="ds-text-accent-primary hover:underline mb-4 inline-block">
           ← Back to Users
         </Link>
 
@@ -251,7 +251,7 @@ export default function InviteUserPage() {
               <button
                 type="submit"
                 disabled={sending}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-500 text-white font-medium py-2 px-4 rounded-lg transition"
+                className="flex-1 ds-bg-accent-primary hover:ds-bg-accent-hover disabled:bg-slate-500 text-white font-medium py-2 px-4 rounded-lg transition"
               >
                 {sending ? 'Sending Invitation...' : 'Send Invitation'}
               </button>

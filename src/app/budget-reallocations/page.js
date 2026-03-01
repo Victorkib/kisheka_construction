@@ -207,7 +207,7 @@ function BudgetReallocationsPageContent() {
           {canAccess('create_budget_reallocation') && (
             <Link
               href="/budget-reallocations/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              className="ds-bg-accent-primary hover:ds-bg-accent-hover text-white font-medium px-6 py-2 rounded-lg transition"
             >
               + New Request
             </Link>
@@ -296,7 +296,7 @@ function BudgetReallocationsPageContent() {
               {canAccess('create_budget_reallocation') && (
                 <Link
                   href="/budget-reallocations/new"
-                  className="mt-4 inline-block text-blue-600 hover:text-blue-800 font-medium"
+                  className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                 >
                   Create your first reallocation request
                 </Link>
@@ -355,7 +355,7 @@ function BudgetReallocationsPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                           <Link
                             href={`/budget-reallocations/${reallocation._id}`}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View
                           </Link>
@@ -411,7 +411,7 @@ function BudgetReallocationsPageContent() {
                                 onClick={() => setPagination((prev) => ({ ...prev, page }))}
                                 className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                   page === pagination.page
-                                    ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                    ? 'z-10 ds-bg-accent-subtle ds-border-accent-primary ds-text-accent-primary'
                                     : 'ds-bg-surface ds-border-subtle ds-text-muted hover:ds-bg-surface-muted'
                                 }`}
                               >

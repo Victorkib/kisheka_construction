@@ -606,7 +606,7 @@ export default function ItemDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Link href="/items" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/items" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Materials
           </Link>
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm sm:text-base">
@@ -637,7 +637,7 @@ export default function ItemDetailPage() {
         />
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/items" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/items" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Materials
           </Link>
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
@@ -679,7 +679,7 @@ export default function ItemDetailPage() {
                   {material.purchaseOrderId && (
                     <Link
                       href={`/purchase-orders/${material.purchaseOrderId}`}
-                      className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 active:text-blue-900 font-medium transition-colors touch-manipulation"
+                      className="text-xs sm:text-sm ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover font-medium transition-colors touch-manipulation"
                     >
                       📦 View Purchase Order
                     </Link>
@@ -699,7 +699,7 @@ export default function ItemDetailPage() {
               {canEdit && (
                 <Link
                   href={`/items/${materialId}/edit`}
-                  className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium text-center touch-manipulation"
+                  className="flex-1 sm:flex-none px-4 py-2.5 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium text-center touch-manipulation"
                 >
                   Edit
                 </Link>
@@ -851,22 +851,22 @@ export default function ItemDetailPage() {
                 <strong>Current Status:</strong> {material.status?.replace('_', ' ').toUpperCase() || 'DRAFT'}
               </p>
               {material.status === 'draft' && (
-                <p className="text-sm text-blue-600 mt-1 leading-normal">
+                <p className="text-sm ds-text-accent-primary mt-1 leading-normal">
                   Next step: Submit for approval
                 </p>
               )}
               {material.status === 'pending_approval' && (
-                <p className="text-sm text-blue-600 mt-1 leading-normal">
+                <p className="text-sm ds-text-accent-primary mt-1 leading-normal">
                   Next step: Awaiting PM/OWNER approval
                 </p>
               )}
               {material.status === 'approved' && (
-                <p className="text-sm text-blue-600 mt-1 leading-normal">
+                <p className="text-sm ds-text-accent-primary mt-1 leading-normal">
                   Next step: Mark as delivered when materials arrive
                 </p>
               )}
               {material.status === 'received' && (
-                <p className="text-sm text-blue-600 mt-1 leading-normal">
+                <p className="text-sm ds-text-accent-primary mt-1 leading-normal">
                   Next step: Track usage as materials are used
                 </p>
               )}
@@ -895,7 +895,7 @@ export default function ItemDetailPage() {
                   {material.projectId && (
                     <Link
                       href={`/dashboard/analytics/wastage?projectId=${material.projectId}`}
-                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-xs sm:text-sm font-medium transition-colors touch-manipulation"
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-xs sm:text-sm font-medium transition-colors touch-manipulation"
                     >
                       View Full Analytics →
                     </Link>
@@ -1038,7 +1038,7 @@ export default function ItemDetailPage() {
                   onClick={() => setActiveTab(tab)}
                   className={`px-3 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap touch-manipulation ${
                     activeTab === tab
-                      ? 'border-blue-600 text-blue-600'
+                      ? 'border-ds-accent-primary ds-text-accent-primary'
                       : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle active:ds-text-primary'
                   }`}
                 >
@@ -1068,7 +1068,7 @@ export default function ItemDetailPage() {
                         {material.quantityDelivered || 0} {material.unit || ''}
                       </dd>
                       {material.dateDelivered && (
-                        <dd className="text-xs text-blue-600 mt-1">
+                        <dd className="text-xs ds-text-accent-primary mt-1">
                           {new Date(material.dateDelivered).toLocaleDateString()}
                         </dd>
                       )}
@@ -1079,7 +1079,7 @@ export default function ItemDetailPage() {
                         {material.quantityUsed || 0} {material.unit || ''}
                       </dd>
                       {material.dateUsed && (
-                        <dd className="text-xs text-blue-600 mt-1">
+                        <dd className="text-xs ds-text-accent-primary mt-1">
                           {new Date(material.dateUsed).toLocaleDateString()}
                         </dd>
                       )}
@@ -1215,7 +1215,7 @@ export default function ItemDetailPage() {
                               <dd className="mt-1">
                                 <Link
                                   href={`/purchase-orders/${material.purchaseOrderId}`}
-                                  className="text-blue-600 hover:text-blue-800 font-medium"
+                                  className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                                 >
                                   View Purchase Order →
                                 </Link>
@@ -1322,7 +1322,7 @@ export default function ItemDetailPage() {
                           <dd className="mt-1 text-sm ds-text-primary">
                             <Link
                               href={`/projects/${material.projectId}`}
-                              className="text-blue-600 hover:text-blue-800"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               {material.projectDetails.projectName || material.projectDetails.projectCode || 'View Project'}
                             </Link>
@@ -1335,7 +1335,7 @@ export default function ItemDetailPage() {
                           <dd className="mt-1 text-sm ds-text-primary">
                             <Link
                               href={`/floors/${material.floor}`}
-                              className="text-blue-600 hover:text-blue-800"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               {(() => {
                                 const floor = material.floorDetails;

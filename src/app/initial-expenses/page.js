@@ -225,7 +225,7 @@ function InitialExpensesPageContent() {
           {canAccess('create_initial_expense') && (
             <Link
               href="/initial-expenses/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              className="ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
             >
               + Add Initial Expense
             </Link>
@@ -357,7 +357,7 @@ function InitialExpensesPageContent() {
             <div className="p-8 text-center ds-text-muted">
               No initial expenses found.
               {canAccess('create_initial_expense') && (
-                <Link href="/initial-expenses/new" className="text-blue-600 hover:underline"> Create one</Link>
+                <Link href="/initial-expenses/new" className="ds-text-accent-primary hover:underline"> Create one</Link>
               )}
             </div>
           ) : (
@@ -394,7 +394,7 @@ function InitialExpensesPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                         <Link
                           href={`/initial-expenses/${expense._id}`}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover"
                         >
                           {expense.expenseCode}
                         </Link>
@@ -419,7 +419,7 @@ function InitialExpensesPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <Link
                           href={`/initial-expenses/${expense._id}`}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover"
                         >
                           View
                         </Link>

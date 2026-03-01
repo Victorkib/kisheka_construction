@@ -126,7 +126,7 @@ function SupplierDetailPageContent() {
           <div className="bg-red-50 border-2 border-red-400/60 text-red-900 px-4 py-3 rounded mb-6 font-medium text-sm sm:text-base">
             {error || 'Supplier not found'}
           </div>
-          <Link href="/suppliers" className="text-blue-600 hover:text-blue-800 active:text-blue-900 underline font-semibold text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/suppliers" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active underline font-semibold text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Suppliers
           </Link>
         </div>
@@ -140,7 +140,7 @@ function SupplierDetailPageContent() {
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:justify-between md:items-start gap-4">
           <div className="flex-1 min-w-0">
-            <Link href="/suppliers" className="text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm mb-4 inline-block font-semibold underline transition-colors touch-manipulation">
+            <Link href="/suppliers" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active text-sm mb-4 inline-block font-semibold underline transition-colors touch-manipulation">
               ← Back to Suppliers
             </Link>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">
@@ -333,7 +333,7 @@ function SupplierDetailPageContent() {
                 {orderCount > recentOrders.length && (
                   <Link
                     href={`/purchase-orders?supplierId=${supplierId}`}
-                    className="block mt-4 text-center text-sm text-blue-600 hover:text-blue-800 active:text-blue-900 font-semibold underline transition-colors touch-manipulation"
+                    className="block mt-4 text-center text-sm ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active font-semibold underline transition-colors touch-manipulation"
                   >
                     View All Orders →
                   </Link>

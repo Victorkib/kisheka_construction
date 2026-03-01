@@ -376,7 +376,7 @@ function EquipmentPageContent() {
             <p className="ds-text-muted mb-4">No equipment found</p>
             <Link
               href={`/equipment/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}`}
-              className="inline-block px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation font-medium"
+              className="inline-block px-4 py-2.5 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation font-medium"
             >
               Add First Equipment
             </Link>
@@ -424,7 +424,7 @@ function EquipmentPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Link
                           href={`/equipment/${eq._id}`}
-                          className="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors"
+                          className="text-sm font-semibold ds-text-accent-primary hover:ds-text-accent-hover transition-colors"
                         >
                           {eq.equipmentName}
                         </Link>
@@ -439,7 +439,7 @@ function EquipmentPageContent() {
                         {eq.phaseName || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-secondary">
-                        {formatDate(eq.startDate)} - {eq.endDate ? formatDate(eq.endDate) : <span className="text-blue-600 font-semibold">Ongoing</span>}
+                        {formatDate(eq.startDate)} - {eq.endDate ? formatDate(eq.endDate) : <span className="ds-text-accent-primary font-semibold">Ongoing</span>}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold ds-text-primary">
                         {formatCurrency(eq.totalCost || 0)}
@@ -451,7 +451,7 @@ function EquipmentPageContent() {
                           </span>
                           <div className="w-16 ds-bg-surface-muted rounded-full h-2">
                             <div
-                              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                              className="ds-bg-accent-primary h-2 rounded-full transition-all duration-300"
                               style={{
                                 width: `${Math.min(100, eq.utilization?.utilizationPercentage || 0)}%`
                               }}
@@ -467,7 +467,7 @@ function EquipmentPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
                           href={`/equipment/${eq._id}`}
-                          className="text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover font-semibold transition-colors"
                         >
                           View →
                         </Link>
@@ -519,7 +519,7 @@ function EquipmentPageContent() {
                     <div className="flex-1 min-w-0">
                       <Link
                         href={`/equipment/${eq._id}`}
-                        className="text-base font-semibold text-blue-600 hover:text-blue-800 block truncate"
+                        className="text-base font-semibold ds-text-accent-primary hover:ds-text-accent-hover block truncate"
                       >
                         {eq.equipmentName}
                       </Link>
@@ -582,7 +582,7 @@ function EquipmentPageContent() {
                   <div className="pt-3">
                     <Link
                       href={`/equipment/${eq._id}`}
-                      className="block text-center px-4 py-2.5 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation"
+                      className="block text-center px-4 py-2.5 bg-blue-500/10 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation border border-blue-400/60"
                     >
                       View Details →
                     </Link>

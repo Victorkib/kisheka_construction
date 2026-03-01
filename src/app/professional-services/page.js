@@ -294,7 +294,7 @@ function ProfessionalServicesPageContent() {
                 href="/professional-services/new"
                 className={`inline-flex items-center justify-center px-4 sm:px-6 py-2.5 rounded-lg transition-all touch-manipulation text-sm sm:text-base ${
                   canCreateAssignment
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg'
+                    ? 'ds-bg-accent-primary text-white hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg'
                     : 'ds-bg-surface-muted ds-text-muted cursor-not-allowed opacity-60'
                 }`}
                 onClick={(e) => {
@@ -449,7 +449,7 @@ function ProfessionalServicesPageContent() {
                   href="/professional-services/new"
                   className={`inline-flex items-center justify-center px-4 sm:px-6 py-2.5 rounded-lg transition-all touch-manipulation text-sm sm:text-base ${
                     canCreateAssignment
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg'
+                      ? 'ds-bg-accent-primary text-white hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg'
                       : 'ds-bg-surface-muted ds-text-muted cursor-not-allowed opacity-60'
                   }`}
                   onClick={(e) => {
@@ -566,7 +566,7 @@ function ProfessionalServicesPageContent() {
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/professional-services/${assignmentId}`}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View
                           </Link>
@@ -646,7 +646,7 @@ function ProfessionalServicesPageContent() {
                               onClick={() => setPagination(prev => ({ ...prev, page }))}
                               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors touch-manipulation ${
                                 page === pagination.page
-                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                  ? 'z-10 bg-blue-500/10 border-ds-accent-primary ds-text-accent-primary'
                                   : 'ds-bg-surface ds-border-subtle ds-text-muted hover:ds-bg-surface-muted active:ds-bg-surface-muted'
                               }`}
                             >
@@ -781,7 +781,7 @@ function ProfessionalServicesPageContent() {
                     <div className="flex flex-wrap gap-2 pt-3">
                       <Link
                         href={`/professional-services/${assignmentId}`}
-                        className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                        className="flex-1 px-3 py-2 bg-blue-500/10 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation text-center border border-blue-400/60"
                       >
                         View
                       </Link>

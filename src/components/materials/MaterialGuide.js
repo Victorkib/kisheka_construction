@@ -105,12 +105,12 @@ export function MaterialGuide({
 
   const getColorClasses = (color) => {
     const colors = {
-      blue: 'bg-blue-50 hover:bg-blue-100 border-blue-400/60 text-blue-700 hover:border-blue-400/60',
-      green: 'bg-green-50 hover:bg-green-100 border-green-400/60 text-green-700 hover:border-green-400/60',
-      purple: 'bg-purple-50 hover:bg-purple-100 border-purple-400/60 text-purple-700 hover:border-purple-400/60',
-      indigo: 'bg-indigo-50 hover:bg-indigo-100 border-indigo-200 text-indigo-700 hover:border-indigo-300',
-      teal: 'bg-teal-50 hover:bg-teal-100 border-teal-200 text-teal-700 hover:border-teal-300',
-      orange: 'bg-orange-50 hover:bg-orange-100 border-orange-200 text-orange-700 hover:border-orange-300',
+      blue: 'bg-blue-500/10 hover:bg-blue-500/20 border-blue-400/60 ds-text-accent-primary hover:border-blue-400/60',
+      green: 'bg-green-500/10 hover:bg-green-500/20 border-green-400/60 text-emerald-200 hover:border-green-400/60',
+      purple: 'bg-purple-500/10 hover:bg-purple-500/20 border-purple-400/60 text-purple-200 hover:border-purple-400/60',
+      indigo: 'bg-indigo-500/10 hover:bg-indigo-500/20 border-indigo-400/60 text-indigo-200 hover:border-indigo-400/60',
+      teal: 'bg-teal-500/10 hover:bg-teal-500/20 border-teal-400/60 text-teal-200 hover:border-teal-400/60',
+      orange: 'bg-orange-500/10 hover:bg-orange-500/20 border-orange-400/60 text-orange-200 hover:border-orange-400/60',
     };
     return colors[color] || colors.blue;
   };
@@ -123,7 +123,7 @@ export function MaterialGuide({
   }
 
   return (
-    <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-sm border ds-border-subtle mb-6 overflow-hidden">
+    <div className="ds-bg-surface rounded-xl shadow-sm border ds-border-subtle mb-6 overflow-hidden">
       {/* Main Content Area */}
       <div className="p-5">
         {/* Quick Actions - Always Visible */}
@@ -131,7 +131,7 @@ export function MaterialGuide({
           <div className="mb-4">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
+                <Sparkles className="w-5 h-5 ds-text-accent-primary" />
                 <h3 className="text-lg font-semibold ds-text-primary">Quick Actions</h3>
               </div>
               {hasGuideContent && (
@@ -166,8 +166,8 @@ export function MaterialGuide({
                     <div className="flex items-start gap-3">
                       <span className="text-2xl flex-shrink-0">{action.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-sm leading-tight mb-0.5">{action.label}</h4>
-                        <p className="text-xs opacity-75 leading-tight">{action.description}</p>
+                        <h4 className="font-semibold text-sm leading-tight mb-0.5 ds-text-primary">{action.label}</h4>
+                        <p className="text-xs ds-text-secondary leading-tight">{action.description}</p>
                       </div>
                     </div>
                   </Link>
@@ -219,9 +219,9 @@ export function MaterialGuide({
         {/* Guide Section - Collapsible */}
         {hasGuideContent && (
           <div className={`border-t ds-border-subtle pt-4 transition-all ${!isGuideExpanded ? 'hidden' : 'block'}`}>
-            <div className="bg-blue-50/50 rounded-lg p-4 border border-blue-100">
+            <div className="ds-bg-accent-subtle rounded-lg p-4 border ds-border-accent-subtle">
               <div className="flex items-start gap-2.5 mb-3">
-                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <Info className="w-5 h-5 ds-text-accent-primary flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   {title && (
                     <h4 className="text-base font-semibold ds-text-primary mb-1.5">{title}</h4>
@@ -236,7 +236,7 @@ export function MaterialGuide({
               {prerequisites.length > 0 && (
                 <div className="mb-3">
                   <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                    <CheckCircle2 className="w-4 h-4 ds-text-accent-primary" />
                     <p className="text-xs font-semibold uppercase tracking-wide ds-text-secondary">
                       Prerequisites
                     </p>
@@ -244,7 +244,7 @@ export function MaterialGuide({
                   <ul className="space-y-1.5 ml-6">
                     {prerequisites.map((item, index) => (
                       <li key={index} className="text-sm ds-text-secondary flex items-start gap-2">
-                        <span className="text-blue-600 mt-1 font-bold">•</span>
+                        <span className="ds-text-accent-primary mt-1 font-bold">•</span>
                         <span>{item}</span>
                       </li>
                     ))}
@@ -254,10 +254,10 @@ export function MaterialGuide({
 
               {/* Tip */}
               {tip && (
-                <div className="bg-blue-100/50 border border-blue-400/60 rounded-lg p-3 mt-3">
+                <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-3 mt-3">
                   <div className="flex items-start gap-2">
-                    <Lightbulb className="w-4 h-4 text-blue-700 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-blue-900 leading-relaxed">
+                    <Lightbulb className="w-4 h-4 ds-text-accent-primary flex-shrink-0 mt-0.5" />
+                    <p className="text-xs ds-text-accent-primary leading-relaxed">
                       <span className="font-semibold">💡 Tip:</span> {tip}
                     </p>
                   </div>

@@ -626,7 +626,7 @@ export default function ApprovalsPage() {
               onClick={() => setActiveTab('materials')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'materials'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'ds-border-accent-primary ds-text-accent-primary'
                   : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
@@ -636,7 +636,7 @@ export default function ApprovalsPage() {
               onClick={() => setActiveTab('expenses')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'expenses'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'ds-border-accent-primary ds-text-accent-primary'
                   : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
@@ -646,7 +646,7 @@ export default function ApprovalsPage() {
               onClick={() => setActiveTab('initial-expenses')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'initial-expenses'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'ds-border-accent-primary ds-text-accent-primary'
                   : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
@@ -792,7 +792,7 @@ export default function ApprovalsPage() {
                               materials.length > 0
                             }
                             onChange={toggleSelectAllMaterials}
-                            className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                            className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                           />
                         </th>
                       )}
@@ -839,7 +839,7 @@ export default function ApprovalsPage() {
                               onChange={() =>
                                 toggleSelectMaterial(material._id)
                               }
-                              className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                              className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                             />
                           </td>
                         )}
@@ -847,7 +847,7 @@ export default function ApprovalsPage() {
                           <div>
                             <Link
                               href={`/items/${material._id}`}
-                              className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                              className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               {material.name || material.materialName}
                             </Link>
@@ -977,7 +977,7 @@ export default function ApprovalsPage() {
                               expenses.length > 0
                             }
                             onChange={toggleSelectAllExpenses}
-                            className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                            className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                           />
                         </th>
                       )}
@@ -1022,14 +1022,14 @@ export default function ApprovalsPage() {
                               type="checkbox"
                               checked={selectedExpenses.includes(expense._id)}
                               onChange={() => toggleSelectExpense(expense._id)}
-                              className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                              className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                             />
                           </td>
                         )}
                         <td className="px-6 py-4">
                           <Link
                             href={`/expenses/${expense._id}`}
-                            className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                            className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             {expense.expenseCode || 'N/A'}
                           </Link>
@@ -1148,7 +1148,7 @@ export default function ApprovalsPage() {
                               initialExpenses.length > 0
                             }
                             onChange={toggleSelectAllInitialExpenses}
-                            className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                            className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                           />
                         </th>
                       )}
@@ -1194,14 +1194,14 @@ export default function ApprovalsPage() {
                               onChange={() =>
                                 toggleSelectInitialExpense(expense._id)
                               }
-                              className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                              className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                             />
                           </td>
                         )}
                         <td className="px-6 py-4">
                           <Link
                             href={`/initial-expenses/${expense._id}`}
-                            className="text-sm font-medium text-blue-600 hover:text-blue-900"
+                            className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             {expense.expenseCode || 'N/A'}
                           </Link>

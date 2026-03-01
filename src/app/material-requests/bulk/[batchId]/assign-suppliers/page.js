@@ -335,7 +335,7 @@ function SupplierAssignmentPageContent() {
           <div className="text-center">
             <h1 className="text-2xl font-bold ds-text-primary mb-2">Access Denied</h1>
             <p className="ds-text-secondary">You don't have permission to assign suppliers.</p>
-            <Link href="/material-requests" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+            <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover mt-4 inline-block">
               ← Back to Material Requests
             </Link>
           </div>
@@ -361,7 +361,7 @@ function SupplierAssignmentPageContent() {
           <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
-          <Link href="/material-requests" className="text-blue-600 hover:text-blue-800">
+          <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Material Requests
           </Link>
         </div>
@@ -399,7 +399,7 @@ function SupplierAssignmentPageContent() {
         <div className="mb-8">
           <Link
             href={`/material-requests/bulk/${params.batchId}`}
-            className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block"
           >
             ← Back to Batch Details
           </Link>
@@ -516,7 +516,7 @@ function SupplierAssignmentPageContent() {
               onClick={() => setMode('single')}
               className={`px-6 py-3 font-medium transition-colors ${
                 mode === 'single'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  ? 'border-b-2 ds-border-accent-primary ds-text-accent-primary'
                   : 'ds-text-secondary hover:ds-text-primary'
               }`}
             >
@@ -527,7 +527,7 @@ function SupplierAssignmentPageContent() {
               onClick={() => setMode('multiple')}
               className={`px-6 py-3 font-medium transition-colors ${
                 mode === 'multiple'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
+                  ? 'border-b-2 ds-border-accent-primary ds-text-accent-primary'
                   : 'ds-text-secondary hover:ds-text-primary'
               }`}
             >
@@ -561,7 +561,7 @@ function SupplierAssignmentPageContent() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
                   href={getSupplierCreationUrl()}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium inline-block"
+                  className="px-6 py-3 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium inline-block"
                 >
                   + Add New Supplier
                 </Link>
@@ -620,7 +620,7 @@ function SupplierAssignmentPageContent() {
               <div className="flex gap-2">
                 <Link
                   href={getSupplierCreationUrl()}
-                  className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm whitespace-nowrap shadow-md transition-all hover:shadow-lg flex items-center gap-2"
+                  className="px-5 py-2.5 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium text-sm whitespace-nowrap shadow-md transition-all hover:shadow-lg flex items-center gap-2"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -687,7 +687,7 @@ function SupplierAssignmentPageContent() {
             isLoading={submitting}
             loadingText="Creating Purchase Orders..."
             disabled={!canProceed || submitting}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             Create Purchase Orders
           </LoadingButton>

@@ -158,7 +158,7 @@ function PhaseTemplatesPageContent() {
           {user && ['owner', 'pm', 'project_manager'].includes(user.role?.toLowerCase()) && (
             <Link
               href="/phase-templates/new"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ds-bg-accent-primary hover:ds-bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ds-accent-focus"
             >
               + Create Template
             </Link>
@@ -190,7 +190,7 @@ function PhaseTemplatesPageContent() {
                 id="templateType-filter"
                 value={filters.templateType}
                 onChange={(e) => handleFilterChange('templateType', e.target.value)}
-                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500"
               >
                 <option value="">All Types</option>
                 {TEMPLATE_TYPES.map((type) => (
@@ -210,7 +210,7 @@ function PhaseTemplatesPageContent() {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search templates..."
-                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500"
               />
             </div>
             <div className="flex items-end">
@@ -256,7 +256,7 @@ function PhaseTemplatesPageContent() {
                       <div className="flex gap-2">
                         <Link
                           href={`/phase-templates/${template._id}`}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover text-sm"
                         >
                           View
                         </Link>

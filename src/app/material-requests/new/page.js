@@ -856,7 +856,7 @@ function NewMaterialRequestPageContent() {
                   )}
                 </select>
                 {formData.phaseId && selectedPhaseInfo && (
-                  <p className="mt-1 text-xs text-blue-600">
+                  <p className="mt-1 text-xs ds-text-accent-primary">
                     {applicableFloors.length > 0 
                       ? `✓ ${applicableFloors.length} floor(s) applicable to ${selectedPhaseInfo.phaseName}`
                       : 'No floors are applicable to this phase. Floor assignment is optional.'}
@@ -889,7 +889,7 @@ function NewMaterialRequestPageContent() {
                     </div>
                     <Link
                       href={`/phases?projectId=${formData.projectId}`}
-                      className="text-sm text-blue-600 hover:underline"
+                      className="text-sm ds-text-accent-primary hover:underline"
                       target="_blank"
                     >
                       Manage phases for this project →
@@ -1204,7 +1204,7 @@ function NewMaterialRequestPageContent() {
                 type="submit"
                 isLoading={loading}
                 loadingText="Creating Request..."
-                className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium rounded-lg transition-colors touch-manipulation"
+                className="w-full sm:w-auto px-6 py-2.5 ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium rounded-lg transition-colors touch-manipulation"
               >
                 Create Request
               </LoadingButton>

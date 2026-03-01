@@ -317,7 +317,7 @@ function ProfessionalActivitiesPageContent() {
               href="/professional-activities/new"
               className={`inline-flex items-center px-4 py-2 rounded-lg transition-all ${
                 canCreateActivity
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                  ? 'ds-bg-accent-primary text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
                   : 'ds-bg-surface-muted ds-text-muted cursor-not-allowed opacity-60'
               }`}
               onClick={(e) => {
@@ -473,7 +473,7 @@ function ProfessionalActivitiesPageContent() {
                   href="/professional-activities/new"
                   className={`inline-flex items-center px-4 py-2 rounded-lg transition-all ${
                     canCreateActivity
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                      ? 'ds-bg-accent-primary text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
                       : 'ds-bg-surface-muted ds-text-muted cursor-not-allowed opacity-60'
                   }`}
                   onClick={(e) => {
@@ -558,7 +558,7 @@ function ProfessionalActivitiesPageContent() {
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/professional-activities/${activity._id}`}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View
                           </Link>
@@ -637,7 +637,7 @@ function ProfessionalActivitiesPageContent() {
                               onClick={() => setPagination(prev => ({ ...prev, page }))}
                               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                 page === pagination.page
-                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                  ? 'z-10 bg-blue-500/10 border-ds-accent-primary ds-text-accent-primary'
                                   : 'ds-bg-surface ds-border-subtle ds-text-muted hover:ds-bg-surface-muted'
                               }`}
                             >

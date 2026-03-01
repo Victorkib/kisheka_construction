@@ -22,7 +22,7 @@ function RegisterPageContent() {
       <div className="text-center text-sm">
         <p className="ds-text-secondary">
           Already have an account?{' '}
-          <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">
+          <Link href="/auth/login" className="ds-text-accent-primary hover:underline font-medium">
             Sign in
           </Link>
         </p>
@@ -36,7 +36,7 @@ export default function RegisterPage() {
     <Suspense fallback={
       <div className="space-y-6">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-ds-accent-primary"></div>
         </div>
       </div>
     }>

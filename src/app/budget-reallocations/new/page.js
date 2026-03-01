@@ -207,7 +207,7 @@ function NewBudgetReallocationPageContent() {
         
         {/* Header */}
         <div className="mb-8">
-          <Link href="/budget-reallocations" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href="/budget-reallocations" className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Budget Reallocations
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold ds-text-primary leading-tight">Create Budget Reallocation Request</h1>
@@ -382,7 +382,7 @@ function NewBudgetReallocationPageContent() {
             <LoadingButton
               type="submit"
               loading={loading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition"
+              className="flex-1 ds-bg-accent-primary hover:ds-bg-accent-hover text-white font-medium px-6 py-3 rounded-lg transition"
             >
               Create Request
             </LoadingButton>

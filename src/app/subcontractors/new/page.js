@@ -229,7 +229,7 @@ function NewSubcontractorPageContent() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/subcontractors" className="text-blue-600 hover:text-blue-800 mb-4 inline-block font-medium">
+          <Link href="/subcontractors" className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block font-medium">
             ← Back to Subcontractors
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">New Subcontractor Assignment</h1>

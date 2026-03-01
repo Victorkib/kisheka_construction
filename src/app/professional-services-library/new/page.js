@@ -68,7 +68,7 @@ export default function NewProfessionalServicesLibraryPage() {
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to manage the professional services library. Only Owners can add professionals.</p>
           </div>
-          <Link href="/professional-services-library" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/professional-services-library" className="ds-text-accent-primary hover:ds-text-accent-hover underline">
             ← Back to Library
           </Link>
         </div>
@@ -81,7 +81,7 @@ export default function NewProfessionalServicesLibraryPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/professional-services-library" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
+          <Link href="/professional-services-library" className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block">
             ← Back to Library
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold ds-text-primary leading-tight">

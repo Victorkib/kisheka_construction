@@ -248,7 +248,33 @@ export async function PATCH(request, { params }) {
       } else if (!ObjectId.isValid(floorId)) {
         return errorResponse('If provided, floorId must be a valid ObjectId', 400);
       } else {
-        updateData.floorId = new ObjectId(floorId);
+        const newFloorId = new ObjectId(floorId);
+        
+        // If changing floorId, check if there are work items linked to this subcontractor
+        // that might be affected (for finishing phases)
+        if (existingSubcontractor.floorId && existingSubcontractor.floorId.toString() !== floorId) {
+          const linkedWorkItems = await db.collection('work_items').find({
+            subcontractorId: new ObjectId(id),
+            deletedAt: null,
+          }).toArray();
+          
+          // Check if any linked work items are for finishing phases
+          const finishingWorkItems = linkedWorkItems.filter(wi => {
+            // We need to check the phase type, but we don't have it in the work item
+            // So we'll just warn if there are any linked work items
+            return wi.floorId && wi.floorId.toString() !== floorId;
+          });
+          
+          if (finishingWorkItems.length > 0) {
+            // Warn but don't block - the work items will need to be updated separately
+            console.warn(
+              `Subcontractor ${id} floorId changed from ${existingSubcontractor.floorId} to ${floorId}. ` +
+              `${finishingWorkItems.length} linked work item(s) may need to be updated to match the new floor.`
+            );
+          }
+        }
+        
+        updateData.floorId = newFloorId;
       }
     }
 

@@ -51,12 +51,12 @@ function LoginContent() {
       <div className="space-y-3 text-center text-sm">
         <p className="ds-text-secondary">
           Don't have an account?{' '}
-          <Link href="/auth/register" className="text-blue-600 hover:underline font-medium">
+          <Link href="/auth/register" className="ds-text-accent-primary hover:underline font-medium">
             Create one
           </Link>
         </p>
         <p>
-          <Link href="/auth/forgot-password" className="text-blue-600 hover:underline">
+          <Link href="/auth/forgot-password" className="ds-text-accent-primary hover:underline">
             Forgot password?
           </Link>
         </p>

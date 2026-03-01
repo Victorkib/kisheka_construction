@@ -48,7 +48,7 @@ function ActionMenu({ canAccess }) {
             <span className="text-xs font-semibold ds-text-muted uppercase tracking-wide">Workers</span>
             <Link
               href="/labour/workers/new"
-              className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+              className="flex items-center gap-2 px-3 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
               title="Add a single worker to the registry"
             >
               <Plus className="w-4 h-4" />
@@ -117,7 +117,7 @@ function ActionMenu({ canAccess }) {
                   onClick={() => setShowMobileMenu(false)}
                   className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors"
                 >
-                  <Plus className="w-5 h-5 text-blue-600" />
+                  <Plus className="w-5 h-5 ds-text-accent-primary" />
                   <div>
                     <p className="text-sm font-medium ds-text-primary">Add Single Worker</p>
                     <p className="text-xs ds-text-secondary">Register one worker</p>
@@ -128,7 +128,7 @@ function ActionMenu({ canAccess }) {
                   onClick={() => setShowMobileMenu(false)}
                   className="flex items-center gap-3 px-4 py-3 hover:bg-blue-50 transition-colors border-b ds-border-subtle"
                 >
-                  <Users className="w-5 h-5 text-blue-600" />
+                  <Users className="w-5 h-5 ds-text-accent-primary" />
                   <div>
                     <p className="text-sm font-medium ds-text-primary">Bulk Import Workers</p>
                     <p className="text-xs ds-text-secondary">Import multiple workers</p>
@@ -469,7 +469,7 @@ function WorkersPageContent() {
 
           {(filters.workerType || filters.status || filters.skillType || filters.search) && (
             <div className="mt-4 flex items-center gap-2">
-              <button onClick={resetFilters} className="text-sm text-blue-600 hover:text-blue-800 font-medium">
+              <button onClick={resetFilters} className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium">
                 Clear Filters
               </button>
             </div>
@@ -491,7 +491,7 @@ function WorkersPageContent() {
             <Users className="w-16 h-16 ds-text-muted mx-auto mb-4" />
             <p className="ds-text-secondary mb-4 font-medium">No workers found</p>
             {canAccess("create_worker_profile") && (
-              <Link href="/labour/workers/new" className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+              <Link href="/labour/workers/new" className="ds-text-accent-primary hover:ds-text-accent-hover font-medium text-sm">
                 Add your first worker
               </Link>
             )}
@@ -602,7 +602,7 @@ function WorkersPageContent() {
                             )}
                             <button
                               onClick={() => handleViewWorker(worker._id)}
-                              className="text-blue-600 hover:text-blue-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                               title="View Details"
                             >
                               <Eye className="w-4 h-4" />

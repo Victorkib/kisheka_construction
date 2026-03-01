@@ -174,7 +174,7 @@ function ProjectProgressPageContent() {
         <div className="mb-6">
           <Link
             href={`/projects/${projectId}`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-2 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium mb-2 inline-block"
           >
             ← Back to Project
           </Link>
@@ -195,7 +195,7 @@ function ProjectProgressPageContent() {
               onClick={() => setActiveTab('photos')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'photos'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-ds-accent-primary ds-text-accent-primary'
                   : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
@@ -205,7 +205,7 @@ function ProjectProgressPageContent() {
               onClick={() => setActiveTab('milestones')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'milestones'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-ds-accent-primary ds-text-accent-primary'
                   : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
@@ -215,7 +215,7 @@ function ProjectProgressPageContent() {
               onClick={() => setActiveTab('updates')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'updates'
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'border-ds-accent-primary ds-text-accent-primary'
                   : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
@@ -295,7 +295,7 @@ function ProjectProgressPageContent() {
                     isLoading={submittingUpdate}
                     loadingText="Adding..."
                     disabled={!dailyUpdateText.trim()}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-500 text-white font-medium py-2 rounded-lg transition"
+                    className="w-full ds-bg-accent-primary hover:bg-blue-700 disabled:bg-slate-500 text-white font-medium py-2 rounded-lg transition"
                   >
                     Add Update
                   </LoadingButton>

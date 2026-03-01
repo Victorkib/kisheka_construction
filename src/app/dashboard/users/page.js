@@ -193,7 +193,7 @@ function UsersPageContent() {
             </div>
             <Link
               href="/dashboard/users/invite"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 transition"
             >
               Invite User
             </Link>
@@ -332,7 +332,7 @@ function UsersPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <Link
                           href={`/dashboard/users/${userItem.id}`}
-                          className="text-blue-600 hover:text-blue-900 mr-4"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover mr-4"
                         >
                           View
                         </Link>

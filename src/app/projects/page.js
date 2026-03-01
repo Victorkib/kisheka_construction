@@ -116,10 +116,10 @@ function ProjectsPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      planning: 'bg-blue-100 text-blue-800',
-      active: 'bg-green-100 text-green-800',
-      paused: 'bg-yellow-100 text-yellow-800',
-      completed: 'bg-purple-100 text-purple-800',
+      planning: 'bg-blue-500/10 text-blue-200 border border-blue-400/60',
+      active: 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60',
+      paused: 'bg-amber-500/10 text-amber-200 border border-amber-400/60',
+      completed: 'bg-purple-500/10 text-purple-200 border border-purple-400/60',
       archived: 'ds-bg-surface-muted ds-text-secondary',
     };
     return colors[status] || 'ds-bg-surface-muted ds-text-primary';
@@ -157,7 +157,7 @@ function ProjectsPageContent() {
             {canCreate && (
               <Link
                 href="/projects/new"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
               >
                 + Create Project
               </Link>
@@ -195,7 +195,7 @@ function ProjectsPageContent() {
               <p className="text-sm font-medium ds-text-secondary">
                 Active Projects
               </p>
-              <p className="text-2xl font-bold text-green-600 mt-1">
+              <p className="text-2xl font-bold text-emerald-400 mt-1">
                 {projects.filter((p) => p.status === 'active').length}
               </p>
             </div>
@@ -209,7 +209,7 @@ function ProjectsPageContent() {
             </div>
             <div className="ds-bg-surface rounded-lg shadow p-4 border-l-4 border-yellow-500">
               <p className="text-sm font-medium ds-text-secondary">In Planning</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">
+              <p className="text-2xl font-bold ds-text-accent-primary mt-1">
                 {projects.filter((p) => p.status === 'planning').length}
               </p>
             </div>
@@ -285,7 +285,7 @@ function ProjectsPageContent() {
             {canCreate && (
               <Link
                 href="/projects/new"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="inline-block ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
               >
                 Create First Project
               </Link>
@@ -337,19 +337,19 @@ function ProjectsPageContent() {
                           ? (totalUsed / totalInvested) * 100
                           : 0;
 
-                      let capitalStatusColor = 'bg-green-100 text-green-800';
-                      let capitalStatusText = 'Capital OK';
+                    let capitalStatusColor = 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60';
+                    let capitalStatusText = 'Capital OK';
 
-                      if (totalInvested === 0) {
-                        capitalStatusColor = 'bg-red-100 text-red-800';
-                        capitalStatusText = 'No Capital';
-                      } else if (availableCapital < 0) {
-                        capitalStatusColor = 'bg-red-100 text-red-800';
-                        capitalStatusText = 'Negative';
-                      } else if (usagePercentage > 80) {
-                        capitalStatusColor = 'bg-yellow-100 text-yellow-800';
-                        capitalStatusText = 'Low Capital';
-                      }
+                    if (totalInvested === 0) {
+                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusText = 'No Capital';
+                    } else if (availableCapital < 0) {
+                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusText = 'Negative';
+                    } else if (usagePercentage > 80) {
+                      capitalStatusColor = 'bg-amber-500/10 text-amber-200 border border-amber-400/60';
+                      capitalStatusText = 'Low Capital';
+                    }
 
                       return (
                         <tr
@@ -360,7 +360,7 @@ function ProjectsPageContent() {
                             <div>
                               <Link
                                 href={`/projects/${project._id}`}
-                                className="text-sm font-semibold ds-text-primary hover:text-blue-600"
+                                className="text-sm font-semibold ds-text-primary hover:ds-text-accent-primary"
                               >
                                 {project.projectName}
                               </Link>
@@ -407,7 +407,7 @@ function ProjectsPageContent() {
                                 </div>
                                 {project.statistics.budgetVsCapitalWarning && (
                                   <div
-                                    className="text-xs text-yellow-600 flex items-center gap-1"
+                                    className="text-xs text-amber-400 flex items-center gap-1"
                                     title={
                                       project.statistics.budgetVsCapitalWarning
                                     }
@@ -431,7 +431,7 @@ function ProjectsPageContent() {
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <Link
                               href={`/projects/${project._id}`}
-                              className="text-blue-600 hover:text-blue-900 font-medium"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                             >
                               View →
                             </Link>
@@ -454,19 +454,19 @@ function ProjectsPageContent() {
                 const usagePercentage =
                   totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
 
-                let capitalStatusColor = 'bg-green-100 text-green-800';
-                let capitalStatusText = 'Capital OK';
+                    let capitalStatusColor = 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60';
+                    let capitalStatusText = 'Capital OK';
 
-                if (totalInvested === 0) {
-                  capitalStatusColor = 'bg-red-100 text-red-800';
-                  capitalStatusText = 'No Capital';
-                } else if (availableCapital < 0) {
-                  capitalStatusColor = 'bg-red-100 text-red-800';
-                  capitalStatusText = 'Negative';
-                } else if (usagePercentage > 80) {
-                  capitalStatusColor = 'bg-yellow-100 text-yellow-800';
-                  capitalStatusText = 'Low Capital';
-                }
+                    if (totalInvested === 0) {
+                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusText = 'No Capital';
+                    } else if (availableCapital < 0) {
+                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusText = 'Negative';
+                    } else if (usagePercentage > 80) {
+                      capitalStatusColor = 'bg-amber-500/10 text-amber-200 border border-amber-400/60';
+                      capitalStatusText = 'Low Capital';
+                    }
 
                 return (
                   <div
@@ -477,7 +477,7 @@ function ProjectsPageContent() {
                       <div className="flex-1">
                         <Link
                           href={`/projects/${project._id}`}
-                          className="text-base font-semibold ds-text-primary hover:text-blue-600 block"
+                          className="text-base font-semibold ds-text-primary hover:ds-text-accent-primary block"
                         >
                           {project.projectName}
                         </Link>
@@ -555,7 +555,7 @@ function ProjectsPageContent() {
                     <div className="mt-3 pt-3 border-t ds-border-subtle">
                       <Link
                         href={`/projects/${project._id}`}
-                        className="block text-center text-sm font-medium text-blue-600 hover:text-blue-900 py-2"
+                        className="block text-center text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover py-2"
                       >
                         View Details →
                       </Link>

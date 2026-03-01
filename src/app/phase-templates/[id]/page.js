@@ -150,7 +150,7 @@ function PhaseTemplateDetailPageContent() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Template not found'}
           </div>
-          <Link href="/phase-templates" className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href="/phase-templates" className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Templates
           </Link>
         </div>
@@ -162,7 +162,7 @@ function PhaseTemplateDetailPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <Link href="/phase-templates" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href="/phase-templates" className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Templates
           </Link>
           <div className="flex justify-between items-center">
@@ -180,7 +180,7 @@ function PhaseTemplateDetailPageContent() {
             {user && ['owner', 'pm', 'project_manager'].includes(user.role?.toLowerCase()) && (
               <button
                 onClick={() => setShowApplyModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 ds-bg-accent-primary text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Apply to Project
               </button>
@@ -332,7 +332,7 @@ function PhaseTemplateDetailPageContent() {
                         onClick={handleApplyTemplate}
                         loading={applying}
                         disabled={!selectedProjectId}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                        className="px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ds-accent-focus disabled:opacity-50"
                       >
                         Apply Template
                       </LoadingButton>

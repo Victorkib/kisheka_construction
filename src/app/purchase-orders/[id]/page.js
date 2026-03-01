@@ -1531,7 +1531,7 @@ function PurchaseOrderDetailPageContent() {
           <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || "Purchase order not found"}
           </div>
-          <Link href="/purchase-orders" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/purchase-orders" className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Purchase Orders
           </Link>
         </div>
@@ -1598,7 +1598,7 @@ function PurchaseOrderDetailPageContent() {
         />
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/purchase-orders" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/purchase-orders" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Purchase Orders
           </Link>
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
@@ -1752,7 +1752,7 @@ function PurchaseOrderDetailPageContent() {
                 {order.isRetryable && (order.retryCount || 0) < 3 && canEdit && (
                   <button
                     onClick={() => setShowRetryModal(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2"
+                    className="ds-bg-accent-primary text-white px-4 py-2 rounded hover:bg-blue-700 mr-2"
                   >
                     Retry with Same Supplier
                   </button>
@@ -1918,7 +1918,7 @@ function PurchaseOrderDetailPageContent() {
                     <div className="sm:col-span-2">
                       <Link
                         href={`/material-requests/bulk/${order.batch._id}`}
-                        className="text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm font-medium transition-colors touch-manipulation"
+                        className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover text-sm font-medium transition-colors touch-manipulation"
                       >
                         View Batch Details →
                       </Link>
@@ -2369,7 +2369,7 @@ function PurchaseOrderDetailPageContent() {
                         </div>
                         <Link
                           href={`/material-requests/${request._id}`}
-                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover font-medium text-sm"
                         >
                           View →
                         </Link>
@@ -2384,7 +2384,7 @@ function PurchaseOrderDetailPageContent() {
                     </div>
                     <Link
                       href={`/material-requests/${materialRequests[0]._id}`}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                      className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                     >
                       View Request →
                     </Link>
@@ -2421,7 +2421,7 @@ function PurchaseOrderDetailPageContent() {
                         </div>
                         <Link
                           href={`/items/${material._id}`}
-                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover font-medium text-sm"
                         >
                           View →
                         </Link>
@@ -2445,7 +2445,7 @@ function PurchaseOrderDetailPageContent() {
                     </div>
                     <Link
                       href={`/items/${linkedMaterials[0]._id}`}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                      className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                     >
                       View Material →
                     </Link>
@@ -2502,7 +2502,7 @@ function PurchaseOrderDetailPageContent() {
             {order.projectId && (
               <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-bold ds-text-primary mb-4">Project</h2>
-                <Link href={`/projects/${order.projectId}`} className="text-blue-600 hover:text-blue-800 font-medium">
+                <Link href={`/projects/${order.projectId}`} className="ds-text-accent-primary hover:ds-text-accent-hover font-medium">
                   View Project →
                 </Link>
               </div>

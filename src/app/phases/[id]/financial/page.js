@@ -104,7 +104,7 @@ function PhaseFinancialPageContent() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Failed to load financial data'}
           </div>
-          <Link href={`/phases/${phaseId}`} className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href={`/phases/${phaseId}`} className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Phase
           </Link>
         </div>
@@ -119,7 +119,7 @@ function PhaseFinancialPageContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href={`/phases/${phaseId}`} className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href={`/phases/${phaseId}`} className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Phase
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">Phase Financial Details</h1>
@@ -129,7 +129,7 @@ function PhaseFinancialPageContent() {
           {project && (
             <Link 
               href={`/projects/${project._id}`}
-              className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block"
+              className="text-sm ds-text-accent-primary hover:ds-text-accent-hover mt-2 inline-block"
             >
               Project: {project.projectName}
             </Link>
@@ -146,7 +146,7 @@ function PhaseFinancialPageContent() {
           </div>
           <div className="ds-bg-surface rounded-lg shadow p-6">
             <p className="text-sm ds-text-secondary mb-2">Actual Spending</p>
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-2xl font-bold ds-text-accent-primary">
               {formatCurrency(financialSummary.actualTotal)}
             </p>
           </div>
@@ -221,7 +221,7 @@ function PhaseFinancialPageContent() {
               </div>
               <div>
                 <p className="ds-text-secondary">Spent</p>
-                <p className="font-semibold text-blue-600">{formatCurrency(financialSummary.actualTotal)}</p>
+                <p className="font-semibold ds-text-accent-primary">{formatCurrency(financialSummary.actualTotal)}</p>
               </div>
               <div>
                 <p className="ds-text-secondary">Committed</p>
@@ -268,7 +268,7 @@ function PhaseFinancialPageContent() {
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Total</p>
-              <p className="text-lg font-semibold text-blue-600">
+              <p className="text-lg font-semibold ds-text-accent-primary">
                 {formatCurrency(spendingBreakdown.total)}
               </p>
             </div>
@@ -344,7 +344,7 @@ function PhaseFinancialPageContent() {
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Actual</p>
-              <p className="text-lg font-semibold text-blue-600">
+              <p className="text-lg font-semibold ds-text-accent-primary">
                 {formatCurrency(phase?.financialStates?.actual || financialSummary.actualTotal)}
               </p>
             </div>

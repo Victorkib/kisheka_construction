@@ -206,7 +206,7 @@ function NewFloorPageContent() {
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to create floors. Only Project Managers and Owners can create floors.</p>
           </div>
-          <Link href="/floors" className="text-blue-600 hover:text-blue-900 active:text-blue-800 underline text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/floors" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover underline text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Floors
           </Link>
         </div>
@@ -219,7 +219,7 @@ function NewFloorPageContent() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/floors" className="text-blue-600 hover:text-blue-900 active:text-blue-800 text-sm sm:text-base mb-4 inline-block transition-colors touch-manipulation">
+          <Link href="/floors" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover text-sm sm:text-base mb-4 inline-block transition-colors touch-manipulation">
             ← Back to Floors
           </Link>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Create New Floor</h1>
@@ -247,7 +247,7 @@ function NewFloorPageContent() {
             ) : projects.length === 0 ? (
               <div className="px-3 py-2.5 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700 text-sm sm:text-base">
                 No projects found. Please create a project first.
-                <Link href="/projects/new" className="ml-2 text-blue-600 hover:underline active:text-blue-800 touch-manipulation">
+                <Link href="/projects/new" className="ml-2 ds-text-accent-primary hover:underline active:ds-text-accent-hover touch-manipulation">
                   Create Project
                 </Link>
               </div>
@@ -422,7 +422,7 @@ function NewFloorPageContent() {
               type="submit"
               isLoading={loading}
               disabled={loading || !formData.projectId || projects.length === 0}
-              className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+              className="w-full sm:w-auto px-6 py-2.5 ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               Create Floor
             </LoadingButton>

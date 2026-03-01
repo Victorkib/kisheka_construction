@@ -223,7 +223,7 @@ function NewSupplierPageContent() {
             <p className="font-bold">Access Denied</p>
             <p className="font-medium">You do not have permission to create suppliers. Only OWNER and PM can create suppliers.</p>
           </div>
-          <Link href={backLink.href} className="text-blue-600 hover:text-blue-800 underline font-semibold">
+          <Link href={backLink.href} className="ds-text-accent-primary hover:ds-text-accent-hover underline font-semibold">
             {backLink.text}
           </Link>
         </div>
@@ -256,7 +256,7 @@ function NewSupplierPageContent() {
                   {returnTo && (
                     <button
                       onClick={handleGoBackToAssignment}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm transition-colors"
+                      className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 font-medium text-sm transition-colors"
                     >
                       ← Go Back to Assignment
                     </button>
@@ -275,7 +275,7 @@ function NewSupplierPageContent() {
 
         {/* Header */}
         <div className="mb-8">
-          <Link href={backLink.href} className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block font-semibold underline">
+          <Link href={backLink.href} className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block font-semibold underline">
             {backLink.text}
           </Link>
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
@@ -610,7 +610,7 @@ function NewSupplierPageContent() {
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md"
+              className="px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-semibold shadow-md"
             >
               {loading ? 'Creating...' : 'Create Supplier'}
             </button>

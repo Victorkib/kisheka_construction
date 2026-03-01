@@ -223,7 +223,7 @@ function BatchApprovalPageContent() {
           <div className="text-center">
             <h1 className="text-2xl font-bold ds-text-primary mb-2">Access Denied</h1>
             <p className="ds-text-secondary">You don't have permission to approve bulk material requests.</p>
-            <Link href="/material-requests" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+            <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover mt-4 inline-block">
               ← Back to Material Requests
             </Link>
           </div>
@@ -249,7 +249,7 @@ function BatchApprovalPageContent() {
           <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error || 'Batch not found'}
           </div>
-          <Link href="/material-requests" className="text-blue-600 hover:text-blue-800">
+          <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Material Requests
           </Link>
         </div>
@@ -284,7 +284,7 @@ function BatchApprovalPageContent() {
         <div className="mb-8">
           <Link
             href={`/material-requests/bulk/${params.batchId}`}
-            className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block"
           >
             ← Back to Batch Details
           </Link>
@@ -360,7 +360,7 @@ function BatchApprovalPageContent() {
               </div>
               <Link
                 href={`/material-requests/bulk/${params.batchId}/assign-suppliers`}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                className="px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium"
               >
                 Assign Suppliers →
               </Link>

@@ -82,7 +82,7 @@ export default function ProgressReportPage() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Failed to load progress report'}
           </div>
-          <Link href={`/phases/${params.id}`} className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href={`/phases/${params.id}`} className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Phase
           </Link>
         </div>
@@ -97,7 +97,7 @@ export default function ProgressReportPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href={`/phases/${params.id}/dashboard`} className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href={`/phases/${params.id}/dashboard`} className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Dashboard
           </Link>
           <div className="flex justify-between items-center">
@@ -125,7 +125,7 @@ export default function ProgressReportPage() {
               <p className="text-3xl font-bold ds-text-primary">{overallProgress.completionPercentage}%</p>
               <div className="mt-2 w-full ds-bg-surface-muted rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full"
+                  className="ds-bg-accent-primary h-2 rounded-full"
                   style={{ width: `${overallProgress.completionPercentage}%` }}
                 />
               </div>
@@ -156,7 +156,7 @@ export default function ProgressReportPage() {
                 <p className="text-sm ds-text-secondary">Status</p>
                 <p className={`text-xl font-semibold ${
                   timelineAdherence.onSchedule ? 'text-green-600' :
-                  timelineAdherence.aheadOfSchedule ? 'text-blue-600' : 'text-red-600'
+                  timelineAdherence.aheadOfSchedule ? 'ds-text-accent-primary' : 'text-red-600'
                 }`}>
                   {timelineAdherence.onSchedule ? 'On Schedule' :
                    timelineAdherence.aheadOfSchedule ? 'Ahead of Schedule' : 'Behind Schedule'}
@@ -165,7 +165,7 @@ export default function ProgressReportPage() {
               {timelineAdherence.daysAhead > 0 && (
                 <div>
                   <p className="text-sm ds-text-secondary">Days Ahead</p>
-                  <p className="text-xl font-semibold text-blue-600">{timelineAdherence.daysAhead}</p>
+                  <p className="text-xl font-semibold ds-text-accent-primary">{timelineAdherence.daysAhead}</p>
                 </div>
               )}
               {timelineAdherence.daysBehind > 0 && (
@@ -201,7 +201,7 @@ export default function ProgressReportPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm ds-text-secondary">In Progress</span>
-                  <span className="font-semibold text-blue-600">{workItems.statistics.byStatus.in_progress || 0}</span>
+                  <span className="font-semibold ds-text-accent-primary">{workItems.statistics.byStatus.in_progress || 0}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm ds-text-secondary">Not Started</span>
@@ -228,7 +228,7 @@ export default function ProgressReportPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm ds-text-secondary">Actual Hours</span>
-                  <span className="font-semibold text-blue-600">{workItems.statistics.totalActualHours.toFixed(1)} hrs</span>
+                  <span className="font-semibold ds-text-accent-primary">{workItems.statistics.totalActualHours.toFixed(1)} hrs</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm ds-text-secondary">Estimated Cost</span>
@@ -236,7 +236,7 @@ export default function ProgressReportPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-sm ds-text-secondary">Actual Cost</span>
-                  <span className="font-semibold text-blue-600">KES {workItems.statistics.totalActualCost.toLocaleString()}</span>
+                  <span className="font-semibold ds-text-accent-primary">KES {workItems.statistics.totalActualCost.toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -264,7 +264,7 @@ export default function ProgressReportPage() {
                       </div>
                       <div>
                         <p className="ds-text-secondary">In Progress</p>
-                        <p className="font-semibold text-blue-600">{item.inProgress}</p>
+                        <p className="font-semibold ds-text-accent-primary">{item.inProgress}</p>
                       </div>
                       <div>
                         <p className="ds-text-secondary">Blocked</p>
@@ -298,7 +298,7 @@ export default function ProgressReportPage() {
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Pending</p>
-              <p className="text-2xl font-bold text-blue-600">{milestones.statistics.pending}</p>
+              <p className="text-2xl font-bold ds-text-accent-primary">{milestones.statistics.pending}</p>
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Overdue</p>
@@ -335,7 +335,7 @@ export default function ProgressReportPage() {
             </div>
             <div>
               <p className="text-sm ds-text-secondary">Pending</p>
-              <p className="text-2xl font-bold text-blue-600">{qualityCheckpoints.statistics.pending}</p>
+              <p className="text-2xl font-bold ds-text-accent-primary">{qualityCheckpoints.statistics.pending}</p>
             </div>
           </div>
           <div className="mt-4">

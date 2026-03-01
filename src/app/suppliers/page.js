@@ -182,7 +182,7 @@ function SuppliersPageContent() {
           {canCreate && (
             <Link
               href="/suppliers/new"
-              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 sm:px-6 py-2.5 rounded-lg transition-colors shadow-md touch-manipulation text-sm sm:text-base text-center"
+              className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 sm:px-6 py-2.5 rounded-lg transition-colors shadow-md touch-manipulation text-sm sm:text-base text-center"
             >
               + Add Supplier
             </Link>
@@ -272,7 +272,7 @@ function SuppliersPageContent() {
             {canCreate && (
               <Link
                 href="/suppliers/new"
-                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg transition-colors inline-block shadow-md touch-manipulation"
+                className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg transition-colors inline-block shadow-md touch-manipulation"
               >
                 + Add Supplier
               </Link>
@@ -380,7 +380,7 @@ function SuppliersPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Link
                             href={`/suppliers/${supplier._id}`}
-                            className="text-blue-600 hover:text-blue-800 font-semibold mr-4 underline"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover font-semibold mr-4 underline"
                           >
                             View
                           </Link>
@@ -511,7 +511,7 @@ function SuppliersPageContent() {
                   <div className="flex flex-wrap gap-2 pt-3">
                     <Link
                       href={`/suppliers/${supplier._id}`}
-                      className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                      className="flex-1 px-3 py-2 bg-blue-500/10 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation text-center border border-blue-400/60"
                     >
                       View
                     </Link>

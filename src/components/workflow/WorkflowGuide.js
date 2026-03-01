@@ -136,69 +136,69 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
   const getColorClasses = (color, isActive, isCompleted, isUpcoming) => {
     const baseColors = {
       blue: {
-        bg: 'bg-blue-50',
+        bg: 'bg-blue-500/10',
         border: 'border-blue-400/60',
-        text: 'text-blue-700',
-        active: 'bg-blue-100 border-blue-400 text-blue-900',
-        completed: 'bg-blue-50 border-blue-400/60 text-blue-800',
+        text: 'ds-text-accent-primary',
+        active: 'bg-blue-500/20 border-blue-400 ds-text-accent-primary border-2',
+        completed: 'bg-blue-500/10 border-blue-400/60 ds-text-accent-primary',
         upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       green: {
-        bg: 'bg-green-50',
+        bg: 'bg-green-500/10',
         border: 'border-green-400/60',
-        text: 'text-green-700',
-        active: 'bg-green-100 border-green-400 text-green-900',
-        completed: 'bg-green-50 border-green-400/60 text-green-800',
+        text: 'text-emerald-200',
+        active: 'bg-green-500/20 border-green-400 text-emerald-200 border-2',
+        completed: 'bg-green-500/10 border-green-400/60 text-emerald-200',
         upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       purple: {
-        bg: 'bg-purple-50',
+        bg: 'bg-purple-500/10',
         border: 'border-purple-400/60',
-        text: 'text-purple-700',
-        active: 'bg-purple-100 border-purple-400 text-purple-900',
-        completed: 'bg-purple-50 border-purple-400/60 text-purple-800',
+        text: 'text-purple-200',
+        active: 'bg-purple-500/20 border-purple-400 text-purple-200 border-2',
+        completed: 'bg-purple-500/10 border-purple-400/60 text-purple-200',
         upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       orange: {
-        bg: 'bg-orange-50',
-        border: 'border-orange-200',
-        text: 'text-orange-700',
-        active: 'bg-orange-100 border-orange-400 text-orange-900',
-        completed: 'bg-orange-50 border-orange-300 text-orange-800',
+        bg: 'bg-orange-500/10',
+        border: 'border-orange-400/60',
+        text: 'text-orange-200',
+        active: 'bg-orange-500/20 border-orange-400 text-orange-200 border-2',
+        completed: 'bg-orange-500/10 border-orange-400/60 text-orange-200',
         upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       yellow: {
-        bg: 'bg-yellow-50',
+        bg: 'bg-yellow-500/10',
         border: 'border-yellow-400/60',
-        text: 'text-yellow-700',
-        active: 'bg-yellow-100 border-yellow-400 text-yellow-900',
-        completed: 'bg-yellow-50 border-yellow-400/60 text-yellow-800',
+        text: 'text-amber-200',
+        active: 'bg-yellow-500/20 border-yellow-400 text-amber-200 border-2',
+        completed: 'bg-yellow-500/10 border-yellow-400/60 text-amber-200',
         upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       indigo: {
-        bg: 'bg-indigo-50',
-        border: 'border-indigo-200',
-        text: 'text-indigo-700',
-        active: 'bg-indigo-100 border-indigo-400 text-indigo-900',
-        completed: 'bg-indigo-50 border-indigo-300 text-indigo-800',
+        bg: 'bg-indigo-500/10',
+        border: 'border-indigo-400/60',
+        text: 'text-indigo-200',
+        active: 'bg-indigo-500/20 border-indigo-400 text-indigo-200 border-2',
+        completed: 'bg-indigo-500/10 border-indigo-400/60 text-indigo-200',
         upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
       pink: {
-        bg: 'bg-pink-50',
-        border: 'border-pink-200',
-        text: 'text-pink-700',
-        active: 'bg-pink-100 border-pink-400 text-pink-900',
-        completed: 'bg-pink-50 border-pink-300 text-pink-800',
+        bg: 'bg-pink-500/10',
+        border: 'border-pink-400/60',
+        text: 'text-pink-200',
+        active: 'bg-pink-500/20 border-pink-400 text-pink-200 border-2',
+        completed: 'bg-pink-500/10 border-pink-400/60 text-pink-200',
         upcoming: 'ds-bg-surface-muted ds-border-subtle ds-text-muted',
       },
     };
 
     const colors = baseColors[color] || baseColors.blue;
     
-    if (isActive) return `${colors.active} border-2 font-semibold`;
-    if (isCompleted) return `${colors.completed} border hover:${colors.active}`;
+    if (isActive) return `${colors.active} font-semibold`;
+    if (isCompleted) return `${colors.completed} border hover:${colors.active.split(' border-2')[0]}`;
     if (isUpcoming) return `${colors.upcoming} border`;
-    return `${colors.bg} ${colors.border} ${colors.text} border hover:${colors.active}`;
+    return `${colors.bg} ${colors.border} ${colors.text} border hover:${colors.active.split(' border-2')[0]}`;
   };
 
   if (compact) {
@@ -253,9 +253,9 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
               {/* Step Number/Icon */}
               <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center border-2 ${
                 isActive 
-                  ? 'bg-blue-100 border-blue-500 text-blue-900' 
+                  ? 'bg-blue-500/20 border-blue-400 ds-text-accent-primary' 
                   : isCompleted
-                    ? 'bg-green-100 border-green-500 text-green-900'
+                    ? 'bg-green-500/20 border-green-400 text-emerald-200'
                     : isUpcoming
                       ? 'ds-bg-surface-muted ds-border-subtle ds-text-muted'
                       : 'ds-bg-surface-muted ds-border-subtle ds-text-muted'
@@ -275,9 +275,9 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
                   href={getStepHref(step)}
                   className={`block p-4 rounded-lg border-2 transition ${
                     isActive
-                      ? 'bg-blue-50 border-blue-400 shadow-md'
+                      ? 'bg-blue-500/10 border-blue-400 shadow-md'
                       : isCompleted
-                        ? 'bg-green-50 border-green-400/60 hover:bg-green-100'
+                        ? 'bg-green-500/10 border-green-400/60 hover:bg-green-500/20'
                         : isUpcoming
                           ? 'ds-bg-surface-muted ds-border-subtle opacity-60'
                           : 'ds-bg-surface ds-border-subtle hover:ds-bg-surface-muted'
@@ -286,18 +286,18 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className={`font-semibold ${
-                        isActive ? 'text-blue-900' : isCompleted ? 'text-green-900' : 'ds-text-secondary'
+                        isActive ? 'ds-text-accent-primary' : isCompleted ? 'text-emerald-200' : 'ds-text-secondary'
                       }`}>
                         {step.label}
                       </h3>
                       <p className={`text-sm mt-1 ${
-                        isActive ? 'text-blue-700' : isCompleted ? 'text-green-700' : 'ds-text-secondary'
+                        isActive ? 'ds-text-accent-primary' : isCompleted ? 'text-emerald-200' : 'ds-text-secondary'
                       }`}>
                         {step.description}
                       </p>
                     </div>
                     {isActive && (
-                      <span className="px-2 py-1 text-xs font-semibold bg-blue-600 text-white rounded-full">
+                      <span className="px-2 py-1 text-xs font-semibold ds-bg-accent-primary text-white rounded-full">
                         Current
                       </span>
                     )}
@@ -310,8 +310,8 @@ export function WorkflowGuide({ currentStep: overrideStep, projectId, compact = 
       </div>
       
       {/* Help Text */}
-      <div className="mt-4 p-3 bg-blue-50 border border-blue-400/60 rounded-lg">
-        <p className="text-sm text-blue-800">
+      <div className="mt-4 p-3 ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg">
+        <p className="text-sm ds-text-accent-primary">
           <strong>Tip:</strong> Follow the workflow steps in order. Each step builds on the previous one. 
           {currentStepId && currentStepIndex !== -1 && currentStepIndex < WORKFLOW_STEPS.length - 1 && (
             <> Next: <strong>{WORKFLOW_STEPS[currentStepIndex + 1].label}</strong></>

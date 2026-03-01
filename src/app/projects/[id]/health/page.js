@@ -25,7 +25,7 @@ function ProjectHealthPageContent() {
         <div className="mb-6">
           <Link
             href={`/projects/${projectId}`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-2 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium mb-2 inline-block"
           >
             ← Back to Project
           </Link>
@@ -46,7 +46,7 @@ function ProjectHealthPageContent() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               href={`/projects/${projectId}/finances`}
-              className="p-4 border-2 border-blue-400/60 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition"
+              className="p-4 border-2 border-blue-400/60 rounded-lg hover:border-blue-400 hover:bg-blue-500/10 transition"
             >
               <div className="flex items-center gap-3">
                 <div className="text-2xl">💰</div>
@@ -59,7 +59,7 @@ function ProjectHealthPageContent() {
 
             <Link
               href={`/projects/${projectId}/costs`}
-              className="p-4 border-2 border-green-400/60 rounded-lg hover:border-green-400 hover:bg-green-50 transition"
+              className="p-4 border-2 border-green-400/60 rounded-lg hover:border-green-400 hover:bg-green-500/10 transition"
             >
               <div className="flex items-center gap-3">
                 <div className="text-2xl">📊</div>
@@ -72,7 +72,7 @@ function ProjectHealthPageContent() {
 
             <Link
               href={`/projects/${projectId}`}
-              className="p-4 border-2 border-purple-400/60 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition"
+              className="p-4 border-2 border-purple-400/60 rounded-lg hover:border-purple-400 hover:bg-purple-500/10 transition"
             >
               <div className="flex items-center gap-3">
                 <div className="text-2xl">🏗️</div>

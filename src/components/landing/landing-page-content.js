@@ -53,13 +53,13 @@ export default function LandingPageContent() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="min-h-screen ds-bg-app">
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-16 md:py-24 text-center">
         <div className="max-w-4xl mx-auto space-y-6">
           <h1 className="text-5xl md:text-6xl font-extrabold ds-text-primary leading-tight">
             Doshaki Construction
-            <span className="block text-blue-600 mt-2">
+            <span className="block ds-text-accent-primary mt-2">
               Accountability System
             </span>
           </h1>
@@ -73,14 +73,14 @@ export default function LandingPageContent() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
             <Link
               href="/auth/login"
-              className="w-full sm:w-auto px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              className="w-full sm:w-auto px-8 py-4 ds-bg-accent-primary hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
               aria-label="Sign in to Doshaki Construction"
             >
               Sign In
             </Link>
             <Link
               href="/auth/register"
-              className="w-full sm:w-auto px-8 py-4 ds-bg-surface hover:ds-bg-surface-muted text-blue-600 font-semibold rounded-lg border-2 border-blue-600 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              className="w-full sm:w-auto px-8 py-4 ds-bg-surface hover:ds-bg-surface-muted ds-text-accent-primary font-semibold rounded-lg border-2 ds-border-strong shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
               aria-label="Create a new account"
             >
               Get Started
@@ -206,14 +206,14 @@ export default function LandingPageContent() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/auth/register"
-              className="px-8 py-4 ds-bg-surface text-blue-600 font-semibold rounded-lg hover:ds-bg-surface-muted transition-colors duration-200 shadow-lg"
+              className="px-8 py-4 ds-bg-surface ds-text-accent-primary font-semibold rounded-lg hover:ds-bg-surface-muted transition-colors duration-200 shadow-lg"
               aria-label="Create account to get started"
             >
               Create Account
             </Link>
             <Link
               href="/auth/login"
-              className="px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:ds-bg-surface hover:text-blue-600 transition-all duration-200"
+              className="px-8 py-4 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:ds-bg-surface hover:ds-text-accent-primary transition-all duration-200"
               aria-label="Sign in to existing account"
             >
               Sign In
@@ -233,13 +233,13 @@ export default function LandingPageContent() {
             System. All rights reserved.
           </p>
           <nav className="mt-4 space-x-6 text-sm" aria-label="Footer links">
-            <Link href="#privacy" className="ds-text-secondary hover:text-blue-600">
+            <Link href="#privacy" className="ds-text-secondary hover:ds-text-accent-primary">
               Privacy Policy
             </Link>
-            <Link href="#terms" className="ds-text-secondary hover:text-blue-600">
+            <Link href="#terms" className="ds-text-secondary hover:ds-text-accent-primary">
               Terms of Service
             </Link>
-            <Link href="#contact" className="ds-text-secondary hover:text-blue-600">
+            <Link href="#contact" className="ds-text-secondary hover:ds-text-accent-primary">
               Contact Us
             </Link>
           </nav>

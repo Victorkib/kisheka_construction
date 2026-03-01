@@ -346,7 +346,7 @@ export default function MaterialRequestDetailPage() {
           <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || 'Material request not found'}
           </div>
-          <Link href="/material-requests" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/material-requests" className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Material Requests
           </Link>
         </div>
@@ -380,7 +380,7 @@ export default function MaterialRequestDetailPage() {
         <div className="mb-6 sm:mb-8">
           <Link
             href="/material-requests"
-            className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation"
+            className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation"
           >
             ← Back to Material Requests
           </Link>
@@ -437,7 +437,7 @@ export default function MaterialRequestDetailPage() {
               {canEdit && (
                 <Link
                   href={`/material-requests/${requestId}/edit`}
-                  className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium rounded-lg transition-colors text-sm text-center touch-manipulation"
+                  className="flex-1 sm:flex-none px-4 py-2.5 ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium rounded-lg transition-colors text-sm text-center touch-manipulation"
                 >
                   Edit
                 </Link>
@@ -668,7 +668,7 @@ export default function MaterialRequestDetailPage() {
                   </div>
                   <Link
                     href={`/purchase-orders/${linkedPurchaseOrder._id}`}
-                    className="text-blue-600 hover:text-blue-800 active:text-blue-900 font-medium text-sm sm:text-base transition-colors touch-manipulation whitespace-nowrap"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover font-medium text-sm sm:text-base transition-colors touch-manipulation whitespace-nowrap"
                   >
                     View Order →
                   </Link>
@@ -702,7 +702,7 @@ export default function MaterialRequestDetailPage() {
                   </div>
                   <Link
                     href={`/items/${linkedMaterial._id}`}
-                    className="text-blue-600 hover:text-blue-800 active:text-blue-900 font-medium text-sm sm:text-base transition-colors touch-manipulation whitespace-nowrap"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover font-medium text-sm sm:text-base transition-colors touch-manipulation whitespace-nowrap"
                   >
                     View Material →
                   </Link>
@@ -756,7 +756,7 @@ export default function MaterialRequestDetailPage() {
                 <h2 className="text-xl font-bold ds-text-primary mb-4">Project</h2>
                 <Link
                   href={`/projects/${request.projectId}`}
-                  className="text-blue-600 hover:text-blue-800 font-medium"
+                  className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                 >
                   View Project →
                 </Link>

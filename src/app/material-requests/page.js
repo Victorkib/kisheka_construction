@@ -421,7 +421,7 @@ function MaterialRequestsPageContent() {
             {canAccess('create_material_request') && (
               <Link
                 href="/material-requests/new"
-                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base"
+                className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base"
               >
                 + New Request
               </Link>
@@ -554,7 +554,7 @@ function MaterialRequestsPageContent() {
             {canAccess('create_material_request') && (
               <Link
                 href="/material-requests/new"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="inline-block ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
               >
                 Create Your First Request
               </Link>
@@ -602,7 +602,7 @@ function MaterialRequestsPageContent() {
                   </div>
                   <button
                     onClick={() => setSelectedRequests(new Set())}
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors touch-manipulation"
+                    className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium transition-colors touch-manipulation"
                   >
                     Clear Selection
                   </button>
@@ -701,13 +701,13 @@ function MaterialRequestsPageContent() {
                             type="checkbox"
                             checked={selectedRequests.has(request._id)}
                             onChange={() => handleSelectRequest(request._id)}
-                            className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
+                            className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                           />
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <Link
                             href={`/material-requests/${request._id}`}
-                            className="text-blue-600 hover:text-blue-800 font-medium"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                           >
                             {request.requestNumber}
                           </Link>
@@ -758,7 +758,7 @@ function MaterialRequestsPageContent() {
                             {canView && (
                               <Link
                                 href={`/material-requests/${request._id}`}
-                                className="text-blue-600 hover:text-blue-800"
+                                className="ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 View
                               </Link>
@@ -853,7 +853,7 @@ function MaterialRequestsPageContent() {
                           />
                           <Link
                             href={`/material-requests/${request._id}`}
-                            className="text-base font-semibold text-blue-600 hover:text-blue-800 truncate"
+                            className="text-base font-semibold ds-text-accent-primary hover:ds-text-accent-hover truncate"
                           >
                             {request.requestNumber}
                           </Link>

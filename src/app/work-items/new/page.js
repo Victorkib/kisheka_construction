@@ -242,7 +242,7 @@ function NewWorkItemPageContent() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/work-items" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block font-medium text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/work-items" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block font-medium text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Work Items
           </Link>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary">New Work Item</h1>
@@ -269,7 +269,7 @@ function NewWorkItemPageContent() {
                   aria-expanded={isInfoExpanded}
                 >
                   <svg 
-                    className={`w-5 h-5 sm:w-6 sm:h-6 text-blue-600 transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ds-text-accent-primary transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -311,7 +311,7 @@ function NewWorkItemPageContent() {
             {/* Project & Phase Selection Section */}
             <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl p-4 sm:p-6 border border-blue-400/60">
               <h2 className="text-base sm:text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 Project & Phase Selection
