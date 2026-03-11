@@ -106,10 +106,10 @@ export default function PhaseDashboardPage() {
   const getStatusColor = (status) => {
     const colors = {
       'not_started': 'ds-bg-surface-muted ds-text-primary',
-      'in_progress': 'bg-blue-100 text-blue-800',
-      'completed': 'bg-green-100 text-green-800',
-      'on_hold': 'bg-yellow-100 text-yellow-800',
-      'cancelled': 'bg-red-100 text-red-800'
+      'in_progress': 'ds-bg-accent-subtle ds-text-accent-primary',
+      'completed': 'ds-bg-success/10 ds-text-success',
+      'on_hold': 'ds-bg-warning/10 ds-text-warning',
+      'cancelled': 'ds-bg-danger/10 ds-text-danger'
     };
     return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
@@ -128,7 +128,7 @@ export default function PhaseDashboardPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
+          <div className="ds-bg-danger/10 ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg">
             {error || 'Failed to load dashboard'}
           </div>
           <Link href={`/phases/${params.id}`} className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
@@ -220,23 +220,23 @@ export default function PhaseDashboardPage() {
             <p className="text-sm ds-text-secondary mb-2">Budget</p>
             <p className="text-2xl font-bold ds-text-primary">{formatCurrency(financialSummary.budgetTotal)}</p>
             <p className="text-sm ds-text-secondary mt-4">Utilization</p>
-            <p className="text-lg font-semibold text-blue-600">{financialSummary.utilizationPercentage.toFixed(1)}%</p>
+            <p className="text-lg font-semibold ds-text-accent-primary">{financialSummary.utilizationPercentage.toFixed(1)}%</p>
           </div>
 
           <div className="ds-bg-surface rounded-lg shadow p-6">
             <p className="text-sm ds-text-secondary mb-2">Actual Spending</p>
-            <p className="text-2xl font-bold text-blue-600">{formatCurrency(financialSummary.actualTotal)}</p>
+            <p className="text-2xl font-bold ds-text-accent-primary">{formatCurrency(financialSummary.actualTotal)}</p>
             <p className="text-sm ds-text-secondary mt-4">Committed</p>
-            <p className="text-lg font-semibold text-orange-600">{formatCurrency(financialSummary.committedTotal)}</p>
+            <p className="text-lg font-semibold ds-text-warning">{formatCurrency(financialSummary.committedTotal)}</p>
           </div>
 
           <div className="ds-bg-surface rounded-lg shadow p-6">
             <p className="text-sm ds-text-secondary mb-2">Remaining</p>
-            <p className={`text-2xl font-bold ${financialSummary.remaining < 0 ? 'text-red-600' : 'text-green-600'}`}>
+            <p className={`text-2xl font-bold ${financialSummary.remaining < 0 ? 'ds-text-danger' : 'ds-text-success'}`}>
               {formatCurrency(financialSummary.remaining)}
             </p>
             <p className="text-sm ds-text-secondary mt-4">Variance</p>
-            <p className={`text-lg font-semibold ${financialSummary.variance < 0 ? 'text-green-600' : 'text-red-600'}`}>
+            <p className={`text-lg font-semibold ${financialSummary.variance < 0 ? 'ds-text-success' : 'ds-text-danger'}`}>
               {financialSummary.variance >= 0 ? '+' : ''}{formatCurrency(financialSummary.variance)}
             </p>
           </div>
@@ -316,11 +316,11 @@ export default function PhaseDashboardPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm ds-text-secondary">Completed</span>
-                <span className="font-semibold text-green-600">{statistics.workItems.byStatus.completed || 0}</span>
+                <span className="font-semibold ds-text-success">{statistics.workItems.byStatus.completed || 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm ds-text-secondary">In Progress</span>
-                <span className="font-semibold text-blue-600">{statistics.workItems.byStatus.in_progress || 0}</span>
+                <span className="font-semibold ds-text-accent-primary">{statistics.workItems.byStatus.in_progress || 0}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm ds-text-secondary">Not Started</span>
@@ -328,7 +328,7 @@ export default function PhaseDashboardPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm ds-text-secondary">Blocked</span>
-                <span className="font-semibold text-red-600">{statistics.workItems.byStatus.blocked || 0}</span>
+                <span className="font-semibold ds-text-danger">{statistics.workItems.byStatus.blocked || 0}</span>
               </div>
               <div className="mt-3 pt-3 border-t">
                 <div className="flex justify-between">
@@ -355,15 +355,15 @@ export default function PhaseDashboardPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm ds-text-secondary">Completed</span>
-                <span className="font-semibold text-green-600">{statistics.milestones.completed}</span>
+                <span className="font-semibold ds-text-success">{statistics.milestones.completed}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm ds-text-secondary">Pending</span>
-                <span className="font-semibold text-blue-600">{statistics.milestones.pending}</span>
+                <span className="font-semibold ds-text-accent-primary">{statistics.milestones.pending}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm ds-text-secondary">Overdue</span>
-                <span className="font-semibold text-red-600">{statistics.milestones.overdue}</span>
+                <span className="font-semibold ds-text-danger">{statistics.milestones.overdue}</span>
               </div>
               <div className="mt-3 pt-3 border-t">
                 <div className="flex justify-between">
@@ -390,15 +390,15 @@ export default function PhaseDashboardPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-sm ds-text-secondary">Passed</span>
-                <span className="font-semibold text-green-600">{statistics.qualityCheckpoints.passed}</span>
+                <span className="font-semibold ds-text-success">{statistics.qualityCheckpoints.passed}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm ds-text-secondary">Failed</span>
-                <span className="font-semibold text-red-600">{statistics.qualityCheckpoints.failed}</span>
+                <span className="font-semibold ds-text-danger">{statistics.qualityCheckpoints.failed}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-sm ds-text-secondary">Pending</span>
-                <span className="font-semibold text-blue-600">{statistics.qualityCheckpoints.pending}</span>
+                <span className="font-semibold ds-text-accent-primary">{statistics.qualityCheckpoints.pending}</span>
               </div>
               <div className="mt-3 pt-3 border-t">
                 <div className="flex justify-between">
@@ -441,7 +441,7 @@ export default function PhaseDashboardPage() {
           {recentActivity && recentActivity.length > 0 ? (
             <div className="space-y-3">
               {recentActivity.map((activity) => (
-                <div key={activity._id} className="border-l-4 border-blue-500 pl-4 py-2">
+                <div key={activity._id} className="border-l-4 ds-border-accent-primary pl-4 py-2">
                   <div className="flex justify-between items-start">
                     <div>
                       <p className="text-sm font-medium ds-text-primary">
