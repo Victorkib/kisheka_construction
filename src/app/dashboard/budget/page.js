@@ -459,7 +459,7 @@ function BudgetDashboardContent() {
 
           {/* Materials Financial Progression Card */}
           {data.materials && (
-            <div className="mb-6 bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-400/60 rounded-lg p-6">
+            <div className="mb-6 ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-purple-900">Materials Financial Progression</h2>
                 <span className={`text-xs px-3 py-1 rounded-full border ${
@@ -602,7 +602,7 @@ function BudgetDashboardContent() {
                 
                 if (materialsStatus.status === 'over_budget' || materialsStatus.committedUtilization > 100 || materialsStatus.estimatedUtilization > 100) {
                   return (
-                    <div className="mt-4 pt-4 border-t border-purple-400/60">
+                    <div className="mt-4 pt-4 border-t ds-border-accent-subtle">
                       {materialsStatus.committedUtilization > 100 && (
                         <p className="text-sm text-red-700 font-semibold mb-1">
                           ⚠️ Committed costs ({formatCurrency(data.materials.committed || 0)}) exceed budget ({formatCurrency(data.materials.budget || 0)}) by {formatCurrency((data.materials.committed || 0) - (data.materials.budget || 0))}

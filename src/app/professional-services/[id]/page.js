@@ -173,10 +173,10 @@ function ProfessionalServiceDetailPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      active: 'bg-green-100 text-green-800',
-      completed: 'bg-blue-100 text-blue-800',
-      terminated: 'bg-red-100 text-red-800',
-      on_hold: 'bg-yellow-100 text-yellow-800',
+      active: 'ds-bg-success/10 ds-text-success',
+      completed: 'ds-bg-accent-subtle ds-text-accent-primary',
+      terminated: 'ds-bg-danger/10 ds-text-danger',
+      on_hold: 'ds-bg-warning/10 ds-text-warning',
     };
     return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
@@ -195,7 +195,7 @@ function ProfessionalServiceDetailPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
+          <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg">
             {error || 'Professional service assignment not found'}
           </div>
           <Link
@@ -250,7 +250,7 @@ function ProfessionalServiceDetailPageContent() {
               {canAccess('terminate_professional_service') && assignment.status !== 'terminated' && (
                 <button
                   onClick={handleTerminateClick}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition"
+                  className="px-4 py-2 ds-bg-danger hover:ds-bg-danger text-white font-medium rounded-lg transition"
                 >
                   Terminate
                 </button>
@@ -391,13 +391,13 @@ function ProfessionalServiceDetailPageContent() {
                   </div>
                   <div>
                     <dt className="text-sm font-medium ds-text-muted">Paid Fees</dt>
-                    <dd className="mt-1 text-2xl font-bold text-green-600">
+                    <dd className="mt-1 text-2xl font-bold ds-text-success">
                       {formatCurrency(assignment.statistics.paidFees || 0)}
                     </dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium ds-text-muted">Pending Fees</dt>
-                    <dd className="mt-1 text-2xl font-bold text-yellow-600">
+                    <dd className="mt-1 text-2xl font-bold ds-text-warning">
                       {formatCurrency(assignment.statistics.pendingFees || 0)}
                     </dd>
                   </div>
@@ -438,9 +438,9 @@ function ProfessionalServiceDetailPageContent() {
                         <span
                           className={`px-2 py-1 text-xs font-semibold rounded-full ${
                             activity.status === 'approved'
-                              ? 'bg-green-100 text-green-800'
+                              ? 'ds-bg-success/10 ds-text-success'
                               : activity.status === 'pending_approval'
-                              ? 'bg-yellow-100 text-yellow-800'
+                              ? 'ds-bg-warning/10 ds-text-warning'
                               : 'ds-bg-surface-muted ds-text-primary'
                           }`}
                         >
@@ -488,11 +488,11 @@ function ProfessionalServiceDetailPageContent() {
                         <span
                           className={`px-2 py-1 text-xs font-semibold rounded-full ${
                             fee.status === 'PAID'
-                              ? 'bg-green-100 text-green-800'
+                              ? 'ds-bg-success/10 ds-text-success'
                               : fee.status === 'APPROVED'
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'ds-bg-accent-subtle ds-text-accent-primary'
                               : fee.status === 'PENDING'
-                              ? 'bg-yellow-100 text-yellow-800'
+                              ? 'ds-bg-warning/10 ds-text-warning'
                               : 'ds-bg-surface-muted ds-text-primary'
                           }`}
                         >

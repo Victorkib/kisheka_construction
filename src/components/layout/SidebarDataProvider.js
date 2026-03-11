@@ -40,7 +40,6 @@ export function SidebarDataProvider({ children }) {
   
   const [data, setData] = useState({
     project: null,
-    pendingActions: [],
     suggestions: [],
     loading: true,
     error: null,
@@ -56,7 +55,7 @@ export function SidebarDataProvider({ children }) {
 
   useEffect(() => {
     if (!user) {
-      setData({ project: null, pendingActions: [], suggestions: [], loading: false, error: null });
+      setData({ project: null, suggestions: [], loading: false, error: null });
       return;
     }
 
@@ -92,68 +91,6 @@ export function SidebarDataProvider({ children }) {
         promises.push(Promise.resolve({ type: 'project', data: null }));
       }
 
-      // Fetch pending actions - filter by project if available
-      if (canAccess && canAccess('approve_material_request')) {
-        const summaryUrl = projectId 
-          ? `/api/dashboard/summary?projectId=${projectId}`
-          : '/api/dashboard/summary';
-        promises.push(
-          fetch(summaryUrl, {
-            cache: 'no-store',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-            },
-          })
-            .then(res => res.json())
-            .then(data => ({ type: 'approvals', data }))
-            .catch(err => ({ type: 'approvals', data: null, error: err }))
-        );
-      } else {
-        promises.push(Promise.resolve({ type: 'approvals', data: null }));
-      }
-
-      // Fetch ready to order count - filter by project if available
-      if (canAccess && (canAccess('create_purchase_order') || canAccess('view_material_requests'))) {
-        const readyToOrderUrl = projectId
-          ? `/api/material-requests?status=ready_to_order&limit=0&projectId=${projectId}`
-          : '/api/material-requests?status=ready_to_order&limit=0';
-        promises.push(
-          fetch(readyToOrderUrl, {
-            cache: 'no-store',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-            },
-          })
-            .then(res => res.json())
-            .then(data => ({ type: 'readyToOrder', data }))
-            .catch(err => ({ type: 'readyToOrder', data: null, error: err }))
-        );
-      } else {
-        promises.push(Promise.resolve({ type: 'readyToOrder', data: null }));
-      }
-
-      // Fetch pending purchase orders for suppliers - filter by project if available
-      if (user?.role?.toLowerCase() === 'supplier') {
-        const ordersUrl = projectId
-          ? `/api/purchase-orders?limit=0&projectId=${projectId}`
-          : '/api/purchase-orders?limit=0';
-        promises.push(
-          fetch(ordersUrl, {
-            cache: 'no-store',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-            },
-          })
-            .then(res => res.json())
-            .then(data => ({ type: 'pendingOrders', data }))
-            .catch(err => ({ type: 'pendingOrders', data: null, error: err }))
-        );
-      } else {
-        promises.push(Promise.resolve({ type: 'pendingOrders', data: null }));
-      }
 
       // Fetch prerequisites for suggestions (if on project page)
       if (projectId && pathname.match(/^\/projects\/[^/]+$/)) {
@@ -197,7 +134,6 @@ export function SidebarDataProvider({ children }) {
 
       // Process results
       let project = null;
-      const pendingActions = [];
       const suggestions = [];
 
       for (const result of results) {
@@ -210,67 +146,6 @@ export function SidebarDataProvider({ children }) {
           case 'project':
             if (result.data?.success) {
               project = result.data.data;
-            }
-            break;
-
-          case 'approvals':
-            if (result.data?.success && result.data.data?.summary?.totalPendingApprovals > 0) {
-              const approvalsHref = projectId 
-                ? `/dashboard/approvals?projectId=${projectId}`
-                : '/dashboard/approvals';
-              pendingActions.push({
-                type: 'approval',
-                label: `${result.data.data.summary.totalPendingApprovals} Material Request${result.data.data.summary.totalPendingApprovals !== 1 ? 's' : ''} Pending Approval`,
-                href: approvalsHref,
-                icon: '✅',
-                priority: 'high',
-                count: result.data.data.summary.totalPendingApprovals,
-              });
-            }
-            break;
-
-          case 'readyToOrder':
-            if (result.data?.success) {
-              let count = 0;
-              if (result.data.data?.pagination?.total !== undefined) {
-                count = result.data.data.pagination.total;
-              } else if (result.data.data?.requests) {
-                count = result.data.data.requests.length;
-              }
-              if (count > 0) {
-                const readyToOrderHref = projectId
-                  ? `/material-requests?status=ready_to_order&projectId=${projectId}`
-                  : '/material-requests?status=ready_to_order';
-                pendingActions.push({
-                  type: 'ready_to_order',
-                  label: `${count} Approved Request${count !== 1 ? 's' : ''} Ready to Order`,
-                  href: readyToOrderHref,
-                  icon: '🛒',
-                  priority: 'medium',
-                  count,
-                });
-              }
-            }
-            break;
-
-          case 'pendingOrders':
-            if (result.data?.success && result.data.data?.orders) {
-              const pendingCount = result.data.data.orders.filter(
-                (order) => order.status === 'order_sent' || order.status === 'order_modified'
-              ).length;
-              if (pendingCount > 0) {
-                const ordersHref = projectId
-                  ? `/purchase-orders?projectId=${projectId}`
-                  : '/purchase-orders';
-                pendingActions.push({
-                  type: 'pending_order',
-                  label: `${pendingCount} Purchase Order${pendingCount !== 1 ? 's' : ''} Awaiting Response`,
-                  href: ordersHref,
-                  icon: '📋',
-                  priority: 'high',
-                  count: pendingCount,
-                });
-              }
             }
             break;
 
@@ -322,7 +197,6 @@ export function SidebarDataProvider({ children }) {
 
       setData({
         project,
-        pendingActions,
         suggestions,
         loading: false,
         error: null,

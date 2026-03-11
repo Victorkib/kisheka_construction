@@ -368,7 +368,7 @@ export default function WorkItemDetailPage() {
           <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || 'Work item not found'}
           </div>
-          <Link href="/work-items" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/work-items" className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Work Items
           </Link>
         </div>
@@ -381,7 +381,7 @@ export default function WorkItemDetailPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/work-items" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block font-medium text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/work-items" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active mb-4 inline-block font-medium text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Work Items
           </Link>
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
@@ -394,14 +394,14 @@ export default function WorkItemDetailPage() {
                 <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
                   <Link 
                     href={`/projects/${project._id}`}
-                    className="text-blue-600 hover:text-blue-800 active:text-blue-900 transition-colors touch-manipulation"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active transition-colors touch-manipulation"
                   >
                     Project: {project.projectName}
                   </Link>
                   <span className="ds-text-muted">•</span>
                   <Link 
                     href={`/phases/${phase._id}`}
-                    className="text-blue-600 hover:text-blue-800 active:text-blue-900 transition-colors touch-manipulation"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active transition-colors touch-manipulation"
                   >
                     Phase: {phase.phaseName}
                   </Link>
@@ -412,7 +412,7 @@ export default function WorkItemDetailPage() {
               {canEdit && (
                 <button
                   onClick={() => setShowEditModal(true)}
-                  className="flex-1 sm:flex-none bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
+                  className="flex-1 sm:flex-none ds-bg-accent-primary text-white px-4 sm:px-6 py-2.5 rounded-lg hover:ds-bg-accent-hover active:ds-bg-accent-active font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
                 >
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -423,7 +423,7 @@ export default function WorkItemDetailPage() {
               {canDelete && (
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="flex-1 sm:flex-none bg-gradient-to-r from-red-600 to-red-700 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 active:from-red-800 active:to-red-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
+                  className="flex-1 sm:flex-none ds-bg-danger text-white px-4 sm:px-6 py-2.5 rounded-lg hover:bg-red-700 active:bg-red-800 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
                 >
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -436,10 +436,10 @@ export default function WorkItemDetailPage() {
         </div>
 
         {/* Information Card */}
-        <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 rounded-xl border-2 border-blue-400/60 p-4 sm:p-5 mb-6 shadow-lg transition-all duration-300">
+        <div className="ds-bg-accent-subtle rounded-xl border-2 ds-border-accent-subtle p-4 sm:p-5 mb-6 shadow-lg transition-all duration-300">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 ds-bg-accent-primary rounded-lg flex items-center justify-center shadow-md">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
@@ -450,12 +450,12 @@ export default function WorkItemDetailPage() {
                 <h3 className="text-sm sm:text-base font-bold ds-text-primary">Work Item Details</h3>
                 <button
                   onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                  className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 ds-bg-surface/80 hover:ds-bg-surface border border-blue-400/60 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 ds-bg-surface/80 hover:ds-bg-surface border ds-border-accent-subtle rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2"
                   aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                   aria-expanded={isInfoExpanded}
                 >
                   <svg 
-                    className={`w-4 h-4 sm:w-5 sm:h-5 text-blue-600 transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
+                    className={`w-4 h-4 sm:w-5 sm:h-5 ds-text-accent-primary transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -490,23 +490,23 @@ export default function WorkItemDetailPage() {
               {getPriorityLabel(workItem.priority || 3)}
             </span>
           </div>
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-400/60 p-6 hover:shadow-xl transition-shadow duration-200">
+          <div className="ds-bg-accent-subtle rounded-xl shadow-lg border ds-border-accent-subtle p-6 hover:shadow-xl transition-shadow duration-200">
             <p className="text-sm font-semibold ds-text-secondary mb-3 uppercase tracking-wide">Estimated Hours</p>
             <p className="text-3xl font-bold text-blue-700 mb-4">
-              {workItem.estimatedHours || 0}<span className="text-base font-normal text-blue-600">h</span>
+              {workItem.estimatedHours || 0}<span className="text-base font-normal ds-text-accent-primary">h</span>
             </p>
             <p className="text-sm font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Actual Hours</p>
-            <p className="text-2xl font-bold text-blue-600">
+            <p className="text-2xl font-bold ds-text-accent-primary">
               {workItem.actualHours || 0}<span className="text-base font-normal text-blue-500">h</span>
             </p>
           </div>
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl shadow-lg border border-green-400/60 p-6 hover:shadow-xl transition-shadow duration-200">
+          <div className="ds-bg-accent-subtle rounded-xl shadow-lg border ds-border-accent-subtle p-6 hover:shadow-xl transition-shadow duration-200">
             <p className="text-sm font-semibold ds-text-secondary mb-3 uppercase tracking-wide">Estimated Cost</p>
             <p className="text-2xl font-bold text-green-700 mb-4">
               {formatCurrency(workItem.estimatedCost || 0)}
             </p>
             <p className="text-sm font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Actual Cost</p>
-            <p className="text-xl font-bold text-green-600">
+            <p className="text-xl font-bold ds-text-success">
               {formatCurrency(workItem.actualCost || 0)}
             </p>
           </div>
@@ -522,7 +522,7 @@ export default function WorkItemDetailPage() {
                 </p>
               )}
               {workItem.actualEndDate && (
-                <p className="text-sm font-semibold text-blue-600">
+                <p className="text-sm font-semibold ds-text-accent-primary">
                   <span className="font-bold">Actual:</span> {formatDate(workItem.actualEndDate)}
                 </p>
               )}
@@ -579,16 +579,16 @@ export default function WorkItemDetailPage() {
                 <Link
                   key={worker._id?.toString()}
                   href={`/labour/workers/${worker._id}`}
-                  className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-50 border border-blue-400/60 rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors text-sm touch-manipulation"
+                  className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-50 border ds-border-accent-subtle rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors text-sm touch-manipulation"
                 >
-                  <svg className="w-4 h-4 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   <span className="font-medium text-blue-900 break-words">{worker.workerName}</span>
                   {worker.employeeId && (
-                    <span className="text-xs text-blue-600">({worker.employeeId})</span>
+                    <span className="text-xs ds-text-accent-primary">({worker.employeeId})</span>
                   )}
-                  <svg className="w-4 h-4 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </Link>
@@ -687,7 +687,7 @@ export default function WorkItemDetailPage() {
               <div className="p-4 sm:p-8">
                 <div className="flex justify-between items-center mb-4 sm:mb-6 pb-4 border-b ds-border-subtle">
                   <h2 className="text-lg sm:text-2xl font-bold ds-text-primary flex items-center gap-2">
-                    <svg className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-5 h-5 sm:w-6 sm:h-6 ds-text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                     Edit Work Item
@@ -720,7 +720,7 @@ export default function WorkItemDetailPage() {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       required
-                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
+                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                     />
                   </div>
 
@@ -734,7 +734,7 @@ export default function WorkItemDetailPage() {
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       rows={4}
                       placeholder="Describe the work item..."
-                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted transition-all duration-200 font-medium resize-y"
+                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 placeholder:ds-text-muted transition-all duration-200 font-medium resize-y"
                     />
                   </div>
 
@@ -753,7 +753,7 @@ export default function WorkItemDetailPage() {
                           value={usesLegacyCategories ? formData.category : formData.categoryId}
                           onChange={handleCategoryChange}
                           required
-                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                         >
                           <option value="" className="ds-text-muted">Select Category</option>
                           {categoryOptions.map((category) => (
@@ -778,7 +778,7 @@ export default function WorkItemDetailPage() {
                         name="priority"
                         value={formData.priority}
                         onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
-                        className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                        className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                       >
                         {WORK_ITEM_PRIORITIES.map((priority) => (
                           <option key={priority} value={priority} className="ds-text-primary">
@@ -803,7 +803,7 @@ export default function WorkItemDetailPage() {
                           onChange={(e) => setFormData({ ...formData, estimatedHours: e.target.value })}
                           min="0"
                           step="0.1"
-                          className="w-full px-4 pr-16 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                          className="w-full px-4 pr-16 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium"
                         />
                       </div>
                     </div>
@@ -821,7 +821,7 @@ export default function WorkItemDetailPage() {
                           onChange={(e) => setFormData({ ...formData, actualHours: e.target.value })}
                           min="0"
                           step="0.1"
-                          className="w-full px-4 pr-16 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                          className="w-full px-4 pr-16 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium"
                         />
                       </div>
                     </div>
@@ -852,7 +852,7 @@ export default function WorkItemDetailPage() {
                           onChange={(e) => setFormData({ ...formData, estimatedCost: e.target.value })}
                           min="0"
                           step="0.01"
-                          className="w-full pl-12 pr-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
+                          className="w-full pl-12 pr-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                         />
                       </div>
                     </div>
@@ -870,7 +870,7 @@ export default function WorkItemDetailPage() {
                           onChange={(e) => setFormData({ ...formData, actualCost: e.target.value })}
                           min="0"
                           step="0.01"
-                          className="w-full pl-12 pr-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
+                          className="w-full pl-12 pr-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                         />
                       </div>
                     </div>
@@ -886,7 +886,7 @@ export default function WorkItemDetailPage() {
                         name="startDate"
                         value={formData.startDate}
                         onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                        className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
+                        className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                       />
                     </div>
 
@@ -900,7 +900,7 @@ export default function WorkItemDetailPage() {
                         value={formData.plannedEndDate}
                         onChange={(e) => setFormData({ ...formData, plannedEndDate: e.target.value })}
                         min={formData.startDate}
-                        className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
+                        className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                       />
                     </div>
                   </div>
@@ -913,7 +913,7 @@ export default function WorkItemDetailPage() {
                       name="status"
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                     >
                       {WORK_ITEM_STATUSES.map((status) => (
                         <option key={status} value={status} className="ds-text-primary">
@@ -934,7 +934,7 @@ export default function WorkItemDetailPage() {
                           name="executionModel"
                           value={formData.executionModel}
                           onChange={(e) => setFormData({ ...formData, executionModel: e.target.value })}
-                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                         >
                           <option value="">Select execution model (optional)</option>
                           {FINISHING_EXECUTION_MODELS.map((model) => (
@@ -959,7 +959,7 @@ export default function WorkItemDetailPage() {
                               name="subcontractorId"
                               value={formData.subcontractorId}
                               onChange={(e) => setFormData({ ...formData, subcontractorId: e.target.value })}
-                              className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                              className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                             >
                               <option value="">Select subcontractor (optional)</option>
                               {subcontractors.map((sub) => (
@@ -984,7 +984,7 @@ export default function WorkItemDetailPage() {
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       rows={4}
                       placeholder="Additional notes about this work item..."
-                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted transition-all duration-200 font-medium resize-y"
+                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 placeholder:ds-text-muted transition-all duration-200 font-medium resize-y"
                     />
                   </div>
 
@@ -999,7 +999,7 @@ export default function WorkItemDetailPage() {
                     <LoadingButton
                       type="submit"
                       loading={saving}
-                      className="w-full sm:w-auto px-6 sm:px-8 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl transition-all duration-200 text-sm touch-manipulation"
+                      className="w-full sm:w-auto px-6 sm:px-8 py-2.5 ds-bg-accent-primary text-white font-semibold rounded-lg hover:ds-bg-accent-hover active:ds-bg-accent-active focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 shadow-lg hover:shadow-xl transition-all duration-200 text-sm touch-manipulation"
                     >
                       {saving ? 'Saving...' : 'Save Changes'}
                     </LoadingButton>

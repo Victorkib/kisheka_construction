@@ -161,12 +161,12 @@ function BatchDetailPageContent() {
   const getStatusBadgeColor = (status) => {
     const colors = {
       draft: 'ds-bg-surface-muted ds-text-primary',
-      submitted: 'bg-blue-100 text-blue-800',
-      pending_approval: 'bg-yellow-100 text-yellow-800',
-      approved: 'bg-green-100 text-green-800',
-      partially_ordered: 'bg-orange-100 text-orange-800',
-      fully_ordered: 'bg-purple-100 text-purple-800',
-      cancelled: 'bg-red-100 text-red-800',
+      submitted: 'ds-bg-accent-subtle ds-text-accent-primary',
+      pending_approval: 'ds-bg-warning/10 ds-text-warning',
+      approved: 'ds-bg-success/10 ds-text-success',
+      partially_ordered: 'ds-bg-warning/10 ds-text-warning',
+      fully_ordered: 'ds-bg-accent-subtle ds-text-accent-primary',
+      cancelled: 'ds-bg-danger/10 ds-text-danger',
     };
     return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
@@ -174,7 +174,7 @@ function BatchDetailPageContent() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <LoadingTable rows={5} columns={6} />
         </div>
       </AppLayout>
@@ -184,8 +184,8 @@ function BatchDetailPageContent() {
   if (error || !batch) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg mb-6">
             {error || 'Batch not found'}
           </div>
           <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover">
@@ -217,7 +217,7 @@ function BatchDetailPageContent() {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <LoadingOverlay
           isLoading={actionLoading}
           message="Updating batch..."
@@ -231,12 +231,12 @@ function BatchDetailPageContent() {
           {(financeLoading || projectFinances || financeError) && (
             <div className={`mb-4 rounded-lg border px-4 py-3 ${
               financeError
-                ? 'bg-red-50 border-red-400/60 text-red-700'
+                ? 'ds-bg-danger/10 ds-border-danger/40 ds-text-danger'
                 : !hasCapital
-                  ? 'bg-yellow-50 border-yellow-400/60 text-yellow-800'
+                  ? 'ds-bg-warning/10 ds-border-warning/40 ds-text-warning'
                   : isCapitalShort
-                    ? 'bg-amber-50 border-amber-200 text-amber-800'
-                    : 'bg-green-50 border-green-400/60 text-green-800'
+                    ? 'ds-bg-warning/10 ds-border-warning/40 ds-text-warning'
+                    : 'ds-bg-success/10 ds-border-success/40 ds-text-success'
             }`}>
               {financeLoading ? (
                 <p className="text-sm">Checking project capital availability...</p>
@@ -265,13 +265,13 @@ function BatchDetailPageContent() {
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Link
                         href={`/financing?projectId=${batch.projectId.toString()}&returnTo=${encodeURIComponent(returnTo)}`}
-                        className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 ds-bg-surface text-amber-800 hover:bg-amber-100"
+                        className="px-3 py-1.5 text-xs font-medium rounded-md border ds-border-accent-subtle ds-bg-surface ds-text-accent-primary hover:ds-bg-accent-subtle"
                       >
                         Open Financing
                       </Link>
                       <Link
                         href={`/investors?projectId=${batch.projectId.toString()}&returnTo=${encodeURIComponent(returnTo)}`}
-                        className="px-3 py-1.5 text-xs font-medium rounded-md border border-amber-300 ds-bg-surface text-amber-800 hover:bg-amber-100"
+                        className="px-3 py-1.5 text-xs font-medium rounded-md border ds-border-accent-subtle ds-bg-surface ds-text-accent-primary hover:ds-bg-accent-subtle"
                       >
                         Allocate Funds (Investors)
                       </Link>
@@ -320,7 +320,7 @@ function BatchDetailPageContent() {
               {canApprove && (
                 <Link
                   href={`/material-requests/bulk/${params.batchId}/approve`}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                  className="px-4 py-2 ds-bg-success text-white rounded-lg hover:ds-bg-success font-medium"
                 >
                   Approve Batch
                 </Link>
@@ -351,7 +351,7 @@ function BatchDetailPageContent() {
                 <LoadingButton
                   onClick={() => setShowDeleteModal(true)}
                   isLoading={actionLoading}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium"
+                  className="px-4 py-2 ds-bg-danger text-white rounded-lg hover:ds-bg-danger font-medium"
                 >
                   Cancel Batch
                 </LoadingButton>
@@ -411,22 +411,22 @@ function BatchDetailPageContent() {
 
         {/* Workflow Guidance Card */}
         {batch && (
-          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-6 mb-6">
-            <h3 className="text-lg font-semibold text-blue-900 mb-3">📋 Workflow Status & Next Steps</h3>
+          <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold ds-text-primary mb-3">📋 Workflow Status & Next Steps</h3>
             {batch.status === 'draft' && (
-              <div className="text-sm text-blue-800">
+              <div className="text-sm ds-text-secondary">
                 <p className="mb-2"><strong>Current Status:</strong> Batch is in draft mode.</p>
                 <p><strong>Next Step:</strong> Submit the batch for approval.</p>
               </div>
             )}
             {batch.status === 'pending_approval' && (
-              <div className="text-sm text-blue-800">
+              <div className="text-sm ds-text-secondary">
                 <p className="mb-2"><strong>Current Status:</strong> Batch is pending approval from PM/OWNER.</p>
                 <p><strong>Next Step:</strong> PM/OWNER should review and approve the batch.</p>
                 {canApprove && (
                   <Link
                     href={`/material-requests/bulk/${params.batchId}/approve`}
-                    className="inline-block mt-3 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                    className="inline-block mt-3 px-4 py-2 ds-bg-success text-white rounded-lg hover:ds-bg-success font-medium"
                   >
                     Review & Approve →
                   </Link>
@@ -434,7 +434,7 @@ function BatchDetailPageContent() {
               </div>
             )}
             {batch.status === 'approved' && (
-              <div className="text-sm text-blue-800">
+              <div className="text-sm ds-text-secondary">
                 <p className="mb-2"><strong>Current Status:</strong> Batch has been approved and is ready for supplier assignment.</p>
                 <p className="mb-3"><strong>Next Step:</strong> Assign suppliers to materials and create purchase orders.</p>
                 {canAssignSuppliers && (
@@ -448,24 +448,24 @@ function BatchDetailPageContent() {
               </div>
             )}
             {(batch.status === 'partially_ordered' || batch.status === 'fully_ordered') && (
-              <div className="text-sm text-blue-800">
+              <div className="text-sm ds-text-secondary">
                 <p className="mb-2"><strong>Current Status:</strong> Purchase orders have been created for this batch.</p>
                 <p><strong>Next Step:</strong> Monitor purchase order status and supplier responses.</p>
                 {batch.purchaseOrderIds && batch.purchaseOrderIds.length > 0 && (
                   <div className="mt-3">
-                    <p className="text-xs text-blue-700 mb-2">View purchase orders:</p>
+                    <p className="text-xs ds-text-secondary mb-2">View purchase orders:</p>
                     <div className="flex flex-wrap gap-2">
                       {batch.purchaseOrderIds.slice(0, 5).map((poId, index) => (
                         <Link
                           key={poId}
                           href={`/purchase-orders/${poId}`}
-                          className="text-xs px-3 py-1 bg-blue-100 text-blue-800 rounded hover:bg-blue-200"
+                          className="text-xs px-3 py-1 ds-bg-accent-subtle ds-text-accent-primary rounded hover:ds-bg-accent-subtle"
                         >
                           PO #{index + 1}
                         </Link>
                       ))}
                       {batch.purchaseOrderIds.length > 5 && (
-                        <span className="text-xs text-blue-700 px-3 py-1">
+                        <span className="text-xs ds-text-secondary px-3 py-1">
                           +{batch.purchaseOrderIds.length - 5} more
                         </span>
                       )}
@@ -475,7 +475,7 @@ function BatchDetailPageContent() {
               </div>
             )}
             {batch.status === 'cancelled' && (
-              <div className="text-sm text-red-800">
+              <div className="text-sm ds-text-danger">
                 <p className="mb-2"><strong>Current Status:</strong> Batch has been cancelled.</p>
                 <p><strong>Action:</strong> This batch cannot be processed further.</p>
               </div>
@@ -562,9 +562,9 @@ function BatchDetailPageContent() {
                       {batch.status === 'approved' && (
                         <td className="px-4 py-3">
                           {request.linkedPurchaseOrderId ? (
-                            <span className="text-xs text-green-600 font-medium">✓ Assigned (PO Created)</span>
+                            <span className="text-xs ds-text-success font-medium">✓ Assigned (PO Created)</span>
                           ) : (
-                            <span className="text-xs text-orange-600 font-medium">⚠ Not Assigned</span>
+                            <span className="text-xs ds-text-warning font-medium">⚠ Not Assigned</span>
                           )}
                           {canAssignSuppliers && !request.linkedPurchaseOrderId && (
                             <div className="mt-1">
@@ -603,14 +603,14 @@ function BatchDetailPageContent() {
             </div>
           )}
           {batch.status === 'approved' && materialRequests.length > 0 && (
-            <div className="mt-4 p-4 bg-blue-50 border border-blue-400/60 rounded-lg">
+            <div className="mt-4 p-4 ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg">
               <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 ds-text-accent-primary mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-blue-900 mb-1">Ready for Supplier Assignment</p>
-                  <p className="text-xs text-blue-700 mb-3">
+                  <p className="text-sm font-medium ds-text-primary mb-1">Ready for Supplier Assignment</p>
+                  <p className="text-xs ds-text-secondary mb-3">
                     This batch has been approved. Assign suppliers to materials to create purchase orders. You can assign all materials to one supplier or different suppliers for each material.
                   </p>
                   {canAssignSuppliers && (
@@ -671,7 +671,7 @@ export default function BatchDetailPage() {
     <Suspense
       fallback={
         <AppLayout>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <LoadingTable rows={5} columns={6} />
           </div>
         </AppLayout>

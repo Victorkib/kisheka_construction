@@ -99,7 +99,7 @@ function EditProfessionalServicesLibraryPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded mb-6">
+          <div className="ds-bg-warning/10 border ds-border-warning/40 ds-text-warning px-4 py-3 rounded mb-6">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to manage the professional services library. Only Owners can edit professionals.</p>
           </div>
@@ -127,7 +127,7 @@ function EditProfessionalServicesLibraryPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded mb-6">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
           </div>

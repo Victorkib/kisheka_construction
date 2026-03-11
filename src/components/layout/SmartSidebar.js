@@ -17,7 +17,6 @@ import { SidebarDataProvider } from '@/components/layout/SidebarDataProvider';
 import { ContextualQuickActions } from '@/components/navigation/ContextualQuickActions';
 import { CurrentProjectContext } from '@/components/navigation/CurrentProjectContext';
 import { RecentlyViewed } from '@/components/navigation/RecentlyViewed';
-import { PendingActions } from '@/components/navigation/PendingActions';
 import { SuggestedActions } from '@/components/navigation/SuggestedActions';
 import { CommandPalette } from '@/components/navigation/CommandPalette';
 import { FavoriteButton } from '@/components/navigation/FavoritesManager';
@@ -109,7 +108,8 @@ const SmartNavSection = memo(function SmartNavSection({
         });
       });
       if (hasActiveChild) {
-        setIsExpanded(true);
+        // Defer state update to avoid cascading renders
+        setTimeout(() => setIsExpanded(true), 0);
       }
     }
   }, [pathname, section.children, hasChildren, isCollapsed]);
@@ -218,13 +218,12 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
   const [readyToOrderCount, setReadyToOrderCount] = useState(0);
-  const [favorites, setFavorites] = useState([]);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Load favorites
+  // Load favorites - use lazy initialization
+  const [favorites, setFavorites] = useState(() => getFavorites());
+
   useEffect(() => {
-    setFavorites(getFavorites());
-    
     const handleFavoritesUpdate = () => {
       setFavorites(getFavorites());
     };
@@ -233,10 +232,22 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
     return () => window.removeEventListener('favorites-updated', handleFavoritesUpdate);
   }, []);
 
-  // Fetch badge counts
+  // Fetch badge counts (project-specific)
   useEffect(() => {
     if (user && ['owner', 'pm', 'project_manager', 'accountant'].includes(user.role?.toLowerCase())) {
-      fetch('/api/dashboard/summary', {
+      // If no project selected, set count to 0 (multi-project system)
+      if (!currentProject?._id) {
+        setTimeout(() => setPendingApprovalsCount(0), 0);
+        return;
+      }
+
+      const projectId = currentProject._id?.toString() || currentProject._id;
+      if (!projectId) {
+        setTimeout(() => setPendingApprovalsCount(0), 0);
+        return;
+      }
+
+      fetch(`/api/dashboard/summary?projectId=${projectId}`, {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -247,11 +258,40 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
         .then((data) => {
           if (data.success && data.data?.summary?.totalPendingApprovals) {
             setPendingApprovalsCount(data.data.summary.totalPendingApprovals);
+          } else {
+            // If no data, set to 0 (no badge)
+            setPendingApprovalsCount(0);
           }
         })
-        .catch((err) => console.error('Error fetching approvals count:', err));
+        .catch((err) => {
+          console.error('Error fetching approvals count:', err);
+          setPendingApprovalsCount(0); // Set to 0 on error (no badge)
+        });
+    } else {
+      // User doesn't have permission, set to 0
+      setPendingApprovalsCount(0);
     }
-  }, [user]);
+  }, [user, currentProject]); // Add currentProject to dependencies
+
+  const projectId = currentProject?._id?.toString() || currentProject?._id || null;
+  
+  // Get smart navigation - must be called before early return
+  const navigation = useMemo(
+    () => {
+      if (!user) return [];
+      return getSmartNavigationForRole(user.role, projectId, { showSettings });
+    },
+    [user?.role, projectId, showSettings]
+  );
+
+  // Get favorites section - must be called before early return
+  const favoritesSection = useMemo(
+    () => {
+      if (!user) return null;
+      return getFavoritesSection(favorites, user.role, projectId);
+    },
+    [favorites, user?.role, projectId]
+  );
 
   if (loading || !user) {
     return (
@@ -270,20 +310,6 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
     );
   }
 
-  const projectId = currentProject?._id?.toString() || currentProject?._id || null;
-  
-  // Get smart navigation
-  const navigation = useMemo(
-    () => getSmartNavigationForRole(user.role, projectId, { showSettings }),
-    [user.role, projectId, showSettings]
-  );
-
-  // Get favorites section
-  const favoritesSection = useMemo(
-    () => getFavoritesSection(favorites, user.role, projectId),
-    [favorites, user.role, projectId]
-  );
-
   // Add favorites to navigation if exists
   const navigationWithFavorites = useMemo(() => {
     if (!favoritesSection) return navigation;
@@ -295,9 +321,11 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
     return navigationWithFavorites.map((section) => {
       if (section.label === 'Operations' && section.children) {
         const updatedChildren = section.children.map((child) => {
+          // ONLY add badge when count > 0 (fixes issue where badge shows even with 0 approvals)
           if (child.href === '/dashboard/approvals' && pendingApprovalsCount > 0) {
             return { ...child, badge: pendingApprovalsCount };
           }
+          // When count is 0, return child WITHOUT badge property (no red highlighting)
           return child;
         });
         return { ...section, children: updatedChildren };
@@ -412,9 +440,6 @@ const SmartSidebarContent = memo(function SmartSidebarContent({
             </button>
           </div>
         )}
-
-        {/* Pending Actions */}
-        <PendingActions isCollapsed={isCollapsed} />
 
         {/* Suggested Actions */}
         <SuggestedActions isCollapsed={isCollapsed} />

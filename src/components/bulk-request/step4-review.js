@@ -83,7 +83,7 @@ export function Step4Review({ wizardData, user, onValidationChange }) {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 ds-border-accent-primary mx-auto"></div>
         <p className="mt-2 text-sm ds-text-secondary">Loading review...</p>
       </div>
     );
@@ -172,20 +172,20 @@ export function Step4Review({ wizardData, user, onValidationChange }) {
       </div>
 
       {/* Totals */}
-      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-4">Summary</h3>
+      <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <p className="text-sm text-blue-700">Total Materials</p>
-            <p className="text-3xl font-bold text-blue-900">{totals.totalMaterials}</p>
+            <p className="text-sm ds-text-secondary">Total Materials</p>
+            <p className="text-3xl font-bold ds-text-primary">{totals.totalMaterials}</p>
           </div>
           <div>
-            <p className="text-sm text-blue-700">Total Estimated Cost</p>
-            <p className="text-3xl font-bold text-blue-900">{formatCurrency(totals.totalCost)}</p>
+            <p className="text-sm ds-text-secondary">Total Estimated Cost</p>
+            <p className="text-3xl font-bold ds-text-primary">{formatCurrency(totals.totalCost)}</p>
           </div>
           <div>
-            <p className="text-sm text-blue-700">Average Cost per Material</p>
-            <p className="text-3xl font-bold text-blue-900">
+            <p className="text-sm ds-text-secondary">Average Cost per Material</p>
+            <p className="text-3xl font-bold ds-text-primary">
               {formatCurrency(totals.totalMaterials > 0 ? totals.totalCost / totals.totalMaterials : 0)}
             </p>
           </div>
@@ -194,14 +194,14 @@ export function Step4Review({ wizardData, user, onValidationChange }) {
 
       {/* Auto-approval Notice */}
       {willAutoApprove && (
-        <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
+        <div className="ds-bg-success/10 border ds-border-success/40 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 ds-text-success mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <p className="font-semibold text-green-900">Auto-Approval Enabled</p>
-              <p className="text-sm text-green-700 mt-1">
+              <p className="font-semibold ds-text-success">Auto-Approval Enabled</p>
+              <p className="text-sm ds-text-success mt-1">
                 As OWNER, this bulk request will be automatically approved and ready for supplier assignment.
               </p>
             </div>

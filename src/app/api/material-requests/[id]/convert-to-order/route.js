@@ -78,13 +78,21 @@ export async function POST(request, { params }) {
     }
 
     // Check if status allows conversion
-    if (materialRequest.status !== 'approved') {
+    // Allow conversion if: approved OR (converted_to_order but no linked PO yet)
+    const canProceed = materialRequest.status === 'approved' || 
+      (materialRequest.status === 'converted_to_order' && !materialRequest.linkedPurchaseOrderId);
+    
+    if (!canProceed) {
+      if (materialRequest.linkedPurchaseOrderId) {
+        return errorResponse('Material request has already been converted to order and linked to a purchase order', 400);
+      }
       return errorResponse(`Cannot convert request with status: ${materialRequest.status}. Request must be approved first.`, 400);
     }
 
-    // Check if already converted
-    if (materialRequest.status === 'converted_to_order') {
-      return errorResponse('Material request has already been converted to order', 400);
+    // If already converted_to_order (but no linked PO), this is idempotent - just return success
+    if (materialRequest.status === 'converted_to_order' && !materialRequest.linkedPurchaseOrderId) {
+      // Already in correct state, just return success without updating
+      return successResponse(materialRequest, 'Material request is already marked as converted to order');
     }
 
     // If purchaseOrderId provided, verify it exists and is linked to this request

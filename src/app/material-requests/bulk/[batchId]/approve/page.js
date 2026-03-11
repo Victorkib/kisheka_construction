@@ -235,7 +235,7 @@ function BatchApprovalPageContent() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <LoadingTable rows={5} columns={6} />
         </div>
       </AppLayout>
@@ -245,8 +245,8 @@ function BatchApprovalPageContent() {
   if (error || !batch) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg mb-6">
             {error || 'Batch not found'}
           </div>
           <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover">
@@ -274,7 +274,7 @@ function BatchApprovalPageContent() {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <LoadingOverlay
           isLoading={actionLoading}
           message="Processing approvals..."
@@ -297,19 +297,19 @@ function BatchApprovalPageContent() {
 
         {/* Auto-Approved Notice (OWNER) */}
         {isAutoApproved && (
-          <div className="bg-green-50 border border-green-400/60 rounded-lg p-6 mb-6">
+          <div className="ds-bg-success/10 border ds-border-success/40 rounded-lg p-6 mb-6">
             <div className="flex items-start gap-3">
-              <svg className="w-6 h-6 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6 ds-text-success mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-green-900 mb-2">Auto-Approved</h3>
-                <p className="text-sm text-green-700 mb-4">
+                <h3 className="text-lg font-semibold ds-text-success mb-2">Auto-Approved</h3>
+                <p className="text-sm ds-text-success mb-4">
                   This batch was automatically approved as you are the OWNER. All material requests are approved and ready for supplier assignment.
                 </p>
                 <Link
                   href={`/material-requests/bulk/${params.batchId}/assign-suppliers`}
-                  className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
+                  className="inline-flex items-center px-4 py-2 ds-bg-success text-white rounded-lg hover:ds-bg-success font-medium"
                 >
                   Continue to Supplier Assignment →
                 </Link>
@@ -350,11 +350,11 @@ function BatchApprovalPageContent() {
 
         {/* Actions */}
         {!isAutoApproved && pendingRequests.length === 0 && (
-          <div className="mt-6 bg-blue-50 border border-blue-400/60 rounded-lg p-6">
+          <div className="mt-6 ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">All Requests Processed</h3>
-                <p className="text-sm text-blue-700">
+                <h3 className="text-lg font-semibold ds-text-primary mb-2">All Requests Processed</h3>
+                <p className="text-sm ds-text-secondary">
                   All material requests in this batch have been approved or rejected.
                 </p>
               </div>
@@ -377,7 +377,7 @@ export default function BatchApprovalPage() {
     <Suspense
       fallback={
         <AppLayout>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <LoadingTable rows={5} columns={6} />
           </div>
         </AppLayout>

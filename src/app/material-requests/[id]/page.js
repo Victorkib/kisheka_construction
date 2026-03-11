@@ -261,15 +261,37 @@ export default function MaterialRequestDetailPage() {
   const handleConvertConfirm = async () => {
     setIsConverting(true);
     try {
-      // First mark as converted
+      // Check if already converted - if so, skip API call and go directly to PO creation
+      if (request.status === 'converted_to_order' && !request.linkedPurchaseOrderId) {
+        // Already converted, just redirect to create PO
+        router.push(`/purchase-orders/new?requestId=${requestId}`);
+        return;
+      }
+
+      // Mark as converted (only if not already converted)
       const convertResponse = await fetch(`/api/material-requests/${requestId}/convert-to-order`, {
           method: 'POST',
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
             'Pragma': 'no-cache',
+            'Content-Type': 'application/json',
           },
       });
+
+      // Check if response is OK before parsing JSON
+      if (!convertResponse.ok) {
+        // Try to parse error response, but handle HTML error pages gracefully
+        let errorMessage = 'Failed to convert material request';
+        try {
+          const errorData = await convertResponse.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch (parseError) {
+          // Response is not JSON (might be HTML error page)
+          errorMessage = `Server error (${convertResponse.status}). Please try again.`;
+        }
+        throw new Error(errorMessage);
+      }
 
       const convertData = await convertResponse.json();
 
@@ -386,10 +408,10 @@ export default function MaterialRequestDetailPage() {
           </Link>
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
             <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">
-                  {request.requestNumber}
-                </h1>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight whitespace-normal break-normal">
+                {request.requestNumber}
+              </h1>
+              <div className="mt-2 flex flex-wrap items-center gap-2 sm:gap-3">
                 <span className={`inline-flex px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${getStatusBadgeColor(request.status)}`}>
                   {request.status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Unknown'}
                 </span>
@@ -397,9 +419,9 @@ export default function MaterialRequestDetailPage() {
                   {request.urgency?.toUpperCase() || 'N/A'}
                 </span>
               </div>
-              <p className="text-sm sm:text-base ds-text-secondary mt-2 break-words">{request.materialName}</p>
+              <p className="text-sm sm:text-base ds-text-secondary mt-2 whitespace-normal break-normal">{request.materialName}</p>
             </div>
-            <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
+            <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto md:justify-end">
               {canApprove && (
                 <button
                   onClick={handleApproveClick}
@@ -418,13 +440,6 @@ export default function MaterialRequestDetailPage() {
               )}
               {canConvert && (
                 <>
-                  {request.status === 'converted_to_order' && !request.linkedPurchaseOrderId && (
-                    <div className="w-full mb-3 p-3 bg-blue-50 border border-blue-400/60 rounded-lg">
-                      <p className="text-xs sm:text-sm text-blue-800">
-                        <strong>Note:</strong> This request has been marked as converted but no purchase order has been created yet. Click below to create the purchase order.
-                      </p>
-                    </div>
-                  )}
                   <button
                     onClick={handleConvertClick}
                     className="flex-1 sm:flex-none px-4 py-2.5 bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium rounded-lg transition-colors text-sm touch-manipulation"
@@ -444,6 +459,13 @@ export default function MaterialRequestDetailPage() {
               )}
             </div>
           </div>
+          {request.status === 'converted_to_order' && !request.linkedPurchaseOrderId && (
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-400/60 rounded-lg">
+              <p className="text-xs sm:text-sm text-blue-800">
+                <strong>Note:</strong> This request has been marked as converted but no purchase order has been created yet. Click below to create the purchase order.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Workflow Guidance Card */}
@@ -465,13 +487,13 @@ export default function MaterialRequestDetailPage() {
             {request.status === 'approved' && !request.linkedPurchaseOrderId && (
               <div className="text-sm text-blue-800">
                 <p className="mb-2"><strong>Current Status:</strong> Request has been approved and is ready for purchase order creation.</p>
-                <p><strong>Next Step:</strong> PM/OWNER should create a purchase order by clicking "Create Purchase Order" above.</p>
+                <p><strong>Next Step:</strong> PM/OWNER should create a purchase order by clicking &quot;Create Purchase Order&quot; above.</p>
               </div>
             )}
             {request.status === 'converted_to_order' && !request.linkedPurchaseOrderId && (
               <div className="text-sm text-amber-800 bg-amber-50 border-amber-200 rounded p-3">
                 <p className="mb-2"><strong>Current Status:</strong> Request has been marked as converted but no purchase order has been created yet.</p>
-                <p><strong>Next Step:</strong> Click "Continue to Create Purchase Order" above to complete the purchase order creation.</p>
+                <p><strong>Next Step:</strong> Click &quot;Continue to Create Purchase Order&quot; above to complete the purchase order creation.</p>
               </div>
             )}
             {request.status === 'converted_to_order' && request.linkedPurchaseOrderId && (
@@ -682,7 +704,7 @@ export default function MaterialRequestDetailPage() {
                 <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-2">Purchase Order Status</h2>
                 <p className="text-xs sm:text-sm text-amber-800 mb-3 break-words">
                   This request has been marked as converted to order, but the purchase order has not been created yet. 
-                  Use the "Create Purchase Order" button above to proceed.
+                  Use the &quot;Create Purchase Order&quot; button above to proceed.
                 </p>
               </div>
             )}

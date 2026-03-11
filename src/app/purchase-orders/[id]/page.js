@@ -1613,7 +1613,7 @@ function PurchaseOrderDetailPageContent() {
                   {order.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown"}
                 </span>
                 <span
-                  className={`inline-flex px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${getFinancialStatusBadgeColor(order.financialStatus)}`}
+                  className={`inline-flex px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ds-bg-surface-muted ds-text-secondary ${getFinancialStatusBadgeColor(order.financialStatus)}`}
                 >
                   {order.financialStatus?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "N/A"}
                 </span>
@@ -1687,7 +1687,7 @@ function PurchaseOrderDetailPageContent() {
         {order && <EnhancedOrderStatus order={order} canManage={canEdit} onRefresh={() => fetchOrder()} />}
 
         {/* Workflow Status Section */}
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-400/60 rounded-lg p-4 sm:p-6 shadow-md mb-6">
+        <div className="ds-bg-accent-subtle border-2 ds-border-accent-subtle rounded-lg p-4 sm:p-6 shadow-md mb-6">
           <h3 className="text-base sm:text-lg font-semibold text-blue-900 mb-2">📋 Workflow Status & Next Steps</h3>
           {order.status === "order_sent" && (
             <div className="text-sm text-blue-800">
@@ -1787,7 +1787,7 @@ function PurchaseOrderDetailPageContent() {
             </div>
           )}
           {order.status === "ready_for_delivery" && !order.linkedMaterialId && (
-            <div className="text-sm text-purple-800 bg-purple-50 border-purple-400/60 rounded p-3">
+            <div className="text-sm text-purple-800 bg-purple-50 ds-border-accent-subtle/60 rounded p-3">
               <p className="mb-2">
                 <strong>Current Status:</strong> Supplier has fulfilled the order and uploaded delivery note. Material
                 entry has been automatically created.
@@ -1807,7 +1807,7 @@ function PurchaseOrderDetailPageContent() {
             </div>
           )}
           {order.status === "ready_for_delivery" && order.linkedMaterialId && (
-            <div className="text-sm text-purple-800 bg-purple-50 border-purple-400/60 rounded p-3">
+            <div className="text-sm text-purple-800 bg-purple-50 ds-border-accent-subtle/60 rounded p-3">
               <p className="mb-2">
                 <strong>Current Status:</strong> Supplier has fulfilled the order. Material entry has been created.
               </p>
@@ -1896,7 +1896,7 @@ function PurchaseOrderDetailPageContent() {
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Batch Information (for bulk orders) */}
             {order.batch && (
-              <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 sm:p-6 mb-6">
+              <div className="bg-blue-50 border ds-border-accent-subtle rounded-lg p-4 sm:p-6 mb-6">
                 <h2 className="text-base sm:text-lg font-semibold text-blue-900 mb-2">Batch Information</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -1918,7 +1918,7 @@ function PurchaseOrderDetailPageContent() {
                     <div className="sm:col-span-2">
                       <Link
                         href={`/material-requests/bulk/${order.batch._id}`}
-                        className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover text-sm font-medium transition-colors touch-manipulation"
+                        className="ds-text-accent-primary ds-bg-surface-muted p hover:ds-text-accent-hover active:ds-text-accent-hover text-sm font-medium transition-colors touch-manipulation"
                       >
                         View Batch Details →
                       </Link>
@@ -2561,7 +2561,7 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Capital Validation Indicator */}
             {validatingCapital && (
-              <div className="bg-blue-50 border border-blue-400/60 text-blue-800 px-3 py-2 rounded-lg text-sm">
+              <div className="bg-blue-50 border ds-border-accent-subtle text-blue-800 px-3 py-2 rounded-lg text-sm">
                 <div className="flex items-center gap-2">
                   <LoadingSpinner size="sm" color="blue-600" />
                   <span>Validating capital availability...</span>
@@ -2848,7 +2848,7 @@ function PurchaseOrderDetailPageContent() {
                 <div className="hidden lg:block ds-bg-surface rounded-xl border ds-border-subtle shadow-sm overflow-hidden">
                   <div className="overflow-x-auto max-h-[450px] overflow-y-auto">
                     <table className="min-w-full divide-y divide-ds-border-subtle">
-                      <thead className="bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 z-10 border-b ds-border-subtle">
+                      <thead className="ds-bg-surface-muted sticky top-0 z-10 border-b ds-border-subtle">
                         <tr>
                           <th className="px-5 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
                             Material
@@ -3521,8 +3521,8 @@ function PurchaseOrderDetailPageContent() {
               {/* Mode Indicator Banner */}
               <div className={`p-3 sm:p-4 rounded-lg border-2 ${
                 isBulkOrderAlternative 
-                  ? 'bg-purple-50 border-purple-400/60' 
-                  : 'bg-blue-50 border-blue-400/60'
+                  ? 'bg-purple-50 ds-border-accent-subtle/60' 
+                  : 'bg-blue-50 ds-border-accent-subtle'
               }`}>
                 <div className="flex items-center gap-2">
                   <span className={`text-lg sm:text-xl ${
@@ -3658,13 +3658,13 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Bulk Order: Rejected Materials Assignment */}
             {isBulkOrderAlternative && rejectedMaterials.length > 0 && (
-              <div className="border-2 border-purple-400 rounded-lg p-5 bg-gradient-to-br from-purple-50 to-purple-100 shadow-md">
+              <div className="border-2 ds-border-accent-subtle rounded-lg p-5 ds-bg-accent-subtle shadow-md">
                 <div className="mb-4">
                   <h3 className="text-lg sm:text-xl font-bold text-purple-900 mb-2 flex items-center gap-2">
                     <span className="text-xl sm:text-2xl">📦</span>
                     <span>Assign Suppliers to Rejected Materials ({rejectedMaterials.length})</span>
                   </h3>
-                  <div className="ds-bg-surface border border-purple-400/60 rounded-lg p-3 mb-3">
+                  <div className="ds-bg-surface border ds-border-accent-subtle/60 rounded-lg p-3 mb-3">
                     <p className="text-sm font-semibold text-purple-800 mb-1">
                       ⚡ How to assign suppliers:
                     </p>
@@ -3684,7 +3684,7 @@ function PurchaseOrderDetailPageContent() {
                     ) || assignment
 
                     return (
-                      <div key={assignment.materialRequestId} className="ds-bg-surface border-2 border-purple-400/60 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                      <div key={assignment.materialRequestId} className="ds-bg-surface border-2 ds-border-accent-subtle/60 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
@@ -3820,7 +3820,7 @@ function PurchaseOrderDetailPageContent() {
                         )}
 
                         {/* Add Supplier Button */}
-                        <div className="mt-4 pt-4 border-t-2 border-purple-400/60">
+                        <div className="mt-4 pt-4 border-t-2 ds-border-accent-subtle/60">
                           <label className="block text-sm font-bold text-purple-900 mb-2 flex items-center gap-2">
                             <span>➕</span>
                             <span>Assign Supplier to This Material</span>
@@ -3837,7 +3837,7 @@ function PurchaseOrderDetailPageContent() {
                               }
                             }}
                             disabled={isModifying || filteredSuppliers.length === 0}
-                            className="w-full px-4 py-3 ds-text-primary ds-bg-surface border-2 border-purple-400/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 font-medium"
+                            className="w-full px-4 py-3 ds-text-primary ds-bg-surface border-2 ds-border-accent-subtle/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 font-medium"
                           >
                             <option value="">Select a supplier from the list below...</option>
                             {filteredSuppliers
@@ -3919,7 +3919,7 @@ function PurchaseOrderDetailPageContent() {
                       )}
                     </div>
                     {isBulkOrderAlternative && (
-                      <div className="mb-3 p-3 bg-blue-50 border border-blue-400/60 rounded-lg">
+                      <div className="mb-3 p-3 bg-blue-50 border ds-border-accent-subtle rounded-lg">
                         <p className="text-sm font-medium text-blue-800">
                           💡 <strong>Note:</strong> This is a reference list showing available suppliers. 
                           To assign suppliers, use the "Assign Supplier" dropdowns in each material card above.
@@ -3931,7 +3931,7 @@ function PurchaseOrderDetailPageContent() {
                       (alternativeMode === "hybrid" && viewMode === "all"
                         ? simpleList.length
                         : alternativeSuppliers.length) && (
-                      <div className="mb-2 p-2 bg-blue-50 border border-blue-400/60 rounded text-xs font-medium text-blue-800">
+                      <div className="mb-2 p-2 bg-blue-50 border ds-border-accent-subtle rounded text-xs font-medium text-blue-800">
                         Showing {filteredSuppliers.length} of{" "}
                         {alternativeMode === "hybrid" && viewMode === "all"
                           ? simpleList.length

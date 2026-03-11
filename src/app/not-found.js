@@ -23,7 +23,7 @@ function NotFoundContent() {
         <div className="max-w-2xl w-full text-center">
           {/* Large 404 Display */}
           <div className="mb-8">
-            <div className="text-9xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 mb-4">
+            <div className="text-9xl font-extrabold ds-text-gradient-accent mb-4">
               404
             </div>
             <div className="text-6xl mb-4">🏗️</div>
@@ -47,7 +47,7 @@ function NotFoundContent() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <Link
                 href="/dashboard/owner"
-                className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border-2 border-blue-400/60 hover:border-blue-400 hover:shadow-md transition-all group"
+                className="p-6 ds-bg-accent-subtle rounded-lg border-2 ds-border-accent-subtle hover:ds-border-accent-primary hover:shadow-md transition-all group"
               >
                 <div className="text-3xl mb-2">📊</div>
                 <h3 className="font-semibold ds-text-primary mb-1 group-hover:ds-text-accent-primary transition-colors">
@@ -60,7 +60,7 @@ function NotFoundContent() {
 
               <Link
                 href="/projects"
-                className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg border-2 border-purple-400/60 hover:border-purple-400 hover:shadow-md transition-all group"
+                className="p-6 ds-bg-accent-subtle rounded-lg border-2 ds-border-accent-subtle hover:ds-border-accent-primary hover:shadow-md transition-all group"
               >
                 <div className="text-3xl mb-2">🏗️</div>
                 <h3 className="font-semibold ds-text-primary mb-1 group-hover:text-purple-600 transition-colors">
@@ -73,10 +73,10 @@ function NotFoundContent() {
 
               <Link
                 href="/items"
-                className="p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg border-2 border-green-400/60 hover:border-green-400 hover:shadow-md transition-all group"
+                className="p-6 ds-bg-accent-subtle rounded-lg border-2 ds-border-accent-subtle hover:ds-border-accent-primary hover:shadow-md transition-all group"
               >
                 <div className="text-3xl mb-2">📦</div>
-                <h3 className="font-semibold ds-text-primary mb-1 group-hover:text-green-600 transition-colors">
+                <h3 className="font-semibold ds-text-primary mb-1 group-hover:ds-text-accent-primary transition-colors">
                   Materials
                 </h3>
                 <p className="text-sm ds-text-secondary">
@@ -86,10 +86,10 @@ function NotFoundContent() {
 
               <Link
                 href="/phases"
-                className="p-6 bg-gradient-to-br from-orange-50 to-amber-50 rounded-lg border-2 border-orange-200 hover:border-orange-400 hover:shadow-md transition-all group"
+                className="p-6 ds-bg-accent-subtle rounded-lg border-2 ds-border-accent-subtle hover:ds-border-accent-primary hover:shadow-md transition-all group"
               >
                 <div className="text-3xl mb-2">📋</div>
-                <h3 className="font-semibold ds-text-primary mb-1 group-hover:text-orange-600 transition-colors">
+                <h3 className="font-semibold ds-text-primary mb-1 group-hover:ds-text-accent-primary transition-colors">
                   Phases
                 </h3>
                 <p className="text-sm ds-text-secondary">

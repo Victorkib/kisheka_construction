@@ -20,10 +20,10 @@ export function Step7SuccessSummary({ batchId, purchaseOrders = [], summary = {}
   return (
     <div className="space-y-6">
       {/* Success Message */}
-      <div className="bg-green-50 border border-green-400/60 rounded-lg p-8 text-center">
+      <div className="ds-bg-success/10 border ds-border-success/40 rounded-lg p-8 text-center">
         <div className="flex justify-center mb-4">
           <svg
-            className="w-16 h-16 text-green-600"
+            className="w-16 h-16 ds-text-success"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -36,8 +36,8 @@ export function Step7SuccessSummary({ batchId, purchaseOrders = [], summary = {}
             />
           </svg>
         </div>
-        <h2 className="text-2xl font-bold text-green-900 mb-2">Purchase Orders Created Successfully!</h2>
-        <p className="text-green-700">
+        <h2 className="text-2xl font-bold ds-text-success mb-2">Purchase Orders Created Successfully!</h2>
+        <p className="ds-text-success">
           Your bulk material request has been processed and purchase orders have been sent to suppliers.
         </p>
       </div>
@@ -77,11 +77,11 @@ export function Step7SuccessSummary({ batchId, purchaseOrders = [], summary = {}
                     <div className="flex items-center gap-3">
                       <Link
                         href={`/purchase-orders/${po.purchaseOrderId}`}
-                        className="text-lg font-semibold text-blue-600 hover:text-blue-800"
+                        className="text-lg font-semibold ds-text-accent-primary hover:ds-text-accent-hover"
                       >
                         {po.purchaseOrderNumber}
                       </Link>
-                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full ds-bg-accent-subtle ds-text-accent-primary">
                         {po.status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Sent'}
                       </span>
                     </div>
@@ -95,7 +95,7 @@ export function Step7SuccessSummary({ batchId, purchaseOrders = [], summary = {}
                   </div>
                   <Link
                     href={`/purchase-orders/${po.purchaseOrderId}`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                    className="px-4 py-2 ds-bg-accent-primary rounded-lg hover:ds-bg-accent-hover text-sm font-medium"
                   >
                     View →
                   </Link>
@@ -110,7 +110,7 @@ export function Step7SuccessSummary({ batchId, purchaseOrders = [], summary = {}
       <div className="flex flex-col sm:flex-row gap-4">
         <Link
           href={`/material-requests/bulk/${batchId}`}
-          className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-center"
+          className="flex-1 px-6 py-3 ds-bg-accent-primary ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-accent-hover font-medium text-center"
         >
           View Batch Details
         </Link>
@@ -122,7 +122,7 @@ export function Step7SuccessSummary({ batchId, purchaseOrders = [], summary = {}
         </Link>
         <Link
           href="/material-requests/bulk"
-          className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-center"
+          className="flex-1 px-6 py-3 ds-bg-success ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-success font-medium text-center"
         >
           Create Another Batch
         </Link>

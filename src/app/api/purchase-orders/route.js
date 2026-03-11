@@ -327,8 +327,12 @@ export async function POST(request) {
     // Log actual status for debugging
     console.log('[POST /api/purchase-orders] Material request found with status:', materialRequestExists.status, 'ID:', materialRequestId);
 
-    // Check if status is valid for PO creation (must be 'approved')
-    if (materialRequestExists.status !== 'approved') {
+    // Check if status is valid for PO creation
+    // Allow: 'approved' OR 'converted_to_order' (if no linked PO yet - idempotent workflow)
+    const isValidStatus = materialRequestExists.status === 'approved' || 
+      (materialRequestExists.status === 'converted_to_order' && !materialRequestExists.linkedPurchaseOrderId);
+    
+    if (!isValidStatus) {
       console.log('[POST /api/purchase-orders] Material request has invalid status:', materialRequestExists.status);
       
       // Provide specific error messages based on status
@@ -336,7 +340,7 @@ export async function POST(request) {
         return errorResponse('Material request is pending approval. Please approve the request before creating a purchase order.', 400);
       }
       
-      if (materialRequestExists.status === 'converted_to_order') {
+      if (materialRequestExists.status === 'converted_to_order' && materialRequestExists.linkedPurchaseOrderId) {
         return errorResponse('Material request has already been converted to a purchase order.', 400);
       }
       
@@ -359,7 +363,7 @@ export async function POST(request) {
       );
     }
 
-    // Material request is approved, use it
+    // Material request is approved or converted_to_order (without linked PO), use it
     const materialRequest = materialRequestExists;
 
     // Phase Management: Inherit phaseId from material request (required)
@@ -376,7 +380,7 @@ export async function POST(request) {
     
     const phase = phaseValidation.phase;
 
-    // Check if request already has a purchase order
+    // Check if request already has a purchase order (additional safeguard)
     if (materialRequest.linkedPurchaseOrderId && ObjectId.isValid(materialRequest.linkedPurchaseOrderId)) {
       const existingPO = await db.collection('purchase_orders').findOne({
         _id: new ObjectId(materialRequest.linkedPurchaseOrderId),

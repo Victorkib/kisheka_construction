@@ -58,7 +58,7 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
             <h3 className="text-sm font-semibold ds-text-primary">Filter by Phase</h3>
             <Link
               href={`/floors/${floor._id}?tab=phases`}
-              className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+              className="text-xs ds-text-accent-primary hover:ds-text-accent-hover font-medium"
             >
               View Full Phase Breakdown →
             </Link>
@@ -68,7 +68,7 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
               onClick={() => setSelectedPhaseFilter('all')}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                 selectedPhaseFilter === 'all'
-                  ? 'bg-blue-600 text-white'
+                  ? 'ds-bg-accent-primary text-white'
                   : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
               }`}
             >
@@ -80,7 +80,7 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
                 onClick={() => setSelectedPhaseFilter(phase.phaseId || phase._id)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                   selectedPhaseFilter === (phase.phaseId || phase._id)
-                    ? 'bg-blue-600 text-white'
+                    ? 'ds-bg-accent-primary text-white'
                     : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
                 }`}
               >
@@ -132,7 +132,7 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
                   {item.link && (
                     <Link
                       href={item.link}
-                      className="text-sm text-blue-600 hover:text-blue-800 whitespace-nowrap"
+                      className="text-sm ds-text-accent-primary hover:ds-text-accent-hover whitespace-nowrap"
                     >
                       View →
                     </Link>
@@ -151,7 +151,7 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
             <h3 className="text-sm font-semibold ds-text-primary">Filter by Phase</h3>
             <Link
               href={`/floors/${floor._id}?tab=phases`}
-              className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+              className="text-xs ds-text-accent-primary hover:ds-text-accent-hover font-medium"
             >
               View Full Phase Breakdown →
             </Link>
@@ -161,7 +161,7 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
               onClick={() => setSelectedPhaseFilter('all')}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                 selectedPhaseFilter === 'all'
-                  ? 'bg-blue-600 text-white'
+                  ? 'ds-bg-accent-primary text-white'
                   : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
               }`}
             >
@@ -173,7 +173,7 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
                 onClick={() => setSelectedPhaseFilter(phase.phaseId)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                   selectedPhaseFilter === phase.phaseId
-                    ? 'bg-blue-600 text-white'
+                    ? 'ds-bg-accent-primary text-white'
                     : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
                 }`}
               >
@@ -196,7 +196,7 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
             </div>
             <Link
               href={`/floors/${floor._id}?tab=phases`}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
             >
               View Full Breakdown →
             </Link>
@@ -213,7 +213,7 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
                     {phase.phaseId ? (
                       <Link
                         href={`/phases/${phase.phaseId}`}
-                        className="font-medium ds-text-primary hover:text-blue-600"
+                        className="font-medium ds-text-primary hover:ds-text-accent-primary"
                       >
                         {phase.phaseName || 'Unknown Phase'}
                       </Link>

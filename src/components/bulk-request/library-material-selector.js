@@ -186,7 +186,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
           <select
             value={filters.categoryId}
             onChange={(e) => setFilters((prev) => ({ ...prev, categoryId: e.target.value }))}
-            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
           >
             <option value="" className="ds-text-primary">All Categories</option>
             {categories.map((cat) => (
@@ -202,7 +202,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
               type="checkbox"
               checked={filters.isCommon === 'true'}
               onChange={(e) => setFilters((prev) => ({ ...prev, isCommon: e.target.checked ? 'true' : '' }))}
-              className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
+              className="w-4 h-4 ds-text-accent-primary ds-border-subtle rounded focus:ring-ds-accent-focus"
             />
             <span className="text-sm font-medium ds-text-secondary">Common Only</span>
           </label>
@@ -210,7 +210,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
         <div className="flex items-end">
           <button
             onClick={() => setFilters({ categoryId: '', isCommon: '', isActive: 'true', search: '' })}
-            className="w-full px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary text-sm"
+            className="w-full px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary text-sm cursor-pointer"
           >
             Clear Filters
           </button>
@@ -219,11 +219,11 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
 
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg">
+        <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg">
           <p className="text-sm font-medium">{error}</p>
           <button
             onClick={() => fetchMaterials(pagination.page, filterValues)}
-            className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+            className="mt-2 text-sm ds-text-danger hover:ds-text-danger underline cursor-pointer"
           >
             Try again
           </button>
@@ -233,7 +233,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
       {/* Materials List */}
       {loading ? (
         <div className="text-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 ds-border-accent-primary mx-auto"></div>
           <p className="mt-2 text-sm ds-text-secondary">Loading materials...</p>
         </div>
       ) : error ? (
@@ -252,7 +252,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                 type="checkbox"
                 checked={selectedIds.size > 0 && selectedIds.size === materials.length}
                 onChange={handleSelectAll}
-                className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
+                className="w-4 h-4 ds-text-accent-primary ds-border-subtle rounded focus:ring-ds-accent-focus"
               />
               <span className="text-sm font-medium ds-text-secondary">
                 Select All ({selectedIds.size} selected)
@@ -261,7 +261,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
             <button
               onClick={handleAddSelected}
               disabled={selectedIds.size === 0}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium cursor-pointer"
             >
               Add Selected ({selectedIds.size})
             </button>
@@ -278,7 +278,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                     onClick={() => handleToggleSelect(material._id.toString())}
                     className={`p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                       isSelected
-                        ? 'border-blue-500 bg-blue-50'
+                        ? 'ds-border-accent-primary ds-bg-accent-subtle'
                         : 'ds-border-subtle hover:ds-border-subtle ds-bg-surface'
                     }`}
                   >
@@ -294,7 +294,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                         checked={isSelected}
                         onChange={() => handleToggleSelect(material._id.toString())}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
+                        className="w-4 h-4 ds-text-accent-primary ds-border-subtle rounded focus:ring-ds-accent-focus"
                       />
                     </div>
                     <div className="mt-2 space-y-1 text-xs ds-text-secondary">
@@ -309,7 +309,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                         </div>
                       )}
                       {material.isCommon && (
-                        <span className="inline-block px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded text-xs">
+                        <span className="inline-block px-2 py-0.5 ds-bg-warning/10 ds-text-warning rounded text-xs">
                           Common
                         </span>
                       )}
@@ -329,7 +329,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                     disabled={pagination.page === 1 || loading}
-                    className="px-3 py-1 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="px-3 py-1 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm cursor-pointer"
                   >
                     Previous
                   </button>
@@ -350,9 +350,9 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                           key={pageNum}
                           onClick={() => setPagination(prev => ({ ...prev, page: pageNum }))}
                           disabled={loading}
-                          className={`px-3 py-1 rounded-lg text-sm ${
+                          className={`px-3 py-1 rounded-lg text-sm cursor-pointer ${
                             pagination.page === pageNum
-                              ? 'bg-blue-600 text-white'
+                              ? 'ds-bg-accent-primary text-white'
                               : 'border ds-border-subtle hover:ds-bg-surface-muted'
                           } disabled:opacity-50 disabled:cursor-not-allowed`}
                         >
@@ -364,7 +364,7 @@ export function LibraryMaterialSelector({ onAddMaterials, selectedLibraryIds = [
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                     disabled={pagination.page === pagination.pages || loading}
-                    className="px-3 py-1 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                    className="px-3 py-1 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm cursor-pointer"
                   >
                     Next
                   </button>

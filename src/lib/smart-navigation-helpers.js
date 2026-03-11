@@ -101,7 +101,7 @@ export const SMART_NAVIGATION_SECTIONS = {
         label: 'Approvals',
         href: '/dashboard/approvals',
         roles: ['owner', 'pm', 'project_manager', 'accountant'],
-        badge: 'pending',
+        // Badge is added dynamically based on pendingApprovalsCount in sidebar components
         priority: 'high',
       },
       {

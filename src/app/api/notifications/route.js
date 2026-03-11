@@ -41,11 +41,20 @@ export async function GET(request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const projectId = searchParams.get('projectId');
+    let projectId = searchParams.get('projectId');
     const isRead = searchParams.get('isRead');
     const type = searchParams.get('type');
     const search = searchParams.get('search');
     const limit = parseInt(searchParams.get('limit') || '100');
+
+    // Validate projectId format if provided
+    if (projectId) {
+      const isValidProjectId = /^[a-f\d]{24}$/i.test(projectId);
+      if (!isValidProjectId) {
+        console.warn('Invalid projectId format in request:', projectId);
+        projectId = undefined; // Ignore invalid projectId
+      }
+    }
 
     let notifications = await getUserNotifications(userProfile._id.toString(), {
       projectId: projectId || undefined,
@@ -100,11 +109,21 @@ export async function PATCH(request) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const { projectId } = body;
+    let { projectId, type } = body;
+
+    // Validate projectId format if provided
+    if (projectId) {
+      const isValidProjectId = /^[a-f\d]{24}$/i.test(projectId);
+      if (!isValidProjectId) {
+        console.warn('Invalid projectId format in request:', projectId);
+        projectId = undefined; // Ignore invalid projectId
+      }
+    }
 
     const markedCount = await markAllNotificationsAsRead(
       userProfile._id.toString(),
-      projectId || undefined
+      projectId || undefined,
+      type || undefined
     );
 
     return successResponse({

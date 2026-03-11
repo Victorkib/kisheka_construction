@@ -6,6 +6,7 @@
 'use client';
 
 import { NotificationItem } from './notification-item';
+import { useProjectContext } from '@/contexts/ProjectContext';
 
 export function NotificationList({
   notifications,
@@ -13,7 +14,9 @@ export function NotificationList({
   onMarkUnread,
   onDelete,
   loading = false,
+  filters = {},
 }) {
+  const { currentProject } = useProjectContext();
   const groupNotificationsByDate = (notifications) => {
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -66,14 +69,21 @@ export function NotificationList({
   }
 
   if (notifications.length === 0) {
+    const hasFilters = filters.projectId || filters.isRead !== undefined || filters.type || filters.search;
+    const projectName = currentProject?.projectName || currentProject?.name;
+    
     return (
       <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
         <div className="text-6xl mb-4">🔔</div>
         <h3 className="text-lg font-semibold ds-text-primary mb-2">
-          No notifications
+          {hasFilters ? 'No notifications match your filters' : 'No notifications'}
         </h3>
         <p className="ds-text-secondary">
-          You're all caught up! New notifications will appear here.
+          {hasFilters 
+            ? 'Try adjusting your filters to see more notifications.'
+            : filters.projectId && projectName
+              ? `You're all caught up for ${projectName}! New notifications will appear here.`
+              : "You're all caught up! New notifications will appear here."}
         </p>
       </div>
     );

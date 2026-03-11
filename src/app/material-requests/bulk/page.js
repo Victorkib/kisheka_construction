@@ -274,7 +274,7 @@ function BulkRequestPageContent() {
 
   return (
     <AppLayout>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block">
@@ -321,7 +321,7 @@ export default function BulkRequestPage() {
     <Suspense
       fallback={
         <AppLayout>
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <LoadingTable rows={5} columns={1} />
           </div>
         </AppLayout>

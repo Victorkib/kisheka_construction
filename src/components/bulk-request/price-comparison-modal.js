@@ -81,9 +81,9 @@ export function PriceComparisonModal({
   const getConfidenceColor = (confidence) => {
     switch (confidence) {
       case 'high':
-        return 'bg-green-100 text-green-800';
+        return 'ds-bg-success/10 ds-text-success';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800';
+        return 'ds-bg-warning/10 ds-text-warning';
       case 'low':
       default:
         return 'ds-bg-surface-muted ds-text-primary';
@@ -128,7 +128,7 @@ export function PriceComparisonModal({
     >
       <div className="max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 z-10 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl border-b ds-border-subtle/50 px-8 py-6 flex justify-between items-center shadow-sm">
+        <div className="sticky top-0 z-10 ds-bg-surface border-b ds-border-subtle px-8 py-6 flex justify-between items-center shadow-sm">
           <div>
             <h2 className="text-2xl font-bold ds-text-primary">Price Comparison</h2>
             <p className="text-sm ds-text-secondary mt-1">
@@ -140,9 +140,9 @@ export function PriceComparisonModal({
         {/* Content */}
         <div className="p-8">
           {error ? (
-            <div className="bg-gradient-to-br from-red-50/80 to-red-100/80 backdrop-blur-sm border border-red-400/60/50 text-red-800 px-6 py-4 rounded-xl shadow-lg">
+            <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-6 py-4 rounded-xl shadow-lg">
               <div className="flex items-center gap-3">
-                <div className="flex-shrink-0 p-2 bg-gradient-to-br from-red-400 to-red-600 rounded-lg">
+                <div className="flex-shrink-0 p-2 ds-bg-danger rounded-lg">
                   <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -152,7 +152,7 @@ export function PriceComparisonModal({
             </div>
           ) : comparisons.length === 0 ? (
             <div className="text-center py-16">
-              <div className="inline-block p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl mb-4">
+              <div className="inline-block p-4 ds-bg-surface-muted rounded-2xl mb-4">
                 <svg className="w-12 h-12 ds-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
                 </svg>
@@ -163,25 +163,25 @@ export function PriceComparisonModal({
             <>
               {/* Summary */}
               {summary && (
-                <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 backdrop-blur-sm border border-blue-400/60/50 rounded-xl p-6 mb-6 shadow-lg">
+                <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-xl p-6 mb-6 shadow-lg">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-semibold text-blue-900 uppercase tracking-wide mb-1">
+                      <p className="text-sm font-semibold ds-text-secondary uppercase tracking-wide mb-1">
                         Best Price
                       </p>
-                      <p className="text-lg font-bold text-blue-900 mb-2">
+                      <p className="text-lg font-bold ds-text-primary mb-2">
                         {summary.cheapestSupplier}
                       </p>
-                      <p className="text-2xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                      <p className="text-2xl font-extrabold ds-text-accent-primary">
                         {formatCurrency(summary.cheapestTotal)}
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="inline-block px-4 py-2 ds-bg-surface/60 backdrop-blur-sm rounded-lg border border-blue-400/60/50">
-                        <p className="text-sm font-semibold text-blue-900">
+                      <div className="inline-block px-4 py-2 ds-bg-surface rounded-lg border ds-border-accent-subtle">
+                        <p className="text-sm font-semibold ds-text-primary">
                           {summary.suppliersWithData} of {summary.totalSuppliers}
                         </p>
-                        <p className="text-xs text-blue-700">
+                        <p className="text-xs ds-text-secondary">
                           suppliers have historical data
                         </p>
                       </div>
@@ -191,9 +191,9 @@ export function PriceComparisonModal({
               )}
 
               {/* Comparison Table */}
-              <div className="overflow-x-auto rounded-xl border ds-border-subtle/50 shadow-lg">
-                <table className="min-w-full divide-y divide-ds-border-subtle/50">
-                  <thead className="bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm sticky top-0">
+              <div className="overflow-x-auto rounded-xl border ds-border-subtle shadow-lg">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted sticky top-0">
                     <tr>
                       <th className="px-6 py-4 text-left text-xs font-bold ds-text-secondary uppercase tracking-wider">
                         Supplier
@@ -219,7 +219,7 @@ export function PriceComparisonModal({
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="ds-bg-surface/50 backdrop-blur-sm divide-y divide-ds-border-subtle/30">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {comparisons.map((comparison, supplierIndex) => {
                       const isCheapest =
                         cheapestSupplier &&
@@ -231,7 +231,7 @@ export function PriceComparisonModal({
                           key={comparison.supplierId.toString()}
                           className={`transition-all duration-200 ${
                             isCheapest 
-                              ? 'bg-gradient-to-r from-green-50/80 to-emerald-50/80 border-l-4 border-green-500 shadow-sm' 
+                              ? 'ds-bg-success/10 border-l-4 ds-border-success/40 shadow-sm'
                               : 'hover:ds-bg-surface-muted/80'
                           } ${!hasData ? 'opacity-75' : ''}`}
                         >
@@ -240,7 +240,7 @@ export function PriceComparisonModal({
                               <div className="text-sm font-semibold ds-text-primary flex items-center gap-2">
                                 {comparison.supplierName}
                                 {isCheapest && (
-                                  <span className="inline-flex px-3 py-1 text-xs font-bold rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md">
+                                  <span className="inline-flex px-3 py-1 text-xs font-bold rounded-full ds-bg-success text-white shadow-md">
                                     Best Price
                                   </span>
                                 )}
@@ -249,7 +249,7 @@ export function PriceComparisonModal({
                                 <div className="text-xs ds-text-muted mt-1">{comparison.supplierEmail}</div>
                               )}
                               {!hasData && (
-                                <div className="text-xs text-yellow-700 mt-1 font-medium">
+                                <div className="text-xs ds-text-warning mt-1 font-medium">
                                   No historical data
                                 </div>
                               )}
@@ -288,14 +288,14 @@ export function PriceComparisonModal({
                             </td>
                           ))}
                           <td className="px-6 py-5 whitespace-nowrap">
-                            <div className="text-lg font-extrabold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                            <div className="text-lg font-extrabold ds-text-accent-primary">
                               {formatCurrency(comparison.totalEstimatedCost)}
                             </div>
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap">
                             <button
                               onClick={() => handleSelectSupplier(comparison)}
-                              className="relative px-5 py-2.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl hover:from-blue-600 hover:to-blue-700 text-sm font-semibold transition-all duration-200 shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 hover:scale-105 active:scale-100"
+                              className="relative px-5 py-2.5 ds-bg-accent-primary text-white rounded-xl hover:ds-bg-accent-hover text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 active:scale-100"
                             >
                               Select
                             </button>
@@ -308,21 +308,21 @@ export function PriceComparisonModal({
               </div>
 
               {/* Legend */}
-              <div className="mt-8 p-5 bg-gradient-to-br from-gray-50/80 to-gray-100/80 backdrop-blur-sm border ds-border-subtle/50 rounded-xl shadow-lg">
+              <div className="mt-8 p-5 ds-bg-surface-muted border ds-border-subtle rounded-xl shadow-lg">
                 <p className="text-xs font-bold ds-text-secondary uppercase tracking-wide mb-4">Legend</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm ds-text-secondary">
                   <div className="flex items-center gap-3">
-                    <span className="w-5 h-5 bg-gradient-to-br from-green-400 to-emerald-600 rounded-lg border-2 border-green-500 shadow-sm"></span>
+                    <span className="w-5 h-5 ds-bg-success rounded-lg border ds-border-success/40 shadow-sm"></span>
                     <span className="font-medium">Best Price</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="inline-flex px-3 py-1 text-xs font-bold rounded-full bg-green-100 text-green-800 shadow-sm">
+                    <span className="inline-flex px-3 py-1 text-xs font-bold rounded-full ds-bg-success/10 ds-text-success shadow-sm">
                       High
                     </span>
                     <span className="text-xs">High confidence (5+ data points)</span>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="inline-flex px-3 py-1 text-xs font-bold rounded-full bg-yellow-100 text-yellow-800 shadow-sm">
+                    <span className="inline-flex px-3 py-1 text-xs font-bold rounded-full ds-bg-warning/10 ds-text-warning shadow-sm">
                       Medium
                     </span>
                     <span className="text-xs">Medium confidence (2-4 data points)</span>
@@ -340,10 +340,10 @@ export function PriceComparisonModal({
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl border-t ds-border-subtle/50 px-8 py-5 flex justify-end shadow-lg">
+        <div className="sticky bottom-0 ds-bg-surface border-t ds-border-subtle px-8 py-5 flex justify-end shadow-lg">
           <button
             onClick={onClose}
-            className="px-6 py-3 text-sm font-semibold ds-text-secondary ds-bg-surface/60 backdrop-blur-sm border ds-border-subtle/50 rounded-xl hover:ds-bg-surface/80 hover:border-ds-border-strong/50 transition-all duration-200 shadow-sm hover:shadow-md"
+            className="px-6 py-3 text-sm font-semibold ds-text-secondary ds-bg-surface border ds-border-subtle rounded-xl hover:ds-bg-surface-muted hover:border-ds-border-strong transition-all duration-200 shadow-sm hover:shadow-md"
           >
             Close
           </button>

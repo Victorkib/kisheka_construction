@@ -91,8 +91,8 @@ export function NotificationPreferences({ user, onUpdate }) {
       <button
         type="button"
         onClick={onChange}
-        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-          enabled ? 'bg-blue-600' : 'ds-bg-surface-muted'
+        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 ${
+          enabled ? 'ds-bg-accent-primary' : 'ds-bg-surface-muted'
         }`}
         role="switch"
         aria-checked={enabled}
@@ -113,13 +113,13 @@ export function NotificationPreferences({ user, onUpdate }) {
       </h2>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm">
+        <div className="mb-4 ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded text-sm">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="mb-4 bg-green-50 border border-green-400/60 text-green-700 px-4 py-3 rounded text-sm">
+        <div className="mb-4 ds-bg-success/10 border ds-border-success/40 ds-text-success px-4 py-3 rounded text-sm">
           Preferences saved successfully!
         </div>
       )}
@@ -155,7 +155,7 @@ export function NotificationPreferences({ user, onUpdate }) {
         <button
           onClick={handleSave}
           disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-slate-500 disabled:cursor-not-allowed"
+          className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition font-medium disabled:ds-bg-surface-muted disabled:cursor-not-allowed"
         >
           {loading ? 'Saving...' : 'Save Preferences'}
         </button>

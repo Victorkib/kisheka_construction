@@ -13,6 +13,7 @@ import { createMaterialFromPurchaseOrder } from '@/lib/material-helpers';
 import { sendPushToUser } from '@/lib/push-service';
 import { createAuditLog } from '@/lib/audit-log';
 import { assessRetryability, formatRejectionReason } from '@/lib/rejection-reasons';
+import { sendOwnerSupplierResponseEmail } from '@/lib/email-templates/communication-event-templates';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
@@ -24,6 +25,83 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 
 // Force dynamic rendering to prevent caching stale data
 export const dynamic = 'force-dynamic';
+
+async function sendOwnerResponseEmailAndTrack({
+  db,
+  purchaseOrderId,
+  purchaseOrder,
+  poCreator,
+  action,
+  eventKey,
+  responseData = {}
+}) {
+  if (!poCreator?.email) {
+    return;
+  }
+
+  const existingSend = await db.collection('purchase_orders').findOne({
+    _id: new ObjectId(purchaseOrderId),
+    communications: {
+      $elemMatch: {
+        channel: 'email',
+        eventType: 'owner_supplier_response',
+        eventKey,
+        status: 'sent'
+      }
+    }
+  });
+  if (existingSend) {
+    return;
+  }
+
+  try {
+    const emailResult = await sendOwnerSupplierResponseEmail({
+      recipientUser: poCreator,
+      purchaseOrder: { ...purchaseOrder, _id: purchaseOrderId },
+      action,
+      responseData
+    });
+
+    await db.collection('purchase_orders').updateOne(
+      { _id: new ObjectId(purchaseOrderId) },
+      {
+        $push: {
+          communications: {
+            channel: 'email',
+            eventType: 'owner_supplier_response',
+            eventKey,
+            responseAction: action,
+            recipientType: 'owner',
+            recipientEmail: poCreator.email,
+            sentAt: new Date(),
+            status: 'sent',
+            messageId: emailResult.messageId || null
+          }
+        }
+      }
+    );
+  } catch (emailError) {
+    console.error('[PO Response] Owner email send failed (non-critical):', emailError);
+    await db.collection('purchase_orders').updateOne(
+      { _id: new ObjectId(purchaseOrderId) },
+      {
+        $push: {
+          communications: {
+            channel: 'email',
+            eventType: 'owner_supplier_response',
+            eventKey,
+            responseAction: action,
+            recipientType: 'owner',
+            recipientEmail: poCreator.email,
+            sentAt: new Date(),
+            status: 'failed',
+            error: emailError.message
+          }
+        }
+      }
+    );
+  }
+}
 
 export async function POST(request, { params }) {
   try {
@@ -281,6 +359,18 @@ export async function POST(request, { params }) {
         } catch (pushError) {
           console.error('Push notification failed:', pushError);
         }
+
+        await sendOwnerResponseEmailAndTrack({
+          db,
+          purchaseOrderId: id,
+          purchaseOrder: { ...purchaseOrder, ...updateData },
+          poCreator,
+          action: 'accept',
+          eventKey: `owner_supplier_response:${id}:accept:${updateData.supplierResponseDate.toISOString()}`,
+          responseData: {
+            notes: supplierNotes?.trim() || null
+          }
+        });
       }
 
       // Create audit log
@@ -383,6 +473,20 @@ export async function POST(request, { params }) {
         } catch (pushError) {
           console.error('Push notification failed:', pushError);
         }
+
+        await sendOwnerResponseEmailAndTrack({
+          db,
+          purchaseOrderId: id,
+          purchaseOrder: { ...purchaseOrder, ...updateData },
+          poCreator,
+          action: 'reject',
+          eventKey: `owner_supplier_response:${id}:reject:${updateData.supplierResponseDate.toISOString()}`,
+          responseData: {
+            notes: supplierNotes?.trim() || null,
+            rejectionReason,
+            rejectionSubcategory
+          }
+        });
       }
 
       // Create audit log
@@ -474,6 +578,18 @@ export async function POST(request, { params }) {
         } catch (pushError) {
           console.error('Push notification failed:', pushError);
         }
+
+        await sendOwnerResponseEmailAndTrack({
+          db,
+          purchaseOrderId: id,
+          purchaseOrder: { ...purchaseOrder, ...updateData },
+          poCreator,
+          action: 'modify',
+          eventKey: `owner_supplier_response:${id}:modify:${updateData.supplierResponseDate.toISOString()}`,
+          responseData: {
+            notes: notes?.trim() || null
+          }
+        });
       }
 
       // Create audit log
@@ -826,6 +942,21 @@ async function handlePartialResponse({ db, purchaseOrder, id, token, materialRes
       } catch (pushError) {
         console.error('Push notification failed:', pushError);
       }
+
+      await sendOwnerResponseEmailAndTrack({
+        db,
+        purchaseOrderId: id,
+        purchaseOrder: { ...purchaseOrder, ...updateData },
+        poCreator,
+        action: 'partial',
+        eventKey: `owner_supplier_response:${id}:partial:${updateData.supplierResponseDate.toISOString()}`,
+        responseData: {
+          notes: supplierNotes?.trim() || null,
+          acceptedCount: acceptedMaterials.length,
+          rejectedCount: rejectedMaterials.length,
+          modifiedCount: modifiedMaterials.length
+        }
+      });
     }
 
     // Create audit log

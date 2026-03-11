@@ -70,10 +70,10 @@ export function BatchApprovalTable({
   const getStatusBadgeColor = (status) => {
     const colors = {
       requested: 'ds-bg-surface-muted ds-text-primary',
-      pending_approval: 'bg-yellow-100 text-yellow-800',
-      approved: 'bg-green-100 text-green-800',
-      rejected: 'bg-red-100 text-red-800',
-      converted_to_order: 'bg-blue-100 text-blue-800',
+      pending_approval: 'ds-bg-warning/10 ds-text-warning',
+      approved: 'ds-bg-success/10 ds-text-success',
+      rejected: 'ds-bg-danger/10 ds-text-danger',
+      converted_to_order: 'ds-bg-accent-subtle ds-text-accent-primary',
       cancelled: 'ds-bg-surface-muted ds-text-primary',
     };
     return colors[status] || 'ds-bg-surface-muted ds-text-primary';
@@ -101,28 +101,28 @@ export function BatchApprovalTable({
           <p className="text-sm ds-text-muted">Total Requests</p>
           <p className="text-2xl font-bold ds-text-primary">{materialRequests.length}</p>
         </div>
-        <div className="bg-amber-500/10 rounded-lg border border-amber-300/70 p-4">
-          <p className="text-sm text-amber-200">Pending Approval</p>
-          <p className="text-2xl font-bold text-amber-50">{pendingRequests.length}</p>
+        <div className="ds-bg-warning/10 rounded-lg border ds-border-warning/40 p-4">
+          <p className="text-sm ds-text-warning">Pending Approval</p>
+          <p className="text-2xl font-bold ds-text-warning">{pendingRequests.length}</p>
         </div>
-        <div className="bg-emerald-500/10 rounded-lg border border-emerald-300/70 p-4">
-          <p className="text-sm text-emerald-200">Approved</p>
-          <p className="text-2xl font-bold text-emerald-50">{approvedRequests.length}</p>
+        <div className="ds-bg-success/10 rounded-lg border ds-border-success/40 p-4">
+          <p className="text-sm ds-text-success">Approved</p>
+          <p className="text-2xl font-bold ds-text-success">{approvedRequests.length}</p>
         </div>
       </div>
 
       {/* Bulk Actions */}
       {pendingRequests.length > 0 && canApprove && (
-        <div className="bg-blue-500/10 border border-blue-400/60/70 rounded-lg p-4">
+        <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={selectedIds.size > 0 && selectedIds.size === pendingRequests.length}
                 onChange={handleSelectAll}
-                className="rounded border-blue-400/60 text-blue-500 focus:ring-blue-500"
+                className="rounded ds-border-accent-subtle ds-text-accent-primary focus:ring-ds-accent-focus cursor-pointer"
               />
-              <span className="text-sm font-medium text-blue-50">
+              <span className="text-sm font-medium ds-text-primary">
                 {selectedIds.size > 0
                   ? `${selectedIds.size} request(s) selected`
                   : 'Select requests to approve/reject'}
@@ -132,14 +132,14 @@ export function BatchApprovalTable({
               <button
                 onClick={handleApproveSelected}
                 disabled={selectedIds.size === 0 || loading}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                className="px-4 py-2 ds-bg-success text-white rounded-lg hover:ds-bg-success disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium cursor-pointer"
               >
                 Approve Selected
               </button>
               <button
                 onClick={handleRejectSelected}
                 disabled={selectedIds.size === 0 || loading}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                className="px-4 py-2 ds-bg-danger text-white rounded-lg hover:ds-bg-danger disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium cursor-pointer"
               >
                 Reject Selected
               </button>
@@ -148,7 +148,7 @@ export function BatchApprovalTable({
           {selectedIds.size > 0 && (
             <div className="space-y-2">
               <div>
-                <label className="block text-sm font-medium text-blue-50 mb-1">
+                <label className="block text-sm font-medium ds-text-primary mb-1">
                   Approval Notes (Optional)
                 </label>
                 <textarea
@@ -156,11 +156,11 @@ export function BatchApprovalTable({
                   onChange={(e) => setApprovalNotes(e.target.value)}
                   placeholder="Add approval notes for selected requests..."
                   rows={2}
-                  className="w-full px-3 py-2 ds-bg-surface text-blue-200 border border-blue-400/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder:ds-text-muted"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-accent-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary text-sm placeholder:ds-text-muted"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-blue-50 mb-1">
+                <label className="block text-sm font-medium ds-text-primary mb-1">
                   Rejection Reason (Required for rejection)
                 </label>
                 <textarea
@@ -168,7 +168,7 @@ export function BatchApprovalTable({
                   onChange={(e) => setRejectionReason(e.target.value)}
                   placeholder="Provide reason for rejection..."
                   rows={2}
-                  className="w-full px-3 py-2 ds-bg-surface text-blue-200 border border-blue-400/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm placeholder:ds-text-muted"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-accent-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary text-sm placeholder:ds-text-muted"
                 />
               </div>
             </div>
@@ -182,7 +182,7 @@ export function BatchApprovalTable({
           <button
             onClick={() => onApproveAll(pendingRequests.map((r) => r._id.toString()), approvalNotes)}
             disabled={loading}
-            className="px-6 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="px-6 py-2 ds-bg-success text-white rounded-lg hover:ds-bg-success disabled:opacity-50 disabled:cursor-not-allowed font-medium cursor-pointer"
           >
             Approve All ({pendingRequests.length})
           </button>
@@ -195,7 +195,7 @@ export function BatchApprovalTable({
               onRejectAll(pendingRequests.map((r) => r._id.toString()), rejectionReason);
             }}
             disabled={loading || !rejectionReason.trim()}
-            className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="px-6 py-2 ds-bg-danger text-white rounded-lg hover:ds-bg-danger disabled:opacity-50 disabled:cursor-not-allowed font-medium cursor-pointer"
           >
             Reject All ({pendingRequests.length})
           </button>
@@ -214,7 +214,7 @@ export function BatchApprovalTable({
                       type="checkbox"
                       checked={selectedIds.size > 0 && selectedIds.size === pendingRequests.length}
                       onChange={handleSelectAll}
-                      className="rounded border-blue-400/60 text-blue-500 focus:ring-blue-500"
+                      className="rounded ds-border-accent-subtle ds-text-accent-primary focus:ring-ds-accent-focus cursor-pointer"
                     />
                   </th>
                 )}
@@ -248,7 +248,7 @@ export function BatchApprovalTable({
                 return (
                   <tr
                     key={request._id}
-                    className={`hover:bg-ds-bg-surface-muted/60 ${isSelected ? 'bg-blue-500/10' : ''}`}
+                    className={`hover:ds-bg-surface-muted ${isSelected ? 'ds-bg-accent-subtle' : ''}`}
                   >
                     {canApprove && pendingRequests.length > 0 && (
                       <td className="px-4 py-3">
@@ -257,7 +257,7 @@ export function BatchApprovalTable({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleSelectRequest(request._id.toString())}
-                            className="rounded border-blue-400/60 text-blue-500 focus:ring-blue-500"
+                            className="rounded ds-border-accent-subtle ds-text-accent-primary focus:ring-ds-accent-focus cursor-pointer"
                           />
                         ) : (
                         <span className="ds-text-muted">-</span>
@@ -267,7 +267,7 @@ export function BatchApprovalTable({
                     <td className="px-4 py-3">
                       <Link
                         href={`/material-requests/${request._id}`}
-                        className="text-blue-400 hover:text-blue-300 font-medium text-sm"
+                        className="ds-text-accent-primary hover:ds-text-accent-hover font-medium text-sm"
                       >
                         {request.requestNumber}
                       </Link>
@@ -303,7 +303,7 @@ export function BatchApprovalTable({
                             <button
                               onClick={() => onApprove(request._id.toString())}
                               disabled={loading}
-                              className="text-emerald-300 hover:text-emerald-200 disabled:opacity-50"
+                              className="ds-text-success hover:ds-text-success disabled:opacity-50 cursor-pointer"
                             >
                               Approve
                             </button>
@@ -315,7 +315,7 @@ export function BatchApprovalTable({
                                 }
                               }}
                               disabled={loading}
-                              className="text-red-400 hover:text-red-300 disabled:opacity-50"
+                              className="ds-text-danger hover:ds-text-danger disabled:opacity-50 cursor-pointer"
                             >
                               Reject
                             </button>

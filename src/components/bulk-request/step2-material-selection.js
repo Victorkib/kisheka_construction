@@ -39,6 +39,7 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
     const materialsWithDefaults = newMaterials.map((material) => ({
       ...material,
       // Only set defaults if not already present
+      phaseId: material.phaseId || wizardData.defaultPhaseId || '',
       floorId: material.floorId || wizardData.defaultFloorId || '',
       categoryId: material.categoryId || wizardData.defaultCategoryId || '',
       category: material.category || '',
@@ -54,6 +55,7 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
     const materialWithDefaults = {
       ...newMaterial,
       // Only set defaults if not already present
+      phaseId: newMaterial.phaseId || wizardData.defaultPhaseId || '',
       floorId: newMaterial.floorId || wizardData.defaultFloorId || '',
       categoryId: newMaterial.categoryId || wizardData.defaultCategoryId || '',
       category: newMaterial.category || '',
@@ -74,13 +76,13 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
       </div>
 
       {/* Materials Count */}
-      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
+      <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-blue-900">
+            <p className="text-sm font-medium ds-text-primary">
               {materials.length} material{materials.length !== 1 ? 's' : ''} added
             </p>
-            <p className="text-xs text-blue-700 mt-1">
+            <p className="text-xs ds-text-secondary mt-1">
               Continue adding materials or proceed to edit details
             </p>
           </div>
@@ -96,7 +98,7 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
                 }, 0);
                 alert(`Total Materials: ${materials.length}\nEstimated Total Cost: ${totalCost.toLocaleString()} KES`);
               }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+              className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover text-sm font-medium cursor-pointer"
             >
               View Summary
             </button>
@@ -110,9 +112,9 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
           <button
             type="button"
             onClick={() => setActiveTab('library')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
               activeTab === 'library'
-                ? 'border-blue-500 text-blue-600'
+                ? 'ds-border-accent-primary ds-text-accent-primary'
                 : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
             }`}
           >
@@ -121,9 +123,9 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
           <button
             type="button"
             onClick={() => setActiveTab('custom')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
               activeTab === 'custom'
-                ? 'border-blue-500 text-blue-600'
+                ? 'ds-border-accent-primary ds-text-accent-primary'
                 : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
             }`}
           >
@@ -132,9 +134,9 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
           <button
             type="button"
             onClick={() => setActiveTab('template')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors cursor-pointer ${
               activeTab === 'template'
-                ? 'border-blue-500 text-blue-600'
+                ? 'ds-border-accent-primary ds-text-accent-primary'
                 : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
             }`}
           >
@@ -165,12 +167,14 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
                     defaultUrgency: templateData.defaultSettings.defaultUrgency || wizardData.defaultUrgency,
                     defaultReason: templateData.defaultSettings.defaultReason || wizardData.defaultReason,
                     defaultCategoryId: templateData.defaultSettings.defaultCategoryId || wizardData.defaultCategoryId,
+                    defaultPhaseId: templateData.defaultSettings.defaultPhaseId || wizardData.defaultPhaseId,
                     defaultFloorId: templateData.defaultSettings.defaultFloorId || wizardData.defaultFloorId,
                   });
                 }
               }
             }}
             currentProjectId={wizardData.projectId}
+            currentPhaseId={wizardData.defaultPhaseId}
             currentFloorId={wizardData.defaultFloorId}
             currentCategoryId={wizardData.defaultCategoryId}
           />
@@ -179,16 +183,16 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
 
       {/* Validation Warning */}
       {materials.length > 0 && !isValid && (
-        <div className="mt-6 bg-yellow-50 border border-yellow-400/60 rounded-lg p-4">
-          <p className="text-sm text-yellow-800 font-medium mb-2">
+        <div className="mt-6 ds-bg-warning/10 border ds-border-warning/40 rounded-lg p-4">
+          <p className="text-sm ds-text-warning font-medium mb-2">
             ⚠️ Some materials are incomplete. Please ensure all materials have:
           </p>
-          <ul className="text-xs text-yellow-700 list-disc list-inside space-y-1">
+          <ul className="text-xs ds-text-warning list-disc list-inside space-y-1">
             <li>Material name (at least 2 characters)</li>
             <li>Quantity (greater than 0)</li>
             <li>Unit</li>
           </ul>
-          <div className="mt-3 text-xs text-yellow-700">
+          <div className="mt-3 text-xs ds-text-warning">
             {materials.map((m, idx) => {
               const materialName = m.name || m.materialName || '';
               const hasName = materialName && typeof materialName === 'string' && materialName.trim().length >= 2;
@@ -229,14 +233,14 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
                   <div
                     key={index}
                     className={`flex items-center justify-between ds-bg-surface p-3 rounded border ${
-                      isMaterialValid ? 'ds-border-subtle' : 'border-yellow-400/60 bg-yellow-50'
+                      isMaterialValid ? 'ds-border-subtle' : 'ds-border-warning/40 ds-bg-warning/10'
                     }`}
                   >
                     <div className="flex-1">
-                      <p className={`font-medium text-sm ${isMaterialValid ? 'ds-text-primary' : 'text-yellow-800'}`}>
+                      <p className={`font-medium text-sm ${isMaterialValid ? 'ds-text-primary' : 'ds-text-warning'}`}>
                         {materialName || 'Missing name'}
                       </p>
-                      <p className={`text-xs mt-1 ${isMaterialValid ? 'ds-text-secondary' : 'text-yellow-700'}`}>
+                      <p className={`text-xs mt-1 ${isMaterialValid ? 'ds-text-secondary' : 'ds-text-warning'}`}>
                         {quantityValid && unitValid ? `${quantity} ${unit}` : 'Missing quantity/unit'}
                         {material.estimatedUnitCost && (
                           <span className="ml-2">
@@ -245,7 +249,7 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
                         )}
                       </p>
                       {!isMaterialValid && (
-                        <p className="text-xs text-yellow-600 mt-1">
+                        <p className="text-xs ds-text-warning mt-1">
                           ⚠️ Incomplete - will need to be fixed in Step 3
                         </p>
                       )}
@@ -255,7 +259,7 @@ export function Step2MaterialSelection({ wizardData, onUpdate, onValidationChang
                       const updated = materials.filter((_, i) => i !== index);
                       onUpdate({ materials: updated });
                     }}
-                    className="ml-4 text-red-600 hover:text-red-800 text-sm"
+                    className="ml-4 ds-text-danger hover:ds-text-danger text-sm cursor-pointer"
                   >
                     Remove
                     </button>

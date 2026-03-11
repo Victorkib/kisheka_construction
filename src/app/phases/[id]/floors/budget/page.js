@@ -248,18 +248,6 @@ function FloorBudgetAllocationContent() {
     );
   }
 
-  if (!phase) {
-    return (
-      <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="ds-bg-surface rounded-lg shadow p-6">
-            <p className="ds-text-secondary">Phase not found.</p>
-          </div>
-        </div>
-      </AppLayout>
-    );
-  }
-
   const [floorBudgets, setFloorBudgets] = useState({});
 
   useEffect(() => {
@@ -295,10 +283,22 @@ function FloorBudgetAllocationContent() {
       setFloorBudgets(budgets);
     };
 
-    if (allocations.length > 0) {
+    if (allocations.length > 0 && phase) {
       fetchFloorBudgets();
     }
-  }, [allocations]);
+  }, [allocations, phase]);
+
+  if (!phase) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="ds-text-secondary">Phase not found.</p>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   const phaseBudget = phase.budgetAllocation?.total || 0;
   const totalAllocated = allocations.reduce((sum, alloc) => sum + (alloc.total || 0), 0);

@@ -172,10 +172,22 @@ export function SmartMobileNav({ isOpen, onClose }) {
     return () => window.removeEventListener('favorites-updated', handleFavoritesUpdate);
   }, []);
 
-  // Fetch badge counts
+  // Fetch badge counts (project-specific)
   useEffect(() => {
     if (user && ['owner', 'pm', 'project_manager', 'accountant'].includes(user.role?.toLowerCase())) {
-      fetch('/api/dashboard/summary', {
+      // If no project selected, set count to 0 (multi-project system)
+      if (!currentProject?._id) {
+        setPendingApprovalsCount(0);
+        return;
+      }
+
+      const projectId = currentProject._id?.toString() || currentProject._id;
+      if (!projectId) {
+        setPendingApprovalsCount(0);
+        return;
+      }
+
+      fetch(`/api/dashboard/summary?projectId=${projectId}`, {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -186,11 +198,20 @@ export function SmartMobileNav({ isOpen, onClose }) {
         .then((data) => {
           if (data.success && data.data?.summary?.totalPendingApprovals) {
             setPendingApprovalsCount(data.data.summary.totalPendingApprovals);
+          } else {
+            // If no data, set to 0 (no badge)
+            setPendingApprovalsCount(0);
           }
         })
-        .catch(() => {});
+        .catch((err) => {
+          console.error('Error fetching approvals count:', err);
+          setPendingApprovalsCount(0); // Set to 0 on error (no badge)
+        });
+    } else {
+      // User doesn't have permission, set to 0
+      setPendingApprovalsCount(0);
     }
-  }, [user]);
+  }, [user, currentProject]); // Add currentProject to dependencies
 
   // Get navigation
   const projectId = currentProject?._id?.toString() || currentProject?._id || null;
@@ -216,9 +237,11 @@ export function SmartMobileNav({ isOpen, onClose }) {
     return navigationWithFavorites.map((section) => {
       if (section.label === 'Operations' && section.children) {
         const updatedChildren = section.children.map((child) => {
+          // ONLY add badge when count > 0 (fixes issue where badge shows even with 0 approvals)
           if (child.href === '/dashboard/approvals' && pendingApprovalsCount > 0) {
             return { ...child, badge: pendingApprovalsCount };
           }
+          // When count is 0, return child WITHOUT badge property (no red highlighting)
           return child;
         });
         return { ...section, children: updatedChildren };

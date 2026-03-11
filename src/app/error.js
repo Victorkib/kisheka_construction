@@ -11,6 +11,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { notifyError } from '@/lib/error-notification-manager';
 
 export default function Error({ error, reset }) {
   const router = useRouter();
@@ -30,13 +31,8 @@ export default function Error({ error, reset }) {
       if (typeof window !== 'undefined' && window.sessionStorage) {
         sessionStorage.setItem('lastError', JSON.stringify(errorData));
         
-        // Dispatch notification event
-        window.dispatchEvent(new CustomEvent('error-notification', {
-          detail: {
-            errorType: 'route_error',
-            errorMessage: errorData.message,
-          },
-        }));
+        // Use centralized notification manager (with deduplication)
+        notifyError(errorData);
       }
     } catch (storageError) {
       console.error('Failed to store error data:', storageError);

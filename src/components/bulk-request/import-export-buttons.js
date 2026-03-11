@@ -78,7 +78,7 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
       {batch && materialRequests.length > 0 && (
         <button
           onClick={handleExportCSV}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
+          className="px-4 py-2 ds-bg-success text-white rounded-lg hover:ds-bg-success text-sm font-medium cursor-pointer"
         >
           📥 Export CSV
         </button>
@@ -87,7 +87,7 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
       {/* Import Button */}
       <button
         onClick={() => setShowImportModal(true)}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+        className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover text-sm font-medium cursor-pointer"
       >
         📤 Import CSV
       </button>
@@ -105,7 +105,7 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
                   setImportError(null);
                   setImportResults(null);
                 }}
-                className="ds-text-muted hover:ds-text-secondary"
+                className="ds-text-muted hover:ds-text-secondary cursor-pointer"
               >
                 ✕
               </button>
@@ -121,7 +121,7 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
                   onChange={(e) => setCsvText(e.target.value)}
                   placeholder={`Format: Material Name, Quantity, Unit, Category, Cost\nExample:\nCement, 500, bag, Structural Materials, 850\nRebars, 600, piece, Structural Materials, 1200`}
                   rows={10}
-                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary font-mono text-sm"
                 />
                 <p className="text-xs ds-text-secondary mt-1">
                   CSV format: Material Name, Quantity, Unit, Category (optional), Cost (optional)
@@ -129,23 +129,23 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
               </div>
 
               {importError && (
-                <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg">
+                <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg">
                   {importError}
                 </div>
               )}
 
               {importResults && (
-                <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
-                  <p className="text-sm font-medium text-blue-900 mb-2">Import Results:</p>
-                  <ul className="text-sm text-blue-800 space-y-1">
+                <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-4">
+                  <p className="text-sm font-medium ds-text-primary mb-2">Import Results:</p>
+                  <ul className="text-sm ds-text-secondary space-y-1">
                     <li>Total parsed: {importResults.totalParsed}</li>
                     <li>Valid: {importResults.validCount}</li>
                     {importResults.errorCount > 0 && (
-                      <li className="text-red-700">Errors: {importResults.errorCount}</li>
+                      <li className="ds-text-danger">Errors: {importResults.errorCount}</li>
                     )}
                   </ul>
                   {importResults.errors && importResults.errors.length > 0 && (
-                    <div className="mt-2 text-xs text-red-700">
+                    <div className="mt-2 text-xs ds-text-danger">
                       <p className="font-medium">Errors:</p>
                       <ul className="list-disc list-inside">
                         {importResults.errors.slice(0, 5).map((error, index) => (
@@ -168,7 +168,7 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
                     setImportError(null);
                     setImportResults(null);
                   }}
-                  className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary"
+                  className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary cursor-pointer"
                 >
                   Cancel
                 </button>
@@ -177,7 +177,7 @@ export function ImportExportButtons({ batch, materialRequests = [], onImportComp
                   isLoading={importing}
                   loadingText="Importing..."
                   disabled={!csvText.trim()}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                 >
                   Import Materials
                 </LoadingButton>

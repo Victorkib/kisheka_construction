@@ -33,7 +33,7 @@ export function LoadingButton({
     <button
       {...buttonProps}
       disabled={isDisabled}
-      className={`${className} ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''} transition`}
+      className={`${className} ${isDisabled ? 'cursor-not-allowed' : ''} transition`}
     >
       {isActuallyLoading ? (
         <span className="flex items-center justify-center gap-2">

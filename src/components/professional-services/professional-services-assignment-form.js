@@ -17,6 +17,7 @@ import { ContractValueCalculator } from './ContractValueCalculator';
 
 export function ProfessionalServicesAssignmentForm({
   initialData = null,
+  presetLibraryId = '',
   professionals = [],
   projects = [],
   phases = [],
@@ -26,6 +27,9 @@ export function ProfessionalServicesAssignmentForm({
   error = null,
   isEdit = false,
 }) {
+  const inputFocusClass = 'focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary';
+  const dateInputClass = `w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} [color-scheme:light_dark] [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100`;
+
   const [formData, setFormData] = useState({
     libraryId: '',
     projectId: '',
@@ -109,6 +113,15 @@ export function ProfessionalServicesAssignmentForm({
       setSelectedProfessional(null);
     }
   }, [formData.libraryId, professionals, isEdit]);
+
+  // Support direct assignment entry from library page.
+  useEffect(() => {
+    if (isEdit || !presetLibraryId || formData.libraryId) return;
+    const exists = professionals.some((p) => p._id?.toString() === presetLibraryId);
+    if (exists) {
+      setFormData((prev) => ({ ...prev, libraryId: presetLibraryId }));
+    }
+  }, [presetLibraryId, professionals, isEdit, formData.libraryId]);
 
   // Filter phases by selected project
   const availablePhases = phases.filter(
@@ -233,7 +246,7 @@ export function ProfessionalServicesAssignmentForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2">
+        <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg flex items-start gap-2">
           <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -258,7 +271,7 @@ export function ProfessionalServicesAssignmentForm({
               onChange={handleChange}
               required
               disabled={isEdit}
-              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
                 validationErrors.libraryId ? 'border-red-400/60' : 'ds-border-subtle'
               } ${isEdit ? 'ds-bg-surface-muted cursor-not-allowed' : ''}`}
             >
@@ -275,7 +288,7 @@ export function ProfessionalServicesAssignmentForm({
               <p className="mt-1 text-sm text-red-600">{validationErrors.libraryId}</p>
             )}
             {selectedProfessional && (
-              <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+              <div className="mt-2 p-3 ds-bg-accent-subtle rounded-lg border ds-border-accent-subtle">
                 <div className="text-sm">
                   <div className="font-medium ds-text-primary">{selectedProfessional.name}</div>
                   {selectedProfessional.email && (
@@ -299,7 +312,7 @@ export function ProfessionalServicesAssignmentForm({
               value={formData.serviceCategory}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
                 validationErrors.serviceCategory ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             >
@@ -326,7 +339,7 @@ export function ProfessionalServicesAssignmentForm({
               onChange={handleChange}
               required
               disabled={isEdit}
-              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
                 validationErrors.projectId ? 'border-red-400/60' : 'ds-border-subtle'
               } ${isEdit ? 'ds-bg-surface-muted cursor-not-allowed' : ''}`}
             >
@@ -351,7 +364,7 @@ export function ProfessionalServicesAssignmentForm({
                 name="phaseId"
                 value={formData.phaseId}
                 onChange={handleChange}
-                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
               >
                 <option value="">Select Phase (Optional)</option>
                 {availablePhases.map((phase) => (
@@ -397,7 +410,7 @@ export function ProfessionalServicesAssignmentForm({
               value={formData.contractType}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
                 validationErrors.contractType ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             >
@@ -427,7 +440,7 @@ export function ProfessionalServicesAssignmentForm({
                 min="0.01"
                 step="0.01"
                 required
-                className={`flex-1 px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted ${
+                className={`flex-1 px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} placeholder:ds-text-muted ${
                   validationErrors.contractValue ? 'border-red-400/60' : 'ds-border-subtle'
                 }`}
               />
@@ -440,7 +453,7 @@ export function ProfessionalServicesAssignmentForm({
                       contractValue: suggestedContractValue.toString(),
                     }));
                   }}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-sm font-medium whitespace-nowrap"
+                  className="px-4 py-2 ds-bg-success text-white rounded-lg hover:ds-bg-success focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 transition-colors text-sm font-medium whitespace-nowrap"
                 >
                   Use Suggested
                 </button>
@@ -465,7 +478,7 @@ export function ProfessionalServicesAssignmentForm({
               value={formData.paymentSchedule}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
                 validationErrors.paymentSchedule ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             >
@@ -490,7 +503,7 @@ export function ProfessionalServicesAssignmentForm({
                 name="visitFrequency"
                 value={formData.visitFrequency}
                 onChange={handleChange}
-                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
               >
                 <option value="">Select Visit Frequency (Optional)</option>
                 {VISIT_FREQUENCIES.map((freq) => (
@@ -517,7 +530,7 @@ export function ProfessionalServicesAssignmentForm({
               name="assignedDate"
               value={formData.assignedDate}
               onChange={handleChange}
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={dateInputClass}
             />
           </div>
           <div>
@@ -530,7 +543,7 @@ export function ProfessionalServicesAssignmentForm({
               value={formData.contractStartDate}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`${dateInputClass} ${
                 validationErrors.contractStartDate ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
@@ -547,7 +560,7 @@ export function ProfessionalServicesAssignmentForm({
               name="contractEndDate"
               value={formData.contractEndDate}
               onChange={handleChange}
-              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`${dateInputClass} ${
                 validationErrors.contractEndDate ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
@@ -604,7 +617,7 @@ export function ProfessionalServicesAssignmentForm({
                     value={newMilestone.milestoneName}
                     onChange={(e) => setNewMilestone(prev => ({ ...prev, milestoneName: e.target.value }))}
                     placeholder="e.g., Design Complete"
-                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
                   />
                 </div>
                 <div>
@@ -615,7 +628,7 @@ export function ProfessionalServicesAssignmentForm({
                     type="date"
                     value={newMilestone.milestoneDate}
                     onChange={(e) => setNewMilestone(prev => ({ ...prev, milestoneDate: e.target.value }))}
-                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={dateInputClass}
                   />
                 </div>
                 <div>
@@ -629,14 +642,14 @@ export function ProfessionalServicesAssignmentForm({
                     placeholder="0.00"
                     min="0.01"
                     step="0.01"
-                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
                   />
                 </div>
                 <div className="flex items-end gap-2">
                   <button
                     type="button"
                     onClick={handleAddMilestone}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover"
                   >
                     Add
                   </button>
@@ -676,7 +689,7 @@ export function ProfessionalServicesAssignmentForm({
               value={formData.paymentTerms}
               onChange={handleChange}
               placeholder="e.g., Net 30, 50% upfront"
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
 
@@ -706,7 +719,7 @@ export function ProfessionalServicesAssignmentForm({
               onChange={handleChange}
               placeholder="Additional notes about this assignment..."
               rows={3}
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
 
@@ -719,7 +732,7 @@ export function ProfessionalServicesAssignmentForm({
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
               >
                 <option value="active">Active</option>
                 <option value="completed">Completed</option>
@@ -743,7 +756,7 @@ export function ProfessionalServicesAssignmentForm({
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (isEdit ? 'Updating...' : 'Assigning...') : (isEdit ? 'Update Assignment' : 'Assign Professional')}
         </button>

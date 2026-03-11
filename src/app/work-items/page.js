@@ -263,7 +263,7 @@ function WorkItemsPageContent() {
           {canEdit && (
             <Link
               href={`/work-items/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}${filters.phaseId ? `&phaseId=${filters.phaseId}` : ''}`}
-              className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base"
+              className="ds-bg-accent-primary text-white px-4 sm:px-6 py-2.5 rounded-lg hover:ds-bg-accent-hover active:ds-bg-accent-active font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -291,10 +291,10 @@ function WorkItemsPageContent() {
         />
 
         {/* Information Card */}
-        <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 rounded-xl border-2 border-blue-400/60 p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
+        <div className="ds-bg-accent-subtle rounded-xl border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 ds-bg-accent-primary rounded-lg flex items-center justify-center shadow-md">
                 <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                 </svg>
@@ -307,7 +307,7 @@ function WorkItemsPageContent() {
                 </h3>
                 <button
                   onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                  className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 ds-bg-surface/80 hover:ds-bg-surface active:ds-bg-surface border border-blue-400/60 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 touch-manipulation"
+                  className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 ds-bg-surface/80 hover:ds-bg-surface active:ds-bg-surface border ds-border-accent-subtle rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 touch-manipulation"
                   aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                   aria-expanded={isInfoExpanded}
                 >
@@ -328,7 +328,7 @@ function WorkItemsPageContent() {
                     Work items are specific tasks and activities that need to be completed in each construction phase. They break down complex phases into manageable, trackable tasks with time estimates, costs, dependencies, and progress tracking.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="ds-bg-surface/60 rounded-lg p-4 border border-blue-400/60">
+                    <div className="ds-bg-surface/60 rounded-lg p-4 border ds-border-accent-subtle">
                       <h4 className="font-semibold ds-text-primary mb-2 flex items-center gap-2 text-sm sm:text-base">
                         <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -339,7 +339,7 @@ function WorkItemsPageContent() {
                         <strong>Project Managers</strong> and <strong>Owners</strong> use work items to plan, track progress, and manage phase completion. <strong>Site Supervisors</strong> use them to coordinate daily activities and ensure tasks are completed on time.
                       </p>
                     </div>
-                    <div className="ds-bg-surface/60 rounded-lg p-4 border border-blue-400/60">
+                    <div className="ds-bg-surface/60 rounded-lg p-4 border ds-border-accent-subtle">
                       <h4 className="font-semibold ds-text-primary mb-2 flex items-center gap-2 text-sm sm:text-base">
                         <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -351,16 +351,16 @@ function WorkItemsPageContent() {
                       </p>
                     </div>
                   </div>
-                  <div className="pt-4 border-t-2 border-blue-400/60">
+                  <div className="pt-4 border-t-2 ds-border-accent-subtle">
                     <h4 className="font-semibold ds-text-primary mb-3 flex items-center gap-2 text-sm sm:text-base">
-                      <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                       </svg>
                       Common Examples:
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {['Pour Foundation Concrete', 'Install Electrical Wiring', 'Complete Wall Painting', 'Conduct Quality Inspection', 'Steel Reinforcement Work', 'Roof Installation', 'Plumbing Installation'].map((example) => (
-                        <span key={example} className="px-2.5 sm:px-3 py-1 sm:py-1.5 ds-bg-surface rounded-full text-xs sm:text-sm font-medium ds-text-secondary border border-blue-400/60 shadow-sm hover:shadow-md transition-shadow">
+                        <span key={example} className="px-2.5 sm:px-3 py-1 sm:py-1.5 ds-bg-surface rounded-full text-xs sm:text-sm font-medium ds-text-secondary border ds-border-accent-subtle shadow-sm hover:shadow-md transition-shadow">
                           {example}
                         </span>
                       ))}
@@ -390,7 +390,7 @@ function WorkItemsPageContent() {
                   handleFilterChange('projectId', e.target.value);
                   handleFilterChange('phaseId', ''); // Reset phase when project changes
                 }}
-                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium touch-manipulation"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium touch-manipulation"
               >
                 <option value="" className="ds-text-muted">All Projects</option>
                 {projects.map((project) => (
@@ -410,7 +410,7 @@ function WorkItemsPageContent() {
                 value={filters.phaseId}
                 onChange={(e) => handleFilterChange('phaseId', e.target.value)}
                 disabled={!filters.projectId}
-                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary disabled:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
               >
                 <option value="" className="ds-text-muted">All Phases</option>
                 {phases.map((phase) => (
@@ -429,7 +429,7 @@ function WorkItemsPageContent() {
                 id="status-filter"
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium touch-manipulation"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium touch-manipulation"
               >
                 <option value="" className="ds-text-muted">All Statuses</option>
                 <option value="not_started" className="ds-text-primary">Not Started</option>
@@ -448,7 +448,7 @@ function WorkItemsPageContent() {
                 id="category-filter"
                 value={filters.category}
                 onChange={(e) => handleFilterChange('category', e.target.value)}
-                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium touch-manipulation"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium touch-manipulation"
               >
                 <option value="" className="ds-text-muted">All Categories</option>
                 {categories.map((category) => (
@@ -518,7 +518,7 @@ function WorkItemsPageContent() {
             <div className="hidden md:block ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-ds-border-subtle">
-                <thead className="bg-gradient-to-br from-gray-50 to-gray-100">
+                <thead className="ds-bg-surface-muted">
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
                       Work Item
@@ -629,7 +629,7 @@ function WorkItemsPageContent() {
                             <div className="flex items-center gap-2">
                               <div className="w-20 ds-bg-surface-muted rounded-full h-2.5 shadow-inner">
                                 <div
-                                  className="bg-gradient-to-r from-blue-500 to-blue-600 h-2.5 rounded-full transition-all duration-300 shadow-sm"
+                                  className="ds-bg-accent-primary h-2.5 rounded-full transition-all duration-300 shadow-sm"
                                   style={{ width: `${Math.min(100, completionPercentage)}%` }}
                                 />
                               </div>
@@ -640,7 +640,7 @@ function WorkItemsPageContent() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium ds-text-primary">
-                              <span className="text-blue-600 font-semibold">{item.actualHours || 0}</span>
+                              <span className="ds-text-accent-primary font-semibold">{item.actualHours || 0}</span>
                               <span className="ds-text-muted mx-1">/</span>
                               <span className="ds-text-secondary">{item.estimatedHours || 0}</span>
                               <span className="ds-text-muted ml-1">hrs</span>
@@ -655,7 +655,7 @@ function WorkItemsPageContent() {
                             <div className="flex flex-col gap-1">
                               <Link
                                 href={`/labour/entries?workItemId=${item._id}`}
-                                className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                               >
                                 View Entries →
                               </Link>
@@ -694,7 +694,7 @@ function WorkItemsPageContent() {
                             <div className="flex items-center justify-end gap-2">
                               <Link
                                 href={`/work-items/${item._id}`}
-                                className="text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+                                className="ds-text-accent-primary hover:ds-text-accent-hover font-semibold transition-colors"
                               >
                                 View →
                               </Link>
@@ -733,7 +733,7 @@ function WorkItemsPageContent() {
                         <div className="flex-1 min-w-0">
                           <Link
                             href={`/work-items/${item._id}`}
-                            className="text-base font-semibold text-blue-600 hover:text-blue-800 block truncate"
+                            className="text-base font-semibold ds-text-accent-primary hover:ds-text-accent-hover block truncate"
                           >
                             {item.name}
                           </Link>
@@ -760,7 +760,7 @@ function WorkItemsPageContent() {
                           {item.phaseName ? (
                             <Link
                               href={`/phases/${item.phaseId}`}
-                              className="text-sm text-blue-600 hover:text-blue-800 font-medium flex-1"
+                              className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium flex-1"
                             >
                               {item.phaseName}
                             </Link>
@@ -776,7 +776,7 @@ function WorkItemsPageContent() {
                                 <Link
                                   key={worker._id?.toString()}
                                   href={`/labour/workers/${worker._id}`}
-                                  className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+                                  className="text-xs ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                                 >
                                   {worker.workerName}
                                 </Link>
@@ -800,7 +800,7 @@ function WorkItemsPageContent() {
                           <div className="flex items-center gap-2">
                             <div className="flex-1 max-w-20 ds-bg-surface-muted rounded-full h-2.5">
                               <div
-                                className="bg-gradient-to-r from-blue-500 to-blue-600 h-2.5 rounded-full transition-all duration-300"
+                                className="ds-bg-accent-primary h-2.5 rounded-full transition-all duration-300"
                                 style={{ width: `${Math.min(100, completionPercentage)}%` }}
                               />
                             </div>
@@ -812,7 +812,7 @@ function WorkItemsPageContent() {
                         <div>
                           <p className="text-xs ds-text-muted mb-1">Hours</p>
                           <p className="text-sm font-semibold ds-text-primary">
-                            <span className="text-blue-600">{item.actualHours || 0}</span>
+                            <span className="ds-text-accent-primary">{item.actualHours || 0}</span>
                             <span className="ds-text-muted mx-1">/</span>
                             <span className="ds-text-secondary">{item.estimatedHours || 0}</span>
                           </p>
@@ -833,7 +833,7 @@ function WorkItemsPageContent() {
                       <div className="flex flex-wrap gap-2 pt-3">
                         <Link
                           href={`/work-items/${item._id}`}
-                          className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                          className="flex-1 px-3 py-2 bg-blue-50 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
                         >
                           View →
                         </Link>

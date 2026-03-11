@@ -34,9 +34,9 @@ export function WizardProgress({ currentStep, totalSteps = 4, stepLabels = null 
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-colors ${
                   step === currentStep
-                    ? 'bg-blue-600 text-white ring-4 ring-blue-100'
+                    ? 'ds-bg-accent-primary text-white ring-4 ring-ds-accent-focus'
                     : step < currentStep
-                    ? 'bg-green-500 text-white'
+                    ? 'ds-bg-success text-white'
                     : 'ds-bg-surface-muted ds-text-secondary'
                 }`}
               >
@@ -52,7 +52,7 @@ export function WizardProgress({ currentStep, totalSteps = 4, stepLabels = null 
               <div className="mt-2 text-xs text-center max-w-[100px]">
                 <div
                   className={`font-medium ${
-                    step === currentStep ? 'text-blue-600' : step < currentStep ? 'text-green-600' : 'ds-text-muted'
+                    step === currentStep ? 'ds-text-accent-primary' : step < currentStep ? 'ds-text-success' : 'ds-text-muted'
                   }`}
                 >
                   {getStepLabel(step)}
@@ -63,7 +63,7 @@ export function WizardProgress({ currentStep, totalSteps = 4, stepLabels = null 
             {index < steps.length - 1 && (
               <div
                 className={`flex-1 h-1 mx-2 ${
-                  step < currentStep ? 'bg-green-500' : 'ds-bg-surface-muted'
+                  step < currentStep ? 'ds-bg-success' : 'ds-bg-surface-muted'
                 }`}
               />
             )}

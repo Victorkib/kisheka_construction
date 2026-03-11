@@ -13,6 +13,11 @@ import { getUserProfile } from '@/lib/auth-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { calculateProjectTotals } from '@/lib/investment-allocation';
+import {
+  getPendingApprovalStatuses,
+  APPROVAL_STATUS_MAP,
+} from '@/lib/status-constants';
+import { validateProjectAccess } from '@/lib/middleware/project-context';
 
 // Force dynamic rendering to prevent caching stale data
 export const dynamic = 'force-dynamic';
@@ -38,12 +43,21 @@ export async function GET(request) {
     const db = await getDatabase();
     const userRole = userProfile.role?.toLowerCase();
 
-    // Get projectId from query params (optional - for project-specific summary)
+    // Get projectId from query params (required for multi-project system)
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get('projectId');
     const projectObjectId = projectId && ObjectId.isValid(projectId) ? new ObjectId(projectId) : null;
 
+    // Validate project access if projectId is provided
+    if (projectObjectId) {
+      const accessResult = await validateProjectAccess(userProfile._id, projectId);
+      if (!accessResult.hasAccess) {
+        return errorResponse(accessResult.error || 'Access denied to this project', 403);
+      }
+    }
+
     // Build project filter for aggregations
+    // If no projectId, return zeros for project-specific data (approvals, costs)
     const projectFilter = projectObjectId ? { projectId: projectObjectId } : {};
 
     // Get total projects count
@@ -140,24 +154,109 @@ export async function GET(request) {
     const totalOverallCost = totalMaterialsCost + totalExpensesCost + totalInitialExpensesCost + totalLabourCost;
 
     // Get pending approvals count - filtered by project if provided
-    const pendingMaterials = await db.collection('materials').countDocuments({
-      deletedAt: null,
-      status: { $in: ['pending_approval', 'submitted'] },
-      ...projectFilter,
-    });
+    // Use standardized status values from status constants
+    const materialsPendingStatuses = getPendingApprovalStatuses('materials');
+    const expensesPendingStatuses = getPendingApprovalStatuses('expenses');
+    const initialExpensesPendingStatuses = getPendingApprovalStatuses('initial_expenses');
+    const materialRequestsPendingStatuses = getPendingApprovalStatuses('material_requests');
+    const labourEntriesPendingStatuses = getPendingApprovalStatuses('labour_entries');
+    const professionalFeesPendingStatuses = getPendingApprovalStatuses('professional_fees');
+    const professionalActivitiesPendingStatuses = getPendingApprovalStatuses('professional_activities');
+    const budgetReallocationsPendingStatuses = getPendingApprovalStatuses('budget_reallocations');
 
-    const pendingExpenses = await db.collection('expenses').countDocuments({
-      deletedAt: null,
-      status: { $in: ['pending_approval', 'submitted'] },
-      ...projectFilter,
-    });
+    // Query all approval types in parallel
+    const [
+      pendingMaterials,
+      pendingExpenses,
+      pendingInitialExpenses,
+      pendingMaterialRequests,
+      pendingLabourEntries,
+      pendingProfessionalFees,
+      pendingProfessionalActivities,
+      pendingBudgetReallocations,
+    ] = await Promise.all([
+      // Materials
+      projectObjectId
+        ? db.collection('materials').countDocuments({
+            deletedAt: null,
+            status: { $in: materialsPendingStatuses },
+            projectId: projectObjectId,
+          })
+        : Promise.resolve(0),
 
-    const pendingInitialExpenses = await db.collection('initial_expenses').countDocuments({
-      status: 'pending_approval',
-      ...projectFilter,
-    });
+      // Expenses
+      projectObjectId
+        ? db.collection('expenses').countDocuments({
+            deletedAt: null,
+            status: { $in: expensesPendingStatuses },
+            projectId: projectObjectId,
+          })
+        : Promise.resolve(0),
 
-    const totalPendingApprovals = pendingMaterials + pendingExpenses + pendingInitialExpenses;
+      // Initial Expenses
+      projectObjectId
+        ? db.collection('initial_expenses').countDocuments({
+            status: { $in: initialExpensesPendingStatuses },
+            projectId: projectObjectId,
+          })
+        : Promise.resolve(0),
+
+      // Material Requests
+      projectObjectId
+        ? db.collection('material_requests').countDocuments({
+            deletedAt: null,
+            status: { $in: materialRequestsPendingStatuses },
+            projectId: projectObjectId,
+          })
+        : Promise.resolve(0),
+
+      // Labour Entries
+      projectObjectId
+        ? db.collection('labour_entries').countDocuments({
+            deletedAt: null,
+            status: { $in: labourEntriesPendingStatuses },
+            projectId: projectObjectId,
+          })
+        : Promise.resolve(0),
+
+      // Professional Fees
+      projectObjectId
+        ? db.collection('professional_fees').countDocuments({
+            deletedAt: null,
+            status: { $in: professionalFeesPendingStatuses },
+            projectId: projectObjectId,
+          })
+        : Promise.resolve(0),
+
+      // Professional Activities
+      projectObjectId
+        ? db.collection('professional_activities').countDocuments({
+            deletedAt: null,
+            status: { $in: professionalActivitiesPendingStatuses },
+            projectId: projectObjectId,
+          })
+        : Promise.resolve(0),
+
+      // Budget Reallocations
+      projectObjectId
+        ? db.collection('budget_reallocations').countDocuments({
+            deletedAt: null,
+            status: { $in: budgetReallocationsPendingStatuses },
+            projectId: projectObjectId,
+          })
+        : Promise.resolve(0),
+    ]);
+
+    // Calculate total pending approvals
+    const totalPendingApprovals =
+      pendingMaterials +
+      pendingExpenses +
+      pendingInitialExpenses +
+      pendingMaterialRequests +
+      pendingLabourEntries +
+      pendingProfessionalFees +
+      pendingProfessionalActivities +
+      pendingBudgetReallocations;
 
     // Get capital raised/used (for OWNER, INVESTOR, ACCOUNTANT, PM)
     // REAL-TIME CALCULATION from actual spending and allocations (not cached project_finances)
@@ -228,6 +327,11 @@ export async function GET(request) {
           materials: pendingMaterials,
           expenses: pendingExpenses,
           initialExpenses: pendingInitialExpenses,
+          materialRequests: pendingMaterialRequests,
+          labourEntries: pendingLabourEntries,
+          professionalFees: pendingProfessionalFees,
+          professionalActivities: pendingProfessionalActivities,
+          budgetReallocations: pendingBudgetReallocations,
         },
         capital: {
           raised: capitalRaised,

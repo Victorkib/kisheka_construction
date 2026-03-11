@@ -224,8 +224,8 @@ function ProfessionalServicesPageContent() {
 
   const getTypeBadgeColor = (type) => {
     return type === 'architect' 
-      ? 'bg-blue-100 text-blue-800' 
-      : 'bg-green-100 text-green-800';
+      ? 'ds-bg-accent-subtle ds-text-accent-primary'
+      : 'ds-bg-success/10 ds-text-success';
   };
 
   const getTypeLabel = (type) => {
@@ -234,10 +234,10 @@ function ProfessionalServicesPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      active: 'bg-green-100 text-green-800',
-      completed: 'bg-blue-100 text-blue-800',
-      terminated: 'bg-red-100 text-red-800',
-      on_hold: 'bg-yellow-100 text-yellow-800',
+      active: 'ds-bg-success/10 ds-text-success',
+      completed: 'ds-bg-accent-subtle ds-text-accent-primary',
+      terminated: 'ds-bg-danger/10 ds-text-danger',
+      on_hold: 'ds-bg-warning/10 ds-text-warning',
     };
     return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
@@ -275,7 +275,7 @@ function ProfessionalServicesPageContent() {
             {canAccess('assign_professional_service') && (
               <Link
                 href="/professional-services-library"
-                className="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 bg-slate-600 text-white rounded-lg hover:bg-slate-700 active:bg-slate-800 transition-colors touch-manipulation text-sm sm:text-base"
+                className="inline-flex items-center justify-center px-4 sm:px-6 py-2.5 ds-bg-surface-muted ds-text-primary rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors touch-manipulation text-sm sm:text-base"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path 
@@ -294,7 +294,7 @@ function ProfessionalServicesPageContent() {
                 href="/professional-services/new"
                 className={`inline-flex items-center justify-center px-4 sm:px-6 py-2.5 rounded-lg transition-all touch-manipulation text-sm sm:text-base ${
                   canCreateAssignment
-                    ? 'ds-bg-accent-primary text-white hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg'
+                    ? 'ds-bg-accent-primary text-white hover:ds-bg-accent-hover active:ds-bg-accent-hover shadow-md hover:shadow-lg'
                     : 'ds-bg-surface-muted ds-text-muted cursor-not-allowed opacity-60'
                 }`}
                 onClick={(e) => {
@@ -360,7 +360,7 @@ function ProfessionalServicesPageContent() {
               <select
                 value={filters.projectId}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ds-text-primary touch-manipulation"
+                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary ds-text-primary touch-manipulation"
               >
                 <option value="">All Projects</option>
                 {projects.map((project) => (
@@ -379,7 +379,7 @@ function ProfessionalServicesPageContent() {
               <select
                 value={filters.type}
                 onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ds-text-primary touch-manipulation"
+                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary ds-text-primary touch-manipulation"
               >
                 <option value="">All Types</option>
                 <option value="architect">Architects</option>
@@ -395,7 +395,7 @@ function ProfessionalServicesPageContent() {
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ds-text-primary touch-manipulation"
+                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary ds-text-primary touch-manipulation"
               >
                 <option value="">All Statuses</option>
                 <option value="active">Active</option>
@@ -415,7 +415,7 @@ function ProfessionalServicesPageContent() {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search by professional name..."
-                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ds-text-primary touch-manipulation"
+                className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary ds-text-primary touch-manipulation"
               />
             </div>
           </div>
@@ -423,7 +423,7 @@ function ProfessionalServicesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg mb-6">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
           </div>
@@ -449,7 +449,7 @@ function ProfessionalServicesPageContent() {
                   href="/professional-services/new"
                   className={`inline-flex items-center justify-center px-4 sm:px-6 py-2.5 rounded-lg transition-all touch-manipulation text-sm sm:text-base ${
                     canCreateAssignment
-                      ? 'ds-bg-accent-primary text-white hover:bg-blue-700 active:bg-blue-800 shadow-md hover:shadow-lg'
+                      ? 'ds-bg-accent-primary text-white hover:ds-bg-accent-hover active:ds-bg-accent-hover shadow-md hover:shadow-lg'
                       : 'ds-bg-surface-muted ds-text-muted cursor-not-allowed opacity-60'
                   }`}
                   onClick={(e) => {
@@ -546,7 +546,7 @@ function ProfessionalServicesPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         <div>Total: {formatCurrency(assignment.totalFees)}</div>
                         <div>Paid: {formatCurrency(assignment.feesPaid)}</div>
-                        <div className="text-xs text-red-600">Pending: {formatCurrency(assignment.feesPending)}</div>
+                        <div className="text-xs ds-text-danger">Pending: {formatCurrency(assignment.feesPending)}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         <div>Activities: {assignment.totalActivities || 0}</div>
@@ -573,7 +573,7 @@ function ProfessionalServicesPageContent() {
                           {canAccess('edit_professional_service_assignment') && (
                             <Link
                               href={`/professional-services/${assignmentId}/edit`}
-                              className="text-indigo-600 hover:text-indigo-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               Edit
                             </Link>
@@ -581,7 +581,7 @@ function ProfessionalServicesPageContent() {
                           {canAccess('terminate_professional_service') && assignment.status === 'active' && (
                             <button
                               onClick={() => handleTerminate(assignmentId, assignment.library?.name)}
-                              className="text-red-600 hover:text-red-900"
+                              className="ds-text-danger hover:ds-text-danger"
                             >
                               Terminate
                             </button>
@@ -745,13 +745,13 @@ function ProfessionalServicesPageContent() {
                       </div>
                       <div>
                         <p className="text-xs ds-text-muted mb-0.5">Paid</p>
-                        <p className="text-sm font-semibold text-green-600">
+                        <p className="text-sm font-semibold ds-text-success">
                           {formatCurrency(assignment.feesPaid)}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs ds-text-muted mb-0.5">Pending</p>
-                        <p className="text-sm font-semibold text-red-600">
+                        <p className="text-sm font-semibold ds-text-danger">
                           {formatCurrency(assignment.feesPending)}
                         </p>
                       </div>
@@ -781,14 +781,14 @@ function ProfessionalServicesPageContent() {
                     <div className="flex flex-wrap gap-2 pt-3">
                       <Link
                         href={`/professional-services/${assignmentId}`}
-                        className="flex-1 px-3 py-2 bg-blue-500/10 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation text-center border border-blue-400/60"
+                        className="flex-1 px-3 py-2 ds-bg-accent-subtle ds-text-accent-primary text-sm font-semibold rounded-lg hover:ds-bg-accent-subtle active:ds-bg-accent-subtle transition-colors touch-manipulation text-center border ds-border-accent-subtle"
                       >
                         View
                       </Link>
                       {canAccess('edit_professional_service_assignment') && (
                         <Link
                           href={`/professional-services/${assignmentId}/edit`}
-                          className="flex-1 px-3 py-2 bg-indigo-50 text-indigo-600 text-sm font-semibold rounded-lg hover:bg-indigo-100 active:bg-indigo-200 transition-colors touch-manipulation text-center"
+                          className="flex-1 px-3 py-2 ds-bg-accent-subtle ds-text-accent-primary text-sm font-semibold rounded-lg hover:ds-bg-accent-subtle active:ds-bg-accent-subtle transition-colors touch-manipulation text-center"
                         >
                           Edit
                         </Link>
@@ -796,7 +796,7 @@ function ProfessionalServicesPageContent() {
                       {canAccess('terminate_professional_service') && assignment.status === 'active' && (
                         <button
                           onClick={() => handleTerminate(assignmentId, assignment.library?.name)}
-                          className="flex-1 px-3 py-2 bg-red-50 text-red-600 text-sm font-semibold rounded-lg hover:bg-red-100 active:bg-red-200 transition-colors touch-manipulation"
+                          className="flex-1 px-3 py-2 ds-bg-danger/10 ds-text-danger text-sm font-semibold rounded-lg hover:ds-bg-danger/20 active:ds-bg-danger/20 transition-colors touch-manipulation"
                         >
                           Terminate
                         </button>

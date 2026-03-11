@@ -117,20 +117,20 @@ export function NotificationStatusIndicator({ showLabel = true, size = 'md' }) {
 
   if (permission === 'granted' && isSubscribed) {
     icon = <Zap className={iconSize} />;
-    color = 'text-green-600';
-    bgColor = 'bg-green-100';
+    color = 'ds-text-success';
+    bgColor = 'ds-bg-success/10';
     label = 'Push enabled';
     tooltip = 'Push notifications active';
   } else if (permission === 'denied') {
     icon = <Ban className={iconSize} />;
-    color = 'text-amber-600';
-    bgColor = 'bg-amber-100';
+    color = 'ds-text-warning';
+    bgColor = 'ds-bg-warning/10';
     label = 'Push blocked';
     tooltip = 'Enable push notifications in settings';
   } else if (permission === 'granted' && !isSubscribed) {
     icon = <CheckCircle2 className={iconSize} />;
-    color = 'text-blue-600';
-    bgColor = 'bg-blue-100';
+    color = 'ds-text-accent-primary';
+    bgColor = 'ds-bg-accent-subtle';
     label = 'Push pending';
     tooltip = 'Initializing push notifications...';
   } else {
@@ -280,8 +280,8 @@ export function NotificationStatusCard({ onRefresh }) {
   }
 
   const getStatusColor = () => {
-    if (permission === 'granted' && isSubscribed) return 'text-green-600';
-    if (permission === 'denied') return 'text-amber-600';
+    if (permission === 'granted' && isSubscribed) return 'ds-text-success';
+    if (permission === 'denied') return 'ds-text-warning';
     return 'ds-text-secondary';
   };
 
@@ -357,14 +357,14 @@ export function NotificationStatusCard({ onRefresh }) {
         {permission === 'granted' && isSubscribed && (
           <button
             onClick={handleUnsubscribe}
-            className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium rounded-lg transition"
+            className="px-4 py-2 ds-bg-danger/10 ds-text-danger hover:ds-bg-danger/20 text-sm font-medium rounded-lg transition"
           >
             Disable Notifications
           </button>
         )}
 
         {permission === 'denied' && (
-          <p className="text-sm text-amber-600">
+          <p className="text-sm ds-text-warning">
             You can enable notifications by changing your browser&apos;s
             notification settings.
           </p>

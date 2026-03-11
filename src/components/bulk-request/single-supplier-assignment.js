@@ -13,6 +13,9 @@ export function SingleSupplierAssignment({
   onAssignmentChange,
   initialData = null,
 }) {
+  const themedDateInputClass =
+    "w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary [color-scheme:light_dark] [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100";
+
   const [assignment, setAssignment] = useState({
     supplierId: initialData?.supplierId || '',
     deliveryDate: initialData?.deliveryDate || '',
@@ -50,8 +53,8 @@ export function SingleSupplierAssignment({
 
   return (
     <div className="space-y-6">
-      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
-        <p className="text-sm text-blue-700">
+      <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-4">
+        <p className="text-sm ds-text-primary">
           All <strong>{materialRequests.length} material(s)</strong> will be ordered from a single supplier.
           One purchase order will be created.
         </p>
@@ -61,13 +64,13 @@ export function SingleSupplierAssignment({
         {/* Supplier Selection */}
         <div>
           <label className="block text-sm font-semibold ds-text-secondary mb-1">
-            Supplier <span className="text-red-500">*</span>
+            Supplier <span className="ds-text-danger">*</span>
           </label>
           <select
             value={assignment.supplierId}
             onChange={(e) => handleChange('supplierId', e.target.value)}
             required
-            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
           >
             <option value="" className="ds-text-primary">Select a supplier</option>
             {suppliers.map((supplier) => {
@@ -92,7 +95,7 @@ export function SingleSupplierAssignment({
         {/* Delivery Date */}
         <div>
           <label className="block text-sm font-semibold ds-text-secondary mb-1">
-            Delivery Date <span className="text-red-500">*</span>
+            Delivery Date <span className="ds-text-danger">*</span>
           </label>
           <input
             type="date"
@@ -100,7 +103,7 @@ export function SingleSupplierAssignment({
             onChange={(e) => handleChange('deliveryDate', e.target.value)}
             required
             min={new Date().toISOString().split('T')[0]}
-            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className={themedDateInputClass}
           />
         </div>
 
@@ -114,7 +117,7 @@ export function SingleSupplierAssignment({
             onChange={(e) => handleChange('terms', e.target.value)}
             placeholder="e.g., Net 30, FOB, etc."
             rows={3}
-            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary placeholder:ds-text-muted"
           />
         </div>
 
@@ -128,7 +131,7 @@ export function SingleSupplierAssignment({
             onChange={(e) => handleChange('notes', e.target.value)}
             placeholder="Additional notes for this purchase order..."
             rows={3}
-            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary placeholder:ds-text-muted"
           />
         </div>
       </div>

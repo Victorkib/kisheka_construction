@@ -15,7 +15,6 @@ import { SidebarDataProvider } from '@/components/layout/SidebarDataProvider';
 import { ContextualQuickActions } from '@/components/navigation/ContextualQuickActions';
 import { CurrentProjectContext } from '@/components/navigation/CurrentProjectContext';
 import { RecentlyViewed } from '@/components/navigation/RecentlyViewed';
-import { PendingActions } from '@/components/navigation/PendingActions';
 import { SuggestedActions } from '@/components/navigation/SuggestedActions';
 import { isRouteActive, getActiveState, getActiveRoute } from '@/lib/utils/route-matching';
 import { getNavItemColors } from '@/lib/utils/navigation-colors';
@@ -268,10 +267,22 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
   const [readyToOrderCount, setReadyToOrderCount] = useState(0);
 
-  // Fetch pending approvals count for badge
+  // Fetch pending approvals count for badge (project-specific)
   useEffect(() => {
     if (user && ['owner', 'pm', 'project_manager', 'accountant'].includes(user.role?.toLowerCase())) {
-      fetch('/api/dashboard/summary', {
+      // If no project selected, set count to 0 (multi-project system)
+      if (!currentProject?._id) {
+        setPendingApprovalsCount(0);
+        return;
+      }
+
+      const projectId = currentProject._id?.toString() || currentProject._id;
+      if (!projectId) {
+        setPendingApprovalsCount(0);
+        return;
+      }
+
+      fetch(`/api/dashboard/summary?projectId=${projectId}`, {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -282,11 +293,20 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
         .then((data) => {
           if (data.success && data.data?.summary?.totalPendingApprovals) {
             setPendingApprovalsCount(data.data.summary.totalPendingApprovals);
+          } else {
+            // If no data or error, set to 0 (no badge)
+            setPendingApprovalsCount(0);
           }
         })
-        .catch((err) => console.error('Error fetching approvals count:', err));
+        .catch((err) => {
+          console.error('Error fetching approvals count:', err);
+          setPendingApprovalsCount(0); // Set to 0 on error (no badge)
+        });
+    } else {
+      // User doesn't have permission, set to 0
+      setPendingApprovalsCount(0);
     }
-  }, [user]);
+  }, [user, currentProject]); // Add currentProject to dependencies
 
   // Fetch pending purchase orders count for supplier badge
   useEffect(() => {
@@ -363,9 +383,11 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
     return navigation.map((section) => {
       if (section.label === 'Operations' && section.children) {
         const updatedChildren = section.children.map((child) => {
+          // ONLY add badge when count > 0 (fixes issue where badge shows even with 0 approvals)
           if (child.href === '/dashboard/approvals' && pendingApprovalsCount > 0) {
             return { ...child, badge: pendingApprovalsCount };
           }
+          // When count is 0, return child WITHOUT badge property (no red highlighting)
           
           // Handle Material Requests children (nested children)
           if (child.label === 'Material Requests' && child.children) {
@@ -509,9 +531,6 @@ const SidebarContent = memo(function SidebarContent({
       >
         {/* Secondary Sections */}
         <div className="flex-shrink-0">
-          {/* Pending Actions */}
-          <PendingActions isCollapsed={isCollapsed} />
-
           {/* Suggested Actions */}
           <SuggestedActions isCollapsed={isCollapsed} />
 

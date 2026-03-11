@@ -17,6 +17,7 @@ import { createMaterialFromPurchaseOrder } from '@/lib/material-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotifications } from '@/lib/notifications';
 import { sendSMS, generateDeliveryConfirmationSMS, formatPhoneNumber } from '@/lib/sms-service';
+import { sendSupplierDeliveryConfirmedEmail } from '@/lib/email-templates/communication-event-templates';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 
@@ -28,6 +29,93 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 
 // Force dynamic rendering to prevent caching stale data
 export const dynamic = 'force-dynamic';
+const SUPPLIER_DELIVERY_FALLBACK_EMAIL =
+  process.env.SUPPLIER_DELIVERY_FALLBACK_EMAIL || 'qinalexander56@gmail.com';
+
+async function resolveSupplierEmailRecipient(db, purchaseOrder) {
+  console.log(`[Confirm Delivery] Resolving supplier email for PO ${purchaseOrder.purchaseOrderNumber}`);
+  console.log(`[Confirm Delivery] PO supplierId: ${purchaseOrder.supplierId}, supplierEmail: ${purchaseOrder.supplierEmail}, supplierName: ${purchaseOrder.supplierName}`);
+  
+  // Priority 1: Use supplierEmail stored on PO (this is what was used when PO was created)
+  if (purchaseOrder?.supplierEmail && purchaseOrder.supplierEmail.trim()) {
+    console.log(`[Confirm Delivery] Using supplierEmail from PO: ${purchaseOrder.supplierEmail}`);
+    
+    // Still try to get supplier details for name/contactPerson, but use PO email
+    let supplierDetails = null;
+    const supplierId = purchaseOrder?.supplierId;
+    const normalizedSupplierId =
+      supplierId instanceof ObjectId
+        ? supplierId
+        : ObjectId.isValid(supplierId)
+          ? new ObjectId(supplierId)
+          : null;
+
+    if (normalizedSupplierId) {
+      supplierDetails = await db.collection('suppliers').findOne({
+        _id: normalizedSupplierId
+      });
+      if (!supplierDetails) {
+        supplierDetails = await db.collection('suppliers').findOne({ _id: normalizedSupplierId });
+      }
+    }
+
+    return {
+      ...(supplierDetails || {}),
+      email: purchaseOrder.supplierEmail.trim(),
+      name: supplierDetails?.name || purchaseOrder.supplierName || 'Supplier',
+      contactPerson: supplierDetails?.contactPerson || purchaseOrder.supplierName || 'Supplier',
+      emailEnabled: supplierDetails?.emailEnabled !== false, // Allow missing emailEnabled (legacy records)
+      _source: 'purchase_order_email'
+    };
+  }
+
+  // Priority 2: Look up supplier by ID and use their email
+  const supplierId = purchaseOrder?.supplierId;
+  const normalizedSupplierId =
+    supplierId instanceof ObjectId
+      ? supplierId
+      : ObjectId.isValid(supplierId)
+        ? new ObjectId(supplierId)
+        : null;
+
+  let supplier = null;
+  if (normalizedSupplierId) {
+    supplier = await db.collection('suppliers').findOne({
+      _id: normalizedSupplierId,
+      status: 'active'
+    });
+    if (!supplier) {
+      supplier = await db.collection('suppliers').findOne({ _id: normalizedSupplierId });
+    }
+    
+    if (supplier?.email && supplier.email.trim()) {
+      console.log(`[Confirm Delivery] Using supplier email from supplier lookup: ${supplier.email}`);
+      return {
+        ...supplier,
+        email: supplier.email.trim(),
+        emailEnabled: supplier.emailEnabled !== false,
+        _source: 'supplier_lookup'
+      };
+    }
+  }
+
+  // Priority 3: Fallback to hardcoded email
+  console.warn(
+    `[Confirm Delivery] No valid supplier email found for PO ${purchaseOrder.purchaseOrderNumber}. ` +
+    `supplierId: ${supplierId}, supplierEmail: ${purchaseOrder?.supplierEmail}. ` +
+    `Using fallback: ${SUPPLIER_DELIVERY_FALLBACK_EMAIL}`
+  );
+  
+  return {
+    ...(supplier || {}),
+    email: SUPPLIER_DELIVERY_FALLBACK_EMAIL,
+    name: supplier?.name || purchaseOrder?.supplierName || 'Supplier',
+    contactPerson: supplier?.contactPerson || purchaseOrder?.supplierName || 'Supplier',
+    emailEnabled: true,
+    _isFallbackRecipient: true,
+    _source: 'fallback'
+  };
+}
 
 export async function POST(request, { params }) {
   try {
@@ -277,6 +365,104 @@ export async function POST(request, { params }) {
     } catch (notifError) {
       console.error('Error creating notifications (non-critical):', notifError);
       // Don't fail the request if notifications fail
+    }
+
+    // Send email to supplier about delivery confirmation
+    try {
+      const supplier = await resolveSupplierEmailRecipient(db, purchaseOrder);
+
+      console.log(`[Confirm Delivery] Resolved supplier for PO ${purchaseOrder.purchaseOrderNumber}:`, {
+        email: supplier?.email,
+        name: supplier?.name,
+        contactPerson: supplier?.contactPerson,
+        emailEnabled: supplier?.emailEnabled,
+        source: supplier?._source,
+        isFallback: supplier?._isFallbackRecipient
+      });
+
+      if (supplier && supplier.email && supplier.emailEnabled !== false) {
+        if (supplier._isFallbackRecipient) {
+          console.warn(
+            `[Confirm Delivery] Supplier email missing for PO ${purchaseOrder.purchaseOrderNumber}. ` +
+              `Using fallback recipient: ${SUPPLIER_DELIVERY_FALLBACK_EMAIL}`
+          );
+        } else {
+          console.log(`[Confirm Delivery] Sending delivery confirmation email to supplier: ${supplier.email} (source: ${supplier._source || 'unknown'})`);
+        }
+        const deliveryAtIso = new Date(updatedOrder?.deliveryConfirmedAt || new Date()).toISOString();
+        const eventKey = `supplier_delivery_confirmed:${id}:${deliveryAtIso}`;
+        const existingSend = await db.collection('purchase_orders').findOne({
+          _id: new ObjectId(id),
+          communications: {
+            $elemMatch: {
+              channel: 'email',
+              eventType: 'supplier_delivery_confirmed',
+              eventKey,
+              status: 'sent'
+            }
+          }
+        });
+        if (!existingSend) {
+          let itemSummary = purchaseOrder.materialName || 'Materials';
+          if (purchaseOrder.isBulkOrder && purchaseOrder.materials && Array.isArray(purchaseOrder.materials)) {
+            itemSummary = `${purchaseOrder.materials.length} material${purchaseOrder.materials.length > 1 ? 's' : ''}`;
+          }
+          const confirmedBy = `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim()
+            || userProfile.email
+            || userProfile._id?.toString()
+            || 'Project team';
+
+          const emailResult = await sendSupplierDeliveryConfirmedEmail({
+            supplier,
+            purchaseOrder,
+            deliverySummary: {
+              deliveryDate: new Date(),
+              itemSummary,
+              confirmedBy
+            }
+          });
+
+          await db.collection('purchase_orders').updateOne(
+            { _id: new ObjectId(id) },
+            {
+              $push: {
+                communications: {
+                  channel: 'email',
+                  eventType: 'supplier_delivery_confirmed',
+                  eventKey,
+                  recipientType: 'supplier',
+                  recipientEmail: supplier.email,
+                  sentAt: new Date(),
+                  status: 'sent',
+                  messageId: emailResult.messageId || null
+                }
+              }
+            }
+          );
+        }
+      }
+    } catch (emailError) {
+      console.error('[Confirm Delivery] Supplier email send failed (non-critical):', emailError);
+      try {
+        await db.collection('purchase_orders').updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $push: {
+              communications: {
+                channel: 'email',
+                eventType: 'supplier_delivery_confirmed',
+                eventKey: `supplier_delivery_confirmed:${id}`,
+                recipientType: 'supplier',
+                sentAt: new Date(),
+                status: 'failed',
+                error: emailError.message
+              }
+            }
+          }
+        );
+      } catch (trackError) {
+        console.error('[Confirm Delivery] Failed to track email failure:', trackError);
+      }
     }
 
     // Send SMS to supplier about delivery confirmation

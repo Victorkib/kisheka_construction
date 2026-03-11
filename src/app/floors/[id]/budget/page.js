@@ -463,7 +463,7 @@ function FloorBudgetPageContent() {
         </div>
 
         {/* Capital Allocation Summary - Always visible */}
-        <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-400/60 rounded-lg p-6 mb-6 shadow-md">
+        <div className="ds-bg-accent-subtle border-2 ds-border-accent-subtle rounded-lg p-6 mb-6 shadow-md">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-xl font-bold ds-text-primary">Capital Allocation</h2>
@@ -471,7 +471,7 @@ function FloorBudgetPageContent() {
             </div>
             <div className="flex items-center gap-3">
               {capitalTotal > 0 && (
-                <div className="text-sm font-medium ds-text-secondary ds-bg-surface px-3 py-1.5 rounded-lg border border-purple-400/60">
+                <div className="text-sm font-medium ds-text-secondary ds-bg-surface px-3 py-1.5 rounded-lg border ds-border-accent-subtle">
                   {capitalVsBudget.toFixed(1)}% of budget
                 </div>
               )}
@@ -531,7 +531,7 @@ function FloorBudgetPageContent() {
                 </div>
                 {/* Capital vs Budget Comparison */}
                 {totalBudget > 0 && (
-                  <div className="mt-4 pt-4 border-t border-purple-400/60">
+                  <div className="mt-4 pt-4 border-t ds-border-accent-subtle">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm font-medium ds-text-secondary">Capital Coverage</span>
                       <span className="text-sm ds-text-secondary">
@@ -588,7 +588,7 @@ function FloorBudgetPageContent() {
               </div>
             )}
             {projectFinances && projectAvailableCapital > 0 && (
-              <div className="mt-4 pt-4 border-t border-purple-400/60">
+              <div className="mt-4 pt-4 border-t ds-border-accent-subtle">
                 <p className="text-xs ds-text-secondary">
                   Project Available Capital: <span className="font-semibold text-purple-700">{formatCurrency(projectAvailableCapital)}</span>
                 </p>
@@ -598,7 +598,7 @@ function FloorBudgetPageContent() {
 
           {/* Capital Allocation Form */}
           {showCapitalForm && projectAvailableCapital > 0 && (
-            <form onSubmit={handleCapitalSubmit} className="mt-6 pt-6 border-t border-purple-400/60 ds-bg-surface rounded-lg p-4">
+            <form onSubmit={handleCapitalSubmit} className="mt-6 pt-6 border-t ds-border-accent-subtle ds-bg-surface rounded-lg p-4">
               <h3 className="text-md font-semibold ds-text-primary mb-4">Allocate Capital by Phase</h3>
               
               {/* Strategy Selection */}
@@ -679,7 +679,7 @@ function FloorBudgetPageContent() {
 
               {/* Strategy Info */}
               {capitalStrategy !== 'manual' && (
-                <div className="mb-4 p-3 bg-blue-50 border border-blue-400/60 rounded-lg">
+                <div className="mb-4 p-3 bg-blue-50 border ds-border-accent-subtle rounded-lg">
                   <p className="text-sm text-blue-800">
                     {capitalStrategy === 'proportional' 
                       ? 'Capital will be distributed proportionally based on each phase\'s budget share.'
@@ -751,7 +751,7 @@ function FloorBudgetPageContent() {
               )}
 
               {/* Actions */}
-              <div className="flex justify-end gap-3 pt-4 border-t border-purple-400/60">
+              <div className="flex justify-end gap-3 pt-4 border-t ds-border-accent-subtle">
                 <button
                   type="button"
                   onClick={() => setShowCapitalForm(false)}
@@ -772,7 +772,7 @@ function FloorBudgetPageContent() {
           )}
 
         {/* Phase Budget Allocation Form - Always visible and prominent */}
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-400/60 rounded-lg p-6 mb-6 shadow-lg">
+        <div className="ds-bg-accent-subtle border-2 ds-border-accent-subtle rounded-lg p-6 mb-6 shadow-lg">
           <div className="mb-4">
             <h2 className="text-2xl font-bold ds-text-primary mb-2">Allocate Budget to Phases</h2>
             <p className="text-sm ds-text-secondary">
@@ -788,7 +788,7 @@ function FloorBudgetPageContent() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow-lg border-2 border-blue-400/60 p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow-lg border-2 ds-border-accent-subtle p-6 space-y-6">
           <div className="flex items-center justify-between mb-4 pb-4 border-b ds-border-subtle">
             <h3 className="text-xl font-semibold ds-text-primary">Phase Budget Allocation</h3>
             <div className="text-sm ds-text-secondary">
@@ -815,7 +815,7 @@ function FloorBudgetPageContent() {
                 : true; // PHASE-03 and PHASE-04 apply to all floors
 
               return (
-                <div key={phaseCode} className={`border-2 rounded-lg p-5 ${isApplicable ? 'border-blue-400/60 bg-blue-50' : 'ds-border-subtle ds-bg-surface-muted opacity-60'}`}>
+                <div key={phaseCode} className={`border-2 rounded-lg p-5 ${isApplicable ? 'ds-border-accent-subtle bg-blue-50' : 'ds-border-subtle ds-bg-surface-muted opacity-60'}`}>
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
@@ -917,7 +917,7 @@ function FloorBudgetPageContent() {
 
           {/* Summary and Validation */}
           {totalBudget > 0 && (
-            <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
+            <div className="bg-blue-50 border ds-border-accent-subtle rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold text-blue-900">Total Floor Budget</span>
                 <span className="text-lg font-bold text-blue-700">{formatCurrency(totalBudget)}</span>

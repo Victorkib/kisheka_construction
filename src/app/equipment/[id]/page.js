@@ -297,7 +297,7 @@ export default function EquipmentDetailPage() {
               {canEdit && (
                 <button
                   onClick={() => setShowEditModal(true)}
-                  className="flex-1 sm:flex-none bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
+                  className="flex-1 sm:flex-none ds-bg-accent-primary text-white px-4 sm:px-6 py-2.5 rounded-lg hover:ds-bg-accent-hover active:ds-bg-accent-active font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
                 >
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -308,7 +308,7 @@ export default function EquipmentDetailPage() {
               {canDelete && (
                 <button
                   onClick={() => setShowDeleteModal(true)}
-                  className="flex-1 sm:flex-none bg-gradient-to-r from-red-600 to-red-700 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:from-red-700 hover:to-red-800 active:from-red-800 active:to-red-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
+                  className="flex-1 sm:flex-none ds-bg-danger text-white px-4 sm:px-6 py-2.5 rounded-lg hover:bg-red-700 active:bg-red-800 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 text-sm touch-manipulation"
                 >
                   <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -321,10 +321,10 @@ export default function EquipmentDetailPage() {
         </div>
 
         {/* Information Card */}
-        <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 rounded-xl border-2 border-green-400/60 p-4 sm:p-5 mb-6 shadow-lg transition-all duration-300">
+        <div className="ds-bg-accent-subtle rounded-xl border-2 ds-border-accent-subtle p-4 sm:p-5 mb-6 shadow-lg transition-all duration-300">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-md">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 ds-bg-accent-primary rounded-lg flex items-center justify-center shadow-md">
                 <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -336,12 +336,12 @@ export default function EquipmentDetailPage() {
                 <h3 className="text-sm sm:text-base font-bold ds-text-primary">Equipment Assignment Details</h3>
                 <button
                   onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                  className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 ds-bg-surface/80 hover:ds-bg-surface border border-green-400/60 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                  className="flex-shrink-0 w-7 h-7 sm:w-8 sm:h-8 ds-bg-surface/80 hover:ds-bg-surface border ds-border-accent-subtle rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
                   aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                   aria-expanded={isInfoExpanded}
                 >
                   <svg 
-                    className={`w-4 h-4 sm:w-5 sm:h-5 text-green-600 transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
+                    className={`w-4 h-4 sm:w-5 sm:h-5 ds-text-accent-primary transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -376,7 +376,7 @@ export default function EquipmentDetailPage() {
               {equipment.acquisitionType?.replace(/\b\w/g, l => l.toUpperCase()) || 'N/A'}
             </p>
           </div>
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg border border-blue-400/60 p-6 hover:shadow-xl transition-shadow duration-200">
+          <div className="ds-bg-accent-subtle rounded-xl shadow-lg border ds-border-accent-subtle p-6 hover:shadow-xl transition-shadow duration-200">
             <p className="text-sm font-semibold ds-text-secondary mb-3 uppercase tracking-wide">Total Cost</p>
             <p className="text-3xl font-bold text-blue-700 mb-4">
               {formatCurrency(equipment.totalCost || 0)}
@@ -423,20 +423,20 @@ export default function EquipmentDetailPage() {
                 {equipment.utilization?.estimatedHours || 0} <span className="text-base font-normal ds-text-secondary">hrs</span>
               </p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-400/60">
+            <div className="bg-blue-50 rounded-lg p-4 border ds-border-accent-subtle">
               <p className="text-sm font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Actual Hours</p>
               <p className="text-2xl font-bold text-blue-700">
                 {equipment.utilization?.actualHours || 0} <span className="text-base font-normal ds-text-accent-primary">hrs</span>
               </p>
             </div>
-            <div className="bg-green-50 rounded-lg p-4 border border-green-400/60">
+            <div className="bg-green-50 rounded-lg p-4 border ds-border-accent-subtle">
               <p className="text-sm font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Utilization</p>
               <p className="text-2xl font-bold text-green-700 mb-3">
                 {equipment.utilization?.utilizationPercentage?.toFixed(1) || 0}%
               </p>
               <div className="w-full ds-bg-surface-muted rounded-full h-3 shadow-inner">
                 <div
-                  className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-500 shadow-sm"
+                  className="ds-bg-accent-primary h-3 rounded-full transition-all duration-500 shadow-sm"
                   style={{
                     width: `${Math.min(100, equipment.utilization?.utilizationPercentage || 0)}%`
                   }}
@@ -542,7 +542,7 @@ export default function EquipmentDetailPage() {
                       value={formData.equipmentName}
                       onChange={(e) => setFormData({ ...formData, equipmentName: e.target.value })}
                       required
-                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
+                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                     />
                   </div>
 
@@ -556,7 +556,7 @@ export default function EquipmentDetailPage() {
                         value={formData.equipmentType}
                         onChange={(e) => setFormData({ ...formData, equipmentType: e.target.value })}
                         required
-                        className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                        className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                       >
                         <option value="" className="ds-text-muted">Select Type</option>
                         {['excavator', 'crane', 'concrete_mixer', 'concrete_pump', 'scaffolding', 'compactor', 'loader', 'bulldozer', 'generator', 'welding_equipment', 'other'].map((type) => (
@@ -576,7 +576,7 @@ export default function EquipmentDetailPage() {
                         value={formData.acquisitionType}
                         onChange={(e) => setFormData({ ...formData, acquisitionType: e.target.value })}
                         required
-                        className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                        className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                       >
                         <option value="" className="ds-text-muted">Select Type</option>
                         <option value="rental" className="ds-text-primary">Rental</option>
@@ -597,7 +597,7 @@ export default function EquipmentDetailPage() {
                         value={formData.startDate}
                         onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                         required
-                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
+                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                       />
                     </div>
 
@@ -610,7 +610,7 @@ export default function EquipmentDetailPage() {
                         name="endDate"
                         value={formData.endDate}
                         onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
+                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium touch-manipulation"
                       />
                     </div>
                   </div>
@@ -630,7 +630,7 @@ export default function EquipmentDetailPage() {
                           required
                           min="0"
                           step="0.01"
-                          className="w-full pl-12 pr-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                          className="w-full pl-12 pr-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium"
                         />
                       </div>
                     </div>
@@ -648,7 +648,7 @@ export default function EquipmentDetailPage() {
                           onChange={(e) => setFormData({ ...formData, estimatedHours: e.target.value })}
                           min="0"
                           step="0.1"
-                          className="w-full px-4 pr-16 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium"
+                          className="w-full px-4 pr-16 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium"
                         />
                       </div>
                     </div>
@@ -662,7 +662,7 @@ export default function EquipmentDetailPage() {
                       name="status"
                       value={formData.status}
                       onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                     >
                       <option value="assigned" className="ds-text-primary">Assigned</option>
                       <option value="in_use" className="ds-text-primary">In Use</option>
@@ -681,7 +681,7 @@ export default function EquipmentDetailPage() {
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                       rows={4}
                       placeholder="Additional notes about this equipment..."
-                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted transition-all duration-200 font-medium resize-y"
+                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500 placeholder:ds-text-muted transition-all duration-200 font-medium resize-y"
                     />
                   </div>
 
@@ -696,7 +696,7 @@ export default function EquipmentDetailPage() {
                     <LoadingButton
                       type="submit"
                       loading={saving}
-                      className="w-full sm:w-auto px-6 sm:px-8 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 shadow-lg hover:shadow-xl transition-all duration-200 text-sm touch-manipulation"
+                      className="w-full sm:w-auto px-6 sm:px-8 py-2.5 ds-bg-accent-primary text-white font-semibold rounded-lg hover:ds-bg-accent-hover active:ds-bg-accent-active focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 shadow-lg hover:shadow-xl transition-all duration-200 text-sm touch-manipulation"
                     >
                       {saving ? 'Saving...' : 'Save Changes'}
                     </LoadingButton>

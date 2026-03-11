@@ -186,7 +186,7 @@ function EquipmentPageContent() {
           </div>
           <Link
             href={`/equipment/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}`}
-            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:from-blue-700 hover:to-blue-800 active:from-blue-800 active:to-blue-900 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base"
+            className="ds-bg-accent-primary text-white px-4 sm:px-6 py-2.5 rounded-lg hover:ds-bg-accent-hover active:ds-bg-accent-active font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -196,10 +196,10 @@ function EquipmentPageContent() {
         </div>
 
         {/* Information Card */}
-        <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 rounded-xl border-2 border-green-400/60 p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
+        <div className="ds-bg-accent-subtle rounded-xl border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 ds-bg-accent-primary rounded-lg flex items-center justify-center shadow-md">
                 <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -213,12 +213,12 @@ function EquipmentPageContent() {
                 </h3>
                 <button
                   onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                  className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 ds-bg-surface/80 hover:ds-bg-surface active:ds-bg-surface border border-green-400/60 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 touch-manipulation"
+                  className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 ds-bg-surface/80 hover:ds-bg-surface active:ds-bg-surface border ds-border-accent-subtle rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 touch-manipulation"
                   aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                   aria-expanded={isInfoExpanded}
                 >
                   <svg 
-                    className={`w-5 h-5 sm:w-6 sm:h-6 text-green-600 transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ds-text-accent-primary transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -234,9 +234,9 @@ function EquipmentPageContent() {
                     Equipment assignments track machinery, tools, and vehicles used in construction phases. Equipment can be rented, purchased, or owned, and includes items like excavators, cranes, generators, scaffolding, and more. Track utilization, costs, suppliers, and ensure proper resource allocation.
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="ds-bg-surface/60 rounded-lg p-4 border border-green-400/60">
+                    <div className="ds-bg-surface/60 rounded-lg p-4 border ds-border-accent-subtle">
                       <h4 className="font-semibold ds-text-primary mb-2 flex items-center gap-2 text-sm sm:text-base">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         Who uses this?
@@ -245,9 +245,9 @@ function EquipmentPageContent() {
                         <strong>Project Managers</strong> and <strong>Owners</strong> use equipment management to track costs, utilization, and ensure proper resource allocation. <strong>Site Supervisors</strong> use it to coordinate equipment availability and schedule usage.
                       </p>
                     </div>
-                    <div className="ds-bg-surface/60 rounded-lg p-4 border border-green-400/60">
+                    <div className="ds-bg-surface/60 rounded-lg p-4 border ds-border-accent-subtle">
                       <h4 className="font-semibold ds-text-primary mb-2 flex items-center gap-2 text-sm sm:text-base">
-                        <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         Why it's important?
@@ -257,16 +257,16 @@ function EquipmentPageContent() {
                       </p>
                     </div>
                   </div>
-                  <div className="pt-4 border-t-2 border-green-400/60">
+                  <div className="pt-4 border-t-2 ds-border-accent-subtle">
                     <h4 className="font-semibold ds-text-primary mb-3 flex items-center gap-2 text-sm sm:text-base">
-                      <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                       </svg>
                       Common Examples:
                     </h4>
                     <div className="flex flex-wrap gap-2">
                       {['Excavators', 'Cranes', 'Concrete Mixers', 'Generators', 'Scaffolding', 'Compactors', 'Loaders', 'Welding Equipment'].map((example) => (
-                        <span key={example} className="px-2.5 sm:px-3 py-1 sm:py-1.5 ds-bg-surface rounded-full text-xs sm:text-sm font-medium ds-text-secondary border border-green-400/60 shadow-sm hover:shadow-md transition-shadow">
+                        <span key={example} className="px-2.5 sm:px-3 py-1 sm:py-1.5 ds-bg-surface rounded-full text-xs sm:text-sm font-medium ds-text-secondary border ds-border-accent-subtle shadow-sm hover:shadow-md transition-shadow">
                           {example}
                         </span>
                       ))}
@@ -290,7 +290,7 @@ function EquipmentPageContent() {
               <select
                 value={filters.projectId || ''}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
               >
                 <option value="" className="ds-text-muted">All Projects</option>
                 {accessibleProjects.map((project) => (
@@ -310,7 +310,7 @@ function EquipmentPageContent() {
               <select
                 value={filters.status || ''}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
               >
                 <option value="" className="ds-text-muted">All Statuses</option>
                 {EQUIPMENT_STATUSES.map((status) => (
@@ -325,7 +325,7 @@ function EquipmentPageContent() {
               <select
                 value={filters.equipmentType || ''}
                 onChange={(e) => handleFilterChange('equipmentType', e.target.value)}
-                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
               >
                 <option value="" className="ds-text-muted">All Types</option>
                 {EQUIPMENT_TYPES.map((type) => (
@@ -340,7 +340,7 @@ function EquipmentPageContent() {
               <select
                 value={filters.acquisitionType || ''}
                 onChange={(e) => handleFilterChange('acquisitionType', e.target.value)}
-                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
               >
                 <option value="" className="ds-text-muted">All Types</option>
                 {ACQUISITION_TYPES.map((type) => (
@@ -387,7 +387,7 @@ function EquipmentPageContent() {
             <div className="hidden md:block ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-ds-border-subtle">
-                <thead className="bg-gradient-to-br from-gray-50 to-gray-100">
+                <thead className="ds-bg-surface-muted">
                   <tr>
                     <th className="px-6 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
                       Equipment Name
@@ -574,7 +574,7 @@ function EquipmentPageContent() {
                   <div className="mb-3 pb-3 border-b ds-border-subtle">
                     <p className="text-xs ds-text-muted mb-0.5">Period</p>
                     <p className="text-sm ds-text-secondary">
-                      {formatDate(eq.startDate)} - {eq.endDate ? formatDate(eq.endDate) : <span className="text-blue-600 font-semibold">Ongoing</span>}
+                      {formatDate(eq.startDate)} - {eq.endDate ? formatDate(eq.endDate) : <span className="ds-text-accent-primary font-semibold">Ongoing</span>}
                     </p>
                   </div>
 

@@ -71,7 +71,7 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
             <select
               value={floor.status}
               onChange={(e) => onStatusChange(e.target.value)}
-              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ds-text-primary"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus ds-text-primary"
             >
               <option value="NOT_STARTED" className="ds-text-primary">Not Started</option>
               <option value="IN_PROGRESS" className="ds-text-primary">In Progress</option>
@@ -107,7 +107,7 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
             {floor.completionDate && (
               <div>
                 <span className="ds-text-muted">Completed:</span>{' '}
-                <span className="font-medium text-green-600">{formatDate(floor.completionDate)}</span>
+                <span className="font-medium ds-text-success">{formatDate(floor.completionDate)}</span>
               </div>
             )}
           </div>
@@ -145,13 +145,13 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
         const capitalRemaining = capitalAllocation.remaining || 0;
         
         return (
-          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-400/60 rounded-lg p-4">
+          <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-semibold ds-text-primary">Capital Allocation</h3>
               {canEdit && (
                 <Link
                   href={`/floors/${floor._id}/budget`}
-                  className="text-xs text-purple-700 hover:text-purple-900 font-medium underline"
+                  className="text-xs ds-text-accent-primary hover:ds-text-accent-hover font-medium underline"
                 >
                   Manage →
                 </Link>
@@ -160,37 +160,37 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <div>
                 <p className="text-xs ds-text-secondary">Total Capital</p>
-                <p className="text-base font-bold text-purple-700 mt-1">
+                <p className="text-base font-bold ds-text-accent-primary mt-1">
                   {formatCurrency(capitalTotal)}
                 </p>
               </div>
               <div>
                 <p className="text-xs ds-text-secondary">Used</p>
-                <p className="text-base font-bold text-blue-600 mt-1">
+                <p className="text-base font-bold ds-text-accent-primary mt-1">
                   {formatCurrency(capitalAllocation.used || 0)}
                 </p>
               </div>
               <div>
                 <p className="text-xs ds-text-secondary">Committed</p>
-                <p className="text-base font-bold text-yellow-600 mt-1">
+                <p className="text-base font-bold ds-text-warning mt-1">
                   {formatCurrency(capitalAllocation.committed || 0)}
                 </p>
               </div>
               <div>
                 <p className="text-xs ds-text-secondary">Remaining</p>
                 <p className={`text-base font-bold mt-1 ${
-                  capitalRemaining < 0 ? 'text-red-600' : 'text-green-600'
+                  capitalRemaining < 0 ? 'ds-text-danger' : 'ds-text-success'
                 }`}>
                   {formatCurrency(capitalRemaining)}
                 </p>
               </div>
             </div>
             {capitalTotal === 0 && canEdit && (
-              <div className="mt-3 pt-3 border-t border-purple-400/60">
-                <p className="text-xs text-purple-700 mb-2">No capital allocated yet.</p>
+              <div className="mt-3 pt-3 border-t ds-border-accent-subtle">
+                <p className="text-xs ds-text-accent-primary mb-2">No capital allocated yet.</p>
                 <Link
                   href={`/floors/${floor._id}/budget`}
-                  className="inline-block px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-700 transition"
+                  className="inline-block px-3 py-1.5 ds-bg-accent-primary text-white text-xs font-medium rounded-lg hover:ds-bg-accent-hover transition"
                 >
                   Allocate Capital
                 </Link>
@@ -211,12 +211,12 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
         }
 
         return (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-400/60 rounded-lg p-6">
+          <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold ds-text-primary">Phase Budget Summary</h3>
               <Link
                 href={`/floors/${floor._id}?tab=phases`}
-                className="text-sm text-blue-700 hover:text-blue-900 font-medium underline"
+                className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium underline"
               >
                 View Full Breakdown →
               </Link>
@@ -226,7 +226,7 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
                 const phaseBudget = byPhase[phaseCode] || { total: 0 };
                 // Note: Actual spending would need to be fetched separately or passed as prop
                 return (
-                  <div key={phaseCode} className="ds-bg-surface rounded-lg p-3 border border-blue-400/60">
+                  <div key={phaseCode} className="ds-bg-surface rounded-lg p-3 border ds-border-accent-subtle">
                     <p className="text-xs ds-text-secondary font-medium">{phaseCode}</p>
                     <p className="text-sm font-bold ds-text-primary mt-1">
                       {formatCurrency(phaseBudget.total)}
@@ -252,7 +252,7 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
             <h3 className="text-lg font-semibold ds-text-primary">Phases Working on This Floor</h3>
             <Link
               href={`/floors/${floor._id}?tab=phases`}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
             >
               View Phase Breakdown →
             </Link>
@@ -289,12 +289,12 @@ export function FloorOverviewTab({ floor, project, canEdit, onStatusChange, form
 
       {/* Project Link */}
       {project && (
-        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
-          <p className="text-sm text-blue-900">
+        <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-4">
+          <p className="text-sm ds-text-accent-primary">
             <span className="font-medium">Project:</span>{' '}
             <Link
               href={`/projects/${project._id}`}
-              className="text-blue-600 hover:text-blue-800 underline"
+              className="ds-text-accent-primary hover:ds-text-accent-hover underline"
             >
               {project.projectName}
             </Link>

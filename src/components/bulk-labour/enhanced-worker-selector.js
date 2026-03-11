@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Search, User, UserPlus, CheckCircle, X } from 'lucide-react';
 
 export function EnhancedWorkerSelector({
@@ -75,6 +75,25 @@ export function EnhancedWorkerSelector({
     }
   }, [isOpen]);
 
+  const handleSelectWorker = useCallback((worker) => {
+    const workerId = worker.userId || worker._id;
+    onChange(workerId);
+    if (onWorkerSelected) {
+      onWorkerSelected(worker);
+    }
+    setIsOpen(false);
+    setSearchTerm('');
+    setHighlightedIndex(-1);
+  }, [onChange, onWorkerSelected]);
+
+  const handleNewWorker = useCallback(() => {
+    if (onNewWorker) {
+      onNewWorker(searchTerm.trim());
+    }
+    setIsOpen(false);
+    setHighlightedIndex(-1);
+  }, [onNewWorker, searchTerm]);
+
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -109,7 +128,7 @@ export function EnhancedWorkerSelector({
       document.addEventListener('keydown', handleKeyDown);
       return () => document.removeEventListener('keydown', handleKeyDown);
     }
-  }, [isOpen, filteredWorkers, highlightedIndex, isNewWorker]);
+  }, [isOpen, filteredWorkers, highlightedIndex, isNewWorker, handleSelectWorker, handleNewWorker]);
 
   // Scroll highlighted item into view
   useEffect(() => {
@@ -120,25 +139,6 @@ export function EnhancedWorkerSelector({
       }
     }
   }, [highlightedIndex]);
-
-  const handleSelectWorker = (worker) => {
-    const workerId = worker.userId || worker._id;
-    onChange(workerId);
-    if (onWorkerSelected) {
-      onWorkerSelected(worker);
-    }
-    setIsOpen(false);
-    setSearchTerm('');
-    setHighlightedIndex(-1);
-  };
-
-  const handleNewWorker = () => {
-    if (onNewWorker) {
-      onNewWorker(searchTerm.trim());
-    }
-    setIsOpen(false);
-    setHighlightedIndex(-1);
-  };
 
   const handleInputChange = (e) => {
     const newValue = e.target.value;

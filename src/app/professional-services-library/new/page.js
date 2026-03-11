@@ -64,7 +64,7 @@ export default function NewProfessionalServicesLibraryPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded mb-6">
+          <div className="ds-bg-warning/10 border ds-border-warning/40 ds-text-warning px-4 py-3 rounded mb-6">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to manage the professional services library. Only Owners can add professionals.</p>
           </div>

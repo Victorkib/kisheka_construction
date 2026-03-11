@@ -34,6 +34,7 @@ function NewProfessionalServicePageContent() {
   const [projects, setProjects] = useState([]);
   const [phases, setPhases] = useState([]);
   const [loadingData, setLoadingData] = useState(true);
+  const presetLibraryId = searchParams.get('libraryId') || '';
 
   // Check prerequisites
   const {
@@ -137,11 +138,11 @@ function NewProfessionalServicePageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-amber-500/10 border border-amber-400/60 text-amber-200 px-4 py-3 rounded mb-6 text-sm sm:text-base">
+          <div className="ds-bg-warning/10 border ds-border-warning/40 ds-text-warning px-4 py-3 rounded mb-6 text-sm sm:text-base">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to assign professionals to projects. Only OWNER and PM can assign professionals.</p>
           </div>
-          <Link href="/professional-services" className="text-blue-400 hover:text-blue-300 active:text-blue-200 underline text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/professional-services" className="ds-text-accent-primary hover:ds-text-accent-hover underline text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Assignments
           </Link>
         </div>
@@ -188,7 +189,7 @@ function NewProfessionalServicePageContent() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/professional-services" className="text-blue-400 hover:text-blue-300 active:text-blue-200 text-sm sm:text-base mb-4 inline-block transition-colors touch-manipulation">
+          <Link href="/professional-services" className="ds-text-accent-primary hover:ds-text-accent-hover text-sm sm:text-base mb-4 inline-block transition-colors touch-manipulation">
             ← Back to Assignments
           </Link>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
@@ -208,6 +209,7 @@ function NewProfessionalServicePageContent() {
             loading={loading}
             error={error}
             isEdit={false}
+            presetLibraryId={presetLibraryId}
           />
         </div>
       </div>

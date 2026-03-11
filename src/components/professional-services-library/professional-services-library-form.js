@@ -22,6 +22,8 @@ export function ProfessionalServicesLibraryForm({
   error = null,
   isEdit = false,
 }) {
+  const inputFocusClass = 'focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary';
+
   const [formData, setFormData] = useState({
     name: '',
     type: '',
@@ -157,7 +159,7 @@ export function ProfessionalServicesLibraryForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2">
+        <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg flex items-start gap-2">
           <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -182,7 +184,7 @@ export function ProfessionalServicesLibraryForm({
               value={formData.type}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
                 validationErrors.type ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             >
@@ -210,7 +212,7 @@ export function ProfessionalServicesLibraryForm({
               onChange={handleChange}
               placeholder="e.g., John Doe Architects or ABC Engineering Firm"
               required
-              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted ${
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} placeholder:ds-text-muted ${
                 validationErrors.name ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
@@ -231,7 +233,7 @@ export function ProfessionalServicesLibraryForm({
               value={formData.companyName}
               onChange={handleChange}
               placeholder="e.g., ABC Architects Ltd"
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
 
@@ -249,7 +251,7 @@ export function ProfessionalServicesLibraryForm({
                   onChange={handleChange}
                   placeholder="First name"
                   required={!formData.companyName}
-                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+                  className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
                 />
               </div>
               <div>
@@ -263,7 +265,7 @@ export function ProfessionalServicesLibraryForm({
                   onChange={handleChange}
                   placeholder="Last name"
                   required={!formData.companyName}
-                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+                  className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
                 />
               </div>
             </div>
@@ -280,7 +282,7 @@ export function ProfessionalServicesLibraryForm({
               onChange={handleChange}
               placeholder="Optional description..."
               rows={3}
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
         </div>
@@ -300,7 +302,7 @@ export function ProfessionalServicesLibraryForm({
               value={formData.email}
               onChange={handleChange}
               placeholder="email@example.com"
-              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted ${
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} placeholder:ds-text-muted ${
                 validationErrors.email ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
@@ -318,7 +320,7 @@ export function ProfessionalServicesLibraryForm({
               value={formData.phone}
               onChange={handleChange}
               placeholder="+254712345678"
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
         </div>
@@ -332,7 +334,7 @@ export function ProfessionalServicesLibraryForm({
             onChange={handleChange}
             placeholder="Physical address..."
             rows={2}
-            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+            className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
           />
         </div>
       </div>
@@ -351,7 +353,7 @@ export function ProfessionalServicesLibraryForm({
               value={formData.registrationNumber}
               onChange={handleChange}
               placeholder="Professional registration number"
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
           <div>
@@ -364,7 +366,7 @@ export function ProfessionalServicesLibraryForm({
               value={formData.licenseNumber}
               onChange={handleChange}
               placeholder="Architecture/Engineering license"
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
         </div>
@@ -377,7 +379,7 @@ export function ProfessionalServicesLibraryForm({
               name="specialization"
               value={formData.specialization}
               onChange={handleChange}
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
             >
               <option value="">Select Specialization (Optional)</option>
               {ENGINEER_SPECIALIZATIONS.map((spec) => (
@@ -402,7 +404,7 @@ export function ProfessionalServicesLibraryForm({
               name="defaultContractType"
               value={formData.defaultContractType}
               onChange={handleChange}
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
             >
               <option value="">Select (Optional)</option>
               {getContractTypes().map((type) => (
@@ -420,7 +422,7 @@ export function ProfessionalServicesLibraryForm({
               name="defaultPaymentSchedule"
               value={formData.defaultPaymentSchedule}
               onChange={handleChange}
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
             >
               <option value="">Select (Optional)</option>
               {PAYMENT_SCHEDULES.map((schedule) => (
@@ -440,7 +442,7 @@ export function ProfessionalServicesLibraryForm({
               name="defaultVisitFrequency"
               value={formData.defaultVisitFrequency}
               onChange={handleChange}
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
             >
               <option value="">Select (Optional)</option>
               {VISIT_FREQUENCIES.map((freq) => (
@@ -469,7 +471,7 @@ export function ProfessionalServicesLibraryForm({
               placeholder="0.00"
               min="0"
               step="0.01"
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
           <div>
@@ -484,7 +486,7 @@ export function ProfessionalServicesLibraryForm({
               placeholder="0.00"
               min="0"
               step="0.01"
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
           <div>
@@ -499,7 +501,7 @@ export function ProfessionalServicesLibraryForm({
               placeholder="0.00"
               min="0"
               step="0.01"
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
         </div>
@@ -520,7 +522,7 @@ export function ProfessionalServicesLibraryForm({
               }
             }}
             placeholder="Add a tag and press Enter"
-            className="flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+            className={`flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
           />
           <button
             type="button"
@@ -535,13 +537,13 @@ export function ProfessionalServicesLibraryForm({
             {formData.tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+                className="inline-flex items-center px-3 py-1 rounded-full text-sm ds-bg-accent-subtle ds-text-accent-primary"
               >
                 {tag}
                 <button
                   type="button"
                   onClick={() => handleRemoveTag(tag)}
-                  className="ml-2 text-blue-600 hover:text-blue-800"
+                  className="ml-2 ds-text-accent-primary hover:ds-text-accent-hover"
                 >
                   ×
                 </button>
@@ -561,7 +563,7 @@ export function ProfessionalServicesLibraryForm({
               name="isCommon"
               checked={formData.isCommon}
               onChange={handleChange}
-              className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
+              className="w-4 h-4 ds-text-accent-primary ds-border-subtle rounded focus:ring-ds-accent-focus"
             />
             <span className="text-sm font-medium ds-text-secondary">
               Mark as Commonly Used
@@ -573,7 +575,7 @@ export function ProfessionalServicesLibraryForm({
               name="isActive"
               checked={formData.isActive}
               onChange={handleChange}
-              className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
+              className="w-4 h-4 ds-text-accent-primary ds-border-subtle rounded focus:ring-ds-accent-focus"
             />
             <span className="text-sm font-medium ds-text-secondary">
               Active (Professional is available for assignment)
@@ -617,7 +619,7 @@ export function ProfessionalServicesLibraryForm({
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (isEdit ? 'Updating...' : 'Creating...') : (isEdit ? 'Update Professional' : 'Create Professional')}
         </button>

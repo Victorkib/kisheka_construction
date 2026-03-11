@@ -105,7 +105,7 @@ export default function ErrorReportPage() {
   if (submitted) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center px-4 py-12">
+        <div className="min-h-screen ds-bg-app flex items-center justify-center px-4 py-12">
           <div className="max-w-2xl w-full ds-bg-surface rounded-xl shadow-xl p-8 border border-green-400/60">
             <div className="text-center">
               <div className="text-6xl mb-4">✅</div>
@@ -150,7 +150,7 @@ export default function ErrorReportPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-8">
+          <div className="ds-bg-danger text-white px-6 py-8">
             <div className="flex items-center gap-4">
               <div className="text-5xl">⚠️</div>
               <div>

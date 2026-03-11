@@ -538,7 +538,7 @@ export default function StockPage() {
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-yellow-500 hover:shadow-lg transition-shadow">
+          <div className="ds-bg-accent-subtle rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-yellow-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xs sm:text-sm font-medium text-yellow-700 uppercase tracking-wide">Low Stock Alerts</h3>
@@ -552,7 +552,7 @@ export default function StockPage() {
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
+          <div className="ds-bg-accent-subtle rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-blue-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xs sm:text-sm font-medium text-blue-700 uppercase tracking-wide">Pending Delivery</h3>
@@ -565,7 +565,7 @@ export default function StockPage() {
               </div>
             </div>
           </div>
-          <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-orange-500 hover:shadow-lg transition-shadow">
+          <div className="ds-bg-accent-subtle rounded-lg shadow-md p-4 sm:p-6 border-l-4 border-orange-500 hover:shadow-lg transition-shadow">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-xs sm:text-sm font-medium text-orange-700 uppercase tracking-wide">Pending Approval</h3>

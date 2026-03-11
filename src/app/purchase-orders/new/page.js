@@ -19,6 +19,34 @@ import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { WorkflowGuide } from '@/components/workflow/WorkflowGuide';
 import { HelpIcon, FieldHelp } from '@/components/help/HelpTooltip';
 
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
+
+const isLikelyObjectId = (value) => /^[a-f0-9]{24}$/i.test((value || '').toString());
+
+const normalizeText = (value) => (value || '').toString().trim().toLowerCase();
+
+const findMatchingFloorId = (floorHint, floorOptions = []) => {
+  const hint = normalizeText(floorHint);
+  if (!hint) return '';
+
+  const byId = floorOptions.find((floor) => normalizeId(floor._id || floor.id) === floorHint);
+  if (byId) return normalizeId(byId._id || byId.id);
+
+  const byNameOrNumber = floorOptions.find((floor) => {
+    const floorName = normalizeText(floor.name || floor.floorName);
+    const floorNumber = normalizeText(floor.floorNumber);
+    return floorName === hint || floorNumber === hint;
+  });
+  return byNameOrNumber ? normalizeId(byNameOrNumber._id || byNameOrNumber.id) : '';
+};
+
 function NewPurchaseOrderPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -35,11 +63,13 @@ function NewPurchaseOrderPageContent() {
   const [loadingPhases, setLoadingPhases] = useState(false);
   const [categories, setCategories] = useState([]);
   const [availableCapital, setAvailableCapital] = useState(null);
+  const [projectFinances, setProjectFinances] = useState(null);
   const [loadingCapital, setLoadingCapital] = useState(false);
   const [capitalValidation, setCapitalValidation] = useState(null);
   const [validatingCapital, setValidatingCapital] = useState(false);
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const [creatingSupplier, setCreatingSupplier] = useState(false);
+  const [pendingFloorHint, setPendingFloorHint] = useState('');
 
   const [formData, setFormData] = useState({
     materialRequestId: '',
@@ -121,11 +151,11 @@ function NewPurchaseOrderPageContent() {
           // Set both requestId and projectId from the fetched request
           setFormData((prev) => ({ 
             ...prev, 
-            materialRequestId: requestIdFromUrl,
-            projectId: request.projectId.toString()
+            materialRequestId: normalizeId(requestIdFromUrl),
+            projectId: normalizeId(request.projectId)
           }));
           // Fetch approved requests for that project
-          fetchApprovedMaterialRequests(request.projectId.toString(), requestIdFromUrl);
+          fetchApprovedMaterialRequests(normalizeId(request.projectId), normalizeId(requestIdFromUrl));
         }
       });
     } else if (projectIdFromUrl) {
@@ -142,10 +172,13 @@ function NewPurchaseOrderPageContent() {
       if (!requestIdFromUrl || formData.materialRequestId !== requestIdFromUrl) {
         fetchApprovedMaterialRequests(formData.projectId);
       }
+      // Keep phase options in sync even when project is populated from URL/request inheritance.
+      fetchPhases(formData.projectId);
       fetchFloors(formData.projectId);
       fetchAvailableCapital(formData.projectId);
     } else {
       setMaterialRequests([]);
+      setPhases([]);
       setFloors([]);
       setAvailableCapital(null);
     }
@@ -159,6 +192,16 @@ function NewPurchaseOrderPageContent() {
       fetchMaterialRequestDetails(formData.materialRequestId);
     }
   }, [formData.materialRequestId, searchParams]);
+
+  // Backfill floor when requests carry legacy/non-id floor references (e.g. name/number).
+  useEffect(() => {
+    if (!pendingFloorHint || formData.floorId || floors.length === 0) return;
+    const matchedFloorId = findMatchingFloorId(pendingFloorHint, floors);
+    if (matchedFloorId) {
+      setFormData((prev) => ({ ...prev, floorId: matchedFloorId }));
+      setPendingFloorHint('');
+    }
+  }, [pendingFloorHint, floors, formData.floorId]);
 
   // Calculate total cost and validate capital when quantity or unit cost changes
   useEffect(() => {
@@ -386,7 +429,7 @@ function NewPurchaseOrderPageContent() {
                 'Pragma': 'no-cache',
               },
             });
-            const specificData = await specificResponse.json();
+            const specificData = await response.json();
             if (specificData.success && specificData.data) {
               const specificRequest = specificData.data;
               // Only add if it's approved/converted and has no linked PO
@@ -453,6 +496,19 @@ function NewPurchaseOrderPageContent() {
       // Pre-fill form with request details
       setFormData((prev) => {
         const requestUnit = request.unit || prev.unit || 'piece';
+        const rawFloorReference = request.floorId || request.floor || request.floorName || request.floorNumber || '';
+        const normalizedFloorReference = normalizeId(rawFloorReference);
+        let resolvedFloorId = '';
+        if (isLikelyObjectId(normalizedFloorReference)) {
+          resolvedFloorId = normalizedFloorReference;
+        } else {
+          resolvedFloorId = findMatchingFloorId(rawFloorReference, floors);
+        }
+        if (!resolvedFloorId && rawFloorReference) {
+          setPendingFloorHint(rawFloorReference.toString());
+        } else if (resolvedFloorId) {
+          setPendingFloorHint('');
+        }
         // Check if unit is in predefined list, if not, use "others" and set customUnit
         const isUnitInList = unitOptions.includes(requestUnit?.toLowerCase());
         const finalUnit = isUnitInList ? requestUnit?.toLowerCase() : 'others';
@@ -460,11 +516,11 @@ function NewPurchaseOrderPageContent() {
         
         return {
         ...prev,
-        materialRequestId: requestId,
-        projectId: request.projectId?.toString() || prev.projectId,
-        phaseId: request.phaseId?.toString() || prev.phaseId, // Inherit phaseId from material request
-        floorId: request.floorId?.toString() || prev.floorId,
-        categoryId: request.categoryId?.toString() || prev.categoryId,
+        materialRequestId: normalizeId(requestId),
+        projectId: normalizeId(request.projectId) || prev.projectId,
+        phaseId: normalizeId(request.phaseId) || prev.phaseId, // Inherit phaseId from material request
+        floorId: resolvedFloorId || prev.floorId,
+        categoryId: normalizeId(request.categoryId) || prev.categoryId,
         category: request.category || prev.category,
         materialName: request.materialName || prev.materialName,
         description: request.description || prev.description,
@@ -498,6 +554,7 @@ function NewPurchaseOrderPageContent() {
       });
       const data = await response.json();
       if (data.success) {
+        setProjectFinances(data.data || null);
         const capital = data.data.availableCapital !== undefined 
           ? data.data.availableCapital 
           : data.data.capitalBalance || 0;
@@ -518,22 +575,41 @@ function NewPurchaseOrderPageContent() {
 
     setValidatingCapital(true);
     try {
+      const totalInvested = projectFinances?.totalInvested ?? null;
+      const capitalNotSet = totalInvested === null || totalInvested === 0;
+      const effectiveAvailableCapital = Math.max(0, Number(availableCapital) || 0);
+
+      // OPTIONAL CAPITAL: mirror backend behavior - allow operation when no capital is invested.
+      if (capitalNotSet) {
+        setCapitalValidation({
+          isValid: true,
+          capitalNotSet: true,
+          message: 'No capital invested. Purchase order creation is allowed and spending will be tracked. Add capital later to enable capital validation.',
+          available: effectiveAvailableCapital,
+          required: totalCost,
+          shortfall: 0,
+        });
+        return;
+      }
+
       // Simulate validation delay for better UX
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      if (totalCost > availableCapital) {
+      if (totalCost > effectiveAvailableCapital) {
         setCapitalValidation({
           isValid: false,
-          message: `Insufficient capital. Required: ${formatCurrency(totalCost)}, Available: ${formatCurrency(availableCapital)}, Shortfall: ${formatCurrency(totalCost - availableCapital)}`,
-          available: availableCapital,
+          capitalNotSet: false,
+          message: `Insufficient capital. Required: ${formatCurrency(totalCost)}, Available: ${formatCurrency(effectiveAvailableCapital)}, Shortfall: ${formatCurrency(totalCost - effectiveAvailableCapital)}`,
+          available: effectiveAvailableCapital,
           required: totalCost,
-          shortfall: totalCost - availableCapital,
+          shortfall: totalCost - effectiveAvailableCapital,
         });
       } else {
         setCapitalValidation({
           isValid: true,
-          message: `Capital validation passed. Available: ${formatCurrency(availableCapital)}, Required: ${formatCurrency(totalCost)}`,
-          available: availableCapital,
+          capitalNotSet: false,
+          message: `Capital validation passed. Available: ${formatCurrency(effectiveAvailableCapital)}, Required: ${formatCurrency(totalCost)}`,
+          available: effectiveAvailableCapital,
           required: totalCost,
         });
       }
@@ -628,9 +704,12 @@ function NewPurchaseOrderPageContent() {
 
     // CRITICAL: Validate capital before submission
     const totalCost = parseFloat(formData.totalCost);
-    if (availableCapital !== null && totalCost > availableCapital) {
+    const totalInvested = projectFinances?.totalInvested ?? null;
+    const capitalNotSet = totalInvested === null || totalInvested === 0;
+    const effectiveAvailableCapital = Math.max(0, Number(availableCapital) || 0);
+    if (!capitalNotSet && availableCapital !== null && totalCost > effectiveAvailableCapital) {
       const proceed = confirm(
-        `WARNING: Total cost (${formatCurrency(totalCost)}) exceeds available capital (${formatCurrency(availableCapital)}). This will be blocked by the server. Do you want to continue?`
+        `WARNING: Total cost (${formatCurrency(totalCost)}) exceeds available capital (${formatCurrency(effectiveAvailableCapital)}). This will be blocked by the server. Do you want to continue?`
       );
       if (!proceed) {
         return;
@@ -745,6 +824,10 @@ function NewPurchaseOrderPageContent() {
     }).format(amount);
   };
 
+  const totalInvested = projectFinances?.totalInvested ?? null;
+  const capitalNotSet = totalInvested === null || totalInvested === 0;
+  const effectiveAvailableCapital = Math.max(0, Number(availableCapital) || 0);
+
   return (
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
@@ -780,8 +863,16 @@ function NewPurchaseOrderPageContent() {
           </div>
         )}
 
+        {/* Capital Info (optional capital mode) */}
+        {capitalValidation?.capitalNotSet && !validatingCapital && (
+          <div className="bg-blue-50 border border-blue-400/60 text-blue-800 px-4 py-3 rounded-lg mb-6">
+            <p className="font-semibold">ℹ️ No Capital Invested</p>
+            <p className="text-sm mt-1">{capitalValidation.message}</p>
+          </div>
+        )}
+
         {/* Capital Warning */}
-        {capitalValidation && !capitalValidation.isValid && !validatingCapital && (
+        {capitalValidation && !capitalValidation.isValid && !capitalValidation.capitalNotSet && !validatingCapital && (
           <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             <p className="font-semibold">⚠️ Insufficient Capital</p>
             <p className="text-sm mt-1">{capitalValidation.message}</p>
@@ -790,7 +881,7 @@ function NewPurchaseOrderPageContent() {
         )}
 
         {/* Capital Validation Success */}
-        {capitalValidation && capitalValidation.isValid && !validatingCapital && (
+        {capitalValidation && capitalValidation.isValid && !capitalValidation.capitalNotSet && !validatingCapital && (
           <div className="bg-green-50 border border-green-400/60 text-green-800 px-4 py-3 rounded-lg mb-6">
             <p className="text-sm">{capitalValidation.message}</p>
           </div>
@@ -800,8 +891,13 @@ function NewPurchaseOrderPageContent() {
         {formData.projectId && availableCapital !== null && canAccess('view_financing') && (
           <div className="bg-blue-50 border border-blue-400/60 text-blue-800 px-4 py-3 rounded-lg mb-6">
             <p className="text-sm">
-              <span className="font-semibold">Available Capital:</span> {formatCurrency(availableCapital)}
+              <span className="font-semibold">Available Capital:</span> {formatCurrency(effectiveAvailableCapital)}
             </p>
+            {capitalNotSet && (
+              <p className="text-sm mt-1">
+                No capital is invested yet. Order creation is still allowed and spending will be tracked.
+              </p>
+            )}
           </div>
         )}
 
@@ -863,12 +959,13 @@ function NewPurchaseOrderPageContent() {
                     </div>
                     <button
                       onClick={() => {
-                        setFormData((prev) => ({ ...prev, materialRequestId: request._id }));
-                        fetchMaterialRequestDetails(request._id).then((requestData) => {
+                        const requestId = normalizeId(request._id || request.id);
+                        setFormData((prev) => ({ ...prev, materialRequestId: requestId }));
+                        fetchMaterialRequestDetails(requestId).then((requestData) => {
                           // Phase will be inherited in fetchMaterialRequestDetails
                           // Also ensure we have phases loaded
                           if (requestData?.projectId && !phases.length) {
-                            fetchPhases(requestData.projectId.toString());
+                            fetchPhases(normalizeId(requestData.projectId));
                           }
                         });
                         // Scroll to form
@@ -945,7 +1042,7 @@ function NewPurchaseOrderPageContent() {
                       )}
                     </p>
                   )}
-                  {formData.materialRequestId && !loadingRequests && !materialRequests.find(r => r._id === formData.materialRequestId) && (
+                  {formData.materialRequestId && !loadingRequests && !materialRequests.find((r) => (r._id?.toString() || r.id?.toString()) === formData.materialRequestId) && (
                     <p className="text-sm text-amber-600 mt-1">
                       ⚠️ The selected request ID is not in the available requests list. Please verify the request is approved and not already converted to an order.
                     </p>
@@ -975,7 +1072,7 @@ function NewPurchaseOrderPageContent() {
               >
                 <option value="">Select a project</option>
                 {projects.map((project) => {
-                  const projectId = project._id?.toString() || project.id?.toString() || '';
+                  const projectId = normalizeId(project._id || project.id);
                   return (
                     <option key={projectId || `project-${project.projectCode || project.projectName}`} value={projectId}>
                       {project.projectName} {project.projectCode && `(${project.projectCode})`}
@@ -1043,6 +1140,62 @@ function NewPurchaseOrderPageContent() {
                   ⚠️ The selected phase is not in the available phases list. Please verify the phase belongs to this project.
                 </p>
               )}
+              {formData.materialRequestId && !formData.phaseId && phases.length > 0 && (
+                <p className="text-sm text-amber-600 mt-1">
+                  This request does not have a phase assigned. Please select the correct phase before creating the purchase order.
+                </p>
+              )}
+            </div>
+
+            {/* Floor Selection (Optional, but recommended for traceability) */}
+            <div>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
+                Floor (Optional)
+                <HelpIcon
+                  content="Select the floor for better traceability. If the source material request had no floor, you can set it here."
+                  position="right"
+                />
+              </label>
+              <FieldHelp>
+                Optional: assign this order to a floor for improved reporting and backtrace.
+              </FieldHelp>
+              {!formData.projectId ? (
+                <div className="w-full px-3 py-2 border ds-border-subtle rounded-lg ds-bg-surface-muted ds-text-muted text-sm">
+                  Please select a project first to see available floors
+                </div>
+              ) : floors.length === 0 ? (
+                <div className="w-full px-3 py-2 border border-yellow-400/60 rounded-lg bg-yellow-50 text-yellow-800 text-sm">
+                  No floors available for this project. You can still create the order, but floor-level traceability will be limited.
+                  <Link
+                    href={`/floors?projectId=${formData.projectId}`}
+                    className="block mt-2 text-yellow-900 hover:text-yellow-950 font-medium underline"
+                  >
+                    Manage floors for this project →
+                  </Link>
+                </div>
+              ) : (
+                <select
+                  name="floorId"
+                  value={formData.floorId}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
+                >
+                  <option value="">No floor selected</option>
+                  {floors.map((floor) => {
+                    const floorId = normalizeId(floor._id || floor.id);
+                    return (
+                      <option key={floorId || `floor-${floor.floorNumber || floor.name}`} value={floorId}>
+                        {floor.name || floor.floorName || floor.floorNumber || 'Unnamed Floor'}
+                      </option>
+                    );
+                  })}
+                </select>
+              )}
+              {formData.materialRequestId && !formData.floorId && floors.length > 0 && (
+                <p className="text-xs ds-text-secondary mt-1">
+                  No floor was inherited from the request. Select one to improve floor-level spending traceability.
+                </p>
+              )}
             </div>
 
             {/* Supplier Selection */}
@@ -1066,7 +1219,7 @@ function NewPurchaseOrderPageContent() {
                 )}
               </div>
               <FieldHelp>
-                Choose the supplier for this order. Create a new supplier if they're not in the list.
+                Choose the supplier for this order. Create a new supplier if they&apos;re not in the list.
               </FieldHelp>
               <select
                 name="supplierId"
@@ -1077,7 +1230,7 @@ function NewPurchaseOrderPageContent() {
               >
                 <option value="">Select a supplier</option>
                 {suppliers.map((supplier) => {
-                  const supplierId = supplier._id?.toString() || supplier.id?.toString() || '';
+                  const supplierId = normalizeId(supplier._id || supplier.id);
                   const displayName = supplier.name || supplier.contactPerson || supplier.email || 'Unknown Supplier';
                   const contactInfo = supplier.contactPerson ? ` - ${supplier.contactPerson}` : '';
                   return (
@@ -1282,7 +1435,7 @@ function NewPurchaseOrderPageContent() {
                 type="submit"
                 isLoading={loading || validatingCapital}
                 loadingText={loading ? "Creating Purchase Order..." : "Validating..."}
-                disabled={capitalValidation && !capitalValidation.isValid}
+                disabled={capitalValidation && !capitalValidation.capitalNotSet && !capitalValidation.isValid}
                 className="px-6 py-2 ds-bg-accent-primary hover:bg-blue-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Create Purchase Order

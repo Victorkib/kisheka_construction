@@ -12,7 +12,12 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ImagePreview } from '@/components/uploads/image-preview';
-import { LoadingButton, LoadingCard, LoadingOverlay } from '@/components/loading';
+import {
+  LoadingButton,
+  LoadingCard,
+  LoadingOverlay,
+  LoadingSpinner,
+} from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { AuditTrail } from '@/components/audit-trail';
 import { checkMaterialDiscrepanciesClient } from '@/lib/discrepancy-calculations-client';

@@ -13,6 +13,9 @@ export function MultiSupplierAssignment({
   onAssignmentChange,
   initialData = null,
 }) {
+  const themedDateInputClass =
+    "w-full px-3 py-2.5 ds-bg-surface ds-text-primary border-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all [color-scheme:light_dark] [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100";
+
   const [assignments, setAssignments] = useState(() => {
     // Initialize as empty - will be populated by useEffect when materialRequests loads
     return [];
@@ -214,8 +217,8 @@ export function MultiSupplierAssignment({
         <div className="ds-bg-surface rounded-lg border ds-border-subtle p-8 text-center">
           <div className="flex flex-col items-center justify-center">
             <div className="relative inline-block mb-4">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full blur-lg opacity-50 animate-pulse" />
-              <div className="relative animate-spin rounded-full h-10 w-10 border-4 border-blue-400/60 border-t-blue-600"></div>
+              <div className="absolute inset-0 ds-bg-accent-subtle rounded-full blur-lg opacity-60 animate-pulse" />
+              <div className="relative animate-spin rounded-full h-10 w-10 border-4 ds-border-accent-subtle border-t-ds-accent-primary"></div>
             </div>
             <p className="ds-text-secondary font-medium">Loading materials...</p>
             <p className="text-sm ds-text-muted mt-2">Please wait while we fetch the material requests</p>
@@ -230,16 +233,16 @@ export function MultiSupplierAssignment({
   if (assignments.length === 0 && materialRequests.length > 0) {
     return (
       <div className="space-y-6">
-        <div className="bg-yellow-50 border-2 border-yellow-400/60 rounded-lg p-6">
+        <div className="ds-bg-warning/10 border-2 ds-border-warning/40 rounded-lg p-6">
           <div className="flex items-start">
             <div className="flex-shrink-0">
-              <svg className="h-6 w-6 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-6 w-6 ds-text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
             <div className="ml-3 flex-1">
-              <h3 className="text-sm font-semibold text-yellow-800 mb-1">No Materials to Assign</h3>
-              <p className="text-sm text-yellow-700">
+              <h3 className="text-sm font-semibold ds-text-warning mb-1">No Materials to Assign</h3>
+              <p className="text-sm ds-text-warning">
                 There are no material requests in this batch to assign suppliers to. Please check the batch details.
               </p>
             </div>
@@ -259,7 +262,7 @@ export function MultiSupplierAssignment({
         <div className="flex flex-wrap gap-2 w-full sm:w-auto">
           <button
             onClick={handleGroupBySupplier}
-            className="flex-1 sm:flex-none px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 text-sm font-medium shadow-md hover:shadow-lg transition-all duration-200"
+            className="flex-1 sm:flex-none px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover text-sm font-medium shadow-md hover:shadow-lg transition-all duration-200"
           >
             Group by Supplier
           </button>
@@ -274,14 +277,14 @@ export function MultiSupplierAssignment({
 
       {/* Validation Status */}
       {!isValid && (
-        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-yellow-400/60 rounded-xl p-4 shadow-sm">
+        <div className="ds-bg-warning/10 border-2 ds-border-warning/40 rounded-xl p-4 shadow-sm">
           <div className="flex items-start gap-3">
             <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-yellow-600 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="h-5 w-5 ds-text-warning mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <p className="text-sm text-yellow-800 font-medium">
+            <p className="text-sm ds-text-warning font-medium">
               Please assign a supplier and delivery date for all materials before proceeding.
             </p>
           </div>
@@ -292,7 +295,7 @@ export function MultiSupplierAssignment({
       <div className="hidden lg:block ds-bg-surface rounded-xl border ds-border-subtle shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-ds-border-subtle">
-            <thead className="bg-gradient-to-br from-gray-50 to-gray-100">
+            <thead className="ds-bg-surface-muted">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-bold ds-text-secondary uppercase tracking-wider">
                   Material
@@ -301,13 +304,13 @@ export function MultiSupplierAssignment({
                   Quantity
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-bold ds-text-secondary uppercase tracking-wider">
-                  Supplier <span className="text-red-500">*</span>
+                  Supplier <span className="ds-text-danger">*</span>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-bold ds-text-secondary uppercase tracking-wider">
                   Unit Cost
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-bold ds-text-secondary uppercase tracking-wider">
-                  Delivery Date <span className="text-red-500">*</span>
+                  Delivery Date <span className="ds-text-danger">*</span>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-bold ds-text-secondary uppercase tracking-wider">
                   Notes
@@ -340,7 +343,7 @@ export function MultiSupplierAssignment({
                     key={assignment.materialRequestId}
                     className={`transition-colors duration-150 ${
                       !hasSupplier || !hasDeliveryDate 
-                        ? 'bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100' 
+                        ? 'ds-bg-warning/10 hover:ds-bg-warning/20'
                         : 'hover:ds-bg-surface-muted'
                     }`}
                   >
@@ -355,13 +358,13 @@ export function MultiSupplierAssignment({
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-800">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-sm font-medium ds-bg-accent-subtle ds-text-accent-primary">
                         {material?.quantityNeeded} {material?.unit}
                       </span>
                     </td>
                     <td className="px-6 py-4">
                       {suppliers.length === 0 ? (
-                        <div className="text-xs text-yellow-700 bg-yellow-50 border-2 border-yellow-400/60 rounded-lg p-2.5">
+                        <div className="text-xs ds-text-warning ds-bg-warning/10 border-2 ds-border-warning/40 rounded-lg p-2.5">
                           No suppliers available. Add suppliers using the button above.
                         </div>
                       ) : (
@@ -369,9 +372,9 @@ export function MultiSupplierAssignment({
                           value={assignment.supplierId}
                           onChange={(e) => handleAssignmentChange(index, 'supplierId', e.target.value)}
                           required
-                          className={`w-full min-w-[180px] px-3 py-2 ds-bg-surface ds-text-primary border-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                          className={`w-full min-w-[180px] px-3 py-2 ds-bg-surface ds-text-primary border-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all ${
                             !hasSupplier 
-                              ? 'border-yellow-400 bg-yellow-50 shadow-sm' 
+                              ? 'ds-border-warning/60 ds-bg-warning/10 shadow-sm'
                               : 'ds-border-subtle hover:border-ds-border-strong'
                           }`}
                         >
@@ -398,7 +401,7 @@ export function MultiSupplierAssignment({
                           placeholder="0.00"
                           min="0"
                           step="0.01"
-                          className="w-32 pl-10 pr-3 py-2 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-ds-border-strong transition-all placeholder:ds-text-muted"
+                          className="w-32 pl-10 pr-3 py-2 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary hover:border-ds-border-strong transition-all placeholder:ds-text-muted"
                         />
                       </div>
                     </td>
@@ -409,9 +412,9 @@ export function MultiSupplierAssignment({
                         onChange={(e) => handleAssignmentChange(index, 'deliveryDate', e.target.value)}
                         required
                         min={new Date().toISOString().split('T')[0]}
-                        className={`w-full min-w-[160px] px-3 py-2 ds-bg-surface ds-text-primary border-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                        className={`${themedDateInputClass} min-w-[160px] ${
                           !hasDeliveryDate 
-                            ? 'border-yellow-400 bg-yellow-50 shadow-sm' 
+                            ? 'ds-border-warning/60 ds-bg-warning/10 shadow-sm'
                             : 'ds-border-subtle hover:border-ds-border-strong'
                         }`}
                       />
@@ -422,7 +425,7 @@ export function MultiSupplierAssignment({
                         value={assignment.notes}
                         onChange={(e) => handleAssignmentChange(index, 'notes', e.target.value)}
                         placeholder="Optional notes"
-                        className="w-full min-w-[200px] px-3 py-2 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 hover:border-ds-border-strong transition-all placeholder:ds-text-muted"
+                        className="w-full min-w-[200px] px-3 py-2 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary hover:border-ds-border-strong transition-all placeholder:ds-text-muted"
                       />
                     </td>
                   </tr>
@@ -459,7 +462,7 @@ export function MultiSupplierAssignment({
                 key={assignment.materialRequestId}
                 className={`ds-bg-surface rounded-xl border-2 shadow-md overflow-hidden transition-all ${
                   !hasSupplier || !hasDeliveryDate
-                    ? 'border-yellow-400/60 bg-gradient-to-br from-yellow-50 to-orange-50'
+                    ? 'ds-border-warning/40 ds-bg-warning/10'
                     : 'ds-border-subtle hover:ds-border-subtle hover:shadow-lg'
                 }`}
               >
@@ -475,7 +478,7 @@ export function MultiSupplierAssignment({
                       </p>
                     )}
                     <div className="mt-2">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-100 text-blue-800">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold ds-bg-accent-subtle ds-text-accent-primary">
                         {material?.quantityNeeded} {material?.unit}
                       </span>
                     </div>
@@ -486,10 +489,10 @@ export function MultiSupplierAssignment({
                     {/* Supplier Selection */}
                     <div>
                       <label className="block text-xs font-semibold ds-text-secondary mb-1.5">
-                        Supplier <span className="text-red-500">*</span>
+                        Supplier <span className="ds-text-danger">*</span>
                       </label>
                       {suppliers.length === 0 ? (
-                        <div className="text-xs text-yellow-700 bg-yellow-50 border-2 border-yellow-400/60 rounded-lg p-2.5">
+                        <div className="text-xs ds-text-warning ds-bg-warning/10 border-2 ds-border-warning/40 rounded-lg p-2.5">
                           No suppliers available. Add suppliers using the button above.
                         </div>
                       ) : (
@@ -497,9 +500,9 @@ export function MultiSupplierAssignment({
                           value={assignment.supplierId}
                           onChange={(e) => handleAssignmentChange(index, 'supplierId', e.target.value)}
                           required
-                          className={`w-full px-3 py-2.5 ds-bg-surface ds-text-primary border-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                          className={`w-full px-3 py-2.5 ds-bg-surface ds-text-primary border-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all ${
                             !hasSupplier
-                              ? 'border-yellow-400 bg-yellow-50 shadow-sm'
+                              ? 'ds-border-warning/60 ds-bg-warning/10 shadow-sm'
                               : 'ds-border-subtle'
                           }`}
                         >
@@ -532,13 +535,13 @@ export function MultiSupplierAssignment({
                             placeholder="0.00"
                             min="0"
                             step="0.01"
-                            className="w-full pl-10 pr-3 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:ds-text-muted"
+                            className="w-full pl-10 pr-3 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all placeholder:ds-text-muted"
                           />
                         </div>
                       </div>
                       <div>
                         <label className="block text-xs font-semibold ds-text-secondary mb-1.5">
-                          Delivery Date <span className="text-red-500">*</span>
+                          Delivery Date <span className="ds-text-danger">*</span>
                         </label>
                         <input
                           type="date"
@@ -546,9 +549,9 @@ export function MultiSupplierAssignment({
                           onChange={(e) => handleAssignmentChange(index, 'deliveryDate', e.target.value)}
                           required
                           min={new Date().toISOString().split('T')[0]}
-                          className={`w-full px-3 py-2.5 ds-bg-surface ds-text-primary border-2 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all ${
+                          className={`${themedDateInputClass} ${
                             !hasDeliveryDate
-                              ? 'border-yellow-400 bg-yellow-50 shadow-sm'
+                              ? 'ds-border-warning/60 ds-bg-warning/10 shadow-sm'
                               : 'ds-border-subtle'
                           }`}
                         />
@@ -565,7 +568,7 @@ export function MultiSupplierAssignment({
                         value={assignment.notes}
                         onChange={(e) => handleAssignmentChange(index, 'notes', e.target.value)}
                         placeholder="Optional notes"
-                        className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all placeholder:ds-text-muted"
+                        className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all placeholder:ds-text-muted"
                       />
                     </div>
                   </div>
@@ -578,9 +581,9 @@ export function MultiSupplierAssignment({
 
       {/* Summary by Supplier */}
       {assignments.some((a) => a.supplierId) && (
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 border-2 ds-border-subtle rounded-xl p-5 shadow-md">
+        <div className="ds-bg-surface-muted border-2 ds-border-subtle rounded-xl p-5 shadow-md">
           <h4 className="text-base font-bold ds-text-primary mb-4 flex items-center gap-2">
-            <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="h-5 w-5 ds-text-accent-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             Summary by Supplier
@@ -607,7 +610,7 @@ export function MultiSupplierAssignment({
               >
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-semibold ds-text-primary truncate">{supplierName}</span>
-                  <span className="ml-2 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800">
+                  <span className="ml-2 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ds-bg-accent-subtle ds-text-accent-primary">
                     {materials.length}
                   </span>
                 </div>

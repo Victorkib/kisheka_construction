@@ -15,6 +15,7 @@ import { createMaterialFromPurchaseOrder } from '@/lib/material-helpers';
 import { sendPushToUser } from '@/lib/push-service';
 import { createAuditLog } from '@/lib/audit-log';
 import { assessRetryability, formatRejectionReason } from '@/lib/rejection-reasons';
+import { sendOwnerSupplierResponseEmail } from '@/lib/email-templates/communication-event-templates';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import crypto from 'crypto';
@@ -25,6 +26,82 @@ import crypto from 'crypto';
 
 // Force dynamic rendering to prevent caching stale data
 export const dynamic = 'force-dynamic';
+
+async function sendOwnerResponseEmailAndTrack({
+  db,
+  purchaseOrder,
+  poCreator,
+  action,
+  eventKey,
+  responseData = {}
+}) {
+  if (!poCreator?.email) {
+    return;
+  }
+
+  const existingSend = await db.collection('purchase_orders').findOne({
+    _id: purchaseOrder._id,
+    communications: {
+      $elemMatch: {
+        channel: 'email',
+        eventType: 'owner_supplier_response',
+        eventKey,
+        status: 'sent'
+      }
+    }
+  });
+  if (existingSend) {
+    return;
+  }
+
+  try {
+    const emailResult = await sendOwnerSupplierResponseEmail({
+      recipientUser: poCreator,
+      purchaseOrder,
+      action,
+      responseData
+    });
+
+    await db.collection('purchase_orders').updateOne(
+      { _id: purchaseOrder._id },
+      {
+        $push: {
+          communications: {
+            channel: 'email',
+            eventType: 'owner_supplier_response',
+            eventKey,
+            responseAction: action,
+            recipientType: 'owner',
+            recipientEmail: poCreator.email,
+            sentAt: new Date(),
+            status: 'sent',
+            messageId: emailResult.messageId || null
+          }
+        }
+      }
+    );
+  } catch (emailError) {
+    console.error('[SMS Webhook] Owner email send failed (non-critical):', emailError);
+    await db.collection('purchase_orders').updateOne(
+      { _id: purchaseOrder._id },
+      {
+        $push: {
+          communications: {
+            channel: 'email',
+            eventType: 'owner_supplier_response',
+            eventKey,
+            responseAction: action,
+            recipientType: 'owner',
+            recipientEmail: poCreator.email,
+            sentAt: new Date(),
+            status: 'failed',
+            error: emailError.message
+          }
+        }
+      }
+    );
+  }
+}
 
 function validateWebhookSignature(body, signature, secret) {
   if (!secret || !signature) {
@@ -632,6 +709,17 @@ export async function POST(request) {
           console.error('[SMS Webhook] Push notification failed (non-critical):', pushError);
           // Don't fail the webhook - notification is non-critical
         }
+
+        await sendOwnerResponseEmailAndTrack({
+          db,
+          purchaseOrder: { ...purchaseOrder, ...updateData },
+          poCreator,
+          action: 'accept',
+          eventKey: `owner_supplier_response:${purchaseOrder._id.toString()}:accept:${updateData.supplierResponseDate.toISOString()}`,
+          responseData: {
+            notes: text
+          }
+        });
       }
 
       // Note: Audit log already created inside transaction above (line 152)
@@ -752,6 +840,19 @@ export async function POST(request) {
         } catch (pushError) {
           console.error('Push notification failed:', pushError);
         }
+
+        await sendOwnerResponseEmailAndTrack({
+          db,
+          purchaseOrder: { ...purchaseOrder, ...updateData },
+          poCreator,
+          action: 'reject',
+          eventKey: `owner_supplier_response:${purchaseOrder._id.toString()}:reject:${updateData.supplierResponseDate.toISOString()}`,
+          responseData: {
+            notes: text,
+            rejectionReason: parsed.rejectionReason,
+            rejectionSubcategory: parsed.rejectionSubcategory
+          }
+        });
       }
 
       // Create audit log
@@ -802,7 +903,7 @@ export async function POST(request) {
         rejectionReason: parsed.rejectionReason,
         isRetryable: retryabilityAssessment.retryable
       }, 'Purchase order rejected via SMS');
-    } else if (parsed.action === 'modify') {
+    } else if (parsed.action === 'modify' && !(parsed.isPartialResponse && parsed.materialResponses && purchaseOrder.isBulkOrder)) {
       // Handle MODIFY action - create modification request for Owner/PM approval
       console.log('[SMS Webhook] Processing MODIFY action');
 
@@ -876,6 +977,17 @@ export async function POST(request) {
         } catch (pushError) {
           console.error('Push notification failed:', pushError);
         }
+
+        await sendOwnerResponseEmailAndTrack({
+          db,
+          purchaseOrder: { ...purchaseOrder, ...updateData },
+          poCreator,
+          action: 'modify',
+          eventKey: `owner_supplier_response:${purchaseOrder._id.toString()}:modify:${updateData.supplierResponseDate.toISOString()}`,
+          responseData: {
+            notes: text
+          }
+        });
       }
 
       // Create audit log
@@ -1093,6 +1205,20 @@ export async function POST(request) {
         } catch (pushError) {
           console.error('[SMS Webhook] Push notification failed:', pushError);
         }
+
+        await sendOwnerResponseEmailAndTrack({
+          db,
+          purchaseOrder: { ...purchaseOrder, ...updateData },
+          poCreator,
+          action: 'partial',
+          eventKey: `owner_supplier_response:${purchaseOrder._id.toString()}:partial:${updateData.supplierResponseDate.toISOString()}`,
+          responseData: {
+            notes: text,
+            acceptedCount: acceptedMaterials.length,
+            rejectedCount: rejectedMaterials.length,
+            modifiedCount: modifiedMaterials.length
+          }
+        });
       }
 
       // Send confirmation SMS

@@ -250,10 +250,10 @@ function NewWorkItemPageContent() {
         </div>
 
         {/* Information Card */}
-        <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-blue-100 rounded-xl border-2 border-blue-400/60 p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
+        <div className="ds-bg-accent-subtle rounded-xl border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 ds-bg-accent-primary rounded-lg flex items-center justify-center shadow-md">
                 <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
@@ -264,7 +264,7 @@ function NewWorkItemPageContent() {
                 <h3 className="text-base sm:text-lg font-bold ds-text-primary">Creating a Work Item</h3>
                 <button
                   onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                  className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 ds-bg-surface/80 hover:ds-bg-surface active:ds-bg-surface border border-blue-400/60 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 touch-manipulation"
+                  className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 ds-bg-surface/80 hover:ds-bg-surface active:ds-bg-surface border ds-border-accent-subtle rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 touch-manipulation"
                   aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                   aria-expanded={isInfoExpanded}
                 >
@@ -284,7 +284,7 @@ function NewWorkItemPageContent() {
                   <p className="text-xs sm:text-sm ds-text-secondary leading-relaxed">
                     Work items break down construction phases into specific, trackable tasks. Each work item represents a concrete activity like "Pour Foundation Concrete" or "Install Electrical Wiring" that needs to be completed, with estimated time, costs, and dependencies.
                   </p>
-                  <div className="ds-bg-surface/70 rounded-lg p-3 border border-blue-400/60">
+                  <div className="ds-bg-surface/70 rounded-lg p-3 border ds-border-accent-subtle">
                     <p className="text-xs ds-text-secondary">
                       <strong className="ds-text-primary">Tip:</strong> Be specific with work item names and include all relevant details. Set realistic time and cost estimates, and define dependencies if this task must wait for others to complete.
                     </p>
@@ -309,7 +309,7 @@ function NewWorkItemPageContent() {
 
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             {/* Project & Phase Selection Section */}
-            <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl p-4 sm:p-6 border border-blue-400/60">
+            <div className="ds-bg-accent-subtle rounded-xl p-4 sm:p-6 border ds-border-accent-subtle">
               <h2 className="text-base sm:text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
                 <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -517,7 +517,7 @@ function NewWorkItemPageContent() {
             </div>
 
             {/* Time & Cost Estimates Section */}
-            <div className="bg-gradient-to-br from-emerald-500/10 to-green-500/10 rounded-xl p-4 sm:p-6 border border-emerald-400/60">
+            <div className="ds-bg-accent-subtle rounded-xl p-4 sm:p-6 border ds-border-accent-subtle">
               <h2 className="text-base sm:text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
                 <svg className="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />

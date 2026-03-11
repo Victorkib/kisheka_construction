@@ -340,10 +340,10 @@ function NewEquipmentPageContent() {
       </div>
 
       {/* Information Card */}
-      <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-green-100 rounded-xl border-2 border-green-400/60 p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
+      <div className="ds-bg-accent-subtle rounded-xl border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
         <div className="flex items-start gap-3 sm:gap-4">
           <div className="flex-shrink-0">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center shadow-md">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 ds-bg-accent-primary rounded-lg flex items-center justify-center shadow-md">
               <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
@@ -354,12 +354,12 @@ function NewEquipmentPageContent() {
               <h3 className="text-base sm:text-lg font-bold ds-text-primary">Creating an Equipment Assignment</h3>
               <button
                 onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 ds-bg-surface/80 hover:ds-bg-surface active:ds-bg-surface border border-emerald-400/60 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 touch-manipulation"
+                className="flex-shrink-0 w-10 h-10 sm:w-11 sm:h-11 ds-bg-surface/80 hover:ds-bg-surface active:ds-bg-surface border ds-border-accent-subtle rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 touch-manipulation"
                 aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                 aria-expanded={isInfoExpanded}
               >
                 <svg 
-                  className={`w-5 h-5 sm:w-6 sm:h-6 text-green-600 transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
+                  className={`w-5 h-5 sm:w-6 sm:h-6 ds-text-accent-primary transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -374,7 +374,7 @@ function NewEquipmentPageContent() {
                 <p className="text-xs sm:text-sm ds-text-secondary leading-relaxed">
                   Equipment assignments track machinery, tools, and vehicles used in construction phases. Equipment can be rented from suppliers, purchased, or owned. Track daily rates, utilization hours, suppliers, and ensure proper cost allocation.
                 </p>
-                <div className="ds-bg-surface/70 rounded-lg p-3 border border-emerald-400/60">
+                <div className="ds-bg-surface/70 rounded-lg p-3 border ds-border-accent-subtle">
                   <p className="text-xs ds-text-secondary">
                     <strong className="ds-text-primary">Tip:</strong> Specify whether equipment is rented, purchased, or owned. For rentals, include supplier details and daily rates. Track estimated and actual utilization hours to monitor efficiency and costs.
                   </p>
@@ -399,7 +399,7 @@ function NewEquipmentPageContent() {
 
         <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
           {/* Project & Phase Selection Section */}
-          <div className="bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-xl p-4 sm:p-6 border border-blue-400/60">
+          <div className="ds-bg-accent-subtle rounded-xl p-4 sm:p-6 border ds-border-accent-subtle">
             <h2 className="text-base sm:text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
               <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />

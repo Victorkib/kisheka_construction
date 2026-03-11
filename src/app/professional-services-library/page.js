@@ -217,8 +217,8 @@ function ProfessionalServicesLibraryPageContent() {
 
   const getTypeBadgeColor = (type) => {
     return type === 'architect' 
-      ? 'bg-blue-100 text-blue-800' 
-      : 'bg-green-100 text-green-800';
+      ? 'ds-bg-accent-subtle ds-text-accent-primary'
+      : 'ds-bg-success/10 ds-text-success';
   };
 
   const getTypeLabel = (type) => {
@@ -246,7 +246,7 @@ function ProfessionalServicesLibraryPageContent() {
           {canAccess('manage_professional_services_library') && (
             <Link
               href="/professional-services-library/new"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -278,7 +278,7 @@ function ProfessionalServicesLibraryPageContent() {
               <select
                 value={filters.type}
                 onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
               >
                 <option value="">All Types</option>
                 <option value="architect">Architects</option>
@@ -294,7 +294,7 @@ function ProfessionalServicesLibraryPageContent() {
               <select
                 value={filters.isCommon}
                 onChange={(e) => handleFilterChange('isCommon', e.target.value)}
-                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
               >
                 <option value="">All</option>
                 <option value="true">Common Only</option>
@@ -310,7 +310,7 @@ function ProfessionalServicesLibraryPageContent() {
               <select
                 value={filters.isActive}
                 onChange={(e) => handleFilterChange('isActive', e.target.value)}
-                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
               >
                 <option value="true">Active</option>
                 <option value="false">Inactive</option>
@@ -328,7 +328,7 @@ function ProfessionalServicesLibraryPageContent() {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search by name..."
-                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
               />
             </div>
           </div>
@@ -336,7 +336,7 @@ function ProfessionalServicesLibraryPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg mb-6">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
           </div>
@@ -360,7 +360,7 @@ function ProfessionalServicesLibraryPageContent() {
               <div className="mt-6">
                 <Link
                   href="/professional-services-library/new"
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="inline-flex items-center px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -438,12 +438,12 @@ function ProfessionalServicesLibraryPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           {professional.isCommon && (
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full ds-bg-accent-subtle ds-text-accent-primary">
                               Common
                             </span>
                           )}
                           {professional.isActive ? (
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full ds-bg-success/10 ds-text-success">
                               Active
                             </span>
                           ) : (
@@ -455,10 +455,19 @@ function ProfessionalServicesLibraryPageContent() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end gap-2">
+                          {canAccess('assign_professional_service') && (
+                            <Link
+                              href={`/professional-services/new?libraryId=${professional._id}`}
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
+                              title="Assign this professional to a project"
+                            >
+                              Assign
+                            </Link>
+                          )}
                           {canAccess('edit_professional_service') && (
                             <Link
                               href={`/professional-services-library/${professional._id}/edit`}
-                              className="text-blue-600 hover:text-blue-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               Edit
                             </Link>
@@ -466,7 +475,7 @@ function ProfessionalServicesLibraryPageContent() {
                           {canAccess('edit_professional_service') && (
                             <button
                               onClick={() => handleToggleCommon(professional._id, professional.isCommon)}
-                              className="text-purple-600 hover:text-purple-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                               title={professional.isCommon ? 'Remove from common' : 'Mark as common'}
                             >
                               {professional.isCommon ? '★' : '☆'}
@@ -475,7 +484,7 @@ function ProfessionalServicesLibraryPageContent() {
                           {canAccess('edit_professional_service') && (
                             <button
                               onClick={() => handleToggleActive(professional._id, professional.isActive)}
-                              className={professional.isActive ? 'ds-text-secondary hover:ds-text-primary' : 'text-green-600 hover:text-green-900'}
+                              className={professional.isActive ? 'ds-text-secondary hover:ds-text-primary' : 'ds-text-success hover:ds-text-success'}
                               title={professional.isActive ? 'Deactivate' : 'Activate'}
                             >
                               {professional.isActive ? '●' : '○'}
@@ -484,7 +493,7 @@ function ProfessionalServicesLibraryPageContent() {
                           {canAccess('delete_professional_service') && (
                             <button
                               onClick={() => handleDelete(professional._id, professional.name)}
-                              className="text-red-600 hover:text-red-900"
+                              className="ds-text-danger hover:ds-text-danger"
                             >
                               Delete
                             </button>
@@ -548,7 +557,7 @@ function ProfessionalServicesLibraryPageContent() {
                               onClick={() => setPagination(prev => ({ ...prev, page }))}
                               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                 page === pagination.page
-                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                                  ? 'z-10 ds-bg-accent-subtle ds-border-accent-primary ds-text-accent-primary'
                                   : 'ds-bg-surface ds-border-subtle ds-text-muted hover:ds-bg-surface-muted'
                               }`}
                             >

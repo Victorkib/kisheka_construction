@@ -30,7 +30,7 @@ export function WizardNavigation({
             type="button"
             onClick={onBack}
             disabled={isLoading}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
           >
             {backText}
           </button>
@@ -40,7 +40,7 @@ export function WizardNavigation({
             type="button"
             onClick={onSaveDraft}
             disabled={isLoading}
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
           >
             Save as Draft
           </button>
@@ -54,7 +54,7 @@ export function WizardNavigation({
             disabled={!canGoNext || isLoading}
             isLoading={isLoading}
             loadingText="Loading..."
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
           >
             {nextText}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,7 +68,7 @@ export function WizardNavigation({
             disabled={!canGoNext || isLoading}
             isLoading={isLoading}
             loadingText="Submitting..."
-            className="w-full sm:w-auto px-4 sm:px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
+            className="w-full sm:w-auto px-4 sm:px-6 py-2 ds-bg-success text-white rounded-lg hover:ds-bg-success cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm sm:text-base"
           >
             {nextText || 'Submit'}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

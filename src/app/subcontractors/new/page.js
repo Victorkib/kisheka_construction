@@ -237,10 +237,10 @@ function NewSubcontractorPageContent() {
         </div>
 
         {/* Information Card */}
-        <div className="bg-gradient-to-br from-purple-50 via-violet-50 to-purple-100 rounded-xl border-2 border-purple-400/60 p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
+        <div className="ds-bg-accent-subtle rounded-xl border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 ds-bg-accent-primary rounded-lg flex items-center justify-center shadow-md">
                 <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
@@ -251,12 +251,12 @@ function NewSubcontractorPageContent() {
                 <h3 className="text-base sm:text-lg font-bold ds-text-primary">Creating a Subcontractor Assignment</h3>
                 <button
                   onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                  className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 ds-bg-surface/80 hover:ds-bg-surface border border-purple-400/60 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 ds-bg-surface/80 hover:ds-bg-surface border ds-border-accent-subtle rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2"
                   aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                   aria-expanded={isInfoExpanded}
                 >
                   <svg 
-                    className={`w-5 h-5 sm:w-6 sm:h-6 text-purple-600 transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ds-text-accent-primary transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -271,7 +271,7 @@ function NewSubcontractorPageContent() {
                   <p className="text-xs sm:text-sm ds-text-secondary leading-relaxed">
                     Subcontractors are external contractors and service providers hired for specific work. This includes construction labour (masons, electricians, plumbers), professional services (architects, engineers, surveyors), and specialized technicians (HVAC, lift technicians, fire safety).
                   </p>
-                  <div className="ds-bg-surface/70 rounded-lg p-3 border border-purple-400/60">
+                  <div className="ds-bg-surface/70 rounded-lg p-3 border ds-border-accent-subtle">
                     <p className="text-xs ds-text-secondary">
                       <strong className="ds-text-primary">Tip:</strong> Specify the subcontractor type clearly, set up payment milestones based on work completion, and track performance ratings. Include contact information for easy communication and coordination.
                     </p>
@@ -296,9 +296,9 @@ function NewSubcontractorPageContent() {
 
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Project & Phase Selection Section */}
-            <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-6 border border-purple-100">
+            <div className="ds-bg-accent-subtle rounded-xl p-6 border ds-border-accent-subtle">
               <h2 className="text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 ds-text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 Project & Phase Selection
@@ -324,7 +324,7 @@ function NewSubcontractorPageContent() {
                       onChange={handleChange}
                       required
                       disabled={loadingProjects}
-                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                     >
                       <option value="" className="ds-text-muted">Select Project</option>
                         {projects.map((project) => (
@@ -363,7 +363,7 @@ function NewSubcontractorPageContent() {
                       onChange={handleChange}
                       required
                       disabled={loadingPhases || !formData.projectId}
-                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
+                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                     >
                       <option value="" className="ds-text-muted">Select Phase</option>
                         {phases.map((phase) => (
@@ -381,8 +381,8 @@ function NewSubcontractorPageContent() {
                 {/* Floor ID (optional, for finishing phases) */}
                 {formData.floorId && (
                   <div className="md:col-span-2">
-                    <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-3">
-                      <p className="text-xs text-blue-800">
+                    <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-3">
+                      <p className="text-xs ds-text-accent-primary">
                         <strong>Note:</strong> This subcontractor will be linked to a specific floor (Floor ID: {formData.floorId}). 
                         This is useful for finishing-phase subcontractors that work on specific floors.
                       </p>
@@ -486,7 +486,7 @@ function NewSubcontractorPageContent() {
             </div>
 
             {/* Contract & Schedule Section */}
-            <div className="bg-gradient-to-br from-indigo-500/10 to-blue-500/10 rounded-xl p-6 border border-indigo-400/60">
+            <div className="ds-bg-accent-subtle rounded-xl p-6 border ds-border-accent-subtle">
               <h2 className="text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
                 <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />

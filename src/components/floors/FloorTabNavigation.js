@@ -23,7 +23,7 @@ export function FloorTabNavigation({ activeTab, onTabChange, tabs }) {
               className={`
                 py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors
                 ${isActive
-                  ? 'border-blue-500 text-blue-600'
+                  ? 'ds-border-accent-primary ds-text-accent-primary'
                   : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
                 }
               `}
@@ -35,7 +35,7 @@ export function FloorTabNavigation({ activeTab, onTabChange, tabs }) {
                 {tab.badge && tab.badge > 0 && (
                   <span className={`
                     ml-2 px-2 py-0.5 text-xs font-semibold rounded-full
-                    ${isActive ? 'bg-blue-100 text-blue-800' : 'ds-bg-surface-muted ds-text-secondary'}
+                    ${isActive ? 'ds-bg-accent-subtle ds-text-accent-primary' : 'ds-bg-surface-muted ds-text-secondary'}
                   `}>
                     {tab.badge}
                   </span>

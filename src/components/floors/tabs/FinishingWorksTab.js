@@ -311,14 +311,14 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                 {formatCurrency(totalBudget)}
               </p>
               {totalBudget === 0 && (
-                <p className="text-xs text-amber-400 mt-1">
+                <p className="text-xs ds-text-warning mt-1">
                   No budget allocated yet
                 </p>
               )}
             </div>
             <div className="ds-bg-surface rounded-lg shadow p-3 border ds-border-subtle">
               <p className="text-xs ds-text-secondary mb-1">Spent</p>
-              <p className={`text-lg font-bold ${totalSpent > totalBudget && totalBudget > 0 ? 'text-red-400' : 'ds-text-primary'}`}>
+              <p className={`text-lg font-bold ${totalSpent > totalBudget && totalBudget > 0 ? 'ds-text-danger' : 'ds-text-primary'}`}>
                 {formatCurrency(totalSpent)}
               </p>
               <p className="text-xs ds-text-muted mt-1">
@@ -327,7 +327,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
             </div>
             <div className="ds-bg-surface rounded-lg shadow p-3">
               <p className="text-xs ds-text-secondary mb-1">Remaining</p>
-              <p className={`text-lg font-bold ${remaining < 0 ? 'text-red-400' : remaining < totalBudget * 0.1 ? 'text-amber-400' : 'ds-text-primary'}`}>
+              <p className={`text-lg font-bold ${remaining < 0 ? 'ds-text-danger' : remaining < totalBudget * 0.1 ? 'ds-text-warning' : 'ds-text-primary'}`}>
                 {formatCurrency(remaining)}
               </p>
               {totalBudget > 0 && (
@@ -358,10 +358,10 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                 <div
                   className={`h-2 rounded-full transition-all ${
                     totalSpent > totalBudget
-                      ? 'bg-red-500'
+                      ? 'ds-bg-danger'
                       : totalSpent > totalBudget * 0.9
-                      ? 'bg-amber-500'
-                      : 'bg-blue-500'
+                      ? 'ds-bg-warning'
+                      : 'ds-bg-accent-primary'
                   }`}
                   style={{ width: `${Math.min(100, (totalSpent / totalBudget) * 100)}%` }}
                 />
@@ -434,7 +434,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
           Plan New Finishing Work on this Floor
         </h3>
         {plannerError && (
-          <div className="mb-3 bg-red-50 border border-red-400/60 text-red-700 px-3 py-2 rounded text-xs">
+          <div className="mb-3 ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-3 py-2 rounded text-xs">
             {plannerError}
           </div>
         )}
@@ -446,7 +446,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               value={plannerForm.phaseId}
               onChange={handlePlannerChange}
               disabled={plannerLoading || creating}
-              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
+              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium"
             >
               <option value="">Select finishing phase</option>
               {phases.map((p) => (
@@ -463,7 +463,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               value={plannerForm.categoryCode}
               onChange={plannerLoading || creating ? undefined : handlePlannerChange}
               disabled={plannerLoading || creating}
-              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
+              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium"
             >
               <option value="">Select category</option>
               {finishingCategories.map((cat) => (
@@ -480,7 +480,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               value={effectiveExecutionModel}
               onChange={plannerLoading || creating ? undefined : handlePlannerChange}
               disabled={plannerLoading || creating}
-              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
+              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium"
             >
               {FINISHING_EXECUTION_MODELS.map((mode) => (
                 <option key={mode} value={mode}>
@@ -496,7 +496,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                 {subcontractors.length === 0 && (
                   <Link
                     href={`/subcontractors/new?projectId=${floor.projectId}&phaseId=${plannerForm.phaseId || ''}&floorId=${floor._id}`}
-                    className="text-xs text-purple-600 hover:text-purple-800 underline font-medium"
+                    className="text-xs ds-text-accent-primary hover:ds-text-accent-hover underline font-medium"
                   >
                     Create new
                   </Link>
@@ -507,7 +507,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                 value={plannerForm.subcontractorId}
                 onChange={plannerLoading || creating ? undefined : handlePlannerChange}
                 disabled={plannerLoading || creating || subcontractors.length === 0}
-                className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
+                className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium"
               >
                 <option value="">Select subcontractor (optional)</option>
                 {subcontractors.map((sub) => (
@@ -518,7 +518,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               </select>
               {subcontractors.length === 0 && (
                 <p className="text-xs ds-text-muted mt-1">
-                  No subcontractors found. <Link href={`/subcontractors/new?projectId=${floor.projectId}&phaseId=${plannerForm.phaseId || ''}&floorId=${floor._id}`} className="text-purple-600 hover:text-purple-800 underline font-medium">Create one</Link> to link to this work.
+                  No subcontractors found. <Link href={`/subcontractors/new?projectId=${floor.projectId}&phaseId=${plannerForm.phaseId || ''}&floorId=${floor._id}`} className="ds-text-accent-primary hover:ds-text-accent-hover underline font-medium">Create one</Link> to link to this work.
                 </p>
               )}
             </div>
@@ -531,7 +531,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               value={plannerForm.name}
               onChange={handlePlannerChange}
               disabled={creating}
-              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
+              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium"
               placeholder="e.g. Electrical - Floor 2"
             />
           </div>
@@ -543,7 +543,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
               value={plannerForm.estimatedCost}
               onChange={handlePlannerChange}
               disabled={creating}
-              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
+              className="w-full px-2 py-1.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg text-xs focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium"
               min="0"
               step="0.01"
             />
@@ -552,7 +552,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
             <button
               type="submit"
               disabled={creating || plannerLoading}
-              className="inline-flex items-center px-3 py-1.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white text-xs font-semibold rounded-lg shadow-lg hover:from-purple-700 hover:to-purple-800 hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center px-3 py-1.5 ds-bg-accent-primary text-white text-xs font-semibold rounded-lg shadow-lg hover:ds-bg-accent-hover hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {creating ? 'Adding…' : 'Add Finishing Work'}
             </button>
@@ -573,7 +573,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
 
     if (error) {
       return (
-        <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm">
+        <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded text-sm">
           {error}
         </div>
       );
@@ -594,13 +594,13 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
             Finishing Work Items ({items.length})
           </h3>
         </div>
-        <div className="divide-y divide-gray-100">
+        <div className="divide-y ds-border-subtle">
           {items.map((item) => {
             const exec = item.executionModel || 'direct_labour';
             const isContract = exec === 'contract_based';
             const badgeClasses = isContract
-              ? 'bg-purple-100 text-purple-800'
-              : 'bg-green-100 text-green-800';
+              ? 'bg-purple-500/20 text-purple-600 border border-purple-500/40'
+              : 'bg-green-500/20 text-green-600 border border-green-500/40';
 
             return (
               <div
@@ -611,7 +611,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/work-items/${item._id}`}
-                      className="text-sm font-semibold ds-text-primary truncate hover:text-purple-600 hover:underline transition-colors"
+                      className="text-sm font-semibold ds-text-primary truncate hover:ds-text-accent-primary hover:underline transition-colors"
                     >
                       {item.name || 'Work Item'}
                     </Link>
@@ -633,18 +633,18 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                   )}
                   {item.subcontractor && (
                     <div className="mt-0.5 space-y-0.5">
-                      <p className="text-xs text-purple-700">
+                      <p className="text-xs ds-text-accent-primary">
                         Subcontractor:{' '}
                         <Link
                           href={`/subcontractors/${item.subcontractor._id}`}
-                          className="hover:text-purple-900 hover:underline"
+                          className="hover:ds-text-accent-hover hover:underline"
                         >
                           {item.subcontractor.subcontractorName}
                         </Link>
                         {' '}({item.subcontractor.contractType})
                       </p>
                       {item.subcontractor.contractValue > 0 && (
-                        <p className="text-xs text-purple-600">
+                        <p className="text-xs ds-text-accent-primary">
                           Contract: {formatCurrency(item.subcontractor.contractValue)} • Paid:{' '}
                           {formatCurrency(item.subcontractor.totalPaid || 0)} (
                           {item.subcontractor.paymentProgress

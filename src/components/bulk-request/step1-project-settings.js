@@ -250,6 +250,25 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
   };
 
   const handleChange = (field, value) => {
+    // Reset dependent defaults when project changes to avoid cross-project leakage.
+    if (field === 'projectId') {
+      onUpdate({
+        projectId: value,
+        defaultPhaseId: '',
+        defaultFloorId: '',
+      });
+      return;
+    }
+
+    // Enforce hierarchy: clearing phase also clears floor.
+    if (field === 'defaultPhaseId' && !value) {
+      onUpdate({
+        defaultPhaseId: '',
+        defaultFloorId: '',
+      });
+      return;
+    }
+
     onUpdate({ [field]: value });
   };
 
@@ -306,100 +325,6 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
           <p className="mt-1 text-sm ds-text-secondary">Give this batch a descriptive name for easy identification</p>
         </div>
 
-        {/* Default Floor */}
-        <div>
-          <label className="block text-sm font-semibold ds-text-secondary mb-1">
-            Default Floor (Optional)
-          </label>
-          {loadingFloors || loadingApplicableFloors ? (
-            <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-muted">
-              Loading floors...
-            </div>
-          ) : floors.length === 0 && wizardData.projectId ? (
-            <div className="px-3 py-2 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700">
-              No floors found for this project
-            </div>
-          ) : (
-            <select
-              value={wizardData.defaultFloorId || ''}
-              onChange={(e) => handleChange('defaultFloorId', e.target.value)}
-              disabled={!wizardData.projectId || floors.length === 0 || loadingApplicableFloors}
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted disabled:cursor-not-allowed"
-            >
-              <option value="" className="ds-text-primary">No default floor</option>
-              {/* Show applicable floors first */}
-              {applicableFloors.length > 0 && (
-                <>
-                  {applicableFloors.map((floor) => {
-                    const getFloorDisplay = (floorNumber, name) => {
-                      if (name) return name;
-                      if (floorNumber === undefined || floorNumber === null) return 'N/A';
-                      if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
-                      if (floorNumber === 0) return 'Ground Floor';
-                      return `Floor ${floorNumber}`;
-                    };
-                    return (
-                      <option key={floor._id} value={floor._id} className="ds-text-primary">
-                        {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)} ✓
-                      </option>
-                    );
-                  })}
-                </>
-              )}
-              {/* Show non-applicable floors (disabled) if phase is selected */}
-              {wizardData.defaultPhaseId && nonApplicableFloors.length > 0 && (
-                <>
-                  <optgroup label={`Not applicable to ${selectedPhaseInfo?.phaseName || 'selected phase'}`} className="ds-text-muted">
-                    {nonApplicableFloors.map((floor) => {
-                      const getFloorDisplay = (floorNumber, name) => {
-                        if (name) return name;
-                        if (floorNumber === undefined || floorNumber === null) return 'N/A';
-                        if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
-                        if (floorNumber === 0) return 'Ground Floor';
-                        return `Floor ${floorNumber}`;
-                      };
-                      return (
-                        <option key={floor._id} value={floor._id} disabled className="ds-text-muted italic">
-                          {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)} ✗
-                        </option>
-                      );
-                    })}
-                  </optgroup>
-                </>
-              )}
-              {/* Fallback: show all floors if no phase selected or API not available */}
-              {!wizardData.defaultPhaseId && floors.length > 0 && applicableFloors.length === 0 && (
-                <>
-                  {floors.map((floor) => {
-                    const getFloorDisplay = (floorNumber, name) => {
-                      if (name) return name;
-                      if (floorNumber === undefined || floorNumber === null) return 'N/A';
-                      if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
-                      if (floorNumber === 0) return 'Ground Floor';
-                      return `Floor ${floorNumber}`;
-                    };
-                    return (
-                      <option key={floor._id} value={floor._id} className="ds-text-primary">
-                        {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)}
-                      </option>
-                    );
-                  })}
-                </>
-              )}
-            </select>
-          )}
-          <p className="mt-1 text-sm ds-text-secondary">
-            Default floor for all materials (can be overridden per material)
-            {wizardData.defaultPhaseId && selectedPhaseInfo && (
-              <span className="block mt-1 text-xs text-blue-600">
-                {applicableFloors.length > 0 
-                  ? `✓ ${applicableFloors.length} floor(s) applicable to ${selectedPhaseInfo.phaseName}`
-                  : 'No floors are applicable to this phase. Floor assignment is optional.'}
-              </span>
-            )}
-          </p>
-        </div>
-
         {/* Default Phase - REQUIRED */}
         <div>
           <label className="block text-sm font-semibold ds-text-secondary mb-1">
@@ -441,6 +366,78 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
           <p className="mt-1 text-sm ds-text-secondary">
             <span className="font-medium text-red-600">Required:</span> Default construction phase for all materials. 
             You can override this for individual materials in Step 3 if needed.
+          </p>
+        </div>
+
+        {/* Default Floor */}
+        <div>
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
+            Default Floor (Optional)
+          </label>
+          {loadingFloors || loadingApplicableFloors ? (
+            <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-muted">
+              Loading floors...
+            </div>
+          ) : floors.length === 0 && wizardData.projectId ? (
+            <div className="px-3 py-2 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700">
+              No floors found for this project
+            </div>
+          ) : (
+            <select
+              value={wizardData.defaultFloorId || ''}
+              onChange={(e) => handleChange('defaultFloorId', e.target.value)}
+              disabled={!wizardData.projectId || !wizardData.defaultPhaseId || floors.length === 0 || loadingApplicableFloors}
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted disabled:cursor-not-allowed"
+            >
+              <option value="" className="ds-text-primary">
+                {wizardData.defaultPhaseId ? 'No default floor' : 'Select phase first'}
+              </option>
+              {applicableFloors.map((floor) => {
+                const getFloorDisplay = (floorNumber, name) => {
+                  if (name) return name;
+                  if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                  if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                  if (floorNumber === 0) return 'Ground Floor';
+                  return `Floor ${floorNumber}`;
+                };
+                return (
+                  <option key={floor._id} value={floor._id} className="ds-text-primary">
+                    {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)} ✓
+                  </option>
+                );
+              })}
+              {wizardData.defaultPhaseId && nonApplicableFloors.length > 0 && (
+                <optgroup label={`Not applicable to ${selectedPhaseInfo?.phaseName || 'selected phase'}`} className="ds-text-muted">
+                  {nonApplicableFloors.map((floor) => {
+                    const getFloorDisplay = (floorNumber, name) => {
+                      if (name) return name;
+                      if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                      if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                      if (floorNumber === 0) return 'Ground Floor';
+                      return `Floor ${floorNumber}`;
+                    };
+                    return (
+                      <option key={floor._id} value={floor._id} disabled className="ds-text-muted italic">
+                        {getFloorDisplay(floor.floorNumber, floor.floorName || floor.name)} ✗
+                      </option>
+                    );
+                  })}
+                </optgroup>
+              )}
+            </select>
+          )}
+          <p className="mt-1 text-sm ds-text-secondary">
+            Default floor for all materials (can be overridden per material).
+            <span className="block mt-1 text-xs">
+              Select a phase first to filter floors by phase applicability.
+            </span>
+            {wizardData.defaultPhaseId && selectedPhaseInfo && (
+              <span className="block mt-1 text-xs text-blue-600">
+                {applicableFloors.length > 0
+                  ? `✓ ${applicableFloors.length} floor(s) applicable to ${selectedPhaseInfo.phaseName}`
+                  : 'No floors are applicable to this phase. Floor assignment is optional.'}
+              </span>
+            )}
           </p>
         </div>
 

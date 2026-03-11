@@ -112,9 +112,9 @@ export function CustomMaterialInput({ onAddMaterial }) {
         <button
           type="button"
           onClick={() => setMode('single')}
-          className={`px-4 py-2 font-medium text-sm transition-colors ${
+          className={`px-4 py-2 font-medium text-sm transition-colors cursor-pointer ${
             mode === 'single'
-              ? 'border-b-2 border-blue-600 text-blue-600'
+              ? 'border-b-2 ds-border-accent-primary ds-text-accent-primary'
               : 'ds-text-secondary hover:ds-text-primary'
           }`}
         >
@@ -123,9 +123,9 @@ export function CustomMaterialInput({ onAddMaterial }) {
         <button
           type="button"
           onClick={() => setMode('bulk')}
-          className={`px-4 py-2 font-medium text-sm transition-colors ${
+          className={`px-4 py-2 font-medium text-sm transition-colors cursor-pointer ${
             mode === 'bulk'
-              ? 'border-b-2 border-blue-600 text-blue-600'
+              ? 'border-b-2 ds-border-accent-primary ds-text-accent-primary'
               : 'ds-text-secondary hover:ds-text-primary'
           }`}
         >
@@ -138,7 +138,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold ds-text-secondary mb-1">
-                Material Name <span className="text-red-500">*</span>
+                Material Name <span className="ds-text-danger">*</span>
               </label>
               <input
                 type="text"
@@ -146,12 +146,12 @@ export function CustomMaterialInput({ onAddMaterial }) {
                 onChange={(e) => setSingleMaterial((prev) => ({ ...prev, name: e.target.value }))}
                 placeholder="e.g., Cement (50kg bag)"
                 required
-                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary placeholder:ds-text-muted"
               />
             </div>
             <div>
               <label className="block text-sm font-semibold ds-text-secondary mb-1">
-                Quantity <span className="text-red-500">*</span>
+                Quantity <span className="ds-text-danger">*</span>
               </label>
               <input
                 type="number"
@@ -161,7 +161,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
                 min="0.01"
                 step="0.01"
                 required
-                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary placeholder:ds-text-muted"
               />
             </div>
           </div>
@@ -169,13 +169,13 @@ export function CustomMaterialInput({ onAddMaterial }) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold ds-text-secondary mb-1">
-                Unit <span className="text-red-500">*</span>
+                Unit <span className="ds-text-danger">*</span>
               </label>
               <select
                 value={singleMaterial.unit}
                 onChange={(e) => setSingleMaterial((prev) => ({ ...prev, unit: e.target.value }))}
                 required
-                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
               >
                 {VALID_UNITS.map((unit) => (
                   <option key={unit} value={unit} className="ds-text-primary">
@@ -187,7 +187,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
             {singleMaterial.unit === 'others' && (
               <div>
                 <label className="block text-sm font-semibold ds-text-secondary mb-1">
-                  Custom Unit <span className="text-red-500">*</span>
+                  Custom Unit <span className="ds-text-danger">*</span>
                 </label>
                 <input
                   type="text"
@@ -195,7 +195,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
                   onChange={(e) => setSingleMaterial((prev) => ({ ...prev, customUnit: e.target.value }))}
                   placeholder="Enter custom unit"
                   required
-                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary placeholder:ds-text-muted"
                 />
               </div>
             )}
@@ -210,14 +210,14 @@ export function CustomMaterialInput({ onAddMaterial }) {
                 placeholder="0.00"
                 min="0"
                 step="0.01"
-                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary placeholder:ds-text-muted"
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full md:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            className="w-full md:w-auto px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium cursor-pointer"
           >
             Add Material
           </button>
@@ -233,7 +233,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
               onChange={(e) => setBulkText(e.target.value)}
               placeholder={`Format: Material Name, Quantity, Unit, Cost (optional)\n\nExample:\nCement, 500, bag, 850\nRebars 12mm, 600, piece\nSand, 20, lorry`}
               rows={10}
-              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm placeholder:ds-text-muted"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary font-mono text-sm placeholder:ds-text-muted"
             />
             <p className="mt-1 text-xs ds-text-secondary">
               Format: Material Name, Quantity, Unit, Cost (optional). One material per line.
@@ -242,7 +242,7 @@ export function CustomMaterialInput({ onAddMaterial }) {
           <button
             type="button"
             onClick={handleBulkParse}
-            className="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+            className="w-full px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium cursor-pointer"
           >
             Parse & Add Materials
           </button>

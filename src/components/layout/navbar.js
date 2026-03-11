@@ -7,6 +7,9 @@
 'use client';
 
 import { useState } from 'react';
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Sidebar } from './sidebar';
 import { MobileNav } from './mobile-nav';
 import { Header } from './header';
@@ -89,11 +92,7 @@ export function LegacyNavbar() {
   const [user, setUser] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
-  const fetchUser = async () => {
+  async function fetchUser() {
     try {
       const response = await fetch('/api/auth/me');
       const data = await response.json();
@@ -103,7 +102,11 @@ export function LegacyNavbar() {
     } catch (err) {
       console.error('Error fetching user:', err);
     }
-  };
+  }
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   const handleLogout = async () => {
     try {

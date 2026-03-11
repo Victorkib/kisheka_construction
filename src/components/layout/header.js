@@ -7,6 +7,7 @@ import { usePermissions, clearUserCache } from '@/hooks/use-permissions';
 import { NotificationBell } from '@/components/notifications/notification-bell';
 import { ProjectSwitcher } from '@/components/project-switcher/ProjectSwitcher';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useProjectContext } from '@/contexts/ProjectContext';
 
 /* ----------------------------------------
    Approvals Badge (DECLARED OUTSIDE RENDER)
@@ -168,13 +169,14 @@ function MobileUserMenu({ user, onLogout, isOpen, onClose }) {
 export function Header({ onMenuClick }) {
   const router = useRouter();
   const { user, loading } = usePermissions();
+  const { currentProject } = useProjectContext();
 
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
-  /* Fetch pending approvals */
+  /* Fetch pending approvals (project-specific) */
   useEffect(() => {
     if (
       user &&
@@ -182,16 +184,37 @@ export function Header({ onMenuClick }) {
         user.role?.toLowerCase(),
       )
     ) {
-      fetch('/api/dashboard/summary')
+      // If no project selected, set count to 0 (multi-project system)
+      if (!currentProject?._id) {
+        setPendingApprovalsCount(0);
+        return;
+      }
+
+      const projectId = currentProject._id?.toString() || currentProject._id;
+      if (!projectId) {
+        setPendingApprovalsCount(0);
+        return;
+      }
+
+      fetch(`/api/dashboard/summary?projectId=${projectId}`)
         .then((res) => res.json())
         .then((data) => {
           if (data?.success && data?.data?.summary?.totalPendingApprovals) {
             setPendingApprovalsCount(data.data.summary.totalPendingApprovals);
+          } else {
+            // If no data, set to 0 (no badge)
+            setPendingApprovalsCount(0);
           }
         })
-        .catch((err) => console.error('Error fetching approvals count:', err));
+        .catch((err) => {
+          console.error('Error fetching approvals count:', err);
+          setPendingApprovalsCount(0); // Set to 0 on error (no badge)
+        });
+    } else {
+      // User doesn't have permission, set to 0
+      setPendingApprovalsCount(0);
     }
-  }, [user]);
+  }, [user, currentProject]); // Add currentProject to dependencies
 
   /* Logout */
   const handleLogout = async () => {

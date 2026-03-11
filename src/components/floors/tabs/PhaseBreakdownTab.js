@@ -144,16 +144,16 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
   const getStatusColor = (status) => {
     const colors = {
       'NOT_STARTED': 'ds-bg-surface-muted ds-text-primary',
-      'IN_PROGRESS': 'bg-blue-100 text-blue-800',
-      'COMPLETED': 'bg-green-100 text-green-800',
+      'IN_PROGRESS': 'bg-blue-500/20 text-blue-600 border border-blue-500/40',
+      'COMPLETED': 'bg-green-500/20 text-green-600 border border-green-500/40',
     };
     return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getProgressColor = (utilization) => {
-    if (utilization >= 100) return 'bg-red-500';
-    if (utilization >= 80) return 'bg-yellow-500';
-    return 'bg-green-500';
+    if (utilization >= 100) return 'ds-bg-danger';
+    if (utilization >= 80) return 'ds-bg-warning';
+    return 'ds-bg-success';
   };
 
   if (loading) {
@@ -167,12 +167,12 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
+      <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg">
         <p className="font-semibold">Error loading phase breakdown</p>
         <p className="text-sm">{error}</p>
         <button
           onClick={fetchPhaseBreakdown}
-          className="mt-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm"
+          className="mt-2 px-4 py-2 ds-bg-danger text-white rounded-lg hover:bg-red-700 active:bg-red-800 text-sm transition-colors"
         >
           Retry
         </button>
@@ -208,7 +208,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
         </div>
         <div className="ds-bg-surface rounded-lg shadow p-4">
           <p className="text-xs ds-text-secondary">In Progress</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{summary.phasesInProgress}</p>
+          <p className="text-2xl font-bold ds-text-accent-primary mt-1">{summary.phasesInProgress}</p>
           <p className="text-xs ds-text-muted mt-1">
             {summary.phasesCompleted} completed
           </p>
@@ -225,7 +225,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
         <div className="ds-bg-surface rounded-lg shadow p-4">
           <p className="text-xs ds-text-secondary">Remaining</p>
           <p className={`text-2xl font-bold mt-1 ${
-            summary.totalRemaining < 0 ? 'text-red-600' : 'text-green-600'
+            summary.totalRemaining < 0 ? 'ds-text-danger' : 'ds-text-success'
           }`}>
             {formatCurrency(summary.totalRemaining)}
           </p>
@@ -296,7 +296,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                     </div>
                     <div className="text-right">
                       <p className={`text-sm font-semibold ${
-                        phase.actual.total > phase.budget.total ? 'text-red-600' : 'text-blue-600'
+                        phase.actual.total > phase.budget.total ? 'ds-text-danger' : 'ds-text-accent-primary'
                       }`}>
                         {formatCurrency(phase.actual.total)}
                       </p>
@@ -304,7 +304,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                     </div>
                     <div className="text-right">
                       <p className={`text-sm font-semibold ${
-                        phase.remaining < 0 ? 'text-red-600' : 'text-green-600'
+                        phase.remaining < 0 ? 'ds-text-danger' : 'ds-text-success'
                       }`}>
                         {formatCurrency(phase.remaining)}
                       </p>
@@ -348,7 +348,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                           </div>
                           <div className="w-full ds-bg-surface-muted rounded-full h-2">
                             <div
-                              className="h-2 rounded-full transition-all bg-blue-500"
+                              className="h-2 rounded-full transition-all ds-bg-accent-primary"
                               style={{ width: `${Math.min(100, currentProgress)}%` }}
                             />
                           </div>
@@ -394,26 +394,26 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                       <div>
                         <p className="ds-text-muted">Materials</p>
                         <p className="font-semibold ds-text-primary">{formatCurrency(phase.budget.materials)}</p>
-                        <p className="text-blue-600">{formatCurrency(phase.actual.materials)}</p>
+                        <p className="ds-text-accent-primary">{formatCurrency(phase.actual.materials)}</p>
                       </div>
                       <div>
                         <p className="ds-text-muted">Labour</p>
                         <p className="font-semibold ds-text-primary">{formatCurrency(phase.budget.labour)}</p>
-                        <p className="text-blue-600">{formatCurrency(phase.actual.labour)}</p>
+                        <p className="ds-text-accent-primary">{formatCurrency(phase.actual.labour)}</p>
                       </div>
                       <div>
                         <p className="ds-text-muted">Equipment</p>
                         <p className="font-semibold ds-text-primary">{formatCurrency(phase.budget.equipment)}</p>
-                        <p className="text-blue-600">{formatCurrency(phase.actual.equipment)}</p>
+                        <p className="ds-text-accent-primary">{formatCurrency(phase.actual.equipment)}</p>
                       </div>
                       <div>
                         <p className="ds-text-muted">Subcontractors</p>
                         <p className="font-semibold ds-text-primary">{formatCurrency(phase.budget.subcontractors)}</p>
-                        <p className="text-blue-600">{formatCurrency(phase.actual.subcontractors)}</p>
+                        <p className="ds-text-accent-primary">{formatCurrency(phase.actual.subcontractors)}</p>
                       </div>
                       <div>
                         <p className="ds-text-muted">Committed</p>
-                        <p className="font-semibold text-yellow-600">{formatCurrency(phase.committed.total)}</p>
+                        <p className="font-semibold ds-text-warning">{formatCurrency(phase.committed.total)}</p>
                         <p className="ds-text-muted text-xs">
                           {phase.committed.materialRequests} requests, {phase.committed.purchaseOrders} orders
                         </p>
@@ -430,7 +430,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                           <h5 className="text-sm font-semibold ds-text-primary">Materials ({phase.counts.materials})</h5>
                           <Link
                             href={`/items?floorId=${floor._id}&phaseId=${phase.phaseId}`}
-                            className="text-xs text-blue-600 hover:text-blue-800"
+                            className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View All →
                           </Link>
@@ -458,7 +458,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                           <h5 className="text-sm font-semibold ds-text-primary">Material Requests ({phase.counts.materialRequests})</h5>
                           <Link
                             href={`/material-requests?floorId=${floor._id}&phaseId=${phase.phaseId}`}
-                            className="text-xs text-blue-600 hover:text-blue-800"
+                            className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View All →
                           </Link>
@@ -486,7 +486,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                           <h5 className="text-sm font-semibold ds-text-primary">Labour ({phase.counts.labour})</h5>
                           <Link
                             href={`/labour/entries?floorId=${floor._id}&phaseId=${phase.phaseId}`}
-                            className="text-xs text-blue-600 hover:text-blue-800"
+                            className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View All →
                           </Link>
@@ -516,7 +516,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                           <h5 className="text-sm font-semibold ds-text-primary">Equipment ({phase.counts.equipment})</h5>
                           <Link
                             href={`/equipment?projectId=${project?._id}&phaseId=${phase.phaseId}`}
-                            className="text-xs text-blue-600 hover:text-blue-800"
+                            className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View All →
                           </Link>
@@ -544,7 +544,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                           <h5 className="text-sm font-semibold ds-text-primary">Work Items ({phase.counts.workItems})</h5>
                           <Link
                             href={`/work-items?floorId=${floor._id}&phaseId=${phase.phaseId}`}
-                            className="text-xs text-blue-600 hover:text-blue-800"
+                            className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View All →
                           </Link>
@@ -601,7 +601,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                           </div>
                           <div className="w-full ds-bg-surface-muted rounded-full h-3">
                             <div
-                              className="h-3 rounded-full transition-all bg-blue-500"
+                              className="h-3 rounded-full transition-all ds-bg-accent-primary"
                               style={{ width: `${Math.min(100, currentProgress)}%` }}
                             />
                           </div>
@@ -616,7 +616,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                                 disabled={isUpdating || currentStatus === 'NOT_STARTED'}
                                 className={`px-3 py-2 text-xs font-medium rounded-lg transition ${
                                   currentStatus === 'NOT_STARTED'
-                                    ? 'bg-slate-600 text-white'
+                                    ? 'ds-bg-surface-muted ds-text-primary border ds-border-subtle'
                                     : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
                                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                               >
@@ -627,8 +627,8 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                                 disabled={isUpdating || currentStatus === 'IN_PROGRESS'}
                                 className={`px-3 py-2 text-xs font-medium rounded-lg transition ${
                                   currentStatus === 'IN_PROGRESS'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                                    ? 'ds-bg-accent-primary text-white'
+                                    : 'ds-bg-accent-subtle ds-text-accent-primary hover:ds-bg-accent-subtle border ds-border-accent-subtle'
                                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                               >
                                 In Progress
@@ -638,8 +638,8 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                                 disabled={isUpdating || currentStatus === 'COMPLETED'}
                                 className={`px-3 py-2 text-xs font-medium rounded-lg transition ${
                                   currentStatus === 'COMPLETED'
-                                    ? 'bg-green-600 text-white'
-                                    : 'bg-green-100 text-green-700 hover:bg-green-200'
+                                    ? 'ds-bg-success text-white'
+                                    : 'ds-bg-success/20 ds-text-success hover:ds-bg-success/30 border ds-border-success/40'
                                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                               >
                                 Completed
@@ -672,7 +672,7 @@ export function FloorPhaseBreakdownTab({ floor, project, formatCurrency, formatD
                   <div className="mt-4 pt-4 border-t ds-border-subtle flex gap-2">
                     <Link
                       href={`/phases/${phase.phaseId}`}
-                      className="px-3 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-lg hover:bg-blue-700 transition"
+                      className="px-3 py-1.5 ds-bg-accent-primary text-white text-xs font-medium rounded-lg hover:ds-bg-accent-hover transition"
                     >
                       View Phase Details →
                     </Link>

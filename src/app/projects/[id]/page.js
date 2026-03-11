@@ -1706,7 +1706,7 @@ export default function ProjectDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-xl border border-slate-700/60 overflow-hidden">
+          <div className="ds-bg-surface rounded-2xl shadow-xl border ds-border-subtle overflow-hidden">
             {/* Top bar with icon and text */}
             <div className="px-6 sm:px-8 py-5 border-b border-slate-700/60 flex items-center gap-4">
               <div className="relative">
@@ -1817,7 +1817,7 @@ export default function ProjectDetailPage() {
                   </span>
                 </div>
                 <div className="h-1.5 w-full rounded-full bg-slate-800 overflow-hidden">
-                  <div className="h-1.5 w-1/3 bg-gradient-to-r from-amber-400 via-emerald-400 to-sky-400 animate-pulse" />
+                  <div className="h-1.5 w-1/3 ds-bg-accent-primary animate-pulse" />
                 </div>
               </div>
             </div>
@@ -2565,7 +2565,7 @@ export default function ProjectDetailPage() {
               </p>
             </div>
 
-            <div className="bg-gradient-to-br from-indigo-50/70 to-blue-50/70 border border-indigo-200/50 rounded-xl p-4">
+            <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold ds-text-primary">Include Basements</p>
@@ -2598,7 +2598,7 @@ export default function ProjectDetailPage() {
           </div>
         </div>
 
-        <div className="px-8 py-6 border-t ds-border-subtle/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 bg-gradient-to-br from-gray-50/60 to-transparent">
+        <div className="px-8 py-6 border-t ds-border-subtle/50 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 ds-bg-surface-muted/60">
           <button
             type="button"
             onClick={() => setShowFloorInitModal(false)}
@@ -2611,7 +2611,7 @@ export default function ProjectDetailPage() {
             type="button"
             onClick={handleSubmitFloorInit}
             disabled={initializingFloors}
-            className="relative w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl hover:from-indigo-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40"
+            className="relative w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white ds-bg-accent-primary rounded-xl hover:ds-bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ds-accent-focus disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
           >
             {initializingFloors ? 'Creating Floors...' : 'Create Floors'}
           </button>

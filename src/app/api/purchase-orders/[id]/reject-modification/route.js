@@ -12,7 +12,7 @@ import { getUserProfile } from '@/lib/auth-helpers';
 import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotifications } from '@/lib/notifications';
-import { sendPushToUser } from '@/lib/push-service';
+import { sendPushToSupplier } from '@/lib/push-service';
 import { sendSMS, generateModificationRejectionSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
@@ -137,19 +137,21 @@ export async function POST(request, { params }) {
     });
 
     // Notify supplier about rejection
-    const supplier = await db.collection('users').findOne({
-      _id: purchaseOrder.supplierId,
-      status: 'active'
+    const supplierProfile = await db.collection('suppliers').findOne({
+      $or: [
+        { _id: purchaseOrder.supplierId, status: 'active' },
+        { userId: purchaseOrder.supplierId, status: 'active' } // legacy mapping support
+      ]
     });
 
-    if (supplier) {
+    if (supplierProfile) {
       try {
-        await sendPushToUser({
-          userId: supplier._id.toString(),
+        await sendPushToSupplier({
+          supplierId: supplierProfile._id.toString(),
           title: 'Modifications Rejected',
           message: `Your modifications to PO ${purchaseOrder.purchaseOrderNumber} were rejected. Reason: ${rejectionReason.trim()}`,
           data: {
-            url: `/purchase-orders/${id}`,
+            url: `/purchase-orders/respond/${purchaseOrder.responseToken || ''}`,
             purchaseOrderId: id
           }
         });
@@ -159,12 +161,7 @@ export async function POST(request, { params }) {
 
       // Send SMS to supplier if enabled
       try {
-        const supplierProfile = await db.collection('suppliers').findOne({
-          userId: purchaseOrder.supplierId,
-          status: 'active'
-        });
-
-        if (supplierProfile && supplierProfile.smsEnabled && supplierProfile.phone) {
+        if (supplierProfile.smsEnabled && supplierProfile.phone) {
           const formattedPhone = formatPhoneNumber(supplierProfile.phone);
           const smsMessage = generateModificationRejectionSMS({
             purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,

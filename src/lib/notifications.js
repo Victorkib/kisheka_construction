@@ -128,9 +128,10 @@ export async function markNotificationAsRead(notificationId, userId) {
  * Marks all notifications as read for a user
  * @param {string} userId - User ID
  * @param {string} [projectId] - Optional project ID to filter by
+ * @param {string} [type] - Optional notification type to filter by (e.g., 'approval_needed')
  * @returns {Promise<number>} Number of notifications marked as read
  */
-export async function markAllNotificationsAsRead(userId, projectId = null) {
+export async function markAllNotificationsAsRead(userId, projectId = null, type = null) {
   try {
     const db = await getDatabase();
     
@@ -141,6 +142,10 @@ export async function markAllNotificationsAsRead(userId, projectId = null) {
     
     if (projectId) {
       query.projectId = new ObjectId(projectId);
+    }
+    
+    if (type) {
+      query.type = type;
     }
     
     const result = await db.collection('notifications').updateMany(

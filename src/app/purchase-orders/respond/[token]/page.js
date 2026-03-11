@@ -123,6 +123,9 @@ function PurchaseOrderResponsePageContent() {
       if (!purchaseOrder) {
         throw new Error('Purchase order not loaded');
       }
+      if (!token) {
+        throw new Error('Response token is missing. Please use the original supplier response link.');
+      }
 
       // Validate action is selected
       if (!action || !['accept', 'reject', 'modify'].includes(action)) {
@@ -161,6 +164,7 @@ function PurchaseOrderResponsePageContent() {
         },
         body: JSON.stringify({
           action,
+          token,
           finalUnitCost: formData.finalUnitCost ? parseFloat(formData.finalUnitCost) : null,
           quantityOrdered: formData.quantityOrdered ? parseFloat(formData.quantityOrdered) : null,
           deliveryDate: formData.deliveryDate || null,
@@ -270,7 +274,7 @@ function PurchaseOrderResponsePageContent() {
     const isExpired = error.includes('expired');
     
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-red-50 flex items-center justify-center px-4">
+      <div className="min-h-screen ds-bg-app flex items-center justify-center px-4">
         <div className="max-w-md w-full ds-bg-surface rounded-xl shadow-xl p-8 border ds-border-subtle">
           <div className="text-center space-y-4">
             <div className="text-7xl mb-4">{isTokenUsed || isExpired ? '🔒' : '⚠️'}</div>
@@ -341,7 +345,7 @@ function PurchaseOrderResponsePageContent() {
     const successContent = getSuccessContent();
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 flex items-center justify-center px-4 py-12">
+      <div className="min-h-screen ds-bg-app flex items-center justify-center px-4 py-12">
         <div className="max-w-lg w-full ds-bg-surface rounded-xl shadow-xl p-10 border ds-border-subtle">
           <div className="text-center space-y-6">
             <div className="text-7xl mb-2">{successContent.icon}</div>
@@ -381,7 +385,7 @@ function PurchaseOrderResponsePageContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen ds-bg-app py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="ds-bg-surface rounded-xl shadow-lg p-8 mb-8 border ds-border-subtle">
@@ -400,7 +404,7 @@ function PurchaseOrderResponsePageContent() {
             <button
               onClick={handleDownloadPDF}
               disabled={downloadingPDF}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 shadow-md hover:shadow-lg transition-all duration-200"
+              className="px-6 py-3 ds-bg-accent-primary font-semibold rounded-xl hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 shadow-md hover:shadow-lg transition-all duration-200 ds-bg-surface-muted ds-text-secondary"
             >
               {downloadingPDF ? (
                 <>
@@ -433,8 +437,8 @@ function PurchaseOrderResponsePageContent() {
 
         {/* Batch Information (for bulk orders) */}
         {purchaseOrder.isBulkOrder && purchaseOrder.batch && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-400/60 rounded-xl p-7 mb-8">
-            <h2 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+          <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-xl p-7 mb-8">
+            <h2 className="text-xl font-bold ds-text-accent-primary mb-4 flex items-center gap-2">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
@@ -845,9 +849,9 @@ function PurchaseOrderResponsePageContent() {
                 type="submit"
                 disabled={submitting || !action}
                 className={`px-8 py-3 rounded-xl text-white font-bold text-base transition-all duration-200 flex-1 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed ${
-                  action === 'accept' ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800' :
-                  action === 'reject' ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800' :
-                  action === 'modify' ? 'bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800' :
+                  action === 'accept' ? 'ds-bg-success hover:bg-emerald-700' :
+                  action === 'reject' ? 'ds-bg-danger hover:bg-red-700' :
+                  action === 'modify' ? 'bg-amber-600 hover:bg-amber-700' :
                   'ds-bg-surface-muted cursor-not-allowed'
                 }`}
               >

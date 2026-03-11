@@ -19,6 +19,7 @@ import { WorkflowGuide } from '@/components/workflow/WorkflowGuide';
 import { HelpIcon, FieldHelp } from '@/components/help/HelpTooltip';
 import { MaterialLibraryPicker } from '@/components/material-library/material-library-picker';
 import { MaterialRequestFinancialStatus } from '@/components/budget/MaterialRequestFinancialStatus';
+import { ConfirmationModal } from '@/components/modals';
 
 function NewMaterialRequestPageContent() {
   const router = useRouter();
@@ -43,6 +44,7 @@ function NewMaterialRequestPageContent() {
   const [loadingCategories, setLoadingCategories] = useState(true);
   const [prerequisites, setPrerequisites] = useState(null);
   const [loadingPrerequisites, setLoadingPrerequisites] = useState(false);
+  const [showCapitalConfirmModal, setShowCapitalConfirmModal] = useState(false);
 
   const [formData, setFormData] = useState({
     projectId: '',
@@ -254,7 +256,7 @@ function NewMaterialRequestPageContent() {
         // Clear phase selection if current phase is not in the new list
         setFormData((prev) => {
           const currentPhaseId = prev.phaseId;
-          const phaseExists = data.data.some(p => p._id === currentPhaseId);
+          const phaseExists = (data.data || []).some((p) => (p._id?.toString() || p.id?.toString()) === currentPhaseId);
           return {
             ...prev,
             phaseId: phaseExists ? currentPhaseId : ''
@@ -507,8 +509,7 @@ function NewMaterialRequestPageContent() {
     }
   }, [formData.estimatedUnitCost, formData.quantityNeeded, formData.estimatedCost]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const processSubmit = async ({ skipCapitalWarning = false } = {}) => {
     setError(null);
 
     // Validation
@@ -556,15 +557,11 @@ function NewMaterialRequestPageContent() {
     }
 
     // Check financial warning if estimated cost exceeds available capital
-    if (formData.estimatedCost && availableCapital !== null) {
+    if (!skipCapitalWarning && formData.estimatedCost && availableCapital !== null) {
       const estimatedCostNum = parseFloat(formData.estimatedCost);
       if (estimatedCostNum > availableCapital) {
-        const proceed = confirm(
-          `Warning: Estimated cost (KES ${estimatedCostNum.toLocaleString()}) exceeds available capital (KES ${availableCapital.toLocaleString()}). Do you want to proceed?`
-        );
-        if (!proceed) {
-          return;
-        }
+        setShowCapitalConfirmModal(true);
+        return;
       }
     }
 
@@ -625,6 +622,16 @@ function NewMaterialRequestPageContent() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await processSubmit({ skipCapitalWarning: false });
+  };
+
+  const handleCapitalWarningConfirm = async () => {
+    setShowCapitalConfirmModal(false);
+    await processSubmit({ skipCapitalWarning: true });
   };
 
   const formatCurrency = (amount) => {
@@ -768,103 +775,6 @@ function NewMaterialRequestPageContent() {
               </select>
             </div>
 
-            {/* Floor Selection (Optional) */}
-            {formData.projectId && floors.length > 0 && (
-              <div>
-                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
-                  Floor (Optional)
-                  <HelpIcon 
-                    content="Select the specific floor if this material is for a particular floor. This helps with organization and tracking."
-                    position="right"
-                  />
-                </label>
-                <FieldHelp>
-                  Optional: Specify which floor these materials are for. Helps organize materials by location.
-                </FieldHelp>
-                <select
-                  name="floorId"
-                  value={formData.floorId}
-                  onChange={handleChange}
-                  disabled={loadingFloors || loadingApplicableFloors || loading || !formData.projectId}
-                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
-                >
-                  {loadingFloors || loadingApplicableFloors ? (
-                    <option>Loading floors...</option>
-                  ) : (
-                    <>
-                      <option value="" className="ds-text-primary">Select a floor (optional)</option>
-                      {/* Show applicable floors first */}
-                      {applicableFloors.length > 0 && (
-                        <>
-                          {applicableFloors.map((floor) => {
-                            const getFloorDisplay = (floorNumber, name) => {
-                              if (name) return name;
-                              if (floorNumber === undefined || floorNumber === null) return 'N/A';
-                              if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
-                              if (floorNumber === 0) return 'Ground Floor';
-                              return `Floor ${floorNumber}`;
-                            };
-                            return (
-                              <option key={floor._id} value={floor._id} className="ds-text-primary">
-                                {getFloorDisplay(floor.floorNumber, floor.name)} ✓
-                              </option>
-                            );
-                          })}
-                        </>
-                      )}
-                      {/* Show non-applicable floors (disabled) if phase is selected */}
-                      {formData.phaseId && nonApplicableFloors.length > 0 && (
-                        <>
-                          <optgroup label={`Not applicable to ${selectedPhaseInfo?.phaseName || 'selected phase'}`} className="ds-text-muted">
-                            {nonApplicableFloors.map((floor) => {
-                              const getFloorDisplay = (floorNumber, name) => {
-                                if (name) return name;
-                                if (floorNumber === undefined || floorNumber === null) return 'N/A';
-                                if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
-                                if (floorNumber === 0) return 'Ground Floor';
-                                return `Floor ${floorNumber}`;
-                              };
-                              return (
-                                <option key={floor._id} value={floor._id} disabled className="ds-text-muted italic">
-                                  {getFloorDisplay(floor.floorNumber, floor.name)} ✗
-                                </option>
-                              );
-                            })}
-                          </optgroup>
-                        </>
-                      )}
-                      {/* Fallback: show all floors if no phase selected or API not available */}
-                      {!formData.phaseId && floors.length > 0 && applicableFloors.length === 0 && (
-                        <>
-                          {floors.map((floor) => {
-                            const getFloorDisplay = (floorNumber, name) => {
-                              if (name) return name;
-                              if (floorNumber === undefined || floorNumber === null) return 'N/A';
-                              if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
-                              if (floorNumber === 0) return 'Ground Floor';
-                              return `Floor ${floorNumber}`;
-                            };
-                            return (
-                              <option key={floor._id} value={floor._id} className="ds-text-primary">
-                                {getFloorDisplay(floor.floorNumber, floor.name)}
-                              </option>
-                            );
-                          })}
-                        </>
-                      )}
-                    </>
-                  )}
-                </select>
-                {formData.phaseId && selectedPhaseInfo && (
-                  <p className="mt-1 text-xs ds-text-accent-primary">
-                    {applicableFloors.length > 0 
-                      ? `✓ ${applicableFloors.length} floor(s) applicable to ${selectedPhaseInfo.phaseName}`
-                      : 'No floors are applicable to this phase. Floor assignment is optional.'}
-                  </p>
-                )}
-              </div>
-            )}
-
             {/* Phase Selection (Required) */}
             {formData.projectId && (
               <div>
@@ -920,6 +830,93 @@ function NewMaterialRequestPageContent() {
               </div>
             )}
 
+            {/* Floor Selection (Optional, after Phase) */}
+            {formData.projectId && (
+              <div>
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
+                  Floor (Optional)
+                  <HelpIcon
+                    content="Select floor after selecting phase. Floors are filtered by the selected phase for better budget and location traceability."
+                    position="right"
+                  />
+                </label>
+                <FieldHelp>
+                  Optional: Select a floor after phase selection. This keeps floor assignment consistent with phase applicability.
+                </FieldHelp>
+                {loadingFloors || loadingApplicableFloors ? (
+                  <div className="w-full px-3 py-2 border ds-border-subtle rounded-lg ds-bg-surface-muted ds-text-muted text-sm">
+                    Loading floors...
+                  </div>
+                ) : floors.length === 0 ? (
+                  <div className="space-y-2">
+                    <div className="w-full px-3 py-2 border border-yellow-400/60 rounded-lg bg-yellow-50 text-yellow-800 text-sm">
+                      No floors available for this project. Floor assignment is optional, but adding floors improves tracking.
+                    </div>
+                    <Link
+                      href={`/floors?projectId=${formData.projectId}`}
+                      className="text-sm ds-text-accent-primary hover:underline"
+                      target="_blank"
+                    >
+                      Manage floors for this project →
+                    </Link>
+                  </div>
+                ) : (
+                  <select
+                    name="floorId"
+                    value={formData.floorId}
+                    onChange={handleChange}
+                    disabled={loading || !formData.phaseId}
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                  >
+                    {!formData.phaseId ? (
+                      <option value="" className="ds-text-primary">Select phase first</option>
+                    ) : (
+                      <option value="" className="ds-text-primary">Select a floor (optional)</option>
+                    )}
+                    {formData.phaseId && applicableFloors.map((floor) => {
+                      const getFloorDisplay = (floorNumber, name) => {
+                        if (name) return name;
+                        if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                        if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                        if (floorNumber === 0) return 'Ground Floor';
+                        return `Floor ${floorNumber}`;
+                      };
+                      return (
+                        <option key={floor._id} value={floor._id} className="ds-text-primary">
+                          {getFloorDisplay(floor.floorNumber, floor.name)} ✓
+                        </option>
+                      );
+                    })}
+                    {formData.phaseId && nonApplicableFloors.length > 0 && (
+                      <optgroup label={`Not applicable to ${selectedPhaseInfo?.phaseName || 'selected phase'}`} className="ds-text-muted">
+                        {nonApplicableFloors.map((floor) => {
+                          const getFloorDisplay = (floorNumber, name) => {
+                            if (name) return name;
+                            if (floorNumber === undefined || floorNumber === null) return 'N/A';
+                            if (floorNumber < 0) return `Basement ${Math.abs(floorNumber)}`;
+                            if (floorNumber === 0) return 'Ground Floor';
+                            return `Floor ${floorNumber}`;
+                          };
+                          return (
+                            <option key={floor._id} value={floor._id} disabled className="ds-text-muted italic">
+                              {getFloorDisplay(floor.floorNumber, floor.name)} ✗
+                            </option>
+                          );
+                        })}
+                      </optgroup>
+                    )}
+                  </select>
+                )}
+                {formData.phaseId && selectedPhaseInfo && (
+                  <p className="mt-1 text-xs ds-text-accent-primary">
+                    {applicableFloors.length > 0
+                      ? `✓ ${applicableFloors.length} floor(s) applicable to ${selectedPhaseInfo.phaseName}`
+                      : 'No floors are applicable to this phase. Floor assignment remains optional.'}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Category Selection (Optional) */}
             <div>
               <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
@@ -968,7 +965,7 @@ function NewMaterialRequestPageContent() {
                 />
               </label>
               <FieldHelp>
-                The name of the material you're requesting. Use clear, descriptive names.
+                The name of the material you&apos;re requesting. Use clear, descriptive names.
               </FieldHelp>
               <input
                 type="text"
@@ -1033,7 +1030,7 @@ function NewMaterialRequestPageContent() {
                   />
                 </label>
                 <FieldHelp>
-                  Unit of measurement for the quantity. Select 'Others' if your unit isn't listed.
+                  Unit of measurement for the quantity. Select &apos;Others&apos; if your unit isn&apos;t listed.
                 </FieldHelp>
                 <select
                   name="unit"
@@ -1211,6 +1208,20 @@ function NewMaterialRequestPageContent() {
             </div>
           </div>
         </form>
+
+        <ConfirmationModal
+          isOpen={showCapitalConfirmModal}
+          onClose={() => {
+            if (!loading) setShowCapitalConfirmModal(false);
+          }}
+          onConfirm={handleCapitalWarningConfirm}
+          title="Proceed Despite Capital Warning?"
+          message={`Estimated cost (${formatCurrency(parseFloat(formData.estimatedCost) || 0)}) exceeds available capital (${formatCurrency(availableCapital || 0)}). Material request creation is allowed, but you should review funding before procurement.`}
+          confirmText="Proceed Anyway"
+          cancelText="Review First"
+          variant="warning"
+          isLoading={loading}
+        />
       </div>
     </AppLayout>
   );

@@ -8,6 +8,7 @@
 
 import { Component } from 'react';
 import Link from 'next/link';
+import { notifyError } from '@/lib/error-notification-manager';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -43,6 +44,9 @@ class ErrorBoundary extends Component {
       
       if (typeof window !== 'undefined' && window.sessionStorage) {
         sessionStorage.setItem('lastError', JSON.stringify(errorData));
+        
+        // Use centralized notification manager (with deduplication)
+        notifyError(errorData);
       }
     } catch (storageError) {
       console.error('Failed to store error data:', storageError);

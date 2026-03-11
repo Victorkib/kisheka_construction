@@ -20,7 +20,7 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
         </div>
         <div className="ds-bg-surface rounded-lg shadow p-6">
           <p className="text-sm ds-text-secondary">Actual Cost</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">
+          <p className="text-2xl font-bold ds-text-accent-primary mt-1">
             {formatCurrency(floor.actualCost || 0)}
           </p>
         </div>
@@ -28,8 +28,8 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
           <p className="text-sm ds-text-secondary">Remaining</p>
           <p className={`text-2xl font-bold mt-1 ${
             ((floor.budgetAllocation?.total || floor.totalBudget || 0) - (floor.actualCost || 0)) < 0
-              ? 'text-red-600'
-              : 'text-green-600'
+              ? 'ds-text-danger'
+              : 'ds-text-success'
           }`}>
             {formatCurrency((floor.budgetAllocation?.total || floor.totalBudget || 0) - (floor.actualCost || 0))}
           </p>
@@ -62,7 +62,7 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
               </p>
               <Link
                 href={`/items?floorId=${floor._id}`}
-                className="text-xs text-blue-600 hover:text-blue-800"
+                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
               >
                 View →
               </Link>
@@ -85,7 +85,7 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
               </p>
               <Link
                 href={`/labour/entries?floorId=${floor._id}`}
-                className="text-xs text-blue-600 hover:text-blue-800"
+                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
               >
                 View →
               </Link>
@@ -106,7 +106,7 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
               </p>
               <Link
                 href={`/work-items?floorId=${floor._id}`}
-                className="text-xs text-blue-600 hover:text-blue-800"
+                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
               >
                 View →
               </Link>
@@ -127,7 +127,7 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
               </p>
               <Link
                 href={`/equipment?floorId=${floor._id}`}
-                className="text-xs text-blue-600 hover:text-blue-800"
+                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
               >
                 View →
               </Link>
@@ -152,7 +152,7 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
               <h3 className="text-lg font-semibold ds-text-primary">Cost Breakdown by Phase</h3>
               <Link
                 href={`/floors/${floor._id}?tab=phases`}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
               >
                 View Full Phase Breakdown →
               </Link>
@@ -208,10 +208,10 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
             <div
               className={`h-3 rounded-full transition-all ${
                 ((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0)) > 1
-                  ? 'bg-red-600'
+                  ? 'ds-bg-danger'
                   : ((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0)) > 0.8
-                  ? 'bg-yellow-600'
-                  : 'bg-green-600'
+                  ? 'ds-bg-warning'
+                  : 'ds-bg-success'
               }`}
               style={{
                 width: `${Math.min(100, ((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0)) * 100)}%`
