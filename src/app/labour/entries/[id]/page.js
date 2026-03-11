@@ -204,12 +204,12 @@ function LabourEntryDetailPageContent() {
 
   const getStatusBadge = (status) => {
     const badges = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       paid: 'bg-blue-100 text-blue-800',
       rejected: 'bg-red-100 text-red-800',
-      cancelled: 'bg-gray-100 text-gray-600',
+      cancelled: 'ds-bg-surface-muted ds-text-secondary',
     };
 
     return (
@@ -239,7 +239,7 @@ function LabourEntryDetailPageContent() {
     return (
       <AppLayout>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 sm:p-6 text-center">
+          <div className="bg-red-50 border border-red-400/60 rounded-lg p-4 sm:p-6 text-center">
             <p className="text-red-800 mb-4 text-sm sm:text-base">{error || 'Labour entry not found'}</p>
             <Link
               href="/labour/entries"
@@ -275,15 +275,15 @@ function LabourEntryDetailPageContent() {
         <div className="mb-6 sm:mb-8">
           <Link
             href="/labour/entries"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 active:text-gray-950 mb-4 text-sm sm:text-base transition-colors touch-manipulation"
+            className="inline-flex items-center gap-2 ds-text-secondary hover:ds-text-primary active:ds-text-primary mb-4 text-sm sm:text-base transition-colors touch-manipulation"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Entries
           </Link>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 break-words">Labour Entry Details</h1>
-              <p className="text-sm sm:text-base text-gray-600 mt-1">Entry Number: {entry.entryNumber || entry._id}</p>
+              <h1 className="text-2xl sm:text-3xl font-bold ds-text-primary break-words">Labour Entry Details</h1>
+              <p className="text-sm sm:text-base ds-text-secondary mt-1">Entry Number: {entry.entryNumber || entry._id}</p>
               {entry.batchId && (
                 <Link
                   href={`/labour/batches/${entry.batchId}`}
@@ -329,40 +329,40 @@ function LabourEntryDetailPageContent() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
-              <span className="text-xs sm:text-sm font-medium text-gray-700">Total Hours</span>
+              <span className="text-xs sm:text-sm font-medium ds-text-secondary">Total Hours</span>
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">
+            <div className="text-xl sm:text-2xl font-bold ds-text-primary">
               {entry.totalHours?.toFixed(1)} hrs
             </div>
             {finalOvertimeHours > 0 && (
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs ds-text-muted mt-1">
                 Regular: {finalRegularHours.toFixed(1)} hrs | Overtime: {finalOvertimeHours.toFixed(1)} hrs
               </div>
             )}
           </div>
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
-              <span className="text-xs sm:text-sm font-medium text-gray-700">Total Cost</span>
+              <span className="text-xs sm:text-sm font-medium ds-text-secondary">Total Cost</span>
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">
+            <div className="text-xl sm:text-2xl font-bold ds-text-primary">
               {entry.totalCost?.toLocaleString()} KES
             </div>
             {finalOvertimeHours > 0 && (
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs ds-text-muted mt-1">
                 Regular: {regularCost.toLocaleString()} KES | Overtime: {overtimeCost.toLocaleString()} KES
               </div>
             )}
           </div>
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
             <div className="flex items-center gap-2 sm:gap-3 mb-2">
               <User className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
-              <span className="text-xs sm:text-sm font-medium text-gray-700">Hourly Rate</span>
+              <span className="text-xs sm:text-sm font-medium ds-text-secondary">Hourly Rate</span>
             </div>
-            <div className="text-xl sm:text-2xl font-bold text-gray-900">
+            <div className="text-xl sm:text-2xl font-bold ds-text-primary">
               {entry.hourlyRate?.toLocaleString()} KES/hr
             </div>
           </div>
@@ -371,11 +371,11 @@ function LabourEntryDetailPageContent() {
         {/* Main Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
           {/* Worker Information */}
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Worker Information</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold ds-text-primary mb-4">Worker Information</h2>
             <div className="space-y-3">
               <div>
-                <label className="text-sm font-medium text-gray-500">Worker Name</label>
+                <label className="text-sm font-medium ds-text-muted">Worker Name</label>
                 {(entry.workerProfileId || entry.workerId) ? (
                   <div>
                     <Link
@@ -392,69 +392,69 @@ function LabourEntryDetailPageContent() {
                     </Link>
                   </div>
                 ) : (
-                  <p className="text-gray-900 font-medium">{entry.workerName}</p>
+                  <p className="ds-text-primary font-medium">{entry.workerName}</p>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Worker Type</label>
-                  <p className="text-gray-900 capitalize">{entry.workerType || 'N/A'}</p>
+                  <label className="text-sm font-medium ds-text-muted">Worker Type</label>
+                  <p className="ds-text-primary capitalize">{entry.workerType || 'N/A'}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Worker Role</label>
-                  <p className="text-gray-900 capitalize">{entry.workerRole || 'N/A'}</p>
+                  <label className="text-sm font-medium ds-text-muted">Worker Role</label>
+                  <p className="ds-text-primary capitalize">{entry.workerRole || 'N/A'}</p>
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-500">Skill Type</label>
-                <p className="text-gray-900">{entry.skillType?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}</p>
+                <label className="text-sm font-medium ds-text-muted">Skill Type</label>
+                <p className="ds-text-primary">{entry.skillType?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase())}</p>
               </div>
             </div>
           </div>
 
           {/* Project Information */}
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Project Information</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-semibold ds-text-primary mb-4">Project Information</h2>
             <div className="space-y-3">
               {project && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Project</label>
-                  <p className="text-gray-900 font-medium">{project.projectName}</p>
+                  <label className="text-sm font-medium ds-text-muted">Project</label>
+                  <p className="ds-text-primary font-medium">{project.projectName}</p>
                 </div>
               )}
               {phase && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Phase</label>
-                  <p className="text-gray-900">{phase.phaseName}</p>
+                  <label className="text-sm font-medium ds-text-muted">Phase</label>
+                  <p className="ds-text-primary">{phase.phaseName}</p>
                 </div>
               )}
               <div>
-                <label className="text-sm font-medium text-gray-500">Entry Date</label>
-                <p className="text-gray-900 flex items-center gap-2">
+                <label className="text-sm font-medium ds-text-muted">Entry Date</label>
+                <p className="ds-text-primary flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   {new Date(entry.entryDate).toLocaleDateString()}
                 </p>
               </div>
               {entry.clockInTime && entry.clockOutTime && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Time Range</label>
-                  <p className="text-gray-900">
+                  <label className="text-sm font-medium ds-text-muted">Time Range</label>
+                  <p className="ds-text-primary">
                     {new Date(entry.clockInTime).toLocaleTimeString()} - {new Date(entry.clockOutTime).toLocaleTimeString()}
                   </p>
                 </div>
               )}
               {entry.workItemId && workItem && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Work Item</label>
+                  <label className="text-sm font-medium ds-text-muted">Work Item</label>
                   <div className="mt-1">
                     <Link
                       href={`/work-items/${workItem._id}`}
-                      className="text-gray-900 font-medium hover:text-blue-600 flex items-center gap-1"
+                      className="ds-text-primary font-medium hover:text-blue-600 flex items-center gap-1"
                     >
                       <Briefcase className="w-4 h-4" />
                       {workItem.name} →
                     </Link>
-                    <div className="mt-1 text-sm text-gray-600">
+                    <div className="mt-1 text-sm ds-text-secondary">
                       <span className="capitalize">{workItem.category || 'Other'}</span>
                       {' • '}
                       <span className="capitalize">{workItem.status?.replace('_', ' ') || 'Not Started'}</span>
@@ -484,33 +484,33 @@ function LabourEntryDetailPageContent() {
 
         {/* Additional Details */}
         {entry.taskDescription && (
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Task Description</h2>
-            <p className="text-sm sm:text-base text-gray-700 break-words">{entry.taskDescription}</p>
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold ds-text-primary mb-4">Task Description</h2>
+            <p className="text-sm sm:text-base ds-text-secondary break-words">{entry.taskDescription}</p>
           </div>
         )}
 
         {/* Professional Service Details */}
         {entry.workerType === 'professional' && (
-          <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
-            <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Professional Service Details</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-semibold ds-text-primary mb-4">Professional Service Details</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {entry.serviceType && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Service Type</label>
-                  <p className="text-gray-900 capitalize">{entry.serviceType}</p>
+                  <label className="text-sm font-medium ds-text-muted">Service Type</label>
+                  <p className="ds-text-primary capitalize">{entry.serviceType}</p>
                 </div>
               )}
               {entry.visitPurpose && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Visit Purpose</label>
-                  <p className="text-gray-900">{entry.visitPurpose}</p>
+                  <label className="text-sm font-medium ds-text-muted">Visit Purpose</label>
+                  <p className="ds-text-primary">{entry.visitPurpose}</p>
                 </div>
               )}
               {entry.deliverables && entry.deliverables.length > 0 && (
                 <div className="md:col-span-2">
-                  <label className="text-sm font-medium text-gray-500">Deliverables</label>
-                  <ul className="list-disc list-inside text-gray-900 mt-1">
+                  <label className="text-sm font-medium ds-text-muted">Deliverables</label>
+                  <ul className="list-disc list-inside ds-text-primary mt-1">
                     {entry.deliverables.map((deliverable, index) => (
                       <li key={index}>{deliverable}</li>
                     ))}
@@ -522,22 +522,22 @@ function LabourEntryDetailPageContent() {
         )}
 
         {/* Cost Breakdown */}
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Cost Breakdown</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-semibold ds-text-primary mb-4">Cost Breakdown</h2>
           <div className="space-y-2">
             <div className="flex justify-between py-2 border-b">
-              <span className="text-gray-600 text-gray-900">Regular Hours ({finalRegularHours.toFixed(1)} hrs)</span>
-              <span className="font-medium text-gray-900 font-bold">{regularCost.toLocaleString()} KES</span>
+              <span className="ds-text-secondary ds-text-primary">Regular Hours ({finalRegularHours.toFixed(1)} hrs)</span>
+              <span className="font-medium ds-text-primary font-bold">{regularCost.toLocaleString()} KES</span>
             </div>
             {finalOvertimeHours > 0 && (
               <div className="flex justify-between py-2 border-b">
-                <span className="text-gray-600 text-gray-900">Overtime Hours ({finalOvertimeHours.toFixed(1)} hrs @ 1.5x)</span>
-                <span className="font-medium text-gray-900 font-bold">{overtimeCost.toLocaleString()} KES</span>
+                <span className="ds-text-secondary ds-text-primary">Overtime Hours ({finalOvertimeHours.toFixed(1)} hrs @ 1.5x)</span>
+                <span className="font-medium ds-text-primary font-bold">{overtimeCost.toLocaleString()} KES</span>
               </div>
             )}
             <div className="flex justify-between py-2 font-bold text-lg">
-              <span className="text-gray-900 font-bold">Total Cost</span>
-              <span className="text-gray-900 font-bold">{entry.totalCost?.toLocaleString()} KES</span>
+              <span className="ds-text-primary font-bold">Total Cost</span>
+              <span className="ds-text-primary font-bold">{entry.totalCost?.toLocaleString()} KES</span>
             </div>
           </div>
         </div>

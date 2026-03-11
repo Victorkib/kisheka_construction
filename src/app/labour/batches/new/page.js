@@ -444,16 +444,16 @@ function BulkLabourEntryPageContent() {
           >
             ← Back to Labour Dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">
+          <h1 className="text-3xl font-bold ds-text-primary mt-2">
             Bulk Labour Entry
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="ds-text-secondary mt-1">
             Create multiple labour entries at once
           </p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-500/10 border border-red-400/60 text-red-200 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
@@ -478,7 +478,7 @@ function BulkLabourEntryPageContent() {
         />
 
         {/* Step Content */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow border ds-border-subtle p-6 mb-6">
           {renderStep()}
         </div>
 
@@ -683,17 +683,17 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl font-semibold ds-text-primary mb-2">
           Project & Settings
         </h2>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm ds-text-secondary">
           Select the project and default settings for all entries in this batch.
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Project <span className="text-red-500">*</span>
           </label>
           <LoadingSelect
@@ -703,7 +703,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
             required
             loading={loadingProjects}
             loadingText="Loading projects..."
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
           >
             <option value="">Select Project</option>
             {projects.map((project) => (
@@ -715,7 +715,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Phase{' '}
             {!wizardData.isIndirectLabour && (
               <span className="text-red-500">*</span>
@@ -729,7 +729,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
             loading={loadingPhases}
             loadingText="Loading phases..."
             disabled={!wizardData.projectId || wizardData.isIndirectLabour}
-            className={`w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus ${
               wizardData.isIndirectLabour ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
@@ -747,7 +747,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Floor (Optional)
           </label>
           <LoadingSelect
@@ -757,7 +757,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
             loading={loadingFloors}
             loadingText="Loading floors..."
             disabled={!wizardData.projectId}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
           >
             <option value="">Select Floor</option>
             {floors.map((floor) => (
@@ -769,14 +769,14 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Work Category (Optional)
           </label>
           <select
             name="defaultCategoryId"
             value={wizardData.defaultCategoryId}
             onChange={handleChange}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
           >
             <option value="">Select Category</option>
             {categories.map((category) => (
@@ -788,7 +788,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Entry Date <span className="text-red-500">*</span>
           </label>
           <input
@@ -797,19 +797,19 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
             value={wizardData.defaultDate}
             onChange={handleChange}
             required
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Entry Type
           </label>
           <select
             name="entryType"
             value={wizardData.entryType}
             onChange={handleChange}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
           >
             <option value="time_based">Time Based</option>
             <option value="task_based">Task Based</option>
@@ -819,14 +819,14 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Default Worker Role
           </label>
           <select
             name="defaultWorkerRole"
             value={wizardData.defaultWorkerRole}
             onChange={handleChange}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
           >
             <option value="skilled">Skilled</option>
             <option value="unskilled">Unskilled</option>
@@ -836,7 +836,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Batch Name (Optional)
           </label>
           <input
@@ -845,12 +845,12 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
             value={wizardData.batchName}
             onChange={handleChange}
             placeholder="e.g., Monday Morning Crew"
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium ds-text-secondary mb-1">
             Work Item {!wizardData.isIndirectLabour && <span className="text-red-600">*</span>}
           </label>
           <LoadingSelect
@@ -860,7 +860,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
             loading={loadingWorkItems}
             loadingText="Loading work items..."
             disabled={!wizardData.defaultPhaseId}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
           >
             <option value="">
               {wizardData.isIndirectLabour ? 'No Work Item (Indirect Labour)' : 'Select Work Item'}
@@ -873,12 +873,12 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
             ))}
           </LoadingSelect>
           {!wizardData.isIndirectLabour && (
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs ds-text-muted">
               Direct labour batches must be linked to a work item.
             </p>
           )}
           {wizardData.workItemId && selectedWorkItem && (
-            <div className="mt-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <div className="mt-3 p-4 bg-blue-50 border border-blue-400/60 rounded-lg">
               <div className="flex items-start gap-2">
                 <div className="flex-shrink-0">
                   <svg
@@ -986,7 +986,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
                   : '',
               });
             }}
-            className="mt-1 w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
+            className="mt-1 w-4 h-4 text-amber-500 border-ds-border-subtle rounded focus:ring-amber-500"
           />
           <div className="flex-1">
             <label
@@ -994,7 +994,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
               className={`block font-medium mb-2 ${
                 wizardData.isIndirectLabour
                   ? 'text-amber-900 text-base'
-                  : 'text-gray-700 text-sm'
+                  : 'ds-text-secondary text-sm'
               }`}
             >
               All Entries in This Batch are Indirect Labour
@@ -1003,7 +1003,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
               className={`${
                 wizardData.isIndirectLabour
                   ? 'text-amber-800 text-sm font-medium mb-2'
-                  : 'text-xs text-gray-600 mb-2'
+                  : 'text-xs ds-text-secondary mb-2'
               }`}
             >
               {wizardData.isIndirectLabour
@@ -1012,7 +1012,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
             </p>
             <div
               className={`text-xs space-y-1 ${
-                wizardData.isIndirectLabour ? 'text-amber-700' : 'text-gray-600'
+                wizardData.isIndirectLabour ? 'text-amber-300' : 'ds-text-secondary'
               }`}
             >
               <p>
@@ -1040,7 +1040,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
         {/* Indirect Cost Category Selection - only show when indirect labour is checked */}
         {wizardData.isIndirectLabour && (
           <div className="mt-4 pl-8 border-l-2 border-amber-300">
-            <label className="block text-sm font-medium text-amber-900 mb-2">
+            <label className="block text-sm font-medium text-amber-200 mb-2">
               Indirect Cost Category <span className="text-red-500">*</span>
             </label>
             <select
@@ -1049,7 +1049,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
               onChange={(e) =>
                 onUpdate({ indirectCostCategory: e.target.value })
               }
-              className="w-full md:w-1/2 px-3 py-2 bg-white text-gray-900 border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full md:w-1/2 px-3 py-2 ds-bg-surface ds-text-primary border border-amber-400/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
             >
               <option value="">-- Select Category --</option>
               <option value="siteOverhead">
@@ -1077,7 +1077,7 @@ function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
       {!wizardData.isIndirectLabour &&
         wizardData.projectId &&
         !wizardData.defaultPhaseId && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 -mx-6 px-6 py-4">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 -mx-6 px-6 py-4">
             <div className="flex items-start gap-2">
               <svg
                 className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0"

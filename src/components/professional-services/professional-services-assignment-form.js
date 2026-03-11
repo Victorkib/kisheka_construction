@@ -17,6 +17,7 @@ import { ContractValueCalculator } from './ContractValueCalculator';
 
 export function ProfessionalServicesAssignmentForm({
   initialData = null,
+  presetLibraryId = '',
   professionals = [],
   projects = [],
   phases = [],
@@ -26,6 +27,9 @@ export function ProfessionalServicesAssignmentForm({
   error = null,
   isEdit = false,
 }) {
+  const inputFocusClass = 'focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary';
+  const dateInputClass = `w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} [color-scheme:light_dark] [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-100`;
+
   const [formData, setFormData] = useState({
     libraryId: '',
     projectId: '',
@@ -109,6 +113,15 @@ export function ProfessionalServicesAssignmentForm({
       setSelectedProfessional(null);
     }
   }, [formData.libraryId, professionals, isEdit]);
+
+  // Support direct assignment entry from library page.
+  useEffect(() => {
+    if (isEdit || !presetLibraryId || formData.libraryId) return;
+    const exists = professionals.some((p) => p._id?.toString() === presetLibraryId);
+    if (exists) {
+      setFormData((prev) => ({ ...prev, libraryId: presetLibraryId }));
+    }
+  }, [presetLibraryId, professionals, isEdit, formData.libraryId]);
 
   // Filter phases by selected project
   const availablePhases = phases.filter(
@@ -233,7 +246,7 @@ export function ProfessionalServicesAssignmentForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2">
+        <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg flex items-start gap-2">
           <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -246,10 +259,10 @@ export function ProfessionalServicesAssignmentForm({
 
       {/* Professional Selection */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Professional Selection</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Professional Selection</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Professional <span className="text-red-500">*</span>
             </label>
             <select
@@ -258,9 +271,9 @@ export function ProfessionalServicesAssignmentForm({
               onChange={handleChange}
               required
               disabled={isEdit}
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.libraryId ? 'border-red-300' : 'border-gray-300'
-              } ${isEdit ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
+                validationErrors.libraryId ? 'border-red-400/60' : 'ds-border-subtle'
+              } ${isEdit ? 'ds-bg-surface-muted cursor-not-allowed' : ''}`}
             >
               <option value="">Select Professional</option>
               {professionals
@@ -275,14 +288,14 @@ export function ProfessionalServicesAssignmentForm({
               <p className="mt-1 text-sm text-red-600">{validationErrors.libraryId}</p>
             )}
             {selectedProfessional && (
-              <div className="mt-2 p-3 bg-blue-50 rounded-lg">
+              <div className="mt-2 p-3 ds-bg-accent-subtle rounded-lg border ds-border-accent-subtle">
                 <div className="text-sm">
-                  <div className="font-medium text-gray-900">{selectedProfessional.name}</div>
+                  <div className="font-medium ds-text-primary">{selectedProfessional.name}</div>
                   {selectedProfessional.email && (
-                    <div className="text-gray-600">Email: {selectedProfessional.email}</div>
+                    <div className="ds-text-secondary">Email: {selectedProfessional.email}</div>
                   )}
                   {selectedProfessional.phone && (
-                    <div className="text-gray-600">Phone: {selectedProfessional.phone}</div>
+                    <div className="ds-text-secondary">Phone: {selectedProfessional.phone}</div>
                   )}
                 </div>
               </div>
@@ -291,7 +304,7 @@ export function ProfessionalServicesAssignmentForm({
 
           {/* Service Category */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Service Category <span className="text-red-500">*</span>
             </label>
             <select
@@ -299,8 +312,8 @@ export function ProfessionalServicesAssignmentForm({
               value={formData.serviceCategory}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.serviceCategory ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
+                validationErrors.serviceCategory ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             >
               <option value="construction">Construction Services</option>
@@ -309,7 +322,7 @@ export function ProfessionalServicesAssignmentForm({
             {validationErrors.serviceCategory && (
               <p className="mt-1 text-sm text-red-600">{validationErrors.serviceCategory}</p>
             )}
-            <p className="mt-1 text-xs text-gray-600">
+            <p className="mt-1 text-xs ds-text-secondary">
               {formData.serviceCategory === 'preconstruction' 
                 ? 'Preconstruction services (design, permits, approvals) are charged to the preconstruction budget.'
                 : 'Construction services (site inspections, construction oversight) are charged to the construction budget.'}
@@ -317,7 +330,7 @@ export function ProfessionalServicesAssignmentForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Project <span className="text-red-500">*</span>
             </label>
             <select
@@ -326,9 +339,9 @@ export function ProfessionalServicesAssignmentForm({
               onChange={handleChange}
               required
               disabled={isEdit}
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.projectId ? 'border-red-300' : 'border-gray-300'
-              } ${isEdit ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
+                validationErrors.projectId ? 'border-red-400/60' : 'ds-border-subtle'
+              } ${isEdit ? 'ds-bg-surface-muted cursor-not-allowed' : ''}`}
             >
               <option value="">Select Project</option>
               {projects.map((project) => (
@@ -344,14 +357,14 @@ export function ProfessionalServicesAssignmentForm({
 
           {formData.projectId && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Phase (Optional)
               </label>
               <select
                 name="phaseId"
                 value={formData.phaseId}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
               >
                 <option value="">Select Phase (Optional)</option>
                 {availablePhases.map((phase) => (
@@ -367,7 +380,7 @@ export function ProfessionalServicesAssignmentForm({
 
       {/* Contract Details */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Contract Details</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Contract Details</h2>
         
         {/* Contract Value Calculator */}
         {selectedProfessional && formData.paymentSchedule && formData.contractType && formData.contractStartDate && (
@@ -389,7 +402,7 @@ export function ProfessionalServicesAssignmentForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Contract Type <span className="text-red-500">*</span>
             </label>
             <select
@@ -397,8 +410,8 @@ export function ProfessionalServicesAssignmentForm({
               value={formData.contractType}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.contractType ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
+                validationErrors.contractType ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             >
               <option value="">Select Contract Type</option>
@@ -414,7 +427,7 @@ export function ProfessionalServicesAssignmentForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Contract Value (KES) <span className="text-red-500">*</span>
             </label>
             <div className="flex gap-2">
@@ -427,8 +440,8 @@ export function ProfessionalServicesAssignmentForm({
                 min="0.01"
                 step="0.01"
                 required
-                className={`flex-1 px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 ${
-                  validationErrors.contractValue ? 'border-red-300' : 'border-gray-300'
+                className={`flex-1 px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} placeholder:ds-text-muted ${
+                  validationErrors.contractValue ? 'border-red-400/60' : 'ds-border-subtle'
                 }`}
               />
               {suggestedContractValue && (
@@ -440,7 +453,7 @@ export function ProfessionalServicesAssignmentForm({
                       contractValue: suggestedContractValue.toString(),
                     }));
                   }}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors text-sm font-medium whitespace-nowrap"
+                  className="px-4 py-2 ds-bg-success text-white rounded-lg hover:ds-bg-success focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 transition-colors text-sm font-medium whitespace-nowrap"
                 >
                   Use Suggested
                 </button>
@@ -450,14 +463,14 @@ export function ProfessionalServicesAssignmentForm({
               <p className="mt-1 text-sm text-red-600">{validationErrors.contractValue}</p>
             )}
             {suggestedContractValue && !formData.contractValue && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs ds-text-muted">
                 Suggested: {suggestedContractValue.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}
               </p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Payment Schedule <span className="text-red-500">*</span>
             </label>
             <select
@@ -465,8 +478,8 @@ export function ProfessionalServicesAssignmentForm({
               value={formData.paymentSchedule}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.paymentSchedule ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg ${inputFocusClass} ${
+                validationErrors.paymentSchedule ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             >
               <option value="">Select Payment Schedule</option>
@@ -483,14 +496,14 @@ export function ProfessionalServicesAssignmentForm({
 
           {selectedProfessional?.type === 'engineer' && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Visit Frequency
               </label>
               <select
                 name="visitFrequency"
                 value={formData.visitFrequency}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
               >
                 <option value="">Select Visit Frequency (Optional)</option>
                 {VISIT_FREQUENCIES.map((freq) => (
@@ -506,10 +519,10 @@ export function ProfessionalServicesAssignmentForm({
 
       {/* Contract Dates */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Contract Dates</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Contract Dates</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Assigned Date
             </label>
             <input
@@ -517,11 +530,11 @@ export function ProfessionalServicesAssignmentForm({
               name="assignedDate"
               value={formData.assignedDate}
               onChange={handleChange}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={dateInputClass}
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Contract Start Date <span className="text-red-500">*</span>
             </label>
             <input
@@ -530,8 +543,8 @@ export function ProfessionalServicesAssignmentForm({
               value={formData.contractStartDate}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.contractStartDate ? 'border-red-300' : 'border-gray-300'
+              className={`${dateInputClass} ${
+                validationErrors.contractStartDate ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
             {validationErrors.contractStartDate && (
@@ -539,7 +552,7 @@ export function ProfessionalServicesAssignmentForm({
             )}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Contract End Date (Optional)
             </label>
             <input
@@ -547,8 +560,8 @@ export function ProfessionalServicesAssignmentForm({
               name="contractEndDate"
               value={formData.contractEndDate}
               onChange={handleChange}
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.contractEndDate ? 'border-red-300' : 'border-gray-300'
+              className={`${dateInputClass} ${
+                validationErrors.contractEndDate ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
             {validationErrors.contractEndDate && (
@@ -561,14 +574,14 @@ export function ProfessionalServicesAssignmentForm({
       {/* Milestone Payments (if payment schedule is milestone) */}
       {formData.paymentSchedule === 'milestone' && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Milestone Payments</h2>
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Milestone Payments</h2>
           {formData.milestonePayments.length > 0 && (
             <div className="mb-4 space-y-2">
               {formData.milestonePayments.map((milestone, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-3 ds-bg-surface-muted rounded-lg">
                   <div className="flex-1">
-                    <div className="font-medium text-gray-900">{milestone.milestoneName}</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="font-medium ds-text-primary">{milestone.milestoneName}</div>
+                    <div className="text-sm ds-text-secondary">
                       {new Date(milestone.milestoneDate).toLocaleDateString()} - {formatCurrency(milestone.paymentAmount)}
                     </div>
                   </div>
@@ -588,15 +601,15 @@ export function ProfessionalServicesAssignmentForm({
             <button
               type="button"
               onClick={() => setShowMilestoneForm(true)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
             >
               + Add Milestone
             </button>
           ) : (
-            <div className="p-4 bg-gray-50 rounded-lg space-y-4">
+            <div className="p-4 ds-bg-surface-muted rounded-lg space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Milestone Name
                   </label>
                   <input
@@ -604,22 +617,22 @@ export function ProfessionalServicesAssignmentForm({
                     value={newMilestone.milestoneName}
                     onChange={(e) => setNewMilestone(prev => ({ ...prev, milestoneName: e.target.value }))}
                     placeholder="e.g., Design Complete"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Milestone Date
                   </label>
                   <input
                     type="date"
                     value={newMilestone.milestoneDate}
                     onChange={(e) => setNewMilestone(prev => ({ ...prev, milestoneDate: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={dateInputClass}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Payment Amount (KES)
                   </label>
                   <input
@@ -629,14 +642,14 @@ export function ProfessionalServicesAssignmentForm({
                     placeholder="0.00"
                     min="0.01"
                     step="0.01"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
                   />
                 </div>
                 <div className="flex items-end gap-2">
                   <button
                     type="button"
                     onClick={handleAddMilestone}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover"
                   >
                     Add
                   </button>
@@ -651,7 +664,7 @@ export function ProfessionalServicesAssignmentForm({
                         paymentStatus: 'pending',
                       });
                     }}
-                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                    className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
                   >
                     Cancel
                   </button>
@@ -664,10 +677,10 @@ export function ProfessionalServicesAssignmentForm({
 
       {/* Additional Information */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Additional Information</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Additional Information</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Payment Terms
             </label>
             <input
@@ -676,12 +689,12 @@ export function ProfessionalServicesAssignmentForm({
               value={formData.paymentTerms}
               onChange={handleChange}
               placeholder="e.g., Net 30, 50% upfront"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Contract Document (Optional)
             </label>
             <CloudinaryUploadWidget
@@ -697,7 +710,7 @@ export function ProfessionalServicesAssignmentForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Notes
             </label>
             <textarea
@@ -706,20 +719,20 @@ export function ProfessionalServicesAssignmentForm({
               onChange={handleChange}
               placeholder="Additional notes about this assignment..."
               rows={3}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
             />
           </div>
 
           {isEdit && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Status
               </label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass}`}
               >
                 <option value="active">Active</option>
                 <option value="completed">Completed</option>
@@ -736,14 +749,14 @@ export function ProfessionalServicesAssignmentForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+          className="px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={loading}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-6 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (isEdit ? 'Updating...' : 'Assigning...') : (isEdit ? 'Update Assignment' : 'Assign Professional')}
         </button>

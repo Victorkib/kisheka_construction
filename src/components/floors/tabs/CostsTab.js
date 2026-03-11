@@ -12,31 +12,31 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
     <div className="space-y-6">
       {/* Cost Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600">Budget</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary">Budget</p>
+          <p className="text-2xl font-bold ds-text-primary mt-1">
             {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600">Actual Cost</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary">Actual Cost</p>
+          <p className="text-2xl font-bold ds-text-accent-primary mt-1">
             {formatCurrency(floor.actualCost || 0)}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600">Remaining</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary">Remaining</p>
           <p className={`text-2xl font-bold mt-1 ${
             ((floor.budgetAllocation?.total || floor.totalBudget || 0) - (floor.actualCost || 0)) < 0
-              ? 'text-red-600'
-              : 'text-green-600'
+              ? 'ds-text-danger'
+              : 'ds-text-success'
           }`}>
             {formatCurrency((floor.budgetAllocation?.total || floor.totalBudget || 0) - (floor.actualCost || 0))}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600">Utilization</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary">Utilization</p>
+          <p className="text-2xl font-bold ds-text-primary mt-1">
             {(floor.budgetAllocation?.total || floor.totalBudget || 0) > 0
               ? `${((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0) * 100).toFixed(1)}%`
               : 'N/A'}
@@ -45,89 +45,89 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
       </div>
 
       {/* Cost Breakdown */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Cost Breakdown</h3>
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Cost Breakdown</h3>
         <div className="space-y-4">
-          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <div className="flex justify-between items-center p-3 ds-bg-surface-muted rounded-lg">
             <div className="flex items-center gap-3">
               <span className="text-xl">📦</span>
               <div>
-                <p className="font-medium text-gray-900">Materials</p>
-                <p className="text-sm text-gray-600">{floorSummary.materials.count} items</p>
+                <p className="font-medium ds-text-primary">Materials</p>
+                <p className="text-sm ds-text-secondary">{floorSummary.materials.count} items</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold ds-text-primary">
                 {formatCurrency(floorSummary.materials.totalCost)}
               </p>
               <Link
                 href={`/items?floorId=${floor._id}`}
-                className="text-xs text-blue-600 hover:text-blue-800"
+                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
               >
                 View →
               </Link>
             </div>
           </div>
 
-          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <div className="flex justify-between items-center p-3 ds-bg-surface-muted rounded-lg">
             <div className="flex items-center gap-3">
               <span className="text-xl">👷</span>
               <div>
-                <p className="font-medium text-gray-900">Labour</p>
-                <p className="text-sm text-gray-600">
+                <p className="font-medium ds-text-primary">Labour</p>
+                <p className="text-sm ds-text-secondary">
                   {floorSummary.labour.count} entries • {floorSummary.labour.totalHours.toFixed(0)} hrs
                 </p>
               </div>
             </div>
             <div className="text-right">
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold ds-text-primary">
                 {formatCurrency(floorSummary.labour.totalCost)}
               </p>
               <Link
                 href={`/labour/entries?floorId=${floor._id}`}
-                className="text-xs text-blue-600 hover:text-blue-800"
+                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
               >
                 View →
               </Link>
             </div>
           </div>
 
-          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <div className="flex justify-between items-center p-3 ds-bg-surface-muted rounded-lg">
             <div className="flex items-center gap-3">
               <span className="text-xl">🔧</span>
               <div>
-                <p className="font-medium text-gray-900">Work Items</p>
-                <p className="text-sm text-gray-600">{floorSummary.workItems.count} items</p>
+                <p className="font-medium ds-text-primary">Work Items</p>
+                <p className="text-sm ds-text-secondary">{floorSummary.workItems.count} items</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold ds-text-primary">
                 {formatCurrency(floorSummary.workItems.totalCost)}
               </p>
               <Link
                 href={`/work-items?floorId=${floor._id}`}
-                className="text-xs text-blue-600 hover:text-blue-800"
+                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
               >
                 View →
               </Link>
             </div>
           </div>
 
-          <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+          <div className="flex justify-between items-center p-3 ds-bg-surface-muted rounded-lg">
             <div className="flex items-center gap-3">
               <span className="text-xl">🚜</span>
               <div>
-                <p className="font-medium text-gray-900">Equipment</p>
-                <p className="text-sm text-gray-600">{floorSummary.equipment.count} items</p>
+                <p className="font-medium ds-text-primary">Equipment</p>
+                <p className="text-sm ds-text-secondary">{floorSummary.equipment.count} items</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="font-semibold text-gray-900">
+              <p className="font-semibold ds-text-primary">
                 {formatCurrency(floorSummary.equipment.totalCost)}
               </p>
               <Link
                 href={`/equipment?floorId=${floor._id}`}
-                className="text-xs text-blue-600 hover:text-blue-800"
+                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
               >
                 View →
               </Link>
@@ -147,12 +147,12 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
         }
 
         return (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Cost Breakdown by Phase</h3>
+              <h3 className="text-lg font-semibold ds-text-primary">Cost Breakdown by Phase</h3>
               <Link
                 href={`/floors/${floor._id}?tab=phases`}
-                className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
               >
                 View Full Phase Breakdown →
               </Link>
@@ -162,29 +162,29 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
                 const phaseBudget = byPhase[phaseCode] || { total: 0, materials: 0, labour: 0, equipment: 0, subcontractors: 0 };
                 // Note: Actual costs would need to be fetched separately or passed as prop
                 return (
-                  <div key={phaseCode} className="border border-gray-200 rounded-lg p-4">
+                  <div key={phaseCode} className="border ds-border-subtle rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="font-semibold text-gray-900">{phaseCode}</h4>
-                      <p className="text-sm font-semibold text-gray-900">
+                      <h4 className="font-semibold ds-text-primary">{phaseCode}</h4>
+                      <p className="text-sm font-semibold ds-text-primary">
                         {formatCurrency(phaseBudget.total)} budget
                       </p>
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                       <div>
-                        <p className="text-gray-500">Materials</p>
-                        <p className="font-semibold text-gray-900">{formatCurrency(phaseBudget.materials)}</p>
+                        <p className="ds-text-muted">Materials</p>
+                        <p className="font-semibold ds-text-primary">{formatCurrency(phaseBudget.materials)}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Labour</p>
-                        <p className="font-semibold text-gray-900">{formatCurrency(phaseBudget.labour)}</p>
+                        <p className="ds-text-muted">Labour</p>
+                        <p className="font-semibold ds-text-primary">{formatCurrency(phaseBudget.labour)}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Equipment</p>
-                        <p className="font-semibold text-gray-900">{formatCurrency(phaseBudget.equipment)}</p>
+                        <p className="ds-text-muted">Equipment</p>
+                        <p className="font-semibold ds-text-primary">{formatCurrency(phaseBudget.equipment)}</p>
                       </div>
                       <div>
-                        <p className="text-gray-500">Subcontractors</p>
-                        <p className="font-semibold text-gray-900">{formatCurrency(phaseBudget.subcontractors)}</p>
+                        <p className="ds-text-muted">Subcontractors</p>
+                        <p className="font-semibold ds-text-primary">{formatCurrency(phaseBudget.subcontractors)}</p>
                       </div>
                     </div>
                   </div>
@@ -197,21 +197,21 @@ export function FloorCostsTab({ floor, floorSummary, formatCurrency }) {
 
       {/* Budget Utilization Bar */}
       {((floor.budgetAllocation?.total || floor.totalBudget || 0) > 0) && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <div className="flex justify-between text-sm ds-text-secondary mb-2">
             <span>Budget Utilization</span>
             <span>
               {((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0) * 100).toFixed(1)}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className="w-full ds-bg-surface-muted rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all ${
                 ((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0)) > 1
-                  ? 'bg-red-600'
+                  ? 'ds-bg-danger'
                   : ((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0)) > 0.8
-                  ? 'bg-yellow-600'
-                  : 'bg-green-600'
+                  ? 'ds-bg-warning'
+                  : 'ds-bg-success'
               }`}
               style={{
                 width: `${Math.min(100, ((floor.actualCost || 0) / (floor.budgetAllocation?.total || floor.totalBudget || 0)) * 100)}%`

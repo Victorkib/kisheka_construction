@@ -145,6 +145,15 @@ export async function PATCH(request, { params }) {
       changes.defaultFloorId = { oldValue: existingBatch.defaultFloorId, newValue: updateData.defaultFloorId };
     }
 
+    if (body.defaultPhaseId !== undefined) {
+      if (body.defaultPhaseId && ObjectId.isValid(body.defaultPhaseId)) {
+        updateData.defaultPhaseId = new ObjectId(body.defaultPhaseId);
+      } else {
+        updateData.defaultPhaseId = null;
+      }
+      changes.defaultPhaseId = { oldValue: existingBatch.defaultPhaseId, newValue: updateData.defaultPhaseId };
+    }
+
     if (body.defaultCategoryId !== undefined) {
       if (body.defaultCategoryId && ObjectId.isValid(body.defaultCategoryId)) {
         updateData.defaultCategoryId = new ObjectId(body.defaultCategoryId);

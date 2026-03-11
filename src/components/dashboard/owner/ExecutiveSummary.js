@@ -27,10 +27,10 @@ export function ExecutiveSummary({ data, formatCurrency }) {
     : 0;
 
   const getHealthColor = (score) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-blue-600';
-    if (score >= 40) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 80) return 'text-emerald-400';
+    if (score >= 60) return 'text-blue-400';
+    if (score >= 40) return 'text-amber-400';
+    return 'text-red-400';
   };
 
   const getHealthStatus = (score) => {
@@ -41,43 +41,43 @@ export function ExecutiveSummary({ data, formatCurrency }) {
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 border border-blue-200">
+    <div className="ds-bg-surface rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 border ds-border-subtle">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-4 sm:mb-6">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Portfolio Overview</h2>
-        <span className="text-xs sm:text-sm text-gray-600">Executive Summary</span>
+        <h2 className="text-xl sm:text-2xl font-bold ds-text-primary">Portfolio Overview</h2>
+        <span className="text-xs sm:text-sm ds-text-secondary">Executive Summary</span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {/* Total Projects */}
         <Link
           href="/projects"
-          className="bg-white rounded-lg p-4 sm:p-6 shadow-md hover:shadow-lg active:shadow-xl transition-all border border-gray-200 hover:border-blue-300 active:border-blue-400 touch-manipulation"
+          className="ds-bg-surface rounded-lg p-4 sm:p-6 shadow-md hover:shadow-lg active:shadow-xl transition-all border ds-border-subtle hover:border-blue-400/60 active:border-blue-500/60 touch-manipulation"
         >
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs sm:text-sm font-medium text-gray-600">Total Projects</span>
+            <span className="text-xs sm:text-sm font-medium ds-text-secondary">Total Projects</span>
             <span className="text-xl sm:text-2xl">🏗️</span>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{totalProjects}</p>
-          <p className="text-xs text-gray-500">
+          <p className="text-2xl sm:text-3xl font-bold ds-text-primary mb-1">{totalProjects}</p>
+          <p className="text-xs ds-text-muted">
             {activeProjects} active • {statusBreakdown?.completed || 0} completed
           </p>
         </Link>
 
         {/* Capital Status */}
-        <div className="bg-white rounded-lg p-4 sm:p-6 shadow-md border border-gray-200">
+        <div className="ds-bg-surface rounded-lg p-4 sm:p-6 shadow-md border ds-border-subtle">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs sm:text-sm font-medium text-gray-600">Total Capital</span>
+            <span className="text-xs sm:text-sm font-medium ds-text-secondary">Total Capital</span>
             <span className="text-xl sm:text-2xl">💰</span>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 break-words">
+          <p className="text-xl sm:text-2xl font-bold ds-text-primary mb-1 break-words">
             {formatCurrency(totalCapitalRaised)}
           </p>
           <div className="mt-2">
-            <div className="flex justify-between text-xs text-gray-600 mb-1">
+            <div className="flex justify-between text-xs ds-text-secondary mb-1">
               <span>Used: {formatCurrency(totalCapitalUsed)}</span>
               <span>{capitalUtilization}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full ds-bg-surface-muted rounded-full h-2">
               <div
                 className={`h-2 rounded-full transition-all ${
                   capitalUtilization > 90
@@ -93,37 +93,37 @@ export function ExecutiveSummary({ data, formatCurrency }) {
         </div>
 
         {/* Portfolio Health */}
-        <div className="bg-white rounded-lg p-4 sm:p-6 shadow-md border border-gray-200">
+        <div className="ds-bg-surface rounded-lg p-4 sm:p-6 shadow-md border ds-border-subtle">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs sm:text-sm font-medium text-gray-600">Portfolio Health</span>
+            <span className="text-xs sm:text-sm font-medium ds-text-secondary">Portfolio Health</span>
             <span className="text-xl sm:text-2xl">📊</span>
           </div>
           <p className={`text-2xl sm:text-3xl font-bold mb-1 ${getHealthColor(portfolioHealthScore)}`}>
             {portfolioHealthScore}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs ds-text-muted">
             {getHealthStatus(portfolioHealthScore)} • {criticalIssues} critical issues
           </p>
         </div>
 
         {/* Monthly Spending */}
-        <div className="bg-white rounded-lg p-4 sm:p-6 shadow-md border border-gray-200">
+        <div className="ds-bg-surface rounded-lg p-4 sm:p-6 shadow-md border ds-border-subtle">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs sm:text-sm font-medium text-gray-600">Monthly Spending</span>
+            <span className="text-xs sm:text-sm font-medium ds-text-secondary">Monthly Spending</span>
             <span className="text-xl sm:text-2xl">📈</span>
           </div>
-          <p className="text-xl sm:text-2xl font-bold text-gray-900 mb-1 break-words">
+          <p className="text-xl sm:text-2xl font-bold ds-text-primary mb-1 break-words">
             {formatCurrency(monthlySpending)}
           </p>
-          <p className="text-xs text-gray-500">Last 30 days</p>
+          <p className="text-xs ds-text-muted">Last 30 days</p>
         </div>
       </div>
 
       {/* Available Capital Highlight */}
-      <div className="mt-4 sm:mt-6 bg-white rounded-lg p-4 border border-gray-200">
+      <div className="mt-4 sm:mt-6 ds-bg-surface rounded-lg p-4 border ds-border-subtle">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0">
           <div className="flex-1 min-w-0">
-            <p className="text-xs sm:text-sm font-medium text-gray-600">Available Capital</p>
+            <p className="text-xs sm:text-sm font-medium ds-text-secondary">Available Capital</p>
             <p className={`text-xl sm:text-2xl font-bold mt-1 break-words ${
               availableCapital < 0
                 ? 'text-red-600'

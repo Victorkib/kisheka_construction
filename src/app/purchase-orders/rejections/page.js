@@ -353,11 +353,11 @@ function RejectionsDashboardContent() {
       timeline: 'bg-yellow-100 text-yellow-800',
       specifications: 'bg-purple-100 text-purple-800',
       quantity: 'bg-blue-100 text-blue-800',
-      business_policy: 'bg-gray-100 text-gray-800',
+      business_policy: 'ds-bg-surface-muted ds-text-primary',
       external_factors: 'bg-teal-100 text-teal-800',
-      other: 'bg-gray-100 text-gray-800',
+      other: 'ds-bg-surface-muted ds-text-primary',
     };
-    return colors[reason] || 'bg-gray-100 text-gray-800';
+    return colors[reason] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (loading && rejections.length === 0) {
@@ -385,8 +385,8 @@ function RejectionsDashboardContent() {
         <div className="mb-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Rejected Purchase Orders</h1>
-              <p className="mt-1 text-sm text-gray-600">
+              <h1 className="text-3xl font-bold ds-text-primary">Rejected Purchase Orders</h1>
+              <p className="mt-1 text-sm ds-text-secondary">
                 Manage and reassign rejected purchase orders
                 {currentProject && (
                   <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs font-medium">
@@ -401,58 +401,58 @@ function RejectionsDashboardContent() {
         {/* Analytics Cards */}
         {analytics && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+            <div className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Rejections</p>
-                  <p className="text-2xl font-bold text-gray-900">{analytics.totalRejections || 0}</p>
+                  <p className="text-sm ds-text-secondary">Total Rejections</p>
+                  <p className="text-2xl font-bold ds-text-primary">{analytics.totalRejections || 0}</p>
                 </div>
                 <TrendingDown className="w-8 h-8 text-red-500" />
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+            <div className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Retryable</p>
+                  <p className="text-sm ds-text-secondary">Retryable</p>
                   <p className="text-2xl font-bold text-green-600">{analytics.retryableCount || 0}</p>
                 </div>
                 <RefreshCw className="w-8 h-8 text-green-500" />
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+            <div className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Needs Reassignment</p>
+                  <p className="text-sm ds-text-secondary">Needs Reassignment</p>
                   <p className="text-2xl font-bold text-orange-600">{analytics.needsReassignmentCount || 0}</p>
                 </div>
                 <AlertCircle className="w-8 h-8 text-orange-500" />
               </div>
             </div>
-            <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
+            <div className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Total Value</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(analytics.totalValue || 0)}</p>
+                  <p className="text-sm ds-text-secondary">Total Value</p>
+                  <p className="text-2xl font-bold ds-text-primary">{formatCurrency(analytics.totalValue || 0)}</p>
                 </div>
-                <DollarSign className="w-8 h-8 text-gray-500" />
+                <DollarSign className="w-8 h-8 ds-text-muted" />
               </div>
             </div>
           </div>
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-4 mb-6">
           <div className="flex items-center space-x-2 mb-4">
-            <Filter className="w-5 h-5 text-gray-500" />
-            <h2 className="text-lg font-semibold text-gray-900">Filters</h2>
+            <Filter className="w-5 h-5 ds-text-muted" />
+            <h2 className="text-lg font-semibold ds-text-primary">Filters</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Project</label>
               <select
                 value={filters.projectId || ''}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Projects</option>
                 {projects && projects.length > 0 ? (
@@ -471,11 +471,11 @@ function RejectionsDashboardContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Rejection Reason</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Rejection Reason</label>
               <select
                 value={filters.rejectionReason}
                 onChange={(e) => handleFilterChange('rejectionReason', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Reasons</option>
                 <option value="price_too_high">Price Too High</option>
@@ -489,11 +489,11 @@ function RejectionsDashboardContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Retryable</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Retryable</label>
               <select
                 value={filters.isRetryable}
                 onChange={(e) => handleFilterChange('isRetryable', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All</option>
                 <option value="true">Retryable</option>
@@ -501,11 +501,11 @@ function RejectionsDashboardContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Reassignment</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Reassignment</label>
               <select
                 value={filters.needsReassignment}
                 onChange={(e) => handleFilterChange('needsReassignment', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All</option>
                 <option value="true">Needs Reassignment</option>
@@ -513,11 +513,11 @@ function RejectionsDashboardContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Supplier</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Supplier</label>
               <select
                 value={filters.supplierId}
                 onChange={(e) => handleFilterChange('supplierId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Suppliers</option>
                 {suppliers.map((supplier) => (
@@ -528,13 +528,13 @@ function RejectionsDashboardContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Search</label>
               <input
                 type="text"
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="PO number, material..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -551,7 +551,7 @@ function RejectionsDashboardContent() {
                 });
                 router.push('/purchase-orders/rejections', { scroll: false });
               }}
-              className="text-sm text-gray-600 hover:text-gray-800"
+              className="text-sm ds-text-secondary hover:ds-text-primary"
             >
               Clear Filters
             </button>
@@ -560,7 +560,7 @@ function RejectionsDashboardContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -569,64 +569,64 @@ function RejectionsDashboardContent() {
         {loading ? (
           <LoadingTable rows={5} columns={8} />
         ) : rejections.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-            <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Rejections Found</h3>
-            <p className="text-gray-600">No rejected purchase orders match your filters.</p>
+          <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-12 text-center">
+            <AlertCircle className="w-12 h-12 ds-text-muted mx-auto mb-4" />
+            <h3 className="text-lg font-medium ds-text-primary mb-2">No Rejections Found</h3>
+            <p className="ds-text-secondary">No rejected purchase orders match your filters.</p>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       PO Number
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Material
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Supplier
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Rejection Reason
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Value
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Rejected Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {rejections.map((order) => (
-                    <tr key={order._id} className="hover:bg-gray-50">
+                    <tr key={order._id} className="hover:ds-bg-surface-muted">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <a
                           href={`/purchase-orders/${order._id}`}
-                          className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                          className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                         >
                           {order.purchaseOrderNumber}
                         </a>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="text-sm text-gray-900">{order.materialName}</div>
+                        <div className="text-sm ds-text-primary">{order.materialName}</div>
                         {order.isBulkOrder && (
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs ds-text-muted">
                             {order.materials?.length || 0} materials
                           </div>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{order.supplierName}</div>
+                        <div className="text-sm ds-text-primary">{order.supplierName}</div>
                       </td>
                       <td className="px-6 py-4">
                         {order.rejectionReason ? (
@@ -634,7 +634,7 @@ function RejectionsDashboardContent() {
                             {order.rejectionMetadata?.formattedReason || order.rejectionReason}
                           </span>
                         ) : (
-                          <span className="text-xs text-gray-500">Not specified</span>
+                          <span className="text-xs ds-text-muted">Not specified</span>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -644,7 +644,7 @@ function RejectionsDashboardContent() {
                               Retryable
                             </span>
                           ) : (
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full ds-bg-surface-muted ds-text-primary">
                               Not Retryable
                             </span>
                           )}
@@ -655,10 +655,10 @@ function RejectionsDashboardContent() {
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                         {formatCurrency(order.totalCost)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {formatDate(order.supplierResponseDate)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -666,14 +666,14 @@ function RejectionsDashboardContent() {
                           <button
                             onClick={() => handleAutoReassign(order._id, 'simple')}
                             disabled={reassigningOrderId === order._id}
-                            className="text-blue-600 hover:text-blue-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Find alternative suppliers"
                           >
                             <RefreshCw className={`w-4 h-4 ${reassigningOrderId === order._id ? 'animate-spin' : ''}`} />
                           </button>
                           <a
                             href={`/purchase-orders/${order._id}`}
-                            className="text-gray-600 hover:text-gray-800"
+                            className="ds-text-secondary hover:ds-text-primary"
                             title="View details"
                           >
                             View
@@ -688,8 +688,8 @@ function RejectionsDashboardContent() {
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="bg-gray-50 px-6 py-3 border-t border-gray-200 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
+              <div className="ds-bg-surface-muted px-6 py-3 border-t ds-border-subtle flex items-center justify-between">
+                <div className="text-sm ds-text-secondary">
                   Showing{' '}
                   <span className="font-medium">
                     {(pagination.page - 1) * pagination.limit + 1}
@@ -704,14 +704,14 @@ function RejectionsDashboardContent() {
                   <button
                     onClick={() => setPagination((prev) => ({ ...prev, page: prev.page - 1 }))}
                     disabled={pagination.page === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 border ds-border-subtle rounded-md text-sm font-medium ds-text-secondary ds-bg-surface hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setPagination((prev) => ({ ...prev, page: prev.page + 1 }))}
                     disabled={pagination.page >= pagination.pages}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 border ds-border-subtle rounded-md text-sm font-medium ds-text-secondary ds-bg-surface hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>

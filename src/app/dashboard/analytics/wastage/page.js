@@ -541,9 +541,9 @@ function WastageAnalyticsPageContent() {
       HIGH: 'bg-orange-100 text-orange-800',
       MEDIUM: 'bg-yellow-100 text-yellow-800',
       LOW: 'bg-blue-100 text-blue-800',
-      NONE: 'bg-gray-100 text-gray-600',
+      NONE: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[severity] || 'bg-gray-100 text-gray-800';
+    return colors[severity] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getStatusColor = (status) => {
@@ -551,9 +551,9 @@ function WastageAnalyticsPageContent() {
       open: 'bg-red-100 text-red-800',
       investigating: 'bg-yellow-100 text-yellow-800',
       resolved: 'bg-green-100 text-green-800',
-      false_positive: 'bg-gray-100 text-gray-800',
+      false_positive: 'ds-bg-surface-muted ds-text-primary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const CHART_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
@@ -703,7 +703,7 @@ function WastageAnalyticsPageContent() {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-700">Loading analytics...</p>
+            <p className="mt-4 ds-text-secondary">Loading analytics...</p>
           </div>
         </div>
       </AppLayout>
@@ -715,7 +715,7 @@ function WastageAnalyticsPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+          <div className="bg-red-50 border border-red-400/60 rounded-lg p-6">
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
@@ -754,16 +754,16 @@ function WastageAnalyticsPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
-            <div className="mx-auto h-24 w-24 text-gray-400 mb-4">
+            <div className="mx-auto h-24 w-24 ds-text-muted mb-4">
               <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No Projects Found</h3>
-            <p className="text-gray-700 mb-4">You need to have at least one project to view wastage analytics.</p>
+            <h3 className="text-lg font-medium ds-text-primary mb-2">No Projects Found</h3>
+            <p className="ds-text-secondary mb-4">You need to have at least one project to view wastage analytics.</p>
             <Link
               href="/projects/new"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="inline-flex items-center px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
             >
               Create Your First Project
             </Link>
@@ -783,8 +783,8 @@ function WastageAnalyticsPageContent() {
         />
         <div className="mb-8 flex justify-between items-start">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Wastage & Loss Analytics</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track variance, loss, and wastage across your project</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Wastage & Loss Analytics</h1>
+            <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Track variance, loss, and wastage across your project</p>
           </div>
           {summary && projectId && (
             <div className="flex gap-2">
@@ -816,7 +816,7 @@ function WastageAnalyticsPageContent() {
                 onClick={handleExportCSV}
                 isLoading={exporting.csv}
                 loadingText="Exporting..."
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 📋 CSV
               </LoadingButton>
@@ -837,20 +837,20 @@ function WastageAnalyticsPageContent() {
                     setComparisonData([]);
                   }
                 }}
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
               />
-              <span className="text-base font-semibold text-gray-700 leading-normal">Compare Multiple Projects</span>
+              <span className="text-base font-semibold ds-text-secondary leading-normal">Compare Multiple Projects</span>
             </label>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {!comparisonMode ? (
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">Select Project</label>
+                <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">Select Project</label>
                 <select
                   value={projectId}
                   onChange={(e) => setProjectId(e.target.value)}
-                  className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 >
                   <option value="">Select a project...</option>
                   {projects.map((project) => (
@@ -862,10 +862,10 @@ function WastageAnalyticsPageContent() {
               </div>
             ) : (
               <div className="md:col-span-3">
-                <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">Select Projects to Compare (2-5 projects)</label>
+                <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">Select Projects to Compare (2-5 projects)</label>
                 <div className="flex flex-wrap gap-2">
                   {projects.map((project) => (
-                    <label key={project._id} className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <label key={project._id} className="flex items-center gap-2 px-3 py-2 ds-bg-surface border ds-border-subtle rounded-lg cursor-pointer hover:ds-bg-surface-muted">
                       <input
                         type="checkbox"
                         checked={selectedProjects.includes(project._id)}
@@ -878,14 +878,14 @@ function WastageAnalyticsPageContent() {
                             setSelectedProjects(selectedProjects.filter((id) => id !== project._id));
                           }
                         }}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                       />
-                      <span className="text-sm text-gray-900">{project.projectName || project.projectCode}</span>
+                      <span className="text-sm ds-text-primary">{project.projectName || project.projectCode}</span>
                     </label>
                   ))}
                 </div>
                 {selectedProjects.length > 0 && (
-                  <p className="text-sm text-gray-700 mt-2 leading-normal">
+                  <p className="text-sm ds-text-secondary mt-2 leading-normal">
                     {selectedProjects.length} project{selectedProjects.length > 1 ? 's' : ''} selected
                   </p>
                 )}
@@ -893,11 +893,11 @@ function WastageAnalyticsPageContent() {
             )}
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">Category Filter</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">Category Filter</label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -909,7 +909,7 @@ function WastageAnalyticsPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">Date Range</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">Date Range</label>
               <div className="flex items-center gap-2">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -921,9 +921,9 @@ function WastageAnalyticsPageContent() {
                         setDateRange({ startDate: '', endDate: '' });
                       }
                     }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                   />
-                  <span className="text-sm text-gray-700">All Time</span>
+                  <span className="text-sm ds-text-secondary">All Time</span>
                 </label>
               </div>
               {!showAllTime && (
@@ -932,14 +932,14 @@ function WastageAnalyticsPageContent() {
                     type="date"
                     value={dateRange.startDate}
                     onChange={(e) => setDateRange((prev) => ({ ...prev, startDate: e.target.value }))}
-                    className="px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    className="px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                     placeholder="Start Date"
                   />
                   <input
                     type="date"
                     value={dateRange.endDate}
                     onChange={(e) => setDateRange((prev) => ({ ...prev, endDate: e.target.value }))}
-                    className="px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                    className="px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                     placeholder="End Date"
                   />
                 </div>
@@ -949,43 +949,43 @@ function WastageAnalyticsPageContent() {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
 
         {!comparisonMode && !projectId ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-gray-700">Please select a project to view analytics</p>
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <p className="ds-text-secondary">Please select a project to view analytics</p>
           </div>
         ) : comparisonMode && selectedProjects.length < 2 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <p className="text-gray-700">Please select at least 2 projects to compare</p>
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <p className="ds-text-secondary">Please select at least 2 projects to compare</p>
           </div>
         ) : comparisonMode ? (
           <>
             {loadingComparison ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-700">Loading comparison data...</p>
+                <p className="mt-4 ds-text-secondary">Loading comparison data...</p>
               </div>
             ) : comparisonData.length > 0 ? (
               <>
-                <div className="bg-white rounded-lg shadow p-6 mb-6">
-                  <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Project Ranking by Wastage</h2>
+                <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+                  <h2 className="text-xl md:text-2xl font-semibold ds-text-primary mb-4 leading-tight">Project Ranking by Wastage</h2>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-ds-border-subtle">
+                      <thead className="ds-bg-surface-muted">
                         <tr>
-                          <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">Rank</th>
-                          <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">Project</th>
-                          <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">Critical</th>
-                          <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">High</th>
-                          <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">Materials with Issues</th>
-                          <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">Total Cost Impact</th>
+                          <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">Rank</th>
+                          <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">Project</th>
+                          <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">Critical</th>
+                          <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">High</th>
+                          <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">Materials with Issues</th>
+                          <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">Total Cost Impact</th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                         {comparisonData
                           .sort((a, b) => b.metrics.totalDiscrepancyCost - a.metrics.totalDiscrepancyCost)
                           .map((project, index) => (
@@ -994,13 +994,13 @@ function WastageAnalyticsPageContent() {
                                 <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                                   index === 0 ? 'bg-red-100 text-red-800' :
                                   index === comparisonData.length - 1 ? 'bg-green-100 text-green-800' :
-                                  'bg-gray-100 text-gray-800'
+                                  'ds-bg-surface-muted ds-text-primary'
                                 }`}>
                                   #{index + 1}
                                 </span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-gray-900">{project.projectName}</div>
+                                <div className="text-sm font-medium ds-text-primary">{project.projectName}</div>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
                                 <span className="px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-800">
@@ -1013,10 +1013,10 @@ function WastageAnalyticsPageContent() {
                                 </span>
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap">
-                                <div className="text-sm text-gray-900">
+                                <div className="text-sm ds-text-primary">
                                   {project.materialsWithIssues} / {project.totalMaterials}
                                 </div>
-                                <div className="text-sm text-gray-700 leading-normal">
+                                <div className="text-sm ds-text-secondary leading-normal">
                                   {project.totalMaterials > 0 ? ((project.materialsWithIssues / project.totalMaterials) * 100).toFixed(1) : 0}%
                                 </div>
                               </td>
@@ -1033,8 +1033,8 @@ function WastageAnalyticsPageContent() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-white rounded-lg shadow p-6">
-                    <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Cost Impact Comparison</h2>
+                  <div className="ds-bg-surface rounded-lg shadow p-6">
+                    <h2 className="text-xl md:text-2xl font-semibold ds-text-primary mb-4 leading-tight">Cost Impact Comparison</h2>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={comparisonData.map((p) => ({
                         name: p.projectName,
@@ -1049,8 +1049,8 @@ function WastageAnalyticsPageContent() {
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="bg-white rounded-lg shadow p-6">
-                    <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Critical Issues Comparison</h2>
+                  <div className="ds-bg-surface rounded-lg shadow p-6">
+                    <h2 className="text-xl md:text-2xl font-semibold ds-text-primary mb-4 leading-tight">Critical Issues Comparison</h2>
                     <ResponsiveContainer width="100%" height={300}>
                       <BarChart data={comparisonData.map((p) => ({
                         name: p.projectName,
@@ -1070,7 +1070,7 @@ function WastageAnalyticsPageContent() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6">
+                  <div className="bg-green-50 border-2 border-green-400/60 rounded-lg p-6">
                     <h3 className="text-lg md:text-xl font-semibold text-green-900 mb-3 leading-tight">✅ Best Performing Project</h3>
                     {comparisonData.length > 0 && (() => {
                       const best = comparisonData.reduce((min, p) => 
@@ -1090,7 +1090,7 @@ function WastageAnalyticsPageContent() {
                     })()}
                   </div>
 
-                  <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
+                  <div className="bg-red-50 border-2 border-red-400/60 rounded-lg p-6">
                     <h3 className="text-lg md:text-xl font-semibold text-red-900 mb-3 leading-tight">⚠️ Worst Performing Project</h3>
                     {comparisonData.length > 0 && (() => {
                       const worst = comparisonData.reduce((max, p) => 
@@ -1115,8 +1115,8 @@ function WastageAnalyticsPageContent() {
                 </div>
               </>
             ) : (
-              <div className="bg-white rounded-lg shadow p-12 text-center">
-                <p className="text-gray-700">No comparison data available</p>
+              <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+                <p className="ds-text-secondary">No comparison data available</p>
               </div>
             )}
           </>
@@ -1124,12 +1124,12 @@ function WastageAnalyticsPageContent() {
           <>
             {summary && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-base font-semibold text-gray-700 leading-normal">Materials with Issues</h3>
-                  <p className="text-3xl font-bold text-gray-900 mt-2">
+                <div className="ds-bg-surface rounded-lg shadow p-6">
+                  <h3 className="text-base font-semibold ds-text-secondary leading-normal">Materials with Issues</h3>
+                  <p className="text-3xl font-bold ds-text-primary mt-2">
                     {summary.materialsWithIssues || 0} / {summary.totalMaterials || 0}
                   </p>
-                  <p className="text-sm text-gray-700 mt-1 leading-normal">
+                  <p className="text-sm ds-text-secondary mt-1 leading-normal">
                     {summary.totalMaterials > 0
                       ? ((summary.materialsWithIssues / summary.totalMaterials) * 100).toFixed(1)
                       : 0}
@@ -1137,49 +1137,49 @@ function WastageAnalyticsPageContent() {
                   </p>
                 </div>
 
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-base font-semibold text-gray-700 leading-normal">Average Wastage</h3>
+                <div className="ds-bg-surface rounded-lg shadow p-6">
+                  <h3 className="text-base font-semibold ds-text-secondary leading-normal">Average Wastage</h3>
                   <p className="text-3xl font-bold text-yellow-600 mt-2">
                     {summary.metrics?.averageWastage?.toFixed(1) || summary.metrics?.totalWastage?.toFixed(1) || '0.0'}%
                   </p>
-                  <p className="text-sm text-gray-700 mt-1 leading-normal">
+                  <p className="text-sm ds-text-secondary mt-1 leading-normal">
                     {summary.materialsWithWastage || summary.totalMaterials || 0} materials analyzed
                   </p>
                 </div>
 
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-base font-semibold text-gray-700 leading-normal">Total Variance Cost</h3>
+                <div className="ds-bg-surface rounded-lg shadow p-6">
+                  <h3 className="text-base font-semibold ds-text-secondary leading-normal">Total Variance Cost</h3>
                   <p className="text-3xl font-bold text-orange-600 mt-2">
                     {formatCurrency(summary.metrics?.totalVarianceCost || 0)}
                   </p>
-                  <p className="text-sm text-gray-700 mt-1 leading-normal">
+                  <p className="text-sm ds-text-secondary mt-1 leading-normal">
                     {(summary.metrics?.totalVariance || 0).toFixed(2)} units
                   </p>
                 </div>
 
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-base font-semibold text-gray-700 leading-normal">Total Loss Cost</h3>
+                <div className="ds-bg-surface rounded-lg shadow p-6">
+                  <h3 className="text-base font-semibold ds-text-secondary leading-normal">Total Loss Cost</h3>
                   <p className="text-3xl font-bold text-red-600 mt-2">
                     {formatCurrency(summary.metrics?.totalLossCost || 0)}
                   </p>
-                  <p className="text-sm text-gray-700 mt-1 leading-normal">
+                  <p className="text-sm ds-text-secondary mt-1 leading-normal">
                     {(summary.metrics?.totalLoss || 0).toFixed(2)} units
                   </p>
                 </div>
 
-                <div className="bg-white rounded-lg shadow p-6">
-                  <h3 className="text-base font-semibold text-gray-700 leading-normal">Total Discrepancy Cost</h3>
+                <div className="ds-bg-surface rounded-lg shadow p-6">
+                  <h3 className="text-base font-semibold ds-text-secondary leading-normal">Total Discrepancy Cost</h3>
                   <p className="text-3xl font-bold text-purple-600 mt-2">
                     {formatCurrency(summary.metrics?.totalDiscrepancyCost || 0)}
                   </p>
-                  <p className="text-sm text-gray-700 mt-1 leading-normal">Combined impact</p>
+                  <p className="text-sm ds-text-secondary mt-1 leading-normal">Combined impact</p>
                 </div>
               </div>
             )}
 
             {summary && summary.severityBreakdown && severityData.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Severity Breakdown</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+                <h2 className="text-xl md:text-2xl font-semibold ds-text-primary mb-4 leading-tight">Severity Breakdown</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     {severityData.length > 0 ? (
@@ -1205,32 +1205,32 @@ function WastageAnalyticsPageContent() {
                         </PieChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div className="flex items-center justify-center h-[300px] text-gray-500">
+                      <div className="flex items-center justify-center h-[300px] ds-text-muted">
                         No severity data available
                       </div>
                     )}
                   </div>
                   <div className="flex flex-col justify-center space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-900">Critical</span>
+                      <span className="text-sm font-medium ds-text-primary">Critical</span>
                       <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getSeverityColor('CRITICAL')}`}>
                         {summary.severityBreakdown.critical}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-900">High</span>
+                      <span className="text-sm font-medium ds-text-primary">High</span>
                       <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getSeverityColor('HIGH')}`}>
                         {summary.severityBreakdown.high}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-900">Medium</span>
+                      <span className="text-sm font-medium ds-text-primary">Medium</span>
                       <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getSeverityColor('MEDIUM')}`}>
                         {summary.severityBreakdown.medium}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-900">Low</span>
+                      <span className="text-sm font-medium ds-text-primary">Low</span>
                       <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getSeverityColor('LOW')}`}>
                         {summary.severityBreakdown.low}
                       </span>
@@ -1241,8 +1241,8 @@ function WastageAnalyticsPageContent() {
             )}
 
             {supplierVarianceData.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Supplier Performance</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+                <h2 className="text-xl md:text-2xl font-semibold ds-text-primary mb-4 leading-tight">Supplier Performance</h2>
                 {supplierVarianceData.length > 0 ? (
                   <ResponsiveContainer width="100%" height={400}>
                     <BarChart data={supplierVarianceData}>
@@ -1275,7 +1275,7 @@ function WastageAnalyticsPageContent() {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex items-center justify-center h-[400px] text-gray-500">
+                  <div className="flex items-center justify-center h-[400px] ds-text-muted">
                     No supplier data available
                   </div>
                 )}
@@ -1283,15 +1283,15 @@ function WastageAnalyticsPageContent() {
             )}
 
             {discrepancies.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl md:text-2xl font-semibold text-gray-900 leading-tight">Top Discrepancies</h2>
+                  <h2 className="text-xl md:text-2xl font-semibold ds-text-primary leading-tight">Top Discrepancies</h2>
                   <div className="flex items-center gap-3">
-                    <label className="text-base font-semibold text-gray-700 leading-normal">Filter by Status:</label>
+                    <label className="text-base font-semibold ds-text-secondary leading-normal">Filter by Status:</label>
                     <select
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
-                      className="px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                      className="px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                     >
                       <option value="all">All</option>
                       <option value="open">Open</option>
@@ -1302,64 +1302,64 @@ function WastageAnalyticsPageContent() {
                   </div>
                 </div>
                 <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                  <table className="min-w-full divide-y divide-ds-border-subtle">
+                    <thead className="ds-bg-surface-muted">
                       <tr>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Material
                         </th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Supplier
                         </th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Variance
                         </th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Loss
                         </th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Cost Impact
                         </th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Severity
                         </th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Status
                         </th>
-                        <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                        <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                           Actions
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                       {filteredDiscrepancies.slice(0, 20).map((discrepancy) => {
                         const status = discrepancyStatuses[discrepancy.materialId] || discrepancy.status || 'open';
                         return (
-                        <tr key={discrepancy.materialId} className="hover:bg-gray-50">
+                        <tr key={discrepancy.materialId} className="hover:ds-bg-surface-muted">
                           <td className="px-6 py-4 whitespace-nowrap">
                             <Link
                               href={`/items/${discrepancy.materialId}`}
-                              className="text-sm font-medium text-blue-600 hover:text-blue-800"
+                              className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               {discrepancy.materialName}
                             </Link>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">{discrepancy.supplierName || 'N/A'}</div>
+                            <div className="text-sm ds-text-primary">{discrepancy.supplierName || 'N/A'}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
+                            <div className="text-sm ds-text-primary">
                               {(discrepancy.metrics?.variance || 0).toFixed(2)} units
                             </div>
-                            <div className="text-sm text-gray-700 leading-normal">
+                            <div className="text-sm ds-text-secondary leading-normal">
                               {(discrepancy.metrics?.variancePercentage || 0).toFixed(2)}%
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm text-gray-900">
+                            <div className="text-sm ds-text-primary">
                               {(discrepancy.metrics?.loss || 0).toFixed(2)} units
                             </div>
-                            <div className="text-sm text-gray-700 leading-normal">
+                            <div className="text-sm ds-text-secondary leading-normal">
                               {(discrepancy.metrics?.lossPercentage || 0).toFixed(2)}%
                             </div>
                           </td>
@@ -1386,7 +1386,7 @@ function WastageAnalyticsPageContent() {
                             <div className="flex gap-2">
                               <Link
                                 href={`/items/${discrepancy.materialId}`}
-                                className="text-blue-600 hover:text-blue-900"
+                                className="ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 View
                               </Link>
@@ -1410,8 +1410,8 @@ function WastageAnalyticsPageContent() {
             )}
 
             {categoryAnalysis.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Category Analysis</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+                <h2 className="text-xl md:text-2xl font-semibold ds-text-primary mb-4 leading-tight">Category Analysis</h2>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div>
                     {categoryAnalysis.length > 0 ? (
@@ -1445,13 +1445,13 @@ function WastageAnalyticsPageContent() {
                         </BarChart>
                       </ResponsiveContainer>
                     ) : (
-                      <div className="flex items-center justify-center h-[300px] text-gray-500">
+                      <div className="flex items-center justify-center h-[300px] ds-text-muted">
                         No category data available
                       </div>
                     )}
                   </div>
                   <div>
-                    <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-4 leading-tight">Top Categories by Wastage</h3>
+                    <h3 className="text-lg md:text-xl font-semibold ds-text-primary mb-4 leading-tight">Top Categories by Wastage</h3>
                     <div className="space-y-3 max-h-64 overflow-y-auto">
                       {categoryAnalysis.slice(0, 10).map((cat, index) => {
                         const materialsWithIssues = Math.max(0, parseFloat(cat.materialsWithIssues) || 0);
@@ -1462,16 +1462,16 @@ function WastageAnalyticsPageContent() {
                           : 0;
                         
                         return (
-                          <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div key={index} className="flex items-center justify-between p-3 ds-bg-surface-muted rounded-lg">
                             <div className="flex-1">
-                              <p className="font-medium text-gray-900">{cat.category || 'Other'}</p>
-                              <p className="text-sm text-gray-700">
+                              <p className="font-medium ds-text-primary">{cat.category || 'Other'}</p>
+                              <p className="text-sm ds-text-secondary">
                                 {materialsWithIssues} / {totalMaterials} materials with issues
                               </p>
                             </div>
                             <div className="text-right">
                               <p className="font-semibold text-red-600">{formatCurrency(totalDiscrepancyCost)}</p>
-                              <p className="text-sm text-gray-700 leading-normal">{issueRate.toFixed(1)}% issue rate</p>
+                              <p className="text-sm ds-text-secondary leading-normal">{issueRate.toFixed(1)}% issue rate</p>
                             </div>
                           </div>
                         );
@@ -1483,8 +1483,8 @@ function WastageAnalyticsPageContent() {
             )}
 
             {trends.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6 mb-6">
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Historical Trends</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+                <h2 className="text-xl md:text-2xl font-semibold ds-text-primary mb-4 leading-tight">Historical Trends</h2>
                 {trends.length > 0 ? (
                   <ResponsiveContainer width="100%" height={400}>
                     <LineChart data={trends.map((t) => ({
@@ -1546,7 +1546,7 @@ function WastageAnalyticsPageContent() {
                     </LineChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex items-center justify-center h-[400px] text-gray-500">
+                  <div className="flex items-center justify-center h-[400px] ds-text-muted">
                     No trend data available
                   </div>
                 )}
@@ -1554,8 +1554,8 @@ function WastageAnalyticsPageContent() {
             )}
 
             {discrepancyBreakdown.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl md:text-2xl font-semibold text-gray-900 mb-4 leading-tight">Discrepancy Breakdown by Material</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-xl md:text-2xl font-semibold ds-text-primary mb-4 leading-tight">Discrepancy Breakdown by Material</h2>
                 {discrepancyBreakdown.length > 0 ? (
                   <ResponsiveContainer width="100%" height={400}>
                     <BarChart data={discrepancyBreakdown}>
@@ -1582,7 +1582,7 @@ function WastageAnalyticsPageContent() {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="flex items-center justify-center h-[400px] text-gray-500">
+                  <div className="flex items-center justify-center h-[400px] ds-text-muted">
                     No discrepancy breakdown data available
                   </div>
                 )}
@@ -1590,8 +1590,8 @@ function WastageAnalyticsPageContent() {
             )}
 
             {!summary && !loading && (
-              <div className="bg-white rounded-lg shadow p-12 text-center">
-                <p className="text-gray-700">No discrepancy data available for this project</p>
+              <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+                <p className="ds-text-secondary">No discrepancy data available for this project</p>
               </div>
             )}
           </>
@@ -1599,34 +1599,34 @@ function WastageAnalyticsPageContent() {
 
         {showResolutionModal && resolvingDiscrepancy && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-lg w-full mx-4">
+            <div className="ds-bg-surface rounded-lg shadow-xl max-w-lg w-full mx-4">
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">Resolve Discrepancy</h2>
+                  <h2 className="text-xl md:text-2xl font-bold ds-text-primary leading-tight">Resolve Discrepancy</h2>
                   <button
                     onClick={() => {
                       setShowResolutionModal(false);
                       setResolvingDiscrepancy(null);
                     }}
-                    className="text-gray-600 hover:text-gray-800"
+                    className="ds-text-secondary hover:ds-text-primary"
                   >
                     ✕
                   </button>
                 </div>
 
-                <p className="text-base text-gray-700 mb-6 leading-relaxed">
+                <p className="text-base ds-text-secondary mb-6 leading-relaxed">
                   Update the status and add resolution notes for this discrepancy.
                 </p>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                    <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                       Status
                     </label>
                     <select
                       value={resolutionForm.status}
                       onChange={(e) => setResolutionForm((prev) => ({ ...prev, status: e.target.value }))}
-                      className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="open">Open</option>
                       <option value="investigating">Investigating</option>
@@ -1636,14 +1636,14 @@ function WastageAnalyticsPageContent() {
                   </div>
 
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                    <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                       Resolution Notes
                     </label>
                     <textarea
                       value={resolutionForm.notes}
                       onChange={(e) => setResolutionForm((prev) => ({ ...prev, notes: e.target.value }))}
                       rows={4}
-                      className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       placeholder="Add notes about the resolution..."
                     />
                   </div>
@@ -1655,14 +1655,14 @@ function WastageAnalyticsPageContent() {
                       setShowResolutionModal(false);
                       setResolvingDiscrepancy(null);
                     }}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                    className="px-4 py-2 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition"
                   >
                     Cancel
                   </button>
                   <LoadingButton
                     onClick={handleSaveResolution}
                     isLoading={false}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
                   >
                     Save Resolution
                   </LoadingButton>
@@ -1674,24 +1674,24 @@ function WastageAnalyticsPageContent() {
 
         {showThresholdModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="ds-bg-surface rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-900 leading-tight">Configure Wastage Thresholds</h2>
+                  <h2 className="text-xl md:text-2xl font-bold ds-text-primary leading-tight">Configure Wastage Thresholds</h2>
                   <button
                     onClick={() => setShowThresholdModal(false)}
-                    className="text-gray-600 hover:text-gray-800"
+                    className="ds-text-secondary hover:ds-text-primary"
                   >
                     ✕
                   </button>
                 </div>
 
-                <p className="text-base text-gray-700 mb-6 leading-relaxed">
+                <p className="text-base ds-text-secondary mb-6 leading-relaxed">
                   Set custom thresholds for variance, loss, and wastage detection. Alerts will be triggered when these thresholds are exceeded.
                 </p>
 
                 <div className="mb-6">
-                  <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">Quick Presets</label>
+                  <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">Quick Presets</label>
                   <div className="flex gap-2">
                     <button
                       onClick={() => applyPreset('strict')}
@@ -1716,7 +1716,7 @@ function WastageAnalyticsPageContent() {
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                    <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                       Variance Percentage Threshold (%)
                     </label>
                     <input
@@ -1726,13 +1726,13 @@ function WastageAnalyticsPageContent() {
                       step="0.1"
                       value={thresholdForm.variancePercentage}
                       onChange={(e) => setThresholdForm((prev) => ({ ...prev, variancePercentage: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <p className="text-sm text-gray-700 mt-1 leading-normal">Alert if variance exceeds this percentage of purchased quantity</p>
+                    <p className="text-sm ds-text-secondary mt-1 leading-normal">Alert if variance exceeds this percentage of purchased quantity</p>
                   </div>
 
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                    <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                       Variance Amount Threshold (units)
                     </label>
                     <input
@@ -1741,13 +1741,13 @@ function WastageAnalyticsPageContent() {
                       step="1"
                       value={thresholdForm.varianceAmount}
                       onChange={(e) => setThresholdForm((prev) => ({ ...prev, varianceAmount: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <p className="text-sm text-gray-700 mt-1 leading-normal">Alert if variance exceeds this absolute amount (0 to disable)</p>
+                    <p className="text-sm ds-text-secondary mt-1 leading-normal">Alert if variance exceeds this absolute amount (0 to disable)</p>
                   </div>
 
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                    <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                       Loss Percentage Threshold (%)
                     </label>
                     <input
@@ -1757,13 +1757,13 @@ function WastageAnalyticsPageContent() {
                       step="0.1"
                       value={thresholdForm.lossPercentage}
                       onChange={(e) => setThresholdForm((prev) => ({ ...prev, lossPercentage: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <p className="text-sm text-gray-700 mt-1 leading-normal">Alert if loss exceeds this percentage of delivered quantity</p>
+                    <p className="text-sm ds-text-secondary mt-1 leading-normal">Alert if loss exceeds this percentage of delivered quantity</p>
                   </div>
 
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                    <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                       Loss Amount Threshold (units)
                     </label>
                     <input
@@ -1772,13 +1772,13 @@ function WastageAnalyticsPageContent() {
                       step="1"
                       value={thresholdForm.lossAmount}
                       onChange={(e) => setThresholdForm((prev) => ({ ...prev, lossAmount: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <p className="text-sm text-gray-700 mt-1 leading-normal">Alert if loss exceeds this absolute amount (0 to disable)</p>
+                    <p className="text-sm ds-text-secondary mt-1 leading-normal">Alert if loss exceeds this absolute amount (0 to disable)</p>
                   </div>
 
                   <div>
-                    <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                    <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                       Wastage Percentage Threshold (%)
                     </label>
                     <input
@@ -1788,16 +1788,16 @@ function WastageAnalyticsPageContent() {
                       step="0.1"
                       value={thresholdForm.wastagePercentage}
                       onChange={(e) => setThresholdForm((prev) => ({ ...prev, wastagePercentage: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <p className="text-sm text-gray-700 mt-1 leading-normal">Alert if total wastage exceeds this percentage of purchased quantity</p>
+                    <p className="text-sm ds-text-secondary mt-1 leading-normal">Alert if total wastage exceeds this percentage of purchased quantity</p>
                   </div>
                 </div>
 
                 <div className="mt-6 flex justify-end gap-3">
                   <button
                     onClick={() => setShowThresholdModal(false)}
-                    className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                    className="px-4 py-2 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition"
                   >
                     Cancel
                   </button>
@@ -1805,7 +1805,7 @@ function WastageAnalyticsPageContent() {
                     onClick={handleSaveThresholds}
                     isLoading={savingThresholds}
                     loadingText="Saving..."
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
                   >
                     Save Thresholds
                   </LoadingButton>
@@ -1826,7 +1826,7 @@ export default function WastageAnalyticsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-700">Loading wastage analytics...</p>
+            <p className="mt-4 ds-text-secondary">Loading wastage analytics...</p>
           </div>
         </div>
       </AppLayout>

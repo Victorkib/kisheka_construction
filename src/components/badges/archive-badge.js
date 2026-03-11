@@ -10,7 +10,7 @@
 export function ArchiveBadge({ className = '' }) {
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-300 ${className}`}
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ds-bg-surface-muted ds-text-primary border ds-border-subtle ${className}`}
       title="This item is archived"
     >
       <svg

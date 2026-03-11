@@ -9,13 +9,14 @@
 import { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { usePermissions } from '@/hooks/use-permissions';
+import { useProjectContext } from '@/contexts/ProjectContext';
 
 const SidebarDataContext = createContext(null);
 
 /**
  * Extract project ID from pathname or search params
  */
-function getProjectId(pathname, searchParams) {
+function getProjectIdFromUrl(pathname, searchParams) {
   const objectIdPattern = /^[a-f\d]{24}$/i;
   const projectMatch = pathname.match(/^\/projects\/([^/]+)/);
   if (projectMatch) {
@@ -29,30 +30,37 @@ function getProjectId(pathname, searchParams) {
 /**
  * Sidebar Data Provider Component
  * Fetches all sidebar-related data in one place
+ * Now uses ProjectContext to get current project, not just URL
  */
 export function SidebarDataProvider({ children }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { user, canAccess } = usePermissions();
+  const { currentProject, currentProjectId } = useProjectContext();
   
   const [data, setData] = useState({
     project: null,
-    pendingActions: [],
     suggestions: [],
     loading: true,
     error: null,
   });
 
-  const projectId = useMemo(() => getProjectId(pathname, searchParams), [pathname, searchParams]);
+  // Prioritize ProjectContext over URL - this ensures sidebar respects project selection
+  const projectIdFromUrl = useMemo(() => getProjectIdFromUrl(pathname, searchParams), [pathname, searchParams]);
+  const projectId = useMemo(() => {
+    // Use currentProjectId from context if available, otherwise fall back to URL
+    const contextProjectId = currentProjectId || (currentProject?._id?.toString() || currentProject?._id || null);
+    return contextProjectId || projectIdFromUrl;
+  }, [currentProjectId, currentProject, projectIdFromUrl]);
 
   useEffect(() => {
     if (!user) {
-      setData({ project: null, pendingActions: [], suggestions: [], loading: false, error: null });
+      setData({ project: null, suggestions: [], loading: false, error: null });
       return;
     }
 
     fetchAllSidebarData();
-  }, [user, pathname, searchParams, projectId, canAccess]);
+  }, [user, pathname, searchParams, projectId, canAccess, currentProject]);
 
   const fetchAllSidebarData = async () => {
     try {
@@ -61,8 +69,12 @@ export function SidebarDataProvider({ children }) {
       // Batch all API requests
       const promises = [];
 
-      // Fetch current project if projectId exists
-      if (projectId) {
+      // Use currentProject from context if available, otherwise fetch
+      if (currentProject && (currentProject._id?.toString() === projectId || currentProject._id === projectId)) {
+        // Use project from context - no need to fetch
+        promises.push(Promise.resolve({ type: 'project', data: { success: true, data: currentProject } }));
+      } else if (projectId) {
+        // Fetch project if not in context
         promises.push(
           fetch(`/api/projects/${projectId}`, {
             cache: 'no-store',
@@ -79,59 +91,6 @@ export function SidebarDataProvider({ children }) {
         promises.push(Promise.resolve({ type: 'project', data: null }));
       }
 
-      // Fetch pending actions
-      if (canAccess && canAccess('approve_material_request')) {
-        promises.push(
-          fetch('/api/dashboard/summary', {
-            cache: 'no-store',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-            },
-          })
-            .then(res => res.json())
-            .then(data => ({ type: 'approvals', data }))
-            .catch(err => ({ type: 'approvals', data: null, error: err }))
-        );
-      } else {
-        promises.push(Promise.resolve({ type: 'approvals', data: null }));
-      }
-
-      // Fetch ready to order count
-      if (canAccess && (canAccess('create_purchase_order') || canAccess('view_material_requests'))) {
-        promises.push(
-          fetch('/api/material-requests?status=ready_to_order&limit=0', {
-            cache: 'no-store',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-            },
-          })
-            .then(res => res.json())
-            .then(data => ({ type: 'readyToOrder', data }))
-            .catch(err => ({ type: 'readyToOrder', data: null, error: err }))
-        );
-      } else {
-        promises.push(Promise.resolve({ type: 'readyToOrder', data: null }));
-      }
-
-      // Fetch pending purchase orders for suppliers
-      if (user?.role?.toLowerCase() === 'supplier') {
-        promises.push(
-          fetch('/api/purchase-orders?limit=0', {
-            cache: 'no-store',
-            headers: {
-              'Cache-Control': 'no-cache, no-store, must-revalidate',
-              'Pragma': 'no-cache',
-            },
-          })
-            .then(res => res.json())
-            .then(data => ({ type: 'pendingOrders', data }))
-            .catch(err => ({ type: 'pendingOrders', data: null, error: err }))
-        );
-      } else {
-        promises.push(Promise.resolve({ type: 'pendingOrders', data: null }));
-      }
 
       // Fetch prerequisites for suggestions (if on project page)
       if (projectId && pathname.match(/^\/projects\/[^/]+$/)) {
@@ -175,7 +134,6 @@ export function SidebarDataProvider({ children }) {
 
       // Process results
       let project = null;
-      const pendingActions = [];
       const suggestions = [];
 
       for (const result of results) {
@@ -188,58 +146,6 @@ export function SidebarDataProvider({ children }) {
           case 'project':
             if (result.data?.success) {
               project = result.data.data;
-            }
-            break;
-
-          case 'approvals':
-            if (result.data?.success && result.data.data?.summary?.totalPendingApprovals > 0) {
-              pendingActions.push({
-                type: 'approval',
-                label: `${result.data.data.summary.totalPendingApprovals} Material Request${result.data.data.summary.totalPendingApprovals !== 1 ? 's' : ''} Pending Approval`,
-                href: '/dashboard/approvals',
-                icon: '✅',
-                priority: 'high',
-                count: result.data.data.summary.totalPendingApprovals,
-              });
-            }
-            break;
-
-          case 'readyToOrder':
-            if (result.data?.success) {
-              let count = 0;
-              if (result.data.data?.pagination?.total !== undefined) {
-                count = result.data.data.pagination.total;
-              } else if (result.data.data?.requests) {
-                count = result.data.data.requests.length;
-              }
-              if (count > 0) {
-                pendingActions.push({
-                  type: 'ready_to_order',
-                  label: `${count} Approved Request${count !== 1 ? 's' : ''} Ready to Order`,
-                  href: '/material-requests?status=ready_to_order',
-                  icon: '🛒',
-                  priority: 'medium',
-                  count,
-                });
-              }
-            }
-            break;
-
-          case 'pendingOrders':
-            if (result.data?.success && result.data.data?.orders) {
-              const pendingCount = result.data.data.orders.filter(
-                (order) => order.status === 'order_sent' || order.status === 'order_modified'
-              ).length;
-              if (pendingCount > 0) {
-                pendingActions.push({
-                  type: 'pending_order',
-                  label: `${pendingCount} Purchase Order${pendingCount !== 1 ? 's' : ''} Awaiting Response`,
-                  href: '/purchase-orders',
-                  icon: '📋',
-                  priority: 'high',
-                  count: pendingCount,
-                });
-              }
             }
             break;
 
@@ -291,7 +197,6 @@ export function SidebarDataProvider({ children }) {
 
       setData({
         project,
-        pendingActions,
         suggestions,
         loading: false,
         error: null,

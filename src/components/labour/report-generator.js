@@ -188,25 +188,25 @@ export function ReportGenerator({
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
-        {description && <p className="text-gray-600">{description}</p>}
+        <h2 className="text-2xl font-bold ds-text-primary mb-2">{title}</h2>
+        {description && <p className="ds-text-secondary">{description}</p>}
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Filter className="w-5 h-5 text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Filters</h3>
+          <Filter className="w-5 h-5 ds-text-secondary" />
+          <h3 className="text-lg font-semibold ds-text-primary">Filters</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium ds-text-secondary mb-2">
               Project <span className="text-red-600">*</span>
             </label>
             <select
               value={filters.projectId}
               onChange={(e) => handleFilterChange('projectId', e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Select Project</option>
               {projects.map((project) => (
@@ -219,11 +219,11 @@ export function ReportGenerator({
 
           {phases.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Phase</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-2">Phase</label>
               <select
                 value={filters.phaseId}
                 onChange={(e) => handleFilterChange('phaseId', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">All Phases</option>
                 {phases.map((phase) => (
@@ -236,27 +236,27 @@ export function ReportGenerator({
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Date From</label>
+            <label className="block text-sm font-medium ds-text-secondary mb-2">Date From</label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted" />
               <input
                 type="date"
                 value={filters.dateFrom}
                 onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Date To</label>
+            <label className="block text-sm font-medium ds-text-secondary mb-2">Date To</label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted" />
               <input
                 type="date"
                 value={filters.dateTo}
                 onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -265,11 +265,11 @@ export function ReportGenerator({
         {/* Additional Filters */}
         {filters.groupBy !== undefined && showGroupBy && (
           <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">Group By</label>
+            <label className="block text-sm font-medium ds-text-secondary mb-2">Group By</label>
             <select
               value={filters.groupBy}
               onChange={(e) => handleFilterChange('groupBy', e.target.value)}
-              className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full md:w-auto px-4 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Default</option>
               {(groupByOptions || [
@@ -291,14 +291,14 @@ export function ReportGenerator({
               if (filter.type === 'select') {
                 return (
                   <div key={filter.key}>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium ds-text-secondary mb-2">
                       {filter.label}
                       {filter.required && <span className="text-red-600"> *</span>}
                     </label>
                     <select
                       value={filters[filter.key] || ''}
                       onChange={(e) => handleFilterChange(filter.key, e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       disabled={filter.disabled}
                     >
                       <option value="">{filter.placeholder || 'Select'}</option>
@@ -314,7 +314,7 @@ export function ReportGenerator({
 
               return (
                 <div key={filter.key}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     {filter.label}
                     {filter.required && <span className="text-red-600"> *</span>}
                   </label>
@@ -323,7 +323,7 @@ export function ReportGenerator({
                     value={filters[filter.key] || ''}
                     onChange={(e) => handleFilterChange(filter.key, e.target.value)}
                     placeholder={filter.placeholder}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     disabled={filter.disabled}
                   />
                 </div>
@@ -347,7 +347,7 @@ export function ReportGenerator({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handleExport('json')}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors"
               >
                 <Download className="w-4 h-4" />
                 Export JSON
@@ -366,7 +366,7 @@ export function ReportGenerator({
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
             <div>
@@ -379,7 +379,7 @@ export function ReportGenerator({
 
       {/* Loading State */}
       {loading && (
-        <div className="bg-white rounded-lg shadow p-12">
+        <div className="ds-bg-surface rounded-lg shadow p-12">
           <div className="flex items-center justify-center">
             <LoadingSpinner size="lg" text="Generating report..." />
           </div>
@@ -388,21 +388,21 @@ export function ReportGenerator({
 
       {/* Report Content */}
       {!loading && data && (
-        <div className="bg-white rounded-lg shadow">
+        <div className="ds-bg-surface rounded-lg shadow">
           {children ? children(data) : <DefaultReportView data={data} />}
         </div>
       )}
 
       {/* No Data State */}
       {!loading && !data && filters.projectId && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-          <p className="text-gray-600">No data available for the selected filters</p>
+        <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-8 text-center">
+          <p className="ds-text-secondary">No data available for the selected filters</p>
         </div>
       )}
 
       {/* Initial State */}
       {!loading && !data && !filters.projectId && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
+        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-8 text-center">
           <p className="text-blue-800">Please select a project to generate a report</p>
         </div>
       )}
@@ -419,7 +419,7 @@ function DefaultReportView({ data }) {
 
   return (
     <div className="p-6">
-      <pre className="bg-gray-50 p-4 rounded-lg overflow-auto text-sm">
+      <pre className="ds-bg-surface-muted p-4 rounded-lg overflow-auto text-sm">
         {JSON.stringify(data, null, 2)}
       </pre>
     </div>

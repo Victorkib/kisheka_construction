@@ -138,14 +138,14 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
     return (
       <div className="flex items-center justify-center py-12">
         <LoadingSpinner />
-        <span className="ml-2 text-gray-600">Loading phase budgets...</span>
+        <span className="ml-2 ds-text-secondary">Loading phase budgets...</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+      <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg">
         <p className="font-semibold">Error loading phase budgets</p>
         <p className="text-sm">{error}</p>
       </div>
@@ -170,33 +170,33 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600">Total Budget</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary">Total Budget</p>
+          <p className="text-2xl font-bold ds-text-primary mt-1">
             {formatCurrency(totalBudget)}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs ds-text-muted mt-1">
             Across {phaseBudgets?.length || 0} phase(s)
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600">Actual Spending</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary">Actual Spending</p>
+          <p className="text-2xl font-bold ds-text-accent-primary mt-1">
             {formatCurrency(totalActual)}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600">Remaining</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary">Remaining</p>
           <p className={`text-2xl font-bold mt-1 ${
-            totalRemaining < 0 ? 'text-red-600' : 'text-green-600'
+            totalRemaining < 0 ? 'ds-text-danger' : 'ds-text-success'
           }`}>
             {formatCurrency(totalRemaining)}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600">Variance</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary">Variance</p>
           <p className={`text-2xl font-bold mt-1 ${
-            totalVariance > 0 ? 'text-red-600' : 'text-green-600'
+            totalVariance > 0 ? 'ds-text-danger' : 'ds-text-success'
           }`}>
             {formatCurrency(totalVariance)}
           </p>
@@ -204,19 +204,19 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
       </div>
 
       {/* Capital Allocation Summary - Always show, even when zero */}
-      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-200 rounded-lg p-6">
+      <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Capital Allocation</h3>
+          <h3 className="text-lg font-semibold ds-text-primary">Capital Allocation</h3>
           <div className="flex items-center gap-3">
             {capitalTotal > 0 && (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm ds-text-secondary">
                 {capitalVsBudget.toFixed(1)}% of budget
               </div>
             )}
             {canEdit && (
               <Link
                 href={`/floors/${floor._id}/budget`}
-                className="px-3 py-1.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition"
+                className="px-3 py-1.5 ds-bg-accent-primary text-white text-sm font-medium rounded-lg hover:ds-bg-accent-hover transition"
               >
                 {capitalTotal > 0 ? 'Manage Capital' : 'Allocate Capital'}
               </Link>
@@ -227,27 +227,27 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
           <>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             <div>
-              <p className="text-sm text-gray-600">Total Capital</p>
-              <p className="text-xl font-bold text-purple-700 mt-1">
+              <p className="text-sm ds-text-secondary">Total Capital</p>
+              <p className="text-xl font-bold ds-text-accent-primary mt-1">
                 {formatCurrency(capitalTotal)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Used</p>
-              <p className="text-xl font-bold text-blue-600 mt-1">
+              <p className="text-sm ds-text-secondary">Used</p>
+              <p className="text-xl font-bold ds-text-accent-primary mt-1">
                 {formatCurrency(capitalUsed)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Committed</p>
-              <p className="text-xl font-bold text-yellow-600 mt-1">
+              <p className="text-sm ds-text-secondary">Committed</p>
+              <p className="text-xl font-bold ds-text-warning mt-1">
                 {formatCurrency(capitalCommitted)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Remaining</p>
+              <p className="text-sm ds-text-secondary">Remaining</p>
               <p className={`text-xl font-bold mt-1 ${
-                capitalRemaining < 0 ? 'text-red-600' : 'text-green-600'
+                capitalRemaining < 0 ? 'ds-text-danger' : 'ds-text-success'
               }`}>
                 {formatCurrency(capitalRemaining)}
               </p>
@@ -256,8 +256,8 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
           
           {/* Capital by Phase Breakdown */}
           {capitalAllocation.byPhase && Object.keys(capitalAllocation.byPhase).length > 0 && (
-            <div className="mt-4 pt-4 border-t border-purple-200">
-              <h4 className="text-sm font-semibold text-gray-700 mb-3">Capital by Phase</h4>
+            <div className="mt-4 pt-4 border-t ds-border-accent-subtle">
+              <h4 className="text-sm font-semibold ds-text-secondary mb-3">Capital by Phase</h4>
               <div className="space-y-2">
                 {Object.entries(capitalAllocation.byPhase).map(([phaseCode, phaseCapital]) => {
                   if (phaseCapital.total === 0) return null;
@@ -266,26 +266,26 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
                   const phaseCapitalVsBudget = phaseBudget > 0 ? (phaseCapital.total / phaseBudget) * 100 : 0;
                   
                   return (
-                    <div key={phaseCode} className="bg-white rounded-lg p-3 border border-purple-100">
+                    <div key={phaseCode} className="ds-bg-surface rounded-lg p-3 border ds-border-accent-subtle">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-900">{phaseName}</span>
-                        <span className="text-xs text-gray-600">
+                        <span className="text-sm font-medium ds-text-primary">{phaseName}</span>
+                        <span className="text-xs ds-text-secondary">
                           {formatCurrency(phaseCapital.total)} ({phaseCapitalVsBudget.toFixed(1)}% of phase budget)
                         </span>
                       </div>
                       <div className="grid grid-cols-3 gap-2 text-xs">
                         <div>
-                          <span className="text-gray-600">Used:</span>
-                          <span className="ml-1 font-medium text-blue-600">{formatCurrency(phaseCapital.used || 0)}</span>
+                          <span className="ds-text-secondary">Used:</span>
+                          <span className="ml-1 font-medium ds-text-accent-primary">{formatCurrency(phaseCapital.used || 0)}</span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Committed:</span>
-                          <span className="ml-1 font-medium text-yellow-600">{formatCurrency(phaseCapital.committed || 0)}</span>
+                          <span className="ds-text-secondary">Committed:</span>
+                          <span className="ml-1 font-medium ds-text-warning">{formatCurrency(phaseCapital.committed || 0)}</span>
                         </div>
                         <div>
-                          <span className="text-gray-600">Remaining:</span>
+                          <span className="ds-text-secondary">Remaining:</span>
                           <span className={`ml-1 font-medium ${
-                            (phaseCapital.remaining || 0) < 0 ? 'text-red-600' : 'text-green-600'
+                            (phaseCapital.remaining || 0) < 0 ? 'ds-text-danger' : 'ds-text-success'
                           }`}>
                             {formatCurrency(phaseCapital.remaining || 0)}
                           </span>
@@ -299,27 +299,27 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
           )}
           
           {/* Capital vs Budget Comparison */}
-          <div className="mt-4 pt-4 border-t border-purple-200">
+          <div className="mt-4 pt-4 border-t ds-border-accent-subtle">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-700">Capital Coverage</span>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm font-medium ds-text-secondary">Capital Coverage</span>
+              <span className="text-sm ds-text-secondary">
                 {formatCurrency(capitalTotal)} / {formatCurrency(totalBudget)}
               </span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full ds-bg-surface-muted rounded-full h-3">
               <div
                 className={`h-3 rounded-full ${
                   capitalVsBudget >= 100
-                    ? 'bg-green-500'
+                    ? 'ds-bg-success'
                     : capitalVsBudget >= 80
-                    ? 'bg-yellow-500'
-                    : 'bg-red-500'
+                    ? 'ds-bg-warning'
+                    : 'ds-bg-danger'
                 }`}
                 style={{ width: `${Math.min(capitalVsBudget, 100)}%` }}
               />
             </div>
             {capitalVsBudget < 100 && (
-              <p className="text-xs text-gray-600 mt-2">
+              <p className="text-xs ds-text-secondary mt-2">
                 Capital covers {capitalVsBudget.toFixed(1)}% of budget. 
                 {capitalVsBudget < 80 && ' Consider allocating more capital to this floor.'}
               </p>
@@ -327,30 +327,30 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
           </div>
           </>
         ) : (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <p className="text-sm text-yellow-800 mb-3">
+          <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-4">
+            <p className="text-sm ds-text-accent-primary mb-3">
               <strong>No capital allocated</strong> to this floor yet.
             </p>
             {projectFinances && projectFinances.capitalBalance > 0 && (
-              <p className="text-xs text-yellow-700 mb-3">
+              <p className="text-xs ds-text-accent-primary mb-3">
                 Project Available Capital: <span className="font-semibold">{formatCurrency(projectFinances.capitalBalance)}</span>
               </p>
             )}
             {canEdit && (
               <Link
                 href={`/floors/${floor._id}/budget`}
-                className="inline-block px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition"
+                className="inline-block px-4 py-2 ds-bg-accent-primary text-white text-sm font-medium rounded-lg hover:ds-bg-accent-hover transition"
               >
                 Allocate Capital Now
               </Link>
             )}
             {(!canEdit || (projectFinances && projectFinances.capitalBalance === 0)) && (
-              <p className="text-xs text-yellow-700 mt-2">
+              <p className="text-xs ds-text-accent-primary mt-2">
                 {!canEdit 
                   ? 'Contact PM or OWNER to allocate capital.'
                   : 'No capital available. Allocate capital to the project first.'}
                 {projectFinances && projectFinances.capitalBalance === 0 && (
-                  <Link href="/investors" className="ml-1 underline hover:text-yellow-900">
+                  <Link href="/investors" className="ml-1 underline hover:ds-text-accent-hover">
                     Go to Investors
                   </Link>
                 )}
@@ -362,107 +362,107 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
 
       {/* Phase Budget Breakdown */}
       {phaseBudgets && phaseBudgets.length > 0 ? (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Budget by Phase</h3>
-            <p className="text-sm text-gray-600 mt-1">
+        <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
+          <div className="px-6 py-4 border-b ds-border-subtle">
+            <h3 className="text-lg font-semibold ds-text-primary">Budget by Phase</h3>
+            <p className="text-sm ds-text-secondary mt-1">
               Detailed breakdown of floor budget allocation across construction phases
             </p>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Phase
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Budget
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Actual
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Committed
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Remaining
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Variance
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Utilization
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {phaseBudgets.map((phase) => (
                   <tr
                     key={phase.phaseId}
-                    className={phase.isOverBudget ? 'bg-red-50' : phase.isLowBudget ? 'bg-yellow-50' : ''}
+                    className={phase.isOverBudget ? 'ds-bg-danger/10' : phase.isLowBudget ? 'ds-bg-warning/10' : ''}
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{phase.phaseName}</p>
-                        <p className="text-xs text-gray-500">{phase.phaseCode}</p>
+                        <p className="text-sm font-medium ds-text-primary">{phase.phaseName}</p>
+                        <p className="text-xs ds-text-muted">{phase.phaseCode}</p>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm ds-text-primary">
                         <p className="font-semibold">{formatCurrency(phase.budget)}</p>
-                        <div className="text-xs text-gray-500 mt-1">
+                        <div className="text-xs ds-text-muted mt-1">
                           <p>M: {formatCurrency(phase.materials)}</p>
                           <p>L: {formatCurrency(phase.labour)}</p>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-sm font-medium text-blue-600">
+                      <p className="text-sm font-medium ds-text-accent-primary">
                         {formatCurrency(phase.actual)}
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm ds-text-secondary">
                         {formatCurrency(phase.committed)}
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <p className={`text-sm font-medium ${
                         phase.remaining < phase.budget * 0.2 && phase.budget > 0
-                          ? 'text-red-600'
+                          ? 'ds-text-danger'
                           : phase.remaining < phase.budget * 0.5 && phase.budget > 0
-                          ? 'text-yellow-600'
-                          : 'text-green-600'
+                          ? 'ds-text-warning'
+                          : 'ds-text-success'
                       }`}>
                         {formatCurrency(phase.remaining)}
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <p className={`text-sm font-medium ${
-                        phase.variance > 0 ? 'text-red-600' : 'text-green-600'
+                        phase.variance > 0 ? 'ds-text-danger' : 'ds-text-success'
                       }`}>
                         {formatCurrency(phase.variance)}
                       </p>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                        <div className="flex-1 ds-bg-surface-muted rounded-full h-2 mr-2">
                           <div
                             className={`h-2 rounded-full ${
                               phase.utilization > 100
-                                ? 'bg-red-600'
+                                ? 'ds-bg-danger'
                                 : phase.utilization > 80
-                                ? 'bg-yellow-600'
-                                : 'bg-green-600'
+                                ? 'ds-bg-warning'
+                                : 'ds-bg-success'
                             }`}
                             style={{ width: `${Math.min(phase.utilization, 100)}%` }}
                           />
                         </div>
-                        <span className="text-xs text-gray-600">
+                        <span className="text-xs ds-text-secondary">
                           {phase.utilization.toFixed(1)}%
                         </span>
                       </div>
@@ -470,7 +470,7 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <Link
                         href={`/phases/${phase.phaseId}/budget`}
-                        className="text-blue-600 hover:text-blue-800 font-medium"
+                        className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                       >
                         Manage →
                       </Link>
@@ -482,16 +482,16 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
           </div>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <div className="text-center py-8">
-            <p className="text-gray-600 mb-4">No phase budgets allocated to this floor yet.</p>
-            <p className="text-sm text-gray-500">
+            <p className="ds-text-secondary mb-4">No phase budgets allocated to this floor yet.</p>
+            <p className="text-sm ds-text-muted">
               Allocate budgets to phases to see the breakdown here.
             </p>
             {project && (
               <Link
                 href={`/projects/${project._id}/budget`}
-                className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="mt-4 inline-block px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
               >
                 Go to Project Budget
               </Link>
@@ -502,12 +502,12 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
 
       {/* Budget Allocation Summary */}
       {floorBudgetAllocation.byPhase && Object.keys(floorBudgetAllocation.byPhase).length > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-4">
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-semibold text-blue-900">Budget Allocation Summary</h4>
+            <h4 className="text-sm font-semibold ds-text-accent-primary">Budget Allocation Summary</h4>
             <Link
               href={`/floors/${floor._id}/budget`}
-              className="text-xs text-blue-700 hover:text-blue-900 font-medium underline"
+              className="text-xs ds-text-accent-primary hover:ds-text-accent-hover font-medium underline"
             >
               Manage Budget →
             </Link>
@@ -518,8 +518,8 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
               const phaseName = phaseBudgets?.find(p => p.phaseCode === phaseCode)?.phaseName || phaseCode;
               return (
                 <div key={phaseCode}>
-                  <p className="text-blue-700 font-medium">{phaseName}</p>
-                  <p className="text-blue-900">{formatCurrency(phaseBudget.total)}</p>
+                  <p className="ds-text-accent-primary font-medium">{phaseName}</p>
+                  <p className="ds-text-accent-primary">{formatCurrency(phaseBudget.total)}</p>
                 </div>
               );
             })}
@@ -530,23 +530,23 @@ export function FloorBudgetTab({ floor, project, formatCurrency, canEdit = false
       {/* No Budget Allocated State */}
       {(!floorBudgetAllocation.byPhase || Object.keys(floorBudgetAllocation.byPhase).length === 0 || 
         Object.values(floorBudgetAllocation.byPhase).every(p => p.total === 0)) && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <div className="text-center py-8">
-            <p className="text-gray-600 mb-4">No phase budgets allocated to this floor yet.</p>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="ds-text-secondary mb-4">No phase budgets allocated to this floor yet.</p>
+            <p className="text-sm ds-text-muted mb-4">
               Allocate budgets to phases to see the breakdown here.
             </p>
             {project && (
               <div className="flex gap-3 justify-center">
                 <Link
                   href={`/projects/${project._id}/budget`}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
                 >
                   Go to Project Budget
                 </Link>
                 <Link
                   href={`/floors/${floor._id}/budget`}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                  className="px-4 py-2 ds-bg-success text-white rounded-lg hover:bg-emerald-700 transition"
                 >
                   Manage Floor Budget
                 </Link>

@@ -83,7 +83,7 @@ export function getStatusColor(status) {
     'completed': 'bg-blue-100 text-blue-800',
     'terminated': 'bg-red-100 text-red-800'
   };
-  return colors[status] || 'bg-gray-100 text-gray-800';
+  return colors[status] || 'ds-bg-surface-muted ds-text-primary';
 }
 
 /**

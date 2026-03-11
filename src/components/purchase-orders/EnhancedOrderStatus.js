@@ -199,8 +199,8 @@ export function EnhancedOrderStatus({ order, canManage = false, onRefresh }) {
               <StatusIcon className={`w-8 h-8 text-${statusColor}-600`} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">{getStatusText(order.status)}</h2>
-              <p className="text-sm text-gray-600">PO #{order.purchaseOrderNumber}</p>
+              <h2 className="text-xl font-bold ds-text-primary">{getStatusText(order.status)}</h2>
+              <p className="text-sm ds-text-secondary">PO #{order.purchaseOrderNumber}</p>
             </div>
           </div>
           
@@ -212,7 +212,7 @@ export function EnhancedOrderStatus({ order, canManage = false, onRefresh }) {
               <button
                 onClick={onRefresh}
                 disabled={loading}
-                className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+                className="p-2 ds-text-muted hover:ds-text-secondary transition-colors"
               >
                 <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
               </button>
@@ -224,42 +224,42 @@ export function EnhancedOrderStatus({ order, canManage = false, onRefresh }) {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-1">
-              <DollarSign className="w-4 h-4 text-gray-400" />
-              <span className="text-lg font-semibold text-gray-900">
+              <DollarSign className="w-4 h-4 ds-text-muted" />
+              <span className="text-lg font-semibold ds-text-primary">
                 ${order.totalCost?.toFixed(2) || '0.00'}
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Total Value</p>
+            <p className="text-xs ds-text-muted mt-1">Total Value</p>
           </div>
 
           <div className="text-center">
             <div className="flex items-center justify-center space-x-1">
-              <Package className="w-4 h-4 text-gray-400" />
-              <span className="text-lg font-semibold text-gray-900">
+              <Package className="w-4 h-4 ds-text-muted" />
+              <span className="text-lg font-semibold ds-text-primary">
                 {order.quantityOrdered || 0}
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Quantity</p>
+            <p className="text-xs ds-text-muted mt-1">Quantity</p>
           </div>
 
           <div className="text-center">
             <div className="flex items-center justify-center space-x-1">
-              <Calendar className="w-4 h-4 text-gray-400" />
-              <span className="text-lg font-semibold text-gray-900">
+              <Calendar className="w-4 h-4 ds-text-muted" />
+              <span className="text-lg font-semibold ds-text-primary">
                 {order.deliveryDate ? new Date(order.deliveryDate).toLocaleDateString() : 'N/A'}
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Delivery Date</p>
+            <p className="text-xs ds-text-muted mt-1">Delivery Date</p>
           </div>
 
           <div className="text-center">
             <div className="flex items-center justify-center space-x-1">
-              <Clock className="w-4 h-4 text-gray-400" />
-              <span className="text-lg font-semibold text-gray-900">
+              <Clock className="w-4 h-4 ds-text-muted" />
+              <span className="text-lg font-semibold ds-text-primary">
                 {order.sentAt ? Math.ceil((new Date() - new Date(order.sentAt)) / (1000 * 60 * 60)) : 'N/A'}h
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Time Elapsed</p>
+            <p className="text-xs ds-text-muted mt-1">Time Elapsed</p>
           </div>
         </div>
       </div>
@@ -273,7 +273,7 @@ export function EnhancedOrderStatus({ order, canManage = false, onRefresh }) {
 
     return (
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold text-gray-900">Risk Indicators</h3>
+        <h3 className="text-sm font-semibold ds-text-primary">Risk Indicators</h3>
         {indicators.map((indicator, index) => {
           const IndicatorIcon = indicator.icon;
           return (
@@ -296,8 +296,8 @@ export function EnhancedOrderStatus({ order, canManage = false, onRefresh }) {
       return (
         <div className="text-center py-4">
           <div className="flex items-center justify-center space-x-2">
-            <Info className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-500">No performance data available</span>
+            <Info className="w-4 h-4 ds-text-muted" />
+            <span className="text-sm ds-text-muted">No performance data available</span>
           </div>
         </div>
       );
@@ -319,27 +319,27 @@ export function EnhancedOrderStatus({ order, canManage = false, onRefresh }) {
           <div className={`inline-flex items-center justify-center w-12 h-12 rounded-full bg-${gradeColor}-100`}>
             <span className={`text-lg font-bold text-${gradeColor}-600`}>{grade}</span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">Performance Grade</p>
+          <p className="text-xs ds-text-muted mt-1">Performance Grade</p>
         </div>
         
         <div className="text-center">
           <div className="flex items-center justify-center space-x-1">
             <CheckCircle className="w-4 h-4 text-green-500" />
-            <span className="text-lg font-semibold text-gray-900">
+            <span className="text-lg font-semibold ds-text-primary">
               {supplierPerformance.timeliness?.responseRate || 0}%
             </span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">Response Rate</p>
+          <p className="text-xs ds-text-muted mt-1">Response Rate</p>
         </div>
         
         <div className="text-center">
           <div className="flex items-center justify-center space-x-1">
             <Clock className="w-4 h-4 text-blue-500" />
-            <span className="text-lg font-semibold text-gray-900">
+            <span className="text-lg font-semibold ds-text-primary">
               {supplierPerformance.timeliness?.averageResponseTime || 'N/A'}h
             </span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">Avg Response Time</p>
+          <p className="text-xs ds-text-muted mt-1">Avg Response Time</p>
         </div>
       </div>
     );
@@ -362,7 +362,7 @@ export function EnhancedOrderStatus({ order, canManage = false, onRefresh }) {
 
       {/* Risk Indicators */}
       {riskIndicators.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-4">
+        <div className="ds-bg-surface border ds-border-subtle rounded-lg p-4">
           {renderRiskIndicators()}
         </div>
       )}
@@ -370,20 +370,20 @@ export function EnhancedOrderStatus({ order, canManage = false, onRefresh }) {
       {/* Expandable Sections */}
       <div className="space-y-4">
         {/* Performance Section */}
-        <div className="bg-white border border-gray-200 rounded-lg">
+        <div className="ds-bg-surface border ds-border-subtle rounded-lg">
           <button
             onClick={() => toggleSection('performance')}
-            className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full p-4 flex items-center justify-between hover:ds-bg-surface-muted transition-colors"
           >
             <div className="flex items-center space-x-3">
               <BarChart3 className="w-5 h-5 text-blue-500" />
-              <span className="font-medium text-gray-900">Supplier Performance</span>
+              <span className="font-medium ds-text-primary">Supplier Performance</span>
             </div>
-            <Eye className={`w-4 h-4 text-gray-400 transform transition-transform ${expandedSections.performance ? 'rotate-180' : ''}`} />
+            <Eye className={`w-4 h-4 ds-text-muted transform transition-transform ${expandedSections.performance ? 'rotate-180' : ''}`} />
           </button>
           
           {expandedSections.performance && (
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-4 border-t ds-border-subtle">
               {renderPerformanceSummary()}
               <div className="mt-4">
                 <SupplierPerformanceIndicators
@@ -398,20 +398,20 @@ export function EnhancedOrderStatus({ order, canManage = false, onRefresh }) {
         </div>
 
         {/* Status Tracking Section */}
-        <div className="bg-white border border-gray-200 rounded-lg">
+        <div className="ds-bg-surface border ds-border-subtle rounded-lg">
           <button
             onClick={() => toggleSection('status')}
-            className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full p-4 flex items-center justify-between hover:ds-bg-surface-muted transition-colors"
           >
             <div className="flex items-center space-x-3">
               <Activity className="w-5 h-5 text-green-500" />
-              <span className="font-medium text-gray-900">Status Tracking</span>
+              <span className="font-medium ds-text-primary">Status Tracking</span>
             </div>
-            <Eye className={`w-4 h-4 text-gray-400 transform transition-transform ${expandedSections.status ? 'rotate-180' : ''}`} />
+            <Eye className={`w-4 h-4 ds-text-muted transform transition-transform ${expandedSections.status ? 'rotate-180' : ''}`} />
           </button>
           
           {expandedSections.status && (
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-4 border-t ds-border-subtle">
               <ResponseStatusTracker
                 order={order}
                 onRefresh={onRefresh}
@@ -422,20 +422,20 @@ export function EnhancedOrderStatus({ order, canManage = false, onRefresh }) {
         </div>
 
         {/* Communication Section */}
-        <div className="bg-white border border-gray-200 rounded-lg">
+        <div className="ds-bg-surface border ds-border-subtle rounded-lg">
           <button
             onClick={() => toggleSection('communication')}
-            className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full p-4 flex items-center justify-between hover:ds-bg-surface-muted transition-colors"
           >
             <div className="flex items-center space-x-3">
               <CheckCircle className="w-5 h-5 text-purple-500" />
-              <span className="font-medium text-gray-900">Communication Status</span>
+              <span className="font-medium ds-text-primary">Communication Status</span>
             </div>
-            <Eye className={`w-4 h-4 text-gray-400 transform transition-transform ${expandedSections.communication ? 'rotate-180' : ''}`} />
+            <Eye className={`w-4 h-4 ds-text-muted transform transition-transform ${expandedSections.communication ? 'rotate-180' : ''}`} />
           </button>
           
           {expandedSections.communication && (
-            <div className="p-4 border-t border-gray-200">
+            <div className="p-4 border-t ds-border-subtle">
               <CommunicationStatus
                 order={order}
                 onRetry={onRefresh}

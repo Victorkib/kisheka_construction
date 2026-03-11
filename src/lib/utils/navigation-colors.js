@@ -178,22 +178,22 @@ export function getSectionColorTheme(sectionLabel) {
     // Archive - Gray with subtle color
     archive: {
       active: {
-        bg: 'bg-gradient-to-r from-gray-50 via-slate-50 to-gray-50',
-        text: 'text-gray-700',
-        icon: 'text-gray-600',
-        border: 'border-gray-300/60',
-        accent: 'bg-gray-600',
+        bg: 'ds-bg-surface-muted',
+        text: 'ds-text-secondary',
+        icon: 'ds-text-secondary',
+        border: 'ds-border-subtle/60',
+        accent: 'bg-slate-600',
       },
       inactive: {
-        bg: 'bg-gradient-to-r from-gray-50/30 via-slate-50/20 to-gray-50/30',
-        text: 'text-gray-800/80',
-        icon: 'text-gray-500',
-        border: 'border-gray-200/30',
+        bg: 'ds-bg-surface-muted/30',
+        text: 'ds-text-primary/80',
+        icon: 'ds-text-muted',
+        border: 'ds-border-subtle/30',
         hover: {
-          bg: 'hover:bg-gradient-to-r hover:from-gray-100/50 hover:via-slate-100/40 hover:to-gray-100/50',
-          text: 'hover:text-gray-900',
-          icon: 'hover:text-gray-700',
-          border: 'hover:border-gray-300/50',
+          bg: 'hover:ds-bg-surface-muted/50',
+          text: 'hover:ds-text-primary',
+          icon: 'hover:ds-text-secondary',
+          border: 'hover:ds-border-subtle/50',
         },
       },
     },
@@ -242,30 +242,37 @@ export function getSectionColorTheme(sectionLabel) {
  */
 export function getNavItemColors(sectionLabel, isActive, isParentActive = false) {
   const theme = getSectionColorTheme(sectionLabel);
-  
+
+  // Use dark, cohesive shells for the sidebar, but keep each section's accent color
+  const accent = theme.active.accent || 'bg-blue-600';
+  const iconColor = theme.active.icon || 'text-blue-400';
+
   if (isActive) {
     return {
-      container: `${theme.active.bg} ${theme.active.text} font-semibold shadow-sm ${theme.active.border}`,
-      icon: theme.active.icon,
-      border: theme.active.border,
-      accent: theme.active.accent,
+      container:
+        'bg-slate-600/90 text-white font-semibold border border-slate-500 hover:bg-slate-500 transition-colors shadow-sm',
+      icon: `${iconColor}`,
+      border: 'border-slate-500',
+      accent,
     };
   }
   
   if (isParentActive) {
     return {
-      container: `${theme.inactive.bg} ${theme.inactive.text} font-medium ${theme.inactive.border} ${theme.inactive.hover.bg} ${theme.inactive.hover.text} ${theme.inactive.hover.border}`,
-      icon: `${theme.inactive.icon} ${theme.inactive.hover.icon}`,
-      border: theme.inactive.border,
-      accent: theme.active.accent,
+      container:
+        'bg-slate-600/70 text-white font-medium border border-slate-500 hover:bg-slate-500/90 hover:text-white transition-colors',
+      icon: `${iconColor}`,
+      border: 'border-slate-500',
+      accent,
     };
   }
   
   return {
-    container: `${theme.inactive.bg} ${theme.inactive.text} font-medium ${theme.inactive.border} ${theme.inactive.hover.bg} ${theme.inactive.hover.text} ${theme.inactive.hover.border}`,
-    icon: `${theme.inactive.icon} ${theme.inactive.hover.icon}`,
-    border: theme.inactive.border,
-    accent: theme.active.accent,
+    container:
+      'bg-slate-600/50 text-slate-100 font-medium border border-slate-500/50 hover:bg-slate-600/80 hover:text-white transition-colors',
+    icon: `${iconColor}`,
+    border: 'border-slate-500/50',
+    accent,
   };
 }
 

@@ -33,10 +33,10 @@ export function CoreKPICard({
   };
 
   const variantStyles = {
-    default: 'border-gray-200',
-    success: 'border-green-200 bg-green-50/30',
-    warning: 'border-yellow-200 bg-yellow-50/30',
-    danger: 'border-red-200 bg-red-50/30',
+    default: 'ds-border-subtle',
+    success: 'border-emerald-400/60 bg-emerald-500/10',
+    warning: 'border-amber-400/60 bg-amber-500/10',
+    danger: 'border-red-400/60 bg-red-500/10',
   };
 
   const getProgressColor = () => {
@@ -54,35 +54,35 @@ export function CoreKPICard({
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm p-6 border ${variantStyles[variant]} h-full flex flex-col`}>
+    <div className={`ds-bg-surface rounded-lg shadow-sm p-6 border ${variantStyles[variant]} h-full flex flex-col`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-2">
-        <p className="text-sm font-medium text-gray-600">{title}</p>
+        <p className="text-sm font-medium ds-text-secondary">{title}</p>
         {icon && <span className="text-xl flex-shrink-0">{icon}</span>}
       </div>
       
       {/* Primary Value */}
-      <p className="text-2xl md:text-3xl font-bold text-gray-900 mt-1 break-words">
+      <p className="text-2xl md:text-3xl font-bold ds-text-primary mt-1 break-words">
         {primaryValue}
       </p>
       
       {/* Secondary Value */}
       {secondaryValue && (
-        <p className="text-sm text-gray-600 mt-1 break-words">
+        <p className="text-sm ds-text-secondary mt-1 break-words">
           {secondaryValue}
         </p>
       )}
       
       {/* Progress Bar */}
       {progress !== undefined && progress !== null && (
-        <div className="mt-4 pt-3 border-t border-gray-100">
+        <div className="mt-4 pt-3 border-t ds-border-subtle">
           <div className="flex items-center justify-between mb-1">
-            <span className="text-xs text-gray-500">Progress</span>
-            <span className="text-xs font-medium text-gray-700">
+            <span className="text-xs ds-text-muted">Progress</span>
+            <span className="text-xs font-medium ds-text-secondary">
               {Math.min(100, Math.max(0, progress)).toFixed(1)}%
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+          <div className="w-full ds-bg-surface-muted rounded-full h-2 overflow-hidden">
             <div
               className={`h-2 rounded-full transition-all duration-300 ${getProgressColor()}`}
               style={{ 

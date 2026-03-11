@@ -421,13 +421,13 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-48"></div>
-          <div className="h-4 bg-gray-200 rounded w-32"></div>
+          <div className="h-6 ds-bg-surface-muted rounded w-48"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-32"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-48 bg-gray-200 rounded"></div>
+              <div key={i} className="h-48 ds-bg-surface-muted rounded"></div>
             ))}
           </div>
         </div>
@@ -436,7 +436,7 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 space-y-6 relative">
+    <div className="ds-bg-surface rounded-lg shadow p-6 space-y-6 relative">
       <LoadingOverlay 
         isLoading={saving} 
         message="Saving allocations and recalculating finances..." 
@@ -446,8 +446,8 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h3 className="text-xl font-semibold text-gray-900">Investment Allocations</h3>
-          <p className="text-sm text-gray-600 mt-1">
+          <h3 className="text-xl font-semibold ds-text-primary">Investment Allocations</h3>
+          <p className="text-sm ds-text-secondary mt-1">
             Allocate investments to specific projects with financial context
           </p>
         </div>
@@ -469,7 +469,7 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
           <button
             onClick={() => handleQuickAction('clear_all')}
             disabled={allocations.length === 0 || saving}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
+            className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
           >
             Clear All
           </button>
@@ -478,11 +478,11 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-400/60">
           <div className="text-sm font-medium text-blue-700">Total Invested</div>
           <div className="text-2xl font-bold text-blue-900 mt-1">{formatCurrency(totalInvested)}</div>
         </div>
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-400/60">
           <div className="text-sm font-medium text-green-700">Total Allocated</div>
           <div className="text-2xl font-bold text-green-900 mt-1">{formatCurrency(totalAllocated)}</div>
         </div>
@@ -498,7 +498,7 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
             {formatCurrency(unallocated)}
           </div>
         </div>
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-400/60">
           <div className="text-sm font-medium text-purple-700">Projects Allocated</div>
           <div className="text-2xl font-bold text-purple-900 mt-1">
             {allocations.filter(a => a.amount > 0).length}
@@ -514,14 +514,14 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
             placeholder="Search projects by name, code, or location..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+            className="w-full px-4 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
           />
         </div>
         <div>
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500 text-gray-900 bg-white"
+            className="px-4 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted ds-text-primary ds-bg-surface"
           >
             <option value="all">All Projects</option>
             <option value="allocated">With Allocations</option>
@@ -535,8 +535,8 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
       {error && (
         <div className={`border px-4 py-3 rounded-lg ${
           error.includes('Warning:') || error.includes('warning')
-            ? 'bg-yellow-50 border-yellow-200 text-yellow-700'
-            : 'bg-red-50 border-red-200 text-red-700'
+            ? 'bg-yellow-50 border-yellow-400/60 text-yellow-700'
+            : 'bg-red-50 border-red-400/60 text-red-700'
         }`}>
           <p className="font-medium">{error.includes('Warning:') || error.includes('warning') ? 'Warning' : 'Error'}</p>
           <div className="text-sm mt-1 whitespace-pre-line">{error}</div>
@@ -545,7 +545,7 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
 
       {/* Success Message */}
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+        <div className="bg-green-50 border border-green-400/60 text-green-700 px-4 py-3 rounded-lg">
           <p className="font-medium">Success</p>
           <p className="text-sm mt-1">Allocations saved successfully!</p>
         </div>
@@ -553,7 +553,7 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
 
       {/* Validation Warning */}
       {unallocated < 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-lg">
+        <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded-lg">
           <p className="font-medium">Warning</p>
           <p className="text-sm mt-1">
             Total allocated amount exceeds total invested. Please adjust allocations.
@@ -563,7 +563,7 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
 
       {/* Project Cards */}
       {filteredProjects.length === 0 ? (
-        <div className="text-center text-gray-600 py-12">
+        <div className="text-center ds-text-secondary py-12">
           <p className="text-lg font-medium">No projects found</p>
           <p className="text-sm mt-2">Try adjusting your search or filter criteria</p>
         </div>
@@ -580,27 +580,27 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
             return (
               <div
                 key={project._id}
-                className="border border-gray-200 rounded-lg p-5 hover:shadow-lg transition-shadow bg-white"
+                className="border ds-border-subtle rounded-lg p-5 hover:shadow-lg transition-shadow ds-bg-surface"
               >
                 {/* Project Header */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <Link
                       href={`/projects/${project._id}`}
-                      className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition"
+                      className="text-lg font-semibold ds-text-primary hover:text-blue-600 transition"
                     >
                       {project.projectName}
                     </Link>
-                    <p className="text-sm text-gray-600 mt-1">{project.projectCode}</p>
+                    <p className="text-sm ds-text-secondary mt-1">{project.projectCode}</p>
                     {project.location && (
-                      <p className="text-xs text-gray-500 mt-1">📍 {project.location}</p>
+                      <p className="text-xs ds-text-muted mt-1">📍 {project.location}</p>
                     )}
                   </div>
                   <span className={`px-2 py-1 rounded text-xs font-medium ${
                     healthStatus.color === 'green' ? 'bg-green-100 text-green-800' :
                     healthStatus.color === 'yellow' ? 'bg-yellow-100 text-yellow-800' :
                     healthStatus.color === 'red' ? 'bg-red-100 text-red-800' :
-                    'bg-gray-100 text-gray-800'
+                    'ds-bg-surface-muted ds-text-primary'
                   }`}>
                     {healthStatus.label}
                   </span>
@@ -610,11 +610,11 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
                 <div className="space-y-3 mb-4">
                   {financial.budget > 0 && (
                     <div>
-                      <div className="flex justify-between text-xs text-gray-600 mb-1">
+                      <div className="flex justify-between text-xs ds-text-secondary mb-1">
                         <span>Budget</span>
                         <span>{formatCurrency(financial.budget)}</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full ds-bg-surface-muted rounded-full h-2">
                         <div
                           className={`h-2 rounded-full transition-all ${
                             newCapitalAfterAllocation >= financial.budget ? 'bg-green-600' :
@@ -631,19 +631,19 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
 
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <div className="text-gray-600">Current Capital</div>
-                      <div className="font-semibold text-gray-900">{formatCurrency(financial.currentCapital)}</div>
+                      <div className="ds-text-secondary">Current Capital</div>
+                      <div className="font-semibold ds-text-primary">{formatCurrency(financial.currentCapital)}</div>
                     </div>
                     <div>
-                      <div className="text-gray-600">Spending</div>
-                      <div className="font-semibold text-gray-900">{formatCurrency(financial.spending)}</div>
+                      <div className="ds-text-secondary">Spending</div>
+                      <div className="font-semibold ds-text-primary">{formatCurrency(financial.spending)}</div>
                     </div>
                     <div>
-                      <div className="text-gray-600">Committed</div>
-                      <div className="font-semibold text-gray-900">{formatCurrency(financial.committed)}</div>
+                      <div className="ds-text-secondary">Committed</div>
+                      <div className="font-semibold ds-text-primary">{formatCurrency(financial.committed)}</div>
                     </div>
                     <div>
-                      <div className="text-gray-600">Available</div>
+                      <div className="ds-text-secondary">Available</div>
                       <div className={`font-semibold ${
                         availableAfterAllocation > 0 ? 'text-green-600' : 'text-red-600'
                       }`}>
@@ -653,7 +653,7 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
                   </div>
 
                   {financial.budgetGap > 0 && (
-                    <div className="bg-yellow-50 border border-yellow-200 rounded p-2">
+                    <div className="bg-yellow-50 border border-yellow-400/60 rounded p-2">
                       <div className="text-xs text-yellow-800">
                         <span className="font-medium">Budget Gap:</span> {formatCurrency(financial.budgetGap)}
                       </div>
@@ -663,7 +663,7 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
 
                 {/* Allocation Input */}
                 <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium ds-text-secondary">
                     Allocation Amount
                   </label>
                   <div className="flex gap-2">
@@ -674,7 +674,7 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
                       min="0"
                       step="1000"
                       placeholder="0"
-                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500 text-gray-900 bg-white"
+                      className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted ds-text-primary ds-bg-surface"
                     />
                     {suggestedAllocation > 0 && currentAllocation === 0 && (
                       <button
@@ -687,7 +687,7 @@ export function EnhancedAllocationManager({ investorId, totalInvested, onUpdate 
                     )}
                   </div>
                   {currentAllocation > 0 && (
-                    <div className="text-xs text-gray-600">
+                    <div className="text-xs ds-text-secondary">
                       New capital: {formatCurrency(newCapitalAfterAllocation)} • Available: {formatCurrency(availableAfterAllocation)}
                     </div>
                   )}

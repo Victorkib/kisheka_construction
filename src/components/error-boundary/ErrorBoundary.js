@@ -8,6 +8,7 @@
 
 import { Component } from 'react';
 import Link from 'next/link';
+import { notifyError } from '@/lib/error-notification-manager';
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -29,8 +30,27 @@ class ErrorBoundary extends Component {
       errorInfo,
     });
 
-    // You can also log the error to an error reporting service here
-    // Example: logErrorToService(error, errorInfo);
+    // Store error data for reporting
+    try {
+      const errorData = {
+        message: error?.message || error?.toString() || 'Unknown error',
+        stack: error?.stack || '',
+        componentStack: errorInfo?.componentStack || '',
+        timestamp: new Date().toISOString(),
+        url: typeof window !== 'undefined' ? window.location.href : '',
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+        type: 'component_error',
+      };
+      
+      if (typeof window !== 'undefined' && window.sessionStorage) {
+        sessionStorage.setItem('lastError', JSON.stringify(errorData));
+        
+        // Use centralized notification manager (with deduplication)
+        notifyError(errorData);
+      }
+    } catch (storageError) {
+      console.error('Failed to store error data:', storageError);
+    }
   }
 
   handleReset = () => {
@@ -41,8 +61,8 @@ class ErrorBoundary extends Component {
     if (this.state.hasError) {
       // Custom fallback UI
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6 sm:p-8 text-center">
+        <div className="min-h-screen flex items-center justify-center ds-bg-surface-muted px-4">
+          <div className="max-w-md w-full ds-bg-surface rounded-lg shadow-lg p-6 sm:p-8 text-center">
             <div className="mb-4">
               <svg
                 className="mx-auto h-12 w-12 sm:h-16 sm:w-16 text-red-500"
@@ -59,10 +79,10 @@ class ErrorBoundary extends Component {
                 />
               </svg>
             </div>
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-xl sm:text-2xl font-bold ds-text-primary mb-2">
               Something went wrong
             </h1>
-            <p className="text-sm sm:text-base text-gray-600 mb-6">
+            <p className="text-sm sm:text-base ds-text-secondary mb-6">
               We're sorry, but something unexpected happened. Please try refreshing the page or contact support if the problem persists.
             </p>
             
@@ -75,8 +95,15 @@ class ErrorBoundary extends Component {
                 Try Again
               </button>
               <Link
+                href="/error-report?auto=true"
+                className="px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 active:bg-red-800 transition-colors text-sm font-medium touch-manipulation focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 text-center"
+                aria-label="Report this error"
+              >
+                Report Error
+              </Link>
+              <Link
                 href="/"
-                className="px-4 py-2.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 active:bg-gray-400 transition-colors text-sm font-medium touch-manipulation focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 text-center"
+                className="px-4 py-2.5 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface transition-colors text-sm font-medium touch-manipulation focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 text-center"
                 aria-label="Go to home page"
               >
                 Go Home
@@ -85,10 +112,10 @@ class ErrorBoundary extends Component {
 
             {process.env.NODE_ENV === 'development' && this.state.error && (
               <details className="mt-6 text-left">
-                <summary className="cursor-pointer text-sm font-medium text-gray-700 hover:text-gray-900 mb-2">
+                <summary className="cursor-pointer text-sm font-medium ds-text-secondary hover:ds-text-primary mb-2">
                   Error Details (Development Only)
                 </summary>
-                <div className="mt-2 p-3 bg-gray-100 rounded text-xs font-mono text-red-600 overflow-auto max-h-48">
+                <div className="mt-2 p-3 ds-bg-surface-muted rounded text-xs font-mono text-red-600 overflow-auto max-h-48">
                   <p className="font-semibold mb-1">Error:</p>
                   <pre className="whitespace-pre-wrap break-words">
                     {this.state.error.toString()}

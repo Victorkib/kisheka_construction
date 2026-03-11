@@ -208,9 +208,9 @@ export function ProjectSwitcher() {
       planning: 'bg-blue-100 text-blue-800',
       paused: 'bg-yellow-100 text-yellow-800',
       completed: 'bg-purple-100 text-purple-800',
-      archived: 'bg-gray-100 text-gray-600',
+      archived: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   // Empty state - only show if truly empty and not loading
@@ -219,7 +219,7 @@ export function ProjectSwitcher() {
       <div className="relative">
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+          className="flex items-center gap-2 px-3 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition"
         >
           <span>🏗️</span>
           <span>No Projects</span>
@@ -228,14 +228,14 @@ export function ProjectSwitcher() {
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50"
+            className="absolute top-full left-0 mt-2 w-80 ds-bg-surface rounded-lg shadow-lg border ds-border-subtle z-50"
           >
             <div className="p-6 text-center">
               <div className="text-4xl mb-4">🏗️</div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold ds-text-primary mb-2">
                 No Projects Available
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm ds-text-secondary mb-4">
                 Get started by creating your first project
               </p>
               <Link
@@ -254,7 +254,7 @@ export function ProjectSwitcher() {
 
   if (loading || loadingPreferences) {
     return (
-      <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-lg">
+      <div className="flex items-center gap-2 px-3 py-2 text-sm font-medium ds-text-muted ds-bg-surface border ds-border-subtle rounded-lg">
         <span>Loading...</span>
       </div>
     );
@@ -265,7 +265,7 @@ export function ProjectSwitcher() {
       {/* Trigger Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition min-w-[200px] justify-between"
+        className="flex items-center gap-2 px-3 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition min-w-[200px] justify-between"
       >
         <div className="flex items-center gap-2 flex-1 min-w-0">
           <span>🏗️</span>
@@ -290,9 +290,9 @@ export function ProjectSwitcher() {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-[9999] max-h-[600px] flex flex-col">
+        <div className="absolute top-full left-0 mt-2 w-80 ds-bg-surface rounded-lg shadow-lg border ds-border-subtle z-[9999] max-h-[600px] flex flex-col">
           {/* Search */}
-          <div className="p-3 border-b border-gray-200">
+          <div className="p-3 border-b ds-border-subtle">
             <div className="relative">
               <input
                 ref={searchInputRef}
@@ -300,10 +300,10 @@ export function ProjectSwitcher() {
                 placeholder="Search projects..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full px-3 py-2 pl-9 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 pl-9 text-sm border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <svg
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400"
+                className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -323,7 +323,7 @@ export function ProjectSwitcher() {
             {/* Favorites */}
             {favoriteProjectsList.length > 0 && (
               <div className="p-2">
-                <div className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase">
+                <div className="px-2 py-1 text-xs font-semibold ds-text-muted uppercase">
                   ⭐ Favorites
                 </div>
                 {favoriteProjectsList
@@ -350,7 +350,7 @@ export function ProjectSwitcher() {
             {/* Recent Projects */}
             {recentProjectsList.length > 0 && (
               <div className="p-2">
-                <div className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase">
+                <div className="px-2 py-1 text-xs font-semibold ds-text-muted uppercase">
                   📋 Recent
                 </div>
                 {recentProjectsList
@@ -377,7 +377,7 @@ export function ProjectSwitcher() {
             {/* All Projects */}
             {otherProjects.length > 0 && (
               <div className="p-2">
-                <div className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase">
+                <div className="px-2 py-1 text-xs font-semibold ds-text-muted uppercase">
                   📁 All Projects
                 </div>
                 {otherProjects.map((project) => (
@@ -399,16 +399,16 @@ export function ProjectSwitcher() {
 
             {/* No Results */}
             {searchQuery && filteredProjects.length === 0 && (
-              <div className="p-6 text-center text-gray-500">
+              <div className="p-6 text-center ds-text-muted">
                 <p>No projects found matching &quot;{searchQuery}&quot;</p>
               </div>
             )}
           </div>
 
           {/* Footer */}
-          <div className="p-2 border-t border-gray-200 bg-gray-50">
-            <div className="text-xs text-gray-500 text-center">
-              Press <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded">Cmd/Ctrl + K</kbd> to open
+          <div className="p-2 border-t ds-border-subtle ds-bg-surface-muted">
+            <div className="text-xs ds-text-muted text-center">
+              Press <kbd className="px-1.5 py-0.5 ds-bg-surface border ds-border-subtle rounded">Cmd/Ctrl + K</kbd> to open
             </div>
           </div>
         </div>
@@ -432,8 +432,8 @@ function ProjectItem({
       onClick={onSelect}
       className={`w-full text-left px-3 py-2 rounded-lg transition cursor-pointer ${
         isCurrent
-          ? 'bg-blue-50 border border-blue-200'
-          : 'hover:bg-gray-50 border border-transparent'
+          ? 'bg-blue-50 border border-blue-400/60'
+          : 'hover:ds-bg-surface-muted border border-transparent'
       }`}
       role="button"
       tabIndex={0}
@@ -449,14 +449,14 @@ function ProjectItem({
           <div className="flex items-center gap-2">
             <span className="text-lg">🏗️</span>
             <div className="flex-1 min-w-0">
-              <div className="font-medium text-gray-900 truncate">
+              <div className="font-medium ds-text-primary truncate">
                 {project.projectName}
                 {isCurrent && (
                   <span className="ml-2 text-xs text-blue-600">← Current</span>
                 )}
               </div>
               {project.projectCode && (
-                <div className="text-xs text-gray-500 mt-0.5">
+                <div className="text-xs ds-text-muted mt-0.5">
                   {project.projectCode}
                 </div>
               )}
@@ -471,7 +471,7 @@ function ProjectItem({
               {project.status || 'planning'}
             </span>
             {project.budget?.total > 0 && (
-              <span className="text-xs text-gray-600">
+              <span className="text-xs ds-text-secondary">
                 {formatCurrency(project.budget.total)}
               </span>
             )}
@@ -479,7 +479,7 @@ function ProjectItem({
         </div>
         <div
           onClick={onToggleFavorite}
-          className="flex-shrink-0 p-1 hover:bg-gray-200 rounded transition cursor-pointer"
+          className="flex-shrink-0 p-1 hover:ds-bg-surface-muted rounded transition cursor-pointer"
           title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           role="button"
           tabIndex={0}
@@ -492,7 +492,7 @@ function ProjectItem({
         >
           <svg
             className={`w-4 h-4 ${
-              isFavorite ? 'text-yellow-500 fill-current' : 'text-gray-400'
+              isFavorite ? 'text-yellow-500 fill-current' : 'ds-text-muted'
             }`}
             fill="currentColor"
             viewBox="0 0 20 20"

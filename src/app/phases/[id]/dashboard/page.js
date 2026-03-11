@@ -105,13 +105,13 @@ export default function PhaseDashboardPage() {
 
   const getStatusColor = (status) => {
     const colors = {
-      'not_started': 'bg-gray-100 text-gray-800',
+      'not_started': 'ds-bg-surface-muted ds-text-primary',
       'in_progress': 'bg-blue-100 text-blue-800',
       'completed': 'bg-green-100 text-green-800',
       'on_hold': 'bg-yellow-100 text-yellow-800',
       'cancelled': 'bg-red-100 text-red-800'
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (loading) {
@@ -128,10 +128,10 @@ export default function PhaseDashboardPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Failed to load dashboard'}
           </div>
-          <Link href={`/phases/${params.id}`} className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href={`/phases/${params.id}`} className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Phase
           </Link>
         </div>
@@ -162,34 +162,34 @@ export default function PhaseDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href={`/phases/${params.id}`} className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href={`/phases/${params.id}`} className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Phase Details
           </Link>
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+              <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">
                 {phase.phaseName} Dashboard
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="ds-text-secondary mt-1">
                 {phase.phaseCode} {project && `• ${project.projectName}`}
               </p>
             </div>
             <div className="flex gap-2">
               <Link
                 href={`/phases/${params.id}/reports/financial`}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
               >
                 Financial Report
               </Link>
               <Link
                 href={`/phases/${params.id}/reports/progress`}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
               >
                 Progress Report
               </Link>
               <Link
                 href={`/phases/${params.id}/reports/resources`}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
               >
                 Resource Report
               </Link>
@@ -199,43 +199,43 @@ export default function PhaseDashboardPage() {
 
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-2">Status</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-2">Status</p>
             <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(phase.status)}`}>
               {phase.status?.replace('_', ' ').toUpperCase() || 'UNKNOWN'}
             </span>
-            <p className="text-sm text-gray-600 mt-4">Progress</p>
+            <p className="text-sm ds-text-secondary mt-4">Progress</p>
             <div className="mt-2">
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full ds-bg-surface-muted rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full"
+                  className="ds-bg-accent-primary h-2 rounded-full"
                   style={{ width: `${phase.completionPercentage || 0}%` }}
                 />
               </div>
-              <p className="text-lg font-bold text-gray-900 mt-1">{phase.completionPercentage || 0}%</p>
+              <p className="text-lg font-bold ds-text-primary mt-1">{phase.completionPercentage || 0}%</p>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-2">Budget</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(financialSummary.budgetTotal)}</p>
-            <p className="text-sm text-gray-600 mt-4">Utilization</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-2">Budget</p>
+            <p className="text-2xl font-bold ds-text-primary">{formatCurrency(financialSummary.budgetTotal)}</p>
+            <p className="text-sm ds-text-secondary mt-4">Utilization</p>
             <p className="text-lg font-semibold text-blue-600">{financialSummary.utilizationPercentage.toFixed(1)}%</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-2">Actual Spending</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-2">Actual Spending</p>
             <p className="text-2xl font-bold text-blue-600">{formatCurrency(financialSummary.actualTotal)}</p>
-            <p className="text-sm text-gray-600 mt-4">Committed</p>
+            <p className="text-sm ds-text-secondary mt-4">Committed</p>
             <p className="text-lg font-semibold text-orange-600">{formatCurrency(financialSummary.committedTotal)}</p>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-2">Remaining</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-2">Remaining</p>
             <p className={`text-2xl font-bold ${financialSummary.remaining < 0 ? 'text-red-600' : 'text-green-600'}`}>
               {formatCurrency(financialSummary.remaining)}
             </p>
-            <p className="text-sm text-gray-600 mt-4">Variance</p>
+            <p className="text-sm ds-text-secondary mt-4">Variance</p>
             <p className={`text-lg font-semibold ${financialSummary.variance < 0 ? 'text-green-600' : 'text-red-600'}`}>
               {financialSummary.variance >= 0 ? '+' : ''}{formatCurrency(financialSummary.variance)}
             </p>
@@ -243,60 +243,60 @@ export default function PhaseDashboardPage() {
         </div>
 
         {/* Financial Summary */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Summary</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Financial Summary</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Materials</p>
-              <p className="text-xl font-bold text-gray-900">{formatCurrency(statistics.materials.totalCost)}</p>
-              <p className="text-xs text-gray-500">{statistics.materials.count} items</p>
+              <p className="text-sm ds-text-secondary">Materials</p>
+              <p className="text-xl font-bold ds-text-primary">{formatCurrency(statistics.materials.totalCost)}</p>
+              <p className="text-xs ds-text-muted">{statistics.materials.count} items</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Expenses</p>
-              <p className="text-xl font-bold text-gray-900">{formatCurrency(statistics.expenses.totalCost)}</p>
-              <p className="text-xs text-gray-500">{statistics.expenses.count} items</p>
+              <p className="text-sm ds-text-secondary">Expenses</p>
+              <p className="text-xl font-bold ds-text-primary">{formatCurrency(statistics.expenses.totalCost)}</p>
+              <p className="text-xs ds-text-muted">{statistics.expenses.count} items</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Equipment</p>
-              <p className="text-xl font-bold text-gray-900">{formatCurrency(statistics.equipment.totalCost)}</p>
-              <p className="text-xs text-gray-500">{statistics.equipment.count} items</p>
+              <p className="text-sm ds-text-secondary">Equipment</p>
+              <p className="text-xl font-bold ds-text-primary">{formatCurrency(statistics.equipment.totalCost)}</p>
+              <p className="text-xs ds-text-muted">{statistics.equipment.count} items</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Subcontractors</p>
-              <p className="text-xl font-bold text-gray-900">{formatCurrency(statistics.subcontractors.totalCost)}</p>
-              <p className="text-xs text-gray-500">{statistics.subcontractors.count} contracts</p>
+              <p className="text-sm ds-text-secondary">Subcontractors</p>
+              <p className="text-xl font-bold ds-text-primary">{formatCurrency(statistics.subcontractors.totalCost)}</p>
+              <p className="text-xs ds-text-muted">{statistics.subcontractors.count} contracts</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Professional Services</p>
-              <p className="text-xl font-bold text-gray-900">{formatCurrency(statistics.professionalServices.totalCost)}</p>
-              <p className="text-xs text-gray-500">{statistics.professionalServices.count} services</p>
+              <p className="text-sm ds-text-secondary">Professional Services</p>
+              <p className="text-xl font-bold ds-text-primary">{formatCurrency(statistics.professionalServices.totalCost)}</p>
+              <p className="text-xs ds-text-muted">{statistics.professionalServices.count} services</p>
             </div>
           </div>
         </div>
 
         {/* Floor Breakdown */}
         {floorData && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Floor Breakdown</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Floor Breakdown</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="border border-gray-200 rounded-lg p-4">
-                <p className="text-sm text-gray-600">Basement</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(floorTotals.basement || 0)}</p>
+              <div className="border ds-border-subtle rounded-lg p-4">
+                <p className="text-sm ds-text-secondary">Basement</p>
+                <p className="text-2xl font-bold ds-text-primary">{formatCurrency(floorTotals.basement || 0)}</p>
               </div>
-              <div className="border border-gray-200 rounded-lg p-4">
-                <p className="text-sm text-gray-600">Superstructure</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(floorTotals.superstructure || 0)}</p>
+              <div className="border ds-border-subtle rounded-lg p-4">
+                <p className="text-sm ds-text-secondary">Superstructure</p>
+                <p className="text-2xl font-bold ds-text-primary">{formatCurrency(floorTotals.superstructure || 0)}</p>
               </div>
-              <div className="border border-gray-200 rounded-lg p-4">
-                <p className="text-sm text-gray-600">Unassigned Floors</p>
-                <p className="text-2xl font-bold text-gray-900">{formatCurrency(unassignedTotal)}</p>
-                <p className="text-xs text-gray-500 mt-1">Assign floors to improve accuracy</p>
+              <div className="border ds-border-subtle rounded-lg p-4">
+                <p className="text-sm ds-text-secondary">Unassigned Floors</p>
+                <p className="text-2xl font-bold ds-text-primary">{formatCurrency(unassignedTotal)}</p>
+                <p className="text-xs ds-text-muted mt-1">Assign floors to improve accuracy</p>
               </div>
             </div>
             <div className="mt-4">
               <Link
                 href={`/phases/${params.id}?tab=floors`}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm ds-text-accent-primary hover:ds-text-accent-hover"
               >
                 View floor breakdown →
               </Link>
@@ -307,109 +307,109 @@ export default function PhaseDashboardPage() {
         {/* Statistics Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {/* Work Items */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Work Items</h3>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold ds-text-primary mb-4">Work Items</h3>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Total</span>
+                <span className="text-sm ds-text-secondary">Total</span>
                 <span className="font-semibold">{statistics.workItems.total}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Completed</span>
+                <span className="text-sm ds-text-secondary">Completed</span>
                 <span className="font-semibold text-green-600">{statistics.workItems.byStatus.completed || 0}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">In Progress</span>
+                <span className="text-sm ds-text-secondary">In Progress</span>
                 <span className="font-semibold text-blue-600">{statistics.workItems.byStatus.in_progress || 0}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Not Started</span>
-                <span className="font-semibold text-gray-600">{statistics.workItems.byStatus.not_started || 0}</span>
+                <span className="text-sm ds-text-secondary">Not Started</span>
+                <span className="font-semibold ds-text-secondary">{statistics.workItems.byStatus.not_started || 0}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Blocked</span>
+                <span className="text-sm ds-text-secondary">Blocked</span>
                 <span className="font-semibold text-red-600">{statistics.workItems.byStatus.blocked || 0}</span>
               </div>
               <div className="mt-3 pt-3 border-t">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Completion</span>
+                  <span className="text-sm ds-text-secondary">Completion</span>
                   <span className="font-semibold">{statistics.workItems.completionPercentage}%</span>
                 </div>
               </div>
             </div>
             <Link
               href={`/phases/${params.id}?tab=work-items`}
-              className="mt-4 inline-block text-sm text-blue-600 hover:text-blue-800"
+              className="mt-4 inline-block text-sm ds-text-accent-primary hover:ds-text-accent-hover"
             >
               View All Work Items →
             </Link>
           </div>
 
           {/* Milestones */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Milestones</h3>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold ds-text-primary mb-4">Milestones</h3>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Total</span>
+                <span className="text-sm ds-text-secondary">Total</span>
                 <span className="font-semibold">{statistics.milestones.total}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Completed</span>
+                <span className="text-sm ds-text-secondary">Completed</span>
                 <span className="font-semibold text-green-600">{statistics.milestones.completed}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Pending</span>
+                <span className="text-sm ds-text-secondary">Pending</span>
                 <span className="font-semibold text-blue-600">{statistics.milestones.pending}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Overdue</span>
+                <span className="text-sm ds-text-secondary">Overdue</span>
                 <span className="font-semibold text-red-600">{statistics.milestones.overdue}</span>
               </div>
               <div className="mt-3 pt-3 border-t">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Completion</span>
+                  <span className="text-sm ds-text-secondary">Completion</span>
                   <span className="font-semibold">{statistics.milestones.completionPercentage}%</span>
                 </div>
               </div>
             </div>
             <Link
               href={`/phases/${params.id}?tab=milestones`}
-              className="mt-4 inline-block text-sm text-blue-600 hover:text-blue-800"
+              className="mt-4 inline-block text-sm ds-text-accent-primary hover:ds-text-accent-hover"
             >
               View All Milestones →
             </Link>
           </div>
 
           {/* Quality Checkpoints */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quality Checkpoints</h3>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold ds-text-primary mb-4">Quality Checkpoints</h3>
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Total</span>
+                <span className="text-sm ds-text-secondary">Total</span>
                 <span className="font-semibold">{statistics.qualityCheckpoints.total}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Passed</span>
+                <span className="text-sm ds-text-secondary">Passed</span>
                 <span className="font-semibold text-green-600">{statistics.qualityCheckpoints.passed}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Failed</span>
+                <span className="text-sm ds-text-secondary">Failed</span>
                 <span className="font-semibold text-red-600">{statistics.qualityCheckpoints.failed}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-sm text-gray-600">Pending</span>
+                <span className="text-sm ds-text-secondary">Pending</span>
                 <span className="font-semibold text-blue-600">{statistics.qualityCheckpoints.pending}</span>
               </div>
               <div className="mt-3 pt-3 border-t">
                 <div className="flex justify-between">
-                  <span className="text-sm text-gray-600">Pass Rate</span>
+                  <span className="text-sm ds-text-secondary">Pass Rate</span>
                   <span className="font-semibold">{statistics.qualityCheckpoints.passRate}%</span>
                 </div>
               </div>
             </div>
             <Link
               href={`/phases/${params.id}?tab=quality`}
-              className="mt-4 inline-block text-sm text-blue-600 hover:text-blue-800"
+              className="mt-4 inline-block text-sm ds-text-accent-primary hover:ds-text-accent-hover"
             >
               View All Checkpoints →
             </Link>
@@ -417,37 +417,37 @@ export default function PhaseDashboardPage() {
         </div>
 
         {/* Timeline */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Timeline</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Timeline</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Start Date</p>
-              <p className="text-lg font-semibold text-gray-900">{formatDate(phase.startDate)}</p>
+              <p className="text-sm ds-text-secondary">Start Date</p>
+              <p className="text-lg font-semibold ds-text-primary">{formatDate(phase.startDate)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Planned End</p>
-              <p className="text-lg font-semibold text-gray-900">{formatDate(phase.plannedEndDate)}</p>
+              <p className="text-sm ds-text-secondary">Planned End</p>
+              <p className="text-lg font-semibold ds-text-primary">{formatDate(phase.plannedEndDate)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Actual End</p>
-              <p className="text-lg font-semibold text-gray-900">{formatDate(phase.actualEndDate) || 'Ongoing'}</p>
+              <p className="text-sm ds-text-secondary">Actual End</p>
+              <p className="text-lg font-semibold ds-text-primary">{formatDate(phase.actualEndDate) || 'Ongoing'}</p>
             </div>
           </div>
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Recent Activity</h2>
           {recentActivity && recentActivity.length > 0 ? (
             <div className="space-y-3">
               {recentActivity.map((activity) => (
                 <div key={activity._id} className="border-l-4 border-blue-500 pl-4 py-2">
                   <div className="flex justify-between items-start">
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium ds-text-primary">
                         {activity.action} {activity.entityType}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs ds-text-muted mt-1">
                         {new Date(activity.createdAt).toLocaleString('en-KE')}
                       </p>
                     </div>
@@ -456,37 +456,37 @@ export default function PhaseDashboardPage() {
               ))}
             </div>
           ) : (
-            <p className="text-gray-500 text-sm">No recent activity</p>
+            <p className="ds-text-muted text-sm">No recent activity</p>
           )}
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-6 bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div className="mt-6 ds-bg-surface rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link
               href={`/phases/${params.id}?tab=materials`}
-              className="px-4 py-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-colors"
+              className="px-4 py-3 border ds-border-subtle rounded-lg text-center hover:ds-bg-surface-muted transition-colors"
             >
-              <p className="font-medium text-gray-900">Add Material</p>
+              <p className="font-medium ds-text-primary">Add Material</p>
             </Link>
             <Link
               href={`/phases/${params.id}?tab=expenses`}
-              className="px-4 py-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-colors"
+              className="px-4 py-3 border ds-border-subtle rounded-lg text-center hover:ds-bg-surface-muted transition-colors"
             >
-              <p className="font-medium text-gray-900">Add Expense</p>
+              <p className="font-medium ds-text-primary">Add Expense</p>
             </Link>
             <Link
               href={`/work-items/new?phaseId=${params.id}`}
-              className="px-4 py-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-colors"
+              className="px-4 py-3 border ds-border-subtle rounded-lg text-center hover:ds-bg-surface-muted transition-colors"
             >
-              <p className="font-medium text-gray-900">Add Work Item</p>
+              <p className="font-medium ds-text-primary">Add Work Item</p>
             </Link>
             <Link
               href={`/phases/${params.id}?tab=milestones`}
-              className="px-4 py-3 border border-gray-300 rounded-lg text-center hover:bg-gray-50 transition-colors"
+              className="px-4 py-3 border ds-border-subtle rounded-lg text-center hover:ds-bg-surface-muted transition-colors"
             >
-              <p className="font-medium text-gray-900">Add Milestone</p>
+              <p className="font-medium ds-text-primary">Add Milestone</p>
             </Link>
           </div>
         </div>

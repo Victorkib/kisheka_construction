@@ -334,17 +334,17 @@ export function ResponseStatusTracker({ order, onRefresh, canManage = false }) {
   const performanceMetrics = getPerformanceMetrics();
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+    <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle">
       {/* Header */}
-      <div className="p-6 border-b border-gray-200">
+      <div className="p-6 border-b ds-border-subtle">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className={`p-2 rounded-lg bg-${statusColor}-100`}>
               <StatusIcon className={`w-6 h-6 text-${statusColor}-600`} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">Response Status</h2>
-              <p className="text-sm text-gray-600">{getStatusText(order.status)}</p>
+              <h2 className="text-lg font-semibold ds-text-primary">Response Status</h2>
+              <p className="text-sm ds-text-secondary">{getStatusText(order.status)}</p>
             </div>
           </div>
           
@@ -353,14 +353,14 @@ export function ResponseStatusTracker({ order, onRefresh, canManage = false }) {
               <button
                 onClick={handleRefresh}
                 disabled={loading}
-                className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+                className="p-2 ds-text-muted hover:ds-text-secondary transition-colors"
               >
                 <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
               </button>
             )}
             <button
               onClick={() => setExpanded(!expanded)}
-              className="p-2 text-gray-500 hover:text-gray-700 transition-colors"
+              className="p-2 ds-text-muted hover:ds-text-secondary transition-colors"
             >
               <Eye className="w-5 h-5" />
             </button>
@@ -376,7 +376,7 @@ export function ResponseStatusTracker({ order, onRefresh, canManage = false }) {
             <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-${statusColor}-100 text-${statusColor}-800`}>
               {getStatusText(order.status)}
             </div>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs ds-text-muted mt-2">
               {order.supplierResponseDate ? 
                 `Updated ${new Date(order.supplierResponseDate).toLocaleDateString()}` : 
                 `Sent ${new Date(order.sentAt || order.createdAt).toLocaleDateString()}`
@@ -388,34 +388,34 @@ export function ResponseStatusTracker({ order, onRefresh, canManage = false }) {
           {performanceMetrics?.responseTime && (
             <div className="text-center">
               <div className="flex items-center justify-center space-x-1">
-                <Clock className="w-4 h-4 text-gray-400" />
-                <span className="text-lg font-semibold text-gray-900">
+                <Clock className="w-4 h-4 ds-text-muted" />
+                <span className="text-lg font-semibold ds-text-primary">
                   {performanceMetrics.responseTime}h
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-1">Response Time</p>
+              <p className="text-xs ds-text-muted mt-1">Response Time</p>
             </div>
           )}
 
           {/* Supplier Info */}
           <div className="text-center">
             <div className="flex items-center justify-center space-x-1">
-              <User className="w-4 h-4 text-gray-400" />
-              <span className="text-sm font-medium text-gray-900">
+              <User className="w-4 h-4 ds-text-muted" />
+              <span className="text-sm font-medium ds-text-primary">
                 {order.supplierName}
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-1">Supplier</p>
+            <p className="text-xs ds-text-muted mt-1">Supplier</p>
           </div>
         </div>
       </div>
 
       {/* Expanded Details */}
       {expanded && (
-        <div className="border-t border-gray-200">
+        <div className="border-t ds-border-subtle">
           {/* Response Timeline */}
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Response Timeline</h3>
+          <div className="p-6 border-b ds-border-subtle">
+            <h3 className="text-sm font-semibold ds-text-primary mb-4">Response Timeline</h3>
             <div className="space-y-3">
               {responseHistory.map((event, index) => {
                 const EventIcon = event.icon;
@@ -425,17 +425,17 @@ export function ResponseStatusTracker({ order, onRefresh, canManage = false }) {
                       <EventIcon className={`w-4 h-4 text-${event.color || 'gray'}-600`} />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900">{event.title}</p>
-                      <p className="text-xs text-gray-500">{event.description}</p>
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-sm font-medium ds-text-primary">{event.title}</p>
+                      <p className="text-xs ds-text-muted">{event.description}</p>
+                      <p className="text-xs ds-text-muted mt-1">
                         {new Date(event.timestamp).toLocaleString()}
                       </p>
                       {event.details && (
-                        <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+                        <div className="mt-2 p-2 ds-bg-surface-muted rounded text-xs">
                           {Object.entries(event.details).map(([key, value]) => (
                             <div key={key} className="flex justify-between">
-                              <span className="text-gray-600">{key}:</span>
-                              <span className="text-gray-900">{value}</span>
+                              <span className="ds-text-secondary">{key}:</span>
+                              <span className="ds-text-primary">{value}</span>
                             </div>
                           ))}
                         </div>
@@ -448,25 +448,25 @@ export function ResponseStatusTracker({ order, onRefresh, canManage = false }) {
           </div>
 
           {/* Next Steps */}
-          <div className="p-6 border-b border-gray-200">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Next Steps</h3>
+          <div className="p-6 border-b ds-border-subtle">
+            <h3 className="text-sm font-semibold ds-text-primary mb-4">Next Steps</h3>
             <div className="space-y-3">
               {getNextSteps().map((step, index) => (
                 <div key={index} className="flex items-start space-x-3">
                   <div className={`p-1 rounded mt-1 ${
                     step.priority === 'high' ? 'bg-red-100' :
                     step.priority === 'medium' ? 'bg-yellow-100' :
-                    'bg-gray-100'
+                    'ds-bg-surface-muted'
                   }`}>
                     <div className={`w-2 h-2 rounded-full ${
                       step.priority === 'high' ? 'bg-red-500' :
                       step.priority === 'medium' ? 'bg-yellow-500' :
-                      'bg-gray-500'
+                      'ds-bg-surface-muted0'
                     }`} />
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">{step.title}</p>
-                    <p className="text-xs text-gray-500">{step.description}</p>
+                    <p className="text-sm font-medium ds-text-primary">{step.title}</p>
+                    <p className="text-xs ds-text-muted">{step.description}</p>
                   </div>
                 </div>
               ))}
@@ -476,34 +476,34 @@ export function ResponseStatusTracker({ order, onRefresh, canManage = false }) {
           {/* Performance Metrics (if available) */}
           {performanceMetrics && (
             <div className="p-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-4">Supplier Performance</h3>
+              <h3 className="text-sm font-semibold ds-text-primary mb-4">Supplier Performance</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                <div className="text-center p-3 ds-bg-surface-muted rounded-lg">
                   <div className="flex items-center justify-center space-x-1">
                     {performanceMetrics.responseTime < performanceMetrics.averageResponseTime ? (
                       <TrendingDown className="w-4 h-4 text-green-500" />
                     ) : (
                       <TrendingUp className="w-4 h-4 text-red-500" />
                     )}
-                    <span className="text-lg font-semibold text-gray-900">
+                    <span className="text-lg font-semibold ds-text-primary">
                       {performanceMetrics.responseTime}h
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">This Response</p>
+                  <p className="text-xs ds-text-muted">This Response</p>
                 </div>
                 
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <span className="text-lg font-semibold text-gray-900">
+                <div className="text-center p-3 ds-bg-surface-muted rounded-lg">
+                  <span className="text-lg font-semibold ds-text-primary">
                     {performanceMetrics.averageResponseTime}h
                   </span>
-                  <p className="text-xs text-gray-500">Average Response</p>
+                  <p className="text-xs ds-text-muted">Average Response</p>
                 </div>
                 
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <span className="text-lg font-semibold text-gray-900">
+                <div className="text-center p-3 ds-bg-surface-muted rounded-lg">
+                  <span className="text-lg font-semibold ds-text-primary">
                     {performanceMetrics.acceptanceRate}%
                   </span>
-                  <p className="text-xs text-gray-500">Acceptance Rate</p>
+                  <p className="text-xs ds-text-muted">Acceptance Rate</p>
                 </div>
               </div>
             </div>

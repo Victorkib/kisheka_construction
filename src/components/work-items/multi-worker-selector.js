@@ -184,13 +184,13 @@ export function MultiWorkerSelector({
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
-      <label className="block text-sm font-semibold text-gray-900 mb-2">
-        Assign Workers <span className="text-gray-500 text-xs font-normal">(Optional)</span>
+      <label className="block text-sm font-semibold ds-text-primary mb-2">
+        Assign Workers <span className="ds-text-muted text-xs font-normal">(Optional)</span>
       </label>
       
       {/* Selected Workers Display */}
       {selectedWorkers.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-2 p-2 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="flex flex-wrap gap-2 mb-2 p-2 bg-blue-50 border border-blue-400/60 rounded-lg">
           {selectedWorkers.map((worker) => {
             const workerId = (worker.userId || worker._id)?.toString();
             return (
@@ -219,7 +219,7 @@ export function MultiWorkerSelector({
       {/* Search Input */}
       <div className="relative">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ds-text-muted" />
           <input
             ref={inputRef}
             type="text"
@@ -233,7 +233,7 @@ export function MultiWorkerSelector({
             onKeyDown={handleKeyDown}
             placeholder={placeholder}
             disabled={disabled}
-            className="w-full pl-10 pr-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
+            className="w-full pl-10 pr-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium"
           />
           {searchTerm && (
             <button
@@ -242,7 +242,7 @@ export function MultiWorkerSelector({
                 setSearchTerm('');
                 setHighlightedIndex(-1);
               }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 ds-text-muted hover:ds-text-secondary"
             >
               <X className="w-4 h-4" />
             </button>
@@ -253,16 +253,16 @@ export function MultiWorkerSelector({
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute z-50 w-full mt-1 bg-white border-2 border-gray-300 rounded-lg shadow-lg max-h-64 overflow-y-auto"
+            className="absolute z-50 w-full mt-1 ds-bg-surface border-2 ds-border-subtle rounded-lg shadow-lg max-h-64 overflow-y-auto"
           >
             {loading ? (
-              <div className="p-4 text-center text-gray-500">Loading workers...</div>
+              <div className="p-4 text-center ds-text-muted">Loading workers...</div>
             ) : filteredWorkers.length === 0 ? (
-              <div className="p-4 text-center text-gray-500">No workers found</div>
+              <div className="p-4 text-center ds-text-muted">No workers found</div>
             ) : (
               <>
                 {suggestedWorkers.length > 0 && !searchTerm && (
-                  <div className="px-3 py-2 bg-yellow-50 border-b border-yellow-200 text-xs font-semibold text-yellow-800">
+                  <div className="px-3 py-2 bg-yellow-50 border-b border-yellow-400/60 text-xs font-semibold text-yellow-800">
                     ✨ Suggested Workers (matching {category || 'category'})
                   </div>
                 )}
@@ -281,18 +281,18 @@ export function MultiWorkerSelector({
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-gray-400" />
+                        <User className="w-4 h-4 ds-text-muted" />
                         <div>
-                          <div className="font-medium text-gray-900">
+                          <div className="font-medium ds-text-primary">
                             {worker.workerName}
                           </div>
                           {worker.employeeId && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs ds-text-muted">
                               {worker.employeeId}
                             </div>
                           )}
                           {worker.skillType && (
-                            <div className="text-xs text-gray-400">
+                            <div className="text-xs ds-text-muted">
                               {worker.skillType}
                             </div>
                           )}
@@ -311,7 +311,7 @@ export function MultiWorkerSelector({
       </div>
 
       {/* Helper Text */}
-      <p className="text-xs text-gray-600 mt-1">
+      <p className="text-xs ds-text-secondary mt-1">
         {selectedWorkers.length > 0 
           ? `${selectedWorkers.length} worker${selectedWorkers.length > 1 ? 's' : ''} selected`
           : 'Select one or more workers for this work item'}

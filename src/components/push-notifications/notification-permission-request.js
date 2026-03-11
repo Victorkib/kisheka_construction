@@ -248,18 +248,18 @@ export function NotificationPermissionRequest() {
   // Render different states based on permission status
   if (permissionStatus === 'granted' && isSubscribed) {
     return (
-      <div className="bg-green-50 border-b border-green-200 px-4 py-3">
+      <div className="ds-bg-success/10 border-b ds-border-success/40 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <CheckCircle2 className="w-5 h-5 text-green-600" />
-            <p className="text-sm text-green-800">
+            <CheckCircle2 className="w-5 h-5 ds-text-success" />
+            <p className="text-sm ds-text-success">
               <span className="font-semibold">Notifications enabled!</span> You
               {`'`}ll receive updates about purchase orders and approvals.
             </p>
           </div>
           <button
             onClick={handleDismiss}
-            className="text-green-600 hover:text-green-800 p-1"
+            className="ds-text-success hover:ds-text-success p-1"
             aria-label="Close"
           >
             <X className="w-4 h-4" />
@@ -271,17 +271,17 @@ export function NotificationPermissionRequest() {
 
   if (permissionStatus === 'granted' && !isSubscribed) {
     return (
-      <div className="bg-blue-50 border-b border-blue-200 px-4 py-3">
+      <div className="ds-bg-accent-subtle border-b ds-border-accent-subtle px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1">
-            <Bell className="w-5 h-5 text-blue-600 flex-shrink-0" />
+            <Bell className="w-5 h-5 ds-text-accent-primary flex-shrink-0" />
             <div>
-              <p className="text-sm text-blue-900">
+              <p className="text-sm ds-text-primary">
                 <span className="font-semibold">
                   Notifications are allowed but not enabled
                 </span>
               </p>
-              <p className="text-xs text-blue-800 mt-1">
+              <p className="text-xs ds-text-secondary mt-1">
                 Enable push notifications to receive real-time updates even when the app is inactive.
               </p>
             </div>
@@ -289,21 +289,21 @@ export function NotificationPermissionRequest() {
 
           <div className="flex items-center gap-2 flex-shrink-0">
             {error && (
-              <div className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+              <div className="text-xs ds-text-danger ds-bg-danger/10 px-2 py-1 rounded">
                 {error}
               </div>
             )}
             <button
               onClick={subscribeToPushNotifications}
               disabled={isSubscribing}
-              className="px-4 py-1 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+              className="px-4 py-1 ds-bg-accent-primary text-white text-sm font-medium rounded-lg hover:ds-bg-accent-hover disabled:ds-bg-surface-muted disabled:cursor-not-allowed transition"
             >
               {isSubscribing ? 'Enabling...' : 'Enable'}
             </button>
             <button
               onClick={handleDismiss}
               disabled={isSubscribing}
-              className="text-blue-600 hover:text-blue-800 p-1 disabled:opacity-50"
+              className="ds-text-accent-primary hover:ds-text-accent-hover p-1 disabled:opacity-50"
               aria-label="Dismiss"
             >
               <X className="w-4 h-4" />
@@ -316,20 +316,20 @@ export function NotificationPermissionRequest() {
 
   if (permissionStatus === 'denied') {
     return (
-      <div className="bg-amber-50 border-b border-amber-200 px-4 py-3">
+      <div className="ds-bg-warning/10 border-b ds-border-warning/40 px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <AlertCircle className="w-5 h-5 text-amber-600" />
+            <AlertCircle className="w-5 h-5 ds-text-warning" />
             <div>
-              <p className="text-sm text-amber-800">
+              <p className="text-sm ds-text-warning">
                 <span className="font-semibold">Notifications disabled</span>
               </p>
-              <p className="text-xs text-amber-700 mt-1">
+              <p className="text-xs ds-text-warning mt-1">
                 Enable notifications in your browser settings to receive
                 updates. You can{' '}
                 <button
                   onClick={handleAskAgain}
-                  className="underline font-semibold hover:text-amber-900"
+                  className="underline font-semibold hover:ds-text-warning"
                 >
                   try again
                 </button>{' '}
@@ -339,7 +339,7 @@ export function NotificationPermissionRequest() {
           </div>
           <button
             onClick={handleDismiss}
-            className="text-amber-600 hover:text-amber-800 p-1 flex-shrink-0"
+            className="ds-text-warning hover:ds-text-warning p-1 flex-shrink-0"
             aria-label="Close"
           >
             <X className="w-4 h-4" />
@@ -351,17 +351,17 @@ export function NotificationPermissionRequest() {
 
   // Default: permission not determined yet
   return (
-    <div className="bg-blue-50 border-b border-blue-200 px-4 py-3">
+    <div className="ds-bg-accent-subtle border-b ds-border-accent-subtle px-4 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         <div className="flex items-center gap-3 flex-1">
-          <Bell className="w-5 h-5 text-blue-600 flex-shrink-0" />
+          <Bell className="w-5 h-5 ds-text-accent-primary flex-shrink-0" />
           <div>
-            <p className="text-sm text-blue-900">
+            <p className="text-sm ds-text-primary">
               <span className="font-semibold">
                 Stay updated with notifications
               </span>
             </p>
-            <p className="text-xs text-blue-800 mt-1">
+            <p className="text-xs ds-text-secondary mt-1">
               Get instant updates about purchase orders, approvals, and
               important actions
             </p>
@@ -370,21 +370,21 @@ export function NotificationPermissionRequest() {
 
         <div className="flex items-center gap-2 flex-shrink-0">
           {error && (
-            <div className="text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
+            <div className="text-xs ds-text-danger ds-bg-danger/10 px-2 py-1 rounded">
               {error}
             </div>
           )}
           <button
             onClick={handleRequestPermission}
             disabled={isSubscribing}
-            className="px-4 py-1 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
+            className="px-4 py-1 ds-bg-accent-primary text-white text-sm font-medium rounded-lg hover:ds-bg-accent-hover disabled:ds-bg-surface-muted disabled:cursor-not-allowed transition"
           >
             {isSubscribing ? 'Enabling...' : 'Enable'}
           </button>
           <button
             onClick={handleDismiss}
             disabled={isSubscribing}
-            className="text-blue-600 hover:text-blue-800 p-1 disabled:opacity-50"
+            className="ds-text-accent-primary hover:ds-text-accent-hover p-1 disabled:opacity-50"
             aria-label="Dismiss"
           >
             <X className="w-4 h-4" />

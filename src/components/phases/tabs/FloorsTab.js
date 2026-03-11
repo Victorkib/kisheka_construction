@@ -99,7 +99,7 @@ export function FloorsTab({ phase, formatCurrency }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 flex justify-center">
+      <div className="ds-bg-surface rounded-lg shadow p-6 flex justify-center">
         <LoadingSpinner />
       </div>
     );
@@ -107,7 +107,7 @@ export function FloorsTab({ phase, formatCurrency }) {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+      <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
         {error}
       </div>
     );
@@ -115,11 +115,11 @@ export function FloorsTab({ phase, formatCurrency }) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900">Floor Breakdown</h2>
-            <p className="text-sm text-gray-600">
+            <h2 className="text-lg font-semibold ds-text-primary">Floor Breakdown</h2>
+            <p className="text-sm ds-text-secondary">
               Floors can appear in multiple phases. Use the filter to focus on basement or superstructure.
             </p>
           </div>
@@ -129,15 +129,15 @@ export function FloorsTab({ phase, formatCurrency }) {
           >
             Manage Floor Budgets
           </Link>
-          <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+          <div className="flex items-center gap-2 ds-bg-surface-muted rounded-lg p-1">
             {['auto', 'basement', 'superstructure', 'all'].map((group) => (
               <button
                 key={group}
                 onClick={() => setGroupFilter(group)}
                 className={`px-3 py-1.5 text-xs font-semibold rounded transition-colors ${
                   groupFilter === group
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    ? 'ds-bg-surface ds-text-primary shadow-sm'
+                    : 'ds-text-secondary hover:ds-text-primary'
                 }`}
               >
                 {group === 'auto' ? 'Auto' : group.replace('_', ' ')}
@@ -148,38 +148,38 @@ export function FloorsTab({ phase, formatCurrency }) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
-            <p className="text-xs text-gray-500">Materials</p>
-            <p className="text-lg font-semibold text-gray-900">{formatCurrency(summary.materials)}</p>
+            <p className="text-xs ds-text-muted">Materials</p>
+            <p className="text-lg font-semibold ds-text-primary">{formatCurrency(summary.materials)}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Material Requests</p>
-            <p className="text-lg font-semibold text-gray-900">{formatCurrency(summary.materialRequests)}</p>
+            <p className="text-xs ds-text-muted">Material Requests</p>
+            <p className="text-lg font-semibold ds-text-primary">{formatCurrency(summary.materialRequests)}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Purchase Orders</p>
-            <p className="text-lg font-semibold text-gray-900">{formatCurrency(summary.purchaseOrders)}</p>
+            <p className="text-xs ds-text-muted">Purchase Orders</p>
+            <p className="text-lg font-semibold ds-text-primary">{formatCurrency(summary.purchaseOrders)}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Labour</p>
-            <p className="text-lg font-semibold text-gray-900">{formatCurrency(summary.labour)}</p>
+            <p className="text-xs ds-text-muted">Labour</p>
+            <p className="text-lg font-semibold ds-text-primary">{formatCurrency(summary.labour)}</p>
           </div>
           <div>
-            <p className="text-xs text-gray-500">Work Items</p>
-            <p className="text-lg font-semibold text-gray-900">{formatCurrency(summary.workItems)}</p>
+            <p className="text-xs ds-text-muted">Work Items</p>
+            <p className="text-lg font-semibold ds-text-primary">{formatCurrency(summary.workItems)}</p>
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-base font-semibold text-gray-900">Floor Heatmap</h3>
-            <p className="text-sm text-gray-600">Darker tiles indicate higher total spend.</p>
+            <h3 className="text-base font-semibold ds-text-primary">Floor Heatmap</h3>
+            <p className="text-sm ds-text-secondary">Darker tiles indicate higher total spend.</p>
           </div>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {floors.length === 0 && (
-            <div className="col-span-full text-sm text-gray-500">
+            <div className="col-span-full text-sm ds-text-muted">
               No floors to display for this filter.
             </div>
           )}
@@ -210,28 +210,28 @@ export function FloorsTab({ phase, formatCurrency }) {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h3 className="text-base font-semibold text-gray-900">Floors</h3>
+      <div className="ds-bg-surface rounded-lg shadow">
+        <div className="px-6 py-4 border-b ds-border-subtle">
+          <h3 className="text-base font-semibold ds-text-primary">Floors</h3>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-ds-border-subtle">
+            <thead className="ds-bg-surface-muted">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Floor</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Materials</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Requests</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Orders</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Labour</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Work Items</th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold ds-text-muted uppercase tracking-wider">Floor</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold ds-text-muted uppercase tracking-wider">Materials</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold ds-text-muted uppercase tracking-wider">Requests</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold ds-text-muted uppercase tracking-wider">Orders</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold ds-text-muted uppercase tracking-wider">Labour</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold ds-text-muted uppercase tracking-wider">Work Items</th>
+                <th className="px-6 py-3 text-right text-xs font-semibold ds-text-muted uppercase tracking-wider">Total</th>
+                <th className="px-6 py-3 text-left text-xs font-semibold ds-text-muted uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
               {floors.length === 0 && (
                 <tr>
-                  <td className="px-6 py-4 text-sm text-gray-500" colSpan={7}>
+                  <td className="px-6 py-4 text-sm ds-text-muted" colSpan={7}>
                     No floors found for this filter.
                   </td>
                 </tr>
@@ -249,14 +249,14 @@ export function FloorsTab({ phase, formatCurrency }) {
                 const floorId = floor.floorId;
                 return (
                   <tr key={floor.floorId}>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 text-sm font-medium ds-text-primary">
                       <div className="flex flex-col">
                         <span>{floor.floorName}</span>
-                        <span className="text-xs text-gray-500">{floor.group === 'basement' ? 'Basement' : 'Superstructure'}</span>
+                        <span className="text-xs ds-text-muted">{floor.group === 'basement' ? 'Basement' : 'Superstructure'}</span>
                         <Link href={`/floors/${floor.floorId}`} className="text-xs text-blue-600 hover:text-blue-800">
                           View floor
                         </Link>
-                        <div className="mt-2 h-1.5 bg-gray-100 rounded-full">
+                        <div className="mt-2 h-1.5 ds-bg-surface-muted rounded-full">
                           <div
                             className="h-1.5 bg-blue-500 rounded-full"
                             style={{ width: `${totalPercent}%` }}
@@ -264,13 +264,13 @@ export function FloorsTab({ phase, formatCurrency }) {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floorTotals.materials || 0)}</td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floorTotals.materialRequests || 0)}</td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floorTotals.purchaseOrders || 0)}</td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floorTotals.labour || 0)}</td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-700">{formatCurrency(floorTotals.workItems || 0)}</td>
-                    <td className="px-6 py-4 text-right text-sm font-semibold text-gray-900">{formatCurrency(total)}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
+                    <td className="px-6 py-4 text-right text-sm ds-text-secondary">{formatCurrency(floorTotals.materials || 0)}</td>
+                    <td className="px-6 py-4 text-right text-sm ds-text-secondary">{formatCurrency(floorTotals.materialRequests || 0)}</td>
+                    <td className="px-6 py-4 text-right text-sm ds-text-secondary">{formatCurrency(floorTotals.purchaseOrders || 0)}</td>
+                    <td className="px-6 py-4 text-right text-sm ds-text-secondary">{formatCurrency(floorTotals.labour || 0)}</td>
+                    <td className="px-6 py-4 text-right text-sm ds-text-secondary">{formatCurrency(floorTotals.workItems || 0)}</td>
+                    <td className="px-6 py-4 text-right text-sm font-semibold ds-text-primary">{formatCurrency(total)}</td>
+                    <td className="px-6 py-4 text-sm ds-text-secondary">
                       <div className="flex flex-col gap-1">
                         <Link
                           href={`/materials?projectId=${projectId}&phaseId=${phaseId}&floor=${floorId}`}
@@ -312,7 +312,7 @@ export function FloorsTab({ phase, formatCurrency }) {
         </div>
       </div>
 
-      <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg">
+      <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-800 px-4 py-3 rounded-lg">
         <p className="text-sm font-medium">Unassigned floor entries</p>
         <p className="text-xs text-yellow-700">
           Items in this phase with no floor selected will appear here. Assign floors to improve visibility.

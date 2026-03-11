@@ -8,6 +8,7 @@ export { ProfileInfo } from './profile-info';
 export { NotificationPreferences } from './notification-preferences';
 export { ActivitySummary } from './activity-summary';
 export { ChangePassword } from './change-password';
+export { ThemePreferences } from './theme-preferences';
 
 
 

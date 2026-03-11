@@ -147,13 +147,13 @@ function InitialExpensesPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
-      deleted: 'bg-gray-200 text-gray-600',
+      deleted: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const formatCurrency = (amount, currency = 'KES') => {
@@ -201,8 +201,8 @@ function InitialExpensesPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Initial Expenses</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track pre-construction expenses (land, permits, approvals, etc.)</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Initial Expenses</h1>
+            <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Track pre-construction expenses (land, permits, approvals, etc.)</p>
           </div>
           <NoProjectsEmptyState
             canCreate={canAccess('create_project')}
@@ -219,13 +219,13 @@ function InitialExpensesPageContent() {
         {/* Header */}
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Initial Expenses</h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track pre-construction expenses (land, permits, approvals, etc.)</p>
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Initial Expenses</h1>
+            <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Track pre-construction expenses (land, permits, approvals, etc.)</p>
           </div>
           {canAccess('create_initial_expense') && (
             <Link
               href="/initial-expenses/new"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+              className="ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
             >
               + Add Initial Expense
             </Link>
@@ -249,37 +249,37 @@ function InitialExpensesPageContent() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Initial Expenses</p>
-            <p className="text-2xl font-bold text-gray-900">{formatCurrency(totals.totalAmount)}</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-1">Total Initial Expenses</p>
+            <p className="text-2xl font-bold ds-text-primary">{formatCurrency(totals.totalAmount)}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Approved Amount</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-1">Approved Amount</p>
             <p className="text-2xl font-bold text-green-600">{formatCurrency(totals.approvedAmount)}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Records</p>
-            <p className="text-2xl font-bold text-gray-900">{pagination.total}</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-1">Total Records</p>
+            <p className="text-2xl font-bold ds-text-primary">{pagination.total}</p>
           </div>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Filters</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Project</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Project</label>
               <select
                 value={filters.projectId}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               >
                 <option value="">All Projects</option>
                 {accessibleProjects.map((project) => (
@@ -290,11 +290,11 @@ function InitialExpensesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Category</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Category</label>
               <select
                 value={filters.category}
                 onChange={(e) => handleFilterChange('category', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               >
                 <option value="">All Categories</option>
                 {initialExpenseCategories.map((cat) => (
@@ -305,11 +305,11 @@ function InitialExpensesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Status</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Status</label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               >
                 <option value="">All Statuses</option>
                 <option value="draft">Draft</option>
@@ -319,96 +319,96 @@ function InitialExpensesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Start Date</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Start Date</label>
               <input
                 type="date"
                 value={filters.startDate}
                 onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               />
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">End Date</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">End Date</label>
               <input
                 type="date"
                 value={filters.endDate}
                 onChange={(e) => handleFilterChange('endDate', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               />
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Search</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Search</label>
               <input
                 type="text"
                 placeholder="Search..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               />
             </div>
           </div>
         </div>
 
         {/* Expenses Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
           {loading ? (
             <LoadingTable rows={10} columns={7} showHeader={true} />
           ) : expenses.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
+            <div className="p-8 text-center ds-text-muted">
               No initial expenses found.
               {canAccess('create_initial_expense') && (
-                <Link href="/initial-expenses/new" className="text-blue-600 hover:underline"> Create one</Link>
+                <Link href="/initial-expenses/new" className="ds-text-accent-primary hover:underline"> Create one</Link>
               )}
             </div>
           ) : (
             <>
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Code
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Item Name
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Category
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Amount
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Date Paid
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {expenses.map((expense) => (
-                    <tr key={expense._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={expense._id} className="hover:ds-bg-surface-muted">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                         <Link
                           href={`/initial-expenses/${expense._id}`}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover"
                         >
                           {expense.expenseCode}
                         </Link>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
+                      <td className="px-6 py-4 text-sm ds-text-primary">
                         {expense.itemName}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {categoryLabels[expense.category] || expense.category}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                         {formatCurrency(expense.amount)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {formatDate(expense.datePaid)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -419,7 +419,7 @@ function InitialExpensesPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <Link
                           href={`/initial-expenses/${expense._id}`}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover"
                         >
                           View
                         </Link>
@@ -431,22 +431,22 @@ function InitialExpensesPageContent() {
 
               {/* Pagination */}
               {pagination.pages > 1 && (
-                <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-t border-gray-200">
-                  <div className="text-sm text-gray-700">
+                <div className="ds-bg-surface-muted px-6 py-4 flex items-center justify-between border-t ds-border-subtle">
+                  <div className="text-sm ds-text-secondary">
                     Showing page {pagination.page} of {pagination.pages} ({pagination.total} total)
                   </div>
                   <div className="flex gap-2">
                     <button
                       onClick={() => setPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                       disabled={pagination.page === 1}
-                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      className="px-4 py-2 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted"
                     >
                       Previous
                     </button>
                     <button
                       onClick={() => setPagination((prev) => ({ ...prev, page: Math.min(pagination.pages, prev.page + 1) }))}
                       disabled={pagination.page === pagination.pages}
-                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                      className="px-4 py-2 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted"
                     >
                       Next
                     </button>
@@ -468,7 +468,7 @@ export default function InitialExpensesPage() {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading initial expenses...</p>
+            <p className="mt-4 ds-text-secondary">Loading initial expenses...</p>
           </div>
         </div>
       </AppLayout>

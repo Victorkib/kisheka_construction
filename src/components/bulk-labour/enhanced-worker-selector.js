@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { Search, User, UserPlus, CheckCircle, X } from 'lucide-react';
 
 export function EnhancedWorkerSelector({
@@ -75,6 +75,25 @@ export function EnhancedWorkerSelector({
     }
   }, [isOpen]);
 
+  const handleSelectWorker = useCallback((worker) => {
+    const workerId = worker.userId || worker._id;
+    onChange(workerId);
+    if (onWorkerSelected) {
+      onWorkerSelected(worker);
+    }
+    setIsOpen(false);
+    setSearchTerm('');
+    setHighlightedIndex(-1);
+  }, [onChange, onWorkerSelected]);
+
+  const handleNewWorker = useCallback(() => {
+    if (onNewWorker) {
+      onNewWorker(searchTerm.trim());
+    }
+    setIsOpen(false);
+    setHighlightedIndex(-1);
+  }, [onNewWorker, searchTerm]);
+
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -109,7 +128,7 @@ export function EnhancedWorkerSelector({
       document.addEventListener('keydown', handleKeyDown);
       return () => document.removeEventListener('keydown', handleKeyDown);
     }
-  }, [isOpen, filteredWorkers, highlightedIndex, isNewWorker]);
+  }, [isOpen, filteredWorkers, highlightedIndex, isNewWorker, handleSelectWorker, handleNewWorker]);
 
   // Scroll highlighted item into view
   useEffect(() => {
@@ -120,25 +139,6 @@ export function EnhancedWorkerSelector({
       }
     }
   }, [highlightedIndex]);
-
-  const handleSelectWorker = (worker) => {
-    const workerId = worker.userId || worker._id;
-    onChange(workerId);
-    if (onWorkerSelected) {
-      onWorkerSelected(worker);
-    }
-    setIsOpen(false);
-    setSearchTerm('');
-    setHighlightedIndex(-1);
-  };
-
-  const handleNewWorker = () => {
-    if (onNewWorker) {
-      onNewWorker(searchTerm.trim());
-    }
-    setIsOpen(false);
-    setHighlightedIndex(-1);
-  };
 
   const handleInputChange = (e) => {
     const newValue = e.target.value;
@@ -187,7 +187,7 @@ export function EnhancedWorkerSelector({
     <div ref={containerRef} className={`relative ${className}`}>
       <div className="relative">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted" />
           <input
             ref={inputRef}
             type="text"
@@ -195,13 +195,13 @@ export function EnhancedWorkerSelector({
             onChange={handleInputChange}
             onFocus={handleInputFocus}
             placeholder={placeholder}
-            className="w-full pl-10 pr-10 py-2 text-sm bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+            className="w-full pl-10 pr-10 py-2 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
           />
           {value && (
             <button
               type="button"
               onClick={handleClear}
-              className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 ds-text-muted hover:ds-text-secondary"
             >
               <X className="w-4 h-4" />
             </button>
@@ -222,11 +222,11 @@ export function EnhancedWorkerSelector({
         {isOpen && (
           <div
             ref={dropdownRef}
-            className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-auto"
+            className="absolute z-50 w-full mt-1 ds-bg-surface border ds-border-subtle rounded-lg shadow-lg max-h-60 overflow-auto"
           >
             {/* Suggested Workers Section */}
             {!searchTerm.trim() && suggestedWorkers.length > 0 && (
-              <div className="px-3 py-2 bg-blue-50 border-b border-blue-200">
+              <div className="px-3 py-2 bg-blue-50 border-b border-blue-400/60">
                 <p className="text-xs font-semibold text-blue-900 uppercase tracking-wide">
                   Suggested Workers
                 </p>
@@ -250,14 +250,14 @@ export function EnhancedWorkerSelector({
                       data-worker-item
                       onClick={() => handleSelectWorker(worker)}
                       className={`px-3 py-2 cursor-pointer flex items-center justify-between ${
-                        isHighlighted ? 'bg-blue-50' : 'hover:bg-gray-50'
+                        isHighlighted ? 'bg-blue-50' : 'hover:ds-bg-surface-muted'
                       } ${isSuggested && !searchTerm.trim() ? 'border-l-2 border-blue-500' : ''}`}
                     >
                       <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                        <User className="w-4 h-4 ds-text-muted flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-gray-900 truncate">
+                            <span className="text-sm font-medium ds-text-primary truncate">
                               {worker.workerName}
                             </span>
                             {isSuggested && !searchTerm.trim() && (
@@ -267,10 +267,10 @@ export function EnhancedWorkerSelector({
                             )}
                           </div>
                           {worker.employeeId && (
-                            <span className="text-xs text-gray-500">{worker.employeeId}</span>
+                            <span className="text-xs ds-text-muted">{worker.employeeId}</span>
                           )}
                           {worker.defaultHourlyRate && (
-                            <span className="text-xs text-gray-500 ml-2">
+                            <span className="text-xs ds-text-muted ml-2">
                               {worker.defaultHourlyRate.toLocaleString()} KES/hr
                             </span>
                           )}
@@ -291,14 +291,14 @@ export function EnhancedWorkerSelector({
               <div
                 data-worker-item
                 onClick={handleNewWorker}
-                className={`px-3 py-2 cursor-pointer flex items-center gap-2 border-t border-gray-200 ${
-                  highlightedIndex === filteredWorkers.length ? 'bg-blue-50' : 'hover:bg-gray-50'
+                className={`px-3 py-2 cursor-pointer flex items-center gap-2 border-t ds-border-subtle ${
+                  highlightedIndex === filteredWorkers.length ? 'bg-blue-50' : 'hover:ds-bg-surface-muted'
                 }`}
               >
                 <UserPlus className="w-4 h-4 text-blue-500" />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium ds-text-primary">
                       Create new worker: "{searchTerm.trim()}"
                     </span>
                     <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
@@ -306,7 +306,7 @@ export function EnhancedWorkerSelector({
                       New
                     </span>
                   </div>
-                  <span className="text-xs text-gray-500">
+                  <span className="text-xs ds-text-muted">
                     Worker profile will be created automatically
                   </span>
                 </div>
@@ -315,14 +315,14 @@ export function EnhancedWorkerSelector({
 
             {/* No Results */}
             {filteredWorkers.length === 0 && !isNewWorker && searchTerm.trim() && (
-              <div className="px-3 py-4 text-center text-sm text-gray-500">
+              <div className="px-3 py-4 text-center text-sm ds-text-muted">
                 No workers found. Type a name to create a new worker.
               </div>
             )}
 
             {/* Empty State */}
             {filteredWorkers.length === 0 && !isNewWorker && !searchTerm.trim() && (
-              <div className="px-3 py-4 text-center text-sm text-gray-500">
+              <div className="px-3 py-4 text-center text-sm ds-text-muted">
                 Start typing to search workers or create a new one.
               </div>
             )}

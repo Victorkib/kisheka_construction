@@ -282,12 +282,12 @@ function ProfessionalActivitiesPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getActivityTypeLabel = (type) => {
@@ -305,10 +305,10 @@ function ProfessionalActivitiesPageContent() {
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl md:text-3xl font-bold ds-text-primary leading-tight">
               Professional Activities
             </h1>
-            <p className="text-gray-600 mt-2">
+            <p className="ds-text-secondary mt-2">
               Track and manage architect and engineer activities
             </p>
           </div>
@@ -317,8 +317,8 @@ function ProfessionalActivitiesPageContent() {
               href="/professional-activities/new"
               className={`inline-flex items-center px-4 py-2 rounded-lg transition-all ${
                 canCreateActivity
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+                  ? 'ds-bg-accent-primary text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                  : 'ds-bg-surface-muted ds-text-muted cursor-not-allowed opacity-60'
               }`}
               onClick={(e) => {
                 if (!canCreateActivity) {
@@ -371,14 +371,14 @@ function ProfessionalActivitiesPageContent() {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Project</label>
               <select
                 value={filters.projectId}
                 onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Projects</option>
                 {projects.map((project) => (
@@ -389,11 +389,11 @@ function ProfessionalActivitiesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Professional</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Professional</label>
               <select
                 value={filters.professionalServiceId}
                 onChange={(e) => handleFilterChange('professionalServiceId', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Professionals</option>
                 {assignments.map((assignment) => (
@@ -404,11 +404,11 @@ function ProfessionalActivitiesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Type</label>
               <select
                 value={filters.activityType}
                 onChange={(e) => handleFilterChange('activityType', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Types</option>
                 <option value="site_visit">Site Visit</option>
@@ -419,11 +419,11 @@ function ProfessionalActivitiesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Status</label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Statuses</option>
                 <option value="draft">Draft</option>
@@ -433,13 +433,13 @@ function ProfessionalActivitiesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-1">Search</label>
               <input
                 type="text"
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search activities..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -447,7 +447,7 @@ function ProfessionalActivitiesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
           </div>
@@ -457,12 +457,12 @@ function ProfessionalActivitiesPageContent() {
         {loading ? (
           <LoadingTable rows={5} columns={6} />
         ) : activities.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <svg className="mx-auto h-12 w-12 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No activities found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <h3 className="mt-2 text-sm font-medium ds-text-primary">No activities found</h3>
+            <p className="mt-1 text-sm ds-text-muted">
               {canAccess('create_professional_activity') 
                 ? 'Get started by logging a new activity.'
                 : 'No professional activities have been logged yet.'}
@@ -473,8 +473,8 @@ function ProfessionalActivitiesPageContent() {
                   href="/professional-activities/new"
                   className={`inline-flex items-center px-4 py-2 rounded-lg transition-all ${
                     canCreateActivity
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed opacity-60'
+                      ? 'ds-bg-accent-primary text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
+                      : 'ds-bg-surface-muted ds-text-muted cursor-not-allowed opacity-60'
                   }`}
                   onClick={(e) => {
                     if (!canCreateActivity) {
@@ -497,56 +497,56 @@ function ProfessionalActivitiesPageContent() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Activity
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Professional
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Project
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {activities.map((activity) => (
-                    <tr key={activity._id} className="hover:bg-gray-50">
+                    <tr key={activity._id} className="hover:ds-bg-surface-muted">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium ds-text-primary">
                           {getActivityTypeLabel(activity.activityType)}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs ds-text-muted">
                           {activity.activityCode}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm ds-text-primary">
                           {activity.library?.name || 'N/A'}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs ds-text-muted">
                           {activity.professionalService?.professionalCode || ''}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm ds-text-primary">
                           {activity.project?.projectName || 'N/A'}
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {activity.activityDate ? new Date(activity.activityDate).toLocaleDateString() : 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -558,7 +558,7 @@ function ProfessionalActivitiesPageContent() {
                         <div className="flex items-center justify-end gap-2">
                           <Link
                             href={`/professional-activities/${activity._id}`}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View
                           </Link>
@@ -588,26 +588,26 @@ function ProfessionalActivitiesPageContent() {
 
             {/* Pagination - Similar structure as before */}
             {pagination.pages > 1 && (
-              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="ds-bg-surface px-4 py-3 flex items-center justify-between border-t ds-border-subtle sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                     disabled={pagination.page === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="relative inline-flex items-center px-4 py-2 border ds-border-subtle text-sm font-medium rounded-md ds-text-secondary ds-bg-surface hover:ds-bg-surface-muted disabled:opacity-50"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                     disabled={pagination.page === pagination.pages}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border ds-border-subtle text-sm font-medium rounded-md ds-text-secondary ds-bg-surface hover:ds-bg-surface-muted disabled:opacity-50"
                   >
                     Next
                   </button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm ds-text-secondary">
                       Showing <span className="font-medium">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
                       <span className="font-medium">
                         {Math.min(pagination.page * pagination.limit, pagination.total)}
@@ -620,7 +620,7 @@ function ProfessionalActivitiesPageContent() {
                       <button
                         onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                         disabled={pagination.page === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border ds-border-subtle ds-bg-surface text-sm font-medium ds-text-muted hover:ds-bg-surface-muted disabled:opacity-50"
                       >
                         Previous
                       </button>
@@ -637,22 +637,22 @@ function ProfessionalActivitiesPageContent() {
                               onClick={() => setPagination(prev => ({ ...prev, page }))}
                               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                 page === pagination.page
-                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                  ? 'z-10 bg-blue-500/10 border-ds-accent-primary ds-text-accent-primary'
+                                  : 'ds-bg-surface ds-border-subtle ds-text-muted hover:ds-bg-surface-muted'
                               }`}
                             >
                               {page}
                             </button>
                           );
                         } else if (page === pagination.page - 2 || page === pagination.page + 2) {
-                          return <span key={page} className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>;
+                          return <span key={page} className="relative inline-flex items-center px-4 py-2 border ds-border-subtle ds-bg-surface text-sm font-medium ds-text-secondary">...</span>;
                         }
                         return null;
                       })}
                       <button
                         onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                         disabled={pagination.page === pagination.pages}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border ds-border-subtle ds-bg-surface text-sm font-medium ds-text-muted hover:ds-bg-surface-muted disabled:opacity-50"
                       >
                         Next
                       </button>
@@ -678,14 +678,14 @@ function ProfessionalActivitiesPageContent() {
             <div className="space-y-4">
               <p>Are you sure you want to approve this activity?</p>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Approval Notes (Optional)
                 </label>
                 <textarea
                   value={approvalNotes}
                   onChange={(e) => setApprovalNotes(e.target.value)}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Add any notes about this approval..."
                 />
               </div>
@@ -711,7 +711,7 @@ function ProfessionalActivitiesPageContent() {
             <div className="space-y-4">
               <p>Are you sure you want to reject this activity?</p>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Rejection Reason <span className="text-red-500">*</span>
                 </label>
                 <textarea
@@ -719,7 +719,7 @@ function ProfessionalActivitiesPageContent() {
                   onChange={(e) => setRejectionReason(e.target.value)}
                   rows={3}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Please provide a reason for rejection..."
                 />
               </div>

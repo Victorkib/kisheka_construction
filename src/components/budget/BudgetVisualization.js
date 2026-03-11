@@ -36,7 +36,7 @@ export function BudgetVisualization({ budget, actualSpending = null, viewType = 
 
   if (!budget) {
     return (
-      <div className="bg-gray-50 rounded-lg p-8 text-center text-gray-500">
+      <div className="ds-bg-surface-muted rounded-lg p-8 text-center ds-text-muted">
         No budget data available
       </div>
     );
@@ -128,16 +128,16 @@ export function BudgetVisualization({ budget, actualSpending = null, viewType = 
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-          <p className="font-semibold text-gray-900">{payload[0].name}</p>
-          <p className="text-sm text-gray-600">
+        <div className="ds-bg-surface border ds-border-subtle rounded-lg shadow-lg p-3">
+          <p className="font-semibold ds-text-primary">{payload[0].name}</p>
+          <p className="text-sm ds-text-secondary">
             {formatCurrency(payload[0].value)}
             {payload[0].payload.percentage && (
               <span className="ml-2">({payload[0].payload.percentage.toFixed(1)}%)</span>
             )}
           </p>
           {payload[0].payload.actual !== undefined && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm ds-text-muted mt-1">
               Actual: {formatCurrency(payload[0].payload.actual)}
             </p>
           )}
@@ -170,16 +170,16 @@ export function BudgetVisualization({ budget, actualSpending = null, viewType = 
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
+    <div className="ds-bg-surface rounded-lg border ds-border-subtle p-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Budget Visualization</h3>
+        <h3 className="text-lg font-semibold ds-text-primary">Budget Visualization</h3>
         <div className="flex gap-2">
           <button
             onClick={() => setActiveView('pie')}
             className={`px-3 py-1 text-sm rounded ${
               activeView === 'pie'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
             }`}
           >
             Pie Chart
@@ -189,7 +189,7 @@ export function BudgetVisualization({ budget, actualSpending = null, viewType = 
             className={`px-3 py-1 text-sm rounded ${
               activeView === 'bar'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
             }`}
           >
             Bar Chart
@@ -200,7 +200,7 @@ export function BudgetVisualization({ budget, actualSpending = null, viewType = 
               className={`px-3 py-1 text-sm rounded ${
                 activeView === 'variance'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
               }`}
             >
               Variance
@@ -309,22 +309,22 @@ export function BudgetVisualization({ budget, actualSpending = null, viewType = 
                   key={item.category}
                   className={`p-3 rounded-lg ${
                     isOver
-                      ? 'bg-red-50 border border-red-200'
+                      ? 'bg-red-50 border border-red-400/60'
                       : isUnder
-                      ? 'bg-green-50 border border-green-200'
-                      : 'bg-gray-50 border border-gray-200'
+                      ? 'bg-green-50 border border-green-400/60'
+                      : 'ds-bg-surface-muted border ds-border-subtle'
                   }`}
                 >
-                  <p className="text-xs text-gray-600 mb-1">{item.category}</p>
+                  <p className="text-xs ds-text-secondary mb-1">{item.category}</p>
                   <p
                     className={`text-lg font-semibold ${
-                      isOver ? 'text-red-600' : isUnder ? 'text-green-600' : 'text-gray-700'
+                      isOver ? 'text-red-600' : isUnder ? 'text-green-600' : 'ds-text-secondary'
                     }`}
                   >
                     {item.variancePercent > 0 ? '+' : ''}
                     {item.variancePercent.toFixed(1)}%
                   </p>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs ds-text-muted mt-1">
                     {formatCurrency(item.variance)}
                   </p>
                 </div>
@@ -335,7 +335,7 @@ export function BudgetVisualization({ budget, actualSpending = null, viewType = 
       )}
 
       {pieData.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 ds-text-muted">
           No budget data to visualize
         </div>
       )}

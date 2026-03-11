@@ -21,16 +21,16 @@ export default function PerformanceDistribution({ distribution, selectedCategory
   return (
     <Card className="p-6">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Distribution</h3>
-        <p className="text-sm text-gray-500">
+        <h3 className="text-lg font-semibold ds-text-primary">Distribution</h3>
+        <p className="text-sm ds-text-muted">
           {selectedCategory === 'overall' ? 'Overall scores' : `Category: ${selectedCategory}`}
         </p>
       </div>
 
       {rows.length === 0 ? (
-        <div className="text-sm text-gray-500">No distribution data available.</div>
+        <div className="text-sm ds-text-muted">No distribution data available.</div>
       ) : (
-        <div className="space-y-2 text-sm text-gray-700">
+        <div className="space-y-2 text-sm ds-text-secondary">
           {rows.map((row) => (
             <div key={row.label} className="flex items-center justify-between">
               <span>{row.label}</span>

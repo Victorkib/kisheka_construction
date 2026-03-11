@@ -226,11 +226,11 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 rounded w-48"></div>
-          <div className="h-4 bg-gray-200 rounded w-32"></div>
-          <div className="h-20 bg-gray-200 rounded"></div>
+          <div className="h-6 ds-bg-surface-muted rounded w-48"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-32"></div>
+          <div className="h-20 ds-bg-surface-muted rounded"></div>
         </div>
       </div>
     );
@@ -244,7 +244,7 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
   });
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 space-y-4 relative">
+    <div className="ds-bg-surface rounded-lg shadow p-6 space-y-4 relative">
       <LoadingOverlay 
         isLoading={saving} 
         message="Saving allocations and recalculating finances..." 
@@ -252,8 +252,8 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
       />
       <div className="flex justify-between items-center">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Investment Allocations</h3>
-          <p className="text-sm text-gray-600 mt-1">
+          <h3 className="text-lg font-semibold ds-text-primary">Investment Allocations</h3>
+          <p className="text-sm ds-text-secondary mt-1">
             Allocate investments to specific projects
           </p>
         </div>
@@ -266,17 +266,17 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
       </div>
 
       {/* Summary */}
-      <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-3 gap-4">
+      <div className="ds-bg-surface-muted rounded-lg p-4 grid grid-cols-3 gap-4">
         <div>
-          <div className="text-sm text-gray-600">Total Invested</div>
-          <div className="text-lg font-semibold text-gray-900">{formatCurrency(totalInvested)}</div>
+          <div className="text-sm ds-text-secondary">Total Invested</div>
+          <div className="text-lg font-semibold ds-text-primary">{formatCurrency(totalInvested)}</div>
         </div>
         <div>
-          <div className="text-sm text-gray-600">Total Allocated</div>
+          <div className="text-sm ds-text-secondary">Total Allocated</div>
           <div className="text-lg font-semibold text-blue-600">{formatCurrency(totalAllocated)}</div>
         </div>
         <div>
-          <div className="text-sm text-gray-600">Unallocated</div>
+          <div className="text-sm ds-text-secondary">Unallocated</div>
           <div className={`text-lg font-semibold ${unallocated > 0 ? 'text-orange-600' : 'text-green-600'}`}>
             {formatCurrency(unallocated)}
           </div>
@@ -287,8 +287,8 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
       {error && (
         <div className={`border px-4 py-3 rounded ${
           error.includes('Warning:') || error.includes('warning')
-            ? 'bg-yellow-50 border-yellow-200 text-yellow-700'
-            : 'bg-red-50 border-red-200 text-red-700'
+            ? 'bg-yellow-50 border-yellow-400/60 text-yellow-700'
+            : 'bg-red-50 border-red-400/60 text-red-700'
         }`}>
           <p className="font-medium">{error.includes('Warning:') || error.includes('warning') ? 'Warning' : 'Error'}</p>
           <div className="text-sm mt-1 whitespace-pre-line">{error}</div>
@@ -297,7 +297,7 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
 
       {/* Success Message */}
       {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+        <div className="bg-green-50 border border-green-400/60 text-green-700 px-4 py-3 rounded">
           <p className="font-medium">Success</p>
           <p className="text-sm mt-1">Allocations saved successfully!</p>
         </div>
@@ -305,7 +305,7 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
 
       {/* Validation Warning */}
       {unallocated < 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded">
+        <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded">
           <p className="font-medium">Warning</p>
           <p className="text-sm mt-1">
             Total allocated amount exceeds total invested. Please adjust allocations.
@@ -315,36 +315,36 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
 
       {/* Allocations Table */}
       {allocations.length === 0 ? (
-        <div className="text-center text-gray-600 py-8">
+        <div className="text-center ds-text-secondary py-8">
           <p>No allocations yet. Click "Add Project" to allocate investments.</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-ds-border-subtle">
+            <thead className="ds-bg-surface-muted">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                <th className="px-4 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                   Project
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                <th className="px-4 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                   Amount
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                <th className="px-4 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                   Notes
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                <th className="px-4 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
               {allocations.map((allocation, index) => (
                 <tr key={index}>
                   <td className="px-4 py-3">
                     <select
                       value={allocation.projectId || ''}
                       onChange={(e) => handleAllocationChange(index, 'projectId', e.target.value)}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">Select Project</option>
                       {projects.map((project) => (
@@ -362,7 +362,7 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
                       min="0"
                       step="0.01"
                       placeholder="0.00"
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </td>
                   <td className="px-4 py-3">
@@ -371,7 +371,7 @@ export function AllocationManager({ investorId, totalInvested, onUpdate }) {
                       value={allocation.notes || ''}
                       onChange={(e) => handleAllocationChange(index, 'notes', e.target.value)}
                       placeholder="Optional notes"
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </td>
                   <td className="px-4 py-3">

@@ -27,25 +27,25 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
     <div className="space-y-6">
       {/* Activity Summary */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-xs text-gray-600">Material Requests</p>
-          <p className="text-lg font-bold text-gray-900 mt-1">{floorSummary?.requests?.count || 0}</p>
-          <p className="text-xs text-gray-500">{formatCurrency(floorSummary?.requests?.totalEstimated || 0)}</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-xs ds-text-secondary">Material Requests</p>
+          <p className="text-lg font-bold ds-text-primary mt-1">{floorSummary?.requests?.count || 0}</p>
+          <p className="text-xs ds-text-muted">{formatCurrency(floorSummary?.requests?.totalEstimated || 0)}</p>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-xs text-gray-600">Purchase Orders</p>
-          <p className="text-lg font-bold text-gray-900 mt-1">{floorSummary?.purchaseOrders?.count || 0}</p>
-          <p className="text-xs text-gray-500">{formatCurrency(floorSummary?.purchaseOrders?.totalCost || 0)}</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-xs ds-text-secondary">Purchase Orders</p>
+          <p className="text-lg font-bold ds-text-primary mt-1">{floorSummary?.purchaseOrders?.count || 0}</p>
+          <p className="text-xs ds-text-muted">{formatCurrency(floorSummary?.purchaseOrders?.totalCost || 0)}</p>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-xs text-gray-600">Equipment</p>
-          <p className="text-lg font-bold text-gray-900 mt-1">{floorSummary?.equipment?.count || 0}</p>
-          <p className="text-xs text-gray-500">{formatCurrency(floorSummary?.equipment?.totalCost || 0)}</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-xs ds-text-secondary">Equipment</p>
+          <p className="text-lg font-bold ds-text-primary mt-1">{floorSummary?.equipment?.count || 0}</p>
+          <p className="text-xs ds-text-muted">{formatCurrency(floorSummary?.equipment?.totalCost || 0)}</p>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-xs text-gray-600">Total Activity</p>
-          <p className="text-lg font-bold text-gray-900 mt-1">{filteredLedgerItems.length}</p>
-          <p className="text-xs text-gray-500">
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-xs ds-text-secondary">Total Activity</p>
+          <p className="text-lg font-bold ds-text-primary mt-1">{filteredLedgerItems.length}</p>
+          <p className="text-xs ds-text-muted">
             {selectedPhaseFilter === 'all' ? 'All phases' : 'Filtered'}
           </p>
         </div>
@@ -53,12 +53,12 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
 
       {/* Phase Filter */}
       {phaseBreakdown && phaseBreakdown.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="ds-bg-surface rounded-lg shadow p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-900">Filter by Phase</h3>
+            <h3 className="text-sm font-semibold ds-text-primary">Filter by Phase</h3>
             <Link
               href={`/floors/${floor._id}?tab=phases`}
-              className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+              className="text-xs ds-text-accent-primary hover:ds-text-accent-hover font-medium"
             >
               View Full Phase Breakdown →
             </Link>
@@ -68,8 +68,8 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
               onClick={() => setSelectedPhaseFilter('all')}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                 selectedPhaseFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'ds-bg-accent-primary text-white'
+                  : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
               }`}
             >
               All Phases
@@ -80,8 +80,8 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
                 onClick={() => setSelectedPhaseFilter(phase.phaseId || phase._id)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                   selectedPhaseFilter === (phase.phaseId || phase._id)
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'ds-bg-accent-primary text-white'
+                    : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
                 }`}
               >
                 {phase.phaseCode || phase.phaseName}
@@ -92,17 +92,17 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
       )}
 
       {/* Recent Activity Ledger */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-          <span className="text-xs text-gray-500">
+          <h3 className="text-lg font-semibold ds-text-primary">Recent Activity</h3>
+          <span className="text-xs ds-text-muted">
             {selectedPhaseFilter === 'all' 
               ? `Last ${Math.min(20, filteredLedgerItems.length)} items`
               : `${filteredLedgerItems.length} item(s) for selected phase`}
           </span>
         </div>
         {filteredLedgerItems.length === 0 ? (
-          <p className="text-gray-500 text-sm">
+          <p className="ds-text-muted text-sm">
             {selectedPhaseFilter === 'all' 
               ? 'No recent activity'
               : 'No activity for the selected phase'}
@@ -112,27 +112,27 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
             {filteredLedgerItems.slice(0, 20).map((item, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between p-3 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition-colors"
               >
                 <div className="flex items-center gap-3 flex-1">
                   <span className="text-lg">{item.icon || '📝'}</span>
                   <div className="flex-1">
-                    <p className="font-medium text-gray-900">{item.label || item.title}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="font-medium ds-text-primary">{item.label || item.title}</p>
+                    <p className="text-xs ds-text-muted">
                       {item.type} • {item.date ? formatDate(item.date) : 'Unknown date'}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
                   {item.amount && (
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold ds-text-primary">
                       {formatCurrency(item.amount)}
                     </p>
                   )}
                   {item.link && (
                     <Link
                       href={item.link}
-                      className="text-sm text-blue-600 hover:text-blue-800 whitespace-nowrap"
+                      className="text-sm ds-text-accent-primary hover:ds-text-accent-hover whitespace-nowrap"
                     >
                       View →
                     </Link>
@@ -146,12 +146,12 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
 
       {/* Phase Filter */}
       {phaseBreakdown.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="ds-bg-surface rounded-lg shadow p-4">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-900">Filter by Phase</h3>
+            <h3 className="text-sm font-semibold ds-text-primary">Filter by Phase</h3>
             <Link
               href={`/floors/${floor._id}?tab=phases`}
-              className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+              className="text-xs ds-text-accent-primary hover:ds-text-accent-hover font-medium"
             >
               View Full Phase Breakdown →
             </Link>
@@ -161,8 +161,8 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
               onClick={() => setSelectedPhaseFilter('all')}
               className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                 selectedPhaseFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  ? 'ds-bg-accent-primary text-white'
+                  : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
               }`}
             >
               All Phases
@@ -173,8 +173,8 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
                 onClick={() => setSelectedPhaseFilter(phase.phaseId)}
                 className={`px-3 py-1.5 text-xs font-medium rounded-lg transition ${
                   selectedPhaseFilter === phase.phaseId
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'ds-bg-accent-primary text-white'
+                    : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
                 }`}
               >
                 {phase.phaseCode || phase.phaseName}
@@ -186,17 +186,17 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
 
       {/* Phase Breakdown */}
       {phaseBreakdown && phaseBreakdown.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Phase Breakdown</h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <h3 className="text-lg font-semibold ds-text-primary">Phase Breakdown</h3>
+              <p className="text-sm ds-text-secondary mt-1">
                 Phases with activity on this floor
               </p>
             </div>
             <Link
               href={`/floors/${floor._id}?tab=phases`}
-              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+              className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
             >
               View Full Breakdown →
             </Link>
@@ -205,7 +205,7 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
             {phaseBreakdown.map((phase, index) => (
               <div
                 key={phase.phaseId || phase._id || index}
-                className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between p-3 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition-colors"
               >
                 <div className="flex items-center gap-3 flex-1">
                   <span className="text-lg">🏗️</span>
@@ -213,22 +213,22 @@ export function FloorActivityTab({ floor, ledgerItems, phaseBreakdown, formatDat
                     {phase.phaseId ? (
                       <Link
                         href={`/phases/${phase.phaseId}`}
-                        className="font-medium text-gray-900 hover:text-blue-600"
+                        className="font-medium ds-text-primary hover:ds-text-accent-primary"
                       >
                         {phase.phaseName || 'Unknown Phase'}
                       </Link>
                     ) : (
-                      <span className="font-medium text-gray-900">
+                      <span className="font-medium ds-text-primary">
                         {phase.phaseName || 'Unknown Phase'}
                       </span>
                     )}
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs ds-text-muted">
                       {phase.count || 0} item(s) • {formatCurrency(phase.totalCost || 0)} total
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold ds-text-primary">
                     {formatCurrency(phase.totalCost || 0)}
                   </p>
                 </div>

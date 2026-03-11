@@ -36,7 +36,7 @@ export function ProfileHeader({ user }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
+    <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
       <div className="flex items-center gap-6">
         {/* Avatar */}
         <div className="relative flex-shrink-0">
@@ -57,10 +57,10 @@ export function ProfileHeader({ user }) {
 
         {/* User Info */}
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-1">
+          <h1 className="text-2xl md:text-3xl font-bold ds-text-primary mb-1">
             {fullName}
           </h1>
-          <p className="text-lg text-gray-600 mb-2">{roleDisplay}</p>
+          <p className="text-lg ds-text-secondary mb-2">{roleDisplay}</p>
           <div className="flex items-center gap-4 flex-wrap">
             {user.isVerified && (
               <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-sm font-medium rounded">
@@ -86,7 +86,7 @@ export function ProfileHeader({ user }) {
                   user.status === 'active'
                     ? 'bg-green-100 text-green-800'
                     : user.status === 'inactive'
-                    ? 'bg-gray-100 text-gray-800'
+                    ? 'ds-bg-surface-muted ds-text-primary'
                     : 'bg-red-100 text-red-800'
                 }`}
               >

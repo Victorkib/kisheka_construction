@@ -140,23 +140,23 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Edit Activity Details</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold ds-text-primary mb-4">Edit Activity Details</h2>
+        <p className="text-sm ds-text-secondary mb-6">
           Review and edit details for each activity. You can modify individual fields or remove activities.
         </p>
       </div>
 
       {activities.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <p className="text-gray-600">No activities added yet</p>
-          <p className="text-sm text-gray-500 mt-1">Go back to Step 2 to add activities</p>
+        <div className="text-center py-12 ds-bg-surface-muted rounded-lg">
+          <p className="ds-text-secondary">No activities added yet</p>
+          <p className="text-sm ds-text-muted mt-1">Go back to Step 2 to add activities</p>
         </div>
       ) : (
         <div className="space-y-4">
           {activities.map((activity, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg p-4">
+            <div key={index} className="border ds-border-subtle rounded-lg p-4">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-900">Activity {index + 1}</h3>
+                <h3 className="font-semibold ds-text-primary">Activity {index + 1}</h3>
                 <button
                   type="button"
                   onClick={() => handleRemove(index)}
@@ -168,13 +168,13 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Activity Type <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={activity.activityType || ''}
                     onChange={(e) => handleActivityUpdate(index, 'activityType', e.target.value)}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Type</option>
                     {getAvailableActivityTypes().map((type) => (
@@ -186,26 +186,26 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Activity Date <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="date"
                     value={activity.activityDate ? new Date(activity.activityDate).toISOString().split('T')[0] : ''}
                     onChange={(e) => handleActivityUpdate(index, 'activityDate', e.target.value)}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 {phases.length > 0 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium ds-text-secondary mb-1">
                       Phase (Optional)
                     </label>
                     <select
                       value={activity.phaseId || ''}
                       onChange={(e) => handleActivityUpdate(index, 'phaseId', e.target.value)}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">No Phase</option>
                       {phases.map((phase) => (
@@ -219,13 +219,13 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
 
                 {floors.length > 0 && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium ds-text-secondary mb-1">
                       Floor (Optional)
                     </label>
                     <select
                       value={activity.floorId || ''}
                       onChange={(e) => handleActivityUpdate(index, 'floorId', e.target.value)}
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       <option value="">No Floor</option>
                       {floors.map((floor) => (
@@ -240,13 +240,13 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                 {activity.activityType === 'site_visit' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium ds-text-secondary mb-1">
                         Visit Purpose
                       </label>
                       <select
                         value={activity.visitPurpose || ''}
                         onChange={(e) => handleActivityUpdate(index, 'visitPurpose', e.target.value)}
-                        className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">Select Purpose</option>
                         {VISIT_PURPOSES.map((purpose) => (
@@ -257,7 +257,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium ds-text-secondary mb-1">
                         Duration (Hours)
                       </label>
                       <input
@@ -267,7 +267,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                         placeholder="0.0"
                         min="0"
                         step="0.5"
-                        className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
                   </>
@@ -276,13 +276,13 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                 {activity.activityType === 'inspection' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium ds-text-secondary mb-1">
                         Inspection Type
                       </label>
                       <select
                         value={activity.inspectionType || ''}
                         onChange={(e) => handleActivityUpdate(index, 'inspectionType', e.target.value)}
-                        className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">Select Type</option>
                         {INSPECTION_TYPES.map((type) => (
@@ -293,13 +293,13 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium ds-text-secondary mb-1">
                         Compliance Status
                       </label>
                       <select
                         value={activity.complianceStatus || ''}
                         onChange={(e) => handleActivityUpdate(index, 'complianceStatus', e.target.value)}
-                        className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
                         <option value="">Select Status</option>
                         {COMPLIANCE_STATUSES.map((status) => (
@@ -313,7 +313,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                 )}
 
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">
                     Notes
                   </label>
                   <textarea
@@ -321,7 +321,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                     onChange={(e) => handleActivityUpdate(index, 'notes', e.target.value)}
                     placeholder="Activity notes..."
                     rows={2}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>

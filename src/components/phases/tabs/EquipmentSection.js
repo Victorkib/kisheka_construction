@@ -70,10 +70,10 @@ export function EquipmentSection({ phase, formatCurrency }) {
     const colors = {
       'assigned': 'bg-blue-100 text-blue-800',
       'in_use': 'bg-green-100 text-green-800',
-      'returned': 'bg-gray-100 text-gray-800',
+      'returned': 'ds-bg-surface-muted ds-text-primary',
       'maintenance': 'bg-yellow-100 text-yellow-800'
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const formatDate = (date) => {
@@ -86,9 +86,9 @@ export function EquipmentSection({ phase, formatCurrency }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="ds-bg-surface rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Equipment</h3>
+        <h3 className="text-lg font-semibold ds-text-primary">Equipment</h3>
         <Link
           href={`/equipment/new?projectId=${phase.projectId}&phaseId=${phase._id}`}
           className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -99,11 +99,11 @@ export function EquipmentSection({ phase, formatCurrency }) {
 
       {loading ? (
         <div className="text-center py-8">
-          <p className="text-gray-500">Loading equipment...</p>
+          <p className="ds-text-muted">Loading equipment...</p>
         </div>
       ) : stats && stats.total === 0 ? (
         <div className="text-center py-8">
-          <p className="text-gray-500 mb-4">No equipment assigned to this phase</p>
+          <p className="ds-text-muted mb-4">No equipment assigned to this phase</p>
           <Link
             href={`/equipment/new?projectId=${phase.projectId}&phaseId=${phase._id}`}
             className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -115,25 +115,25 @@ export function EquipmentSection({ phase, formatCurrency }) {
         <>
           {/* Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600">Total Equipment</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{stats?.total || 0}</p>
+            <div className="border ds-border-subtle rounded-lg p-4">
+              <p className="text-sm ds-text-secondary">Total Equipment</p>
+              <p className="text-2xl font-bold ds-text-primary mt-1">{stats?.total || 0}</p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600">Total Cost</p>
+            <div className="border ds-border-subtle rounded-lg p-4">
+              <p className="text-sm ds-text-secondary">Total Cost</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">
                 {formatCurrency(stats?.totalCost || 0)}
               </p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600">In Use</p>
+            <div className="border ds-border-subtle rounded-lg p-4">
+              <p className="text-sm ds-text-secondary">In Use</p>
               <p className="text-2xl font-bold text-green-600 mt-1">
                 {stats?.byStatus?.in_use || 0}
               </p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-4">
-              <p className="text-sm text-gray-600">Avg Utilization</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+            <div className="border ds-border-subtle rounded-lg p-4">
+              <p className="text-sm ds-text-secondary">Avg Utilization</p>
+              <p className="text-2xl font-bold ds-text-primary mt-1">
                 {stats?.averageUtilization?.toFixed(1) || 0}%
               </p>
             </div>
@@ -144,14 +144,14 @@ export function EquipmentSection({ phase, formatCurrency }) {
             {equipment.slice(0, 5).map((eq) => (
               <div
                 key={eq._id}
-                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                className="border ds-border-subtle rounded-lg p-4 hover:ds-bg-surface-muted transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <Link
                         href={`/equipment/${eq._id}`}
-                        className="font-semibold text-gray-900 hover:text-blue-600"
+                        className="font-semibold ds-text-primary hover:text-blue-600"
                       >
                         {eq.equipmentName}
                       </Link>
@@ -159,7 +159,7 @@ export function EquipmentSection({ phase, formatCurrency }) {
                         {eq.status?.replace('_', ' ').toUpperCase() || 'UNKNOWN'}
                       </span>
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-600">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm ds-text-secondary">
                       <div>
                         <span className="font-medium">Type:</span> {eq.equipmentType?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Other'}
                       </div>
@@ -174,7 +174,7 @@ export function EquipmentSection({ phase, formatCurrency }) {
                       </div>
                     </div>
                     {eq.startDate && (
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-2 text-xs ds-text-muted">
                         Period: {formatDate(eq.startDate)} - {eq.endDate ? formatDate(eq.endDate) : 'Ongoing'}
                       </div>
                     )}

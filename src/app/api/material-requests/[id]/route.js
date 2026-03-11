@@ -226,25 +226,69 @@ export async function PATCH(request, { params }) {
 
     // Phase Budget Validation: Check if updated estimated cost fits within phase material budget
     const phaseId = existingRequest.phaseId;
-    const newEstimatedCost = updateData.estimatedCost !== undefined ? updateData.estimatedCost : existingRequest.estimatedCost;
-    
+    const newEstimatedCost =
+      updateData.estimatedCost !== undefined
+        ? updateData.estimatedCost
+        : existingRequest.estimatedCost;
+
     if (phaseId && newEstimatedCost && newEstimatedCost > 0) {
       const { validatePhaseMaterialBudget } = await import('@/lib/phase-helpers');
-      const budgetValidation = await validatePhaseMaterialBudget(phaseId.toString(), newEstimatedCost, id);
-      
+      const budgetValidation = await validatePhaseMaterialBudget(
+        phaseId.toString(),
+        newEstimatedCost,
+        id
+      );
+
       // Only block if budget is set AND exceeded
       // If budget is not set (budgetNotSet = true), allow the operation
       if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
         return errorResponse(
           `Phase material budget exceeded. ${budgetValidation.message}. ` +
-          `Phase material budget: ${budgetValidation.materialBudget.toLocaleString()}, ` +
-          `Available: ${budgetValidation.available.toLocaleString()}, ` +
-          `Required: ${budgetValidation.required.toLocaleString()}`,
+            `Phase material budget: ${budgetValidation.materialBudget.toLocaleString()}, ` +
+            `Available: ${budgetValidation.available.toLocaleString()}, ` +
+            `Required: ${budgetValidation.required.toLocaleString()}`,
           400
         );
       }
       // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
       // Spending will still be tracked regardless
+    }
+
+    // Floor Budget Validation (optional, secondary check) – mirror POST behavior
+    // Only validate if floorId is (or remains) set AND estimated cost is positive
+    const effectiveFloorId =
+      updateData.floorId !== undefined ? updateData.floorId : existingRequest.floorId;
+
+    if (effectiveFloorId && newEstimatedCost && newEstimatedCost > 0) {
+      try {
+        const { validateFloorBudget } = await import('@/lib/floor-financial-helpers');
+        const floorBudgetValidation = await validateFloorBudget(
+          effectiveFloorId.toString(),
+          newEstimatedCost,
+          'materials',
+          id
+        );
+
+        // Only block if floor budget is set AND exceeded
+        // If floor budget is not set (budgetNotSet = true), allow the operation
+        if (!floorBudgetValidation.isValid && !floorBudgetValidation.budgetNotSet) {
+          return errorResponse(
+            `Floor material budget exceeded. ${floorBudgetValidation.message}. ` +
+              `Floor budget: ${floorBudgetValidation.floorBudget.toLocaleString()}, ` +
+              `Available: ${floorBudgetValidation.available.toLocaleString()}, ` +
+              `Required: ${floorBudgetValidation.required.toLocaleString()}`,
+            400
+          );
+        }
+        // If floor budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
+        // Spending will still be tracked regardless
+      } catch (floorValidationError) {
+        // Don't block if floor validation fails – log and continue
+        console.error(
+          'Floor budget validation error during material request update (non-blocking):',
+          floorValidationError
+        );
+      }
     }
 
     // Update request

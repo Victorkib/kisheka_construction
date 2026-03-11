@@ -97,22 +97,22 @@ export function BaseModal({
     blue: {
       shadow: 'shadow-blue-500/20',
       glow: 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
-      border: 'border-blue-200/30',
+      border: 'border-blue-400/60/30',
     },
     red: {
       shadow: 'shadow-red-500/20',
       glow: 'shadow-[0_0_30px_rgba(239,68,68,0.3)]',
-      border: 'border-red-200/30',
+      border: 'border-red-400/60/30',
     },
     yellow: {
       shadow: 'shadow-yellow-500/20',
       glow: 'shadow-[0_0_30px_rgba(234,179,8,0.3)]',
-      border: 'border-yellow-200/30',
+      border: 'border-yellow-400/60/30',
     },
     green: {
       shadow: 'shadow-green-500/20',
       glow: 'shadow-[0_0_30px_rgba(34,197,94,0.3)]',
-      border: 'border-green-200/30',
+      border: 'border-green-400/60/30',
     },
     indigo: {
       shadow: 'shadow-indigo-500/20',
@@ -166,7 +166,7 @@ export function BaseModal({
           <div
             className={`
               relative
-              bg-white/80
+              ds-bg-surface/80
               backdrop-blur-xl
               backdrop-saturate-150
               rounded-2xl
@@ -200,7 +200,7 @@ export function BaseModal({
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/50 backdrop-blur-sm hover:bg-white/70 text-gray-500 hover:text-gray-700 transition-all duration-200 border border-white/20 hover:border-white/40"
+                className="absolute top-4 right-4 z-10 p-2 rounded-full ds-bg-surface/50 backdrop-blur-sm hover:ds-bg-surface/70 ds-text-muted hover:ds-text-secondary transition-all duration-200 border ds-border-subtle/20 hover:border-ds-border-subtle/40"
                 aria-label="Close"
               >
                 <svg

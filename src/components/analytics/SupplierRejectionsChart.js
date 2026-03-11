@@ -17,10 +17,10 @@ const SupplierRejectionsChart = ({ suppliers }) => {
     return (
       <Card>
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Supplier Rejections</h3>
-          <div className="flex items-center justify-center h-64 text-gray-500">
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">Supplier Rejections</h3>
+          <div className="flex items-center justify-center h-64 ds-text-muted">
             <div className="text-center">
-              <Users className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+              <Users className="w-12 h-12 mx-auto mb-2 ds-text-muted" />
               <p>No supplier rejection data available</p>
             </div>
           </div>
@@ -81,24 +81,24 @@ const SupplierRejectionsChart = ({ suppliers }) => {
           return (
             <div key={supplier.supplierId} className="flex items-center space-x-3">
               <div className="w-32 flex-shrink-0">
-                <p className="text-sm font-medium text-gray-700 truncate">
+                <p className="text-sm font-medium ds-text-secondary truncate">
                   {supplier.supplierName}
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs ds-text-muted">
                   {supplier.totalOrders} orders
                 </p>
               </div>
               
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-xs text-gray-600">
+                  <span className="text-xs ds-text-secondary">
                     {supplier.rejectionCount} rejections
                   </span>
                   <Badge variant={getBadgeVariant(supplier.rejectionRate)}>
                     {supplier.rejectionRate}%
                   </Badge>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full ds-bg-surface-muted rounded-full h-2">
                   <div
                     className={`bg-${severityColor}-500 h-2 rounded-full transition-all duration-300`}
                     style={{ width: `${percentage}%` }}
@@ -121,14 +121,14 @@ const SupplierRejectionsChart = ({ suppliers }) => {
         return (
           <div
             key={supplier.supplierId}
-            className={`p-4 border-l-4 border-${severityColor}-500 bg-gray-50 rounded-r-lg`}
+            className={`p-4 border-l-4 border-${severityColor}-500 ds-bg-surface-muted rounded-r-lg`}
           >
             <div className="flex items-center justify-between mb-2">
               <div>
-                <h4 className="font-medium text-gray-900">
+                <h4 className="font-medium ds-text-primary">
                   {supplier.supplierName}
                 </h4>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   {supplier.totalOrders} total orders
                 </p>
               </div>
@@ -138,7 +138,7 @@ const SupplierRejectionsChart = ({ suppliers }) => {
                   {supplier.rejectionRate}% rate
                 </Badge>
                 {index < 3 && (
-                  <span className="text-xs font-medium text-gray-500">
+                  <span className="text-xs font-medium ds-text-muted">
                     #{index + 1}
                   </span>
                 )}
@@ -147,20 +147,20 @@ const SupplierRejectionsChart = ({ suppliers }) => {
             
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <p className="text-gray-500">Rejections</p>
-                <p className="font-medium text-gray-900">
+                <p className="ds-text-muted">Rejections</p>
+                <p className="font-medium ds-text-primary">
                   {supplier.rejectionCount}
                 </p>
               </div>
               <div>
-                <p className="text-gray-500">Financial Impact</p>
-                <p className="font-medium text-gray-900">
+                <p className="ds-text-muted">Financial Impact</p>
+                <p className="font-medium ds-text-primary">
                   {formatCurrency(supplier.financialImpact)}
                 </p>
               </div>
               <div>
-                <p className="text-gray-500">Top Reason</p>
-                <p className="font-medium text-gray-900 truncate">
+                <p className="ds-text-muted">Top Reason</p>
+                <p className="font-medium ds-text-primary truncate">
                   {supplier.topReason || 'N/A'}
                 </p>
               </div>
@@ -188,12 +188,12 @@ const SupplierRejectionsChart = ({ suppliers }) => {
     <Card>
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Supplier Rejections</h3>
+          <h3 className="text-lg font-semibold ds-text-primary">Supplier Rejections</h3>
           <div className="flex items-center space-x-2">
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm border ds-border-subtle rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="count">Sort by Count</option>
               <option value="rate">Sort by Rate</option>
@@ -207,7 +207,7 @@ const SupplierRejectionsChart = ({ suppliers }) => {
                 className={`px-2 py-1 text-xs rounded-md transition-colors ${
                   viewType === 'list'
                     ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
                 }`}
               >
                 List
@@ -217,7 +217,7 @@ const SupplierRejectionsChart = ({ suppliers }) => {
                 className={`px-2 py-1 text-xs rounded-md transition-colors ${
                   viewType === 'chart'
                     ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
                 }`}
               >
                 Chart
@@ -227,7 +227,7 @@ const SupplierRejectionsChart = ({ suppliers }) => {
         </div>
         
         <div className="mb-4">
-          <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="flex items-center justify-between text-sm ds-text-secondary">
             <span>Total Suppliers: {suppliers.length}</span>
             <span>Avg Rejection Rate: {
               (suppliers.reduce((sum, s) => sum + s.rejectionRate, 0) / suppliers.length).toFixed(1)
@@ -242,32 +242,32 @@ const SupplierRejectionsChart = ({ suppliers }) => {
         )}
 
         {/* Summary Statistics */}
-        <div className="mt-4 pt-4 border-t border-gray-200">
+        <div className="mt-4 pt-4 border-t ds-border-subtle">
           <div className="grid grid-cols-3 gap-4 text-sm">
             <div className="text-center">
               <div className="flex items-center justify-center mb-1">
                 <AlertTriangle className="w-4 h-4 text-red-500 mr-1" />
-                <span className="font-medium text-gray-900">High Risk</span>
+                <span className="font-medium ds-text-primary">High Risk</span>
               </div>
-              <p className="text-gray-600">
+              <p className="ds-text-secondary">
                 {suppliers.filter(s => s.rejectionRate >= 20).length} suppliers
               </p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-1">
                 <AlertTriangle className="w-4 h-4 text-orange-500 mr-1" />
-                <span className="font-medium text-gray-900">Medium Risk</span>
+                <span className="font-medium ds-text-primary">Medium Risk</span>
               </div>
-              <p className="text-gray-600">
+              <p className="ds-text-secondary">
                 {suppliers.filter(s => s.rejectionRate >= 10 && s.rejectionRate < 20).length} suppliers
               </p>
             </div>
             <div className="text-center">
               <div className="flex items-center justify-center mb-1">
                 <Users className="w-4 h-4 text-green-500 mr-1" />
-                <span className="font-medium text-gray-900">Low Risk</span>
+                <span className="font-medium ds-text-primary">Low Risk</span>
               </div>
-              <p className="text-gray-600">
+              <p className="ds-text-secondary">
                 {suppliers.filter(s => s.rejectionRate < 10).length} suppliers
               </p>
             </div>

@@ -4,7 +4,7 @@
  */
 
 export default function Card({ children, className = '', ...props }) {
-  const classes = `bg-white rounded-lg shadow ${className}`.trim();
+  const classes = `ds-bg-surface rounded-lg shadow border ds-border-subtle ${className}`.trim();
 
   return (
     <div className={classes} {...props}>

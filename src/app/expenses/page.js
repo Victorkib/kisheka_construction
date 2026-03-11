@@ -170,9 +170,9 @@ function ExpensesPageContent() {
       APPROVED: 'bg-green-100 text-green-800',
       REJECTED: 'bg-red-100 text-red-800',
       PAID: 'bg-blue-100 text-blue-800',
-      ARCHIVED: 'bg-gray-100 text-gray-600',
+      ARCHIVED: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const formatCurrency = (amount, currency = 'KES') => {
@@ -213,8 +213,8 @@ function ExpensesPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expenses</h1>
-            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage project expenses</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Expenses</h1>
+            <p className="text-sm sm:text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Track and manage project expenses</p>
           </div>
           <NoProjectsEmptyState
             canCreate={canAccess('create_project')}
@@ -231,13 +231,13 @@ function ExpensesPageContent() {
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expenses</h1>
-            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage project expenses</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Expenses</h1>
+            <p className="text-sm sm:text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Track and manage project expenses</p>
           </div>
           {canAccess('create_expense') && (
             <Link
               href="/expenses/new"
-              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base"
+              className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base"
             >
               + Add Expense
             </Link>
@@ -261,32 +261,32 @@ function ExpensesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 leading-tight text-gray-900">Filters</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 leading-tight ds-text-primary">Filters</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Search</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Search</label>
               <input
                 type="text"
                 placeholder="Search expenses..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               />
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Category</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Category</label>
               <select
                 value={filters.category}
                 onChange={(e) => handleFilterChange('category', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               >
                 <option value="">All Categories</option>
                 {expenseCategories.map((cat) => (
@@ -298,12 +298,12 @@ function ExpensesPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Phase</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Phase</label>
               <select
                 value={filters.phaseId}
                 onChange={(e) => handleFilterChange('phaseId', e.target.value)}
                 disabled={loadingPhases}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:opacity-50"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50"
               >
                 <option value="">All Phases</option>
                 {loadingPhases ? (
@@ -319,11 +319,11 @@ function ExpensesPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Status</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Status</label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               >
                 <option value="">All Statuses</option>
                 <option value="PENDING">Pending</option>
@@ -334,11 +334,11 @@ function ExpensesPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Cost Type</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Cost Type</label>
               <select
                 value={filters.isIndirectCost}
                 onChange={(e) => handleFilterChange('isIndirectCost', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               >
                 <option value="">All Costs</option>
                 <option value="true">Indirect Costs</option>
@@ -347,24 +347,24 @@ function ExpensesPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Vendor</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Vendor</label>
               <input
                 type="text"
                 placeholder="Filter by vendor..."
                 value={filters.vendor}
                 onChange={(e) => handleFilterChange('vendor', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               />
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Start Date</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Start Date</label>
               <div className="relative">
                 <input
                   type="date"
                   value={filters.startDate}
                   onChange={(e) => handleFilterChange('startDate', e.target.value)}
-                  className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer"
+                  className="w-full px-3 pr-12 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted cursor-pointer"
                 />
                 <button
                   type="button"
@@ -376,11 +376,11 @@ function ExpensesPageContent() {
                       input.focus();
                     }
                   }}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:ds-bg-surface-muted rounded-r-lg transition-colors"
                   aria-label="Open date picker"
                   tabIndex={-1}
                 >
-                  <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 ds-text-secondary hover:ds-text-accent-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </button>
@@ -388,13 +388,13 @@ function ExpensesPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">End Date</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">End Date</label>
               <div className="relative">
                 <input
                   type="date"
                   value={filters.endDate}
                   onChange={(e) => handleFilterChange('endDate', e.target.value)}
-                  className="w-full px-3 pr-12 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 cursor-pointer"
+                  className="w-full px-3 pr-12 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted cursor-pointer"
                 />
                 <button
                   type="button"
@@ -406,11 +406,11 @@ function ExpensesPageContent() {
                       input.focus();
                     }
                   }}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-50 rounded-r-lg transition-colors"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:ds-bg-surface-muted rounded-r-lg transition-colors"
                   aria-label="Open date picker"
                   tabIndex={-1}
                 >
-                  <svg className="w-5 h-5 text-gray-600 hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 ds-text-secondary hover:ds-text-accent-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </button>
@@ -421,14 +421,14 @@ function ExpensesPageContent() {
 
         {/* Expenses Table */}
         {loading ? (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
             <LoadingTable rows={10} columns={7} showHeader={true} />
           </div>
         ) : expenses.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="text-6xl mb-4">💸</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No expenses found</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-xl font-semibold ds-text-primary mb-2">No expenses found</h3>
+            <p className="ds-text-secondary mb-6">
               {filters.search || filters.category || filters.status
                 ? 'Try adjusting your filters'
                 : 'Get started by creating your first expense'}
@@ -436,7 +436,7 @@ function ExpensesPageContent() {
             {canAccess('create_expense') && (
               <Link
                 href="/expenses/new"
-                className="inline-block bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation"
+                className="inline-block ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-6 py-2.5 rounded-lg transition-colors touch-manipulation"
               >
                 Create Your First Expense
               </Link>
@@ -445,47 +445,47 @@ function ExpensesPageContent() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+            <div className="hidden md:block ds-bg-surface rounded-lg shadow overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Expense Code
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Description
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Category
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Vendor
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Amount
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Date
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide leading-normal">
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {expenses.map((expense) => (
-                      <tr key={expense._id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-base leading-normal font-medium text-gray-900">
+                      <tr key={expense._id} className="hover:ds-bg-surface-muted">
+                        <td className="px-6 py-4 whitespace-nowrap text-base leading-normal font-medium ds-text-primary">
                           {expense.expenseCode || 'N/A'}
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                        <td className="px-6 py-4 text-sm ds-text-primary max-w-xs truncate">
                           {expense.description}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-base leading-normal text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-base leading-normal ds-text-muted">
                           <div className="flex items-center gap-2">
                             {expense.category?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                             {expense.isIndirectCost && (
@@ -495,13 +495,13 @@ function ExpensesPageContent() {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-base leading-normal text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-base leading-normal ds-text-muted">
                           {expense.vendor || 'N/A'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-base leading-normal font-semibold text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-base leading-normal font-semibold ds-text-primary">
                           {formatCurrency(expense.amount, expense.currency)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-base leading-normal text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-base leading-normal ds-text-muted">
                           {formatDate(expense.date)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
@@ -516,7 +516,7 @@ function ExpensesPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap text-base leading-normal font-medium">
                           <Link
                             href={`/expenses/${expense._id}`}
-                            className="text-blue-600 hover:text-blue-900"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover"
                           >
                             View
                           </Link>
@@ -529,8 +529,8 @@ function ExpensesPageContent() {
 
               {/* Desktop Pagination */}
               {pagination.pages > 1 && (
-                <div className="bg-gray-50 px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-gray-200">
-                  <div className="text-sm text-gray-700 text-center sm:text-left">
+                <div className="ds-bg-surface-muted px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t ds-border-subtle">
+                  <div className="text-sm ds-text-secondary text-center sm:text-left">
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
                     {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} expenses
                   </div>
@@ -538,17 +538,17 @@ function ExpensesPageContent() {
                     <button
                       onClick={() => setPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                       disabled={pagination.page === 1}
-                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
+                      className="px-4 py-2 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors touch-manipulation"
                     >
                       Previous
                     </button>
-                    <span className="px-4 py-2 text-sm text-gray-700 flex items-center">
+                    <span className="px-4 py-2 text-sm ds-text-secondary flex items-center">
                       Page {pagination.page} of {pagination.pages}
                     </span>
                     <button
                       onClick={() => setPagination((prev) => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                       disabled={pagination.page === pagination.pages}
-                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
+                      className="px-4 py-2 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors touch-manipulation"
                     >
                       Next
                     </button>
@@ -562,13 +562,13 @@ function ExpensesPageContent() {
               {expenses.map((expense) => (
                 <div
                   key={expense._id}
-                  className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                  className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle"
                 >
                   {/* Header Row */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <p className="text-base font-semibold text-gray-900 truncate">
+                        <p className="text-base font-semibold ds-text-primary truncate">
                           {expense.expenseCode || 'N/A'}
                         </p>
                         {expense.isIndirectCost && (
@@ -577,7 +577,7 @@ function ExpensesPageContent() {
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-900 line-clamp-2">{expense.description}</p>
+                      <p className="text-sm ds-text-primary line-clamp-2">{expense.description}</p>
                     </div>
                     <span
                       className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ml-2 ${getStatusBadgeColor(
@@ -591,32 +591,32 @@ function ExpensesPageContent() {
                   {/* Details Grid */}
                   <div className="grid grid-cols-2 gap-3 mb-3">
                     <div>
-                      <p className="text-xs text-gray-500 mb-0.5">Amount</p>
-                      <p className="text-sm font-semibold text-gray-900">
+                      <p className="text-xs ds-text-muted mb-0.5">Amount</p>
+                      <p className="text-sm font-semibold ds-text-primary">
                         {formatCurrency(expense.amount, expense.currency)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-0.5">Date</p>
-                      <p className="text-sm text-gray-700">{formatDate(expense.date)}</p>
+                      <p className="text-xs ds-text-muted mb-0.5">Date</p>
+                      <p className="text-sm ds-text-secondary">{formatDate(expense.date)}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-0.5">Category</p>
-                      <p className="text-sm text-gray-700">
+                      <p className="text-xs ds-text-muted mb-0.5">Category</p>
+                      <p className="text-sm ds-text-secondary">
                         {expense.category?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 mb-0.5">Vendor</p>
-                      <p className="text-sm text-gray-700 truncate">{expense.vendor || 'N/A'}</p>
+                      <p className="text-xs ds-text-muted mb-0.5">Vendor</p>
+                      <p className="text-sm ds-text-secondary truncate">{expense.vendor || 'N/A'}</p>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="pt-3 border-t border-gray-200">
+                  <div className="pt-3 border-t ds-border-subtle">
                     <Link
                       href={`/expenses/${expense._id}`}
-                      className="block text-center px-4 py-2.5 bg-blue-50 text-blue-600 text-sm font-medium rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation"
+                      className="block text-center px-4 py-2.5 bg-blue-500/10 ds-text-accent-primary text-sm font-medium rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation border border-blue-400/60"
                     >
                       View Details →
                     </Link>
@@ -626,8 +626,8 @@ function ExpensesPageContent() {
 
               {/* Mobile Pagination */}
               {pagination.pages > 1 && (
-                <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                  <div className="text-sm text-gray-700 text-center mb-3">
+                <div className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
+                  <div className="text-sm ds-text-secondary text-center mb-3">
                     Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
                     {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} expenses
                   </div>
@@ -635,17 +635,17 @@ function ExpensesPageContent() {
                     <button
                       onClick={() => setPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                       disabled={pagination.page === 1}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation font-medium"
+                      className="flex-1 px-4 py-2.5 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors touch-manipulation font-medium"
                     >
                       Previous
                     </button>
-                    <span className="px-4 py-2.5 text-sm text-gray-700 font-medium">
+                    <span className="px-4 py-2.5 text-sm ds-text-secondary font-medium">
                       {pagination.page} / {pagination.pages}
                     </span>
                     <button
                       onClick={() => setPagination((prev) => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                       disabled={pagination.page === pagination.pages}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation font-medium"
+                      className="flex-1 px-4 py-2.5 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors touch-manipulation font-medium"
                     >
                       Next
                     </button>
@@ -667,7 +667,7 @@ export default function ExpensesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading expenses...</p>
+            <p className="mt-4 ds-text-secondary">Loading expenses...</p>
           </div>
         </div>
       </AppLayout>

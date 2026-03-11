@@ -12,14 +12,14 @@ export default function ResetPasswordPage() {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Set New Password</h1>
-        <p className="text-gray-600 mt-2">Enter your new password below</p>
+        <h1 className="text-2xl font-bold ds-text-primary">Set New Password</h1>
+        <p className="ds-text-secondary mt-2">Enter your new password below</p>
       </div>
 
       <ResetPasswordForm />
 
       <div className="text-center">
-        <Link href="/auth/login" className="text-blue-600 hover:underline text-sm">
+        <Link href="/auth/login" className="ds-text-accent-primary hover:underline text-sm">
           Back to login
         </Link>
       </div>

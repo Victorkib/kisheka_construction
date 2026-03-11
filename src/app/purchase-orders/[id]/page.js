@@ -1479,19 +1479,19 @@ function PurchaseOrderDetailPageContent() {
       order_modified: "bg-yellow-100 text-yellow-800",
       ready_for_delivery: "bg-purple-100 text-purple-800",
       delivered: "bg-indigo-100 text-indigo-800",
-      cancelled: "bg-gray-100 text-gray-800",
+      cancelled: "bg-slate-500/10 text-slate-200 border border-slate-400/60",
     }
-    return colors[status] || "bg-gray-100 text-gray-800"
+    return colors[status] || "bg-slate-500/10 text-slate-200 border border-slate-400/60"
   }
 
   const getFinancialStatusBadgeColor = (financialStatus) => {
     const colors = {
-      not_committed: "bg-gray-100 text-gray-800",
+      not_committed: "bg-slate-500/10 text-slate-200 border border-slate-400/60",
       committed: "bg-orange-100 text-orange-800",
       fulfilled: "bg-green-100 text-green-800",
       cancelled: "bg-red-100 text-red-800",
     }
-    return colors[financialStatus] || "bg-gray-100 text-gray-800"
+    return colors[financialStatus] || "bg-slate-500/10 text-slate-200 border border-slate-400/60"
   }
 
   const formatDate = (date) => {
@@ -1528,10 +1528,10 @@ function PurchaseOrderDetailPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg text-sm sm:text-base">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg text-sm sm:text-base">
             {error || "Purchase order not found"}
           </div>
-          <Link href="/purchase-orders" className="mt-4 inline-block text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/purchase-orders" className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Purchase Orders
           </Link>
         </div>
@@ -1598,13 +1598,13 @@ function PurchaseOrderDetailPageContent() {
         />
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/purchase-orders" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/purchase-orders" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Purchase Orders
           </Link>
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">
                   {order.purchaseOrderNumber}
                 </h1>
                 <span
@@ -1613,12 +1613,12 @@ function PurchaseOrderDetailPageContent() {
                   {order.status?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "Unknown"}
                 </span>
                 <span
-                  className={`inline-flex px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ${getFinancialStatusBadgeColor(order.financialStatus)}`}
+                  className={`inline-flex px-2 sm:px-3 py-1 text-xs sm:text-sm font-semibold rounded-full ds-bg-surface-muted ds-text-secondary ${getFinancialStatusBadgeColor(order.financialStatus)}`}
                 >
                   {order.financialStatus?.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()) || "N/A"}
                 </span>
               </div>
-              <p className="text-sm sm:text-base text-gray-700 mt-2 break-words">{order.materialName}</p>
+              <p className="text-sm sm:text-base ds-text-secondary mt-2 break-words">{order.materialName}</p>
             </div>
             <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
               {canAccept && (
@@ -1687,7 +1687,7 @@ function PurchaseOrderDetailPageContent() {
         {order && <EnhancedOrderStatus order={order} canManage={canEdit} onRefresh={() => fetchOrder()} />}
 
         {/* Workflow Status Section */}
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-lg p-4 sm:p-6 shadow-md mb-6">
+        <div className="ds-bg-accent-subtle border-2 ds-border-accent-subtle rounded-lg p-4 sm:p-6 shadow-md mb-6">
           <h3 className="text-base sm:text-lg font-semibold text-blue-900 mb-2">📋 Workflow Status & Next Steps</h3>
           {order.status === "order_sent" && (
             <div className="text-sm text-blue-800">
@@ -1701,7 +1701,7 @@ function PurchaseOrderDetailPageContent() {
             </div>
           )}
           {order.status === "order_accepted" && (
-            <div className="text-sm text-green-800 bg-green-50 border-green-200 rounded p-3">
+            <div className="text-sm text-green-800 bg-green-50 border-green-400/60 rounded p-3">
               <p className="mb-2">
                 <strong>Current Status:</strong> Supplier has accepted the purchase order. Cost is now committed.
               </p>
@@ -1719,7 +1719,7 @@ function PurchaseOrderDetailPageContent() {
             </div>
           )}
           {order.status === "order_rejected" && (
-            <div className="text-sm text-red-800 bg-red-50 border-red-200 rounded p-3">
+            <div className="text-sm text-red-800 bg-red-50 border-red-400/60 rounded p-3">
               <p className="mb-2">
                 <strong>Current Status:</strong> Supplier has rejected the purchase order.
               </p>
@@ -1752,7 +1752,7 @@ function PurchaseOrderDetailPageContent() {
                 {order.isRetryable && (order.retryCount || 0) < 3 && canEdit && (
                   <button
                     onClick={() => setShowRetryModal(true)}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2"
+                    className="ds-bg-accent-primary text-white px-4 py-2 rounded hover:bg-blue-700 mr-2"
                   >
                     Retry with Same Supplier
                   </button>
@@ -1776,7 +1776,7 @@ function PurchaseOrderDetailPageContent() {
             </div>
           )}
           {order.status === "order_modified" && (
-            <div className="text-sm text-yellow-800 bg-yellow-50 border-yellow-200 rounded p-3">
+            <div className="text-sm text-yellow-800 bg-yellow-50 border-yellow-400/60 rounded p-3">
               <p className="mb-2">
                 <strong>Current Status:</strong> Supplier has proposed modifications to the purchase order.
               </p>
@@ -1787,7 +1787,7 @@ function PurchaseOrderDetailPageContent() {
             </div>
           )}
           {order.status === "ready_for_delivery" && !order.linkedMaterialId && (
-            <div className="text-sm text-purple-800 bg-purple-50 border-purple-200 rounded p-3">
+            <div className="text-sm text-purple-800 bg-purple-50 ds-border-accent-subtle/60 rounded p-3">
               <p className="mb-2">
                 <strong>Current Status:</strong> Supplier has fulfilled the order and uploaded delivery note. Material
                 entry has been automatically created.
@@ -1807,7 +1807,7 @@ function PurchaseOrderDetailPageContent() {
             </div>
           )}
           {order.status === "ready_for_delivery" && order.linkedMaterialId && (
-            <div className="text-sm text-purple-800 bg-purple-50 border-purple-200 rounded p-3">
+            <div className="text-sm text-purple-800 bg-purple-50 ds-border-accent-subtle/60 rounded p-3">
               <p className="mb-2">
                 <strong>Current Status:</strong> Supplier has fulfilled the order. Material entry has been created.
               </p>
@@ -1823,7 +1823,7 @@ function PurchaseOrderDetailPageContent() {
             </div>
           )}
           {order.status === "delivered" && (
-            <div className="text-sm text-green-800 bg-green-50 border-green-200 rounded p-3">
+            <div className="text-sm text-green-800 bg-green-50 border-green-400/60 rounded p-3">
               <p className="mb-2">
                 <strong>Current Status:</strong> Delivery has been confirmed. Materials have been created.
               </p>
@@ -1831,7 +1831,7 @@ function PurchaseOrderDetailPageContent() {
                 <p className="mb-2">
                   <strong>Confirmed By:</strong> {order.deliveryConfirmedBy === user?._id ? 'You' : 'Owner/PM'}
                   {order.deliveryConfirmedAt && (
-                    <span className="text-xs text-gray-600 ml-2">
+                    <span className="text-xs ds-text-secondary ml-2">
                       on {new Date(order.deliveryConfirmedAt).toLocaleDateString()}
                     </span>
                   )}
@@ -1858,7 +1858,7 @@ function PurchaseOrderDetailPageContent() {
                       </Link>
                     ))}
                     {linkedMaterials.length > 3 && (
-                      <span className="text-sm text-gray-600">and {linkedMaterials.length - 3} more</span>
+                      <span className="text-sm ds-text-secondary">and {linkedMaterials.length - 3} more</span>
                     )}
                   </div>
                 </div>
@@ -1879,7 +1879,7 @@ function PurchaseOrderDetailPageContent() {
             </div>
           )}
           {order.status === "cancelled" && (
-            <div className="text-sm text-gray-800 bg-gray-50 border-gray-200 rounded p-3">
+            <div className="text-sm ds-text-primary ds-bg-surface-muted ds-border-subtle rounded p-3">
               <p className="mb-2">
                 <strong>Current Status:</strong> Purchase order has been cancelled.
               </p>
@@ -1896,7 +1896,7 @@ function PurchaseOrderDetailPageContent() {
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Batch Information (for bulk orders) */}
             {order.batch && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6 mb-6">
+              <div className="bg-blue-50 border ds-border-accent-subtle rounded-lg p-4 sm:p-6 mb-6">
                 <h2 className="text-base sm:text-lg font-semibold text-blue-900 mb-2">Batch Information</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
@@ -1918,7 +1918,7 @@ function PurchaseOrderDetailPageContent() {
                     <div className="sm:col-span-2">
                       <Link
                         href={`/material-requests/bulk/${order.batch._id}`}
-                        className="text-blue-600 hover:text-blue-800 active:text-blue-900 text-sm font-medium transition-colors touch-manipulation"
+                        className="ds-text-accent-primary ds-bg-surface-muted p hover:ds-text-accent-hover active:ds-text-accent-hover text-sm font-medium transition-colors touch-manipulation"
                       >
                         View Batch Details →
                       </Link>
@@ -1929,50 +1929,50 @@ function PurchaseOrderDetailPageContent() {
             )}
 
             {/* Order Details */}
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Order Details</h2>
+            <div className="ds-bg-surface rounded-lg shadow border ds-border-subtle p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Order Details</h2>
 
               {/* Bulk Order - Show Materials Table */}
               {order.isBulkOrder && order.materials && Array.isArray(order.materials) && order.materials.length > 0 ? (
                 <div className="mb-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Materials in this Order</h3>
+                  <h3 className="text-lg font-semibold ds-text-primary mb-4">Materials in this Order</h3>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y ds-border-subtle">
+                      <thead className="ds-bg-surface-muted">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Material</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantity</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Cost</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Material</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Quantity</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">Unit Cost</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                             Total Cost
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                         {order.materials.map((material, index) => (
                           <tr key={index}>
-                            <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                            <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                               {material.materialName}
                               {material.description && (
-                                <div className="text-xs text-gray-500 mt-1">{material.description}</div>
+                                <div className="text-xs ds-text-muted mt-1">{material.description}</div>
                               )}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600">
+                            <td className="px-4 py-3 text-sm ds-text-secondary">
                               {material.quantity} {material.unit}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600">{formatCurrency(material.unitCost)}</td>
-                            <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                            <td className="px-4 py-3 text-sm ds-text-secondary">{formatCurrency(material.unitCost)}</td>
+                            <td className="px-4 py-3 text-sm font-semibold ds-text-primary">
                               {formatCurrency(material.totalCost)}
                             </td>
                           </tr>
                         ))}
                       </tbody>
-                      <tfoot className="bg-gray-50">
+                      <tfoot className="ds-bg-surface-muted">
                         <tr>
-                          <td colSpan="3" className="px-4 py-3 text-sm font-semibold text-gray-900 text-right">
+                          <td colSpan="3" className="px-4 py-3 text-sm font-semibold ds-text-primary text-right">
                             Total:
                           </td>
-                          <td className="px-4 py-3 text-sm font-bold text-gray-900">
+                          <td className="px-4 py-3 text-sm font-bold ds-text-primary">
                             {formatCurrency(order.totalCost)}
                           </td>
                         </tr>
@@ -1984,48 +1984,48 @@ function PurchaseOrderDetailPageContent() {
                 /* Single Order - Show Standard Details */
                 <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Material Name</dt>
-                    <dd className="mt-1 text-base text-gray-900">{order.materialName}</dd>
+                    <dt className="text-sm font-semibold ds-text-secondary">Material Name</dt>
+                    <dd className="mt-1 text-base ds-text-primary">{order.materialName}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Quantity Ordered</dt>
-                    <dd className="mt-1 text-base text-gray-900">
+                    <dt className="text-sm font-semibold ds-text-secondary">Quantity Ordered</dt>
+                    <dd className="mt-1 text-base ds-text-primary">
                       {order.quantityOrdered} {order.unit}
                     </dd>
                   </div>
                   {order.description && (
                     <div className="md:col-span-2">
-                      <dt className="text-sm font-semibold text-gray-700">Description</dt>
-                      <dd className="mt-1 text-base text-gray-900">{order.description}</dd>
+                      <dt className="text-sm font-semibold ds-text-secondary">Description</dt>
+                      <dd className="mt-1 text-base ds-text-primary">{order.description}</dd>
                     </div>
                   )}
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Unit Cost</dt>
-                    <dd className="mt-1 text-base text-gray-900">{formatCurrency(order.unitCost)}</dd>
+                    <dt className="text-sm font-semibold ds-text-secondary">Unit Cost</dt>
+                    <dd className="mt-1 text-base ds-text-primary">{formatCurrency(order.unitCost)}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-semibold text-gray-500">Total Cost</dt>
-                    <dd className="mt-1 text-base font-semibold text-gray-900">{formatCurrency(order.totalCost)}</dd>
+                    <dt className="text-sm font-semibold ds-text-muted">Total Cost</dt>
+                    <dd className="mt-1 text-base font-semibold ds-text-primary">{formatCurrency(order.totalCost)}</dd>
                   </div>
                 </dl>
               )}
 
-              <div className="mt-6 pt-6 border-t border-gray-200">
+              <div className="mt-6 pt-6 border-t ds-border-subtle">
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Delivery Date</dt>
-                    <dd className="mt-1 text-sm sm:text-base text-gray-900">{formatDate(order.deliveryDate)}</dd>
+                    <dt className="text-sm font-semibold ds-text-secondary">Delivery Date</dt>
+                    <dd className="mt-1 text-sm sm:text-base ds-text-primary">{formatDate(order.deliveryDate)}</dd>
                   </div>
                   {order.terms && (
                     <div className="sm:col-span-2">
-                      <dt className="text-sm font-semibold text-gray-700">Payment Terms</dt>
-                      <dd className="mt-1 text-sm sm:text-base text-gray-900 break-words">{order.terms}</dd>
+                      <dt className="text-sm font-semibold ds-text-secondary">Payment Terms</dt>
+                      <dd className="mt-1 text-sm sm:text-base ds-text-primary break-words">{order.terms}</dd>
                     </div>
                   )}
                   {order.notes && (
                     <div className="sm:col-span-2">
-                      <dt className="text-sm font-semibold text-gray-700">Notes</dt>
-                      <dd className="mt-1 text-sm sm:text-base text-gray-900 break-words">{order.notes}</dd>
+                      <dt className="text-sm font-semibold ds-text-secondary">Notes</dt>
+                      <dd className="mt-1 text-sm sm:text-base ds-text-primary break-words">{order.notes}</dd>
                     </div>
                   )}
                 </dl>
@@ -2034,15 +2034,15 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Financial Information */}
             {(order.totalCost || availableCapital !== null) && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Financial Information</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Financial Information</h2>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Total Cost</dt>
-                    <dd className="mt-1 text-base font-semibold text-gray-900">{formatCurrency(order.totalCost)}</dd>
+                    <dt className="text-sm font-semibold ds-text-secondary">Total Cost</dt>
+                    <dd className="mt-1 text-base font-semibold ds-text-primary">{formatCurrency(order.totalCost)}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Financial Status</dt>
+                    <dt className="text-sm font-semibold ds-text-secondary">Financial Status</dt>
                     <dd className="mt-1">
                       <span
                         className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getFinancialStatusBadgeColor(order.financialStatus)}`}
@@ -2054,14 +2054,14 @@ function PurchaseOrderDetailPageContent() {
                   {availableCapital !== null && canAccess("view_financing") && (
                     <>
                       <div>
-                        <dt className="text-sm font-semibold text-gray-700">Available Capital</dt>
-                        <dd className="mt-1 text-base text-gray-900">{formatCurrency(availableCapital)}</dd>
+                        <dt className="text-sm font-semibold ds-text-secondary">Available Capital</dt>
+                        <dd className="mt-1 text-base ds-text-primary">{formatCurrency(availableCapital)}</dd>
                       </div>
                       <div>
-                        <dt className="text-sm font-semibold text-gray-700">Remaining After This Order</dt>
+                        <dt className="text-sm font-semibold ds-text-secondary">Remaining After This Order</dt>
                         <dd
                           className={`mt-1 text-base font-semibold ${
-                            availableCapital - order.totalCost < 0 ? "text-red-600" : "text-gray-900"
+                            availableCapital - order.totalCost < 0 ? "text-red-600" : "ds-text-primary"
                           }`}
                         >
                           {formatCurrency(availableCapital - order.totalCost)}
@@ -2080,7 +2080,7 @@ function PurchaseOrderDetailPageContent() {
                   )}
                 </dl>
                 {order.totalCost && availableCapital !== null && order.totalCost > availableCapital && (
-                  <div className="mt-4 p-3 sm:p-4 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="mt-4 p-3 sm:p-4 bg-red-50 border border-red-400/60 rounded-lg">
                     <p className="text-xs sm:text-sm font-semibold text-red-800 break-words">
                       ⚠️ Warning: Total cost ({formatCurrency(order.totalCost)}) exceeds available capital (
                       {formatCurrency(availableCapital)}) by {formatCurrency(order.totalCost - availableCapital)}
@@ -2088,12 +2088,12 @@ function PurchaseOrderDetailPageContent() {
                   </div>
                 )}
                 {projectFinances && projectFinances.materialsBreakdown && (
-                  <div className="mt-4 pt-4 border-t border-gray-200">
-                    <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2">Materials Budget Context</h3>
+                  <div className="mt-4 pt-4 border-t ds-border-subtle">
+                    <h3 className="text-xs sm:text-sm font-semibold ds-text-secondary mb-2">Materials Budget Context</h3>
                     <dl className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                       <div>
-                        <dt className="text-gray-700">Budget</dt>
-                        <dd className="font-semibold text-gray-900">
+                        <dt className="ds-text-secondary">Budget</dt>
+                        <dd className="font-semibold ds-text-primary">
                           {formatCurrency(projectFinances.materialsBreakdown.budget || 0)}
                         </dd>
                       </div>
@@ -2122,16 +2122,16 @@ function PurchaseOrderDetailPageContent() {
             )}
 
             {/* Supplier Information */}
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Supplier Information</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Supplier Information</h2>
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Supplier Name</dt>
-                  <dd className="mt-1 text-base text-gray-900">{order.supplierName || "N/A"}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Supplier Name</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{order.supplierName || "N/A"}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Supplier Email</dt>
-                  <dd className="mt-1 text-base text-gray-900">{order.supplierEmail || "N/A"}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Supplier Email</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{order.supplierEmail || "N/A"}</dd>
                 </div>
               </dl>
             </div>
@@ -2145,21 +2145,21 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Supplier Response */}
             {order.supplierResponse && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4">Supplier Response</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4">Supplier Response</h2>
                 <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Response</dt>
-                    <dd className="mt-1 text-base text-gray-900 capitalize">{order.supplierResponse}</dd>
+                    <dt className="text-sm font-semibold ds-text-secondary">Response</dt>
+                    <dd className="mt-1 text-base ds-text-primary capitalize">{order.supplierResponse}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Response Date</dt>
-                    <dd className="mt-1 text-base text-gray-900">{formatDate(order.supplierResponseDate)}</dd>
+                    <dt className="text-sm font-semibold ds-text-secondary">Response Date</dt>
+                    <dd className="mt-1 text-base ds-text-primary">{formatDate(order.supplierResponseDate)}</dd>
                   </div>
                   {order.supplierNotes && (
                     <div className="md:col-span-2">
-                      <dt className="text-sm font-semibold text-gray-700">Supplier Notes</dt>
-                      <dd className="mt-1 text-base text-gray-900">{order.supplierNotes}</dd>
+                      <dt className="text-sm font-semibold ds-text-secondary">Supplier Notes</dt>
+                      <dd className="mt-1 text-base ds-text-primary">{order.supplierNotes}</dd>
                     </div>
                   )}
                 </dl>
@@ -2168,7 +2168,7 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Supplier Modifications */}
             {order.supplierModifications && order.modificationApproved === undefined && (
-              <div className="bg-white rounded-lg shadow p-6 border-l-4 border-yellow-500">
+              <div className="ds-bg-surface rounded-lg shadow p-6 border-l-4 border-yellow-500">
                 <div className="flex justify-between items-start mb-4">
                   <h2 className="text-xl font-bold text-yellow-900">Proposed Modifications</h2>
                   {canEdit && (
@@ -2191,25 +2191,25 @@ function PurchaseOrderDetailPageContent() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   {/* Original Values */}
                   <div className="md:col-span-2">
-                    <h3 className="text-sm font-semibold text-gray-700 mb-2">Original Values</h3>
+                    <h3 className="text-sm font-semibold ds-text-secondary mb-2">Original Values</h3>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       <div>
-                        <dt className="text-gray-600">Quantity</dt>
-                        <dd className="text-gray-900 font-medium">
+                        <dt className="ds-text-secondary">Quantity</dt>
+                        <dd className="ds-text-primary font-medium">
                           {order.quantityOrdered} {order.unit}
                         </dd>
                       </div>
                       <div>
-                        <dt className="text-gray-600">Unit Cost</dt>
-                        <dd className="text-gray-900 font-medium">{formatCurrency(order.unitCost)}</dd>
+                        <dt className="ds-text-secondary">Unit Cost</dt>
+                        <dd className="ds-text-primary font-medium">{formatCurrency(order.unitCost)}</dd>
                       </div>
                       <div>
-                        <dt className="text-gray-600">Total Cost</dt>
-                        <dd className="text-gray-900 font-medium">{formatCurrency(order.totalCost)}</dd>
+                        <dt className="ds-text-secondary">Total Cost</dt>
+                        <dd className="ds-text-primary font-medium">{formatCurrency(order.totalCost)}</dd>
                       </div>
                       <div>
-                        <dt className="text-gray-600">Delivery Date</dt>
-                        <dd className="text-gray-900 font-medium">{formatDate(order.deliveryDate)}</dd>
+                        <dt className="ds-text-secondary">Delivery Date</dt>
+                        <dd className="ds-text-primary font-medium">{formatDate(order.deliveryDate)}</dd>
                       </div>
                     </div>
                   </div>
@@ -2219,7 +2219,7 @@ function PurchaseOrderDetailPageContent() {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                       {order.supplierModifications.quantityOrdered !== undefined && (
                         <div>
-                          <dt className="text-gray-600">Quantity</dt>
+                          <dt className="ds-text-secondary">Quantity</dt>
                           <dd className="text-yellow-900 font-medium">
                             {order.supplierModifications.quantityOrdered} {order.unit}
                             {order.supplierModifications.quantityOrdered !== order.quantityOrdered && (
@@ -2244,7 +2244,7 @@ function PurchaseOrderDetailPageContent() {
                       )}
                       {order.supplierModifications.unitCost !== undefined && (
                         <div>
-                          <dt className="text-gray-600">Unit Cost</dt>
+                          <dt className="ds-text-secondary">Unit Cost</dt>
                           <dd className="text-yellow-900 font-medium">
                             {formatCurrency(order.supplierModifications.unitCost)}
                             {order.supplierModifications.unitCost !== order.unitCost && (
@@ -2268,7 +2268,7 @@ function PurchaseOrderDetailPageContent() {
                       {order.supplierModifications.unitCost !== undefined ||
                       order.supplierModifications.quantityOrdered !== undefined ? (
                         <div>
-                          <dt className="text-gray-600">New Total</dt>
+                          <dt className="ds-text-secondary">New Total</dt>
                           <dd className="text-yellow-900 font-medium">
                             {formatCurrency(
                               (order.supplierModifications.quantityOrdered || order.quantityOrdered) *
@@ -2280,13 +2280,13 @@ function PurchaseOrderDetailPageContent() {
                         </div>
                       ) : (
                         <div>
-                          <dt className="text-gray-600">Total Cost</dt>
+                          <dt className="ds-text-secondary">Total Cost</dt>
                           <dd className="text-yellow-900 font-medium">{formatCurrency(order.totalCost)}</dd>
                         </div>
                       )}
                       {order.supplierModifications.deliveryDate && (
                         <div>
-                          <dt className="text-gray-600">Delivery Date</dt>
+                          <dt className="ds-text-secondary">Delivery Date</dt>
                           <dd className="text-yellow-900 font-medium">
                             {formatDate(order.supplierModifications.deliveryDate)}
                             {new Date(order.supplierModifications.deliveryDate).getTime() !==
@@ -2312,8 +2312,8 @@ function PurchaseOrderDetailPageContent() {
                   </div>
                   {order.supplierModifications.notes && (
                     <div className="md:col-span-2">
-                      <dt className="text-sm font-semibold text-gray-700">Modification Notes</dt>
-                      <dd className="mt-1 text-base text-gray-900">{order.supplierModifications.notes}</dd>
+                      <dt className="text-sm font-semibold ds-text-secondary">Modification Notes</dt>
+                      <dd className="mt-1 text-base ds-text-primary">{order.supplierModifications.notes}</dd>
                     </div>
                   )}
                 </div>
@@ -2322,19 +2322,19 @@ function PurchaseOrderDetailPageContent() {
             {/* Modification Approval Status */}
             {order.modificationApproved !== undefined && (
               <div
-                className={`bg-white rounded-lg shadow p-6 border-l-4 ${
+                className={`ds-bg-surface rounded-lg shadow p-6 border-l-4 ${
                   order.modificationApproved ? "border-green-500" : "border-red-500"
                 }`}
               >
                 <h2 className="text-xl font-bold mb-2">
                   {order.modificationApproved ? "Modifications Approved" : "Modifications Rejected"}
                 </h2>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   {order.modificationApprovedAt && `On ${formatDate(order.modificationApprovedAt)}`}
                   {order.modificationApprovedBy && ` by ${order.modificationApprovedByName || "PM/OWNER"}`}
                 </p>
                 {order.modificationApprovalNotes && (
-                  <p className="mt-2 text-sm text-gray-700">{order.modificationApprovalNotes}</p>
+                  <p className="mt-2 text-sm ds-text-secondary">{order.modificationApprovalNotes}</p>
                 )}
                 {order.modificationRejectionReason && (
                   <p className="mt-2 text-sm text-red-700">{order.modificationRejectionReason}</p>
@@ -2344,16 +2344,16 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Delivery Note */}
             {order.deliveryNoteFileUrl && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Delivery Note</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-xl font-bold ds-text-primary mb-4">Delivery Note</h2>
                 <ImagePreview imageUrl={order.deliveryNoteFileUrl} alt="Delivery Note" />
               </div>
             )}
 
             {/* Linked Material Requests */}
             {materialRequests.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-xl font-bold ds-text-primary mb-4">
                   {materialRequests.length > 1 ? "Linked Material Requests" : "Linked Material Request"}
                 </h2>
                 {materialRequests.length > 1 ? (
@@ -2361,15 +2361,15 @@ function PurchaseOrderDetailPageContent() {
                     {materialRequests.map((request) => (
                       <div
                         key={request._id}
-                        className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0"
+                        className="flex items-center justify-between py-2 border-b ds-border-subtle last:border-0"
                       >
                         <div>
-                          <p className="text-base font-semibold text-gray-900">{request.requestNumber}</p>
-                          <p className="text-sm text-gray-700 mt-1">{request.materialName}</p>
+                          <p className="text-base font-semibold ds-text-primary">{request.requestNumber}</p>
+                          <p className="text-sm ds-text-secondary mt-1">{request.materialName}</p>
                         </div>
                         <Link
                           href={`/material-requests/${request._id}`}
-                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover font-medium text-sm"
                         >
                           View →
                         </Link>
@@ -2379,12 +2379,12 @@ function PurchaseOrderDetailPageContent() {
                 ) : (
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-base font-semibold text-gray-900">{materialRequests[0].requestNumber}</p>
-                      <p className="text-sm text-gray-700 mt-1">{materialRequests[0].materialName}</p>
+                      <p className="text-base font-semibold ds-text-primary">{materialRequests[0].requestNumber}</p>
+                      <p className="text-sm ds-text-secondary mt-1">{materialRequests[0].materialName}</p>
                     </div>
                     <Link
                       href={`/material-requests/${materialRequests[0]._id}`}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                      className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                     >
                       View Request →
                     </Link>
@@ -2395,8 +2395,8 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Linked Material Entries */}
             {linkedMaterials.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-xl font-bold ds-text-primary mb-4">
                   {linkedMaterials.length > 1 ? "Linked Material Entries" : "Linked Material Entry"}
                 </h2>
                 {linkedMaterials.length > 1 ? (
@@ -2404,13 +2404,13 @@ function PurchaseOrderDetailPageContent() {
                     {linkedMaterials.map((material) => (
                       <div
                         key={material._id}
-                        className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0"
+                        className="flex items-center justify-between py-2 border-b ds-border-subtle last:border-0"
                       >
                         <div>
-                          <p className="text-base font-semibold text-gray-900">
+                          <p className="text-base font-semibold ds-text-primary">
                             {material.name || material.materialName}
                           </p>
-                          <p className="text-sm text-gray-700 mt-1">
+                          <p className="text-sm ds-text-secondary mt-1">
                             Status:{" "}
                             <span
                               className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(material.status)}`}
@@ -2421,7 +2421,7 @@ function PurchaseOrderDetailPageContent() {
                         </div>
                         <Link
                           href={`/items/${material._id}`}
-                          className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover font-medium text-sm"
                         >
                           View →
                         </Link>
@@ -2431,10 +2431,10 @@ function PurchaseOrderDetailPageContent() {
                 ) : (
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-base font-semibold text-gray-900">
+                      <p className="text-base font-semibold ds-text-primary">
                         {linkedMaterials[0].name || linkedMaterials[0].materialName}
                       </p>
-                      <p className="text-sm text-gray-700 mt-1">
+                      <p className="text-sm ds-text-secondary mt-1">
                         Status:{" "}
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusBadgeColor(linkedMaterials[0].status)}`}
@@ -2445,7 +2445,7 @@ function PurchaseOrderDetailPageContent() {
                     </div>
                     <Link
                       href={`/items/${linkedMaterials[0]._id}`}
-                      className="text-blue-600 hover:text-blue-800 font-medium"
+                      className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                     >
                       View Material →
                     </Link>
@@ -2455,8 +2455,8 @@ function PurchaseOrderDetailPageContent() {
             )}
 
             {/* Audit Trail */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Activity Log</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold ds-text-primary mb-4">Activity Log</h2>
               <AuditTrail entityType="PURCHASE_ORDER" entityId={orderId} projectId={order.projectId?.toString()} />
             </div>
           </div>
@@ -2464,45 +2464,45 @@ function PurchaseOrderDetailPageContent() {
           {/* Right Column - Metadata */}
           <div className="space-y-6">
             {/* Order Information */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Order Information</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-xl font-bold ds-text-primary mb-4">Order Information</h2>
               <dl className="space-y-3">
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Order Number</dt>
-                  <dd className="mt-1 text-base text-gray-900">{order.purchaseOrderNumber}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Order Number</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{order.purchaseOrderNumber}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Created By</dt>
-                  <dd className="mt-1 text-base text-gray-900">{order.createdByName || "N/A"}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Created By</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{order.createdByName || "N/A"}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Sent At</dt>
-                  <dd className="mt-1 text-base text-gray-900">{formatDate(order.sentAt || order.createdAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Sent At</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{formatDate(order.sentAt || order.createdAt)}</dd>
                 </div>
                 {order.committedAt && (
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Committed At</dt>
-                    <dd className="mt-1 text-base text-gray-900">{formatDate(order.committedAt)}</dd>
+                    <dt className="text-sm font-semibold ds-text-secondary">Committed At</dt>
+                    <dd className="mt-1 text-base ds-text-primary">{formatDate(order.committedAt)}</dd>
                   </div>
                 )}
                 {order.fulfilledAt && (
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Fulfilled At</dt>
-                    <dd className="mt-1 text-base text-gray-900">{formatDate(order.fulfilledAt)}</dd>
+                    <dt className="text-sm font-semibold ds-text-secondary">Fulfilled At</dt>
+                    <dd className="mt-1 text-base ds-text-primary">{formatDate(order.fulfilledAt)}</dd>
                   </div>
                 )}
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Last Updated</dt>
-                  <dd className="mt-1 text-base text-gray-900">{formatDate(order.updatedAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Last Updated</dt>
+                  <dd className="mt-1 text-base ds-text-primary">{formatDate(order.updatedAt)}</dd>
                 </div>
               </dl>
             </div>
 
             {/* Project Information */}
             {order.projectId && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4">Project</h2>
-                <Link href={`/projects/${order.projectId}`} className="text-blue-600 hover:text-blue-800 font-medium">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-xl font-bold ds-text-primary mb-4">Project</h2>
+                <Link href={`/projects/${order.projectId}`} className="ds-text-accent-primary hover:ds-text-accent-hover font-medium">
                   View Project →
                 </Link>
               </div>
@@ -2530,7 +2530,7 @@ function PurchaseOrderDetailPageContent() {
         >
           <div className="mt-4 space-y-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Final Unit Cost (Optional)
               </label>
               <input
@@ -2541,12 +2541,12 @@ function PurchaseOrderDetailPageContent() {
                 step="0.01"
                 placeholder={order.unitCost?.toString() || "0.00"}
                 disabled={isAccepting}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:text-gray-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:ds-text-muted disabled:opacity-50 disabled:cursor-not-allowed"
               />
-              <p className="text-sm text-gray-700 mt-1">Leave empty to use original unit cost</p>
+              <p className="text-sm ds-text-secondary mt-1">Leave empty to use original unit cost</p>
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Supplier Notes (Optional)
               </label>
               <textarea
@@ -2554,14 +2554,14 @@ function PurchaseOrderDetailPageContent() {
                 onChange={(e) => setAcceptData((prev) => ({ ...prev, supplierNotes: e.target.value }))}
                 rows={3}
                 disabled={isAccepting}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:ds-text-muted"
                 placeholder="Add any notes about this acceptance..."
               />
             </div>
 
             {/* Capital Validation Indicator */}
             {validatingCapital && (
-              <div className="bg-blue-50 border border-blue-200 text-blue-800 px-3 py-2 rounded-lg text-sm">
+              <div className="bg-blue-50 border ds-border-accent-subtle text-blue-800 px-3 py-2 rounded-lg text-sm">
                 <div className="flex items-center gap-2">
                   <LoadingSpinner size="sm" color="blue-600" />
                   <span>Validating capital availability...</span>
@@ -2586,7 +2586,7 @@ function PurchaseOrderDetailPageContent() {
           confirmColor="red"
         >
           <div className="mt-4">
-            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+            <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
               Rejection Reason *
             </label>
             <textarea
@@ -2594,7 +2594,7 @@ function PurchaseOrderDetailPageContent() {
               onChange={(e) => setRejectData((prev) => ({ ...prev, supplierNotes: e.target.value }))}
               rows={3}
               required
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder:text-gray-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder:ds-text-muted"
               placeholder="Explain why you are rejecting this order..."
             />
           </div>
@@ -2622,7 +2622,7 @@ function PurchaseOrderDetailPageContent() {
           <div className="mt-4 space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Proposed Quantity
                 </label>
                 <input
@@ -2632,11 +2632,11 @@ function PurchaseOrderDetailPageContent() {
                   min="0.01"
                   step="0.01"
                   placeholder={order.quantityOrdered?.toString() || ""}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder:text-gray-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder:ds-text-muted"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Proposed Unit Cost
                 </label>
                 <input
@@ -2646,12 +2646,12 @@ function PurchaseOrderDetailPageContent() {
                   min="0"
                   step="0.01"
                   placeholder={order.unitCost?.toString() || ""}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder:text-gray-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder:ds-text-muted"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Proposed Delivery Date
               </label>
               <input
@@ -2659,18 +2659,18 @@ function PurchaseOrderDetailPageContent() {
                 value={modifyData.deliveryDate}
                 onChange={(e) => setModifyData((prev) => ({ ...prev, deliveryDate: e.target.value }))}
                 min={new Date().toISOString().split("T")[0]}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
               />
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Modification Notes
               </label>
               <textarea
                 value={modifyData.notes}
                 onChange={(e) => setModifyData((prev) => ({ ...prev, notes: e.target.value }))}
                 rows={3}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder:ds-text-muted"
                 placeholder="Explain the proposed changes..."
               />
             </div>
@@ -2697,7 +2697,7 @@ function PurchaseOrderDetailPageContent() {
         >
           <div className="mt-4 space-y-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Delivery Note *</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Delivery Note *</label>
               <CloudinaryUploadWidget
                 value={fulfillData.deliveryNoteFileUrl}
                 onChange={(url) => setFulfillData((prev) => ({ ...prev, deliveryNoteFileUrl: url }))}
@@ -2711,7 +2711,7 @@ function PurchaseOrderDetailPageContent() {
               )}
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Actual Quantity Delivered (Optional)
               </label>
               <input
@@ -2721,19 +2721,19 @@ function PurchaseOrderDetailPageContent() {
                 min="0.01"
                 step="0.01"
                 placeholder={order.quantityOrdered?.toString() || ""}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted"
               />
-              <p className="text-sm text-gray-700 mt-1">Leave empty to use ordered quantity</p>
+              <p className="text-sm ds-text-secondary mt-1">Leave empty to use ordered quantity</p>
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Supplier Notes (Optional)
               </label>
               <textarea
                 value={fulfillData.supplierNotes}
                 onChange={(e) => setFulfillData((prev) => ({ ...prev, supplierNotes: e.target.value }))}
                 rows={3}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted"
                 placeholder="Add any notes about the delivery..."
               />
             </div>
@@ -2778,7 +2778,7 @@ function PurchaseOrderDetailPageContent() {
           <div className="mt-6 space-y-6">
             {/* Delivery Note Section */}
             <div className="space-y-2">
-              <label className="block text-sm font-bold text-gray-900 mb-2 leading-tight">
+              <label className="block text-sm font-bold ds-text-primary mb-2 leading-tight">
                 Delivery Note
                 <span className="text-red-600 ml-1">*</span>
               </label>
@@ -2797,19 +2797,19 @@ function PurchaseOrderDetailPageContent() {
                 />
               </div>
               {confirmDeliveryData.deliveryNoteFileUrl && (
-                <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                <div className="mt-3 rounded-lg overflow-hidden border ds-border-subtle shadow-sm">
                   <ImagePreview imageUrl={confirmDeliveryData.deliveryNoteFileUrl} alt="Delivery Note" />
                 </div>
               )}
               {deliveryValidationErrors.deliveryNote ? (
-                <div className="mt-2 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="mt-2 flex items-start gap-2 p-3 bg-red-50 border border-red-400/60 rounded-lg">
                   <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   <p className="text-sm font-medium text-red-800 leading-relaxed">{deliveryValidationErrors.deliveryNote}</p>
                 </div>
               ) : (
-                <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+                <p className="text-sm ds-text-secondary mt-2 leading-relaxed">
                   Upload the delivery note or receipt from the supplier. This document is required to confirm delivery.
                 </p>
               )}
@@ -2821,11 +2821,11 @@ function PurchaseOrderDetailPageContent() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <div className="flex-shrink-0 w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-600 rounded-full"></div>
-                    <label className="block text-sm font-bold text-gray-900 leading-tight">
+                    <label className="block text-sm font-bold ds-text-primary leading-tight">
                       Material Delivery Details
                     </label>
                   </div>
-                  <p className="text-sm text-gray-700 leading-relaxed pl-3">
+                  <p className="text-sm ds-text-secondary leading-relaxed pl-3">
                     Update quantities and unit costs as needed. Leave empty to use ordered values. 
                     <span className="text-red-600 font-semibold ml-1">*</span> indicates required fields.
                   </p>
@@ -2845,32 +2845,32 @@ function PurchaseOrderDetailPageContent() {
                 </div>
                 
                 {/* Desktop Table View */}
-                <div className="hidden lg:block bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="hidden lg:block ds-bg-surface rounded-xl border ds-border-subtle shadow-sm overflow-hidden">
                   <div className="overflow-x-auto max-h-[450px] overflow-y-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gradient-to-r from-gray-50 to-gray-100 sticky top-0 z-10 border-b border-gray-200">
+                    <table className="min-w-full divide-y divide-ds-border-subtle">
+                      <thead className="ds-bg-surface-muted sticky top-0 z-10 border-b ds-border-subtle">
                         <tr>
-                          <th className="px-5 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
                             Material
                           </th>
-                          <th className="px-5 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
                             Ordered Qty
                           </th>
-                          <th className="px-5 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
                             Actual Qty
                           </th>
-                          <th className="px-5 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
                             Unit
                           </th>
-                          <th className="px-5 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
                             Ordered Cost
                           </th>
-                          <th className="px-5 py-4 text-left text-xs font-bold text-gray-900 uppercase tracking-wider">
+                          <th className="px-5 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
                             Actual Cost
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                         {(order.materials || []).map((material, index) => {
                           const materialRequestId = material.materialRequestId?.toString() || material._id?.toString() || `material-${index}`
                           const currentQuantity = (confirmDeliveryData.materialQuantities && confirmDeliveryData.materialQuantities[materialRequestId]) || ""
@@ -2882,10 +2882,10 @@ function PurchaseOrderDetailPageContent() {
                           const hasInvalidCost = !orderedUnitCost || orderedUnitCost <= 0
 
                           return (
-                            <tr key={materialRequestId} className={`transition-colors duration-150 ${hasInvalidCost ? 'bg-yellow-50/50 hover:bg-yellow-100/70' : 'hover:bg-gray-50/80'}`}>
+                            <tr key={materialRequestId} className={`transition-colors duration-150 ${hasInvalidCost ? 'bg-yellow-50/50 hover:bg-yellow-100/70' : 'hover:ds-bg-surface-muted/80'}`}>
                               <td className="px-5 py-4 whitespace-nowrap">
                                 <div className="flex items-center gap-2">
-                                  <div className="text-sm font-semibold text-gray-900">
+                                  <div className="text-sm font-semibold ds-text-primary">
                                     {materialName}
                                   </div>
                                   {hasInvalidCost && (
@@ -2894,8 +2894,8 @@ function PurchaseOrderDetailPageContent() {
                                 </div>
                               </td>
                               <td className="px-5 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-gray-700">
-                                  {orderedQuantity} <span className="text-gray-500 text-xs">{unit}</span>
+                                <div className="text-sm font-medium ds-text-secondary">
+                                  {orderedQuantity} <span className="ds-text-muted text-xs">{unit}</span>
                                 </div>
                               </td>
                               <td className="px-5 py-4 whitespace-nowrap">
@@ -2935,24 +2935,24 @@ function PurchaseOrderDetailPageContent() {
                                       min="0.01"
                                       step="0.01"
                                       placeholder={orderedQuantity.toString()}
-                                      className={`w-24 px-3 py-2 text-sm font-medium bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
+                                      className={`w-24 px-3 py-2 text-sm font-medium ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:ds-text-muted ${
                                         deliveryValidationErrors.materialQuantities?.[materialRequestId]
                                           ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50/50'
-                                          : 'border-gray-300 focus:ring-green-500 focus:border-green-500 hover:border-gray-400'
+                                          : 'ds-border-subtle focus:ring-green-500 focus:border-green-500 hover:border-ds-border-strong'
                                       }`}
                                     />
                                     {deliveryValidationErrors.materialQuantities?.[materialRequestId] && (
                                       <p className="text-xs text-red-600 mt-1.5 font-medium">{deliveryValidationErrors.materialQuantities[materialRequestId]}</p>
                                     )}
                                   </div>
-                                  <span className="text-xs text-gray-500 mt-2.5 font-medium">{unit}</span>
+                                  <span className="text-xs ds-text-muted mt-2.5 font-medium">{unit}</span>
                                 </div>
                               </td>
                               <td className="px-5 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-gray-600">{unit}</div>
+                                <div className="text-sm font-medium ds-text-secondary">{unit}</div>
                               </td>
                               <td className="px-5 py-4 whitespace-nowrap">
-                                <div className="text-sm font-medium text-gray-700">
+                                <div className="text-sm font-medium ds-text-secondary">
                                   {orderedUnitCost > 0 
                                     ? new Intl.NumberFormat("en-US", { style: "currency", currency: "KES" }).format(orderedUnitCost)
                                     : <span className="text-red-600 font-semibold">Missing</span>}
@@ -2960,7 +2960,7 @@ function PurchaseOrderDetailPageContent() {
                               </td>
                               <td className="px-5 py-4 whitespace-nowrap">
                                 <div className="flex items-start gap-2">
-                                  <span className="text-xs text-gray-500 mt-2.5 font-medium">KES</span>
+                                  <span className="text-xs ds-text-muted mt-2.5 font-medium">KES</span>
                                   <div className="flex-1">
                                     <input
                                       type="number"
@@ -3005,12 +3005,12 @@ function PurchaseOrderDetailPageContent() {
                                       min="0.01"
                                       step="0.01"
                                       placeholder={orderedUnitCost > 0 ? orderedUnitCost.toString() : "Required"}
-                                      className={`w-32 px-3 py-2 text-sm font-medium bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
+                                      className={`w-32 px-3 py-2 text-sm font-medium ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:ds-text-muted ${
                                         deliveryValidationErrors.materialUnitCosts?.[materialRequestId]
                                           ? 'border-red-500 bg-red-50/50 focus:ring-red-500 focus:border-red-500'
                                           : hasInvalidCost
                                           ? 'border-yellow-400 bg-yellow-50/50 focus:ring-green-500 focus:border-green-500'
-                                          : 'border-gray-300 focus:ring-green-500 focus:border-green-500 hover:border-gray-400'
+                                          : 'ds-border-subtle focus:ring-green-500 focus:border-green-500 hover:border-ds-border-strong'
                                       }`}
                                     />
                                     {deliveryValidationErrors.materialUnitCosts?.[materialRequestId] && (
@@ -3040,9 +3040,9 @@ function PurchaseOrderDetailPageContent() {
                     const hasInvalidCost = !orderedUnitCost || orderedUnitCost <= 0
 
                     return (
-                      <div key={materialRequestId} className={`border rounded-xl p-4 shadow-sm transition-all ${hasInvalidCost ? 'bg-yellow-50/80 border-yellow-300' : 'bg-white border-gray-200 hover:border-gray-300'}`}>
+                      <div key={materialRequestId} className={`border rounded-xl p-4 shadow-sm transition-all ${hasInvalidCost ? 'bg-yellow-50/80 border-yellow-400/60' : 'ds-bg-surface ds-border-subtle hover:ds-border-subtle'}`}>
                         <div className="mb-4 flex items-center gap-2">
-                          <h4 className="text-sm font-bold text-gray-900 flex-1">
+                          <h4 className="text-sm font-bold ds-text-primary flex-1">
                             {materialName}
                           </h4>
                           {hasInvalidCost && (
@@ -3051,7 +3051,7 @@ function PurchaseOrderDetailPageContent() {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide">
+                            <label className="block text-xs font-bold ds-text-secondary uppercase tracking-wide">
                               Quantity
                             </label>
                             <div className="flex items-center gap-2">
@@ -3089,28 +3089,28 @@ function PurchaseOrderDetailPageContent() {
                                 min="0.01"
                                 step="0.01"
                                 placeholder={orderedQuantity.toString()}
-                                className={`flex-1 px-3 py-2.5 text-sm font-medium bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
+                                className={`flex-1 px-3 py-2.5 text-sm font-medium ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:ds-text-muted ${
                                   deliveryValidationErrors.materialQuantities?.[materialRequestId]
                                     ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50/50'
-                                    : 'border-gray-300 focus:ring-green-500 focus:border-green-500 hover:border-gray-400'
+                                    : 'ds-border-subtle focus:ring-green-500 focus:border-green-500 hover:border-ds-border-strong'
                                 }`}
                               />
-                              <span className="text-xs text-gray-600 whitespace-nowrap font-medium">{unit}</span>
+                              <span className="text-xs ds-text-secondary whitespace-nowrap font-medium">{unit}</span>
                             </div>
                             {deliveryValidationErrors.materialQuantities?.[materialRequestId] ? (
                               <p className="text-xs text-red-600 mt-1.5 font-medium">{deliveryValidationErrors.materialQuantities[materialRequestId]}</p>
                             ) : (
-                              <p className="text-xs text-gray-500 mt-1.5">
+                              <p className="text-xs ds-text-muted mt-1.5">
                                 Ordered: <span className="font-medium">{orderedQuantity} {unit}</span>
                               </p>
                             )}
                           </div>
                           <div className="space-y-2">
-                            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide">
+                            <label className="block text-xs font-bold ds-text-secondary uppercase tracking-wide">
                               Unit Cost
                             </label>
                             <div className="flex items-center gap-2">
-                              <span className="text-xs text-gray-600 font-medium">KES</span>
+                              <span className="text-xs ds-text-secondary font-medium">KES</span>
                               <input
                                 type="number"
                                 value={currentUnitCost}
@@ -3154,19 +3154,19 @@ function PurchaseOrderDetailPageContent() {
                                 min="0.01"
                                 step="0.01"
                                 placeholder={orderedUnitCost > 0 ? orderedUnitCost.toString() : "Required"}
-                                className={`flex-1 px-3 py-2.5 text-sm font-medium bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
+                                className={`flex-1 px-3 py-2.5 text-sm font-medium ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:ds-text-muted ${
                                   deliveryValidationErrors.materialUnitCosts?.[materialRequestId]
                                     ? 'border-red-500 bg-red-50/50 focus:ring-red-500 focus:border-red-500'
                                     : hasInvalidCost
                                     ? 'border-yellow-400 bg-yellow-50/50 focus:ring-green-500 focus:border-green-500'
-                                    : 'border-gray-300 focus:ring-green-500 focus:border-green-500 hover:border-gray-400'
+                                    : 'ds-border-subtle focus:ring-green-500 focus:border-green-500 hover:border-ds-border-strong'
                                 }`}
                               />
                             </div>
                             {deliveryValidationErrors.materialUnitCosts?.[materialRequestId] ? (
                               <p className="text-xs text-red-600 mt-1.5 font-medium">{deliveryValidationErrors.materialUnitCosts[materialRequestId]}</p>
                             ) : (
-                              <p className="text-xs text-gray-500 mt-1.5">
+                              <p className="text-xs ds-text-muted mt-1.5">
                                 {orderedUnitCost > 0 
                                   ? <>Ordered: <span className="font-medium">{new Intl.NumberFormat("en-US", { style: "currency", currency: "KES" }).format(orderedUnitCost)}</span></>
                                   : <span className="text-red-600 font-semibold">⚠️ Required</span>}
@@ -3183,9 +3183,9 @@ function PurchaseOrderDetailPageContent() {
               // Single order: Show single quantity input
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <label className="block text-sm font-bold text-gray-900 leading-tight">
+                  <label className="block text-sm font-bold ds-text-primary leading-tight">
                     Actual Quantity Delivered
-                    <span className="text-gray-500 font-normal ml-2">(Optional)</span>
+                    <span className="ds-text-muted font-normal ml-2">(Optional)</span>
                   </label>
                   <input
                     type="number"
@@ -3203,22 +3203,22 @@ function PurchaseOrderDetailPageContent() {
                     min="0.01"
                     step="0.01"
                     placeholder={order.quantityOrdered?.toString() || ""}
-                    className={`w-full px-4 py-3 text-sm font-medium bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
+                    className={`w-full px-4 py-3 text-sm font-medium ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:ds-text-muted ${
                       deliveryValidationErrors.quantity 
                         ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50/50' 
-                        : 'border-gray-300 focus:ring-green-500 focus:border-green-500 hover:border-gray-400'
+                        : 'ds-border-subtle focus:ring-green-500 focus:border-green-500 hover:border-ds-border-strong'
                     }`}
                   />
                   {deliveryValidationErrors.quantity ? (
-                    <div className="mt-2 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="mt-2 flex items-start gap-2 p-3 bg-red-50 border border-red-400/60 rounded-lg">
                       <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                       </svg>
                       <p className="text-sm font-medium text-red-800 leading-relaxed">{deliveryValidationErrors.quantity}</p>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-                      Leave empty to use ordered quantity: <span className="font-semibold text-gray-900">{order.quantityOrdered || 0} {order.unit || ""}</span>
+                    <p className="text-sm ds-text-secondary mt-2 leading-relaxed">
+                      Leave empty to use ordered quantity: <span className="font-semibold ds-text-primary">{order.quantityOrdered || 0} {order.unit || ""}</span>
                     </p>
                   )}
                 </div>
@@ -3226,12 +3226,12 @@ function PurchaseOrderDetailPageContent() {
             )}
             {!order?.isBulkOrder && (
               <div className="space-y-2">
-                <label className="block text-sm font-bold text-gray-900 leading-tight">
+                <label className="block text-sm font-bold ds-text-primary leading-tight">
                   Actual Unit Cost
-                  <span className="text-gray-500 font-normal ml-2">(Optional)</span>
+                  <span className="ds-text-muted font-normal ml-2">(Optional)</span>
                 </label>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600 font-medium">KES</span>
+                  <span className="text-sm ds-text-secondary font-medium">KES</span>
                   <input
                     type="number"
                     value={confirmDeliveryData.actualUnitCost}
@@ -3248,23 +3248,23 @@ function PurchaseOrderDetailPageContent() {
                     min="0.01"
                     step="0.01"
                     placeholder={order.unitCost?.toString() || ""}
-                    className={`flex-1 px-4 py-3 text-sm font-medium bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:text-gray-400 ${
+                    className={`flex-1 px-4 py-3 text-sm font-medium ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 transition-all placeholder:ds-text-muted ${
                       deliveryValidationErrors.unitCost 
                         ? 'border-red-500 focus:ring-red-500 focus:border-red-500 bg-red-50/50' 
-                        : 'border-gray-300 focus:ring-green-500 focus:border-green-500 hover:border-gray-400'
+                        : 'ds-border-subtle focus:ring-green-500 focus:border-green-500 hover:border-ds-border-strong'
                     }`}
                   />
                 </div>
                 {deliveryValidationErrors.unitCost ? (
-                  <div className="mt-2 flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <div className="mt-2 flex items-start gap-2 p-3 bg-red-50 border border-red-400/60 rounded-lg">
                     <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
                     <p className="text-sm font-medium text-red-800 leading-relaxed">{deliveryValidationErrors.unitCost}</p>
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-600 mt-2 leading-relaxed">
-                    Leave empty to use ordered unit cost: <span className="font-semibold text-gray-900">
+                  <p className="text-sm ds-text-secondary mt-2 leading-relaxed">
+                    Leave empty to use ordered unit cost: <span className="font-semibold ds-text-primary">
                       {order.unitCost
                         ? new Intl.NumberFormat("en-US", { style: "currency", currency: "KES" }).format(order.unitCost)
                         : "N/A"}
@@ -3274,18 +3274,18 @@ function PurchaseOrderDetailPageContent() {
               </div>
             )}
             <div className="space-y-2">
-              <label className="block text-sm font-bold text-gray-900 leading-tight">
+              <label className="block text-sm font-bold ds-text-primary leading-tight">
                 Delivery Notes
-                <span className="text-gray-500 font-normal ml-2">(Optional)</span>
+                <span className="ds-text-muted font-normal ml-2">(Optional)</span>
               </label>
               <textarea
                 value={confirmDeliveryData.notes}
                 onChange={(e) => setConfirmDeliveryData((prev) => ({ ...prev, notes: e.target.value }))}
                 rows={4}
-                className="w-full px-4 py-3 text-sm font-medium bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:text-gray-400 transition-all hover:border-gray-400 resize-y"
+                className="w-full px-4 py-3 text-sm font-medium ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:ds-text-muted transition-all hover:border-ds-border-strong resize-y"
                 placeholder="Add any notes about the delivery, condition of materials, discrepancies, etc..."
               />
-              <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+              <p className="text-sm ds-text-secondary mt-2 leading-relaxed">
                 Document any important details about the delivery for audit purposes
               </p>
             </div>
@@ -3321,7 +3321,7 @@ function PurchaseOrderDetailPageContent() {
           isLoading={isModifying}
         >
           <div className="mt-4 space-y-4">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-3">
               <p className="text-sm text-yellow-800">
                 <strong>Original Rejection:</strong> {order.rejectionReason}{" "}
                 {order.rejectionSubcategory && `- ${order.rejectionSubcategory}`}
@@ -3335,10 +3335,10 @@ function PurchaseOrderDetailPageContent() {
             </div>
 
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">Adjustments</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">Adjustments</label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">New Unit Cost</label>
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">New Unit Cost</label>
                   <input
                     type="number"
                     value={retryData.adjustments.unitCost}
@@ -3352,11 +3352,11 @@ function PurchaseOrderDetailPageContent() {
                     step="0.01"
                     placeholder={order.unitCost?.toString() || ""}
                     disabled={isModifying}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500 disabled:opacity-50"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">New Quantity</label>
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">New Quantity</label>
                   <input
                     type="number"
                     value={retryData.adjustments.quantityOrdered}
@@ -3370,11 +3370,11 @@ function PurchaseOrderDetailPageContent() {
                     step="0.01"
                     placeholder={order.quantityOrdered?.toString() || ""}
                     disabled={isModifying}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500 disabled:opacity-50"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">New Delivery Date</label>
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">New Delivery Date</label>
                   <input
                     type="date"
                     value={retryData.adjustments.deliveryDate}
@@ -3386,11 +3386,11 @@ function PurchaseOrderDetailPageContent() {
                     }
                     min={new Date().toISOString().split("T")[0]}
                     disabled={isModifying}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500 disabled:opacity-50"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-600 mb-1">New Terms</label>
+                  <label className="block text-sm font-medium ds-text-secondary mb-1">New Terms</label>
                   <input
                     type="text"
                     value={retryData.adjustments.terms}
@@ -3402,12 +3402,12 @@ function PurchaseOrderDetailPageContent() {
                     }
                     placeholder={order.terms || ""}
                     disabled={isModifying}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500 disabled:opacity-50"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted disabled:opacity-50"
                   />
                 </div>
               </div>
               <div className="mt-3">
-                <label className="block text-sm font-medium text-gray-600 mb-1">Additional Notes</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Additional Notes</label>
                 <textarea
                   value={retryData.adjustments.notes}
                   onChange={(e) =>
@@ -3418,14 +3418,14 @@ function PurchaseOrderDetailPageContent() {
                   }
                   rows={2}
                   disabled={isModifying}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                   placeholder="Explain the adjustments made..."
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-600 mb-2">Communication Channels</label>
+              <label className="block text-sm font-medium ds-text-secondary mb-2">Communication Channels</label>
               <div className="space-y-2">
                 {["email", "sms", "push"].map((channel) => (
                   <label key={channel} className="flex items-center">
@@ -3448,7 +3448,7 @@ function PurchaseOrderDetailPageContent() {
                       disabled={isModifying}
                       className="mr-2"
                     />
-                    <span className="text-sm text-gray-700 capitalize">{channel}</span>
+                    <span className="text-sm ds-text-secondary capitalize">{channel}</span>
                   </label>
                 ))}
               </div>
@@ -3468,7 +3468,7 @@ function PurchaseOrderDetailPageContent() {
                   disabled={isModifying}
                   className="mr-2"
                 />
-                <span className="text-sm text-gray-700">Send retry immediately</span>
+                <span className="text-sm ds-text-secondary">Send retry immediately</span>
               </label>
             </div>
           </div>
@@ -3521,8 +3521,8 @@ function PurchaseOrderDetailPageContent() {
               {/* Mode Indicator Banner */}
               <div className={`p-3 sm:p-4 rounded-lg border-2 ${
                 isBulkOrderAlternative 
-                  ? 'bg-purple-50 border-purple-300' 
-                  : 'bg-blue-50 border-blue-300'
+                  ? 'bg-purple-50 ds-border-accent-subtle/60' 
+                  : 'bg-blue-50 ds-border-accent-subtle'
               }`}>
                 <div className="flex items-center gap-2">
                   <span className={`text-lg sm:text-xl ${
@@ -3557,7 +3557,7 @@ function PurchaseOrderDetailPageContent() {
                   value={alternativeSearchQuery}
                   onChange={(e) => setAlternativeSearchQuery(e.target.value)}
                   placeholder="Search suppliers by name, email, or phone..."
-                  className="flex-1 px-3 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-500"
+                  className="flex-1 px-3 py-2 ds-text-primary ds-bg-surface border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted"
                   disabled={loadingAlternatives}
                 />
                 <button
@@ -3572,7 +3572,7 @@ function PurchaseOrderDetailPageContent() {
               {/* Mode and Data Quality Indicator */}
               <div className="mt-2 flex items-center justify-between text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-gray-700">Search Mode:</span>
+                  <span className="font-medium ds-text-secondary">Search Mode:</span>
                   <span
                     className={`px-2 py-1 rounded font-medium ${
                       alternativeMode === "simple"
@@ -3590,10 +3590,10 @@ function PurchaseOrderDetailPageContent() {
                   </span>
                   {alternativeDataQuality > 0 && (
                     <>
-                      <span className="text-gray-400">•</span>
-                      <span className="font-medium text-gray-700">Data Quality:</span>
+                      <span className="ds-text-muted">•</span>
+                      <span className="font-medium ds-text-secondary">Data Quality:</span>
                       <div className="flex items-center gap-1">
-                        <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="w-16 h-2 ds-bg-surface-muted rounded-full overflow-hidden">
                           <div
                             className={`h-full transition-all ${
                               alternativeDataQuality < 30
@@ -3605,13 +3605,13 @@ function PurchaseOrderDetailPageContent() {
                             style={{ width: `${alternativeDataQuality}%` }}
                           />
                         </div>
-                        <span className="font-semibold text-gray-800">{alternativeDataQuality}%</span>
+                        <span className="font-semibold ds-text-primary">{alternativeDataQuality}%</span>
                       </div>
                     </>
                   )}
                 </div>
                 {alternativeSuppliers.length > 0 && (
-                  <span className="font-medium text-gray-700">
+                  <span className="font-medium ds-text-secondary">
                     {alternativeSuppliers.length} supplier{alternativeSuppliers.length !== 1 ? "s" : ""} found
                   </span>
                 )}
@@ -3620,10 +3620,10 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Hybrid Mode Toggle */}
             {alternativeMode === "hybrid" && simpleList.length > 0 && alternativeSuppliers.length > 0 && (
-              <div className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <div className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-400/60 rounded-lg">
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium text-yellow-800">View Mode:</span>
-                  <div className="flex gap-1 bg-white rounded-lg p-1 border border-yellow-300">
+                  <div className="flex gap-1 ds-bg-surface rounded-lg p-1 border border-yellow-400/60">
                     <button
                       type="button"
                       onClick={() => setViewMode("recommended")}
@@ -3658,13 +3658,13 @@ function PurchaseOrderDetailPageContent() {
 
             {/* Bulk Order: Rejected Materials Assignment */}
             {isBulkOrderAlternative && rejectedMaterials.length > 0 && (
-              <div className="border-2 border-purple-400 rounded-lg p-5 bg-gradient-to-br from-purple-50 to-purple-100 shadow-md">
+              <div className="border-2 ds-border-accent-subtle rounded-lg p-5 ds-bg-accent-subtle shadow-md">
                 <div className="mb-4">
                   <h3 className="text-lg sm:text-xl font-bold text-purple-900 mb-2 flex items-center gap-2">
                     <span className="text-xl sm:text-2xl">📦</span>
                     <span>Assign Suppliers to Rejected Materials ({rejectedMaterials.length})</span>
                   </h3>
-                  <div className="bg-white border border-purple-200 rounded-lg p-3 mb-3">
+                  <div className="ds-bg-surface border ds-border-accent-subtle/60 rounded-lg p-3 mb-3">
                     <p className="text-sm font-semibold text-purple-800 mb-1">
                       ⚡ How to assign suppliers:
                     </p>
@@ -3684,11 +3684,11 @@ function PurchaseOrderDetailPageContent() {
                     ) || assignment
 
                     return (
-                      <div key={assignment.materialRequestId} className="bg-white border-2 border-purple-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
+                      <div key={assignment.materialRequestId} className="ds-bg-surface border-2 ds-border-accent-subtle/60 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className="font-bold text-lg text-gray-900">{material.materialName || assignment.materialName}</h4>
+                              <h4 className="font-bold text-lg ds-text-primary">{material.materialName || assignment.materialName}</h4>
                               <span className={`px-2 py-0.5 text-xs font-bold rounded ${
                                 assignment.suppliers.length > 0 
                                   ? 'bg-green-500 text-white' 
@@ -3699,7 +3699,7 @@ function PurchaseOrderDetailPageContent() {
                                   : '⚠ No suppliers'}
                               </span>
                             </div>
-                            <div className="text-sm font-medium text-gray-700 mt-1">
+                            <div className="text-sm font-medium ds-text-secondary mt-1">
                               <span>Quantity: {material.quantity || assignment.quantity} {material.unit || assignment.unit}</span>
                               <span className="mx-2">•</span>
                               <span>Unit Cost: Ksh {material.unitCost || assignment.unitCost}</span>
@@ -3727,13 +3727,13 @@ function PurchaseOrderDetailPageContent() {
 
                               return (
                                 <div key={`${assignment.materialRequestId}-${supplierAssignment.supplierId}`} 
-                                     className="bg-gray-50 border border-gray-200 rounded p-3">
+                                     className="ds-bg-surface-muted border ds-border-subtle rounded p-3">
                                   <div className="flex items-start justify-between mb-2">
                                     <div className="flex-1">
-                                      <div className="font-medium text-gray-900">
+                                      <div className="font-medium ds-text-primary">
                                         {supplier?.name || 'Unknown Supplier'}
                                       </div>
-                                      <div className="text-xs text-gray-500 mt-1">
+                                      <div className="text-xs ds-text-muted mt-1">
                                         {supplier?.email || 'No email'}
                                       </div>
                                     </div>
@@ -3750,7 +3750,7 @@ function PurchaseOrderDetailPageContent() {
                                   {/* Quantity Split */}
                                   <div className="grid grid-cols-2 gap-2 mb-2">
                                     <div>
-                                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                                      <label className="block text-xs font-semibold ds-text-secondary mb-1">
                                         Quantity {assignment.suppliers.length > 1 ? '(split)' : ''}
                                       </label>
                                       <input
@@ -3766,14 +3766,14 @@ function PurchaseOrderDetailPageContent() {
                                         max={assignment.quantity}
                                         placeholder={assignment.quantity.toString()}
                                         disabled={isModifying}
-                                        className="w-full px-2 py-1 text-sm text-gray-900 bg-white border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                                        className="w-full px-2 py-1 text-sm ds-text-primary ds-bg-surface border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
                                       />
-                                      <div className="text-xs font-medium text-gray-600 mt-0.5">
+                                      <div className="text-xs font-medium ds-text-secondary mt-0.5">
                                         Max: {assignment.quantity} {assignment.unit}
                                       </div>
                                     </div>
                                     <div>
-                                      <label className="block text-xs font-semibold text-gray-700 mb-1">
+                                      <label className="block text-xs font-semibold ds-text-secondary mb-1">
                                         Unit Cost
                                       </label>
                                       <input
@@ -3789,14 +3789,14 @@ function PurchaseOrderDetailPageContent() {
                                         step="0.01"
                                         placeholder={assignment.unitCost.toString()}
                                         disabled={isModifying}
-                                        className="w-full px-2 py-1 text-sm text-gray-900 bg-white border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                                        className="w-full px-2 py-1 text-sm ds-text-primary ds-bg-surface border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
                                       />
                                     </div>
                                   </div>
                                   
                                   {/* Delivery Date */}
                                   <div>
-                                    <label className="block text-xs font-semibold text-gray-700 mb-1">
+                                    <label className="block text-xs font-semibold ds-text-secondary mb-1">
                                       Delivery Date
                                     </label>
                                     <input
@@ -3810,7 +3810,7 @@ function PurchaseOrderDetailPageContent() {
                                       )}
                                       min={new Date().toISOString().split('T')[0]}
                                       disabled={isModifying}
-                                      className="w-full px-2 py-1 text-sm text-gray-900 bg-white border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                                      className="w-full px-2 py-1 text-sm ds-text-primary ds-bg-surface border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
                                     />
                                   </div>
                                 </div>
@@ -3820,12 +3820,12 @@ function PurchaseOrderDetailPageContent() {
                         )}
 
                         {/* Add Supplier Button */}
-                        <div className="mt-4 pt-4 border-t-2 border-purple-200">
+                        <div className="mt-4 pt-4 border-t-2 ds-border-accent-subtle/60">
                           <label className="block text-sm font-bold text-purple-900 mb-2 flex items-center gap-2">
                             <span>➕</span>
                             <span>Assign Supplier to This Material</span>
                           </label>
-                          <p className="text-xs text-gray-600 mb-2">
+                          <p className="text-xs ds-text-secondary mb-2">
                             Select a supplier from the dropdown below. Available suppliers are shown in the reference list.
                           </p>
                           <select
@@ -3837,7 +3837,7 @@ function PurchaseOrderDetailPageContent() {
                               }
                             }}
                             disabled={isModifying || filteredSuppliers.length === 0}
-                            className="w-full px-4 py-3 text-gray-900 bg-white border-2 border-purple-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 font-medium"
+                            className="w-full px-4 py-3 ds-text-primary ds-bg-surface border-2 ds-border-accent-subtle/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 font-medium"
                           >
                             <option value="">Select a supplier from the list below...</option>
                             {filteredSuppliers
@@ -3863,11 +3863,11 @@ function PurchaseOrderDetailPageContent() {
               {loadingAlternatives ? (
                 <div className="text-center py-8">
                   <LoadingSpinner size="md" color="purple-600" />
-                  <p className="mt-2 font-medium text-gray-700">Loading suppliers...</p>
+                  <p className="mt-2 font-medium ds-text-secondary">Loading suppliers...</p>
                 </div>
               ) : filteredSuppliers.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="font-medium text-gray-700">
+                  <p className="font-medium ds-text-secondary">
                     {alternativeSearchQuery
                       ? `No suppliers found matching "${alternativeSearchQuery}"`
                       : isBulkOrderAlternative
@@ -3886,7 +3886,7 @@ function PurchaseOrderDetailPageContent() {
                     </button>
                   )}
                   {alternativeSuppliers.length > 0 && alternativeSearchQuery && (
-                    <p className="mt-2 text-xs font-medium text-gray-600">
+                    <p className="mt-2 text-xs font-medium ds-text-secondary">
                       Showing filtered results. {alternativeSuppliers.length} total
                       supplier{alternativeSuppliers.length !== 1 ? "s" : ""} available.
                     </p>
@@ -3896,11 +3896,11 @@ function PurchaseOrderDetailPageContent() {
                 <>
                   <div>
                     <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
-                      <label className="block text-base font-bold text-gray-900 leading-normal">
+                      <label className="block text-base font-bold ds-text-primary leading-normal">
                         {isBulkOrderAlternative 
                           ? "📋 Available Suppliers (Reference List)"
                           : "📄 Select Alternative Suppliers for Single Order"}
-                        <span className="ml-2 text-sm font-medium text-gray-600">
+                        <span className="ml-2 text-sm font-medium ds-text-secondary">
                           ({filteredSuppliers.length} {alternativeSearchQuery ? "filtered" : "available"}
                           {alternativeMode === "hybrid" &&
                             viewMode === "all" &&
@@ -3919,7 +3919,7 @@ function PurchaseOrderDetailPageContent() {
                       )}
                     </div>
                     {isBulkOrderAlternative && (
-                      <div className="mb-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <div className="mb-3 p-3 bg-blue-50 border ds-border-accent-subtle rounded-lg">
                         <p className="text-sm font-medium text-blue-800">
                           💡 <strong>Note:</strong> This is a reference list showing available suppliers. 
                           To assign suppliers, use the "Assign Supplier" dropdowns in each material card above.
@@ -3931,7 +3931,7 @@ function PurchaseOrderDetailPageContent() {
                       (alternativeMode === "hybrid" && viewMode === "all"
                         ? simpleList.length
                         : alternativeSuppliers.length) && (
-                      <div className="mb-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs font-medium text-blue-800">
+                      <div className="mb-2 p-2 bg-blue-50 border ds-border-accent-subtle rounded text-xs font-medium text-blue-800">
                         Showing {filteredSuppliers.length} of{" "}
                         {alternativeMode === "hybrid" && viewMode === "all"
                           ? simpleList.length
@@ -3942,7 +3942,7 @@ function PurchaseOrderDetailPageContent() {
                   {alternativeMode === "hybrid" &&
                     viewMode === "recommended" &&
                     alternativeSuppliers.length > 0 && (
-                      <div className="mb-2 p-2 bg-green-50 border border-green-200 rounded text-xs font-medium text-green-800">
+                      <div className="mb-2 p-2 bg-green-50 border border-green-400/60 rounded text-xs font-medium text-green-800">
                         ⭐ Showing {alternativeSuppliers.length} algorithm-recommended
                         supplier{alternativeSuppliers.length !== 1 ? "s" : ""} based on data quality
                       </div>
@@ -3951,8 +3951,8 @@ function PurchaseOrderDetailPageContent() {
                     isBulkOrderAlternative 
                       ? 'max-h-[60vh] lg:max-h-[70vh]' 
                       : 'max-h-64'
-                  } overflow-y-auto border border-gray-200 rounded-lg p-3 ${
-                    isBulkOrderAlternative ? 'bg-gray-50' : ''
+                  } overflow-y-auto border ds-border-subtle rounded-lg p-3 ${
+                    isBulkOrderAlternative ? 'ds-bg-surface-muted' : ''
                   }`}>
                     {filteredSuppliers.map((supplier) => {
                       const supplierId = supplier.id || supplier._id
@@ -3983,7 +3983,7 @@ function PurchaseOrderDetailPageContent() {
                             isRecommended ? "border-yellow-400 bg-yellow-50 shadow-sm" : 
                             isBulkOrderAlternative && assignedMaterials.length > 0
                               ? "border-green-400 bg-green-50 shadow-sm"
-                              : "border-gray-200"
+                              : "ds-border-subtle"
                           }`}
                         >
                           <div className="flex items-start justify-between">
@@ -4008,7 +4008,7 @@ function PurchaseOrderDetailPageContent() {
                                           ? "bg-green-100 text-green-700"
                                           : supplier.priority >= 60
                                             ? "bg-yellow-100 text-yellow-700"
-                                            : "bg-gray-100 text-gray-700"
+                                            : "ds-bg-surface-muted ds-text-secondary"
                                       }`}
                                     >
                                       Score: {supplier.priority}
@@ -4018,10 +4018,10 @@ function PurchaseOrderDetailPageContent() {
                               {isBulkOrderAlternative ? (
                                 <div className="flex-1">
                                   <div className="flex items-center justify-between">
-                                    <h4 className="font-semibold text-gray-900">{supplier.name}</h4>
+                                    <h4 className="font-semibold ds-text-primary">{supplier.name}</h4>
                                   </div>
                                   {assignedMaterials.length > 0 && (
-                                    <div className="mt-2 p-2 bg-white border border-green-300 rounded text-xs">
+                                    <div className="mt-2 p-2 ds-bg-surface border border-green-400/60 rounded text-xs">
                                       <div className="font-semibold text-green-800 mb-1">Assigned to:</div>
                                       <ul className="list-disc list-inside text-green-700 space-y-0.5">
                                         {assignedMaterials.map((materialName, idx) => (
@@ -4032,16 +4032,16 @@ function PurchaseOrderDetailPageContent() {
                                   )}
                                   {/* Contact Information for bulk mode */}
                                   <div className="mt-2 space-y-1 text-sm">
-                                    <div className="flex items-center text-gray-700">
+                                    <div className="flex items-center ds-text-secondary">
                                       <span className="mr-2">📧</span>
                                       <span>{supplier.email}</span>
                                     </div>
-                                    <div className="flex items-center text-gray-700">
+                                    <div className="flex items-center ds-text-secondary">
                                       <span className="mr-2">📱</span>
                                       <span>{supplier.phone}</span>
                                     </div>
                                     {supplier.contactPerson && (
-                                      <div className="flex items-center text-gray-600 text-xs">
+                                      <div className="flex items-center ds-text-secondary text-xs">
                                         <span className="mr-2">👤</span>
                                         <span>Contact: {supplier.contactPerson}</span>
                                       </div>
@@ -4067,7 +4067,7 @@ function PurchaseOrderDetailPageContent() {
                                   />
                                   <div className="flex-1">
                                     <div className="flex items-center justify-between">
-                                      <h4 className="font-semibold text-gray-900">{supplier.name}</h4>
+                                      <h4 className="font-semibold ds-text-primary">{supplier.name}</h4>
                                     </div>
 
                                     {/* Show recommendation reasons only in hybrid/smart mode */}
@@ -4076,7 +4076,7 @@ function PurchaseOrderDetailPageContent() {
                                       supplier.recommendationReasons.length > 0 && (
                                         <div className="mt-2 space-y-1">
                                           {supplier.recommendationReasons.slice(0, 3).map((reason, index) => (
-                                            <div key={index} className="flex items-center text-xs text-gray-600">
+                                            <div key={index} className="flex items-center text-xs ds-text-secondary">
                                               <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                                               {typeof reason === "string" ? reason : reason.text || reason}
                                             </div>
@@ -4089,8 +4089,8 @@ function PurchaseOrderDetailPageContent() {
                                       supplier.priority !== undefined && (
                                         <div className="mt-2">
                                           <div className="flex items-center gap-2 text-xs">
-                                            <span className="text-gray-600">Confidence:</span>
-                                            <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                            <span className="ds-text-secondary">Confidence:</span>
+                                            <div className="flex-1 h-2 ds-bg-surface-muted rounded-full overflow-hidden">
                                               <div
                                                 className={`h-full transition-all ${
                                                   supplier.priority >= 80
@@ -4102,23 +4102,23 @@ function PurchaseOrderDetailPageContent() {
                                                 style={{ width: `${supplier.priority}%` }}
                                               />
                                             </div>
-                                            <span className="text-gray-600 font-medium">{supplier.priority}%</span>
+                                            <span className="ds-text-secondary font-medium">{supplier.priority}%</span>
                                           </div>
                                         </div>
                                       )}
 
                                     {/* Contact Information */}
                                     <div className="mt-2 space-y-1 text-sm">
-                                      <div className="flex items-center text-gray-700">
+                                      <div className="flex items-center ds-text-secondary">
                                         <span className="mr-2">📧</span>
                                         <span>{supplier.email}</span>
                                       </div>
-                                      <div className="flex items-center text-gray-700">
+                                      <div className="flex items-center ds-text-secondary">
                                         <span className="mr-2">📱</span>
                                         <span>{supplier.phone}</span>
                                       </div>
                                       {supplier.contactPerson && (
-                                        <div className="flex items-center text-gray-600 text-xs">
+                                        <div className="flex items-center ds-text-secondary text-xs">
                                           <span className="mr-2">👤</span>
                                           <span>Contact: {supplier.contactPerson}</span>
                                         </div>
@@ -4129,7 +4129,7 @@ function PurchaseOrderDetailPageContent() {
                                     {alternativeMode !== "simple" &&
                                       supplier.estimatedPrice &&
                                       supplier.estimatedPrice.unitCost && (
-                                        <div className="mt-2 text-sm text-gray-600">
+                                        <div className="mt-2 text-sm ds-text-secondary">
                                           <span className="font-medium">Est. Price:</span>{" "}
                                           {supplier.estimatedPrice.unitCost.toLocaleString()} KES/unit
                                           {supplier.estimatedPrice.totalCost && (
@@ -4143,7 +4143,7 @@ function PurchaseOrderDetailPageContent() {
                                     {alternativeMode !== "simple" &&
                                       supplier.estimatedDelivery &&
                                       supplier.estimatedDelivery.estimatedDays && (
-                                        <div className="mt-1 text-sm text-gray-600">
+                                        <div className="mt-1 text-sm ds-text-secondary">
                                           <span className="font-medium">Est. Delivery:</span>{" "}
                                           {supplier.estimatedDelivery.estimatedDays} days
                                         </div>
@@ -4186,12 +4186,12 @@ function PurchaseOrderDetailPageContent() {
             {!isBulkOrderAlternative && alternativeSuppliers.length > 0 && (
               <div className="lg:col-span-2">
                     <div>
-                      <label className="block text-base font-bold text-gray-900 mb-2 leading-normal">
+                      <label className="block text-base font-bold ds-text-primary mb-2 leading-normal">
                         📝 Adjustments for Single Order
                       </label>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-1">New Unit Cost</label>
+                          <label className="block text-sm font-semibold ds-text-secondary mb-1">New Unit Cost</label>
                           <input
                             type="number"
                             value={alternativesData.adjustments.unitCost}
@@ -4205,11 +4205,11 @@ function PurchaseOrderDetailPageContent() {
                             step="0.01"
                             placeholder={order.unitCost?.toString() || ""}
                             disabled={isModifying}
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-500 disabled:opacity-50"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted disabled:opacity-50"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-1">New Quantity</label>
+                          <label className="block text-sm font-semibold ds-text-secondary mb-1">New Quantity</label>
                           <input
                             type="number"
                             value={alternativesData.adjustments.quantityOrdered}
@@ -4223,11 +4223,11 @@ function PurchaseOrderDetailPageContent() {
                             step="0.01"
                             placeholder={order.quantityOrdered?.toString() || ""}
                             disabled={isModifying}
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-500 disabled:opacity-50"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted disabled:opacity-50"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-1">New Delivery Date</label>
+                          <label className="block text-sm font-semibold ds-text-secondary mb-1">New Delivery Date</label>
                           <input
                             type="date"
                             value={alternativesData.adjustments.deliveryDate}
@@ -4239,11 +4239,11 @@ function PurchaseOrderDetailPageContent() {
                             }
                             min={new Date().toISOString().split("T")[0]}
                             disabled={isModifying}
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-500 disabled:opacity-50"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted disabled:opacity-50"
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-semibold text-gray-700 mb-1">New Terms</label>
+                          <label className="block text-sm font-semibold ds-text-secondary mb-1">New Terms</label>
                           <input
                             type="text"
                             value={alternativesData.adjustments.terms}
@@ -4255,12 +4255,12 @@ function PurchaseOrderDetailPageContent() {
                             }
                             placeholder={order.terms || ""}
                             disabled={isModifying}
-                            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-500 disabled:opacity-50"
+                            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted disabled:opacity-50"
                           />
                         </div>
                       </div>
                       <div className="mt-3">
-                        <label className="block text-sm font-semibold text-gray-700 mb-1">Additional Notes</label>
+                        <label className="block text-sm font-semibold ds-text-secondary mb-1">Additional Notes</label>
                         <textarea
                           value={alternativesData.adjustments.notes}
                           onChange={(e) =>
@@ -4271,14 +4271,14 @@ function PurchaseOrderDetailPageContent() {
                           }
                           rows={2}
                           disabled={isModifying}
-                          className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-500"
+                          className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted"
                           placeholder="Explain the adjustments made for alternative suppliers..."
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Communication Channels</label>
+                      <label className="block text-sm font-semibold ds-text-secondary mb-2">Communication Channels</label>
                       <div className="space-y-2">
                         {["email", "sms", "push"].map((channel) => (
                           <label key={channel} className="flex items-center">
@@ -4301,7 +4301,7 @@ function PurchaseOrderDetailPageContent() {
                               disabled={isModifying}
                               className="mr-2"
                             />
-                            <span className="text-sm font-medium text-gray-800 capitalize">{channel}</span>
+                            <span className="text-sm font-medium ds-text-primary capitalize">{channel}</span>
                           </label>
                         ))}
                       </div>
@@ -4321,7 +4321,7 @@ function PurchaseOrderDetailPageContent() {
                           disabled={isModifying}
                           className="mr-2"
                         />
-                        <span className="text-sm font-medium text-gray-800">Send orders immediately</span>
+                        <span className="text-sm font-medium ds-text-primary">Send orders immediately</span>
                       </label>
                     </div>
               </div>
@@ -4349,16 +4349,16 @@ function PurchaseOrderDetailPageContent() {
         >
           <div className="mt-4 space-y-4">
             {order?.supplierModifications && (
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2 text-sm">
+              <div className="ds-bg-surface-muted rounded-lg p-4 space-y-2 text-sm">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <span className="text-gray-600">New Quantity:</span>
+                    <span className="ds-text-secondary">New Quantity:</span>
                     <span className="ml-2 font-medium">
                       {order.supplierModifications.quantityOrdered || order.quantityOrdered} {order.unit}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-600">New Unit Cost:</span>
+                    <span className="ds-text-secondary">New Unit Cost:</span>
                     <span className="ml-2 font-medium">
                       {formatCurrency(
                         order.supplierModifications.unitCost !== undefined
@@ -4368,7 +4368,7 @@ function PurchaseOrderDetailPageContent() {
                     </span>
                   </div>
                   <div className="col-span-2">
-                    <span className="text-gray-600">New Total Cost:</span>
+                    <span className="ds-text-secondary">New Total Cost:</span>
                     <span className="ml-2 font-medium">
                       {formatCurrency(
                         (order.supplierModifications.quantityOrdered || order.quantityOrdered) *
@@ -4382,7 +4382,7 @@ function PurchaseOrderDetailPageContent() {
               </div>
             )}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Approval Notes (Optional)
               </label>
               <textarea
@@ -4390,7 +4390,7 @@ function PurchaseOrderDetailPageContent() {
                 onChange={(e) => setModificationApprovalData((prev) => ({ ...prev, approvalNotes: e.target.value }))}
                 rows={3}
                 disabled={isApprovingModification}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 placeholder:ds-text-muted"
                 placeholder="Add any notes about this approval..."
               />
             </div>
@@ -4408,7 +4408,7 @@ function PurchaseOrderDetailPageContent() {
                   disabled={isApprovingModification}
                   className="mr-2"
                 />
-                <span className="text-sm text-gray-700">
+                <span className="text-sm ds-text-secondary">
                   Auto-commit order (accept modifications and commit financially)
                 </span>
               </label>
@@ -4435,7 +4435,7 @@ function PurchaseOrderDetailPageContent() {
         >
           <div className="mt-4 space-y-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Rejection Reason *
               </label>
               <textarea
@@ -4449,7 +4449,7 @@ function PurchaseOrderDetailPageContent() {
                 rows={3}
                 required
                 disabled={isRejectingModification}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 placeholder:ds-text-muted"
                 placeholder="Explain why you are rejecting these modifications..."
               />
             </div>
@@ -4467,7 +4467,7 @@ function PurchaseOrderDetailPageContent() {
                   disabled={isRejectingModification}
                   className="mr-2"
                 />
-                <span className="text-sm text-gray-700">Revert to original order values</span>
+                <span className="text-sm ds-text-secondary">Revert to original order values</span>
               </label>
             </div>
           </div>

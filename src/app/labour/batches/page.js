@@ -155,13 +155,13 @@ function LabourBatchesPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       submitted: 'bg-blue-100 text-blue-800',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getProjectName = (projectId) => {
@@ -175,8 +175,8 @@ function LabourBatchesPageContent() {
       <AppLayout>
         <div className="container mx-auto px-4 py-8">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Labour Batches</h1>
-            <p className="text-gray-600 mt-1">View and manage all labour batches</p>
+            <h1 className="text-3xl font-bold ds-text-primary">Labour Batches</h1>
+            <p className="ds-text-secondary mt-1">View and manage all labour batches</p>
           </div>
           <NoProjectsEmptyState />
         </div>
@@ -201,8 +201,8 @@ function LabourBatchesPageContent() {
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Labour Batches</h1>
-              <p className="text-gray-600 mt-1">View and manage all labour batches</p>
+              <h1 className="text-3xl font-bold ds-text-primary">Labour Batches</h1>
+              <p className="ds-text-secondary mt-1">View and manage all labour batches</p>
             </div>
             {canAccess('create_labour_batch') && (
               <Link
@@ -231,14 +231,14 @@ function LabourBatchesPageContent() {
           />
 
           {/* Filters */}
-          <div className="bg-white rounded-lg shadow p-4 mb-6">
+          <div className="ds-bg-surface rounded-lg shadow p-4 mb-6">
             <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Project</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Project</label>
                 <select
                   value={filters.projectId}
                   onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Projects</option>
                   {accessibleProjects.map((project) => (
@@ -250,11 +250,11 @@ function LabourBatchesPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Status</label>
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">All Statuses</option>
                   <option value="draft">Draft</option>
@@ -266,15 +266,15 @@ function LabourBatchesPageContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Search</label>
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted" />
                   <input
                     type="text"
                     value={filters.search}
                     onChange={(e) => handleFilterChange('search', e.target.value)}
                     placeholder="Batch number, name..."
-                    className="w-full pl-10 pr-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
               </div>
@@ -294,17 +294,17 @@ function LabourBatchesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
         {/* Batches Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
           {batches.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 mb-4">No labour batches found</p>
+              <Users className="w-12 h-12 ds-text-muted mx-auto mb-4" />
+              <p className="ds-text-secondary mb-4">No labour batches found</p>
               {canAccess('create_labour_batch') && (
                 <Link
                   href="/labour/batches/new"
@@ -317,38 +317,38 @@ function LabourBatchesPageContent() {
           ) : (
             <>
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                         Batch Number
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                         Project
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                         Entries
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                         Hours
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                         Total Cost
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                         Created
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {batches.map((batch) => (
-                      <tr key={batch._id} className="hover:bg-gray-50">
+                      <tr key={batch._id} className="hover:ds-bg-surface-muted">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <Link
                             href={`/labour/batches/${batch._id}`}
@@ -357,27 +357,27 @@ function LabourBatchesPageContent() {
                             {batch.batchNumber || 'N/A'}
                           </Link>
                           {batch.batchName && (
-                            <div className="text-sm text-gray-500">{batch.batchName}</div>
+                            <div className="text-sm ds-text-muted">{batch.batchName}</div>
                           )}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {getProjectName(batch.projectId)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           <div className="flex items-center gap-1">
-                            <Users className="w-4 h-4 text-gray-400" />
+                            <Users className="w-4 h-4 ds-text-muted" />
                             {batch.actualEntryCount || batch.totalEntries || 0} entries
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4 text-gray-400" />
+                            <Clock className="w-4 h-4 ds-text-muted" />
                             {batch.totalHours?.toFixed(1) || 0} hrs
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           <div className="flex items-center gap-1">
-                            <DollarSign className="w-4 h-4 text-gray-400" />
+                            <DollarSign className="w-4 h-4 ds-text-muted" />
                             {formatCurrency(batch.totalCost || 0)}
                           </div>
                         </td>
@@ -390,9 +390,9 @@ function LabourBatchesPageContent() {
                             {batch.status?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'Unknown'}
                           </span>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                           <div className="flex items-center gap-1">
-                            <Calendar className="w-4 h-4 text-gray-400" />
+                            <Calendar className="w-4 h-4 ds-text-muted" />
                             {formatDate(batch.createdAt)}
                           </div>
                         </td>
@@ -412,9 +412,9 @@ function LabourBatchesPageContent() {
 
               {/* Pagination */}
               {pagination.totalPages > 1 && (
-                <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                <div className="ds-bg-surface-muted px-6 py-4 border-t ds-border-subtle">
                   <div className="flex items-center justify-between">
-                    <div className="text-sm text-gray-700">
+                    <div className="text-sm ds-text-secondary">
                       Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
                       {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
                       {pagination.total} batches
@@ -425,11 +425,11 @@ function LabourBatchesPageContent() {
                           setPagination((prev) => ({ ...prev, page: Math.max(1, prev.page - 1) }))
                         }
                         disabled={pagination.page === 1}
-                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                        className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                       >
                         Previous
                       </button>
-                      <span className="px-4 py-2 text-sm text-gray-700">
+                      <span className="px-4 py-2 text-sm ds-text-secondary">
                         Page {pagination.page} of {pagination.totalPages}
                       </span>
                       <button
@@ -440,7 +440,7 @@ function LabourBatchesPageContent() {
                           }))
                         }
                         disabled={pagination.page >= pagination.totalPages}
-                        className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                        className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
                       >
                         Next
                       </button>

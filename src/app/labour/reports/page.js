@@ -180,8 +180,8 @@ export default function LabourReportsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Labour Reports</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold ds-text-primary mb-2">Labour Reports</h1>
+          <p className="ds-text-secondary">
             Comprehensive labour analytics and reporting for your construction projects
           </p>
         </div>
@@ -206,18 +206,18 @@ export default function LabourReportsPage() {
         <div className="space-y-8">
           {reportCategories.map((category, categoryIndex) => (
             <div key={categoryIndex}>
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">{category.title}</h2>
+              <h2 className="text-xl font-semibold ds-text-primary mb-4">{category.title}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {category.reports.map((report) => {
                   const Icon = report.icon;
                   const colorClasses = {
-                    blue: 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100',
-                    purple: 'bg-purple-50 border-purple-200 text-purple-600 hover:bg-purple-100',
-                    green: 'bg-green-50 border-green-200 text-green-600 hover:bg-green-100',
+                    blue: 'bg-blue-50 border-blue-400/60 text-blue-600 hover:bg-blue-100',
+                    purple: 'bg-purple-50 border-purple-400/60 text-purple-600 hover:bg-purple-100',
+                    green: 'bg-green-50 border-green-400/60 text-green-600 hover:bg-green-100',
                     orange: 'bg-orange-50 border-orange-200 text-orange-600 hover:bg-orange-100',
                     indigo: 'bg-indigo-50 border-indigo-200 text-indigo-600 hover:bg-indigo-100',
                     teal: 'bg-teal-50 border-teal-200 text-teal-600 hover:bg-teal-100',
-                    red: 'bg-red-50 border-red-200 text-red-600 hover:bg-red-100',
+                    red: 'bg-red-50 border-red-400/60 text-red-600 hover:bg-red-100',
                   };
 
                   return (
@@ -227,12 +227,12 @@ export default function LabourReportsPage() {
                       className={`block p-6 rounded-lg border-2 transition-all duration-200 ${colorClasses[report.color]}`}
                     >
                       <div className="flex items-start gap-4">
-                        <div className={`p-3 rounded-lg bg-white ${colorClasses[report.color].replace('bg-', 'bg-').replace('-50', '-100')}`}>
+                        <div className={`p-3 rounded-lg ds-bg-surface ${colorClasses[report.color].replace('bg-', 'bg-').replace('-50', '-100')}`}>
                           <Icon className="w-6 h-6" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2">{report.name}</h3>
-                          <p className="text-sm text-gray-600">{report.description}</p>
+                          <h3 className="text-lg font-semibold ds-text-primary mb-2">{report.name}</h3>
+                          <p className="text-sm ds-text-secondary">{report.description}</p>
                         </div>
                       </div>
                     </Link>
@@ -244,37 +244,37 @@ export default function LabourReportsPage() {
         </div>
 
         {/* Quick Stats */}
-        <div className="mt-12 bg-gray-50 rounded-lg p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Access</h2>
+        <div className="mt-12 ds-bg-surface-muted rounded-lg p-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Quick Access</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <Link
               href="/labour"
-              className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all"
+              className="flex items-center gap-3 p-4 ds-bg-surface rounded-lg border ds-border-subtle hover:border-blue-400/60 hover:shadow-md transition-all"
             >
               <BarChart3 className="w-5 h-5 text-blue-600" />
               <div>
-                <p className="font-medium text-gray-900">Labour Dashboard</p>
-                <p className="text-sm text-gray-600">View today's summary</p>
+                <p className="font-medium ds-text-primary">Labour Dashboard</p>
+                <p className="text-sm ds-text-secondary">View today's summary</p>
               </div>
             </Link>
             <Link
               href="/labour/entries/new"
-              className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-green-300 hover:shadow-md transition-all"
+              className="flex items-center gap-3 p-4 ds-bg-surface rounded-lg border ds-border-subtle hover:border-green-400/60 hover:shadow-md transition-all"
             >
               <FileText className="w-5 h-5 text-green-600" />
               <div>
-                <p className="font-medium text-gray-900">New Entry</p>
-                <p className="text-sm text-gray-600">Add labour entry</p>
+                <p className="font-medium ds-text-primary">New Entry</p>
+                <p className="text-sm ds-text-secondary">Add labour entry</p>
               </div>
             </Link>
             <Link
               href="/labour/batches/new"
-              className="flex items-center gap-3 p-4 bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:shadow-md transition-all"
+              className="flex items-center gap-3 p-4 ds-bg-surface rounded-lg border ds-border-subtle hover:border-purple-400/60 hover:shadow-md transition-all"
             >
               <Users className="w-5 h-5 text-purple-600" />
               <div>
-                <p className="font-medium text-gray-900">Bulk Entry</p>
-                <p className="text-sm text-gray-600">Create batch entry</p>
+                <p className="font-medium ds-text-primary">Bulk Entry</p>
+                <p className="text-sm ds-text-secondary">Create batch entry</p>
               </div>
             </Link>
           </div>

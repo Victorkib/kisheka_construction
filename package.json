@@ -18,6 +18,7 @@
     "test:db": "node scripts/test-connection.mjs",
     "test:connections": "node scripts/test-connections.mjs",
     "test:dependencies": "node --test tests/project-dependencies.test.mjs",
+    "test:approvals": "node scripts/verify-approvals-implementation.mjs",
     "update:user-role": "node scripts/update-user-role.mjs",
     "migrate:investor-links": "node scripts/migrate-investor-user-links.mjs",
     "migrate:role-naming": "node scripts/migrate-role-naming.mjs",

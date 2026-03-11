@@ -30,8 +30,8 @@ export default function ContingencyPage() {
 
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Contingency Reserve</h1>
-          <p className="mt-2 text-sm text-gray-600">
+          <h1 className="text-3xl font-bold ds-text-primary">Contingency Reserve</h1>
+          <p className="mt-2 text-sm ds-text-secondary">
             Manage contingency reserve budget, draws, and usage
           </p>
         </div>

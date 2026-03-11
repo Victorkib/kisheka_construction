@@ -90,11 +90,11 @@ export function getMilestoneStatistics(milestones) {
  */
 export function getStatusColor(status) {
   const colors = {
-    'pending': 'bg-gray-100 text-gray-800',
+    'pending': 'ds-bg-surface-muted ds-text-primary',
     'completed': 'bg-green-100 text-green-800',
     'overdue': 'bg-red-100 text-red-800'
   };
-  return colors[status] || 'bg-gray-100 text-gray-800';
+  return colors[status] || 'ds-bg-surface-muted ds-text-primary';
 }
 
 

@@ -17,10 +17,10 @@ const RejectionTrendsChart = ({ trends }) => {
     return (
       <Card>
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Rejection Trends</h3>
-          <div className="flex items-center justify-center h-64 text-gray-500">
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">Rejection Trends</h3>
+          <div className="flex items-center justify-center h-64 ds-text-muted">
             <div className="text-center">
-              <ChartLine className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+              <ChartLine className="w-12 h-12 mx-auto mb-2 ds-text-muted" />
               <p>No trend data available</p>
             </div>
           </div>
@@ -57,9 +57,9 @@ const RejectionTrendsChart = ({ trends }) => {
   const SimpleLineChart = ({ data, height = 300 }) => {
     if (!data || data.length === 0) {
       return (
-        <div className="flex items-center justify-center h-64 text-gray-500">
+        <div className="flex items-center justify-center h-64 ds-text-muted">
           <div className="text-center">
-            <ChartLine className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+            <ChartLine className="w-12 h-12 mx-auto mb-2 ds-text-muted" />
             <p>No data available for selected period</p>
           </div>
         </div>
@@ -266,12 +266,12 @@ const RejectionTrendsChart = ({ trends }) => {
     <Card>
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Rejection Trends</h3>
+          <h3 className="text-lg font-semibold ds-text-primary">Rejection Trends</h3>
           <div className="flex items-center space-x-2">
             <select
               value={timeRange}
               onChange={(e) => setTimeRange(e.target.value)}
-              className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm border ds-border-subtle rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="daily">Daily</option>
               <option value="weekly">Weekly</option>
@@ -281,7 +281,7 @@ const RejectionTrendsChart = ({ trends }) => {
             <select
               value={metric}
               onChange={(e) => setMetric(e.target.value)}
-              className="text-sm border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm border ds-border-subtle rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="count">Rejection Count</option>
               <option value="rate">Rejection Rate</option>
@@ -292,12 +292,12 @@ const RejectionTrendsChart = ({ trends }) => {
 
         {/* Trend Statistics */}
         {trendStats && (
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+          <div className="mb-4 p-3 ds-bg-surface-muted rounded-lg">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <div>
-                  <p className="text-sm text-gray-600">Recent Average</p>
-                  <p className="text-lg font-semibold text-gray-900">
+                  <p className="text-sm ds-text-secondary">Recent Average</p>
+                  <p className="text-lg font-semibold ds-text-primary">
                     {metric === 'count' ? Math.round(trendStats.recent).toLocaleString() :
                      metric === 'rate' ? `${trendStats.recent.toFixed(1)}%` :
                      new Intl.NumberFormat('en-US', {
@@ -319,11 +319,11 @@ const RejectionTrendsChart = ({ trends }) => {
                   <span className={`text-sm font-medium ${
                     trendStats.direction === 'up' ? 'text-red-600' :
                     trendStats.direction === 'down' ? 'text-green-600' :
-                    'text-gray-600'
+                    'ds-text-secondary'
                   }`}>
                     {trendStats.change > 0 ? '+' : ''}{trendStats.change.toFixed(1)}%
                   </span>
-                  <span className="text-sm text-gray-500 ml-1">vs previous period</span>
+                  <span className="text-sm ds-text-muted ml-1">vs previous period</span>
                 </div>
               </div>
               
@@ -343,18 +343,18 @@ const RejectionTrendsChart = ({ trends }) => {
 
         {/* Key Insights */}
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700">Key Insights:</h4>
+          <h4 className="text-sm font-medium ds-text-secondary">Key Insights:</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
             <div className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-600">
+              <Calendar className="w-4 h-4 ds-text-muted" />
+              <span className="ds-text-secondary">
                 Period: {timeRange === 'daily' ? 'Last 30 days' :
                         timeRange === 'weekly' ? 'Last 12 weeks' : 'Last 12 months'}
               </span>
             </div>
             <div className="flex items-center space-x-2">
-              <ChartLine className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-600">
+              <ChartLine className="w-4 h-4 ds-text-muted" />
+              <span className="ds-text-secondary">
                 Data points: {filteredTrends.length}
               </span>
             </div>

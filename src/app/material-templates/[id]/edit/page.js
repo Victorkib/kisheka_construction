@@ -87,9 +87,9 @@ function EditTemplatePageContent() {
       <AppLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-            <p className="text-gray-600">You don't have permission to edit templates.</p>
-            <Link href="/material-templates" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+            <h1 className="text-2xl font-bold ds-text-primary mb-2">Access Denied</h1>
+            <p className="ds-text-secondary">You don't have permission to edit templates.</p>
+            <Link href="/material-templates" className="ds-text-accent-primary hover:ds-text-accent-hover mt-4 inline-block">
               ← Back to Templates
             </Link>
           </div>
@@ -112,10 +112,10 @@ function EditTemplatePageContent() {
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error || 'Template not found'}
           </div>
-          <Link href="/material-templates" className="text-blue-600 hover:text-blue-800">
+          <Link href="/material-templates" className="ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Templates
           </Link>
         </div>
@@ -127,11 +127,11 @@ function EditTemplatePageContent() {
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <Link href="/material-templates" className="text-blue-600 hover:text-blue-800 text-sm mb-4 inline-block">
+          <Link href="/material-templates" className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block">
             ← Back to Templates
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Edit Template</h1>
-          <p className="text-gray-600 mt-2">{template.name}</p>
+          <h1 className="text-3xl font-bold ds-text-primary">Edit Template</h1>
+          <p className="ds-text-secondary mt-2">{template.name}</p>
         </div>
 
         <TemplateForm

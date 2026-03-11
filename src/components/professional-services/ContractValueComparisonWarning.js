@@ -43,8 +43,8 @@ export function ContractValueComparisonWarning({ suggestedValue, currentValue })
   return (
     <div className={`mt-3 flex items-start gap-2 p-3 rounded-lg border ${
       warning.type === 'error' 
-        ? 'bg-red-50 border-red-200' 
-        : 'bg-yellow-50 border-yellow-200'
+        ? 'bg-red-50 border-red-400/60' 
+        : 'bg-yellow-50 border-yellow-400/60'
     }`}>
       <AlertTriangle className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
         warning.type === 'error' ? 'text-red-600' : 'text-yellow-600'

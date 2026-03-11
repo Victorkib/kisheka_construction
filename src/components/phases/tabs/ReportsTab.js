@@ -28,12 +28,12 @@ export function ReportsTab({ phase, formatCurrency, formatDate }) {
     <div className="space-y-6">
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Completion</p>
-          <p className="text-3xl font-bold text-gray-900">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Completion</p>
+          <p className="text-3xl font-bold ds-text-primary">
             {phase.completionPercentage || 0}%
           </p>
-          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+          <div className="mt-2 w-full ds-bg-surface-muted rounded-full h-2">
             <div
               className={`h-2 rounded-full ${
                 phase.completionPercentage >= 100
@@ -42,19 +42,19 @@ export function ReportsTab({ phase, formatCurrency, formatDate }) {
                   ? 'bg-blue-600'
                   : phase.completionPercentage >= 50
                   ? 'bg-yellow-600'
-                  : 'bg-gray-400'
+                  : 'ds-bg-surface-muted'
               }`}
               style={{ width: `${Math.min(100, phase.completionPercentage || 0)}%` }}
             />
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Budget Utilization</p>
-          <p className="text-3xl font-bold text-gray-900">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Budget Utilization</p>
+          <p className="text-3xl font-bold ds-text-primary">
             {financialSummary.utilizationPercentage.toFixed(1)}%
           </p>
-          <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+          <div className="mt-2 w-full ds-bg-surface-muted rounded-full h-2">
             <div
               className={`h-2 rounded-full ${
                 financialSummary.utilizationPercentage > 100
@@ -70,8 +70,8 @@ export function ReportsTab({ phase, formatCurrency, formatDate }) {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Timeline Adherence</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Timeline Adherence</p>
           {timelineAdherence !== null ? (
             <>
               <p className={`text-2xl font-bold ${
@@ -79,23 +79,23 @@ export function ReportsTab({ phase, formatCurrency, formatDate }) {
               }`}>
                 {timelineAdherence > 0 ? '+' : ''}{Math.round(timelineAdherence)} days
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs ds-text-muted mt-1">
                 {timelineAdherence > 0 ? 'Behind schedule' : 'On or ahead of schedule'}
               </p>
             </>
           ) : (
-            <p className="text-lg text-gray-500">N/A</p>
+            <p className="text-lg ds-text-muted">N/A</p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Budget Variance</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Budget Variance</p>
           <p className={`text-2xl font-bold ${
             financialSummary.variance > 0 ? 'text-red-600' : 'text-green-600'
           }`}>
             {formatCurrency(financialSummary.variance)}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs ds-text-muted mt-1">
             {financialSummary.variancePercentage > 0 ? '+' : ''}
             {financialSummary.variancePercentage.toFixed(1)}%
           </p>
@@ -103,21 +103,21 @@ export function ReportsTab({ phase, formatCurrency, formatDate }) {
       </div>
 
       {/* Report Links */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Reports</h3>
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Available Reports</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Link
             href={`/phases/${phase._id}/reports/financial`}
-            className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+            className="border ds-border-subtle rounded-lg p-4 hover:ds-bg-surface-muted transition-colors"
           >
             <div className="flex items-start justify-between">
               <div>
-                <h4 className="font-semibold text-gray-900 mb-1">Financial Report</h4>
-                <p className="text-sm text-gray-600">
+                <h4 className="font-semibold ds-text-primary mb-1">Financial Report</h4>
+                <p className="text-sm ds-text-secondary">
                   Comprehensive financial analysis including budget vs actual, spending trends, and cost breakdowns
                 </p>
               </div>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
@@ -125,16 +125,16 @@ export function ReportsTab({ phase, formatCurrency, formatDate }) {
 
           <Link
             href={`/phases/${phase._id}/reports/progress`}
-            className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+            className="border ds-border-subtle rounded-lg p-4 hover:ds-bg-surface-muted transition-colors"
           >
             <div className="flex items-start justify-between">
               <div>
-                <h4 className="font-semibold text-gray-900 mb-1">Progress Report</h4>
-                <p className="text-sm text-gray-600">
+                <h4 className="font-semibold ds-text-primary mb-1">Progress Report</h4>
+                <p className="text-sm ds-text-secondary">
                   Phase progress tracking, milestone completion, and timeline analysis
                 </p>
               </div>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
@@ -142,31 +142,31 @@ export function ReportsTab({ phase, formatCurrency, formatDate }) {
 
           <Link
             href={`/phases/${phase._id}/reports/resources`}
-            className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+            className="border ds-border-subtle rounded-lg p-4 hover:ds-bg-surface-muted transition-colors"
           >
             <div className="flex items-start justify-between">
               <div>
-                <h4 className="font-semibold text-gray-900 mb-1">Resource Report</h4>
-                <p className="text-sm text-gray-600">
+                <h4 className="font-semibold ds-text-primary mb-1">Resource Report</h4>
+                <p className="text-sm ds-text-secondary">
                   Resource utilization, worker assignments, and equipment tracking
                 </p>
               </div>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
           </Link>
 
-          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+          <div className="border ds-border-subtle rounded-lg p-4 ds-bg-surface-muted">
             <div className="flex items-start justify-between">
               <div>
-                <h4 className="font-semibold text-gray-900 mb-1">Materials Report</h4>
-                <p className="text-sm text-gray-600">
+                <h4 className="font-semibold ds-text-primary mb-1">Materials Report</h4>
+                <p className="text-sm ds-text-secondary">
                   Material consumption, inventory levels, and procurement analysis
                 </p>
-                <p className="text-xs text-gray-500 mt-2">Coming soon</p>
+                <p className="text-xs ds-text-muted mt-2">Coming soon</p>
               </div>
-              <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
@@ -175,15 +175,15 @@ export function ReportsTab({ phase, formatCurrency, formatDate }) {
       </div>
 
       {/* Export Options */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Export Data</h3>
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Export Data</h3>
         <div className="flex flex-wrap gap-3">
           <button
             onClick={() => {
               // TODO: Implement CSV export
               alert('CSV export coming soon');
             }}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
           >
             Export to CSV
           </button>
@@ -192,7 +192,7 @@ export function ReportsTab({ phase, formatCurrency, formatDate }) {
               // TODO: Implement PDF export
               alert('PDF export coming soon');
             }}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
           >
             Export to PDF
           </button>
@@ -201,7 +201,7 @@ export function ReportsTab({ phase, formatCurrency, formatDate }) {
               // TODO: Implement Excel export
               alert('Excel export coming soon');
             }}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
           >
             Export to Excel
           </button>

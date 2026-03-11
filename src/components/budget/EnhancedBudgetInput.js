@@ -377,15 +377,15 @@ export function EnhancedBudgetInput({
             </svg>
           </div>
           <div>
-            <h3 className="text-lg font-bold text-gray-900">Budget Structure</h3>
-            <p className="text-xs text-gray-600 mt-1">Comprehensive budget breakdown with detailed categories</p>
+            <h3 className="text-lg font-bold ds-text-primary">Budget Structure</h3>
+            <p className="text-xs ds-text-secondary mt-1">Comprehensive budget breakdown with detailed categories</p>
           </div>
         </div>
       </div>
 
       {/* Top Level Summary */}
-      <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border-2 border-gray-200 shadow-sm">
-        <h4 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+      <div className="bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl p-6 border-2 ds-border-subtle shadow-sm">
+        <h4 className="text-sm font-bold ds-text-primary mb-4 flex items-center gap-2">
           <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -397,25 +397,25 @@ export function EnhancedBudgetInput({
           Budget Summary
         </h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white rounded-lg p-4 border border-gray-200 shadow-sm">
-            <label className="block text-xs font-semibold text-gray-600 mb-2 uppercase tracking-wide">
+          <div className="ds-bg-surface rounded-lg p-4 border ds-border-subtle shadow-sm">
+            <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
               Total Project Budget
             </label>
-            <p className="text-xl font-bold text-gray-900">{formatCurrency(budgetData.total || 0)}</p>
+            <p className="text-xl font-bold ds-text-primary">{formatCurrency(budgetData.total || 0)}</p>
           </div>
-          <div className="bg-white rounded-lg p-4 border border-blue-200 shadow-sm">
+          <div className="ds-bg-surface rounded-lg p-4 border border-blue-400/60 shadow-sm">
             <label className="block text-xs font-semibold text-blue-700 mb-2 uppercase tracking-wide">
               Direct Construction
             </label>
             <p className="text-xl font-bold text-blue-600">{formatCurrency(budgetData.directConstructionCosts || 0)}</p>
           </div>
-          <div className="bg-white rounded-lg p-4 border border-purple-200 shadow-sm">
+          <div className="ds-bg-surface rounded-lg p-4 border border-purple-400/60 shadow-sm">
             <label className="block text-xs font-semibold text-purple-700 mb-2 uppercase tracking-wide">
               Pre-Construction
             </label>
             <p className="text-xl font-bold text-purple-600">{formatCurrency(budgetData.preConstructionCosts || 0)}</p>
           </div>
-          <div className="bg-white rounded-lg p-4 border border-orange-200 shadow-sm">
+          <div className="ds-bg-surface rounded-lg p-4 border border-orange-200 shadow-sm">
             <label className="block text-xs font-semibold text-orange-700 mb-2 uppercase tracking-wide">
               Contingency Reserve
             </label>
@@ -425,8 +425,8 @@ export function EnhancedBudgetInput({
       </div>
 
       {/* Direct Construction Costs */}
-      <div className="bg-white border-2 border-gray-200 rounded-xl p-6 shadow-sm">
-        <h4 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
+      <div className="ds-bg-surface border-2 ds-border-subtle rounded-xl p-6 shadow-sm">
+        <h4 className="text-base font-bold ds-text-primary mb-6 flex items-center gap-2">
           <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -440,7 +440,7 @@ export function EnhancedBudgetInput({
 
         {/* Materials */}
         <div className="mb-6 bg-blue-50 rounded-lg p-5 border-l-4 border-blue-500">
-          <label className="block text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <label className="block text-sm font-bold ds-text-primary mb-4 flex items-center gap-2">
             <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -453,7 +453,7 @@ export function EnhancedBudgetInput({
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Total</label>
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Total</label>
               <input
                 type="number"
                 value={budgetData.directCosts?.materials?.total || 0}
@@ -461,12 +461,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                 Structural
               </label>
               <input
@@ -476,12 +476,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                 Finishing
               </label>
               <input
@@ -491,16 +491,16 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide flex items-center gap-1">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide flex items-center gap-1">
                 MEP
                 <span className="relative group cursor-help" title="Mechanical, Electrical, Plumbing">
                   <svg
-                    className="w-4 h-4 text-gray-500 hover:text-blue-600 transition-colors"
+                    className="w-4 h-4 ds-text-muted hover:text-blue-600 transition-colors"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -513,7 +513,7 @@ export function EnhancedBudgetInput({
                     />
                   </svg>
                   {/* Subtle tooltip on hover */}
-                  <span className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap">
+                  <span className="absolute hidden group-hover:block bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-slate-800 text-white text-xs rounded whitespace-nowrap">
                     Mechanical, Electrical, Plumbing
                   </span>
                 </span>
@@ -525,12 +525,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                 Specialty
               </label>
               <input
@@ -540,7 +540,7 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
@@ -549,7 +549,7 @@ export function EnhancedBudgetInput({
 
         {/* Labour */}
         <div className="mb-6 bg-green-50 rounded-lg p-5 border-l-4 border-green-500">
-          <label className="block text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <label className="block text-sm font-bold ds-text-primary mb-4 flex items-center gap-2">
             <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -562,7 +562,7 @@ export function EnhancedBudgetInput({
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Total</label>
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Total</label>
               <input
                 type="number"
                 value={budgetData.directCosts?.labour?.total || 0}
@@ -570,12 +570,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Skilled</label>
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Skilled</label>
               <input
                 type="number"
                 value={budgetData.directCosts?.labour?.skilled || 0}
@@ -583,12 +583,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                 Unskilled
               </label>
               <input
@@ -598,12 +598,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                 Supervisory
               </label>
               <input
@@ -613,12 +613,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                 Specialized
               </label>
               <input
@@ -628,7 +628,7 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
@@ -637,7 +637,7 @@ export function EnhancedBudgetInput({
 
         {/* Equipment */}
         <div className="mb-6 bg-yellow-50 rounded-lg p-5 border-l-4 border-yellow-500">
-          <label className="block text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <label className="block text-sm font-bold ds-text-primary mb-4 flex items-center gap-2">
             <svg className="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -651,7 +651,7 @@ export function EnhancedBudgetInput({
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Total</label>
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Total</label>
               <input
                 type="number"
                 value={budgetData.directCosts?.equipment?.total || 0}
@@ -659,12 +659,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Rental</label>
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Rental</label>
               <input
                 type="number"
                 value={budgetData.directCosts?.equipment?.rental || 0}
@@ -672,12 +672,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Purchase</label>
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Purchase</label>
               <input
                 type="number"
                 value={budgetData.directCosts?.equipment?.purchase || 0}
@@ -685,12 +685,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                 Maintenance
               </label>
               <input
@@ -700,7 +700,7 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
@@ -709,7 +709,7 @@ export function EnhancedBudgetInput({
 
         {/* Subcontractors */}
         <div className="mb-6 bg-indigo-50 rounded-lg p-5 border-l-4 border-indigo-500">
-          <label className="block text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+          <label className="block text-sm font-bold ds-text-primary mb-4 flex items-center gap-2">
             <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -722,7 +722,7 @@ export function EnhancedBudgetInput({
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Total</label>
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Total</label>
               <input
                 type="number"
                 value={budgetData.directCosts?.subcontractors?.total || 0}
@@ -730,12 +730,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                 Specialized Trades
               </label>
               <input
@@ -745,12 +745,12 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                 Professional Services
               </label>
               <input
@@ -762,7 +762,7 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
@@ -772,8 +772,8 @@ export function EnhancedBudgetInput({
 
       {/* Pre-Construction Costs */}
       {showAdvanced && (
-        <div className="bg-white border-2 border-purple-200 rounded-xl p-6 shadow-sm">
-          <h4 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <div className="ds-bg-surface border-2 border-purple-400/60 rounded-xl p-6 shadow-sm">
+          <h4 className="text-base font-bold ds-text-primary mb-6 flex items-center gap-2">
             <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -787,7 +787,7 @@ export function EnhancedBudgetInput({
           <div className="bg-purple-50 rounded-lg p-5 border-l-4 border-purple-500">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Total</label>
+                <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Total</label>
                 <input
                   type="number"
                   value={budgetData.preConstructionCosts || 0}
@@ -795,12 +795,12 @@ export function EnhancedBudgetInput({
                   min="0"
                   step="0.01"
                   disabled={disabled}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base font-medium transition-all"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base font-medium transition-all"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                   Land Acquisition
                 </label>
                 <input
@@ -810,12 +810,12 @@ export function EnhancedBudgetInput({
                   min="0"
                   step="0.01"
                   disabled={disabled}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base font-medium transition-all"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base font-medium transition-all"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                   Legal & Regulatory
                 </label>
                 <input
@@ -825,12 +825,12 @@ export function EnhancedBudgetInput({
                   min="0"
                   step="0.01"
                   disabled={disabled}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base font-medium transition-all"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base font-medium transition-all"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                   Permits & Approvals
                 </label>
                 <input
@@ -840,12 +840,12 @@ export function EnhancedBudgetInput({
                   min="0"
                   step="0.01"
                   disabled={disabled}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base font-medium transition-all"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base font-medium transition-all"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                   Site Preparation
                 </label>
                 <input
@@ -855,7 +855,7 @@ export function EnhancedBudgetInput({
                   min="0"
                   step="0.01"
                   disabled={disabled}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base font-medium transition-all"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-base font-medium transition-all"
                   placeholder="0.00"
                 />
               </div>
@@ -866,8 +866,8 @@ export function EnhancedBudgetInput({
 
       {/* Indirect Costs */}
       {showAdvanced && (
-        <div className="bg-white border-2 border-teal-200 rounded-xl p-6 shadow-sm">
-          <h4 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
+        <div className="ds-bg-surface border-2 border-teal-200 rounded-xl p-6 shadow-sm">
+          <h4 className="text-base font-bold ds-text-primary mb-6 flex items-center gap-2">
             <svg className="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -881,7 +881,7 @@ export function EnhancedBudgetInput({
           <div className="bg-teal-50 rounded-lg p-5 border-l-4 border-teal-500">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Total</label>
+                <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">Total</label>
                 <input
                   type="number"
                   value={budgetData.indirectCosts || 0}
@@ -889,12 +889,12 @@ export function EnhancedBudgetInput({
                   min="0"
                   step="0.01"
                   disabled={disabled}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-base font-medium transition-all"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-base font-medium transition-all"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                   Site Overhead
                 </label>
                 <input
@@ -904,12 +904,12 @@ export function EnhancedBudgetInput({
                   min="0"
                   step="0.01"
                   disabled={disabled}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-base font-medium transition-all"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-base font-medium transition-all"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                   Transportation
                 </label>
                 <input
@@ -919,12 +919,12 @@ export function EnhancedBudgetInput({
                   min="0"
                   step="0.01"
                   disabled={disabled}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-base font-medium transition-all"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-base font-medium transition-all"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                   Utilities
                 </label>
                 <input
@@ -934,12 +934,12 @@ export function EnhancedBudgetInput({
                   min="0"
                   step="0.01"
                   disabled={disabled}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-base font-medium transition-all"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-base font-medium transition-all"
                   placeholder="0.00"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                   Safety & Compliance
                 </label>
                 <input
@@ -949,7 +949,7 @@ export function EnhancedBudgetInput({
                   min="0"
                   step="0.01"
                   disabled={disabled}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-base font-medium transition-all"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-base font-medium transition-all"
                   placeholder="0.00"
                 />
               </div>
@@ -959,8 +959,8 @@ export function EnhancedBudgetInput({
       )}
 
       {/* Contingency Breakdown */}
-      <div className="bg-white border-2 border-orange-200 rounded-xl p-6 shadow-sm">
-        <h4 className="text-base font-bold text-gray-900 mb-6 flex items-center gap-2">
+      <div className="ds-bg-surface border-2 border-orange-200 rounded-xl p-6 shadow-sm">
+        <h4 className="text-base font-bold ds-text-primary mb-6 flex items-center gap-2">
           <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
@@ -974,7 +974,7 @@ export function EnhancedBudgetInput({
         <div className="bg-orange-50 rounded-lg p-5 border-l-4 border-orange-500">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+              <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                 Total Reserve
               </label>
               <input
@@ -984,14 +984,14 @@ export function EnhancedBudgetInput({
                 min="0"
                 step="0.01"
                 disabled={disabled}
-                className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base font-medium transition-all"
+                className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base font-medium transition-all"
                 placeholder="0.00"
               />
             </div>
             {showAdvanced && (
               <>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                  <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                     Design Contingency
                   </label>
                   <input
@@ -1001,12 +1001,12 @@ export function EnhancedBudgetInput({
                     min="0"
                     step="0.01"
                     disabled={disabled}
-                    className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base font-medium transition-all"
+                    className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base font-medium transition-all"
                     placeholder="0.00"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                  <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                     Construction Contingency
                   </label>
                   <input
@@ -1016,12 +1016,12 @@ export function EnhancedBudgetInput({
                     min="0"
                     step="0.01"
                     disabled={disabled}
-                    className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base font-medium transition-all"
+                    className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base font-medium transition-all"
                     placeholder="0.00"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">
+                  <label className="block text-xs font-semibold ds-text-secondary mb-2 uppercase tracking-wide">
                     Owner's Reserve
                   </label>
                   <input
@@ -1031,7 +1031,7 @@ export function EnhancedBudgetInput({
                     min="0"
                     step="0.01"
                     disabled={disabled}
-                    className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base font-medium transition-all"
+                    className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-base font-medium transition-all"
                     placeholder="0.00"
                   />
                 </div>
@@ -1048,7 +1048,7 @@ export function EnhancedBudgetInput({
           onClick={() => {
             setShowAdvanced(true)
           }}
-          className="w-full py-4 px-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl hover:from-blue-100 hover:to-indigo-100 hover:border-blue-300 transition-all flex items-center justify-center gap-3 font-semibold text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          className="w-full py-4 px-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-400/60 rounded-xl hover:from-blue-100 hover:to-indigo-100 hover:border-blue-400/60 transition-all flex items-center justify-center gap-3 font-semibold text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           disabled={disabled}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1071,7 +1071,7 @@ export function EnhancedBudgetInput({
           onClick={() => {
             setShowAdvanced(false)
           }}
-          className="w-full py-4 px-6 bg-gradient-to-r from-gray-50 to-gray-100 border-2 border-gray-300 rounded-xl hover:from-gray-100 hover:to-gray-200 hover:border-gray-400 transition-all flex items-center justify-center gap-3 font-semibold text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+          className="w-full py-4 px-6 bg-gradient-to-r from-gray-50 to-gray-100 border-2 ds-border-subtle rounded-xl hover:from-gray-100 hover:to-gray-200 hover:border-ds-border-strong transition-all flex items-center justify-center gap-3 font-semibold ds-text-secondary disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           disabled={disabled}
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

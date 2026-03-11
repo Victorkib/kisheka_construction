@@ -159,17 +159,17 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl font-semibold ds-text-primary mb-2">
           Edit Details
         </h2>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm ds-text-secondary">
           Review and edit details for each worker entry. Click on a row to
           expand and edit additional fields.
         </p>
       </div>
 
       {/* Summary */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
         <div className="grid grid-cols-3 gap-4 text-center">
           <div>
             <p className="text-sm font-medium text-blue-900">Total Workers</p>
@@ -194,28 +194,28 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
 
       {/* Entries Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 border border-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-ds-border-subtle border ds-border-subtle">
+          <thead className="ds-bg-surface-muted">
             <tr>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-12"></th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[200px]">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase w-12"></th>
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase min-w-[200px]">
                 Worker
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[120px]">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase min-w-[120px]">
                 Skill
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[100px]">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase min-w-[100px]">
                 Hours
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[120px]">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase min-w-[120px]">
                 Rate
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[120px]">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase min-w-[120px]">
                 Cost
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
             {entries.map((entry, index) => {
               // Use schema calculation logic to match what will be saved
               const totalHours = parseFloat(entry.totalHours) || 0;
@@ -236,34 +236,34 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                 <>
                   <tr
                     key={index}
-                    className="hover:bg-gray-50 cursor-pointer"
+                    className="hover:ds-bg-surface-muted cursor-pointer"
                     onClick={() => toggleRow(index)}
                   >
-                    <td className="px-3 py-2 text-sm text-gray-600">
+                    <td className="px-3 py-2 text-sm ds-text-secondary">
                       {isExpanded ? '▼' : '▶'}
                     </td>
-                    <td className="px-3 py-2 text-sm font-medium text-gray-900">
+                    <td className="px-3 py-2 text-sm font-medium ds-text-primary">
                       {entry.workerName}
                     </td>
-                    <td className="px-3 py-2 text-sm text-gray-600">
+                    <td className="px-3 py-2 text-sm ds-text-secondary">
                       {entry.skillType?.replace(/_/g, ' ')}
                     </td>
-                    <td className="px-3 py-2 text-sm text-gray-600">
+                    <td className="px-3 py-2 text-sm ds-text-secondary">
                       {entry.totalHours} hrs
                     </td>
-                    <td className="px-3 py-2 text-sm text-gray-600">
+                    <td className="px-3 py-2 text-sm ds-text-secondary">
                       {hourlyRate.toLocaleString()} KES/hr
                     </td>
-                    <td className="px-3 py-2 text-sm font-medium text-gray-900">
+                    <td className="px-3 py-2 text-sm font-medium ds-text-primary">
                       {totalCost.toLocaleString()} KES
                     </td>
                   </tr>
                   {isExpanded && (
-                    <tr className="bg-gray-50">
+                    <tr className="ds-bg-surface-muted">
                       <td colSpan="6" className="px-4 py-4">
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                           {/* Indirect Labour Toggle */}
-                          <div className="col-span-2 md:col-span-3 bg-white border border-amber-200 rounded-lg p-3 mb-2">
+                          <div className="col-span-2 md:col-span-3 ds-bg-surface border border-amber-200 rounded-lg p-3 mb-2">
                             <label className="flex items-start gap-3 cursor-pointer">
                               <input
                                 type="checkbox"
@@ -275,13 +275,13 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                                     e.target.checked
                                   )
                                 }
-                                className="mt-1 w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
+                                className="mt-1 w-4 h-4 text-amber-600 ds-border-subtle rounded focus:ring-amber-500"
                               />
                               <div>
-                                <p className="text-sm font-medium text-gray-900">
+                                <p className="text-sm font-medium ds-text-primary">
                                   This is Indirect Labour
                                 </p>
-                                <p className="text-xs text-gray-600">
+                                <p className="text-xs ds-text-secondary">
                                   Mark if this entry is for site management,
                                   security, or office staff (will use indirect
                                   costs budget)
@@ -307,7 +307,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                                     e.target.value
                                   )
                                 }
-                                className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-amber-300 rounded focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500"
+                                className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border border-amber-300 rounded focus:outline-none focus:ring-1 focus:ring-amber-500 focus:border-amber-500"
                               >
                                 <option value="siteOverhead">
                                   Site Overhead
@@ -324,7 +324,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                           )}
 
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                            <label className="block text-xs font-medium ds-text-secondary mb-1">
                               Worker Type
                             </label>
                             <select
@@ -336,7 +336,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                                   e.target.value
                                 )
                               }
-                              className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             >
                               {VALID_WORKER_TYPES.map((type) => (
                                 <option key={type} value={type}>
@@ -347,7 +347,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                           </div>
 
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                            <label className="block text-xs font-medium ds-text-secondary mb-1">
                               Worker Role
                             </label>
                             <select
@@ -359,7 +359,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                                   e.target.value
                                 )
                               }
-                              className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             >
                               {VALID_WORKER_ROLES.map((role) => (
                                 <option key={role} value={role}>
@@ -370,7 +370,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                           </div>
 
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                            <label className="block text-xs font-medium ds-text-secondary mb-1">
                               Overtime Hours
                             </label>
                             <input
@@ -385,12 +385,12 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                               }
                               min="0"
                               step="0.5"
-                              className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             />
                           </div>
 
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                            <label className="block text-xs font-medium ds-text-secondary mb-1">
                               Break Duration (min)
                             </label>
                             <input
@@ -404,12 +404,12 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                                 )
                               }
                               min="0"
-                              className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                              className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             />
                           </div>
 
                           <div className="col-span-2">
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                            <label className="block text-xs font-medium ds-text-secondary mb-1">
                               Task Description
                             </label>
                             <textarea
@@ -422,7 +422,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                                 )
                               }
                               rows="2"
-                              className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                              className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                               placeholder="Describe the work performed..."
                             />
                           </div>
@@ -431,7 +431,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                           {entry.workerType === 'professional' && (
                             <>
                               <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium ds-text-secondary mb-1">
                                   Service Type
                                 </label>
                                 <select
@@ -443,7 +443,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                                       e.target.value
                                     )
                                   }
-                                  className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                  className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                                 >
                                   <option value="">Select Service Type</option>
                                   <option value="consultation">
@@ -458,7 +458,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                               </div>
 
                               <div>
-                                <label className="block text-xs font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium ds-text-secondary mb-1">
                                   Visit Purpose
                                 </label>
                                 <input
@@ -471,13 +471,13 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                                       e.target.value
                                     )
                                   }
-                                  className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                                  className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                                   placeholder="Purpose of visit"
                                 />
                               </div>
 
                               <div className="col-span-2">
-                                <label className="block text-xs font-medium text-gray-700 mb-1">
+                                <label className="block text-xs font-medium ds-text-secondary mb-1">
                                   Deliverables
                                 </label>
                                 <textarea
@@ -498,7 +498,7 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
                                     );
                                   }}
                                   rows="2"
-                                  className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                                  className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                                   placeholder="Enter deliverables separated by commas"
                                 />
                               </div>
@@ -512,19 +512,19 @@ export function Step3EditDetails({ wizardData, onUpdate, onValidationChange }) {
               );
             })}
           </tbody>
-          <tfoot className="bg-gray-50">
+          <tfoot className="ds-bg-surface-muted">
             <tr>
               <td
                 colSpan="3"
-                className="px-3 py-2 text-sm font-semibold text-gray-900 text-right"
+                className="px-3 py-2 text-sm font-semibold ds-text-primary text-right"
               >
                 Totals:
               </td>
-              <td className="px-3 py-2 text-sm font-semibold text-gray-900">
+              <td className="px-3 py-2 text-sm font-semibold ds-text-primary">
                 {totals.totalHours.toFixed(1)} hrs
               </td>
               <td className="px-3 py-2"></td>
-              <td className="px-3 py-2 text-sm font-semibold text-gray-900">
+              <td className="px-3 py-2 text-sm font-semibold ds-text-primary">
                 {totals.totalCost.toLocaleString()} KES
               </td>
             </tr>

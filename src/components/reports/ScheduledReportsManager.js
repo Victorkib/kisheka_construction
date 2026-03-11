@@ -185,19 +185,19 @@ export function ScheduledReportsManager({ projectId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 border-2 border-gray-200">
+      <div className="ds-bg-surface rounded-lg shadow p-6 border-2 ds-border-subtle">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="h-6 ds-bg-surface-muted rounded w-1/3 mb-4"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 border-2 border-gray-200">
+    <div className="ds-bg-surface rounded-lg shadow p-6 border-2 ds-border-subtle">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <h3 className="text-lg font-semibold ds-text-primary flex items-center gap-2">
+          <svg className="w-5 h-5 ds-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           Scheduled Reports
@@ -211,26 +211,26 @@ export function ScheduledReportsManager({ projectId }) {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+        <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-4 text-sm">
           {error}
         </div>
       )}
 
       {/* Create Form */}
       {showCreateForm && (
-        <form onSubmit={handleCreate} className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <h4 className="font-semibold text-gray-900 mb-4">Schedule New Report</h4>
+        <form onSubmit={handleCreate} className="mb-6 p-4 ds-bg-surface-muted rounded-lg border ds-border-subtle">
+          <h4 className="font-semibold ds-text-primary mb-4">Schedule New Report</h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Report Type <span className="text-red-500">*</span>
               </label>
               <select
                 value={formData.reportType}
                 onChange={(e) => setFormData({ ...formData, reportType: e.target.value })}
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="financial">Comprehensive Financial</option>
                 <option value="summary">Cost Category Summary</option>
@@ -239,14 +239,14 @@ export function ScheduledReportsManager({ projectId }) {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Frequency <span className="text-red-500">*</span>
               </label>
               <select
                 value={formData.frequency}
                 onChange={(e) => setFormData({ ...formData, frequency: e.target.value })}
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="daily">Daily</option>
                 <option value="weekly">Weekly</option>
@@ -256,14 +256,14 @@ export function ScheduledReportsManager({ projectId }) {
 
             {formData.frequency === 'weekly' && (
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold ds-text-secondary mb-1">
                   Day of Week <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={formData.dayOfWeek}
                   onChange={(e) => setFormData({ ...formData, dayOfWeek: parseInt(e.target.value) })}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="0">Sunday</option>
                   <option value="1">Monday</option>
@@ -278,7 +278,7 @@ export function ScheduledReportsManager({ projectId }) {
 
             {formData.frequency === 'monthly' && (
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold ds-text-secondary mb-1">
                   Day of Month <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -288,13 +288,13 @@ export function ScheduledReportsManager({ projectId }) {
                   value={formData.dayOfMonth}
                   onChange={(e) => setFormData({ ...formData, dayOfMonth: parseInt(e.target.value) })}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Time <span className="text-red-500">*</span>
               </label>
               <input
@@ -302,12 +302,12 @@ export function ScheduledReportsManager({ projectId }) {
                 value={formData.time}
                 onChange={(e) => setFormData({ ...formData, time: e.target.value })}
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Recipients (comma-separated emails)
               </label>
               <input
@@ -315,41 +315,41 @@ export function ScheduledReportsManager({ projectId }) {
                 value={formData.recipients}
                 onChange={(e) => setFormData({ ...formData, recipients: e.target.value })}
                 placeholder="email1@example.com, email2@example.com"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
 
           {formData.reportType === 'financial' && (
-            <div className="mb-4 p-3 bg-white rounded border border-gray-200">
-              <p className="text-sm font-semibold text-gray-700 mb-2">Report Options</p>
+            <div className="mb-4 p-3 ds-bg-surface rounded border ds-border-subtle">
+              <p className="text-sm font-semibold ds-text-secondary mb-2">Report Options</p>
               <div className="space-y-2">
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={formData.includeForecast}
                     onChange={(e) => setFormData({ ...formData, includeForecast: e.target.checked })}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                    className="w-4 h-4 text-blue-600 ds-border-subtle rounded"
                   />
-                  <span className="text-sm text-gray-700">Include Forecast</span>
+                  <span className="text-sm ds-text-secondary">Include Forecast</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={formData.includeTrends}
                     onChange={(e) => setFormData({ ...formData, includeTrends: e.target.checked })}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                    className="w-4 h-4 text-blue-600 ds-border-subtle rounded"
                   />
-                  <span className="text-sm text-gray-700">Include Trends</span>
+                  <span className="text-sm ds-text-secondary">Include Trends</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
                     checked={formData.includeRecommendations}
                     onChange={(e) => setFormData({ ...formData, includeRecommendations: e.target.checked })}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                    className="w-4 h-4 text-blue-600 ds-border-subtle rounded"
                   />
-                  <span className="text-sm text-gray-700">Include Recommendations</span>
+                  <span className="text-sm ds-text-secondary">Include Recommendations</span>
                 </label>
               </div>
             </div>
@@ -366,7 +366,7 @@ export function ScheduledReportsManager({ projectId }) {
 
       {/* Schedules List */}
       {schedules.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 ds-text-muted">
           <p>No scheduled reports yet.</p>
           <button
             onClick={() => setShowCreateForm(true)}
@@ -380,29 +380,29 @@ export function ScheduledReportsManager({ projectId }) {
           {schedules.map((schedule) => (
             <div
               key={schedule._id}
-              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition"
+              className="border ds-border-subtle rounded-lg p-4 hover:ds-bg-surface-muted transition"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-2">
-                    <h4 className="font-semibold text-gray-900">
+                    <h4 className="font-semibold ds-text-primary">
                       {reportTypeLabels[schedule.reportType] || schedule.reportType} Report
                     </h4>
                     <span className={`px-2 py-1 text-xs font-semibold rounded ${
-                      schedule.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      schedule.isActive ? 'bg-green-100 text-green-800' : 'ds-bg-surface-muted ds-text-primary'
                     }`}>
                       {schedule.isActive ? 'ACTIVE' : 'INACTIVE'}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-1">
+                  <p className="text-sm ds-text-secondary mb-1">
                     {getFrequencyLabel(schedule.frequency, schedule.dayOfWeek, schedule.dayOfMonth)} at {schedule.time}
                   </p>
                   {schedule.recipients && schedule.recipients.length > 0 && (
-                    <p className="text-xs text-gray-500 mb-1">
+                    <p className="text-xs ds-text-muted mb-1">
                       Recipients: {schedule.recipients.join(', ')}
                     </p>
                   )}
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs ds-text-muted">
                     Next run: {formatDate(schedule.nextRun)}
                     {schedule.lastRun && ` | Last run: ${formatDate(schedule.lastRun)}`}
                   </p>

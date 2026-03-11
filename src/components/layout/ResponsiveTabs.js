@@ -41,7 +41,7 @@ export function ResponsiveTabs({ tabs, activeTab, onTabChange }) {
   }, [tabs, activeTab]);
 
   return (
-    <div className="mb-4 sm:mb-6 border-b border-gray-200">
+    <div className="mb-4 sm:mb-6 border-b ds-border-subtle">
       {/* Desktop/Tablet View - Tab Navigation with side scroll controls */}
       <div className="relative hidden sm:block">
         {/* Left gradient + button */}
@@ -55,13 +55,13 @@ export function ResponsiveTabs({ tabs, activeTab, onTabChange }) {
           className={`
             hidden sm:flex items-center justify-center
             absolute inset-y-0 left-0 w-7 sm:w-8 z-20
-            text-gray-500 hover:text-gray-800
+            ds-text-muted hover:ds-text-primary
             transition
             ${canScrollLeft ? 'cursor-pointer' : 'cursor-default opacity-0'}
           `}
           aria-label="Scroll tabs left"
         >
-          <span className="inline-flex items-center justify-center rounded-full bg-white/80 shadow-sm border border-gray-200 w-6 h-6">
+          <span className="inline-flex items-center justify-center rounded-full ds-bg-surface/80 shadow-sm border ds-border-subtle w-6 h-6">
             ‹
           </span>
         </button>
@@ -77,13 +77,13 @@ export function ResponsiveTabs({ tabs, activeTab, onTabChange }) {
           className={`
             hidden sm:flex items-center justify-center
             absolute inset-y-0 right-0 w-7 sm:w-8 z-20
-            text-gray-500 hover:text-gray-800
+            ds-text-muted hover:ds-text-primary
             transition
             ${canScrollRight ? 'cursor-pointer' : 'cursor-default opacity-0'}
           `}
           aria-label="Scroll tabs right"
         >
-          <span className="inline-flex items-center justify-center rounded-full bg-white/80 shadow-sm border border-gray-200 w-6 h-6">
+          <span className="inline-flex items-center justify-center rounded-full ds-bg-surface/80 shadow-sm border ds-border-subtle w-6 h-6">
             ›
           </span>
         </button>
@@ -108,7 +108,7 @@ export function ResponsiveTabs({ tabs, activeTab, onTabChange }) {
                 ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                    : 'border-transparent ds-text-secondary hover:ds-text-primary hover:ds-border-subtle'
                 }
               `}
               title={tab.label}
@@ -141,7 +141,7 @@ export function ResponsiveTabs({ tabs, activeTab, onTabChange }) {
               ${
                 isDropdownOpen
                   ? 'border-blue-500 text-blue-600 bg-blue-50'
-                  : 'border-transparent text-gray-600'
+                  : 'border-transparent ds-text-secondary'
               }
             `}
           >
@@ -171,7 +171,7 @@ export function ResponsiveTabs({ tabs, activeTab, onTabChange }) {
           {/* Dropdown Menu */}
           {isDropdownOpen && (
             <div
-              className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto"
+              className="absolute top-full left-0 right-0 mt-1 ds-bg-surface border ds-border-subtle rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto"
               style={{ WebkitOverflowScrolling: 'touch' }}
             >
               {tabs.map((tab) => (
@@ -182,12 +182,12 @@ export function ResponsiveTabs({ tabs, activeTab, onTabChange }) {
                     setIsDropdownOpen(false);
                   }}
                   className={`
-                    w-full text-left px-4 py-3 border-b border-gray-100 last:border-b-0
+                    w-full text-left px-4 py-3 border-b ds-border-subtle last:border-b-0
                     flex items-center gap-3 transition
                     ${
                       activeTab === tab.id
                         ? 'bg-blue-50 text-blue-600 font-medium'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        : 'ds-text-secondary hover:ds-bg-surface-muted'
                     }
                   `}
                 >
@@ -197,7 +197,7 @@ export function ResponsiveTabs({ tabs, activeTab, onTabChange }) {
                       {tab.label}
                     </div>
                     {tab.description && (
-                      <div className="text-xs text-gray-500 truncate">
+                      <div className="text-xs ds-text-muted truncate">
                         {tab.description}
                       </div>
                     )}

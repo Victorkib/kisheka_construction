@@ -120,7 +120,7 @@ function ExpensesPageContent() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading expense data...</p>
+          <p className="mt-4 ds-text-secondary">Loading expense data...</p>
         </div>
       </div>
     );
@@ -131,29 +131,29 @@ function ExpensesPageContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Expense Dashboard</h1>
-          <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and analyze project expenses</p>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Expense Dashboard</h1>
+          <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Track and analyze project expenses</p>
         </div>
 
         {/* Date Range Filter */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <div className="flex gap-4 items-end">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Start Date</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Start Date</label>
               <input
                 type="date"
                 value={dateRange.startDate}
                 onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
-                className="px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               />
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">End Date</label>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">End Date</label>
               <input
                 type="date"
                 value={dateRange.endDate}
                 onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
-                className="px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               />
             </div>
             <button
@@ -165,7 +165,7 @@ function ExpensesPageContent() {
                   endDate: new Date().toISOString().split('T')[0],
                 });
               }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
             >
               Last Month
             </button>
@@ -174,7 +174,7 @@ function ExpensesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
@@ -183,53 +183,53 @@ function ExpensesPageContent() {
         {summary && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-sm font-medium text-gray-500">Total Spent</h3>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-sm font-medium ds-text-muted">Total Spent</h3>
+                <p className="text-3xl font-bold ds-text-primary mt-2">
                   KES {summary.totalExpenses?.toLocaleString() || '0.00'}
                 </p>
-                <p className="text-sm text-gray-600 mt-1 leading-normal">
+                <p className="text-sm ds-text-secondary mt-1 leading-normal">
                   {summary.totalItems || 0} items
                 </p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-sm font-medium text-gray-500">Daily Average</h3>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-sm font-medium ds-text-muted">Daily Average</h3>
+                <p className="text-3xl font-bold ds-text-primary mt-2">
                   KES {summary.dailyBurnRate?.toLocaleString() || '0.00'}
                 </p>
-                <p className="text-sm text-gray-600 mt-1 leading-normal">Per day</p>
+                <p className="text-sm ds-text-secondary mt-1 leading-normal">Per day</p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-sm font-medium text-gray-500">Categories</h3>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-sm font-medium ds-text-muted">Categories</h3>
+                <p className="text-3xl font-bold ds-text-primary mt-2">
                   {summary.categoryBreakdown?.length || 0}
                 </p>
-                <p className="text-sm text-gray-600 mt-1 leading-normal">Active categories</p>
+                <p className="text-sm ds-text-secondary mt-1 leading-normal">Active categories</p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-sm font-medium text-gray-500">Floors</h3>
-                <p className="text-3xl font-bold text-gray-900 mt-2">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-sm font-medium ds-text-muted">Floors</h3>
+                <p className="text-3xl font-bold ds-text-primary mt-2">
                   {summary.floorBreakdown?.length || 0}
                 </p>
-                <p className="text-sm text-gray-600 mt-1 leading-normal">With expenses</p>
+                <p className="text-sm ds-text-secondary mt-1 leading-normal">With expenses</p>
               </div>
             </div>
 
             {/* Category Breakdown */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Cost by Category</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold ds-text-primary mb-4">Cost by Category</h2>
                 {summary.categoryBreakdown && summary.categoryBreakdown.length > 0 ? (
                   <div className="space-y-3">
                     {summary.categoryBreakdown.slice(0, 10).map((item, index) => (
                       <div key={index}>
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-base font-semibold text-gray-700 leading-normal">{item.category}</span>
-                          <span className="text-sm font-bold text-gray-900">
+                          <span className="text-base font-semibold ds-text-secondary leading-normal">{item.category}</span>
+                          <span className="text-sm font-bold ds-text-primary">
                             KES {item.total.toLocaleString()}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full ds-bg-surface-muted rounded-full h-2">
                           <div
                             className="bg-blue-600 h-2 rounded-full"
                             style={{
@@ -237,7 +237,7 @@ function ExpensesPageContent() {
                             }}
                           ></div>
                         </div>
-                        <div className="flex justify-between text-sm text-gray-600 mt-1 leading-normal">
+                        <div className="flex justify-between text-sm ds-text-secondary mt-1 leading-normal">
                           <span>{item.count} items</span>
                           <span>{item.percentage}%</span>
                         </div>
@@ -245,25 +245,25 @@ function ExpensesPageContent() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No category data available</p>
+                  <p className="ds-text-muted">No category data available</p>
                 )}
               </div>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Cost by Floor</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold ds-text-primary mb-4">Cost by Floor</h2>
                 {summary.floorBreakdown && summary.floorBreakdown.length > 0 ? (
                   <div className="space-y-3">
                     {summary.floorBreakdown.map((item, index) => (
                       <div key={index}>
                         <div className="flex justify-between items-center mb-1">
-                          <span className="text-base font-semibold text-gray-700 leading-normal">
+                          <span className="text-base font-semibold ds-text-secondary leading-normal">
                             {item.floorName || `Floor ${item.floorNumber}`}
                           </span>
-                          <span className="text-sm font-bold text-gray-900">
+                          <span className="text-sm font-bold ds-text-primary">
                             KES {item.total.toLocaleString()}
                           </span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="w-full ds-bg-surface-muted rounded-full h-2">
                           <div
                             className="bg-green-600 h-2 rounded-full"
                             style={{
@@ -276,7 +276,7 @@ function ExpensesPageContent() {
                             }}
                           ></div>
                         </div>
-                        <div className="flex justify-between text-sm text-gray-600 mt-1 leading-normal">
+                        <div className="flex justify-between text-sm ds-text-secondary mt-1 leading-normal">
                           <span>{item.count} items</span>
                           {item.percentage && <span>Budget: {item.percentage}%</span>}
                         </div>
@@ -284,21 +284,21 @@ function ExpensesPageContent() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No floor data available</p>
+                  <p className="ds-text-muted">No floor data available</p>
                 )}
               </div>
             </div>
 
             {/* Recent Expenses & Supplier Summary */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Expenses</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold ds-text-primary mb-4">Recent Expenses</h2>
                 {recentExpenses.length > 0 ? (
                   <div className="space-y-3">
                     {recentExpenses.slice(0, 10).map((expense) => (
                       <div
                         key={expense._id}
-                        className="flex justify-between items-center border-b border-gray-200 pb-3"
+                        className="flex justify-between items-center border-b ds-border-subtle pb-3"
                       >
                         <div>
                           <Link
@@ -307,15 +307,15 @@ function ExpensesPageContent() {
                           >
                             {expense.description || expense.expenseCode || 'Expense'}
                           </Link>
-                          <p className="text-sm text-gray-600 leading-normal">
+                          <p className="text-sm ds-text-secondary leading-normal">
                             {expense.vendor || 'N/A'} • {expense.category?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-sm font-bold text-gray-900">
+                          <p className="text-sm font-bold ds-text-primary">
                             {expense.currency || 'KES'} {expense.amount?.toLocaleString() || '0.00'}
                           </p>
-                          <p className="text-sm text-gray-600 leading-normal">
+                          <p className="text-sm ds-text-secondary leading-normal">
                             {expense.date
                               ? new Date(expense.date).toLocaleDateString()
                               : expense.createdAt
@@ -327,7 +327,7 @@ function ExpensesPageContent() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No recent expenses</p>
+                  <p className="ds-text-muted">No recent expenses</p>
                 )}
                 <div className="mt-4">
                   <Link
@@ -339,8 +339,8 @@ function ExpensesPageContent() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Suppliers</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold ds-text-primary mb-4">Top Suppliers</h2>
                 <SupplierSummaryTable dateRange={dateRange} />
               </div>
             </div>
@@ -388,11 +388,11 @@ function SupplierSummaryTable({ dateRange }) {
   };
 
   if (loading) {
-    return <p className="text-gray-500">Loading suppliers...</p>;
+    return <p className="ds-text-muted">Loading suppliers...</p>;
   }
 
   if (suppliers.length === 0) {
-    return <p className="text-gray-500">No supplier data available</p>;
+    return <p className="ds-text-muted">No supplier data available</p>;
   }
 
   return (
@@ -400,17 +400,17 @@ function SupplierSummaryTable({ dateRange }) {
       {suppliers.slice(0, 10).map((supplier, index) => (
         <div
           key={index}
-          className="flex justify-between items-center border-b border-gray-200 pb-3"
+          className="flex justify-between items-center border-b ds-border-subtle pb-3"
         >
           <div>
-            <p className="text-sm font-medium text-gray-900">{supplier.name}</p>
-            <p className="text-sm text-gray-600 leading-normal">{supplier.itemCount} items</p>
+            <p className="text-sm font-medium ds-text-primary">{supplier.name}</p>
+            <p className="text-sm ds-text-secondary leading-normal">{supplier.itemCount} items</p>
           </div>
           <div className="text-right">
-            <p className="text-sm font-bold text-gray-900">
+            <p className="text-sm font-bold ds-text-primary">
               KES {supplier.totalSpent.toLocaleString()}
             </p>
-            <p className="text-sm text-gray-600 leading-normal">
+            <p className="text-sm ds-text-secondary leading-normal">
               Avg: KES {supplier.avgPrice.toLocaleString()}
             </p>
           </div>
@@ -423,7 +423,7 @@ function SupplierSummaryTable({ dateRange }) {
 export default function ExpensesPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center ds-bg-surface-muted">
         <div className="text-center">
           <LoadingSpinner size="lg" text="Loading..." />
         </div>

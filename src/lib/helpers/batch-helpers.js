@@ -221,6 +221,9 @@ export async function createBatch(materials, settings, userProfile, status = 'dr
     batchNumber,
     batchName: settings.batchName?.trim() || null,
     projectId: new ObjectId(settings.projectId),
+    ...(settings.defaultPhaseId && ObjectId.isValid(settings.defaultPhaseId) && {
+      defaultPhaseId: new ObjectId(settings.defaultPhaseId),
+    }),
     ...(settings.defaultFloorId && ObjectId.isValid(settings.defaultFloorId) && {
       defaultFloorId: new ObjectId(settings.defaultFloorId),
     }),

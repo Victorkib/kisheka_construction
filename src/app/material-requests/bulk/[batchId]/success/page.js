@@ -77,7 +77,7 @@ function SuccessPageContent() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <LoadingTable rows={5} columns={6} />
         </div>
       </AppLayout>
@@ -87,8 +87,8 @@ function SuccessPageContent() {
   if (error || !batch) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg mb-6">
             {error || 'Batch not found'}
           </div>
         </div>
@@ -117,7 +117,7 @@ function SuccessPageContent() {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Step7SuccessSummary
           batchId={params.batchId}
           purchaseOrders={formattedPOs}
@@ -133,7 +133,7 @@ export default function SuccessPage() {
     <Suspense
       fallback={
         <AppLayout>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <LoadingTable rows={5} columns={6} />
           </div>
         </AppLayout>

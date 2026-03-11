@@ -240,7 +240,7 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
                   type="button"
                   onClick={handleCloseAttempt}
                   disabled={saving}
-                  className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-2 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Cancel
                 </button>
@@ -261,7 +261,7 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
       >
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+          <div className="bg-red-50 border border-red-400/60 rounded-lg p-4 mb-6">
             <p className="text-red-800 text-sm">{error}</p>
             <button
               onClick={() => fetchWorker()}
@@ -280,7 +280,7 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
           <form id="edit-worker-form" onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Worker Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -290,12 +290,12 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
                   onChange={handleChange}
                   required
                   minLength={2}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Employee ID <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -304,12 +304,12 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
                   value={formData.employeeId}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Worker Type <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -317,7 +317,7 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
                   value={formData.workerType}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {VALID_WORKER_TYPES.map((type) => (
                     <option key={type} value={type}>
@@ -328,7 +328,7 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Status <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -336,7 +336,7 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
                   value={formData.status}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {VALID_WORKER_STATUSES.map((status) => (
                     <option key={status} value={status}>
@@ -347,7 +347,7 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Phone Number
                 </label>
                 <input
@@ -355,13 +355,13 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="+254 700 000 000"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Email
                 </label>
                 <input
@@ -369,13 +369,13 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="worker@example.com"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Hourly Rate (KES) <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -386,12 +386,12 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
                   value={formData.defaultHourlyRate}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Daily Rate (KES)
                 </label>
                 <input
@@ -401,13 +401,13 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
                   min="0"
                   value={formData.defaultDailyRate}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Optional"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Employment Type <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -415,7 +415,7 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
                   value={formData.employmentType}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   {VALID_EMPLOYMENT_TYPES.map((type) => (
                     <option key={type} value={type}>
@@ -428,29 +428,29 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
 
             {/* Skills Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Skills
               </label>
-              <div className="border border-gray-300 rounded-lg p-4 max-h-64 overflow-y-auto bg-gray-50">
+              <div className="border ds-border-subtle rounded-lg p-4 max-h-64 overflow-y-auto ds-bg-surface-muted">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {VALID_SKILL_TYPES.map((skill) => (
                     <label
                       key={skill}
-                      className="flex items-center gap-2 cursor-pointer hover:bg-white p-2 rounded transition-colors"
+                      className="flex items-center gap-2 cursor-pointer hover:ds-bg-surface p-2 rounded transition-colors"
                     >
                       <input
                         type="checkbox"
                         checked={formData.skillTypes.includes(skill)}
                         onChange={() => toggleSkill(skill)}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 w-4 h-4"
+                        className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500 w-4 h-4"
                       />
-                      <span className="text-sm text-gray-700">{getSkillTypeLabel(skill)}</span>
+                      <span className="text-sm ds-text-secondary">{getSkillTypeLabel(skill)}</span>
                     </label>
                   ))}
                 </div>
               </div>
               {formData.skillTypes.length > 0 && (
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm ds-text-secondary">
                   {formData.skillTypes.length} skill{formData.skillTypes.length !== 1 ? 's' : ''} selected
                 </p>
               )}
@@ -462,15 +462,15 @@ export function EditWorkerDrawer({ workerId, isOpen, onClose, onSave }) {
       {/* Unsaved Changes Warning Modal */}
       {showUnsavedWarning && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[60] flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Unsaved Changes</h3>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className="ds-bg-surface rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-lg font-semibold ds-text-primary mb-2">Unsaved Changes</h3>
+            <p className="text-sm ds-text-secondary mb-4">
               You have unsaved changes. Are you sure you want to close without saving?
             </p>
             <div className="flex items-center justify-end gap-3">
               <button
                 onClick={handleCancelClose}
-                className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition-colors"
               >
                 Cancel
               </button>

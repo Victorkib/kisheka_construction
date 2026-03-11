@@ -161,8 +161,8 @@ export default function LabourDashboardPage() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">Labour Dashboard</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold ds-text-primary">Labour Dashboard</h1>
+          <p className="ds-text-secondary mt-1">
             Track and manage all labour activities
           </p>
         </div>
@@ -182,7 +182,7 @@ export default function LabourDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <Link
             href="/labour/entries/new"
-            className="flex items-center gap-3 p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-3 p-4 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-6 h-6" />
             <div>
@@ -240,19 +240,19 @@ export default function LabourDashboardPage() {
 
         {/* Today's Summary */}
         {summary && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h2 className="text-xl font-semibold ds-text-primary mb-4">
               Today's Summary
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="p-4 bg-blue-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <Clock className="w-5 h-5 ds-text-accent-primary" />
+                  <span className="text-sm font-medium ds-text-secondary">
                     Total Hours
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-blue-600">
+                <div className="text-2xl font-bold ds-text-accent-primary">
                   {(summary.today.totalHours || 0).toFixed(1)} hrs
                 </div>
               </div>
@@ -260,7 +260,7 @@ export default function LabourDashboardPage() {
               <div className="p-4 bg-green-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <DollarSign className="w-5 h-5 text-green-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium ds-text-secondary">
                     Total Cost
                   </span>
                 </div>
@@ -272,7 +272,7 @@ export default function LabourDashboardPage() {
               <div className="p-4 bg-purple-50 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
                   <Users className="w-5 h-5 text-purple-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium ds-text-secondary">
                     Active Workers
                   </span>
                 </div>
@@ -281,14 +281,14 @@ export default function LabourDashboardPage() {
                 </div>
               </div>
 
-              <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="p-4 ds-bg-surface-muted rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-5 h-5 text-gray-600" />
-                  <span className="text-sm font-medium text-gray-700">
+                  <CheckCircle className="w-5 h-5 ds-text-secondary" />
+                  <span className="text-sm font-medium ds-text-secondary">
                     Entries
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-gray-600">
+                <div className="text-2xl font-bold ds-text-secondary">
                   {summary.today.entryCount || 0}
                 </div>
               </div>
@@ -298,7 +298,7 @@ export default function LabourDashboardPage() {
 
         {/* Budget Alerts */}
         {budgetAlerts.length > 0 && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-4 mb-6">
             <div className="flex items-center gap-2 mb-2">
               <AlertTriangle className="w-5 h-5 text-yellow-600" />
               <h3 className="font-semibold text-yellow-900">Budget Alerts</h3>
@@ -314,21 +314,21 @@ export default function LabourDashboardPage() {
         )}
 
         {/* Recent Entries */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold ds-text-primary">
               Recent Entries
             </h2>
             <Link
               href="/labour/entries"
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium"
             >
               View All →
             </Link>
           </div>
 
           {recentEntries.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 ds-text-muted">
               <p>No labour entries for today</p>
               <Link
                 href="/labour/entries/new"
@@ -339,42 +339,42 @@ export default function LabourDashboardPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                       Worker
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                       Skill
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                       Hours
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                       Cost
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                       Date
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {recentEntries.map((entry) => (
-                    <tr key={entry._id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm text-gray-900">
+                    <tr key={entry._id} className="hover:ds-bg-surface-muted">
+                      <td className="px-4 py-3 text-sm ds-text-primary">
                         {entry.workerName}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-4 py-3 text-sm ds-text-secondary">
                         {entry.skillType ? entry.skillType.replace(/_/g, ' ') : 'N/A'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-4 py-3 text-sm ds-text-secondary">
                         {(entry.totalHours || 0).toFixed(1)} hrs
                       </td>
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                      <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                         {(entry.totalCost || 0).toLocaleString()} KES
                       </td>
                       <td className="px-4 py-3 text-sm">
@@ -392,7 +392,7 @@ export default function LabourDashboardPage() {
                           {entry.status || 'draft'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-4 py-3 text-sm ds-text-secondary">
                         {entry.entryDate ? new Date(entry.entryDate).toLocaleDateString() : 'N/A'}
                       </td>
                     </tr>

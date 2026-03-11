@@ -123,10 +123,10 @@ export function FeeCalculator({
   }
 
   return (
-    <div className={`rounded-lg border border-purple-200 bg-gradient-to-br from-purple-50 to-pink-50 p-5 shadow-sm ${className}`}>
+    <div className={`rounded-lg border border-purple-400/60 bg-gradient-to-br from-purple-50 to-pink-50 p-5 shadow-sm ${className}`}>
           <div className="flex items-center gap-2 mb-4">
             <Calculator className="h-5 w-5 text-purple-600" />
-        <h3 className="text-base font-semibold text-gray-900">Fee Calculator</h3>
+        <h3 className="text-base font-semibold ds-text-primary">Fee Calculator</h3>
             {isCalculating && (
               <Sparkles className="h-4 w-4 text-purple-500 animate-pulse ml-auto" />
             )}
@@ -152,12 +152,12 @@ export function FeeCalculator({
       {calculationResult && !error && (
         <div className="space-y-3">
           {/* Calculated Fee */}
-          <div className="bg-white/70 rounded-lg p-4 border border-purple-200">
+          <div className="ds-bg-surface/70 rounded-lg p-4 border border-purple-400/60">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700">Suggested Fee</span>
+                  <span className="text-sm font-medium ds-text-secondary">Suggested Fee</span>
                   <CheckCircle className="h-5 w-5 text-purple-600" />
             </div>
-            <p className="text-2xl font-bold text-gray-900">
+            <p className="text-2xl font-bold ds-text-primary">
               {calculationResult.calculatedFee.toLocaleString('en-KE', {
                 style: 'currency',
                 currency: 'KES',
@@ -169,22 +169,22 @@ export function FeeCalculator({
 
           {/* Calculation Breakdown */}
           {calculationResult.calculation && (
-            <div className="bg-white/70 rounded-lg p-4 border border-purple-200">
-              <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Calculation</p>
+            <div className="ds-bg-surface/70 rounded-lg p-4 border border-purple-400/60">
+              <p className="text-xs font-medium ds-text-secondary uppercase tracking-wide mb-2">Calculation</p>
               <div className="space-y-1">
-                <p className="text-sm text-gray-700">
+                <p className="text-sm ds-text-secondary">
                   <span className="font-medium">Method:</span> {calculationResult.calculation.method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                 </p>
                 {calculationResult.calculation.formula && (
-                  <p className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded">
+                  <p className="text-sm ds-text-secondary font-mono ds-bg-surface-muted px-2 py-1 rounded">
                     {calculationResult.calculation.formula}
                   </p>
                 )}
                 {calculationResult.calculation.rate && (
-                  <div className="mt-2 pt-2 border-t border-gray-200">
+                  <div className="mt-2 pt-2 border-t ds-border-subtle">
                     <div className="grid grid-cols-2 gap-2 text-xs">
-                      <span className="text-gray-600">Rate:</span>
-                      <span className="font-medium text-gray-900">
+                      <span className="ds-text-secondary">Rate:</span>
+                      <span className="font-medium ds-text-primary">
                         {calculationResult.calculation.rate.toLocaleString('en-KE', {
                           style: 'currency',
                           currency: 'KES',
@@ -193,8 +193,8 @@ export function FeeCalculator({
                       </span>
                       {calculationResult.calculation.duration && (
                         <>
-                          <span className="text-gray-600">Duration:</span>
-                          <span className="font-medium text-gray-900">{calculationResult.calculation.duration} hours</span>
+                          <span className="ds-text-secondary">Duration:</span>
+                          <span className="font-medium ds-text-primary">{calculationResult.calculation.duration} hours</span>
                         </>
                       )}
                     </div>
@@ -205,7 +205,7 @@ export function FeeCalculator({
           )}
 
           {/* Action Hint */}
-            <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 border border-blue-200">
+            <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 border border-blue-400/60">
               <DollarSign className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-blue-800">
               <span className="font-medium">Tip:</span> Click "Use Suggested Fee" to apply this amount, or enter your own fee amount.

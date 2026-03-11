@@ -207,7 +207,7 @@ export function Drawer({
       {/* Drawer */}
       <div
         ref={drawerRef}
-        className={`fixed top-0 right-0 h-screen ${sizeClasses[size]} w-full bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
+        className={`fixed top-0 right-0 h-screen ${sizeClasses[size]} w-full ds-bg-surface shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
           isAnimating ? 'translate-x-0' : 'translate-x-full'
         }`}
         role="dialog"
@@ -218,13 +218,13 @@ export function Drawer({
         <div className="flex flex-col h-full">
           {/* Header */}
           {title && (
-            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between z-10">
-              <h2 id="drawer-title" className="text-2xl font-bold text-gray-900">
+            <div className="sticky top-0 ds-bg-surface border-b ds-border-subtle px-6 py-4 flex items-center justify-between z-10">
+              <h2 id="drawer-title" className="text-2xl font-bold ds-text-primary">
                 {title}
               </h2>
               <div className="flex items-center gap-2">
                 {isLoading && (
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm ds-text-secondary">
                     <LoadingSpinner size="sm" />
                     <span>{loadingMessage}</span>
                   </div>
@@ -233,7 +233,7 @@ export function Drawer({
                   <button
                     onClick={onClose}
                     disabled={isLoading && preventCloseDuringLoading}
-                    className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="p-2 rounded-lg ds-text-muted hover:ds-text-secondary hover:ds-bg-surface-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label="Close drawer"
                   >
                     <X className="w-5 h-5" />
@@ -252,18 +252,18 @@ export function Drawer({
 
           {/* Footer */}
           {footer && (
-            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 z-10">
+            <div className="sticky bottom-0 ds-bg-surface border-t ds-border-subtle px-6 py-4 z-10">
               {footer}
             </div>
           )}
 
           {/* Loading Overlay */}
           {isLoading && (
-            <div className="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-20">
+            <div className="absolute inset-0 ds-bg-surface/90 backdrop-blur-sm flex items-center justify-center z-20">
               <div className="flex flex-col items-center gap-4">
                 <LoadingSpinner size="lg" />
                 {loadingMessage && (
-                  <p className="text-sm font-medium text-gray-700">{loadingMessage}</p>
+                  <p className="text-sm font-medium ds-text-secondary">{loadingMessage}</p>
                 )}
               </div>
             </div>

@@ -59,13 +59,13 @@ export function IndirectCostsBudgetCard({ projectId }) {
   const getStatusColor = (status) => {
     switch (status) {
       case 'exceeded':
-        return 'bg-red-100 text-red-800 border-red-300';
+        return 'bg-red-100 text-red-800 border-red-400/60';
       case 'critical':
         return 'bg-orange-100 text-orange-800 border-orange-300';
       case 'warning':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-400/60';
       default:
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-green-100 text-green-800 border-green-400/60';
     }
   };
 
@@ -98,11 +98,11 @@ export function IndirectCostsBudgetCard({ projectId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 border-2 border-blue-200">
+      <div className="ds-bg-surface rounded-lg shadow p-6 border-2 border-blue-400/60/70">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
-          <div className="h-8 bg-gray-200 rounded w-1/2 mb-4"></div>
-          <div className="h-2 bg-gray-200 rounded w-full"></div>
+          <div className="h-6 ds-bg-surface-muted rounded w-1/3 mb-4"></div>
+          <div className="h-8 ds-bg-surface-muted rounded w-1/2 mb-4"></div>
+          <div className="h-2 ds-bg-surface-muted rounded w-full"></div>
         </div>
       </div>
     );
@@ -110,10 +110,10 @@ export function IndirectCostsBudgetCard({ projectId }) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 border-2 border-red-200">
-        <div className="text-red-600">
-          <p className="font-semibold mb-2">Error loading indirect costs data</p>
-          <p className="text-sm">{error}</p>
+      <div className="ds-bg-surface rounded-lg shadow p-6 border-2 border-red-400/60/70">
+        <div className="text-sm ds-text-primary">
+          <p className="font-semibold mb-2 text-red-500">Error loading indirect costs data</p>
+          <p className="text-sm ds-text-secondary">{error}</p>
         </div>
       </div>
     );
@@ -121,16 +121,16 @@ export function IndirectCostsBudgetCard({ projectId }) {
 
   if (!data || data.budgeted === 0) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 border-2 border-blue-200">
+      <div className="ds-bg-surface rounded-lg shadow p-6 border-2 border-blue-400/60/70">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <h3 className="text-lg font-semibold ds-text-primary flex items-center gap-2">
             <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
             </svg>
             Indirect Costs
           </h3>
         </div>
-        <p className="text-sm text-gray-600">Indirect costs budget not set. Please set a project budget first.</p>
+        <p className="text-sm ds-text-secondary">Indirect costs budget not set. Please set a project budget first.</p>
       </div>
     );
   }
@@ -138,10 +138,10 @@ export function IndirectCostsBudgetCard({ projectId }) {
   const { budgeted, spent, remaining, usagePercentage, status, byCategory } = data;
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 border-2 border-blue-200">
+    <div className="ds-bg-surface rounded-lg shadow p-6 border-2 border-blue-400/60/70">
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+        <h3 className="text-lg font-semibold ds-text-primary flex items-center gap-2">
           <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
@@ -155,15 +155,15 @@ export function IndirectCostsBudgetCard({ projectId }) {
       {/* Summary Stats */}
       <div className="grid grid-cols-3 gap-4 mb-4">
         <div>
-          <p className="text-xs text-gray-600 mb-1">Budgeted</p>
-          <p className="text-xl font-bold text-gray-900">{formatCurrency(budgeted)}</p>
+          <p className="text-xs ds-text-muted mb-1">Budgeted</p>
+          <p className="text-xl font-bold ds-text-primary">{formatCurrency(budgeted)}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-600 mb-1">Spent</p>
+          <p className="text-xs ds-text-muted mb-1">Spent</p>
           <p className="text-xl font-semibold text-blue-600">{formatCurrency(spent)}</p>
         </div>
         <div>
-          <p className="text-xs text-gray-600 mb-1">Remaining</p>
+          <p className="text-xs ds-text-muted mb-1">Remaining</p>
           <p className={`text-xl font-semibold ${remaining < 0 ? 'text-red-600' : 'text-green-600'}`}>
             {formatCurrency(remaining)}
           </p>
@@ -173,7 +173,7 @@ export function IndirectCostsBudgetCard({ projectId }) {
       {/* Progress Bar */}
       <div className="mb-4">
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm text-gray-600">Usage</span>
+          <span className="text-sm ds-text-muted">Usage</span>
           <span className={`text-sm font-semibold ${
             usagePercentage >= 100 ? 'text-red-600' :
             usagePercentage >= 90 ? 'text-orange-600' :
@@ -183,7 +183,7 @@ export function IndirectCostsBudgetCard({ projectId }) {
             {usagePercentage.toFixed(1)}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3">
+        <div className="w-full ds-bg-surface-muted rounded-full h-3">
           <div
             className={`h-3 rounded-full transition-all ${getProgressBarColor(usagePercentage)}`}
             style={{ width: `${Math.min(100, usagePercentage)}%` }}
@@ -195,11 +195,11 @@ export function IndirectCostsBudgetCard({ projectId }) {
       <div className="border-t pt-4">
         <button
           onClick={() => setExpanded(!expanded)}
-          className="w-full flex items-center justify-between text-left text-sm font-semibold text-gray-700 hover:text-gray-900"
+          className="w-full flex items-center justify-between text-left text-sm font-semibold ds-text-secondary hover:ds-text-primary"
         >
           <span>Category Breakdown</span>
           <svg
-            className={`w-5 h-5 text-gray-500 transition-transform ${expanded ? 'transform rotate-180' : ''}`}
+            className={`w-5 h-5 ds-text-muted transition-transform ${expanded ? 'transform rotate-180' : ''}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -213,22 +213,22 @@ export function IndirectCostsBudgetCard({ projectId }) {
             {Object.entries(byCategory).map(([category, amount]) => {
               const categoryPercentage = budgeted > 0 ? (amount / budgeted) * 100 : 0;
               return (
-                <div key={category} className="bg-gray-50 rounded-lg p-3">
+                <div key={category} className="ds-bg-surface-muted rounded-lg p-3">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium ds-text-secondary">
                       {categoryLabels[category] || category}
                     </span>
-                    <span className="text-sm font-semibold text-gray-900">
+                    <span className="text-sm font-semibold ds-text-primary">
                       {formatCurrency(amount)}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full ds-bg-surface rounded-full h-2">
                     <div
                       className="bg-blue-600 h-2 rounded-full"
                       style={{ width: `${Math.min(100, categoryPercentage)}%` }}
                     ></div>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs ds-text-muted mt-1">
                     {categoryPercentage.toFixed(1)}% of total budget
                   </p>
                 </div>
@@ -248,7 +248,7 @@ export function IndirectCostsBudgetCard({ projectId }) {
         </Link>
         <Link
           href={`/expenses?projectId=${projectId}&isIndirectCost=true`}
-          className="flex-1 text-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition"
+          className="flex-1 text-center px-4 py-2 ds-bg-surface-muted hover:ds-bg-surface text-sm font-medium rounded-lg transition ds-text-secondary hover:ds-text-primary"
         >
           View All
         </Link>

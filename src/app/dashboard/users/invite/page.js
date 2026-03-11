@@ -144,32 +144,32 @@ export default function InviteUserPage() {
   return (
     <AppLayout>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link href="/dashboard/users" className="text-blue-600 hover:underline mb-4 inline-block">
+        <Link href="/dashboard/users" className="ds-text-accent-primary hover:underline mb-4 inline-block">
           ← Back to Users
         </Link>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Invite User</h1>
-          <p className="text-gray-700 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h1 className="text-2xl font-bold ds-text-primary mb-2">Invite User</h1>
+          <p className="ds-text-secondary mb-6">
             Send an invitation to a new user. They will receive an email with a link to create their account.
           </p>
 
           {success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">
+            <div className="bg-green-50 border border-green-400/60 text-green-700 px-4 py-3 rounded-lg mb-6">
               <p className="font-semibold">✅ Invitation sent successfully!</p>
               <p className="text-sm mt-1">The user will receive an email with instructions to create their account.</p>
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+            <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+              <label htmlFor="email" className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                 Email Address <span className="text-red-500">*</span>
               </label>
               <input
@@ -181,13 +181,13 @@ export default function InviteUserPage() {
                 required
                 disabled={sending}
                 placeholder="user@example.com"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted placeholder:ds-text-muted"
               />
-              <p className="text-sm text-gray-700 mt-1 leading-normal">The user will receive an invitation email at this address</p>
+              <p className="text-sm ds-text-secondary mt-1 leading-normal">The user will receive an invitation email at this address</p>
             </div>
 
             <div>
-              <label htmlFor="role" className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+              <label htmlFor="role" className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                 Role <span className="text-red-500">*</span>
               </label>
               <select
@@ -197,7 +197,7 @@ export default function InviteUserPage() {
                 onChange={handleChange}
                 required
                 disabled={sending}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted"
               >
                 {roleOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -205,12 +205,12 @@ export default function InviteUserPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-sm text-gray-700 mt-1 leading-normal">The user will be assigned this role upon registration</p>
+              <p className="text-sm ds-text-secondary mt-1 leading-normal">The user will be assigned this role upon registration</p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                <label htmlFor="firstName" className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                   First Name (Optional)
                 </label>
                 <input
@@ -221,11 +221,11 @@ export default function InviteUserPage() {
                   onChange={handleChange}
                   disabled={sending}
                   placeholder="John"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 placeholder:text-gray-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted placeholder:ds-text-muted"
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                <label htmlFor="lastName" className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                   Last Name (Optional)
                 </label>
                 <input
@@ -236,12 +236,12 @@ export default function InviteUserPage() {
                   onChange={handleChange}
                   disabled={sending}
                   placeholder="Doe"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500 placeholder:text-gray-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted placeholder:ds-text-muted"
                 />
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
               <p className="text-sm text-blue-800">
                 <strong>ℹ️ Note:</strong> The invitation will expire in 7 days. The user must accept it before then.
               </p>
@@ -251,13 +251,13 @@ export default function InviteUserPage() {
               <button
                 type="submit"
                 disabled={sending}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition"
+                className="flex-1 ds-bg-accent-primary hover:ds-bg-accent-hover disabled:bg-slate-500 text-white font-medium py-2 px-4 rounded-lg transition"
               >
                 {sending ? 'Sending Invitation...' : 'Send Invitation'}
               </button>
               <Link
                 href="/dashboard/users"
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition"
+                className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition"
               >
                 Cancel
               </Link>

@@ -101,10 +101,10 @@ function PhaseFinancialPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Failed to load financial data'}
           </div>
-          <Link href={`/phases/${phaseId}`} className="mt-4 inline-block text-blue-600 hover:text-blue-800">
+          <Link href={`/phases/${phaseId}`} className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Phase
           </Link>
         </div>
@@ -119,17 +119,17 @@ function PhaseFinancialPageContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href={`/phases/${phaseId}`} className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href={`/phases/${phaseId}`} className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Phase
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Phase Financial Details</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">Phase Financial Details</h1>
+          <p className="ds-text-secondary mt-1">
             {phase?.phaseName} ({phase?.phaseCode})
           </p>
           {project && (
             <Link 
               href={`/projects/${project._id}`}
-              className="text-sm text-blue-600 hover:text-blue-800 mt-2 inline-block"
+              className="text-sm ds-text-accent-primary hover:ds-text-accent-hover mt-2 inline-block"
             >
               Project: {project.projectName}
             </Link>
@@ -138,26 +138,26 @@ function PhaseFinancialPageContent() {
 
         {/* Financial Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-2">Budget Allocated</p>
-            <p className="text-2xl font-bold text-gray-900">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-2">Budget Allocated</p>
+            <p className="text-2xl font-bold ds-text-primary">
               {formatCurrency(financialSummary.budgetTotal)}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-2">Actual Spending</p>
-            <p className="text-2xl font-bold text-blue-600">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-2">Actual Spending</p>
+            <p className="text-2xl font-bold ds-text-accent-primary">
               {formatCurrency(financialSummary.actualTotal)}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-2">Committed</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-2">Committed</p>
             <p className="text-2xl font-bold text-orange-600">
               {formatCurrency(financialSummary.committedTotal || 0)}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-2">Estimated</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-2">Estimated</p>
             <p className="text-2xl font-bold text-purple-600">
               {formatCurrency(financialSummary.estimatedTotal || 0)}
             </p>
@@ -166,40 +166,40 @@ function PhaseFinancialPageContent() {
 
         {/* Remaining & Variance */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-2">Remaining Budget</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-2">Remaining Budget</p>
             <p className={`text-2xl font-bold ${
               financialSummary.remaining < 0 ? 'text-red-600' : 'text-green-600'
             }`}>
               {formatCurrency(financialSummary.remaining)}
             </p>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs ds-text-muted mt-2">
               Budget - Actual - Committed
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-2">Variance</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-2">Variance</p>
             <p className={`text-2xl font-bold ${
               financialSummary.variance > 0 ? 'text-red-600' : 'text-green-600'
             }`}>
               {formatCurrency(financialSummary.variance)}
             </p>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs ds-text-muted mt-2">
               {formatPercentage(financialSummary.variancePercentage)} vs Budget
             </p>
           </div>
         </div>
 
         {/* Budget Utilization */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Budget Utilization</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Budget Utilization</h2>
           <div className="space-y-4">
             <div>
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
+              <div className="flex justify-between text-sm ds-text-secondary mb-2">
                 <span>Overall Utilization</span>
                 <span>{financialSummary.utilizationPercentage.toFixed(1)}%</span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-3">
+              <div className="w-full ds-bg-surface-muted rounded-full h-3">
                 <div
                   className={`h-3 rounded-full ${
                     financialSummary.utilizationPercentage > 100 
@@ -216,15 +216,15 @@ function PhaseFinancialPageContent() {
             </div>
             <div className="grid grid-cols-3 gap-4 text-sm">
               <div>
-                <p className="text-gray-600">Budget</p>
-                <p className="font-semibold text-gray-900">{formatCurrency(financialSummary.budgetTotal)}</p>
+                <p className="ds-text-secondary">Budget</p>
+                <p className="font-semibold ds-text-primary">{formatCurrency(financialSummary.budgetTotal)}</p>
               </div>
               <div>
-                <p className="text-gray-600">Spent</p>
-                <p className="font-semibold text-blue-600">{formatCurrency(financialSummary.actualTotal)}</p>
+                <p className="ds-text-secondary">Spent</p>
+                <p className="font-semibold ds-text-accent-primary">{formatCurrency(financialSummary.actualTotal)}</p>
               </div>
               <div>
-                <p className="text-gray-600">Committed</p>
+                <p className="ds-text-secondary">Committed</p>
                 <p className="font-semibold text-orange-600">{formatCurrency(financialSummary.committedTotal || 0)}</p>
               </div>
             </div>
@@ -232,43 +232,43 @@ function PhaseFinancialPageContent() {
         </div>
 
         {/* Spending Breakdown */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Spending Breakdown</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Spending Breakdown</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Materials</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm ds-text-secondary">Materials</p>
+              <p className="text-lg font-semibold ds-text-primary">
                 {formatCurrency(spendingBreakdown.materials)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Expenses</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm ds-text-secondary">Expenses</p>
+              <p className="text-lg font-semibold ds-text-primary">
                 {formatCurrency(spendingBreakdown.expenses)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Labour</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm ds-text-secondary">Labour</p>
+              <p className="text-lg font-semibold ds-text-primary">
                 {formatCurrency(spendingBreakdown.labour)}
               </p>
-              <p className="text-xs text-gray-500">(Not yet implemented)</p>
+              <p className="text-xs ds-text-muted">(Not yet implemented)</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Equipment</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm ds-text-secondary">Equipment</p>
+              <p className="text-lg font-semibold ds-text-primary">
                 {formatCurrency(spendingBreakdown.equipment)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Subcontractors</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm ds-text-secondary">Subcontractors</p>
+              <p className="text-lg font-semibold ds-text-primary">
                 {formatCurrency(spendingBreakdown.subcontractors)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Total</p>
-              <p className="text-lg font-semibold text-blue-600">
+              <p className="text-sm ds-text-secondary">Total</p>
+              <p className="text-lg font-semibold ds-text-accent-primary">
                 {formatCurrency(spendingBreakdown.total)}
               </p>
             </div>
@@ -280,16 +280,16 @@ function PhaseFinancialPageContent() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Materials by Category */}
             {categoryBreakdown?.materials?.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Materials by Category</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold ds-text-primary mb-4">Materials by Category</h2>
                 <div className="space-y-3">
                   {categoryBreakdown.materials.map((cat, index) => (
-                    <div key={index} className="flex justify-between items-center pb-3 border-b border-gray-200 last:border-0">
+                    <div key={index} className="flex justify-between items-center pb-3 border-b ds-border-subtle last:border-0">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{cat.category}</p>
-                        <p className="text-xs text-gray-500">{cat.count} item(s)</p>
+                        <p className="text-sm font-medium ds-text-primary">{cat.category}</p>
+                        <p className="text-xs ds-text-muted">{cat.count} item(s)</p>
                       </div>
-                      <p className="text-sm font-semibold text-gray-900">
+                      <p className="text-sm font-semibold ds-text-primary">
                         {formatCurrency(cat.total)}
                       </p>
                     </div>
@@ -300,16 +300,16 @@ function PhaseFinancialPageContent() {
 
             {/* Expenses by Category */}
             {categoryBreakdown?.expenses?.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Expenses by Category</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold ds-text-primary mb-4">Expenses by Category</h2>
                 <div className="space-y-3">
                   {categoryBreakdown.expenses.map((cat, index) => (
-                    <div key={index} className="flex justify-between items-center pb-3 border-b border-gray-200 last:border-0">
+                    <div key={index} className="flex justify-between items-center pb-3 border-b ds-border-subtle last:border-0">
                       <div>
-                        <p className="text-sm font-medium text-gray-900">{cat.category}</p>
-                        <p className="text-xs text-gray-500">{cat.count} entry(ies)</p>
+                        <p className="text-sm font-medium ds-text-primary">{cat.category}</p>
+                        <p className="text-xs ds-text-muted">{cat.count} entry(ies)</p>
                       </div>
-                      <p className="text-sm font-semibold text-gray-900">
+                      <p className="text-sm font-semibold ds-text-primary">
                         {formatCurrency(cat.total)}
                       </p>
                     </div>
@@ -321,30 +321,30 @@ function PhaseFinancialPageContent() {
         )}
 
         {/* Financial States Summary */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial States</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Financial States</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Budgeted</p>
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-sm ds-text-secondary">Budgeted</p>
+              <p className="text-lg font-semibold ds-text-primary">
                 {formatCurrency(phase?.financialStates?.budgeted || financialSummary.budgetTotal)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Estimated</p>
+              <p className="text-sm ds-text-secondary">Estimated</p>
               <p className="text-lg font-semibold text-purple-600">
                 {formatCurrency(phase?.financialStates?.estimated || financialSummary.estimatedTotal || 0)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Committed</p>
+              <p className="text-sm ds-text-secondary">Committed</p>
               <p className="text-lg font-semibold text-orange-600">
                 {formatCurrency(phase?.financialStates?.committed || financialSummary.committedTotal || 0)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Actual</p>
-              <p className="text-lg font-semibold text-blue-600">
+              <p className="text-sm ds-text-secondary">Actual</p>
+              <p className="text-lg font-semibold ds-text-accent-primary">
                 {formatCurrency(phase?.financialStates?.actual || financialSummary.actualTotal)}
               </p>
             </div>

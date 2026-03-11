@@ -79,26 +79,26 @@ export function NotificationPreferences({ user, onUpdate }) {
   };
 
   const ToggleSwitch = ({ enabled, onChange, label, description }) => (
-    <div className="flex items-center justify-between py-3 border-b border-gray-200 last:border-b-0">
+    <div className="flex items-center justify-between py-3 border-b ds-border-subtle last:border-b-0">
       <div className="flex-1">
-        <label className="text-sm font-medium text-gray-900 cursor-pointer">
+        <label className="text-sm font-medium ds-text-primary cursor-pointer">
           {label}
         </label>
         {description && (
-          <p className="text-xs text-gray-500 mt-1">{description}</p>
+          <p className="text-xs ds-text-muted mt-1">{description}</p>
         )}
       </div>
       <button
         type="button"
         onClick={onChange}
-        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-          enabled ? 'bg-blue-600' : 'bg-gray-200'
+        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2 ${
+          enabled ? 'ds-bg-accent-primary' : 'ds-bg-surface-muted'
         }`}
         role="switch"
         aria-checked={enabled}
       >
         <span
-          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full ds-bg-surface shadow ring-0 transition duration-200 ease-in-out ${
             enabled ? 'translate-x-5' : 'translate-x-0'
           }`}
         />
@@ -107,19 +107,19 @@ export function NotificationPreferences({ user, onUpdate }) {
   );
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">
+    <div className="ds-bg-surface rounded-lg shadow p-6 mb-6 border ds-border-subtle">
+      <h2 className="text-xl font-semibold ds-text-primary mb-4">
         Notification Preferences
       </h2>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+        <div className="mb-4 ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded text-sm">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-sm">
+        <div className="mb-4 ds-bg-success/10 border ds-border-success/40 ds-text-success px-4 py-3 rounded text-sm">
           Preferences saved successfully!
         </div>
       )}
@@ -151,11 +151,11 @@ export function NotificationPreferences({ user, onUpdate }) {
         />
       </div>
 
-      <div className="mt-6 pt-4 border-t border-gray-200">
+      <div className="mt-6 pt-4 border-t ds-border-subtle">
         <button
           onClick={handleSave}
           disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+          className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition font-medium disabled:ds-bg-surface-muted disabled:cursor-not-allowed"
         >
           {loading ? 'Saving...' : 'Save Preferences'}
         </button>

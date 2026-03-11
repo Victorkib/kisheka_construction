@@ -46,7 +46,7 @@ export function AppLayoutWithSmartNav({ children, forceSmartNav = null }) {
   const MobileNavComponent = useSmartNav ? SmartMobileNav : MobileNav;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen ds-bg-surface-muted flex">
       {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <SidebarComponent

@@ -214,7 +214,7 @@ function WorkerDetailPageContent() {
     return (
       <AppLayout>
         <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <div className="bg-red-50 border border-red-400/60 rounded-lg p-6 text-center">
             <p className="text-red-800 mb-4">{error || 'Worker not found'}</p>
             <Link
               href="/labour/workers"
@@ -245,13 +245,13 @@ function WorkerDetailPageContent() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">{worker.workerName}</h1>
+                <h1 className="text-3xl font-bold ds-text-primary">{worker.workerName}</h1>
                 <span
                   className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${
                     worker.status === 'active'
                       ? 'bg-green-100 text-green-800'
                       : worker.status === 'inactive'
-                      ? 'bg-gray-100 text-gray-800'
+                      ? 'ds-bg-surface-muted ds-text-primary'
                       : worker.status === 'terminated'
                       ? 'bg-red-100 text-red-800'
                       : 'bg-yellow-100 text-yellow-800'
@@ -261,7 +261,7 @@ function WorkerDetailPageContent() {
                 </span>
               </div>
               {worker.employeeId && (
-                <p className="text-gray-600">Employee ID: {worker.employeeId}</p>
+                <p className="ds-text-secondary">Employee ID: {worker.employeeId}</p>
               )}
             </div>
             <div className="flex items-center gap-2">
@@ -299,37 +299,37 @@ function WorkerDetailPageContent() {
 
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+          <div className="ds-bg-surface rounded-lg shadow p-6 border ds-border-subtle">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="w-5 h-5 text-blue-600" />
-              <p className="text-sm text-gray-600">Total Hours</p>
+              <p className="text-sm ds-text-secondary">Total Hours</p>
             </div>
             <p className="text-2xl font-bold text-blue-600">
               {stats.totalHoursWorked?.toFixed(1) || '0'} hrs
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+          <div className="ds-bg-surface rounded-lg shadow p-6 border ds-border-subtle">
             <div className="flex items-center gap-2 mb-2">
               <DollarSign className="w-5 h-5 text-green-600" />
-              <p className="text-sm text-gray-600">Total Earned</p>
+              <p className="text-sm ds-text-secondary">Total Earned</p>
             </div>
             <p className="text-2xl font-bold text-green-600">
               {formatCurrency(stats.totalEarned || 0)}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+          <div className="ds-bg-surface rounded-lg shadow p-6 border ds-border-subtle">
             <div className="flex items-center gap-2 mb-2">
               <FileText className="w-5 h-5 text-purple-600" />
-              <p className="text-sm text-gray-600">Total Entries</p>
+              <p className="text-sm ds-text-secondary">Total Entries</p>
             </div>
             <p className="text-2xl font-bold text-purple-600">
               {stats.entryCount || 0}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+          <div className="ds-bg-surface rounded-lg shadow p-6 border ds-border-subtle">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp className="w-5 h-5 text-orange-600" />
-              <p className="text-sm text-gray-600">Avg Rating</p>
+              <p className="text-sm ds-text-secondary">Avg Rating</p>
             </div>
             <p className="text-2xl font-bold text-orange-600">
               {stats.averageRating?.toFixed(1) || '0'}/5
@@ -338,9 +338,9 @@ function WorkerDetailPageContent() {
         </div>
 
         {/* Assigned Work Items Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6 border border-gray-200">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6 border ds-border-subtle">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <h2 className="text-lg font-semibold ds-text-primary flex items-center gap-2">
               <Briefcase className="w-5 h-5 text-blue-600" />
               Assigned Work Items ({assignedWorkItems.length})
             </h2>
@@ -360,8 +360,8 @@ function WorkerDetailPageContent() {
               <LoadingSpinner />
             </div>
           ) : assignedWorkItems.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <Briefcase className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+            <div className="text-center py-8 ds-text-muted">
+              <Briefcase className="w-12 h-12 mx-auto mb-3 ds-text-muted" />
               <p className="font-medium">No work items assigned</p>
               <p className="text-sm mt-1">This worker has no assigned work items yet.</p>
               {canAccess('create_work_item') && (
@@ -383,7 +383,7 @@ function WorkerDetailPageContent() {
                 return (
                   <div
                     key={workItem._id}
-                    className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                    className="border ds-border-subtle rounded-lg p-4 hover:ds-bg-surface-muted transition-colors"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -398,12 +398,12 @@ function WorkerDetailPageContent() {
                             workItem.status === 'completed' ? 'bg-green-100 text-green-800' :
                             workItem.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
                             workItem.status === 'blocked' ? 'bg-red-100 text-red-800' :
-                            'bg-gray-100 text-gray-800'
+                            'ds-bg-surface-muted ds-text-primary'
                           }`}>
                             {workItem.status?.replace('_', ' ').toUpperCase()}
                           </span>
                         </div>
-                        <div className="text-sm text-gray-600 space-y-1">
+                        <div className="text-sm ds-text-secondary space-y-1">
                           {workItem.phaseName && (
                             <p>
                               Phase: <Link href={`/phases/${workItem.phaseId}`} className="text-blue-600 hover:text-blue-800">
@@ -435,7 +435,7 @@ function WorkerDetailPageContent() {
                         )}
                         <Link
                           href={`/work-items/${workItem._id}`}
-                          className="px-3 py-1.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 text-xs font-medium"
+                          className="px-3 py-1.5 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted text-xs font-medium"
                           title="View Work Item"
                         >
                           View
@@ -453,53 +453,53 @@ function WorkerDetailPageContent() {
           {/* Left Column - Worker Information */}
           <div className="lg:col-span-1 space-y-6">
             {/* Basic Information */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Basic Information</h2>
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Worker Type</label>
-                  <p className="text-gray-900">{getWorkerTypeLabel(worker.workerType)}</p>
+                  <label className="text-sm font-medium ds-text-secondary">Worker Type</label>
+                  <p className="ds-text-primary">{getWorkerTypeLabel(worker.workerType)}</p>
                 </div>
                 {worker.phoneNumber && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                    <label className="text-sm font-medium ds-text-secondary flex items-center gap-1">
                       <Phone className="w-4 h-4" />
                       Phone
                     </label>
-                    <p className="text-gray-900">{worker.phoneNumber}</p>
+                    <p className="ds-text-primary">{worker.phoneNumber}</p>
                   </div>
                 )}
                 {worker.email && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                    <label className="text-sm font-medium ds-text-secondary flex items-center gap-1">
                       <Mail className="w-4 h-4" />
                       Email
                     </label>
-                    <p className="text-gray-900">{worker.email}</p>
+                    <p className="ds-text-primary">{worker.email}</p>
                   </div>
                 )}
                 {worker.nationalId && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700">National ID</label>
-                    <p className="text-gray-900">{worker.nationalId}</p>
+                    <label className="text-sm font-medium ds-text-secondary">National ID</label>
+                    <p className="ds-text-primary">{worker.nationalId}</p>
                   </div>
                 )}
                 {worker.hireDate && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                    <label className="text-sm font-medium ds-text-secondary flex items-center gap-1">
                       <Calendar className="w-4 h-4" />
                       Hire Date
                     </label>
-                    <p className="text-gray-900">{formatDate(worker.hireDate)}</p>
+                    <p className="ds-text-primary">{formatDate(worker.hireDate)}</p>
                   </div>
                 )}
                 {worker.employmentType && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                    <label className="text-sm font-medium ds-text-secondary flex items-center gap-1">
                       <Briefcase className="w-4 h-4" />
                       Employment Type
                     </label>
-                    <p className="text-gray-900 capitalize">
+                    <p className="ds-text-primary capitalize">
                       {worker.employmentType.replace(/_/g, ' ')}
                     </p>
                   </div>
@@ -508,11 +508,11 @@ function WorkerDetailPageContent() {
             </div>
 
             {/* Skills & Rates */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">Skills & Rates</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-lg font-semibold ds-text-primary mb-4">Skills & Rates</h2>
               <div className="space-y-3">
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Skills</label>
+                  <label className="text-sm font-medium ds-text-secondary">Skills</label>
                   <div className="flex flex-wrap gap-2 mt-1">
                     {(worker.skillTypes || []).map((skill, idx) => (
                       <span
@@ -523,27 +523,27 @@ function WorkerDetailPageContent() {
                       </span>
                     ))}
                     {(!worker.skillTypes || worker.skillTypes.length === 0) && (
-                      <span className="text-gray-400 text-sm">No skills specified</span>
+                      <span className="ds-text-muted text-sm">No skills specified</span>
                     )}
                   </div>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Hourly Rate</label>
-                  <p className="text-gray-900 font-medium">
+                  <label className="text-sm font-medium ds-text-secondary">Hourly Rate</label>
+                  <p className="ds-text-primary font-medium">
                     {formatCurrency(worker.defaultHourlyRate || 0)}/hr
                   </p>
                 </div>
                 {worker.defaultDailyRate && (
                   <div>
-                    <label className="text-sm font-medium text-gray-700">Daily Rate</label>
-                    <p className="text-gray-900 font-medium">
+                    <label className="text-sm font-medium ds-text-secondary">Daily Rate</label>
+                    <p className="ds-text-primary font-medium">
                       {formatCurrency(worker.defaultDailyRate)}/day
                     </p>
                   </div>
                 )}
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Overtime Multiplier</label>
-                  <p className="text-gray-900">{worker.overtimeMultiplier || 1.5}x</p>
+                  <label className="text-sm font-medium ds-text-secondary">Overtime Multiplier</label>
+                  <p className="ds-text-primary">{worker.overtimeMultiplier || 1.5}x</p>
                 </div>
               </div>
             </div>
@@ -551,9 +551,9 @@ function WorkerDetailPageContent() {
 
           {/* Right Column - Entries */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="ds-bg-surface rounded-lg shadow p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-900">Recent Entries</h2>
+                <h2 className="text-lg font-semibold ds-text-primary">Recent Entries</h2>
                 <Link
                   href={`/labour/entries?workerId=${worker.userId || worker._id}`}
                   className="text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -568,8 +568,8 @@ function WorkerDetailPageContent() {
                 </div>
               ) : entries.length === 0 ? (
                 <div className="text-center py-8">
-                  <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500 mb-4">No entries found for this worker</p>
+                  <FileText className="w-12 h-12 ds-text-muted mx-auto mb-4" />
+                  <p className="ds-text-muted mb-4">No entries found for this worker</p>
                   {canAccess('create_labour_entry') && (
                     <Link
                       href={`/labour/entries/new?workerId=${worker.userId || worker._id}`}
@@ -582,49 +582,49 @@ function WorkerDetailPageContent() {
               ) : (
                 <>
                   <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
+                    <table className="min-w-full divide-y divide-ds-border-subtle">
+                      <thead className="ds-bg-surface-muted">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                             Date
                           </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                             Project/Phase
                           </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                             Hours
                           </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                             Cost
                           </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                             Status
                           </th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                          <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                             Actions
                           </th>
                         </tr>
                       </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
+                      <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                         {entries.map((entry) => (
-                          <tr key={entry._id} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                          <tr key={entry._id} className="hover:ds-bg-surface-muted">
+                            <td className="px-4 py-3 whitespace-nowrap text-sm ds-text-secondary">
                               {formatDate(entry.entryDate)}
                             </td>
-                            <td className="px-4 py-3 text-sm text-gray-600">
+                            <td className="px-4 py-3 text-sm ds-text-secondary">
                               <div>
                                 {entry.projectName && (
                                   <div className="font-medium">{entry.projectName}</div>
                                 )}
                                 {entry.phaseName && (
-                                  <div className="text-xs text-gray-500">{entry.phaseName}</div>
+                                  <div className="text-xs ds-text-muted">{entry.phaseName}</div>
                                 )}
                               </div>
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                            <td className="px-4 py-3 whitespace-nowrap text-sm ds-text-secondary">
                               {entry.totalHours?.toFixed(1)} hrs
                             </td>
-                            <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                            <td className="px-4 py-3 whitespace-nowrap text-sm font-medium ds-text-primary">
                               {formatCurrency(entry.totalCost || 0)}
                             </td>
                             <td className="px-4 py-3 whitespace-nowrap">
@@ -634,7 +634,7 @@ function WorkerDetailPageContent() {
                                     ? 'bg-green-100 text-green-800'
                                     : entry.status === 'draft'
                                     ? 'bg-yellow-100 text-yellow-800'
-                                    : 'bg-gray-100 text-gray-800'
+                                    : 'ds-bg-surface-muted ds-text-primary'
                                 }`}
                               >
                                 {entry.status?.charAt(0).toUpperCase() + entry.status?.slice(1)}
@@ -656,8 +656,8 @@ function WorkerDetailPageContent() {
 
                   {/* Pagination */}
                   {entriesPagination.totalPages > 1 && (
-                    <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
-                      <div className="text-sm text-gray-600">
+                    <div className="mt-4 pt-4 border-t ds-border-subtle flex items-center justify-between">
+                      <div className="text-sm ds-text-secondary">
                         Showing {((entriesPagination.page - 1) * entriesPagination.limit) + 1} to{' '}
                         {Math.min(entriesPagination.page * entriesPagination.limit, entriesPagination.total)} of{' '}
                         {entriesPagination.total} entries
@@ -666,17 +666,17 @@ function WorkerDetailPageContent() {
                         <button
                           onClick={() => setEntriesPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                           disabled={entriesPagination.page === 1}
-                          className="px-3 py-1 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                          className="px-3 py-1 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted"
                         >
                           Previous
                         </button>
-                        <span className="text-sm text-gray-700">
+                        <span className="text-sm ds-text-secondary">
                           Page {entriesPagination.page} of {entriesPagination.totalPages}
                         </span>
                         <button
                           onClick={() => setEntriesPagination(prev => ({ ...prev, page: Math.min(entriesPagination.totalPages, prev.page + 1) }))}
                           disabled={entriesPagination.page >= entriesPagination.totalPages}
-                          className="px-3 py-1 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+                          className="px-3 py-1 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted"
                         >
                           Next
                         </button>

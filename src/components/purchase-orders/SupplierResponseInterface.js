@@ -319,30 +319,30 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
     if (isBulkOrder && materials.length > 0) {
       // Bulk order summary
       return (
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-gray-900 mb-3">Bulk Order Summary</h3>
+        <div className="ds-bg-surface-muted rounded-lg p-4 mb-6">
+          <h3 className="font-semibold ds-text-primary mb-3">Bulk Order Summary</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
             <div className="flex items-center space-x-2">
-              <Package className="w-4 h-4 text-gray-500" />
-              <span className="text-gray-600">Total Materials:</span>
+              <Package className="w-4 h-4 ds-text-muted" />
+              <span className="ds-text-secondary">Total Materials:</span>
               <span className="font-medium">{materials.length}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <DollarSign className="w-4 h-4 text-gray-500" />
-              <span className="text-gray-600">Total Value:</span>
+              <DollarSign className="w-4 h-4 ds-text-muted" />
+              <span className="ds-text-secondary">Total Value:</span>
               <span className="font-medium text-lg">KES {order.totalCost?.toLocaleString() || '0'}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <Calendar className="w-4 h-4 text-gray-500" />
-              <span className="text-gray-600">Delivery:</span>
+              <Calendar className="w-4 h-4 ds-text-muted" />
+              <span className="ds-text-secondary">Delivery:</span>
               <span className="font-medium">{new Date(order.deliveryDate).toLocaleDateString()}</span>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="text-gray-600">Total Quantity:</span>
+              <span className="ds-text-secondary">Total Quantity:</span>
               <span className="font-medium">{order.quantityOrdered} {order.unit || 'units'}</span>
             </div>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-3">
             <p className="text-sm text-blue-800">
               <strong>Note:</strong> You can respond to each material individually. Accept some materials and reject others as needed.
             </p>
@@ -353,31 +353,31 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
     
     // Single order summary (existing)
     return (
-      <div className="bg-gray-50 rounded-lg p-4 mb-6">
-        <h3 className="font-semibold text-gray-900 mb-3">Order Summary</h3>
+      <div className="ds-bg-surface-muted rounded-lg p-4 mb-6">
+        <h3 className="font-semibold ds-text-primary mb-3">Order Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div className="flex items-center space-x-2">
-            <Package className="w-4 h-4 text-gray-500" />
-            <span className="text-gray-600">Material:</span>
+            <Package className="w-4 h-4 ds-text-muted" />
+            <span className="ds-text-secondary">Material:</span>
             <span className="font-medium">{order.materialName}</span>
           </div>
           <div className="flex items-center space-x-2">
-            <DollarSign className="w-4 h-4 text-gray-500" />
-            <span className="text-gray-600">Original Cost:</span>
+            <DollarSign className="w-4 h-4 ds-text-muted" />
+            <span className="ds-text-secondary">Original Cost:</span>
             <span className="font-medium">KES {order.unitCost?.toLocaleString() || '0'}/unit</span>
           </div>
           <div className="flex items-center space-x-2">
-            <span className="text-gray-600">Quantity:</span>
+            <span className="ds-text-secondary">Quantity:</span>
             <span className="font-medium">{order.quantityOrdered} {order.unit || 'units'}</span>
           </div>
           <div className="flex items-center space-x-2">
-            <Calendar className="w-4 h-4 text-gray-500" />
-            <span className="text-gray-600">Delivery:</span>
+            <Calendar className="w-4 h-4 ds-text-muted" />
+            <span className="ds-text-secondary">Delivery:</span>
             <span className="font-medium">{new Date(order.deliveryDate).toLocaleDateString()}</span>
           </div>
           <div className="flex items-center space-x-2 md:col-span-2">
-            <DollarSign className="w-4 h-4 text-gray-500" />
-            <span className="text-gray-600">Total Value:</span>
+            <DollarSign className="w-4 h-4 ds-text-muted" />
+            <span className="ds-text-secondary">Total Value:</span>
             <span className="font-medium text-lg">KES {order.totalCost?.toLocaleString() || '0'}</span>
           </div>
         </div>
@@ -391,11 +391,11 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
     
     return (
       <div className="space-y-4">
-        <div className="border-b border-gray-200 pb-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">
+        <div className="border-b ds-border-subtle pb-4">
+          <h2 className="text-lg font-semibold ds-text-primary mb-2">
             Respond to Each Material
           </h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm ds-text-secondary">
             Select an action for each material. You can accept some, reject others, or request modifications.
           </p>
         </div>
@@ -411,11 +411,11 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
             const totalCost = quantity * unitCost;
             
             return (
-              <div key={materialRequestId} className="border border-gray-200 rounded-lg p-4 bg-white">
+              <div key={materialRequestId} className="border ds-border-subtle rounded-lg p-4 ds-bg-surface">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 mb-1">{materialName}</h3>
-                    <div className="text-sm text-gray-600 space-y-1">
+                    <h3 className="font-semibold ds-text-primary mb-1">{materialName}</h3>
+                    <div className="text-sm ds-text-secondary space-y-1">
                       <p>Quantity: {quantity} {unit}</p>
                       <p>Unit Cost: KES {unitCost.toLocaleString()}</p>
                       <p>Total: KES {totalCost.toLocaleString()}</p>
@@ -425,7 +425,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                     materialResponse.action === 'accept' ? 'bg-green-100 text-green-800' :
                     materialResponse.action === 'reject' ? 'bg-red-100 text-red-800' :
                     materialResponse.action === 'modify' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-gray-100 text-gray-600'
+                    'ds-bg-surface-muted ds-text-secondary'
                   }`}>
                     {materialResponse.action === 'accept' ? 'Accepted' :
                      materialResponse.action === 'reject' ? 'Rejected' :
@@ -442,7 +442,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                     className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                       materialResponse.action === 'accept'
                         ? 'bg-green-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
                     }`}
                   >
                     Accept
@@ -453,7 +453,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                     className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                       materialResponse.action === 'reject'
                         ? 'bg-red-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
                     }`}
                   >
                     Reject
@@ -464,7 +464,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                     className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
                       materialResponse.action === 'modify'
                         ? 'bg-yellow-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
                     }`}
                   >
                     Modify
@@ -473,7 +473,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                     <button
                       type="button"
                       onClick={() => handleMaterialResponseChange(index, 'action', 'pending')}
-                      className="px-3 py-1.5 rounded text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                      className="px-3 py-1.5 rounded text-sm font-medium ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted transition-colors"
                     >
                       Clear
                     </button>
@@ -482,15 +482,15 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                 
                 {/* Reject form */}
                 {materialResponse.action === 'reject' && (
-                  <div className="mt-4 space-y-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                  <div className="mt-4 space-y-3 p-3 bg-red-50 rounded-lg border border-red-400/60">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium ds-text-secondary mb-1">
                         Rejection Reason *
                       </label>
                       <select
                         value={materialResponse.rejectionReason}
                         onChange={(e) => handleMaterialResponseChange(index, 'rejectionReason', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
                       >
                         <option value="">Select a reason...</option>
                         {Object.entries(rejectionReasons).map(([key, reason]) => (
@@ -500,13 +500,13 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                     </div>
                     {materialResponse.rejectionReason && rejectionReasons[materialResponse.rejectionReason] && (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium ds-text-secondary mb-1">
                           Specific Reason *
                         </label>
                         <select
                           value={materialResponse.rejectionSubcategory}
                           onChange={(e) => handleMaterialResponseChange(index, 'rejectionSubcategory', e.target.value)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+                          className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
                         >
                           <option value="">Select specific reason...</option>
                           {Object.entries(rejectionReasons[materialResponse.rejectionReason].subcategories).map(([key, label]) => (
@@ -516,14 +516,14 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                       </div>
                     )}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium ds-text-secondary mb-1">
                         Explanation *
                       </label>
                       <textarea
                         value={materialResponse.notes}
                         onChange={(e) => handleMaterialResponseChange(index, 'notes', e.target.value)}
                         rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 text-sm"
                         placeholder="Explain why this material is rejected..."
                       />
                     </div>
@@ -532,10 +532,10 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                 
                 {/* Modify form */}
                 {materialResponse.action === 'modify' && (
-                  <div className="mt-4 space-y-3 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                  <div className="mt-4 space-y-3 p-3 bg-yellow-50 rounded-lg border border-yellow-400/60">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium ds-text-secondary mb-1">
                           New Unit Cost
                         </label>
                         <input
@@ -543,12 +543,12 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                           step="0.01"
                           value={materialResponse.modifications.unitCost || ''}
                           onChange={(e) => handleMaterialResponseChange(index, 'modifications.unitCost', e.target.value || null)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
+                          className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
                           placeholder={unitCost.toString()}
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium ds-text-secondary mb-1">
                           New Quantity
                         </label>
                         <input
@@ -556,31 +556,31 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                           step="0.01"
                           value={materialResponse.modifications.quantityOrdered || ''}
                           onChange={(e) => handleMaterialResponseChange(index, 'modifications.quantityOrdered', e.target.value || null)}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
+                          className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
                           placeholder={quantity.toString()}
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium ds-text-secondary mb-1">
                         New Delivery Date
                       </label>
                       <input
                         type="date"
                         value={materialResponse.modifications.deliveryDate || ''}
                         onChange={(e) => handleMaterialResponseChange(index, 'modifications.deliveryDate', e.target.value || null)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium ds-text-secondary mb-1">
                         Modification Notes *
                       </label>
                       <textarea
                         value={materialResponse.notes}
                         onChange={(e) => handleMaterialResponseChange(index, 'notes', e.target.value)}
                         rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm"
                         placeholder="Explain the modifications needed..."
                       />
                     </div>
@@ -589,16 +589,16 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
                 
                 {/* Accept form */}
                 {materialResponse.action === 'accept' && (
-                  <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-400/60">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium ds-text-secondary mb-1">
                         Notes (Optional)
                       </label>
                       <textarea
                         value={materialResponse.notes}
                         onChange={(e) => handleMaterialResponseChange(index, 'notes', e.target.value)}
                         rows={2}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 text-sm"
                         placeholder="Add any notes or confirmations..."
                       />
                     </div>
@@ -610,7 +610,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
         </div>
         
         {validationErrors.materialResponses && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-3">
+          <div className="bg-red-50 border border-red-400/60 rounded-lg p-3">
             <p className="text-sm text-red-800">{validationErrors.materialResponses}</p>
           </div>
         )}
@@ -626,7 +626,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
         className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
           action === 'accept'
             ? 'bg-green-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
         }`}
       >
         <CheckCircle className="w-5 h-5 inline mr-2" />
@@ -638,7 +638,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
         className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
           action === 'modify'
             ? 'bg-blue-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
         }`}
       >
         <MessageSquare className="w-5 h-5 inline mr-2" />
@@ -650,7 +650,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
         className={`flex-1 py-3 px-4 rounded-lg font-medium transition-colors ${
           action === 'reject'
             ? 'bg-red-600 text-white'
-            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
         }`}
       >
         <AlertCircle className="w-5 h-5 inline mr-2" />
@@ -662,40 +662,40 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
   const renderAcceptForm = () => (
     <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium ds-text-secondary mb-2">
           Final Unit Cost (Optional)
         </label>
         <div className="relative">
-          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted" />
           <input
             type="number"
             step="0.01"
             value={formData.finalUnitCost}
             onChange={(e) => setFormData(prev => ({ ...prev, finalUnitCost: e.target.value }))}
-            className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            className="w-full pl-10 pr-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
             placeholder={order.unitCost?.toFixed(2) || '0.00'}
           />
         </div>
-        <p className="text-xs text-gray-500 mt-1">
+        <p className="text-xs ds-text-muted mt-1">
           Leave empty to use original unit cost
         </p>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium ds-text-secondary mb-2">
           Notes (Optional)
         </label>
         <textarea
           value={formData.supplierNotes}
           onChange={(e) => setFormData(prev => ({ ...prev, supplierNotes: e.target.value }))}
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+          className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
           placeholder="Add any notes or confirmations..."
         />
       </div>
 
       {formData.finalUnitCost && parseFloat(formData.finalUnitCost) !== order.unitCost && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-3">
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-4 h-4 text-blue-600" />
             <span className="text-sm text-blue-800">
@@ -713,18 +713,18 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium ds-text-secondary mb-2">
             Unit Cost
           </label>
           <div className="relative">
-            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <DollarSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted" />
             <input
               type="number"
               step="0.01"
               value={formData.finalUnitCost}
               onChange={(e) => setFormData(prev => ({ ...prev, finalUnitCost: e.target.value }))}
               className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-                validationErrors.finalUnitCost ? 'border-red-300' : 'border-gray-300'
+                validationErrors.finalUnitCost ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
           </div>
@@ -734,7 +734,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium ds-text-secondary mb-2">
             Quantity
           </label>
           <input
@@ -743,7 +743,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
             value={formData.quantityOrdered}
             onChange={(e) => setFormData(prev => ({ ...prev, quantityOrdered: e.target.value }))}
             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              validationErrors.quantityOrdered ? 'border-red-300' : 'border-gray-300'
+              validationErrors.quantityOrdered ? 'border-red-400/60' : 'ds-border-subtle'
             }`}
           />
           {validationErrors.quantityOrdered && (
@@ -753,17 +753,17 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium ds-text-secondary mb-2">
           Delivery Date
         </label>
         <div className="relative">
-          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted" />
           <input
             type="date"
             value={formData.deliveryDate}
             onChange={(e) => setFormData(prev => ({ ...prev, deliveryDate: e.target.value }))}
             className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
-              validationErrors.deliveryDate ? 'border-red-300' : 'border-gray-300'
+              validationErrors.deliveryDate ? 'border-red-400/60' : 'ds-border-subtle'
             }`}
           />
         </div>
@@ -773,21 +773,21 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium ds-text-secondary mb-2">
           Modification Notes *
         </label>
         <textarea
           value={formData.notes}
           onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
           rows={4}
-          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           placeholder="Please explain the modifications needed..."
           required
         />
       </div>
 
       {(formData.finalUnitCost || formData.quantityOrdered) && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+        <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-3">
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-4 h-4 text-yellow-600" />
             <span className="text-sm text-yellow-800">
@@ -802,7 +802,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
   const renderRejectForm = () => (
     <div className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium ds-text-secondary mb-2">
           Rejection Reason *
         </label>
         <select
@@ -813,7 +813,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
             rejectionSubcategory: '' // Reset subcategory when reason changes
           }))}
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
-            validationErrors.rejectionReason ? 'border-red-300' : 'border-gray-300'
+            validationErrors.rejectionReason ? 'border-red-400/60' : 'ds-border-subtle'
           }`}
         >
           <option value="">Select a reason...</option>
@@ -828,13 +828,13 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
 
       {formData.rejectionReason && rejectionReasons[formData.rejectionReason] && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium ds-text-secondary mb-2">
             Specific Reason *
           </label>
           <select
             value={formData.rejectionSubcategory}
             onChange={(e) => setFormData(prev => ({ ...prev, rejectionSubcategory: e.target.value }))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
+            className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
           >
             <option value="">Select specific reason...</option>
             {Object.entries(rejectionReasons[formData.rejectionReason].subcategories).map(([key, label]) => (
@@ -845,7 +845,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
       )}
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium ds-text-secondary mb-2">
           Detailed Explanation *
         </label>
         <textarea
@@ -853,7 +853,7 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
           onChange={(e) => setFormData(prev => ({ ...prev, supplierNotes: e.target.value }))}
           rows={4}
           className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 ${
-            validationErrors.supplierNotes ? 'border-red-300' : 'border-gray-300'
+            validationErrors.supplierNotes ? 'border-red-400/60' : 'ds-border-subtle'
           }`}
           placeholder="Please provide detailed explanation for the rejection..."
           required
@@ -875,10 +875,10 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-gray-900">Respond to Purchase Order</h1>
-          <p className="text-gray-600 mt-1">PO #{order.purchaseOrderNumber}</p>
+      <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle">
+        <div className="p-6 border-b ds-border-subtle">
+          <h1 className="text-2xl font-bold ds-text-primary">Respond to Purchase Order</h1>
+          <p className="ds-text-secondary mt-1">PO #{order.purchaseOrderNumber}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -886,19 +886,19 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
           
           {isBulkOrder && materials.length > 0 ? (
             // Bulk order: Show material-level responses
-            <div className="border-t border-gray-200 pt-6">
+            <div className="border-t ds-border-subtle pt-6">
               {renderMaterialResponses()}
               
               {/* General notes for bulk order */}
               <div className="mt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium ds-text-secondary mb-2">
                   General Notes (Optional)
                 </label>
                 <textarea
                   value={formData.supplierNotes}
                   onChange={(e) => setFormData(prev => ({ ...prev, supplierNotes: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Add any general notes about the order..."
                 />
               </div>
@@ -907,8 +907,8 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
             // Single order: Show action buttons and forms
             <>
               {renderActionButtons()}
-              <div className="border-t border-gray-200 pt-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="border-t ds-border-subtle pt-6">
+                <h2 className="text-lg font-semibold ds-text-primary mb-4">
                   {action === 'accept' && 'Accept Order Details'}
                   {action === 'modify' && 'Modification Request'}
                   {action === 'reject' && 'Rejection Details'}
@@ -921,11 +921,11 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
             </>
           )}
 
-          <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200">
+          <div className="flex justify-end space-x-3 pt-6 border-t ds-border-subtle">
             <button
               type="button"
               onClick={() => setShowPreview(!showPreview)}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 ds-text-secondary ds-bg-surface-muted rounded-lg hover:ds-bg-surface-muted transition-colors"
             >
               {showPreview ? 'Hide' : 'Show'} Preview
             </button>
@@ -942,8 +942,8 @@ export function SupplierResponseInterface({ order, token, onResponse }) {
       </div>
 
       {showPreview && (
-        <div className="mt-6 bg-gray-50 rounded-lg p-6">
-          <h3 className="font-semibold text-gray-900 mb-3">Response Preview</h3>
+        <div className="mt-6 ds-bg-surface-muted rounded-lg p-6">
+          <h3 className="font-semibold ds-text-primary mb-3">Response Preview</h3>
           <div className="text-sm space-y-2">
             <p><strong>Action:</strong> {action}</p>
             {formData.supplierNotes && <p><strong>Notes:</strong> {formData.supplierNotes}</p>}

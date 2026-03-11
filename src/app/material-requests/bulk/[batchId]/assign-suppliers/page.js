@@ -333,9 +333,9 @@ function SupplierAssignmentPageContent() {
       <AppLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-            <p className="text-gray-600">You don't have permission to assign suppliers.</p>
-            <Link href="/material-requests" className="text-blue-600 hover:text-blue-800 mt-4 inline-block">
+            <h1 className="text-2xl font-bold ds-text-primary mb-2">Access Denied</h1>
+            <p className="ds-text-secondary">You don't have permission to assign suppliers.</p>
+            <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover mt-4 inline-block">
               ← Back to Material Requests
             </Link>
           </div>
@@ -347,7 +347,7 @@ function SupplierAssignmentPageContent() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <LoadingTable rows={5} columns={6} />
         </div>
       </AppLayout>
@@ -357,11 +357,11 @@ function SupplierAssignmentPageContent() {
   if (error && !batch) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
-          <Link href="/material-requests" className="text-blue-600 hover:text-blue-800">
+          <Link href="/material-requests" className="ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Material Requests
           </Link>
         </div>
@@ -389,7 +389,7 @@ function SupplierAssignmentPageContent() {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <LoadingOverlay
           isLoading={submitting}
           message="Assigning suppliers..."
@@ -399,17 +399,17 @@ function SupplierAssignmentPageContent() {
         <div className="mb-8">
           <Link
             href={`/material-requests/bulk/${params.batchId}`}
-            className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block"
           >
             ← Back to Batch Details
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Assign Suppliers</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold ds-text-primary">Assign Suppliers</h1>
+          <p className="ds-text-secondary mt-2">
             Batch: <span className="font-medium">{batch?.batchNumber}</span>
             {batch?.batchName && ` - ${batch.batchName}`}
           </p>
           {batch?.project && (
-            <p className="text-gray-600 mt-1">
+            <p className="ds-text-secondary mt-1">
               Project: <span className="font-medium">{batch.project.projectName}</span>
               {batch.project.projectCode && ` (${batch.project.projectCode})`}
             </p>
@@ -420,14 +420,14 @@ function SupplierAssignmentPageContent() {
         {(financeLoading || projectFinances || financeError) && (
           <div className={`mb-6 rounded-lg border px-4 py-3 ${
             financeError
-              ? 'bg-red-50 border-red-200 text-red-700'
+              ? 'ds-bg-danger/10 ds-border-danger/40 ds-text-danger'
               : capitalNotSet
-                ? 'bg-blue-50 border-blue-200 text-blue-800'
+                ? 'ds-bg-accent-subtle ds-border-accent-subtle ds-text-primary'
                 : !hasCapital
-                  ? 'bg-amber-50 border-amber-200 text-amber-800'
+                  ? 'ds-bg-warning/10 ds-border-warning/40 ds-text-warning'
                   : isCapitalShort
-                    ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                    : 'bg-green-50 border-green-200 text-green-800'
+                    ? 'ds-bg-warning/10 ds-border-warning/40 ds-text-warning'
+                    : 'ds-bg-success/10 ds-border-success/40 ds-text-success'
           }`}>
             {financeLoading ? (
               <p className="text-sm">Checking project capital availability...</p>
@@ -483,13 +483,13 @@ function SupplierAssignmentPageContent() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Link
                       href={`/financing?projectId=${projectId}&returnTo=${encodeURIComponent(returnTo)}`}
-                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                      className="px-3 py-1.5 text-xs font-medium rounded-md border ds-border-accent-subtle ds-bg-surface ds-text-accent-primary hover:ds-bg-accent-subtle"
                     >
                       Open Financing
                     </Link>
                     <Link
                       href={`/investors?projectId=${projectId}&returnTo=${encodeURIComponent(returnTo)}`}
-                      className="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-300 bg-white text-blue-800 hover:bg-blue-100"
+                      className="px-3 py-1.5 text-xs font-medium rounded-md border ds-border-accent-subtle ds-bg-surface ds-text-accent-primary hover:ds-bg-accent-subtle"
                     >
                       Allocate Funds (Investors)
                     </Link>
@@ -502,22 +502,22 @@ function SupplierAssignmentPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
 
         {/* Mode Selection */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Assignment Mode</h2>
-          <div className="flex gap-4 border-b border-gray-200">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Assignment Mode</h2>
+          <div className="flex gap-4 border-b ds-border-subtle">
             <button
               type="button"
               onClick={() => setMode('single')}
-              className={`px-6 py-3 font-medium transition-colors ${
+              className={`px-6 py-3 font-medium transition-colors cursor-pointer ${
                 mode === 'single'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'border-b-2 ds-border-accent-primary ds-text-accent-primary'
+                  : 'ds-text-secondary hover:ds-text-primary'
               }`}
             >
               Single Supplier
@@ -525,10 +525,10 @@ function SupplierAssignmentPageContent() {
             <button
               type="button"
               onClick={() => setMode('multiple')}
-              className={`px-6 py-3 font-medium transition-colors ${
+              className={`px-6 py-3 font-medium transition-colors cursor-pointer ${
                 mode === 'multiple'
-                  ? 'border-b-2 border-blue-600 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'border-b-2 ds-border-accent-primary ds-text-accent-primary'
+                  : 'ds-text-secondary hover:ds-text-primary'
               }`}
             >
               Multiple Suppliers
@@ -541,7 +541,7 @@ function SupplierAssignmentPageContent() {
           <div className="mb-6 flex justify-end">
             <button
               onClick={() => setShowPriceComparison(true)}
-              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-medium"
+              className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium cursor-pointer"
             >
               💰 Compare Prices
             </button>
@@ -550,29 +550,29 @@ function SupplierAssignmentPageContent() {
 
         {/* Empty Suppliers State */}
         {suppliers.length === 0 && !loading && (
-          <div className="bg-yellow-50 border-2 border-yellow-300 rounded-lg p-8 mb-6 text-center">
+          <div className="ds-bg-warning/10 border-2 ds-border-warning/40 rounded-lg p-8 mb-6 text-center">
             <div className="max-w-md mx-auto">
               <div className="text-6xl mb-4">📦</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">No Suppliers Found</h3>
-              <p className="text-gray-700 mb-6">
+              <h3 className="text-xl font-bold ds-text-primary mb-2">No Suppliers Found</h3>
+              <p className="ds-text-secondary mb-6">
                 You need to add suppliers before you can assign them to materials. 
                 Your assignment progress will be saved automatically.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Link
                   href={getSupplierCreationUrl()}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium inline-block"
+                  className="px-6 py-3 border-2 ds-border-accent-primary ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover font-medium inline-block shadow-sm"
                 >
                   + Add New Supplier
                 </Link>
                 <Link
                   href="/suppliers"
-                  className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium inline-block"
+                  className="px-6 py-3 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted font-medium inline-block"
                 >
                   View All Suppliers
                 </Link>
               </div>
-              <p className="text-sm text-gray-600 mt-4">
+              <p className="text-sm ds-text-secondary mt-4">
                 💡 Tip: You can also use the sidebar to navigate to Suppliers. Your work here will be saved.
               </p>
             </div>
@@ -581,7 +581,7 @@ function SupplierAssignmentPageContent() {
 
         {/* Assignment Form */}
         {suppliers.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
             {mode === 'single' ? (
               <SingleSupplierAssignment
                 materialRequests={materialRequests}
@@ -602,25 +602,25 @@ function SupplierAssignmentPageContent() {
 
         {/* Quick Add Supplier Link (when suppliers exist but user wants to add more) */}
         {suppliers.length > 0 && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-5 mb-6 shadow-sm">
+          <div className="ds-bg-accent-subtle border-2 ds-border-accent-subtle rounded-lg p-5 mb-6 shadow-sm">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <svg className="h-5 w-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-5 w-5 ds-text-accent-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  <p className="text-base font-semibold text-blue-900">
+                  <p className="text-base font-semibold ds-text-primary">
                     Need to add another supplier?
                   </p>
                 </div>
-                <p className="text-sm text-blue-700 mt-1">
+                <p className="text-sm ds-text-secondary mt-1">
                   💾 Your current assignments will be saved automatically. You can add multiple suppliers and return here.
                 </p>
               </div>
               <div className="flex gap-2">
                 <Link
                   href={getSupplierCreationUrl()}
-                  className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm whitespace-nowrap shadow-md transition-all hover:shadow-lg flex items-center gap-2"
+                  className="px-5 py-2.5 border-2 ds-border-accent-primary ds-bg-accent-primary rounded-lg hover:ds-bg-accent-hover font-medium text-sm whitespace-nowrap shadow-md transition-all hover:shadow-lg flex items-center gap-2 cursor-pointer"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -629,7 +629,7 @@ function SupplierAssignmentPageContent() {
                 </Link>
                 <Link
                   href="/suppliers"
-                  className="px-5 py-2.5 border-2 border-blue-600 text-blue-700 rounded-lg hover:bg-blue-50 font-medium text-sm whitespace-nowrap transition-all flex items-center gap-2"
+                  className="px-5 py-2.5 border-2 ds-border-accent-primary ds-text-accent-primary rounded-lg hover:ds-bg-accent-subtle font-medium text-sm whitespace-nowrap transition-all flex items-center gap-2 cursor-pointer"
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -678,7 +678,7 @@ function SupplierAssignmentPageContent() {
         <div className="flex justify-between items-center">
           <Link
             href={`/material-requests/bulk/${params.batchId}`}
-            className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
+            className="px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium"
           >
             Cancel
           </Link>
@@ -687,18 +687,18 @@ function SupplierAssignmentPageContent() {
             isLoading={submitting}
             loadingText="Creating Purchase Orders..."
             disabled={!canProceed || submitting}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="px-6 py-2 border-2 ds-border-accent-primary ds-bg-accent-primary rounded-lg hover:ds-bg-accent-hover disabled:!opacity-100 disabled:ds-bg-surface-muted disabled:ds-text-muted disabled:ds-border-subtle disabled:cursor-not-allowed font-medium cursor-pointer"
           >
             Create Purchase Orders
           </LoadingButton>
         </div>
         {capitalNotSet && (
-          <p className="mt-3 text-xs text-blue-700">
+          <p className="mt-3 text-xs ds-text-accent-primary">
             ℹ️ No capital invested. Purchase orders will be created and spending will be tracked. Add capital later to enable capital validation.
           </p>
         )}
         {!capitalNotSet && !hasCapital && (
-          <p className="mt-3 text-xs text-amber-700">
+          <p className="mt-3 text-xs ds-text-warning">
             ⚠️ Insufficient capital. Purchase orders will be created but may fail capital validation. Add capital to ensure sufficient funds.
           </p>
         )}
@@ -712,7 +712,7 @@ export default function SupplierAssignmentPage() {
     <Suspense
       fallback={
         <AppLayout>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <LoadingTable rows={5} columns={6} />
           </div>
         </AppLayout>

@@ -348,10 +348,10 @@ function MaterialLibraryPageContent() {
       <AppLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold ds-text-primary mb-2">
               Access Denied
             </h1>
-            <p className="text-gray-600">
+            <p className="ds-text-secondary">
               You don't have permission to view the material library.
             </p>
           </div>
@@ -373,10 +373,10 @@ function MaterialLibraryPageContent() {
         {/* Header */}
         <div className="mb-6 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold ds-text-primary">
               Material Library
             </h1>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm ds-text-secondary">
               Manage commonly used construction materials
             </p>
           </div>
@@ -444,7 +444,7 @@ function MaterialLibraryPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -468,7 +468,7 @@ function MaterialLibraryPageContent() {
             {/* Pagination */}
             {pagination.pages > 1 && (
               <div className="mt-6 flex items-center justify-between">
-                <div className="text-sm text-gray-700">
+                <div className="text-sm ds-text-secondary">
                   Showing{' '}
                   <span className="font-medium">
                     {(pagination.page - 1) * pagination.limit + 1}
@@ -492,7 +492,7 @@ function MaterialLibraryPageContent() {
                       }))
                     }
                     disabled={pagination.page === 1}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 border ds-border-subtle rounded-md text-sm font-medium ds-text-secondary ds-bg-surface hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Previous
                   </button>
@@ -504,7 +504,7 @@ function MaterialLibraryPageContent() {
                       }))
                     }
                     disabled={pagination.page >= pagination.pages}
-                    className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 border ds-border-subtle rounded-md text-sm font-medium ds-text-secondary ds-bg-surface hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                   </button>
@@ -530,7 +530,7 @@ function MaterialLibraryPageContent() {
                 Are you sure you want to remove "{materialToDelete?.name}" from the library?
               </p>
               {materialUsage && materialUsage.total > 0 && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-3">
+                <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-4 mb-3">
                   <p className="font-semibold text-yellow-800 mb-2">
                     ⚠️ This material is currently in use:
                   </p>
@@ -551,7 +551,7 @@ function MaterialLibraryPageContent() {
                 </div>
               )}
               {(!materialUsage || materialUsage.total === 0) && (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   This action cannot be undone.
                 </p>
               )}

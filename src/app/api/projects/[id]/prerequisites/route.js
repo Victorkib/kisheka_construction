@@ -109,9 +109,10 @@ export async function GET(request, { params }) {
 
     // Determine readiness
     // OPTIONAL BUDGET: Budget is no longer required for materials/purchase orders
-    // Spending will be tracked regardless of budget
-    const readyForMaterials = hasCapital && hasFloors && hasPhases; // Budget no longer required
-    const readyForPurchaseOrders = readyForMaterials && hasSuppliers;
+    // OPTIONAL CAPITAL (for requests): Capital is recommended but not required to create material requests.
+    // Capital is still enforced later at purchase order / commitment stages.
+    const readyForMaterials = hasFloors && hasPhases; // Budget and capital not required for creating requests
+    const readyForPurchaseOrders = readyForMaterials && hasSuppliers && hasCapital; // Capital required when committing to POs
     const overallReadiness = {
       readyForMaterials,
       readyForPurchaseOrders,
@@ -163,11 +164,12 @@ export async function GET(request, { params }) {
       },
       capital: {
         completed: hasCapital,
-        required: true,
+        required: false, // Capital is optional for requests, but required/recommended for purchase orders
+        recommended: true,
         status: capitalStatus,
         message: hasCapital 
           ? `Capital allocated: ${totalInvested.toLocaleString()} KES (Available: ${Math.max(0, availableCapital).toLocaleString()} KES)`
-          : 'No capital allocated',
+          : 'No capital allocated yet (you can still create material requests; capital will be enforced later when creating purchase orders).',
         warning: capitalWarning,
         details: {
           totalInvested,
@@ -248,8 +250,9 @@ export async function GET(request, { params }) {
  */
 function calculateCompletionPercentage({ hasBudget, hasCapital, hasFloors, hasPhases, hasSuppliers, hasCategories }) {
   // OPTIONAL BUDGET: Budget is now optional (recommended but not required)
-  const required = [hasCapital, hasFloors, hasPhases]; // Budget no longer required
-  const optional = [hasBudget, hasSuppliers, hasCategories]; // Budget moved to optional
+  // OPTIONAL CAPITAL (for requests): Capital is treated as optional here and required for purchase orders.
+  const required = [hasFloors, hasPhases]; // Capital and budget no longer required for basic readiness
+  const optional = [hasBudget, hasCapital, hasSuppliers, hasCategories];
   
   const requiredCompleted = required.filter(Boolean).length;
   const optionalCompleted = optional.filter(Boolean).length;

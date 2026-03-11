@@ -241,10 +241,10 @@ function ArchivedProjectsPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
-          <Link href="/projects" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/projects" className="ds-text-accent-primary hover:ds-text-accent-hover underline">
             ← Back to Projects
           </Link>
         </div>
@@ -259,14 +259,14 @@ function ArchivedProjectsPageContent() {
         <div className="mb-6">
           <Link
             href="/projects"
-            className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block"
           >
             ← Back to Projects
           </Link>
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Archived Projects</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">Archived Projects</h1>
+              <p className="ds-text-secondary mt-1">
                 {projects.length} archived project{projects.length !== 1 ? 's' : ''}
               </p>
             </div>
@@ -275,9 +275,9 @@ function ArchivedProjectsPageContent() {
 
         {/* Projects Table */}
         {projects.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className="mx-auto h-12 w-12 ds-text-muted"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -289,60 +289,60 @@ function ArchivedProjectsPageContent() {
                 d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
               />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No archived projects</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <h3 className="mt-2 text-sm font-medium ds-text-primary">No archived projects</h3>
+            <p className="mt-1 text-sm ds-text-muted">
               There are no archived projects at this time.
             </p>
           </div>
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+            <div className="hidden md:block ds-bg-surface rounded-lg shadow overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Project
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Archived Date
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Budget
                       </th>
                       {canManage && (
-                        <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-right text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                           Actions
                         </th>
                       )}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {projects.map((project) => (
-                      <tr key={project._id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={project._id} className="hover:ds-bg-surface-muted transition-colors">
                         <td className="px-6 py-4">
                           <div>
                             <Link
                               href={`/projects/${project._id}`}
-                              className="text-sm font-semibold text-gray-900 hover:text-blue-600"
+                              className="text-sm font-semibold ds-text-primary hover:ds-text-accent-primary"
                             >
                               {project.projectName}
                             </Link>
-                            <p className="text-xs text-gray-500 mt-0.5">{project.projectCode}</p>
+                            <p className="text-xs ds-text-muted mt-0.5">{project.projectCode}</p>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <ArchiveBadge />
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                           {formatDate(project.deletedAt)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium ds-text-primary">
                             {formatCurrency(project.budget?.total || 0)}
                           </span>
                         </td>
@@ -376,37 +376,37 @@ function ArchivedProjectsPageContent() {
             {/* Mobile Card View */}
             <div className="md:hidden space-y-4">
               {projects.map((project) => (
-                <div key={project._id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                <div key={project._id} className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <Link
                         href={`/projects/${project._id}`}
-                        className="text-base font-semibold text-gray-900 hover:text-blue-600 block"
+                        className="text-base font-semibold ds-text-primary hover:ds-text-accent-primary block"
                       >
                         {project.projectName}
                       </Link>
-                      <p className="text-sm text-gray-500 mt-0.5">{project.projectCode}</p>
+                      <p className="text-sm ds-text-muted mt-0.5">{project.projectCode}</p>
                     </div>
                     <ArchiveBadge />
                   </div>
                   
                   <div className="grid grid-cols-2 gap-3 mb-3">
                     <div>
-                      <p className="text-xs text-gray-500">Budget</p>
-                      <p className="text-sm font-medium text-gray-900 mt-0.5">
+                      <p className="text-xs ds-text-muted">Budget</p>
+                      <p className="text-sm font-medium ds-text-primary mt-0.5">
                         {formatCurrency(project.budget?.total || 0)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Archived</p>
-                      <p className="text-sm font-medium text-gray-900 mt-0.5">
+                      <p className="text-xs ds-text-muted">Archived</p>
+                      <p className="text-sm font-medium ds-text-primary mt-0.5">
                         {formatDate(project.deletedAt)}
                       </p>
                     </div>
                   </div>
 
                   {canManage && (
-                    <div className="mt-3 pt-3 border-t border-gray-200 flex gap-2">
+                    <div className="mt-3 pt-3 border-t ds-border-subtle flex gap-2">
                       <button
                         onClick={() => handleRestoreClick(project)}
                         disabled={restoring}
@@ -458,11 +458,11 @@ function ArchivedProjectsPageContent() {
                 <p className="mb-3">
                   Are you sure you want to permanently delete <strong>"{selectedProject.projectName}"</strong>?
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm ds-text-secondary">
                   This will permanently remove the project and all linked records.
                 </p>
                 {impactLoading && (
-                  <div className="text-xs text-gray-500 mt-2 flex items-center gap-2">
+                  <div className="text-xs ds-text-muted mt-2 flex items-center gap-2">
                     <LoadingSpinner size="sm" />
                     <span>Loading impact summary...</span>
                   </div>
@@ -494,7 +494,7 @@ export default function ArchivedProjectsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <LoadingSpinner />
-            <p className="mt-4 text-gray-600">Loading archived projects...</p>
+            <p className="mt-4 ds-text-secondary">Loading archived projects...</p>
           </div>
         </div>
       </AppLayout>

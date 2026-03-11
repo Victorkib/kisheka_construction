@@ -85,9 +85,9 @@ export function getFloorColorClass(floorNumber) {
     case 'ground':
       return 'text-blue-900';
     case 'above-ground':
-      return 'text-gray-900';
+      return 'ds-text-primary';
     default:
-      return 'text-gray-500';
+      return 'ds-text-muted';
   }
 }
 

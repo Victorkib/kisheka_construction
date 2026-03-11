@@ -4,12 +4,12 @@
  */
 
 const VARIANT_CLASSES = {
-  success: 'bg-green-100 text-green-800',
-  info: 'bg-blue-100 text-blue-800',
-  warning: 'bg-yellow-100 text-yellow-800',
-  danger: 'bg-red-100 text-red-800',
-  gray: 'bg-gray-100 text-gray-800',
-  neutral: 'bg-gray-100 text-gray-800',
+  success: 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60',
+  info: 'bg-blue-500/10 text-blue-200 border border-blue-400/60',
+  warning: 'bg-amber-500/10 text-amber-200 border border-amber-400/60',
+  danger: 'bg-red-500/10 text-red-200 border border-red-400/60',
+  gray: 'bg-slate-500/10 text-slate-200 border border-slate-400/60',
+  neutral: 'bg-slate-500/10 text-slate-200 border border-slate-400/60',
 };
 
 const SIZE_CLASSES = {

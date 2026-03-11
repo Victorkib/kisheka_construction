@@ -320,10 +320,34 @@ export async function calculateFloorActualSpending(floorId, includeByPhase = tru
     });
   }
   
-  // Calculate subcontractor spending (if subcontractors are linked to floors)
-  // Note: Subcontractors might not be directly linked to floors, so this might be 0
-  const subcontractorSpending = 0; // Placeholder for future implementation
+  // Calculate subcontractor spending (subcontractors linked to this floor)
+  // Get subcontractors with floorId matching this floor
+  const subcontractors = await db.collection('subcontractors').find({
+    floorId: floorObjectId,
+    deletedAt: null,
+    status: { $in: ['active', 'completed'] }
+  }).toArray();
+  
+  // Calculate total paid amounts from payment schedules, grouped by phase
+  let subcontractorSpending = 0;
   const subcontractorsByPhase = {};
+  
+  for (const sub of subcontractors) {
+    if (sub.paymentSchedule && Array.isArray(sub.paymentSchedule)) {
+      // Calculate paid amount for this subcontractor
+      const paidAmount = sub.paymentSchedule
+        .filter(p => p.paid === true)
+        .reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+      
+      subcontractorSpending += paidAmount;
+      
+      // Group by phase if includeByPhase is true
+      if (includeByPhase && sub.phaseId) {
+        const phaseId = sub.phaseId.toString();
+        subcontractorsByPhase[phaseId] = (subcontractorsByPhase[phaseId] || 0) + paidAmount;
+      }
+    }
+  }
   
   const totalSpending = materialsSpending + labourSpending + equipmentSpending + subcontractorSpending;
   

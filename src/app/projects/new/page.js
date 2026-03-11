@@ -376,13 +376,13 @@ export default function NewProjectPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-6">
+          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded mb-6">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to create projects. Only Project Managers and Owners can create projects.</p>
           </div>
           <Link
             href="/projects"
-            className="text-blue-600 hover:text-blue-900 underline"
+            className="ds-text-accent-primary hover:ds-text-accent-hover underline"
           >
             ← Back to Projects
           </Link>
@@ -409,9 +409,9 @@ export default function NewProjectPage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50">
+      <div className="min-h-screen ds-bg-app">
         {/* Header with Gradient */}
-        <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white shadow-lg">
+        <div className="ds-bg-accent-primary text-white shadow-lg">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
             {/* Breadcrumb */}
             <Link
@@ -426,7 +426,7 @@ export default function NewProjectPage() {
             
             {/* Title Section */}
             <div className="flex items-center gap-4 mb-6">
-              <div className="bg-white/20 backdrop-blur-sm rounded-xl p-3 md:p-4">
+              <div className="ds-bg-surface/20 backdrop-blur-sm rounded-xl p-3 md:p-4">
                 <svg className="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
@@ -443,9 +443,9 @@ export default function NewProjectPage() {
                 <span className="text-sm font-medium text-blue-100">Form Completion</span>
                 <span className="text-sm font-bold text-white">{progress}%</span>
               </div>
-              <div className="w-full bg-white/20 rounded-full h-2.5 overflow-hidden">
+              <div className="w-full ds-bg-surface/20 rounded-full h-2.5 overflow-hidden">
                 <div 
-                  className="bg-white h-full rounded-full transition-all duration-500 ease-out"
+                  className="ds-bg-surface h-full rounded-full transition-all duration-500 ease-out"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -483,17 +483,17 @@ export default function NewProjectPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Section 1: Basic Information */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-200">
+            <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
+              <div className="ds-bg-accent-subtle px-6 py-4 border-b ds-border-subtle">
                 <div className="flex items-center gap-3">
-                  <div className="bg-blue-600 rounded-lg p-2">
+                  <div className="ds-bg-accent-primary rounded-lg p-2">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Basic Information</h2>
-                    <p className="text-sm text-gray-600">Essential project details</p>
+                    <h2 className="text-xl font-bold ds-text-primary">Basic Information</h2>
+                    <p className="text-sm ds-text-secondary">Essential project details</p>
                   </div>
                 </div>
               </div>
@@ -501,12 +501,12 @@ export default function NewProjectPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Project Code */}
                   <div className="md:col-span-1">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold ds-text-secondary mb-2">
                       Project Code <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
                         </svg>
                       </div>
@@ -517,20 +517,20 @@ export default function NewProjectPage() {
                         onChange={handleChange}
                         placeholder="e.g., DOSHAKI-001"
                         required
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-gray-900"
+                        className="w-full pl-10 pr-4 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted transition-all ds-text-primary"
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">Unique identifier for this project</p>
+                    <p className="text-xs ds-text-muted mt-2">Unique identifier for this project</p>
                   </div>
 
                   {/* Project Name */}
                   <div className="md:col-span-1">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold ds-text-secondary mb-2">
                       Project Name <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </div>
@@ -541,7 +541,7 @@ export default function NewProjectPage() {
                         onChange={handleChange}
                         placeholder="e.g., 10-Storey Residential Building"
                         required
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-gray-900"
+                        className="w-full pl-10 pr-4 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted transition-all ds-text-primary"
                       />
                     </div>
                   </div>
@@ -549,8 +549,8 @@ export default function NewProjectPage() {
                   {/* Description */}
                   <div className="md:col-span-2">
                     <div className="flex justify-between items-center mb-2">
-                      <label className="block text-sm font-semibold text-gray-700">Description</label>
-                      <span className={`text-xs font-medium ${formData.description.length > 450 ? 'text-orange-500' : 'text-gray-400'}`}>
+                      <label className="block text-sm font-semibold ds-text-secondary">Description</label>
+                      <span className={`text-xs font-medium ${formData.description.length > 450 ? 'text-orange-500' : 'ds-text-muted'}`}>
                         {formData.description.length} / 500 characters
                       </span>
                     </div>
@@ -561,16 +561,16 @@ export default function NewProjectPage() {
                       placeholder="Provide a detailed description of the project..."
                       rows={4}
                       maxLength={500}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all resize-none text-gray-900"
+                      className="w-full px-4 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted transition-all resize-none ds-text-primary"
                     />
                   </div>
 
                   {/* Location */}
                   <div className="md:col-span-1">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+                    <label className="block text-sm font-semibold ds-text-secondary mb-2">Location</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
@@ -581,17 +581,17 @@ export default function NewProjectPage() {
                         value={formData.location}
                         onChange={handleChange}
                         placeholder="e.g., Nairobi, Kenya"
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-black"
+                        className="w-full pl-10 pr-4 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted transition-all ds-text-primary"
                       />
                     </div>
                   </div>
 
                   {/* Client */}
                   <div className="md:col-span-1">
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Client</label>
+                    <label className="block text-sm font-semibold ds-text-secondary mb-2">Client</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
                       </div>
@@ -601,7 +601,7 @@ export default function NewProjectPage() {
                         value={formData.client}
                         onChange={handleChange}
                         placeholder="Client name"
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 transition-all text-gray-900"
+                        className="w-full pl-10 pr-4 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted transition-all ds-text-primary"
                       />
                     </div>
                   </div>
@@ -610,8 +610,8 @@ export default function NewProjectPage() {
             </div>
 
             {/* Section 2: Status & Timeline */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-purple-50 to-pink-50 px-6 py-4 border-b border-gray-200">
+            <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
+              <div className="ds-bg-accent-subtle px-6 py-4 border-b ds-border-subtle">
                 <div className="flex items-center gap-3">
                   <div className="bg-purple-600 rounded-lg p-2">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -619,8 +619,8 @@ export default function NewProjectPage() {
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Status & Timeline</h2>
-                    <p className="text-sm text-gray-600">Project status and important dates</p>
+                    <h2 className="text-xl font-bold ds-text-primary">Status & Timeline</h2>
+                    <p className="text-sm ds-text-secondary">Project status and important dates</p>
                   </div>
                 </div>
               </div>
@@ -628,10 +628,10 @@ export default function NewProjectPage() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Status */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                    <label className="block text-sm font-semibold ds-text-secondary mb-2">Status</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
@@ -639,7 +639,7 @@ export default function NewProjectPage() {
                         name="status"
                         value={formData.status}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 appearance-none cursor-pointer transition-all text-gray-900"
+                        className="w-full pl-10 pr-4 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 appearance-none cursor-pointer transition-all ds-text-primary"
                       >
                         <option value="planning">Planning</option>
                         <option value="active">Active</option>
@@ -648,7 +648,7 @@ export default function NewProjectPage() {
                         <option value="archived">Archived</option>
                       </select>
                       <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                         </svg>
                       </div>
@@ -657,10 +657,10 @@ export default function NewProjectPage() {
 
                   {/* Start Date */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Start Date</label>
+                    <label className="block text-sm font-semibold ds-text-secondary mb-2">Start Date</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
@@ -669,7 +669,7 @@ export default function NewProjectPage() {
                         name="startDate"
                         value={formData.startDate}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-gray-900 cursor-pointer"
+                        className="w-full pl-10 pr-12 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all ds-text-primary cursor-pointer"
                       />
                       {/* Visible Calendar Icon on the Right */}
                       <button
@@ -682,12 +682,12 @@ export default function NewProjectPage() {
                             input.focus();
                           }
                         }}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-100 rounded-r-lg transition-colors"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:ds-bg-surface-muted rounded-r-lg transition-colors"
                         aria-label="Open date picker"
                         tabIndex={-1}
                       >
                         <svg
-                          className="w-5 h-5 text-gray-600 hover:text-purple-600 transition-colors"
+                          className="w-5 h-5 ds-text-secondary hover:text-purple-600 transition-colors"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -700,10 +700,10 @@ export default function NewProjectPage() {
 
                   {/* Planned End Date */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Planned End Date</label>
+                    <label className="block text-sm font-semibold ds-text-secondary mb-2">Planned End Date</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
@@ -712,7 +712,7 @@ export default function NewProjectPage() {
                         name="plannedEndDate"
                         value={formData.plannedEndDate}
                         onChange={handleChange}
-                        className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all text-gray-900 cursor-pointer"
+                        className="w-full pl-10 pr-12 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all ds-text-primary cursor-pointer"
                       />
                       {/* Visible Calendar Icon on the Right */}
                       <button
@@ -725,12 +725,12 @@ export default function NewProjectPage() {
                             input.focus();
                           }
                         }}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:bg-gray-100 rounded-r-lg transition-colors"
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-auto cursor-pointer hover:ds-bg-surface-muted rounded-r-lg transition-colors"
                         aria-label="Open date picker"
                         tabIndex={-1}
                       >
                         <svg
-                          className="w-5 h-5 text-gray-600 hover:text-purple-600 transition-colors"
+                          className="w-5 h-5 ds-text-secondary hover:text-purple-600 transition-colors"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -745,8 +745,8 @@ export default function NewProjectPage() {
             </div>
 
             {/* Section 3: Budget */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b border-gray-200">
+            <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
+              <div className="ds-bg-accent-subtle px-6 py-4 border-b ds-border-subtle">
                 <div className="flex items-center gap-3">
                   <div className="bg-green-600 rounded-lg p-2">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -754,15 +754,15 @@ export default function NewProjectPage() {
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Budget & Financials</h2>
-                    <p className="text-sm text-gray-600">Set project budget and allocations</p>
+                    <h2 className="text-xl font-bold ds-text-primary">Budget & Financials</h2>
+                    <p className="text-sm ds-text-secondary">Set project budget and allocations</p>
                   </div>
                 </div>
               </div>
               <div className="p-6">
                 {/* Budget mode selector */}
                 <div className="mb-4">
-                  <p className="text-sm font-semibold text-gray-800 mb-2">
+                  <p className="text-sm font-semibold ds-text-primary mb-2">
                     How do you want to handle the project budget right now?
                   </p>
                   <div className="flex flex-col md:flex-row gap-3">
@@ -772,20 +772,20 @@ export default function NewProjectPage() {
                       className={`flex-1 rounded-lg border px-4 py-3 text-left transition-all ${
                         budgetMode === 'later'
                           ? 'border-blue-600 bg-blue-50 shadow-sm'
-                          : 'border-gray-200 bg-white hover:border-blue-300'
+                          : 'ds-border-subtle ds-bg-surface hover:border-blue-400/60'
                       }`}
                     >
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold ${
-                          budgetMode === 'later' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'
+                          budgetMode === 'later' ? 'ds-bg-accent-primary text-white' : 'ds-bg-surface-muted ds-text-secondary'
                         }`}>
                           1
                         </span>
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-semibold ds-text-primary">
                           Skip for now (set budget later)
                         </span>
                       </div>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs ds-text-secondary">
                         Recommended if you are still confirming financing. You can still track all spending and add a detailed budget later.
                       </p>
                     </button>
@@ -795,20 +795,20 @@ export default function NewProjectPage() {
                       className={`flex-1 rounded-lg border px-4 py-3 text-left transition-all ${
                         budgetMode === 'now'
                           ? 'border-emerald-600 bg-emerald-50 shadow-sm'
-                          : 'border-gray-200 bg-white hover:border-emerald-300'
+                          : 'ds-border-subtle ds-bg-surface hover:border-emerald-300'
                       }`}
                     >
                       <div className="flex items-center gap-2 mb-1">
                         <span className={`inline-flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold ${
-                          budgetMode === 'now' ? 'bg-emerald-600 text-white' : 'bg-gray-200 text-gray-700'
+                          budgetMode === 'now' ? 'bg-emerald-600 text-white' : 'ds-bg-surface-muted ds-text-secondary'
                         }`}>
                           2
                         </span>
-                        <span className="text-sm font-semibold text-gray-900">
+                        <span className="text-sm font-semibold ds-text-primary">
                           Set initial budget now (recommended for control)
                         </span>
                       </div>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs ds-text-secondary">
                         Ideal if you already have a clear budget. Enables budget validation, phase allocations, and richer financial analytics from day one.
                       </p>
                     </button>
@@ -864,7 +864,7 @@ export default function NewProjectPage() {
                       const budgetTotal = parseFloat(formData.budget?.total || 0);
                       if (budgetTotal === 0 || isNaN(budgetTotal)) {
                         return (
-                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
+                          <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-3 mt-3">
                             <div className="flex items-start gap-2">
                               <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -911,7 +911,7 @@ export default function NewProjectPage() {
                         };
                         const totalPhaseBudgets = Object.values(phaseAllocations).reduce((sum, val) => sum + val, 0);
                         return (
-  <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-2 border-blue-500/30 rounded-xl p-6 mt-4 shadow-xl">
+  <div className="ds-bg-surface border-2 ds-border-accent-subtle rounded-xl p-6 mt-4 shadow-xl">
     {/* Header */}
     <div className="flex items-start justify-between mb-4">
       <div className="flex items-center gap-3">
@@ -988,7 +988,7 @@ export default function NewProjectPage() {
         <div className="font-bold text-white text-lg">{phaseAllocations.finalSystems.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}</div>
         <p className="text-xs text-slate-500 mt-2">Lift, testing & handover</p>
       </div>
-      <div className="bg-gradient-to-br from-blue-900/50 to-indigo-900/50 rounded-lg p-4 border-2 border-blue-500/50 hover:border-blue-400 transition-all">
+      <div className="ds-bg-accent-subtle rounded-lg p-4 border-2 ds-border-accent-subtle hover:ds-border-accent-primary transition-all">
         <div className="flex items-center justify-between mb-2">
           <span className="text-blue-300 text-xs font-bold uppercase tracking-wide">Total Allocation</span>
           <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1037,8 +1037,8 @@ export default function NewProjectPage() {
             </div>
 
             {/* Section 4: Team Assignment */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-orange-50 to-amber-50 px-6 py-4 border-b border-gray-200">
+            <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
+              <div className="ds-bg-accent-subtle px-6 py-4 border-b ds-border-subtle">
                 <div className="flex items-center gap-3">
                   <div className="bg-orange-600 rounded-lg p-2">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1046,8 +1046,8 @@ export default function NewProjectPage() {
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Team Assignment</h2>
-                    <p className="text-sm text-gray-600">Assign project team members</p>
+                    <h2 className="text-xl font-bold ds-text-primary">Team Assignment</h2>
+                    <p className="text-sm ds-text-secondary">Assign project team members</p>
                   </div>
                 </div>
               </div>
@@ -1055,18 +1055,18 @@ export default function NewProjectPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Site Manager */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Site Manager <span className="text-gray-500 font-normal">(Optional)</span>
+                    <label className="block text-sm font-semibold ds-text-secondary mb-2">
+                      Site Manager <span className="ds-text-muted font-normal">(Optional)</span>
                     </label>
                     {loadingUsers ? (
-                      <div className="px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg flex items-center gap-3">
+                      <div className="px-4 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg flex items-center gap-3">
                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-orange-600"></div>
-                        <span className="text-gray-600">Loading users...</span>
+                        <span className="ds-text-secondary">Loading users...</span>
                       </div>
                     ) : (
                       <div className="relative">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                           </svg>
                         </div>
@@ -1074,7 +1074,7 @@ export default function NewProjectPage() {
                           name="siteManager"
                           value={formData.siteManager}
                           onChange={handleChange}
-                          className="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 appearance-none cursor-pointer transition-all text-gray-900"
+                          className="w-full pl-10 pr-10 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500 appearance-none cursor-pointer transition-all ds-text-primary"
                         >
                           <option value="">No site manager assigned</option>
                           {Array.isArray(availableUsers) && availableUsers.length > 0 ? (
@@ -1088,30 +1088,30 @@ export default function NewProjectPage() {
                           )}
                         </select>
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <svg className="w-5 h-5 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                           </svg>
                         </div>
                       </div>
                     )}
-                    <p className="text-xs text-gray-500 mt-2">
+                    <p className="text-xs ds-text-muted mt-2">
                       Assign a site manager to oversee this project. Can be assigned later.
                     </p>
                   </div>
 
                   {/* Team Members - Info */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold ds-text-secondary mb-2">
                       Team Members
                     </label>
-                    <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg">
+                    <div className="px-4 py-3 ds-bg-surface-muted border ds-border-subtle rounded-lg">
                       <div className="flex items-start gap-3">
-                        <svg className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 ds-text-muted mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <div>
-                          <p className="text-sm font-medium text-gray-700">Add After Creation</p>
-                          <p className="text-xs text-gray-600 mt-1">
+                          <p className="text-sm font-medium ds-text-secondary">Add After Creation</p>
+                          <p className="text-xs ds-text-secondary mt-1">
                             Team members can be added after project creation from the project team page for better control.
                           </p>
                         </div>
@@ -1123,8 +1123,8 @@ export default function NewProjectPage() {
             </div>
 
             {/* Section 5: Configuration */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-4 border-b border-gray-200">
+            <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
+              <div className="bg-gradient-to-r from-indigo-50 to-blue-50 px-6 py-4 border-b ds-border-subtle">
                 <div className="flex items-center gap-3">
                   <div className="bg-indigo-600 rounded-lg p-2">
                     <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1133,21 +1133,21 @@ export default function NewProjectPage() {
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900">Project Configuration</h2>
-                    <p className="text-sm text-gray-600">Auto-setup options and preferences</p>
+                    <h2 className="text-xl font-bold ds-text-primary">Project Configuration</h2>
+                    <p className="text-sm ds-text-secondary">Auto-setup options and preferences</p>
                   </div>
                 </div>
               </div>
               <div className="p-6 space-y-6">
                 {/* Floor Configuration */}
                 <div>
-                  <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <h3 className="text-base font-semibold ds-text-primary mb-4 flex items-center gap-2">
                     <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     Floor Configuration
                   </h3>
-                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="ds-bg-surface-muted rounded-lg p-4 border ds-border-subtle">
                     <div className="flex items-start gap-4">
                       <div className="flex items-center h-5">
                         <input
@@ -1156,14 +1156,14 @@ export default function NewProjectPage() {
                           name="autoCreateFloors"
                           checked={formData.autoCreateFloors}
                           onChange={handleChange}
-                          className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
+                          className="w-5 h-5 text-indigo-600 ds-border-subtle rounded focus:ring-indigo-500 cursor-pointer"
                         />
                       </div>
                       <div className="flex-1">
-                        <label htmlFor="autoCreateFloors" className="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">
+                        <label htmlFor="autoCreateFloors" className="block text-sm font-semibold ds-text-primary mb-1 cursor-pointer">
                           Auto-create Floors
                         </label>
-                        <p className="text-xs text-gray-600">
+                        <p className="text-xs ds-text-secondary">
                           Automatically create floors for this project. You can create floors manually later if disabled.
                         </p>
                       </div>
@@ -1171,7 +1171,7 @@ export default function NewProjectPage() {
 
                     {formData.autoCreateFloors && (
                       <div className="mt-4 ml-9">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium ds-text-secondary mb-2">
                           Number of Floors
                         </label>
                         <input
@@ -1182,9 +1182,9 @@ export default function NewProjectPage() {
                           placeholder="10"
                           min="0"
                           max="50"
-                          className="w-full px-4 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder:text-gray-400 transition-all"
+                          className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder:ds-text-muted transition-all"
                         />
-                        <p className="text-xs text-gray-500 mt-2">
+                        <p className="text-xs ds-text-muted mt-2">
                           Number of floors to create (0-50). Ground floor is included. Default: 10 floors (Ground + 9 floors).
                         </p>
                       </div>
@@ -1194,13 +1194,13 @@ export default function NewProjectPage() {
 
                 {/* Phase Configuration */}
                 <div>
-                  <h3 className="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <h3 className="text-base font-semibold ds-text-primary mb-4 flex items-center gap-2">
                     <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                     Phase Configuration
                   </h3>
-                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <div className="ds-bg-surface-muted rounded-lg p-4 border ds-border-subtle">
                     <div className="flex items-start gap-4">
                       <div className="flex items-center h-5">
                         <input
@@ -1209,21 +1209,21 @@ export default function NewProjectPage() {
                           name="autoInitializePhases"
                           checked={formData.autoInitializePhases}
                           onChange={handleChange}
-                          className="w-5 h-5 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500 cursor-pointer"
+                          className="w-5 h-5 text-indigo-600 ds-border-subtle rounded focus:ring-indigo-500 cursor-pointer"
                         />
                       </div>
                       <div className="flex-1">
-                        <label htmlFor="autoInitializePhases" className="block text-sm font-semibold text-gray-800 mb-1 cursor-pointer">
+                        <label htmlFor="autoInitializePhases" className="block text-sm font-semibold ds-text-primary mb-1 cursor-pointer">
                           Auto-initialize Default Phases <span className="text-indigo-600">(Recommended)</span>
                         </label>
-                        <p className="text-xs text-gray-600 mb-3">
+                        <p className="text-xs ds-text-secondary mb-3">
                           Automatically create 4 default construction phases (Basement, Superstructure, Finishing, Final Systems) with automatic budget allocation from Direct Construction Costs (DCC). Pre-construction costs are tracked separately via initial expenses. This enables phase-based budget tracking and financial management.
                         </p>
                   {formData.autoInitializePhases && (() => {
                     const budgetTotal = parseFloat(formData.budget?.total || 0);
                     if (budgetTotal === 0 || isNaN(budgetTotal)) {
                       return (
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-2">
+                        <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-3 mt-2">
                           <div className="flex items-start gap-2">
                             <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -1250,11 +1250,11 @@ export default function NewProjectPage() {
             </div>
 
             {/* Submit Buttons */}
-            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+            <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle p-6">
               <div className="flex flex-col sm:flex-row justify-end gap-4">
                 <Link
                   href="/projects"
-                  className="px-6 py-3 border-2 border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 font-medium text-gray-700 transition-all text-center"
+                  className="px-6 py-3 border-2 ds-border-subtle rounded-lg hover:ds-bg-surface-muted hover:border-ds-border-strong font-medium ds-text-secondary transition-all text-center"
                 >
                   Cancel
                 </Link>

@@ -382,3 +382,148 @@ This is an automated reminder from Doshaki Construction System.
   });
 }
 
+/**
+ * Send owner/request-side alert when supplier responds to a purchase order.
+ * @param {Object} options
+ * @param {Object} options.recipientUser - Owner/request-side user profile
+ * @param {Object} options.purchaseOrder - Purchase order document
+ * @param {string} options.action - Supplier action: accept|reject|modify|partial
+ * @param {Object} [options.responseData] - Optional response payload summary
+ * @returns {Promise<Object>} Send result
+ */
+export async function sendOwnerSupplierResponseEmail({
+  recipientUser,
+  purchaseOrder,
+  action,
+  responseData = {}
+}) {
+  if (!recipientUser?.email) {
+    throw new Error('Recipient email is required');
+  }
+
+  const actionLabelMap = {
+    accept: 'Accepted',
+    reject: 'Rejected',
+    modify: 'Requested Modifications',
+    partial: 'Partially Responded'
+  };
+  const actionLabel = actionLabelMap[action] || 'Responded';
+  const poNumber = purchaseOrder.purchaseOrderNumber || 'Unknown PO';
+  const supplierName = purchaseOrder.supplierName || 'Supplier';
+  const poUrl = `${APP_URL}/purchase-orders/${purchaseOrder._id?.toString?.() || purchaseOrder._id || ''}`;
+
+  const details = [];
+  if (responseData.notes) details.push(`Notes: ${responseData.notes}`);
+  if (responseData.rejectionReason) details.push(`Rejection Reason: ${responseData.rejectionReason}`);
+  if (responseData.rejectionSubcategory) details.push(`Rejection Subcategory: ${responseData.rejectionSubcategory}`);
+  if (typeof responseData.acceptedCount === 'number') details.push(`Accepted Materials: ${responseData.acceptedCount}`);
+  if (typeof responseData.rejectedCount === 'number') details.push(`Rejected Materials: ${responseData.rejectedCount}`);
+  if (typeof responseData.modifiedCount === 'number') details.push(`Modified Materials: ${responseData.modifiedCount}`);
+  const detailsHtml = details.length > 0
+    ? `<ul style="margin: 8px 0 0 18px;">${details.map(d => `<li>${d}</li>`).join('')}</ul>`
+    : '<p style="margin: 8px 0 0 0;">No extra details were provided.</p>';
+
+  const subject = `Supplier ${actionLabel}: ${poNumber}`;
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${subject}</title></head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2 style="color: #1f2937;">Supplier Response Update</h2>
+      <p>Hello ${recipientUser.firstName || recipientUser.email},</p>
+      <p><strong>${supplierName}</strong> has <strong>${actionLabel.toLowerCase()}</strong> purchase order <strong>${poNumber}</strong>.</p>
+      <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; margin: 14px 0;">
+        <p style="margin: 0;"><strong>Action:</strong> ${actionLabel}</p>
+        ${detailsHtml}
+      </div>
+      <p><a href="${poUrl}" style="display: inline-block; background-color: #2563eb; color: #fff; padding: 10px 16px; text-decoration: none; border-radius: 6px;">View Purchase Order</a></p>
+      <p style="font-size: 12px; color: #6b7280;">Automated message from Doshaki Construction.</p>
+    </body>
+    </html>
+  `;
+
+  const text = `
+Supplier Response Update
+
+Hello ${recipientUser.firstName || recipientUser.email},
+
+${supplierName} has ${actionLabel.toLowerCase()} purchase order ${poNumber}.
+Action: ${actionLabel}
+${details.length > 0 ? details.map(d => `- ${d}`).join('\n') : 'No extra details were provided.'}
+
+View PO: ${poUrl}
+  `.trim();
+
+  return sendEmail({
+    to: recipientUser.email,
+    toName: `${recipientUser.firstName || ''} ${recipientUser.lastName || ''}`.trim() || recipientUser.email,
+    subject,
+    text,
+    html
+  });
+}
+
+/**
+ * Send supplier email when owner/PM confirms delivery.
+ * @param {Object} options
+ * @param {Object} options.supplier - Supplier profile
+ * @param {Object} options.purchaseOrder - Purchase order document
+ * @param {Object} [options.deliverySummary] - Optional delivery details
+ * @returns {Promise<Object>} Send result
+ */
+export async function sendSupplierDeliveryConfirmedEmail({
+  supplier,
+  purchaseOrder,
+  deliverySummary = {}
+}) {
+  if (!supplier?.email) {
+    throw new Error('Supplier email is required');
+  }
+
+  const poNumber = purchaseOrder.purchaseOrderNumber || 'Unknown PO';
+  const deliveryDate = deliverySummary.deliveryDate || new Date();
+  const dateText = new Date(deliveryDate).toLocaleDateString('en-KE', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
+  const itemSummary = deliverySummary.itemSummary || purchaseOrder.materialName || `${purchaseOrder.quantityOrdered || ''} ${purchaseOrder.unit || ''}`.trim();
+  const subject = `Delivery Confirmed: ${poNumber}`;
+  const text = `
+Delivery ConfirmedHello ${supplier.contactPerson || supplier.name || 'Supplier'},
+
+Delivery has been confirmed for purchase order ${poNumber}.
+
+Received: ${itemSummary}
+Date Confirmed: ${dateText}
+
+Thank you for your delivery. You may proceed with invoice/payment follow-up as agreed.
+  `.trim();
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${subject}</title></head>
+    <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+      <h2 style="color: #1f2937;">Delivery Confirmed</h2>
+      <p>Hello ${supplier.contactPerson || supplier.name || 'Supplier'},</p>
+      <p>Delivery has been confirmed for purchase order <strong>${poNumber}</strong>.</p>
+      <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; padding: 14px; margin: 14px 0;">
+        <p style="margin: 0;"><strong>Received:</strong> ${itemSummary}</p>
+        <p style="margin: 4px 0 0 0;"><strong>Date Confirmed:</strong> ${dateText}</p>
+      </div>
+      <p>Thank you for your delivery. You may proceed with invoice/payment follow-up as agreed.</p>
+      <p style="font-size: 12px; color: #6b7280;">Automated message from Doshaki Construction.</p>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to: supplier.email,
+    toName: supplier.contactPerson || supplier.name || supplier.email,
+    subject,
+    text,
+    html
+  });
+}

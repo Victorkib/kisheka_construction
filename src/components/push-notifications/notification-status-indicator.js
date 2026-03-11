@@ -102,41 +102,41 @@ export function NotificationStatusIndicator({ showLabel = true, size = 'md' }) {
 
   // Determine icon and color
   let icon = null;
-  let color = 'text-gray-400';
-  let bgColor = 'bg-gray-100';
+  let color = 'ds-text-muted';
+  let bgColor = 'ds-bg-surface-muted';
   let label = 'Notifications disabled';
   let tooltip = 'Browser notifications not enabled';
 
   if (isLoading) {
     return (
       <div className="flex items-center gap-2">
-        <div className={`${iconSize} rounded-full bg-gray-200 animate-pulse`} />
+        <div className={`${iconSize} rounded-full ds-bg-surface-muted animate-pulse`} />
       </div>
     );
   }
 
   if (permission === 'granted' && isSubscribed) {
     icon = <Zap className={iconSize} />;
-    color = 'text-green-600';
-    bgColor = 'bg-green-100';
+    color = 'ds-text-success';
+    bgColor = 'ds-bg-success/10';
     label = 'Push enabled';
     tooltip = 'Push notifications active';
   } else if (permission === 'denied') {
     icon = <Ban className={iconSize} />;
-    color = 'text-amber-600';
-    bgColor = 'bg-amber-100';
+    color = 'ds-text-warning';
+    bgColor = 'ds-bg-warning/10';
     label = 'Push blocked';
     tooltip = 'Enable push notifications in settings';
   } else if (permission === 'granted' && !isSubscribed) {
     icon = <CheckCircle2 className={iconSize} />;
-    color = 'text-blue-600';
-    bgColor = 'bg-blue-100';
+    color = 'ds-text-accent-primary';
+    bgColor = 'ds-bg-accent-subtle';
     label = 'Push pending';
     tooltip = 'Initializing push notifications...';
   } else {
     icon = <WifiOff className={iconSize} />;
-    color = 'text-gray-400';
-    bgColor = 'bg-gray-100';
+    color = 'ds-text-muted';
+    bgColor = 'ds-bg-surface-muted';
     label = 'Push disabled';
     tooltip = 'Enable push to get alerts';
   }
@@ -148,7 +148,7 @@ export function NotificationStatusIndicator({ showLabel = true, size = 'md' }) {
     >
       {icon}
       {showLabel && (
-        <span className="text-xs font-medium text-gray-700 hidden sm:inline">
+        <span className="text-xs font-medium ds-text-secondary hidden sm:inline">
           {label}
         </span>
       )}
@@ -268,11 +268,11 @@ export function NotificationStatusCard({ onRefresh }) {
 
   if (permission === 'unsupported') {
     return (
-      <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      <div className="ds-bg-surface rounded-lg shadow p-6 border ds-border-subtle">
+        <h3 className="text-lg font-semibold ds-text-primary mb-2">
           Browser Notifications
         </h3>
-        <p className="text-gray-600">
+        <p className="ds-text-secondary">
           Your browser does not support push notifications.
         </p>
       </div>
@@ -280,9 +280,9 @@ export function NotificationStatusCard({ onRefresh }) {
   }
 
   const getStatusColor = () => {
-    if (permission === 'granted' && isSubscribed) return 'text-green-600';
-    if (permission === 'denied') return 'text-amber-600';
-    return 'text-gray-600';
+    if (permission === 'granted' && isSubscribed) return 'ds-text-success';
+    if (permission === 'denied') return 'ds-text-warning';
+    return 'ds-text-secondary';
   };
 
   const getStatusText = () => {
@@ -294,10 +294,10 @@ export function NotificationStatusCard({ onRefresh }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+    <div className="ds-bg-surface rounded-lg shadow p-6 border ds-border-subtle">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold ds-text-primary">
             Browser Notifications
           </h3>
           <p className={`text-sm font-medium mt-1 ${getStatusColor()}`}>
@@ -307,7 +307,7 @@ export function NotificationStatusCard({ onRefresh }) {
         <button
           onClick={handleRefresh}
           disabled={isLoading}
-          className="text-gray-600 hover:text-gray-900 disabled:opacity-50"
+          className="ds-text-secondary hover:ds-text-primary disabled:opacity-50"
           title="Refresh status"
         >
           <svg
@@ -327,25 +327,25 @@ export function NotificationStatusCard({ onRefresh }) {
       </div>
 
       {/* Status details */}
-      <div className="space-y-3 mb-4 text-sm text-gray-600">
+      <div className="space-y-3 mb-4 text-sm ds-text-secondary">
         <div className="flex items-center gap-2">
           <span>Permission:</span>
-          <span className="font-mono text-gray-900">
+          <span className="font-mono ds-text-primary">
             {permission || 'checking...'}
           </span>
         </div>
 
         <div className="flex items-center gap-2">
           <span>Subscribed:</span>
-          <span className="font-mono text-gray-900">
+          <span className="font-mono ds-text-primary">
             {isLoading ? 'checking...' : isSubscribed ? 'Yes' : 'No'}
           </span>
         </div>
 
         {subscriptionInfo && (
-          <div className="text-xs bg-gray-50 p-2 rounded break-all">
-            <p className="font-semibold text-gray-700 mb-1">Endpoint:</p>
-            <p className="font-mono text-gray-600">
+          <div className="text-xs ds-bg-surface-muted p-2 rounded break-all">
+            <p className="font-semibold ds-text-secondary mb-1">Endpoint:</p>
+            <p className="font-mono ds-text-secondary">
               {subscriptionInfo.endpoint.substring(0, 60)}...
             </p>
           </div>
@@ -357,14 +357,14 @@ export function NotificationStatusCard({ onRefresh }) {
         {permission === 'granted' && isSubscribed && (
           <button
             onClick={handleUnsubscribe}
-            className="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 text-sm font-medium rounded-lg transition"
+            className="px-4 py-2 ds-bg-danger/10 ds-text-danger hover:ds-bg-danger/20 text-sm font-medium rounded-lg transition"
           >
             Disable Notifications
           </button>
         )}
 
         {permission === 'denied' && (
-          <p className="text-sm text-amber-600">
+          <p className="text-sm ds-text-warning">
             You can enable notifications by changing your browser&apos;s
             notification settings.
           </p>

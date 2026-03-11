@@ -289,13 +289,13 @@ export default function InitialExpenseDetailPage() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
-      deleted: 'bg-gray-200 text-gray-600',
+      deleted: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const categoryLabels = {
@@ -315,8 +315,8 @@ export default function InitialExpenseDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-48"></div>
+              <div className="h-8 ds-bg-surface-muted rounded w-64 mb-2"></div>
+              <div className="h-4 ds-bg-surface-muted rounded w-48"></div>
             </div>
             <LoadingCard count={2} showHeader={true} lines={6} />
           </div>
@@ -331,7 +331,7 @@ export default function InitialExpenseDetailPage() {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading initial expense...</p>
+            <p className="mt-4 ds-text-secondary">Loading initial expense...</p>
           </div>
         </div>
       </AppLayout>
@@ -342,7 +342,7 @@ export default function InitialExpenseDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded">
             {error || 'Initial expense not found'}
           </div>
           <Link
@@ -375,10 +375,10 @@ export default function InitialExpenseDetailPage() {
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">{expense.itemName}</h1>
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">{expense.itemName}</h1>
                 {expense.status === 'deleted' && <ArchiveBadge />}
               </div>
-              <p className="text-gray-600 mt-1">Expense Code: {expense.expenseCode}</p>
+              <p className="ds-text-secondary mt-1">Expense Code: {expense.expenseCode}</p>
             </div>
             <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${getStatusBadgeColor(expense.status)}`}>
               {expense.status.replace('_', ' ').toUpperCase()}
@@ -388,11 +388,11 @@ export default function InitialExpenseDetailPage() {
 
         {/* Approval Actions (if pending) */}
         {expense.status === 'pending_approval' && canAccess('approve_initial_expense') && (
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-gray-900 mb-2">Pending Approval</h3>
+          <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold ds-text-primary mb-2">Pending Approval</h3>
             {/* Capital Balance Warning */}
             {expense.projectId && (
-              <div className="mb-3 text-gray-900">
+              <div className="mb-3 ds-text-primary">
                 <CapitalBalanceWarning
                   projectId={expense.projectId}
                   amountToApprove={expense.amount || 0}
@@ -405,14 +405,14 @@ export default function InitialExpenseDetailPage() {
                 onChange={(e) => setApprovalNotes(e.target.value)}
                 placeholder="Add approval notes (optional)..."
                 rows={2}
-                className="w-full px-3 py-2 border border-yellow-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 text-gray-900"
+                className="w-full px-3 py-2 border border-yellow-400/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 ds-text-primary"
               />
               <div className="flex gap-3">
                 <LoadingButton
                   onClick={handleApproveClick}
                   isLoading={isApproving}
                   loadingText="Processing..."
-                  className="bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg transition"
+                  className="bg-green-600 hover:bg-green-700 disabled:bg-slate-500 text-white font-medium px-6 py-2 rounded-lg transition"
                 >
                   Approve
                 </LoadingButton>
@@ -420,7 +420,7 @@ export default function InitialExpenseDetailPage() {
                   onClick={handleRejectClick}
                   isLoading={isApproving}
                   loadingText="Processing..."
-                  className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg transition"
+                  className="bg-red-600 hover:bg-red-700 disabled:bg-slate-500 text-white font-medium px-6 py-2 rounded-lg transition"
                 >
                   Reject
                 </LoadingButton>
@@ -431,12 +431,12 @@ export default function InitialExpenseDetailPage() {
 
         {/* Archive/Delete Actions */}
         {canAccess('delete_initial_expense') && expense.status !== 'deleted' && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Actions</h3>
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h3 className="text-lg font-semibold ds-text-primary mb-2">Actions</h3>
             <div className="flex gap-2">
               <button
                 onClick={handleArchiveClick}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition"
+                className="px-4 py-2 bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition"
               >
                 Archive
               </button>
@@ -450,8 +450,8 @@ export default function InitialExpenseDetailPage() {
           </div>
         )}
         {canAccess('delete_initial_expense') && expense.status === 'deleted' && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Actions</h3>
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h3 className="text-lg font-semibold ds-text-primary mb-2">Actions</h3>
             <div className="flex gap-2">
               <button
                 onClick={handleRestoreClick}
@@ -476,12 +476,12 @@ export default function InitialExpenseDetailPage() {
           {/* Left Column - Main Details */}
           <div className="lg:col-span-2 space-y-6">
             {/* Basic Information */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900">Basic Information</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-4 ds-text-primary">Basic Information</h2>
               <dl className="grid grid-cols-2 gap-4">
                 {expense.project && (
                   <div className="col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">Project</dt>
+                    <dt className="text-sm font-medium ds-text-muted">Project</dt>
                     <dd className="mt-1">
                       <Link
                         href={`/projects/${expense.projectId}`}
@@ -491,44 +491,44 @@ export default function InitialExpenseDetailPage() {
                         <span className="text-xs">→</span>
                       </Link>
                       {expense.project.projectCode && expense.project.projectName && (
-                        <p className="text-sm text-gray-600 mt-1 leading-normal">Code: {expense.project.projectCode}</p>
+                        <p className="text-sm ds-text-secondary mt-1 leading-normal">Code: {expense.project.projectCode}</p>
                       )}
                     </dd>
                   </div>
                 )}
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Category</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Category</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {categoryLabels[expense.category] || expense.category}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Amount</dt>
-                  <dd className="mt-1 text-sm font-semibold text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Amount</dt>
+                  <dd className="mt-1 text-sm font-semibold ds-text-primary">
                     {formatCurrency(expense.amount)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Supplier/Agency</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Supplier/Agency</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {expense.supplier || 'N/A'}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Receipt Number</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Receipt Number</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {expense.receiptNumber || 'N/A'}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Date Paid</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Date Paid</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {formatDate(expense.datePaid)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Created</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Created</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {formatDate(expense.createdAt)}
                   </dd>
                 </div>
@@ -537,25 +537,25 @@ export default function InitialExpenseDetailPage() {
 
             {/* Notes */}
             {expense.notes && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4 text-gray-900">Notes</h2>
-                <p className="text-gray-700 whitespace-pre-wrap">{expense.notes}</p>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4 ds-text-primary">Notes</h2>
+                <p className="ds-text-secondary whitespace-pre-wrap">{expense.notes}</p>
               </div>
             )}
 
             {/* Documents */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900">Documents</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-4 ds-text-primary">Documents</h2>
               <div className="space-y-4">
                 {expense.receiptFileUrl && (
                   <div>
-                    <p className="text-base font-semibold text-gray-700 mb-2 leading-normal">Receipt/Invoice</p>
+                    <p className="text-base font-semibold ds-text-secondary mb-2 leading-normal">Receipt/Invoice</p>
                     <ImagePreview fileUrl={expense.receiptFileUrl} />
                   </div>
                 )}
                 {expense.supportingDocuments && expense.supportingDocuments.length > 0 && (
                   <div>
-                    <p className="text-base font-semibold text-gray-700 mb-2 leading-normal">Supporting Documents</p>
+                    <p className="text-base font-semibold ds-text-secondary mb-2 leading-normal">Supporting Documents</p>
                     <div className="grid grid-cols-2 gap-4">
                       {expense.supportingDocuments.map((doc, index) => (
                         <div key={index}>
@@ -566,7 +566,7 @@ export default function InitialExpenseDetailPage() {
                   </div>
                 )}
                 {!expense.receiptFileUrl && (!expense.supportingDocuments || expense.supportingDocuments.length === 0) && (
-                  <p className="text-sm text-gray-500">No documents uploaded</p>
+                  <p className="text-sm ds-text-muted">No documents uploaded</p>
                 )}
               </div>
             </div>
@@ -576,8 +576,8 @@ export default function InitialExpenseDetailPage() {
           <div className="space-y-6">
             {/* Project Information */}
             {expense.project && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4 text-gray-900">Project</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4 ds-text-primary">Project</h2>
                 <div className="space-y-2">
                   <Link
                     href={`/projects/${expense.projectId}`}
@@ -586,21 +586,21 @@ export default function InitialExpenseDetailPage() {
                     {expense.project.projectName || expense.project.projectCode || 'View Project'}
                   </Link>
                   {expense.project.projectCode && (
-                    <p className="text-sm text-gray-600">Code: {expense.project.projectCode}</p>
+                    <p className="text-sm ds-text-secondary">Code: {expense.project.projectCode}</p>
                   )}
                   {expense.project.location && (
-                    <p className="text-sm text-gray-600">📍 {expense.project.location}</p>
+                    <p className="text-sm ds-text-secondary">📍 {expense.project.location}</p>
                   )}
                 </div>
               </div>
             )}
 
             {/* Approval Information */}
-            <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-xl font-semibold mb-4 text-gray-900">Approval Information</h2>
+            <div className="ds-bg-surface rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-4 ds-text-primary">Approval Information</h2>
               <dl className="space-y-4">
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Status</dt>
+                  <dt className="text-sm font-medium ds-text-muted">Status</dt>
                   <dd className="mt-1">
                     <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeColor(expense.status)}`}>
                       {expense.status.replace('_', ' ').toUpperCase()}
@@ -611,23 +611,23 @@ export default function InitialExpenseDetailPage() {
                 {/* Entered By User */}
                 {expense.enteredBy && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500 mb-2">Entered By</dt>
+                    <dt className="text-sm font-medium ds-text-muted mb-2">Entered By</dt>
                     <dd className="mt-1">
                       {expense.enteredByUser ? (
-                        <div className="bg-gray-50 rounded-lg p-3 space-y-1">
+                        <div className="ds-bg-surface-muted rounded-lg p-3 space-y-1">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
                               {expense.enteredByUser.firstName?.[0] || ''}{expense.enteredByUser.lastName?.[0] || ''}
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-gray-900">
+                              <p className="text-sm font-medium ds-text-primary">
                                 {expense.enteredByUser.firstName} {expense.enteredByUser.lastName}
                               </p>
-                              <p className="text-sm text-gray-600 leading-normal">{expense.enteredByUser.email}</p>
+                              <p className="text-sm ds-text-secondary leading-normal">{expense.enteredByUser.email}</p>
                             </div>
                           </div>
                           {expense.enteredByUser.role && (
-                            <p className="text-xs text-gray-600 mt-1">
+                            <p className="text-xs ds-text-secondary mt-1">
                               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                                 {expense.enteredByUser.role.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                               </span>
@@ -635,7 +635,7 @@ export default function InitialExpenseDetailPage() {
                           )}
                         </div>
                       ) : (
-                        <div className="text-sm text-gray-500 italic">
+                        <div className="text-sm ds-text-muted italic">
                           User not found (ID: {expense.enteredBy})
                         </div>
                       )}
@@ -646,23 +646,23 @@ export default function InitialExpenseDetailPage() {
                 {/* Approved By User */}
                 {expense.approvedBy && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500 mb-2">Approved By</dt>
+                    <dt className="text-sm font-medium ds-text-muted mb-2">Approved By</dt>
                     <dd className="mt-1">
                       {expense.approvedByUser ? (
-                        <div className="bg-gray-50 rounded-lg p-3 space-y-1">
+                        <div className="ds-bg-surface-muted rounded-lg p-3 space-y-1">
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-semibold text-sm">
                               {expense.approvedByUser.firstName?.[0] || ''}{expense.approvedByUser.lastName?.[0] || ''}
                             </div>
                             <div>
-                              <p className="text-sm font-medium text-gray-900">
+                              <p className="text-sm font-medium ds-text-primary">
                                 {expense.approvedByUser.firstName} {expense.approvedByUser.lastName}
                               </p>
-                              <p className="text-sm text-gray-600 leading-normal">{expense.approvedByUser.email}</p>
+                              <p className="text-sm ds-text-secondary leading-normal">{expense.approvedByUser.email}</p>
                             </div>
                           </div>
                           {expense.approvedByUser.role && (
-                            <p className="text-xs text-gray-600 mt-1">
+                            <p className="text-xs ds-text-secondary mt-1">
                               <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                                 {expense.approvedByUser.role.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                               </span>
@@ -670,7 +670,7 @@ export default function InitialExpenseDetailPage() {
                           )}
                         </div>
                       ) : (
-                        <div className="text-sm text-gray-500 italic">
+                        <div className="text-sm ds-text-muted italic">
                           User not found (ID: {expense.approvedBy})
                         </div>
                       )}
@@ -680,8 +680,8 @@ export default function InitialExpenseDetailPage() {
 
                 {expense.approvalNotes && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Approval Notes</dt>
-                    <dd className="mt-1 text-sm text-gray-900 bg-gray-50 rounded-lg p-3">{expense.approvalNotes}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Approval Notes</dt>
+                    <dd className="mt-1 text-sm ds-text-primary ds-bg-surface-muted rounded-lg p-3">{expense.approvalNotes}</dd>
                   </div>
                 )}
               </dl>
@@ -689,8 +689,8 @@ export default function InitialExpenseDetailPage() {
 
             {/* Quick Actions */}
             {expense.status === 'draft' && (
-              <div className="bg-white rounded-lg shadow p-6">
-                <h2 className="text-xl font-semibold mb-4 text-gray-900">Quick Actions</h2>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h2 className="text-xl font-semibold mb-4 ds-text-primary">Quick Actions</h2>
                 <div className="space-y-2">
                   <Link
                     href={`/initial-expenses/${expense._id}/edit`}
@@ -721,9 +721,9 @@ export default function InitialExpenseDetailPage() {
       {/* Rejection Modal with Reason Input */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
+          <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
+            <div className="relative ds-bg-surface rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
               <div className="p-6">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
@@ -733,30 +733,30 @@ export default function InitialExpenseDetailPage() {
                   </div>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
+                  <h3 className="text-lg font-semibold leading-6 ds-text-primary mb-2" id="modal-title">
                     Reject Initial Expense
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm ds-text-muted mb-4">
                       Please provide a reason for rejecting this initial expense:
                     </p>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Enter rejection reason..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                       rows="4"
                       disabled={isRejecting}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-200">
+              <div className="ds-bg-surface-muted px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-400/60">
                 <button
                   type="button"
                   onClick={() => setShowRejectModal(false)}
                   disabled={isRejecting}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Cancel
                 </button>
@@ -800,7 +800,7 @@ export default function InitialExpenseDetailPage() {
               {expense.status !== 'deleted' && (
                 <>
                   <p className="mb-2 font-medium">Permanent deletion will:</p>
-                  <ul className="list-disc list-inside mb-3 space-y-1 text-gray-600">
+                  <ul className="list-disc list-inside mb-3 space-y-1 ds-text-secondary">
                     <li>Permanently remove the initial expense from the system</li>
                     {expense.status === 'approved' && expense.amount > 0 && (
                       <li>Recalculate project finances</li>

@@ -207,25 +207,25 @@ function NewBudgetReallocationPageContent() {
         
         {/* Header */}
         <div className="mb-8">
-          <Link href="/budget-reallocations" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href="/budget-reallocations" className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Budget Reallocations
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">Create Budget Reallocation Request</h1>
-          <p className="text-gray-600 mt-2">Request a budget transfer between phases or project budget</p>
+          <h1 className="text-2xl md:text-3xl font-bold ds-text-primary leading-tight">Create Budget Reallocation Request</h1>
+          <p className="ds-text-secondary mt-2">Request a budget transfer between phases or project budget</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow p-6 space-y-6">
           {/* Project Selection */}
           <div>
-            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+            <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
               Project <span className="text-red-500">*</span>
             </label>
             <select
@@ -233,7 +233,7 @@ function NewBudgetReallocationPageContent() {
               value={formData.projectId}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Select a project</option>
               {projects.map((project) => (
@@ -246,7 +246,7 @@ function NewBudgetReallocationPageContent() {
 
           {/* Reallocation Type */}
           <div>
-            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+            <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
               Reallocation Type <span className="text-red-500">*</span>
             </label>
             <select
@@ -254,13 +254,13 @@ function NewBudgetReallocationPageContent() {
               value={formData.reallocationType}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="phase_to_phase">Phase to Phase</option>
               <option value="project_to_phase">Project Budget to Phase</option>
               <option value="phase_to_project">Phase to Project Budget</option>
             </select>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm ds-text-secondary mt-1">
               {formData.reallocationType === 'phase_to_phase' && 'Transfer budget from one phase to another'}
               {formData.reallocationType === 'project_to_phase' && 'Allocate unallocated project budget to a phase'}
               {formData.reallocationType === 'phase_to_project' && 'Return phase budget to project unallocated pool'}
@@ -270,19 +270,19 @@ function NewBudgetReallocationPageContent() {
           {/* Source Phase (if applicable) */}
           {(formData.reallocationType === 'phase_to_phase' || formData.reallocationType === 'phase_to_project') && (
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Source Phase <span className="text-red-500">*</span>
               </label>
               {!formData.projectId ? (
-                <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
+                <div className="px-3 py-2 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700 text-sm">
                   Please select a project first
                 </div>
               ) : loadingPhases ? (
-                <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
+                <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-secondary text-sm">
                   Loading phases...
                 </div>
               ) : phases.length === 0 ? (
-                <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
+                <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-secondary text-sm">
                   No phases available for this project
                 </div>
               ) : (
@@ -291,7 +291,7 @@ function NewBudgetReallocationPageContent() {
                   value={formData.fromPhaseId}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select source phase</option>
                   {phases.map((phase) => (
@@ -307,19 +307,19 @@ function NewBudgetReallocationPageContent() {
           {/* Target Phase (if applicable) */}
           {(formData.reallocationType === 'phase_to_phase' || formData.reallocationType === 'project_to_phase') && (
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Target Phase <span className="text-red-500">*</span>
               </label>
               {!formData.projectId ? (
-                <div className="px-3 py-2 bg-yellow-50 border border-yellow-300 rounded-lg text-yellow-700 text-sm">
+                <div className="px-3 py-2 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700 text-sm">
                   Please select a project first
                 </div>
               ) : loadingPhases ? (
-                <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
+                <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-secondary text-sm">
                   Loading phases...
                 </div>
               ) : phases.length === 0 ? (
-                <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-gray-600 text-sm">
+                <div className="px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg ds-text-secondary text-sm">
                   No phases available for this project
                 </div>
               ) : (
@@ -328,7 +328,7 @@ function NewBudgetReallocationPageContent() {
                   value={formData.toPhaseId}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="">Select target phase</option>
                   {phases
@@ -345,7 +345,7 @@ function NewBudgetReallocationPageContent() {
 
           {/* Amount */}
           <div>
-            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+            <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
               Amount (KES) <span className="text-red-500">*</span>
             </label>
             <input
@@ -357,13 +357,13 @@ function NewBudgetReallocationPageContent() {
               min="0"
               step="0.01"
               required
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
             />
           </div>
 
           {/* Reason */}
           <div>
-            <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+            <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
               Reason <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -373,7 +373,7 @@ function NewBudgetReallocationPageContent() {
               rows={4}
               placeholder="Explain why this budget reallocation is needed..."
               required
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
             />
           </div>
 
@@ -382,13 +382,13 @@ function NewBudgetReallocationPageContent() {
             <LoadingButton
               type="submit"
               loading={loading}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg transition"
+              className="flex-1 ds-bg-accent-primary hover:ds-bg-accent-hover text-white font-medium px-6 py-3 rounded-lg transition"
             >
               Create Request
             </LoadingButton>
             <Link
               href="/budget-reallocations"
-              className="px-6 py-3 border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded-lg transition"
+              className="px-6 py-3 border ds-border-subtle ds-text-secondary hover:ds-bg-surface-muted font-medium rounded-lg transition"
             >
               Cancel
             </Link>

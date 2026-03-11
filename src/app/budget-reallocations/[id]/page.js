@@ -147,9 +147,9 @@ function BudgetReallocationDetailPageContent() {
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
       executed: 'bg-blue-100 text-blue-800',
-      cancelled: 'bg-gray-100 text-gray-800',
+      cancelled: 'ds-bg-surface-muted ds-text-primary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getReallocationTypeLabel = (type) => {
@@ -175,10 +175,10 @@ function BudgetReallocationDetailPageContent() {
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error || 'Budget reallocation not found'}
           </div>
-          <Link href="/budget-reallocations" className="text-blue-600 hover:text-blue-800">
+          <Link href="/budget-reallocations" className="ds-text-accent-primary hover:ds-text-accent-hover">
             ← Back to Budget Reallocations
           </Link>
         </div>
@@ -196,13 +196,13 @@ function BudgetReallocationDetailPageContent() {
         />
         {/* Header */}
         <div className="mb-8">
-          <Link href="/budget-reallocations" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
+          <Link href="/budget-reallocations" className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block">
             ← Back to Budget Reallocations
           </Link>
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">Budget Reallocation Request</h1>
-              <p className="text-gray-600 mt-2">View and manage budget reallocation details</p>
+              <h1 className="text-2xl md:text-3xl font-bold ds-text-primary leading-tight">Budget Reallocation Request</h1>
+              <p className="ds-text-secondary mt-2">View and manage budget reallocation details</p>
             </div>
             <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusBadgeColor(reallocation.status)}`}>
               {reallocation.status.charAt(0).toUpperCase() + reallocation.status.slice(1)}
@@ -211,62 +211,62 @@ function BudgetReallocationDetailPageContent() {
         </div>
 
         {/* Details */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Reallocation Details</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-xl font-semibold ds-text-primary mb-4">Reallocation Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Type</label>
-              <p className="text-base text-gray-900">{getReallocationTypeLabel(reallocation.reallocationType)}</p>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Type</label>
+              <p className="text-base ds-text-primary">{getReallocationTypeLabel(reallocation.reallocationType)}</p>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Amount</label>
-              <p className="text-2xl font-bold text-blue-600">{formatCurrency(reallocation.amount)}</p>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Amount</label>
+              <p className="text-2xl font-bold ds-text-accent-primary">{formatCurrency(reallocation.amount)}</p>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">From</label>
-              <p className="text-base text-gray-900">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">From</label>
+              <p className="text-base ds-text-primary">
                 {reallocation.fromPhaseId ? `Phase: ${reallocation.fromPhaseId}` : 'Project Budget'}
               </p>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">To</label>
-              <p className="text-base text-gray-900">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">To</label>
+              <p className="text-base ds-text-primary">
                 {reallocation.toPhaseId ? `Phase: ${reallocation.toPhaseId}` : 'Project Budget'}
               </p>
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Reason</label>
-              <p className="text-base text-gray-900 bg-gray-50 p-3 rounded-lg">{reallocation.reason}</p>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Reason</label>
+              <p className="text-base ds-text-primary ds-bg-surface-muted p-3 rounded-lg">{reallocation.reason}</p>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Requested By</label>
-              <p className="text-base text-gray-900">{reallocation.requestedByName || 'Unknown'}</p>
-              <p className="text-sm text-gray-600">{formatDate(reallocation.requestedAt)}</p>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Requested By</label>
+              <p className="text-base ds-text-primary">{reallocation.requestedByName || 'Unknown'}</p>
+              <p className="text-sm ds-text-secondary">{formatDate(reallocation.requestedAt)}</p>
             </div>
             {reallocation.approvedBy && (
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Approved By</label>
-                <p className="text-base text-gray-900">{reallocation.approvedByName || 'Unknown'}</p>
-                <p className="text-sm text-gray-600">{formatDate(reallocation.approvedAt)}</p>
+                <label className="block text-sm font-semibold ds-text-secondary mb-1">Approved By</label>
+                <p className="text-base ds-text-primary">{reallocation.approvedByName || 'Unknown'}</p>
+                <p className="text-sm ds-text-secondary">{formatDate(reallocation.approvedAt)}</p>
               </div>
             )}
             {reallocation.rejectedBy && (
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Rejected By</label>
-                <p className="text-base text-gray-900">{reallocation.rejectedByName || 'Unknown'}</p>
-                <p className="text-sm text-gray-600">{formatDate(reallocation.rejectedAt)}</p>
+                <label className="block text-sm font-semibold ds-text-secondary mb-1">Rejected By</label>
+                <p className="text-base ds-text-primary">{reallocation.rejectedByName || 'Unknown'}</p>
+                <p className="text-sm ds-text-secondary">{formatDate(reallocation.rejectedAt)}</p>
               </div>
             )}
             {reallocation.approvalNotes && (
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Approval Notes</label>
-                <p className="text-base text-gray-900 bg-green-50 p-3 rounded-lg">{reallocation.approvalNotes}</p>
+                <label className="block text-sm font-semibold ds-text-secondary mb-1">Approval Notes</label>
+                <p className="text-base ds-text-primary bg-green-50 p-3 rounded-lg">{reallocation.approvalNotes}</p>
               </div>
             )}
             {reallocation.rejectionReason && (
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Rejection Reason</label>
-                <p className="text-base text-gray-900 bg-red-50 p-3 rounded-lg">{reallocation.rejectionReason}</p>
+                <label className="block text-sm font-semibold ds-text-secondary mb-1">Rejection Reason</label>
+                <p className="text-base ds-text-primary bg-red-50 p-3 rounded-lg">{reallocation.rejectionReason}</p>
               </div>
             )}
           </div>
@@ -274,18 +274,18 @@ function BudgetReallocationDetailPageContent() {
 
         {/* Actions */}
         {reallocation.status === 'pending' && (canAccess('approve_budget_reallocation') || canAccess('reject_budget_reallocation')) && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Actions</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold ds-text-primary mb-4">Actions</h2>
             <div className="space-y-4">
               {canAccess('approve_budget_reallocation') && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Approval Notes (Optional)</label>
+                  <label className="block text-sm font-semibold ds-text-secondary mb-2">Approval Notes (Optional)</label>
                   <textarea
                     value={approvalNotes}
                     onChange={(e) => setApprovalNotes(e.target.value)}
                     rows={3}
                     placeholder="Add notes about this approval..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 mb-3"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 mb-3"
                   />
                   <button
                     onClick={handleApprove}
@@ -298,14 +298,14 @@ function BudgetReallocationDetailPageContent() {
               )}
               {canAccess('reject_budget_reallocation') && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Rejection Reason (Required)</label>
+                  <label className="block text-sm font-semibold ds-text-secondary mb-2">Rejection Reason (Required)</label>
                   <textarea
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
                     rows={3}
                     placeholder="Explain why this reallocation is being rejected..."
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 mb-3"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 mb-3"
                   />
                   <button
                     onClick={handleReject}

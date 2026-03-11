@@ -141,7 +141,7 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
             <button
               onClick={handleRefresh}
               disabled={refreshing}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               {refreshing ? (
                 <>
@@ -158,7 +158,7 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
     >
       {/* Error State */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+        <div className="bg-red-50 border border-red-400/60 rounded-lg p-4 mb-6">
           <p className="text-red-800 text-sm">{error}</p>
           <button
             onClick={() => fetchWorker()}
@@ -176,7 +176,7 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
       {worker && !loading && (
         <div className="space-y-6">
           {/* Quick Actions */}
-          <div className="flex items-center gap-3 pb-4 border-b border-gray-200">
+          <div className="flex items-center gap-3 pb-4 border-b ds-border-subtle">
             {canAccess('create_labour_entry') && (
               <>
                 <Link
@@ -199,7 +199,7 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
             )}
             <Link
               href={`/labour/entries?workerId=${worker.userId || worker._id}`}
-              className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium"
+              className="flex items-center gap-2 px-4 py-2 border ds-border-subtle ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition-colors text-sm font-medium"
               onClick={onClose}
             >
               <Eye className="w-4 h-4" />
@@ -209,28 +209,28 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
 
           {/* Basic Information */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+            <h3 className="text-lg font-semibold ds-text-primary mb-4">Basic Information</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-700">Name</label>
-                <p className="text-gray-900 font-medium mt-1">{worker.workerName}</p>
+                <label className="text-sm font-medium ds-text-secondary">Name</label>
+                <p className="ds-text-primary font-medium mt-1">{worker.workerName}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">Employee ID</label>
-                <p className="text-gray-900 mt-1">{worker.employeeId || 'N/A'}</p>
+                <label className="text-sm font-medium ds-text-secondary">Employee ID</label>
+                <p className="ds-text-primary mt-1">{worker.employeeId || 'N/A'}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">Worker Type</label>
-                <p className="text-gray-900 mt-1">{getWorkerTypeLabel(worker.workerType)}</p>
+                <label className="text-sm font-medium ds-text-secondary">Worker Type</label>
+                <p className="ds-text-primary mt-1">{getWorkerTypeLabel(worker.workerType)}</p>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">Status</label>
+                <label className="text-sm font-medium ds-text-secondary">Status</label>
                 <span
                   className={`inline-block mt-1 px-2 py-1 text-xs rounded-full ${
                     worker.status === 'active'
                       ? 'bg-green-100 text-green-800'
                       : worker.status === 'inactive'
-                      ? 'bg-gray-100 text-gray-800'
+                      ? 'ds-bg-surface-muted ds-text-primary'
                       : worker.status === 'terminated'
                       ? 'bg-red-100 text-red-800'
                       : 'bg-yellow-100 text-yellow-800'
@@ -241,20 +241,20 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
               </div>
               {worker.phoneNumber && (
                 <div>
-                  <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  <label className="text-sm font-medium ds-text-secondary flex items-center gap-1">
                     <Phone className="w-4 h-4" />
                     Phone
                   </label>
-                  <p className="text-gray-900 mt-1">{worker.phoneNumber}</p>
+                  <p className="ds-text-primary mt-1">{worker.phoneNumber}</p>
                 </div>
               )}
               {worker.email && (
                 <div>
-                  <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                  <label className="text-sm font-medium ds-text-secondary flex items-center gap-1">
                     <Mail className="w-4 h-4" />
                     Email
                   </label>
-                  <p className="text-gray-900 mt-1">{worker.email}</p>
+                  <p className="ds-text-primary mt-1">{worker.email}</p>
                 </div>
               )}
             </div>
@@ -262,10 +262,10 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
 
           {/* Skills & Rates */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Skills & Rates</h3>
+            <h3 className="text-lg font-semibold ds-text-primary mb-4">Skills & Rates</h3>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-700 mb-2 block">Skills</label>
+                <label className="text-sm font-medium ds-text-secondary mb-2 block">Skills</label>
                 <div className="flex flex-wrap gap-2">
                   {(worker.skillTypes || []).length > 0 ? (
                     worker.skillTypes.map((skill, idx) => (
@@ -277,27 +277,27 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
                       </span>
                     ))
                   ) : (
-                    <span className="text-sm text-gray-500">No skills assigned</span>
+                    <span className="text-sm ds-text-muted">No skills assigned</span>
                   )}
                 </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-700">Hourly Rate</label>
-                <p className="text-gray-900 font-semibold text-lg mt-1">
+                <label className="text-sm font-medium ds-text-secondary">Hourly Rate</label>
+                <p className="ds-text-primary font-semibold text-lg mt-1">
                   {worker.defaultHourlyRate?.toLocaleString() || '0'} KES/hr
                 </p>
               </div>
               {worker.defaultDailyRate && (
                 <div>
-                  <label className="text-sm font-medium text-gray-700">Daily Rate</label>
-                  <p className="text-gray-900 font-semibold mt-1">
+                  <label className="text-sm font-medium ds-text-secondary">Daily Rate</label>
+                  <p className="ds-text-primary font-semibold mt-1">
                     {worker.defaultDailyRate.toLocaleString()} KES/day
                   </p>
                 </div>
               )}
               <div>
-                <label className="text-sm font-medium text-gray-700">Employment Type</label>
-                <p className="text-gray-900 mt-1 capitalize">
+                <label className="text-sm font-medium ds-text-secondary">Employment Type</label>
+                <p className="ds-text-primary mt-1 capitalize">
                   {worker.employmentType?.replace(/_/g, ' ') || 'N/A'}
                 </p>
               </div>
@@ -306,12 +306,12 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
 
           {/* Statistics */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Statistics</h3>
+            <h3 className="text-lg font-semibold ds-text-primary mb-4">Statistics</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
                 <div className="flex items-center gap-2 mb-2">
                   <Clock className="w-5 h-5 text-blue-600" />
-                  <span className="text-sm font-medium text-gray-700">Total Hours</span>
+                  <span className="text-sm font-medium ds-text-secondary">Total Hours</span>
                 </div>
                 <div className="text-2xl font-bold text-blue-600">
                   {stats.totalHoursWorked?.toFixed(1) || '0'}
@@ -320,7 +320,7 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
               <div className="p-4 bg-green-50 rounded-lg border border-green-100">
                 <div className="flex items-center gap-2 mb-2">
                   <DollarSign className="w-5 h-5 text-green-600" />
-                  <span className="text-sm font-medium text-gray-700">Total Earned</span>
+                  <span className="text-sm font-medium ds-text-secondary">Total Earned</span>
                 </div>
                 <div className="text-2xl font-bold text-green-600">
                   {stats.totalEarned?.toLocaleString() || '0'} KES
@@ -329,7 +329,7 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
               <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
                 <div className="flex items-center gap-2 mb-2">
                   <CheckCircle className="w-5 h-5 text-purple-600" />
-                  <span className="text-sm font-medium text-gray-700">Entries</span>
+                  <span className="text-sm font-medium ds-text-secondary">Entries</span>
                 </div>
                 <div className="text-2xl font-bold text-purple-600">
                   {stats.entryCount || '0'}
@@ -338,7 +338,7 @@ export function WorkerDetailDrawer({ workerId, isOpen, onClose, onEdit }) {
               <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
                 <div className="flex items-center gap-2 mb-2">
                   <User className="w-5 h-5 text-yellow-600" />
-                  <span className="text-sm font-medium text-gray-700">Rating</span>
+                  <span className="text-sm font-medium ds-text-secondary">Rating</span>
                 </div>
                 <div className="text-2xl font-bold text-yellow-600">
                   {stats.averageRating?.toFixed(1) || '0'}/5

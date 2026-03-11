@@ -12,7 +12,7 @@ import { getUserProfile } from '@/lib/auth-helpers';
 import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { createNotifications } from '@/lib/notifications';
-import { sendPushToUser } from '@/lib/push-service';
+import { sendPushToSupplier } from '@/lib/push-service';
 import { sendSMS, generateModificationApprovalSMS, formatPhoneNumber } from '@/lib/sms-service';
 import { updateCommittedCost, recalculateProjectFinances, validateCapitalAvailability } from '@/lib/financial-helpers';
 import { ObjectId } from 'mongodb';
@@ -240,19 +240,21 @@ export async function POST(request, { params }) {
     });
 
     // Notify supplier about approval
-    const supplier = await db.collection('users').findOne({
-      _id: purchaseOrder.supplierId,
-      status: 'active'
+    const supplierProfile = await db.collection('suppliers').findOne({
+      $or: [
+        { _id: purchaseOrder.supplierId, status: 'active' },
+        { userId: purchaseOrder.supplierId, status: 'active' } // legacy mapping support
+      ]
     });
 
-    if (supplier) {
+    if (supplierProfile) {
       try {
-        await sendPushToUser({
-          userId: supplier._id.toString(),
+        await sendPushToSupplier({
+          supplierId: supplierProfile._id.toString(),
           title: 'Modifications Approved',
           message: `Your modifications to PO ${purchaseOrder.purchaseOrderNumber} have been approved${autoCommit ? ' and order is now accepted' : ''}`,
           data: {
-            url: `/purchase-orders/${id}`,
+            url: `/purchase-orders/respond/${purchaseOrder.responseToken || ''}`,
             purchaseOrderId: id
           }
         });
@@ -262,12 +264,7 @@ export async function POST(request, { params }) {
 
       // Send SMS to supplier if enabled
       try {
-        const supplierProfile = await db.collection('suppliers').findOne({
-          userId: purchaseOrder.supplierId,
-          status: 'active'
-        });
-
-        if (supplierProfile && supplierProfile.smsEnabled && supplierProfile.phone) {
+        if (supplierProfile.smsEnabled && supplierProfile.phone) {
           const formattedPhone = formatPhoneNumber(supplierProfile.phone);
           const smsMessage = generateModificationApprovalSMS({
             purchaseOrderNumber: purchaseOrder.purchaseOrderNumber,

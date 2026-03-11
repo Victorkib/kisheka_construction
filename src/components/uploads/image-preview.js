@@ -58,7 +58,7 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
   return (
     <div className="space-y-2">
       {/* Preview Card */}
-      <div className="border border-gray-300 rounded-lg p-3 bg-white hover:shadow-md transition-shadow">
+      <div className="border ds-border-subtle rounded-lg p-3 ds-bg-surface hover:shadow-md transition-shadow">
         <div className="flex items-center gap-3">
           {/* Thumbnail */}
           {isImage && (
@@ -66,7 +66,7 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
               <img
                 src={url}
                 alt={title || 'Image preview'}
-                className="h-16 w-16 object-cover rounded border border-gray-300 cursor-pointer transition-transform hover:scale-105"
+                className="h-16 w-16 object-cover rounded border ds-border-subtle cursor-pointer transition-transform hover:scale-105"
                 onClick={() => setShowFullscreen(true)}
                 loading="lazy"
                 decoding="async"
@@ -85,7 +85,7 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
 
           {isPDF && (
             <div className="flex-shrink-0">
-              <div className="h-16 w-16 bg-red-100 rounded border border-red-300 flex items-center justify-center">
+              <div className="h-16 w-16 bg-red-100 rounded border border-red-400/60 flex items-center justify-center">
                 <svg
                   className="h-8 w-8 text-red-600"
                   fill="none"
@@ -105,8 +105,8 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
 
           {/* File Info */}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">{title}</p>
-            <p className="text-xs text-gray-500 truncate mt-1">{url}</p>
+            <p className="text-sm font-medium ds-text-primary truncate">{title}</p>
+            <p className="text-xs ds-text-muted truncate mt-1">{url}</p>
           </div>
 
           {/* Actions */}
@@ -147,7 +147,7 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
 
       {/* Delete Confirmation */}
       {showDeleteConfirm && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded p-2 text-sm text-yellow-800">
+        <div className="bg-yellow-50 border border-yellow-400/60 rounded p-2 text-sm text-yellow-800">
           <p>Are you sure? This action cannot be undone.</p>
           <div className="flex gap-2 mt-2">
             <button
@@ -160,7 +160,7 @@ export function ImagePreview({ url, title = 'File', onDelete, showDelete = true 
             <button
               type="button"
               onClick={() => setShowDeleteConfirm(false)}
-              className="px-2 py-1 bg-gray-600 text-white rounded text-xs hover:bg-gray-700"
+              className="px-2 py-1 bg-slate-600 text-white rounded text-xs hover:bg-slate-700"
             >
               Cancel
             </button>

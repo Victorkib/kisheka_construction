@@ -92,11 +92,11 @@ function EditActivityTemplatePageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-6">
+          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded mb-6">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to edit activity templates. Only OWNER and PM can edit templates.</p>
           </div>
-          <Link href="/activity-templates" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/activity-templates" className="ds-text-accent-primary hover:ds-text-accent-hover underline">
             ← Back to Activity Templates
           </Link>
         </div>
@@ -120,11 +120,11 @@ function EditActivityTemplatePageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
           </div>
-          <Link href="/activity-templates" className="text-blue-600 hover:text-blue-900 underline">
+          <Link href="/activity-templates" className="ds-text-accent-primary hover:ds-text-accent-hover underline">
             ← Back to Activity Templates
           </Link>
         </div>
@@ -137,25 +137,25 @@ function EditActivityTemplatePageContent() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Link href="/activity-templates" className="text-blue-600 hover:text-blue-900 text-sm mb-4 inline-block">
+          <Link href="/activity-templates" className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mb-4 inline-block">
             ← Back to Activity Templates
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-2xl md:text-3xl font-bold ds-text-primary leading-tight">
             Edit Activity Template
           </h1>
-          <p className="text-gray-600 mt-2">Update activity template details</p>
+          <p className="ds-text-secondary mt-2">Update activity template details</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
           </div>
         )}
 
         {/* Form */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <ActivityTemplateForm
             initialData={template}
             onSubmit={handleSubmit}

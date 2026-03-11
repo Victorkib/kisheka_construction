@@ -19,6 +19,34 @@ import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { WorkflowGuide } from '@/components/workflow/WorkflowGuide';
 import { HelpIcon, FieldHelp } from '@/components/help/HelpTooltip';
 
+const normalizeId = (value) => {
+  if (!value) return '';
+  if (Array.isArray(value)) return normalizeId(value[0]);
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return normalizeId(value._id);
+  return value.toString?.() || '';
+};
+
+const isLikelyObjectId = (value) => /^[a-f0-9]{24}$/i.test((value || '').toString());
+
+const normalizeText = (value) => (value || '').toString().trim().toLowerCase();
+
+const findMatchingFloorId = (floorHint, floorOptions = []) => {
+  const hint = normalizeText(floorHint);
+  if (!hint) return '';
+
+  const byId = floorOptions.find((floor) => normalizeId(floor._id || floor.id) === floorHint);
+  if (byId) return normalizeId(byId._id || byId.id);
+
+  const byNameOrNumber = floorOptions.find((floor) => {
+    const floorName = normalizeText(floor.name || floor.floorName);
+    const floorNumber = normalizeText(floor.floorNumber);
+    return floorName === hint || floorNumber === hint;
+  });
+  return byNameOrNumber ? normalizeId(byNameOrNumber._id || byNameOrNumber.id) : '';
+};
+
 function NewPurchaseOrderPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -35,11 +63,13 @@ function NewPurchaseOrderPageContent() {
   const [loadingPhases, setLoadingPhases] = useState(false);
   const [categories, setCategories] = useState([]);
   const [availableCapital, setAvailableCapital] = useState(null);
+  const [projectFinances, setProjectFinances] = useState(null);
   const [loadingCapital, setLoadingCapital] = useState(false);
   const [capitalValidation, setCapitalValidation] = useState(null);
   const [validatingCapital, setValidatingCapital] = useState(false);
   const [showSupplierModal, setShowSupplierModal] = useState(false);
   const [creatingSupplier, setCreatingSupplier] = useState(false);
+  const [pendingFloorHint, setPendingFloorHint] = useState('');
 
   const [formData, setFormData] = useState({
     materialRequestId: '',
@@ -121,11 +151,11 @@ function NewPurchaseOrderPageContent() {
           // Set both requestId and projectId from the fetched request
           setFormData((prev) => ({ 
             ...prev, 
-            materialRequestId: requestIdFromUrl,
-            projectId: request.projectId.toString()
+            materialRequestId: normalizeId(requestIdFromUrl),
+            projectId: normalizeId(request.projectId)
           }));
           // Fetch approved requests for that project
-          fetchApprovedMaterialRequests(request.projectId.toString(), requestIdFromUrl);
+          fetchApprovedMaterialRequests(normalizeId(request.projectId), normalizeId(requestIdFromUrl));
         }
       });
     } else if (projectIdFromUrl) {
@@ -142,10 +172,13 @@ function NewPurchaseOrderPageContent() {
       if (!requestIdFromUrl || formData.materialRequestId !== requestIdFromUrl) {
         fetchApprovedMaterialRequests(formData.projectId);
       }
+      // Keep phase options in sync even when project is populated from URL/request inheritance.
+      fetchPhases(formData.projectId);
       fetchFloors(formData.projectId);
       fetchAvailableCapital(formData.projectId);
     } else {
       setMaterialRequests([]);
+      setPhases([]);
       setFloors([]);
       setAvailableCapital(null);
     }
@@ -159,6 +192,16 @@ function NewPurchaseOrderPageContent() {
       fetchMaterialRequestDetails(formData.materialRequestId);
     }
   }, [formData.materialRequestId, searchParams]);
+
+  // Backfill floor when requests carry legacy/non-id floor references (e.g. name/number).
+  useEffect(() => {
+    if (!pendingFloorHint || formData.floorId || floors.length === 0) return;
+    const matchedFloorId = findMatchingFloorId(pendingFloorHint, floors);
+    if (matchedFloorId) {
+      setFormData((prev) => ({ ...prev, floorId: matchedFloorId }));
+      setPendingFloorHint('');
+    }
+  }, [pendingFloorHint, floors, formData.floorId]);
 
   // Calculate total cost and validate capital when quantity or unit cost changes
   useEffect(() => {
@@ -386,7 +429,7 @@ function NewPurchaseOrderPageContent() {
                 'Pragma': 'no-cache',
               },
             });
-            const specificData = await specificResponse.json();
+            const specificData = await response.json();
             if (specificData.success && specificData.data) {
               const specificRequest = specificData.data;
               // Only add if it's approved/converted and has no linked PO
@@ -453,6 +496,19 @@ function NewPurchaseOrderPageContent() {
       // Pre-fill form with request details
       setFormData((prev) => {
         const requestUnit = request.unit || prev.unit || 'piece';
+        const rawFloorReference = request.floorId || request.floor || request.floorName || request.floorNumber || '';
+        const normalizedFloorReference = normalizeId(rawFloorReference);
+        let resolvedFloorId = '';
+        if (isLikelyObjectId(normalizedFloorReference)) {
+          resolvedFloorId = normalizedFloorReference;
+        } else {
+          resolvedFloorId = findMatchingFloorId(rawFloorReference, floors);
+        }
+        if (!resolvedFloorId && rawFloorReference) {
+          setPendingFloorHint(rawFloorReference.toString());
+        } else if (resolvedFloorId) {
+          setPendingFloorHint('');
+        }
         // Check if unit is in predefined list, if not, use "others" and set customUnit
         const isUnitInList = unitOptions.includes(requestUnit?.toLowerCase());
         const finalUnit = isUnitInList ? requestUnit?.toLowerCase() : 'others';
@@ -460,11 +516,11 @@ function NewPurchaseOrderPageContent() {
         
         return {
         ...prev,
-        materialRequestId: requestId,
-        projectId: request.projectId?.toString() || prev.projectId,
-        phaseId: request.phaseId?.toString() || prev.phaseId, // Inherit phaseId from material request
-        floorId: request.floorId?.toString() || prev.floorId,
-        categoryId: request.categoryId?.toString() || prev.categoryId,
+        materialRequestId: normalizeId(requestId),
+        projectId: normalizeId(request.projectId) || prev.projectId,
+        phaseId: normalizeId(request.phaseId) || prev.phaseId, // Inherit phaseId from material request
+        floorId: resolvedFloorId || prev.floorId,
+        categoryId: normalizeId(request.categoryId) || prev.categoryId,
         category: request.category || prev.category,
         materialName: request.materialName || prev.materialName,
         description: request.description || prev.description,
@@ -498,6 +554,7 @@ function NewPurchaseOrderPageContent() {
       });
       const data = await response.json();
       if (data.success) {
+        setProjectFinances(data.data || null);
         const capital = data.data.availableCapital !== undefined 
           ? data.data.availableCapital 
           : data.data.capitalBalance || 0;
@@ -518,22 +575,41 @@ function NewPurchaseOrderPageContent() {
 
     setValidatingCapital(true);
     try {
+      const totalInvested = projectFinances?.totalInvested ?? null;
+      const capitalNotSet = totalInvested === null || totalInvested === 0;
+      const effectiveAvailableCapital = Math.max(0, Number(availableCapital) || 0);
+
+      // OPTIONAL CAPITAL: mirror backend behavior - allow operation when no capital is invested.
+      if (capitalNotSet) {
+        setCapitalValidation({
+          isValid: true,
+          capitalNotSet: true,
+          message: 'No capital invested. Purchase order creation is allowed and spending will be tracked. Add capital later to enable capital validation.',
+          available: effectiveAvailableCapital,
+          required: totalCost,
+          shortfall: 0,
+        });
+        return;
+      }
+
       // Simulate validation delay for better UX
       await new Promise(resolve => setTimeout(resolve, 300));
       
-      if (totalCost > availableCapital) {
+      if (totalCost > effectiveAvailableCapital) {
         setCapitalValidation({
           isValid: false,
-          message: `Insufficient capital. Required: ${formatCurrency(totalCost)}, Available: ${formatCurrency(availableCapital)}, Shortfall: ${formatCurrency(totalCost - availableCapital)}`,
-          available: availableCapital,
+          capitalNotSet: false,
+          message: `Insufficient capital. Required: ${formatCurrency(totalCost)}, Available: ${formatCurrency(effectiveAvailableCapital)}, Shortfall: ${formatCurrency(totalCost - effectiveAvailableCapital)}`,
+          available: effectiveAvailableCapital,
           required: totalCost,
-          shortfall: totalCost - availableCapital,
+          shortfall: totalCost - effectiveAvailableCapital,
         });
       } else {
         setCapitalValidation({
           isValid: true,
-          message: `Capital validation passed. Available: ${formatCurrency(availableCapital)}, Required: ${formatCurrency(totalCost)}`,
-          available: availableCapital,
+          capitalNotSet: false,
+          message: `Capital validation passed. Available: ${formatCurrency(effectiveAvailableCapital)}, Required: ${formatCurrency(totalCost)}`,
+          available: effectiveAvailableCapital,
           required: totalCost,
         });
       }
@@ -628,9 +704,12 @@ function NewPurchaseOrderPageContent() {
 
     // CRITICAL: Validate capital before submission
     const totalCost = parseFloat(formData.totalCost);
-    if (availableCapital !== null && totalCost > availableCapital) {
+    const totalInvested = projectFinances?.totalInvested ?? null;
+    const capitalNotSet = totalInvested === null || totalInvested === 0;
+    const effectiveAvailableCapital = Math.max(0, Number(availableCapital) || 0);
+    if (!capitalNotSet && availableCapital !== null && totalCost > effectiveAvailableCapital) {
       const proceed = confirm(
-        `WARNING: Total cost (${formatCurrency(totalCost)}) exceeds available capital (${formatCurrency(availableCapital)}). This will be blocked by the server. Do you want to continue?`
+        `WARNING: Total cost (${formatCurrency(totalCost)}) exceeds available capital (${formatCurrency(effectiveAvailableCapital)}). This will be blocked by the server. Do you want to continue?`
       );
       if (!proceed) {
         return;
@@ -745,6 +824,10 @@ function NewPurchaseOrderPageContent() {
     }).format(amount);
   };
 
+  const totalInvested = projectFinances?.totalInvested ?? null;
+  const capitalNotSet = totalInvested === null || totalInvested === 0;
+  const effectiveAvailableCapital = Math.max(0, Number(availableCapital) || 0);
+
   return (
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
@@ -766,13 +849,13 @@ function NewPurchaseOrderPageContent() {
               { label: 'Create Order', href: '/purchase-orders/new', current: true },
             ]}
           />
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create Purchase Order</h1>
-          <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Create a purchase order from an approved material request</p>
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Create Purchase Order</h1>
+          <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Create a purchase order from an approved material request</p>
         </div>
 
         {/* Capital Validation Loading */}
         {validatingCapital && (
-          <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-blue-50 border border-blue-400/60 text-blue-800 px-4 py-3 rounded-lg mb-6">
             <div className="flex items-center gap-2">
               <LoadingSpinner size="sm" color="blue-600" />
               <p className="text-sm">Validating capital availability...</p>
@@ -780,9 +863,17 @@ function NewPurchaseOrderPageContent() {
           </div>
         )}
 
+        {/* Capital Info (optional capital mode) */}
+        {capitalValidation?.capitalNotSet && !validatingCapital && (
+          <div className="bg-blue-50 border border-blue-400/60 text-blue-800 px-4 py-3 rounded-lg mb-6">
+            <p className="font-semibold">ℹ️ No Capital Invested</p>
+            <p className="text-sm mt-1">{capitalValidation.message}</p>
+          </div>
+        )}
+
         {/* Capital Warning */}
-        {capitalValidation && !capitalValidation.isValid && !validatingCapital && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+        {capitalValidation && !capitalValidation.isValid && !capitalValidation.capitalNotSet && !validatingCapital && (
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             <p className="font-semibold">⚠️ Insufficient Capital</p>
             <p className="text-sm mt-1">{capitalValidation.message}</p>
             <p className="text-sm mt-1">This purchase order will be blocked by the server if submitted.</p>
@@ -790,24 +881,29 @@ function NewPurchaseOrderPageContent() {
         )}
 
         {/* Capital Validation Success */}
-        {capitalValidation && capitalValidation.isValid && !validatingCapital && (
-          <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6">
+        {capitalValidation && capitalValidation.isValid && !capitalValidation.capitalNotSet && !validatingCapital && (
+          <div className="bg-green-50 border border-green-400/60 text-green-800 px-4 py-3 rounded-lg mb-6">
             <p className="text-sm">{capitalValidation.message}</p>
           </div>
         )}
 
         {/* Available Capital Display */}
         {formData.projectId && availableCapital !== null && canAccess('view_financing') && (
-          <div className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-blue-50 border border-blue-400/60 text-blue-800 px-4 py-3 rounded-lg mb-6">
             <p className="text-sm">
-              <span className="font-semibold">Available Capital:</span> {formatCurrency(availableCapital)}
+              <span className="font-semibold">Available Capital:</span> {formatCurrency(effectiveAvailableCapital)}
             </p>
+            {capitalNotSet && (
+              <p className="text-sm mt-1">
+                No capital is invested yet. Order creation is still allowed and spending will be tracked.
+              </p>
+            )}
           </div>
         )}
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -817,9 +913,9 @@ function NewPurchaseOrderPageContent() {
 
         {/* Quick Actions - Approved Requests Ready to Order */}
         {!formData.projectId && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-            <p className="text-sm text-gray-700 mb-4">Select a project above to see approved requests ready for ordering, or browse all ready requests:</p>
+          <div className="ds-bg-surface rounded-lg shadow border ds-border-subtle p-6 mb-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Quick Actions</h2>
+            <p className="text-sm ds-text-secondary mb-4">Select a project above to see approved requests ready for ordering, or browse all ready requests:</p>
             <Link
               href="/material-requests?status=ready_to_order"
               className="inline-block bg-purple-600 hover:bg-purple-700 text-white font-medium px-6 py-2 rounded-lg transition"
@@ -831,21 +927,21 @@ function NewPurchaseOrderPageContent() {
 
         {/* Approved Requests List (when project selected) */}
         {formData.projectId && materialRequests.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Approved Requests Ready to Order</h2>
-            <p className="text-sm text-gray-700 mb-4">Select a request below to quickly create an order, or use the form to create manually:</p>
+          <div className="ds-bg-surface rounded-lg shadow border ds-border-subtle p-6 mb-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Approved Requests Ready to Order</h2>
+            <p className="text-sm ds-text-secondary mb-4">Select a request below to quickly create an order, or use the form to create manually:</p>
             <div className="space-y-3">
               {materialRequests.slice(0, 5).map((request) => (
                 <div
                   key={request._id}
-                  className="p-4 border border-gray-200 rounded-lg hover:border-purple-300 hover:bg-purple-50 transition"
+                  className="p-4 border ds-border-subtle rounded-lg hover:border-purple-400/60 hover:bg-purple-500/10 transition"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <Link
                           href={`/material-requests/${request._id}`}
-                          className="font-semibold text-gray-900 hover:text-purple-600"
+                          className="font-semibold ds-text-primary hover:text-purple-400"
                         >
                           {request.requestNumber}
                         </Link>
@@ -853,8 +949,8 @@ function NewPurchaseOrderPageContent() {
                           {request.urgency?.toUpperCase() || 'MEDIUM'}
                         </span>
                       </div>
-                      <p className="text-sm font-medium text-gray-900">{request.materialName}</p>
-                      <p className="text-sm text-gray-700">
+                      <p className="text-sm font-medium ds-text-primary">{request.materialName}</p>
+                      <p className="text-sm ds-text-secondary">
                         {request.quantityNeeded} {request.unit}
                         {request.estimatedCost && (
                           <span className="ml-2">• Est: {new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 }).format(request.estimatedCost)}</span>
@@ -863,12 +959,13 @@ function NewPurchaseOrderPageContent() {
                     </div>
                     <button
                       onClick={() => {
-                        setFormData((prev) => ({ ...prev, materialRequestId: request._id }));
-                        fetchMaterialRequestDetails(request._id).then((requestData) => {
+                        const requestId = normalizeId(request._id || request.id);
+                        setFormData((prev) => ({ ...prev, materialRequestId: requestId }));
+                        fetchMaterialRequestDetails(requestId).then((requestData) => {
                           // Phase will be inherited in fetchMaterialRequestDetails
                           // Also ensure we have phases loaded
                           if (requestData?.projectId && !phases.length) {
-                            fetchPhases(requestData.projectId.toString());
+                            fetchPhases(normalizeId(requestData.projectId));
                           }
                         });
                         // Scroll to form
@@ -896,11 +993,11 @@ function NewPurchaseOrderPageContent() {
         )}
 
         {/* Form */}
-        <form id="purchase-order-form" onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6">
+        <form id="purchase-order-form" onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow border ds-border-subtle p-6">
           <div className="space-y-6">
             {/* Material Request Selection */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Material Request <span className="text-red-500">*</span>
                 <HelpIcon 
                   content="Select an approved material request to create a purchase order from. Only approved requests are available."
@@ -911,7 +1008,7 @@ function NewPurchaseOrderPageContent() {
                 Choose an approved material request. The form will auto-fill details from the selected request.
               </FieldHelp>
               {loadingRequests ? (
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+                <div className="w-full px-3 py-2 border ds-border-subtle rounded-lg ds-bg-surface-muted ds-text-muted text-sm">
                   Loading available requests...
                 </div>
               ) : (
@@ -921,7 +1018,7 @@ function NewPurchaseOrderPageContent() {
                     value={formData.materialRequestId}
                     onChange={handleChange}
                     required
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                   >
                     <option value="">Select an approved material request</option>
                     {materialRequests.map((request) => {
@@ -936,7 +1033,7 @@ function NewPurchaseOrderPageContent() {
                     })}
                   </select>
                   {materialRequests.length === 0 && formData.projectId && !loadingRequests && (
-                    <p className="text-sm text-gray-700 mt-1">
+                    <p className="text-sm ds-text-secondary mt-1">
                       No approved material requests available for this project. 
                       {formData.materialRequestId && (
                         <span className="text-amber-600 block mt-1">
@@ -945,7 +1042,7 @@ function NewPurchaseOrderPageContent() {
                       )}
                     </p>
                   )}
-                  {formData.materialRequestId && !loadingRequests && !materialRequests.find(r => r._id === formData.materialRequestId) && (
+                  {formData.materialRequestId && !loadingRequests && !materialRequests.find((r) => (r._id?.toString() || r.id?.toString()) === formData.materialRequestId) && (
                     <p className="text-sm text-amber-600 mt-1">
                       ⚠️ The selected request ID is not in the available requests list. Please verify the request is approved and not already converted to an order.
                     </p>
@@ -956,7 +1053,7 @@ function NewPurchaseOrderPageContent() {
 
             {/* Project Selection */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Project <span className="text-red-500">*</span>
                 <HelpIcon 
                   content="Select the project this purchase order is for. Capital availability will be checked for this project."
@@ -971,11 +1068,11 @@ function NewPurchaseOrderPageContent() {
                 value={formData.projectId}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
               >
                 <option value="">Select a project</option>
                 {projects.map((project) => {
-                  const projectId = project._id?.toString() || project.id?.toString() || '';
+                  const projectId = normalizeId(project._id || project.id);
                   return (
                     <option key={projectId || `project-${project.projectCode || project.projectName}`} value={projectId}>
                       {project.projectName} {project.projectCode && `(${project.projectCode})`}
@@ -987,7 +1084,7 @@ function NewPurchaseOrderPageContent() {
 
             {/* Phase Selection (Required) */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Construction Phase <span className="text-red-500">*</span>
                 <HelpIcon 
                   content="Select the construction phase this purchase order is for. This is required for phase-based budget tracking and financial management."
@@ -998,15 +1095,15 @@ function NewPurchaseOrderPageContent() {
                 Required: Select which construction phase this purchase order belongs to. This helps track phase-based spending and budget allocation. The phase will be inherited from the material request if available.
               </FieldHelp>
               {!formData.projectId ? (
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+                <div className="w-full px-3 py-2 border ds-border-subtle rounded-lg ds-bg-surface-muted ds-text-muted text-sm">
                   Please select a project first to see available phases
                 </div>
               ) : loadingPhases ? (
-                <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 text-sm">
+                <div className="w-full px-3 py-2 border ds-border-subtle rounded-lg ds-bg-surface-muted ds-text-muted text-sm">
                   Loading phases...
                 </div>
               ) : phases.length === 0 ? (
-                <div className="w-full px-3 py-2 border border-yellow-300 rounded-lg bg-yellow-50 text-yellow-800 text-sm">
+                <div className="w-full px-3 py-2 border border-yellow-400/60 rounded-lg bg-yellow-50 text-yellow-800 text-sm">
                   No phases available for this project. Phases can be created in the project phases section.
                   <Link
                     href={`/phases?projectId=${formData.projectId}`}
@@ -1022,16 +1119,16 @@ function NewPurchaseOrderPageContent() {
                   onChange={handleChange}
                   required
                   disabled={loadingPhases || !formData.projectId}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-50 disabled:text-gray-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus disabled:ds-bg-surface-muted disabled:ds-text-muted"
                 >
-                  <option value="" className="text-gray-900">Select phase (required)</option>
+                  <option value="" className="ds-text-primary">Select phase (required)</option>
                   {phases.map((phase) => {
                     const phaseId = phase._id?.toString() || phase.id?.toString() || '';
                     const phaseName = phase.phaseName || phase.name || 'Unknown Phase';
                     const phaseCode = phase.phaseCode || phase.code || '';
                     const phaseStatus = phase.status ? `(${phase.status.replace('_', ' ')})` : '';
                     return (
-                      <option key={phaseId} value={phaseId} className="text-gray-900">
+                      <option key={phaseId} value={phaseId} className="ds-text-primary">
                         {phaseName} {phaseCode && `(${phaseCode})`} {phaseStatus}
                       </option>
                     );
@@ -1043,12 +1140,68 @@ function NewPurchaseOrderPageContent() {
                   ⚠️ The selected phase is not in the available phases list. Please verify the phase belongs to this project.
                 </p>
               )}
+              {formData.materialRequestId && !formData.phaseId && phases.length > 0 && (
+                <p className="text-sm text-amber-600 mt-1">
+                  This request does not have a phase assigned. Please select the correct phase before creating the purchase order.
+                </p>
+              )}
+            </div>
+
+            {/* Floor Selection (Optional, but recommended for traceability) */}
+            <div>
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
+                Floor (Optional)
+                <HelpIcon
+                  content="Select the floor for better traceability. If the source material request had no floor, you can set it here."
+                  position="right"
+                />
+              </label>
+              <FieldHelp>
+                Optional: assign this order to a floor for improved reporting and backtrace.
+              </FieldHelp>
+              {!formData.projectId ? (
+                <div className="w-full px-3 py-2 border ds-border-subtle rounded-lg ds-bg-surface-muted ds-text-muted text-sm">
+                  Please select a project first to see available floors
+                </div>
+              ) : floors.length === 0 ? (
+                <div className="w-full px-3 py-2 border border-yellow-400/60 rounded-lg bg-yellow-50 text-yellow-800 text-sm">
+                  No floors available for this project. You can still create the order, but floor-level traceability will be limited.
+                  <Link
+                    href={`/floors?projectId=${formData.projectId}`}
+                    className="block mt-2 text-yellow-900 hover:text-yellow-950 font-medium underline"
+                  >
+                    Manage floors for this project →
+                  </Link>
+                </div>
+              ) : (
+                <select
+                  name="floorId"
+                  value={formData.floorId}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
+                >
+                  <option value="">No floor selected</option>
+                  {floors.map((floor) => {
+                    const floorId = normalizeId(floor._id || floor.id);
+                    return (
+                      <option key={floorId || `floor-${floor.floorNumber || floor.name}`} value={floorId}>
+                        {floor.name || floor.floorName || floor.floorNumber || 'Unnamed Floor'}
+                      </option>
+                    );
+                  })}
+                </select>
+              )}
+              {formData.materialRequestId && !formData.floorId && floors.length > 0 && (
+                <p className="text-xs ds-text-secondary mt-1">
+                  No floor was inherited from the request. Select one to improve floor-level spending traceability.
+                </p>
+              )}
             </div>
 
             {/* Supplier Selection */}
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-base font-semibold text-gray-700 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary leading-normal">
                   Supplier <span className="text-red-500">*</span>
                   <HelpIcon 
                     content="Select the supplier who will fulfill this purchase order. You can create a new supplier if needed."
@@ -1059,25 +1212,25 @@ function NewPurchaseOrderPageContent() {
                   <button
                     type="button"
                     onClick={() => setShowSupplierModal(true)}
-                    className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                    className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                   >
                     + Create New Supplier
                   </button>
                 )}
               </div>
               <FieldHelp>
-                Choose the supplier for this order. Create a new supplier if they're not in the list.
+                Choose the supplier for this order. Create a new supplier if they&apos;re not in the list.
               </FieldHelp>
               <select
                 name="supplierId"
                 value={formData.supplierId}
                 onChange={handleChange}
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
               >
                 <option value="">Select a supplier</option>
                 {suppliers.map((supplier) => {
-                  const supplierId = supplier._id?.toString() || supplier.id?.toString() || '';
+                  const supplierId = normalizeId(supplier._id || supplier.id);
                   const displayName = supplier.name || supplier.contactPerson || supplier.email || 'Unknown Supplier';
                   const contactInfo = supplier.contactPerson ? ` - ${supplier.contactPerson}` : '';
                   return (
@@ -1091,7 +1244,7 @@ function NewPurchaseOrderPageContent() {
 
             {/* Material Name */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Material Name <span className="text-red-500">*</span>
               </label>
               <input
@@ -1101,13 +1254,13 @@ function NewPurchaseOrderPageContent() {
                 onChange={handleChange}
                 required
                 minLength={2}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
               />
             </div>
 
             {/* Description */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Description (Optional)
               </label>
               <textarea
@@ -1115,14 +1268,14 @@ function NewPurchaseOrderPageContent() {
                 value={formData.description}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
               />
             </div>
 
             {/* Quantity and Unit Cost */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Quantity Ordered <span className="text-red-500">*</span>
                   <HelpIcon 
                     content="Enter the quantity you're ordering. This may differ from the requested quantity."
@@ -1140,11 +1293,11 @@ function NewPurchaseOrderPageContent() {
                   required
                   min="0.01"
                   step="0.01"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Unit <span className="text-red-500">*</span>
                 </label>
                 <select
@@ -1152,7 +1305,7 @@ function NewPurchaseOrderPageContent() {
                   value={formData.unit}
                   onChange={handleChange}
                   required
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 >
                   {unitOptions.map((option) => (
                     <option key={option} value={option}>
@@ -1168,7 +1321,7 @@ function NewPurchaseOrderPageContent() {
                     onChange={handleChange}
                     required
                     placeholder="Enter custom unit name"
-                    className="w-full mt-2 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                    className="w-full mt-2 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
                   />
                 )}
               </div>
@@ -1177,7 +1330,7 @@ function NewPurchaseOrderPageContent() {
             {/* Unit Cost and Total Cost */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Unit Cost <span className="text-red-500">*</span>
                   <HelpIcon 
                     content="Enter the cost per unit. The total cost will be calculated automatically (Quantity × Unit Cost)."
@@ -1195,11 +1348,11 @@ function NewPurchaseOrderPageContent() {
                   required
                   min="0"
                   step="0.01"
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
                 />
               </div>
               <div>
-                <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Total Cost
                   <HelpIcon 
                     content="Total cost is calculated automatically from Quantity × Unit Cost. This amount will be committed from project capital."
@@ -1213,14 +1366,14 @@ function NewPurchaseOrderPageContent() {
                   type="text"
                   value={formatCurrency(formData.totalCost || 0)}
                   readOnly
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-900"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg ds-bg-surface-muted ds-text-primary"
                 />
               </div>
             </div>
 
             {/* Delivery Date */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Delivery Date <span className="text-red-500">*</span>
                 <HelpIcon 
                   content="Select the expected delivery date for this order. This helps with planning and tracking."
@@ -1237,13 +1390,13 @@ function NewPurchaseOrderPageContent() {
                 onChange={handleChange}
                 required
                 min={new Date().toISOString().split('T')[0]}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
               />
             </div>
 
             {/* Terms */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Payment Terms (Optional)
               </label>
               <textarea
@@ -1252,13 +1405,13 @@ function NewPurchaseOrderPageContent() {
                 onChange={handleChange}
                 rows={2}
                 placeholder="e.g., Net 30, Payment on delivery, etc."
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted"
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Additional Notes (Optional)
               </label>
               <textarea
@@ -1266,15 +1419,15 @@ function NewPurchaseOrderPageContent() {
                 value={formData.notes}
                 onChange={handleChange}
                 rows={3}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
               />
             </div>
 
             {/* Submit Buttons */}
-            <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
+            <div className="flex justify-end gap-4 pt-4 border-t ds-border-subtle">
               <Link
                 href="/purchase-orders"
-                className="px-6 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition"
+                className="px-6 py-2 border ds-border-subtle hover:ds-bg-surface-muted ds-text-secondary font-medium rounded-lg transition"
               >
                 Cancel
               </Link>
@@ -1282,8 +1435,8 @@ function NewPurchaseOrderPageContent() {
                 type="submit"
                 isLoading={loading || validatingCapital}
                 loadingText={loading ? "Creating Purchase Order..." : "Validating..."}
-                disabled={capitalValidation && !capitalValidation.isValid}
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={capitalValidation && !capitalValidation.capitalNotSet && !capitalValidation.isValid}
+                className="px-6 py-2 ds-bg-accent-primary hover:bg-blue-700 text-white font-medium rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Create Purchase Order
               </LoadingButton>
@@ -1294,13 +1447,13 @@ function NewPurchaseOrderPageContent() {
           {/* Supplier Creation Modal */}
           {showSupplierModal && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-                <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-gray-900">Create New Supplier</h2>
+              <div className="ds-bg-surface rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+                <div className="sticky top-0 ds-bg-surface border-b ds-border-subtle px-6 py-4 flex items-center justify-between">
+                  <h2 className="text-xl font-bold ds-text-primary">Create New Supplier</h2>
                   <button
                     type="button"
                     onClick={() => setShowSupplierModal(false)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="ds-text-muted hover:ds-text-secondary"
                   >
                     <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1381,7 +1534,7 @@ function NewPurchaseOrderPageContent() {
     return (
       <form onSubmit={handleSubmit} className="p-6 space-y-6">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded">
             <p className="font-semibold">Error</p>
             <p className="text-sm">{error}</p>
           </div>
@@ -1389,7 +1542,7 @@ function NewPurchaseOrderPageContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium ds-text-secondary mb-1">
               Supplier Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -1398,23 +1551,23 @@ function NewPurchaseOrderPageContent() {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+            <label className="block text-sm font-medium ds-text-secondary mb-1">Contact Person</label>
             <input
               type="text"
               name="contactPerson"
               value={formData.contactPerson}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium ds-text-secondary mb-1">
               Email <span className="text-red-500">*</span>
             </label>
             <input
@@ -1423,12 +1576,12 @@ function NewPurchaseOrderPageContent() {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium ds-text-secondary mb-1">
               Phone <span className="text-red-500">*</span>
             </label>
             <input
@@ -1437,7 +1590,7 @@ function NewPurchaseOrderPageContent() {
               value={formData.phone}
               onChange={handleChange}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus"
             />
           </div>
         </div>
@@ -1446,7 +1599,7 @@ function NewPurchaseOrderPageContent() {
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+            className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary"
             disabled={loading}
           >
             Cancel
@@ -1455,7 +1608,7 @@ function NewPurchaseOrderPageContent() {
             type="submit"
             isLoading={loading}
             loadingText="Creating..."
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700"
           >
             Create Supplier
           </LoadingButton>

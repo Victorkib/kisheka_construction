@@ -349,11 +349,7 @@ export async function deleteProfessionalFeeCloudinaryAssets(fee) {
  * @returns {Promise<{success: number, failed: number}>}
  */
 export async function deletePhaseCloudinaryAssets(phase) {
-  if (!phase) return { success: 0, failed: 0 };
-
-  const urls = [];
-
-  // Collect all Cloudinary URLs from phase documents
+  if (!phase) return { success: 0, failed: 0 };  const urls = [];  // Collect all Cloudinary URLs from phase documents
   if (phase.documents && Array.isArray(phase.documents)) {
     phase.documents.forEach((doc) => {
       if (doc.url) urls.push(doc.url);
@@ -370,9 +366,7 @@ export async function deletePhaseCloudinaryAssets(phase) {
  * @returns {Promise<{success: number, failed: number}>}
  */
 export async function deleteFloorProgressCloudinaryAssets(floor) {
-  if (!floor) return { success: 0, failed: 0 };
-
-  const urls = [];  // Collect all Cloudinary URLs from floor progress photos
+  if (!floor) return { success: 0, failed: 0 };  const urls = [];  // Collect all Cloudinary URLs from floor progress photos
   if (floor.progress?.photos && Array.isArray(floor.progress.photos)) {
     floor.progress.photos.forEach((photo) => {
       if (photo.url) urls.push(photo.url);

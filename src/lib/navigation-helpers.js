@@ -186,7 +186,7 @@ export const NAVIGATION_SECTIONS = {
         label: 'Approvals',
         href: '/dashboard/approvals',
         roles: ['owner', 'pm', 'project_manager', 'accountant'],
-        badge: 'pending', // Will show count of pending approvals
+        // Badge is added dynamically based on pendingApprovalsCount in sidebar components
       },
       {
         label: 'Work Items',

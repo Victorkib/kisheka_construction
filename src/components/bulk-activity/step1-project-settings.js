@@ -179,8 +179,8 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Project & Professional Service</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold ds-text-primary mb-4">Project & Professional Service</h2>
+        <p className="text-sm ds-text-secondary mb-6">
           Select the project and professional service for bulk activity entry. Default phase and floor can be set for all activities.
         </p>
       </div>
@@ -188,17 +188,17 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
       <div className="space-y-4">
         {/* Project Selection */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Project <span className="text-red-500">*</span>
           </label>
           {loadingProjects ? (
-            <div className="px-3 py-2 bg-gray-100 rounded-lg animate-pulse">Loading projects...</div>
+            <div className="px-3 py-2 ds-bg-surface-muted rounded-lg animate-pulse">Loading projects...</div>
           ) : (
             <select
               value={wizardData.projectId}
               onChange={(e) => handleChange('projectId', e.target.value)}
               required
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Project</option>
               {projects.map((project) => (
@@ -212,17 +212,17 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
 
         {/* Professional Service Selection */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Professional Service <span className="text-red-500">*</span>
           </label>
           {loadingServices ? (
-            <div className="px-3 py-2 bg-gray-100 rounded-lg animate-pulse">Loading services...</div>
+            <div className="px-3 py-2 ds-bg-surface-muted rounded-lg animate-pulse">Loading services...</div>
           ) : !wizardData.projectId ? (
-            <div className="px-3 py-2 bg-gray-100 rounded-lg text-gray-500">
+            <div className="px-3 py-2 ds-bg-surface-muted rounded-lg ds-text-muted">
               Please select a project first
             </div>
           ) : professionalServices.length === 0 ? (
-            <div className="px-3 py-2 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700">
+            <div className="px-3 py-2 bg-yellow-50 border border-yellow-400/60 rounded-lg text-yellow-700">
               No active professional services found for this project
             </div>
           ) : (
@@ -231,7 +231,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
                 value={wizardData.professionalServiceId}
                 onChange={(e) => handleChange('professionalServiceId', e.target.value)}
                 required
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Professional Service</option>
                 {professionalServices.map((service) => (
@@ -243,10 +243,10 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
               {selectedService && (
                 <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                   <div className="text-sm">
-                    <div className="font-medium text-gray-900">
+                    <div className="font-medium ds-text-primary">
                       {selectedService.library?.name || 'N/A'} ({selectedService.type === 'architect' ? 'Architect' : 'Engineer'})
                     </div>
-                    <div className="text-gray-600 mt-1">
+                    <div className="ds-text-secondary mt-1">
                       Contract: {selectedService.contractType || 'N/A'} | Status: {selectedService.status || 'N/A'}
                     </div>
                   </div>
@@ -259,20 +259,20 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
         {/* Default Phase (Optional) */}
         {wizardData.projectId && (
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Default Phase (Optional)
             </label>
             {loadingPhases ? (
-              <div className="px-3 py-2 bg-gray-100 rounded-lg animate-pulse">Loading phases...</div>
+              <div className="px-3 py-2 ds-bg-surface-muted rounded-lg animate-pulse">Loading phases...</div>
             ) : phases.length === 0 ? (
-              <div className="px-3 py-2 bg-gray-100 rounded-lg text-gray-500">
+              <div className="px-3 py-2 ds-bg-surface-muted rounded-lg ds-text-muted">
                 No phases available for this project
               </div>
             ) : (
               <select
                 value={wizardData.defaultPhaseId}
                 onChange={(e) => handleChange('defaultPhaseId', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">No Default Phase</option>
                 {phases.map((phase) => (
@@ -288,20 +288,20 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
         {/* Default Floor (Optional) */}
         {wizardData.projectId && (
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Default Floor (Optional)
             </label>
             {loadingFloors ? (
-              <div className="px-3 py-2 bg-gray-100 rounded-lg animate-pulse">Loading floors...</div>
+              <div className="px-3 py-2 ds-bg-surface-muted rounded-lg animate-pulse">Loading floors...</div>
             ) : floors.length === 0 ? (
-              <div className="px-3 py-2 bg-gray-100 rounded-lg text-gray-500">
+              <div className="px-3 py-2 ds-bg-surface-muted rounded-lg ds-text-muted">
                 No floors available for this project
               </div>
             ) : (
               <select
                 value={wizardData.defaultFloorId}
                 onChange={(e) => handleChange('defaultFloorId', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">No Default Floor</option>
                 {floors.map((floor) => (

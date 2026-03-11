@@ -30,8 +30,8 @@ const RejectionDetailsTable = ({ rejections }) => {
 
   if (!rejections || rejections.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        <AlertTriangle className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+      <div className="text-center py-8 ds-text-muted">
+        <AlertTriangle className="w-12 h-12 mx-auto mb-2 text-slate-500" />
         <p>No rejection details available</p>
       </div>
     );
@@ -168,23 +168,23 @@ const RejectionDetailsTable = ({ rejections }) => {
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 ds-text-muted" />
             <input
               type="text"
               placeholder="Search by order, supplier, material, or reason..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
             />
           </div>
         </div>
         
         <div className="flex items-center space-x-2">
-          <Filter className="w-4 h-4 text-gray-500" />
+          <Filter className="w-4 h-4 ds-text-muted" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -196,7 +196,7 @@ const RejectionDetailsTable = ({ rejections }) => {
       </div>
 
       {/* Results Summary */}
-      <div className="flex items-center justify-between text-sm text-gray-600">
+      <div className="flex items-center justify-between text-sm ds-text-muted">
         <span>
           Showing {startIndex + 1}-{Math.min(endIndex, filteredAndSortedRejections.length)} of {filteredAndSortedRejections.length} rejections
         </span>
@@ -215,76 +215,76 @@ const RejectionDetailsTable = ({ rejections }) => {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            <tr className="ds-bg-surface-muted border-b ds-border-subtle">
+              <th className="px-4 py-3 text-left text-xs font-medium ds-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('date')}
-                  className="flex items-center space-x-1 hover:text-gray-700"
+                  className="flex items-center space-x-1 hover:ds-text-primary"
                 >
                   <span>Date</span>
                   {sortBy === 'date' && (
-                    <span className="text-blue-600">
+                    <span className="text-blue-400">
                       {sortOrder === 'asc' ? '↑' : '↓'}
                     </span>
                   )}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium ds-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('supplier')}
-                  className="flex items-center space-x-1 hover:text-gray-700"
+                  className="flex items-center space-x-1 hover:ds-text-primary"
                 >
                   <span>Supplier</span>
                   {sortBy === 'supplier' && (
-                    <span className="text-blue-600">
+                    <span className="text-blue-400">
                       {sortOrder === 'asc' ? '↑' : '↓'}
                     </span>
                   )}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium ds-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('material')}
-                  className="flex items-center space-x-1 hover:text-gray-700"
+                  className="flex items-center space-x-1 hover:ds-text-primary"
                 >
                   <span>Material</span>
                   {sortBy === 'material' && (
-                    <span className="text-blue-600">
+                    <span className="text-blue-400">
                       {sortOrder === 'asc' ? '↑' : '↓'}
                     </span>
                   )}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium ds-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('reason')}
-                  className="flex items-center space-x-1 hover:text-gray-700"
+                  className="flex items-center space-x-1 hover:ds-text-primary"
                 >
                   <span>Reason</span>
                   {sortBy === 'reason' && (
-                    <span className="text-blue-600">
+                    <span className="text-blue-400">
                       {sortOrder === 'asc' ? '↑' : '↓'}
                     </span>
                   )}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium ds-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('status')}
-                  className="flex items-center space-x-1 hover:text-gray-700"
+                  className="flex items-center space-x-1 hover:ds-text-primary"
                 >
                   <span>Status</span>
                   {sortBy === 'status' && (
-                    <span className="text-blue-600">
+                    <span className="text-blue-400">
                       {sortOrder === 'asc' ? '↑' : '↓'}
                     </span>
                   )}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium ds-text-secondary uppercase tracking-wider">
                 <button
                   onClick={() => handleSort('impact')}
-                  className="flex items-center space-x-1 hover:text-gray-700"
+                  className="flex items-center space-x-1 hover:ds-text-secondary"
                 >
                   <span>Impact</span>
                   {sortBy === 'impact' && (
@@ -294,33 +294,33 @@ const RejectionDetailsTable = ({ rejections }) => {
                   )}
                 </button>
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="ds-bg-surface divide-y ds-border-subtle">
             {currentRejections.map((rejection) => (
-              <tr key={rejection.id} className="hover:bg-gray-50">
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+              <tr key={rejection.id} className="hover:bg-ds-bg-surface-muted/60">
+                <td className="px-4 py-4 whitespace-nowrap text-sm ds-text-primary">
                   <div>
                     <div className="font-medium">{rejection.orderNumber}</div>
-                    <div className="text-gray-500">{formatDate(rejection.rejectionDate)}</div>
+                    <div className="ds-text-muted">{formatDate(rejection.rejectionDate)}</div>
                   </div>
                 </td>
-                <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td className="px-4 py-4 whitespace-nowrap text-sm ds-text-primary">
                   <div>
                     <div className="font-medium">{rejection.supplierName}</div>
-                    <div className="text-gray-500">ID: {rejection.supplierId}</div>
+                    <div className="ds-text-muted">ID: {rejection.supplierId}</div>
                   </div>
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-900">
+                <td className="px-4 py-4 text-sm ds-text-primary">
                   <div>
                     <div className="font-medium">{rejection.materialName}</div>
-                    <div className="text-gray-500">{rejection.quantity} units</div>
+                    <div className="ds-text-muted">{rejection.quantity} units</div>
                   </div>
                 </td>
-                <td className="px-4 py-4 text-sm text-gray-900">
+                <td className="px-4 py-4 text-sm ds-text-primary">
                   <div className="max-w-xs">
                     <p className="truncate" title={rejection.reason}>
                       {rejection.reason}
@@ -342,7 +342,7 @@ const RejectionDetailsTable = ({ rejections }) => {
                 </td>
                 <td className="px-4 py-4 whitespace-nowrap text-sm">
                   <div className="flex items-center space-x-2">
-                    <span className={`text-${getImpactColor(rejection.financialImpact)}-600 font-medium`}>
+                    <span className={`text-${getImpactColor(rejection.financialImpact)}-400 font-medium`}>
                       {formatCurrency(rejection.financialImpact)}
                     </span>
                     <Badge variant={getImpactColor(rejection.financialImpact)} size="sm">
@@ -366,7 +366,7 @@ const RejectionDetailsTable = ({ rejections }) => {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm ds-text-muted">
             Page {currentPage} of {totalPages}
           </div>
           <div className="flex items-center space-x-2">

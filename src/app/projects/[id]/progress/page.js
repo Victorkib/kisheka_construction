@@ -135,8 +135,8 @@ function ProjectProgressPageContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-96"></div>
+              <div className="h-8 ds-bg-surface-muted rounded w-64 mb-2"></div>
+              <div className="h-4 ds-bg-surface-muted rounded w-96"></div>
             </div>
             <LoadingCard count={3} showHeader={true} lines={4} />
           </div>
@@ -149,7 +149,7 @@ function ProjectProgressPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 p-4 rounded">
             <p className="font-semibold mb-2">Error Loading Progress</p>
             <p>{error}</p>
             <button
@@ -174,29 +174,29 @@ function ProjectProgressPageContent() {
         <div className="mb-6">
           <Link
             href={`/projects/${projectId}`}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-2 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover text-sm font-medium mb-2 inline-block"
           >
             ← Back to Project
           </Link>
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
             Progress Documentation
           </h1>
           {project && (
-            <p className="text-gray-600 mt-1">
+            <p className="ds-text-secondary mt-1">
               {project.projectName} ({project.projectCode})
             </p>
           )}
         </div>
 
         {/* Tabs */}
-        <div className="mb-6 border-b border-gray-200">
+        <div className="mb-6 border-b ds-border-subtle">
           <nav className="flex space-x-8">
             <button
               onClick={() => setActiveTab('photos')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'photos'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-ds-accent-primary ds-text-accent-primary'
+                  : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
               Photos ({progress.photos?.length || 0})
@@ -205,8 +205,8 @@ function ProjectProgressPageContent() {
               onClick={() => setActiveTab('milestones')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'milestones'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-ds-accent-primary ds-text-accent-primary'
+                  : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
               Milestones ({progress.milestones?.length || 0})
@@ -215,8 +215,8 @@ function ProjectProgressPageContent() {
               onClick={() => setActiveTab('updates')}
               className={`py-4 px-1 border-b-2 font-medium text-sm ${
                 activeTab === 'updates'
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-ds-accent-primary ds-text-accent-primary'
+                  : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
               }`}
             >
               Daily Updates ({progress.dailyUpdates?.length || 0})
@@ -235,27 +235,27 @@ function ProjectProgressPageContent() {
                 folder={`Kisheka_construction/progress/${projectId}`}
               />
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold ds-text-primary mb-4">
                   Photo Gallery ({progress.photos?.length || 0})
                 </h3>
                 {!progress.photos || progress.photos.length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-8">
+                  <p className="text-sm ds-text-muted text-center py-8">
                     No photos uploaded yet
                   </p>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {progress.photos.map((photo, index) => (
-                      <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+                      <div key={index} className="border ds-border-subtle rounded-lg overflow-hidden">
                         <ImagePreview
                           url={photo.url}
                           title={photo.description || `Photo ${index + 1}`}
                           showDelete={false}
                         />
                         {photo.description && (
-                          <div className="p-3 bg-gray-50">
-                            <p className="text-sm text-gray-700">{photo.description}</p>
-                            <p className="text-sm text-gray-600 mt-1 leading-normal">
+                          <div className="p-3 ds-bg-surface-muted">
+                            <p className="text-sm ds-text-secondary">{photo.description}</p>
+                            <p className="text-sm ds-text-secondary mt-1 leading-normal">
                               {new Date(photo.uploadedAt).toLocaleDateString()}
                             </p>
                           </div>
@@ -280,34 +280,34 @@ function ProjectProgressPageContent() {
           {/* Daily Updates Tab */}
           {activeTab === 'updates' && (
             <div className="space-y-6">
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Add Daily Update</h3>
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold ds-text-primary mb-4">Add Daily Update</h3>
                 <div className="space-y-4">
                   <textarea
                     value={dailyUpdateText}
                     onChange={(e) => setDailyUpdateText(e.target.value)}
                     placeholder="Enter today's progress update..."
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <LoadingButton
                     onClick={handleAddDailyUpdate}
                     isLoading={submittingUpdate}
                     loadingText="Adding..."
                     disabled={!dailyUpdateText.trim()}
-                    className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 rounded-lg transition"
+                    className="w-full ds-bg-accent-primary hover:bg-blue-700 disabled:bg-slate-500 text-white font-medium py-2 rounded-lg transition"
                   >
                     Add Update
                   </LoadingButton>
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
+                <h3 className="text-lg font-semibold ds-text-primary mb-4">
                   Update History ({progress.dailyUpdates?.length || 0})
                 </h3>
                 {!progress.dailyUpdates || progress.dailyUpdates.length === 0 ? (
-                  <p className="text-sm text-gray-500 text-center py-8">
+                  <p className="text-sm ds-text-muted text-center py-8">
                     No daily updates yet
                   </p>
                 ) : (
@@ -317,10 +317,10 @@ function ProjectProgressPageContent() {
                       .map((update, index) => (
                         <div
                           key={index}
-                          className="border-l-4 border-blue-500 pl-4 py-2 bg-gray-50 rounded"
+                          className="border-l-4 border-blue-500 pl-4 py-2 ds-bg-surface-muted rounded"
                         >
                           <div className="flex justify-between items-start mb-1">
-                            <p className="text-sm font-medium text-gray-900">
+                            <p className="text-sm font-medium ds-text-primary">
                               {new Date(update.date).toLocaleDateString('en-US', {
                                 weekday: 'long',
                                 year: 'numeric',
@@ -329,7 +329,7 @@ function ProjectProgressPageContent() {
                               })}
                             </p>
                           </div>
-                          <p className="text-sm text-gray-700 whitespace-pre-line">
+                          <p className="text-sm ds-text-secondary whitespace-pre-line">
                             {update.notes}
                           </p>
                         </div>
@@ -352,7 +352,7 @@ export default function ProjectProgressPage() {
         <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading project progress...</p>
+            <p className="mt-4 ds-text-secondary">Loading project progress...</p>
           </div>
         </div>
       </AppLayout>

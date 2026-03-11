@@ -49,7 +49,7 @@ export function WorkItemLabourTracking({ workItemId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex items-center justify-center py-8">
           <LoadingSpinner size="md" text="Loading labour data..." />
         </div>
@@ -59,7 +59,7 @@ export function WorkItemLabourTracking({ workItemId }) {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
         <p className="text-sm text-red-800">Error loading labour data: {error}</p>
       </div>
     );
@@ -80,14 +80,14 @@ export function WorkItemLabourTracking({ workItemId }) {
     <div className="space-y-6">
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-5 h-5 text-blue-600" />
-            <span className="text-sm font-medium text-gray-700">Total Hours</span>
+            <span className="text-sm font-medium ds-text-secondary">Total Hours</span>
           </div>
           <div className="text-2xl font-bold text-blue-600">{summary.totalHours.toFixed(1)}</div>
           {workItem.estimatedHours > 0 && (
-            <div className="text-xs text-gray-600 mt-1">
+            <div className="text-xs ds-text-secondary mt-1">
               of {workItem.estimatedHours} estimated
               {hoursUtilization > 0 && (
                 <span className={`ml-2 ${hoursUtilization > 100 ? 'text-red-600' : 'text-green-600'}`}>
@@ -98,16 +98,16 @@ export function WorkItemLabourTracking({ workItemId }) {
           )}
         </div>
 
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign className="w-5 h-5 text-green-600" />
-            <span className="text-sm font-medium text-gray-700">Total Cost</span>
+            <span className="text-sm font-medium ds-text-secondary">Total Cost</span>
           </div>
           <div className="text-2xl font-bold text-green-600">
             {summary.totalCost.toLocaleString()} KES
           </div>
           {workItem.estimatedCost > 0 && (
-            <div className="text-xs text-gray-600 mt-1">
+            <div className="text-xs ds-text-secondary mt-1">
               of {workItem.estimatedCost.toLocaleString()} estimated
               {costUtilization > 0 && (
                 <span className={`ml-2 ${costUtilization > 100 ? 'text-red-600' : 'text-green-600'}`}>
@@ -118,13 +118,13 @@ export function WorkItemLabourTracking({ workItemId }) {
           )}
         </div>
 
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+        <div className="bg-purple-50 border border-purple-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-5 h-5 text-purple-600" />
-            <span className="text-sm font-medium text-gray-700">Workers</span>
+            <span className="text-sm font-medium ds-text-secondary">Workers</span>
           </div>
           <div className="text-2xl font-bold text-purple-600">{summary.uniqueWorkers}</div>
-          <div className="text-xs text-gray-600 mt-1">{summary.entryCount} entries</div>
+          <div className="text-xs ds-text-secondary mt-1">{summary.entryCount} entries</div>
         </div>
 
         <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
@@ -134,7 +134,7 @@ export function WorkItemLabourTracking({ workItemId }) {
             ) : (
               <TrendingDown className="w-5 h-5 text-green-600" />
             )}
-            <span className="text-sm font-medium text-gray-700">Variance</span>
+            <span className="text-sm font-medium ds-text-secondary">Variance</span>
           </div>
           <div
             className={`text-2xl font-bold ${hoursVariance < 0 ? 'text-orange-600' : 'text-green-600'}`}
@@ -142,7 +142,7 @@ export function WorkItemLabourTracking({ workItemId }) {
             {hoursVariance > 0 ? '+' : ''}
             {hoursVariance.toFixed(1)} hrs
           </div>
-          <div className="text-xs text-gray-600 mt-1">
+          <div className="text-xs ds-text-secondary mt-1">
             {costVariance > 0 ? '+' : ''}
             {costVariance.toLocaleString()} KES
           </div>
@@ -151,7 +151,7 @@ export function WorkItemLabourTracking({ workItemId }) {
 
       {/* Variance Alerts */}
       {(hoursUtilization > 100 || costUtilization > 100) && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
             <div>
@@ -170,39 +170,39 @@ export function WorkItemLabourTracking({ workItemId }) {
 
       {/* Breakdown by Worker */}
       {byWorker && byWorker.length > 0 && (
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">By Worker</h3>
+        <div className="ds-bg-surface rounded-lg shadow">
+          <div className="px-4 py-3 border-b ds-border-subtle">
+            <h3 className="text-lg font-semibold ds-text-primary">By Worker</h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Worker
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Hours
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Cost
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Entries
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {byWorker.map((worker, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <tr key={index} className="hover:ds-bg-surface-muted">
+                    <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                       {worker.workerName}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{worker.totalHours.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm ds-text-secondary">{worker.totalHours.toFixed(1)}</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
                       {worker.totalCost.toLocaleString()} KES
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{worker.entryCount}</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">{worker.entryCount}</td>
                   </tr>
                 ))}
               </tbody>
@@ -213,39 +213,39 @@ export function WorkItemLabourTracking({ workItemId }) {
 
       {/* Breakdown by Skill */}
       {bySkill && bySkill.length > 0 && (
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">By Skill Type</h3>
+        <div className="ds-bg-surface rounded-lg shadow">
+          <div className="px-4 py-3 border-b ds-border-subtle">
+            <h3 className="text-lg font-semibold ds-text-primary">By Skill Type</h3>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Skill Type
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Hours
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Cost
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Workers
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {bySkill.map((skill, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <tr key={index} className="hover:ds-bg-surface-muted">
+                    <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                       {skill.skillTypeLabel}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{skill.totalHours.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm ds-text-secondary">{skill.totalHours.toFixed(1)}</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
                       {skill.totalCost.toLocaleString()} KES
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{skill.workerCount}</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">{skill.workerCount}</td>
                   </tr>
                 ))}
               </tbody>
@@ -255,7 +255,7 @@ export function WorkItemLabourTracking({ workItemId }) {
       )}
 
       {/* Quick Actions */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 mb-6">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-sm font-semibold text-blue-900 mb-1">Quick Actions</h3>
@@ -289,9 +289,9 @@ export function WorkItemLabourTracking({ workItemId }) {
 
       {/* Recent Labour Entries */}
       {labourEntries && labourEntries.length > 0 && (
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Labour Entries</h3>
+        <div className="ds-bg-surface rounded-lg shadow">
+          <div className="px-4 py-3 border-b ds-border-subtle flex items-center justify-between">
+            <h3 className="text-lg font-semibold ds-text-primary">Recent Labour Entries</h3>
             <Link
               href={`/labour/entries?workItemId=${workItemId}`}
               className="text-sm text-blue-600 hover:text-blue-800"
@@ -300,43 +300,43 @@ export function WorkItemLabourTracking({ workItemId }) {
             </Link>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Date
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Worker
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Skill
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Hours
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Cost
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Status
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {labourEntries.slice(0, 10).map((entry) => (
-                  <tr key={entry._id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                  <tr key={entry._id} className="hover:ds-bg-surface-muted">
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
                       {new Date(entry.entryDate).toLocaleDateString()}
                     </td>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                       {entry.workerName}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
                       {entry.skillType?.replace(/_/g, ' ')}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{entry.totalHours.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                    <td className="px-4 py-3 text-sm ds-text-secondary">{entry.totalHours.toFixed(1)}</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
                       {entry.totalCost.toLocaleString()} KES
                     </td>
                     <td className="px-4 py-3 text-sm">
@@ -360,8 +360,8 @@ export function WorkItemLabourTracking({ workItemId }) {
 
       {/* No Labour Entries */}
       {labourEntries && labourEntries.length === 0 && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-          <p className="text-gray-600 mb-4">No labour entries found for this work item</p>
+        <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-8 text-center">
+          <p className="ds-text-secondary mb-4">No labour entries found for this work item</p>
           <div className="flex items-center justify-center gap-3">
             <Link
               href={`/labour/entries/new?workItemId=${workItemId}`}

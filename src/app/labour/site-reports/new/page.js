@@ -351,16 +351,16 @@ export default function NewSiteReportPage() {
     <AppLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900">New Site Report</h1>
-          <p className="text-gray-600 mt-1">Log work completed, labour, and attachments</p>
+          <h1 className="text-3xl font-bold ds-text-primary">New Site Report</h1>
+          <p className="ds-text-secondary mt-1">Log work completed, labour, and attachments</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Site Context</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Site Context</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Project <span className="text-red-600">*</span>
                 </label>
                 <LoadingSelect
@@ -377,7 +377,7 @@ export default function NewSiteReportPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Phase <span className="text-red-600">*</span>
                 </label>
                 <LoadingSelect
@@ -395,7 +395,7 @@ export default function NewSiteReportPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Floor</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Floor</label>
                 <LoadingSelect
                   value={formData.floorId}
                   onChange={(e) => setFormData((prev) => ({ ...prev, floorId: e.target.value }))}
@@ -413,29 +413,29 @@ export default function NewSiteReportPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Work Date <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="date"
                   value={formData.entryDate}
                   onChange={(e) => setFormData((prev) => ({ ...prev, entryDate: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Reported By <span className="text-red-600">*</span>
                 </label>
                 <input
                   type="text"
                   value={formData.reportedByName}
                   onChange={(e) => setFormData((prev) => ({ ...prev, reportedByName: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Channel</label>
+                <label className="block text-sm font-medium ds-text-secondary mb-1">Channel</label>
                 <LoadingSelect
                   value={formData.submissionChannel}
                   onChange={(e) => setFormData((prev) => ({ ...prev, submissionChannel: e.target.value }))}
@@ -449,12 +449,12 @@ export default function NewSiteReportPage() {
             </div>
 
             <div className="mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium ds-text-secondary mb-2">
                 Work Items Completed <span className="text-red-600">*</span>
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {workItems.map((item) => (
-                  <label key={item._id} className="flex items-center gap-2 text-sm text-gray-700">
+                  <label key={item._id} className="flex items-center gap-2 text-sm ds-text-secondary">
                     <input
                       type="checkbox"
                       checked={formData.workItemIds.includes(item._id)}
@@ -465,34 +465,34 @@ export default function NewSiteReportPage() {
                 ))}
               </div>
               {workItems.length === 0 && (
-                <p className="text-sm text-gray-500">No work items available for this phase.</p>
+                <p className="text-sm ds-text-muted">No work items available for this phase.</p>
               )}
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Report Summary</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Report Summary</h2>
             <div className="space-y-4">
               <textarea
                 rows={3}
                 value={formData.summary}
                 onChange={(e) => setFormData((prev) => ({ ...prev, summary: e.target.value }))}
                 placeholder="Short summary of work completed"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
               />
               <textarea
                 rows={4}
                 value={formData.notes}
                 onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
                 placeholder="Additional notes, issues, or observations"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
               />
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900">Labour Entries</h2>
+              <h2 className="text-lg font-semibold ds-text-primary">Labour Entries</h2>
               <button
                 type="button"
                 onClick={addLabourEntry}
@@ -504,13 +504,13 @@ export default function NewSiteReportPage() {
             </div>
 
             {formData.labourEntries.length === 0 ? (
-              <p className="text-sm text-gray-500">No labour entries added yet.</p>
+              <p className="text-sm ds-text-muted">No labour entries added yet.</p>
             ) : (
               <div className="space-y-3">
                 {formData.labourEntries.map((entry, index) => (
                   <div key={index} className="grid grid-cols-1 md:grid-cols-6 gap-3 items-end">
                     <div>
-                      <label className="text-xs text-gray-500">Worker</label>
+                      <label className="text-xs ds-text-muted">Worker</label>
                       <LoadingSelect
                         value={entry.workerId}
                         onChange={(e) => updateLabourEntry(index, 'workerId', e.target.value)}
@@ -524,7 +524,7 @@ export default function NewSiteReportPage() {
                       </LoadingSelect>
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">Work Item</label>
+                      <label className="text-xs ds-text-muted">Work Item</label>
                       <LoadingSelect
                         value={entry.workItemId}
                         onChange={(e) => updateLabourEntry(index, 'workItemId', e.target.value)}
@@ -538,32 +538,32 @@ export default function NewSiteReportPage() {
                       </LoadingSelect>
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">Skill</label>
+                      <label className="text-xs ds-text-muted">Skill</label>
                       <input
                         type="text"
                         value={entry.skillType}
                         onChange={(e) => updateLabourEntry(index, 'skillType', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">Hours</label>
+                      <label className="text-xs ds-text-muted">Hours</label>
                       <input
                         type="number"
                         value={entry.hours}
                         onChange={(e) => updateLabourEntry(index, 'hours', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
                         min="0"
                         step="0.5"
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">Rate</label>
+                      <label className="text-xs ds-text-muted">Rate</label>
                       <input
                         type="number"
                         value={entry.hourlyRate}
                         onChange={(e) => updateLabourEntry(index, 'hourlyRate', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
                         min="0"
                         step="0.01"
                       />
@@ -581,7 +581,7 @@ export default function NewSiteReportPage() {
                         value={entry.taskDescription}
                         onChange={(e) => updateLabourEntry(index, 'taskDescription', e.target.value)}
                         placeholder="Task description"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg"
                       />
                     </div>
                   </div>
@@ -590,8 +590,8 @@ export default function NewSiteReportPage() {
             )}
           </div>
 
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Attachments</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Attachments</h2>
             <div className="flex items-center gap-4">
               <input
                 ref={fileInputRef}
@@ -603,7 +603,7 @@ export default function NewSiteReportPage() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="inline-flex items-center gap-2 px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted"
                 disabled={uploading}
               >
                 <UploadCloud className="w-4 h-4" />
@@ -614,7 +614,7 @@ export default function NewSiteReportPage() {
             {attachments.length > 0 && (
               <div className="mt-4 space-y-2">
                 {attachments.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between text-sm text-gray-600">
+                  <div key={index} className="flex items-center justify-between text-sm ds-text-secondary">
                     <span>{file.fileName}</span>
                     <button
                       type="button"
@@ -633,7 +633,7 @@ export default function NewSiteReportPage() {
             <button
               type="button"
               onClick={() => router.push('/labour/site-reports')}
-              className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+              className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted"
             >
               Cancel
             </button>

@@ -147,15 +147,15 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
     <div className="space-y-6">
       {/* Phase Status and Info Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Status</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Status</p>
           {canEdit ? (
             <div className="space-y-2">
               <select
                 value={phase.status}
                 onChange={(e) => onStatusChange(e.target.value)}
                 disabled={updatingStatus}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="not_started">Not Started</option>
                 <option value="in_progress">In Progress</option>
@@ -163,14 +163,14 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
                 <option value="on_hold">On Hold</option>
                 <option value="cancelled">Cancelled</option>
               </select>
-              {updatingStatus && <p className="text-xs text-gray-500">Updating...</p>}
+              {updatingStatus && <p className="text-xs ds-text-muted">Updating...</p>}
             </div>
           ) : (
             <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(phase.status)}`}>
               {phase.status.replace('_', ' ').toUpperCase()}
             </span>
           )}
-          <p className="text-sm text-gray-600 mt-4">Completion</p>
+          <p className="text-sm ds-text-secondary mt-4">Completion</p>
           {canEdit ? (
             <div className="space-y-2">
               <div className="flex items-center gap-2">
@@ -184,18 +184,18 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
                     onCompletionChange(value);
                   }}
                   disabled={updatingCompletion}
-                  className="w-20 px-2 py-1 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-20 px-2 py-1 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
-                <span className="text-2xl font-bold text-gray-900">%</span>
+                <span className="text-2xl font-bold ds-text-primary">%</span>
               </div>
-              {updatingCompletion && <p className="text-xs text-gray-500">Updating...</p>}
+              {updatingCompletion && <p className="text-xs ds-text-muted">Updating...</p>}
             </div>
           ) : (
-            <p className="text-2xl font-bold text-gray-900">{phase.completionPercentage || 0}%</p>
+            <p className="text-2xl font-bold ds-text-primary">{phase.completionPercentage || 0}%</p>
           )}
           {/* Progress Bar */}
           <div className="mt-4">
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full ds-bg-surface-muted rounded-full h-2">
               <div
                 className={`h-2 rounded-full transition-all ${
                   phase.completionPercentage >= 100
@@ -204,7 +204,7 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
                     ? 'bg-blue-600'
                     : phase.completionPercentage >= 50
                     ? 'bg-yellow-600'
-                    : 'bg-gray-400'
+                    : 'ds-bg-surface-muted'
                 }`}
                 style={{ width: `${Math.min(100, phase.completionPercentage || 0)}%` }}
               />
@@ -212,37 +212,37 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Phase Code</p>
-          <p className="text-lg font-semibold text-gray-900">{phase.phaseCode}</p>
-          <p className="text-sm text-gray-600 mt-4">Sequence</p>
-          <p className="text-lg font-semibold text-gray-900">#{phase.sequence}</p>
-          <p className="text-sm text-gray-600 mt-4">Type</p>
-          <p className="text-sm font-semibold text-gray-900">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Phase Code</p>
+          <p className="text-lg font-semibold ds-text-primary">{phase.phaseCode}</p>
+          <p className="text-sm ds-text-secondary mt-4">Sequence</p>
+          <p className="text-lg font-semibold ds-text-primary">#{phase.sequence}</p>
+          <p className="text-sm ds-text-secondary mt-4">Type</p>
+          <p className="text-sm font-semibold ds-text-primary">
             {phase.phaseType?.replace('_', ' ').toUpperCase() || 'N/A'}
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Timeline</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Timeline</p>
           <div className="space-y-2 text-sm">
             <div>
-              <span className="text-gray-500">Start:</span>{' '}
-              <span className="font-medium text-gray-900">{formatDate(phase.startDate)}</span>
+              <span className="ds-text-muted">Start:</span>{' '}
+              <span className="font-medium ds-text-primary">{formatDate(phase.startDate)}</span>
             </div>
             <div>
-              <span className="text-gray-500">Planned End:</span>{' '}
-              <span className="font-medium text-gray-900">{formatDate(phase.plannedEndDate)}</span>
+              <span className="ds-text-muted">Planned End:</span>{' '}
+              <span className="font-medium ds-text-primary">{formatDate(phase.plannedEndDate)}</span>
             </div>
             {phase.actualEndDate && (
               <div>
-                <span className="text-gray-500">Actual End:</span>{' '}
+                <span className="ds-text-muted">Actual End:</span>{' '}
                 <span className="font-medium text-green-600">{formatDate(phase.actualEndDate)}</span>
               </div>
             )}
             {phase.canStartAfter && (
-              <div className="mt-2 pt-2 border-t border-gray-200">
-                <span className="text-gray-500">Can Start After:</span>{' '}
+              <div className="mt-2 pt-2 border-t ds-border-subtle">
+                <span className="ds-text-muted">Can Start After:</span>{' '}
                 <span className="font-medium text-blue-600">{formatDate(phase.canStartAfter)}</span>
               </div>
             )}
@@ -252,9 +252,9 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
 
       {/* Phase Description */}
       {phase.description && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-          <p className="text-gray-700 whitespace-pre-wrap">{phase.description}</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold ds-text-primary mb-2">Description</h3>
+          <p className="ds-text-secondary whitespace-pre-wrap">{phase.description}</p>
         </div>
       )}
 
@@ -264,11 +264,11 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
       )}
 
       {/* Dashboard Summary Card */}
-      <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg p-6">
+      <div className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-400/60 rounded-lg p-6">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Phase Dashboard</h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <h3 className="text-lg font-semibold ds-text-primary mb-2">Phase Dashboard</h3>
+            <p className="text-sm ds-text-secondary mb-4">
               View comprehensive phase analytics, statistics, and insights
             </p>
           </div>
@@ -283,43 +283,43 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
-          <div className="bg-white rounded-lg p-3">
-            <p className="text-xs text-gray-600">Milestones</p>
-            <p className="text-lg font-bold text-gray-900">{phase.milestones?.length || 0}</p>
+          <div className="ds-bg-surface rounded-lg p-3">
+            <p className="text-xs ds-text-secondary">Milestones</p>
+            <p className="text-lg font-bold ds-text-primary">{phase.milestones?.length || 0}</p>
           </div>
-          <div className="bg-white rounded-lg p-3">
-            <p className="text-xs text-gray-600">Quality Checks</p>
-            <p className="text-lg font-bold text-gray-900">{phase.qualityCheckpoints?.length || 0}</p>
+          <div className="ds-bg-surface rounded-lg p-3">
+            <p className="text-xs ds-text-secondary">Quality Checks</p>
+            <p className="text-lg font-bold ds-text-primary">{phase.qualityCheckpoints?.length || 0}</p>
           </div>
-          <div className="bg-white rounded-lg p-3">
-            <p className="text-xs text-gray-600">Work Items</p>
-            <p className="text-lg font-bold text-gray-900">{phase.workItems?.length || 0}</p>
+          <div className="ds-bg-surface rounded-lg p-3">
+            <p className="text-xs ds-text-secondary">Work Items</p>
+            <p className="text-lg font-bold ds-text-primary">{phase.workItems?.length || 0}</p>
           </div>
-          <div className="bg-white rounded-lg p-3">
-            <p className="text-xs text-gray-600">Completion</p>
-            <p className="text-lg font-bold text-gray-900">{phase.completionPercentage || 0}%</p>
+          <div className="ds-bg-surface rounded-lg p-3">
+            <p className="text-xs ds-text-secondary">Completion</p>
+            <p className="text-lg font-bold ds-text-primary">{phase.completionPercentage || 0}%</p>
           </div>
         </div>
       </div>
 
       {/* Quick Financial Summary */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Financial Summary</h3>
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Quick Financial Summary</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <p className="text-sm text-gray-600">Budget Allocated</p>
-            <p className="text-xl font-bold text-gray-900 mt-1">
+            <p className="text-sm ds-text-secondary">Budget Allocated</p>
+            <p className="text-xl font-bold ds-text-primary mt-1">
               {formatCurrency(financialSummary.budgetTotal)}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Actual Spending</p>
+            <p className="text-sm ds-text-secondary">Actual Spending</p>
             <p className="text-xl font-bold text-blue-600 mt-1">
               {formatCurrency(financialSummary.actualTotal)}
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Remaining Budget</p>
+            <p className="text-sm ds-text-secondary">Remaining Budget</p>
             <p className={`text-xl font-bold mt-1 ${
               financialSummary.remaining < 0 ? 'text-red-600' : 'text-green-600'
             }`}>
@@ -327,19 +327,19 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
             </p>
           </div>
           <div>
-            <p className="text-sm text-gray-600">Utilization</p>
-            <p className="text-xl font-bold text-gray-900 mt-1">
+            <p className="text-sm ds-text-secondary">Utilization</p>
+            <p className="text-xl font-bold ds-text-primary mt-1">
               {financialSummary.utilizationPercentage.toFixed(1)}%
             </p>
           </div>
         </div>
         {/* Budget Utilization Bar */}
         <div className="mt-4">
-          <div className="flex justify-between text-sm text-gray-600 mb-2">
+          <div className="flex justify-between text-sm ds-text-secondary mb-2">
             <span>Budget Utilization</span>
             <span>{financialSummary.utilizationPercentage.toFixed(1)}%</span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className="w-full ds-bg-surface-muted rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all ${
                 financialSummary.utilizationPercentage > 100
@@ -357,42 +357,42 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
       </div>
 
       {/* Resource Counts */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Resource Summary</h3>
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Resource Summary</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Link
             href={`/phases/${phase._id}?tab=materials`}
-            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="p-4 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition-colors"
           >
-            <p className="text-sm text-gray-600">Materials</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">
+            <p className="text-sm ds-text-secondary">Materials</p>
+            <p className="text-2xl font-bold ds-text-primary mt-1">
               {resourceCounts.loading ? '...' : resourceCounts.materials}
             </p>
           </Link>
           <Link
             href={`/phases/${phase._id}?tab=resources`}
-            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="p-4 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition-colors"
           >
-            <p className="text-sm text-gray-600">Labour</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">
+            <p className="text-sm ds-text-secondary">Labour</p>
+            <p className="text-2xl font-bold ds-text-primary mt-1">
               {resourceCounts.loading ? '...' : resourceCounts.labour}
             </p>
           </Link>
           <Link
             href={`/phases/${phase._id}?tab=resources`}
-            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="p-4 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition-colors"
           >
-            <p className="text-sm text-gray-600">Equipment</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">
+            <p className="text-sm ds-text-secondary">Equipment</p>
+            <p className="text-2xl font-bold ds-text-primary mt-1">
               {resourceCounts.loading ? '...' : resourceCounts.equipment}
             </p>
           </Link>
           <Link
             href={`/phases/${phase._id}?tab=work-items`}
-            className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            className="p-4 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition-colors"
           >
-            <p className="text-sm text-gray-600">Work Items</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1">
+            <p className="text-sm ds-text-secondary">Work Items</p>
+            <p className="text-2xl font-bold ds-text-primary mt-1">
               {resourceCounts.loading ? '...' : resourceCounts.workItems}
             </p>
           </Link>
@@ -401,16 +401,16 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
 
       {/* Key Risks & Alerts */}
       {risks.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Key Risks & Alerts</h3>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">Key Risks & Alerts</h3>
           <div className="space-y-2">
             {risks.map((risk, index) => (
               <div
                 key={index}
                 className={`p-3 rounded-lg border ${
                   risk.severity === 'high'
-                    ? 'bg-red-50 border-red-200'
-                    : 'bg-yellow-50 border-yellow-200'
+                    ? 'bg-red-50 border-red-400/60'
+                    : 'bg-yellow-50 border-yellow-400/60'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -429,9 +429,9 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
 
       {/* Floors in This Phase */}
       {!floorsLoading && floors.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Floors in This Phase</h3>
+            <h3 className="text-lg font-semibold ds-text-primary">Floors in This Phase</h3>
             <Link
               href={`/phases/${phase._id}?tab=floors`}
               className="text-sm text-blue-600 hover:text-blue-800 font-medium"
@@ -443,15 +443,15 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
             {floors.map((floor) => (
               <div
                 key={floor.floorId}
-                className="p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="p-3 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition-colors"
               >
                 <Link
                   href={`/floors/${floor.floorId}`}
-                  className="font-medium text-gray-900 hover:text-blue-600"
+                  className="font-medium ds-text-primary hover:text-blue-600"
                 >
                   {floor.floorName}
                 </Link>
-                <div className="mt-1 text-xs text-gray-500">
+                <div className="mt-1 text-xs ds-text-muted">
                   {floor.counts?.materials || 0} materials • {floor.counts?.workItems || 0} work items
                 </div>
               </div>
@@ -462,7 +462,7 @@ export function OverviewTab({ phase, project, canEdit, onStatusChange, onComplet
 
       {/* Project Link */}
       {project && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
           <p className="text-sm text-blue-900">
             <span className="font-medium">Project:</span>{' '}
             <Link

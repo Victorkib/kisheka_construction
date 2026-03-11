@@ -24,9 +24,9 @@ const RejectionOverview = ({ overview }) => {
         {[1, 2, 3, 4].map((i) => (
           <Card key={i} className="p-6">
             <div className="animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
-              <div className="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
-              <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+              <div className="h-4 ds-bg-surface-muted rounded w-1/2 mb-2"></div>
+              <div className="h-8 ds-bg-surface-muted rounded w-3/4 mb-2"></div>
+              <div className="h-3 ds-bg-surface-muted rounded w-1/3"></div>
             </div>
           </Card>
         ))}
@@ -102,8 +102,8 @@ const RejectionOverview = ({ overview }) => {
   ];
 
   const getChangeColor = (change) => {
-    if (!change) return 'text-gray-500';
-    return change > 0 ? 'text-red-600' : 'text-green-600';
+    if (!change) return 'ds-text-muted';
+    return change > 0 ? 'text-red-500' : 'text-emerald-400';
   };
 
   const getChangeIcon = (change) => {
@@ -125,37 +125,37 @@ const RejectionOverview = ({ overview }) => {
   const getColorClasses = (color) => {
     const colorMap = {
       red: {
-        bg: 'bg-red-50',
+        bg: 'bg-red-500/10',
         icon: 'text-red-600',
-        border: 'border-red-200'
+        border: 'border-red-400/60'
       },
       orange: {
-        bg: 'bg-orange-50',
+        bg: 'bg-orange-500/10',
         icon: 'text-orange-600',
         border: 'border-orange-200'
       },
       blue: {
-        bg: 'bg-blue-50',
+        bg: 'bg-blue-500/10',
         icon: 'text-blue-600',
-        border: 'border-blue-200'
+        border: 'border-blue-400/60'
       },
       purple: {
-        bg: 'bg-purple-50',
+        bg: 'bg-purple-500/10',
         icon: 'text-purple-600',
-        border: 'border-purple-200'
+        border: 'border-purple-400/60'
       },
       green: {
-        bg: 'bg-green-50',
+        bg: 'bg-green-500/10',
         icon: 'text-green-600',
-        border: 'border-green-200'
+        border: 'border-green-400/60'
       },
       indigo: {
-        bg: 'bg-indigo-50',
+        bg: 'bg-indigo-500/10',
         icon: 'text-indigo-600',
         border: 'border-indigo-200'
       },
       teal: {
-        bg: 'bg-teal-50',
+        bg: 'bg-teal-500/10',
         icon: 'text-teal-600',
         border: 'border-teal-200'
       }
@@ -173,10 +173,10 @@ const RejectionOverview = ({ overview }) => {
           <Card key={index} className={`p-6 border-l-4 ${colorClasses.border}`}>
             <div className="flex items-center justify-between">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600 mb-1">
+                <p className="text-sm font-medium ds-text-secondary mb-1">
                   {metric.title}
                 </p>
-                <p className="text-2xl font-bold text-gray-900 mb-2">
+                <p className="text-2xl font-bold ds-text-primary mb-2">
                   {metric.value}
                 </p>
                 
@@ -186,7 +186,7 @@ const RejectionOverview = ({ overview }) => {
                     <span className="ml-1">
                       {formatChange(metric.change, metric.format)}
                     </span>
-                    <span className="ml-1 text-gray-500">vs last period</span>
+                    <span className="ml-1 ds-text-muted">vs last period</span>
                   </div>
                 )}
               </div>

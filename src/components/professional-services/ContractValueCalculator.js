@@ -108,10 +108,10 @@ export function ContractValueCalculator({
 
       {/* Calculator */}
       {paymentSchedule && contractType && contractStartDate && (
-        <div className="rounded-lg border border-green-200 bg-gradient-to-br from-green-50 to-emerald-50 p-5 shadow-sm">
+        <div className="rounded-lg border border-green-400/60 bg-gradient-to-br from-green-50 to-emerald-50 p-5 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <Calculator className="h-5 w-5 text-green-600" />
-            <h3 className="text-base font-semibold text-gray-900">Contract Value Calculator</h3>
+            <h3 className="text-base font-semibold ds-text-primary">Contract Value Calculator</h3>
             {isCalculating && (
               <Sparkles className="h-4 w-4 text-green-500 animate-pulse ml-auto" />
             )}
@@ -137,12 +137,12 @@ export function ContractValueCalculator({
           {calculationResult && !error && (
             <div className="space-y-3">
               {/* Suggested Value */}
-              <div className="bg-white/70 rounded-lg p-4 border border-green-200">
+              <div className="ds-bg-surface/70 rounded-lg p-4 border border-green-400/60">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700">Suggested Contract Value</span>
+                  <span className="text-sm font-medium ds-text-secondary">Suggested Contract Value</span>
                   <CheckCircle className="h-5 w-5 text-green-600" />
                 </div>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-2xl font-bold ds-text-primary">
                   {calculationResult.suggestedValue.toLocaleString('en-KE', {
                     style: 'currency',
                     currency: 'KES',
@@ -154,24 +154,24 @@ export function ContractValueCalculator({
 
               {/* Calculation Breakdown */}
               {calculationResult.calculation && (
-                <div className="bg-white/70 rounded-lg p-4 border border-green-200">
-                  <p className="text-xs font-medium text-gray-600 uppercase tracking-wide mb-2">Calculation</p>
+                <div className="ds-bg-surface/70 rounded-lg p-4 border border-green-400/60">
+                  <p className="text-xs font-medium ds-text-secondary uppercase tracking-wide mb-2">Calculation</p>
                   <div className="space-y-1">
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm ds-text-secondary">
                       <span className="font-medium">Method:</span> {calculationResult.calculation.method.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
                     </p>
                     {calculationResult.calculation.formula && (
-                      <p className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded">
+                      <p className="text-sm ds-text-secondary font-mono ds-bg-surface-muted px-2 py-1 rounded">
                         {calculationResult.calculation.formula}
                       </p>
                     )}
                     {calculationResult.breakdown && (
-                      <div className="mt-2 pt-2 border-t border-gray-200">
+                      <div className="mt-2 pt-2 border-t ds-border-subtle">
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           {calculationResult.breakdown.rate && (
                             <>
-                              <span className="text-gray-600">Rate:</span>
-                              <span className="font-medium text-gray-900">
+                              <span className="ds-text-secondary">Rate:</span>
+                              <span className="font-medium ds-text-primary">
                                 {calculationResult.breakdown.rate.toLocaleString('en-KE', {
                                   style: 'currency',
                                   currency: 'KES',
@@ -182,26 +182,26 @@ export function ContractValueCalculator({
                           )}
                           {calculationResult.breakdown.months && (
                             <>
-                              <span className="text-gray-600">Duration:</span>
-                              <span className="font-medium text-gray-900">{calculationResult.breakdown.months} months</span>
+                              <span className="ds-text-secondary">Duration:</span>
+                              <span className="font-medium ds-text-primary">{calculationResult.breakdown.months} months</span>
                             </>
                           )}
                           {calculationResult.breakdown.visitsPerMonth && (
                             <>
-                              <span className="text-gray-600">Visits/Month:</span>
-                              <span className="font-medium text-gray-900">{calculationResult.breakdown.visitsPerMonth}</span>
+                              <span className="ds-text-secondary">Visits/Month:</span>
+                              <span className="font-medium ds-text-primary">{calculationResult.breakdown.visitsPerMonth}</span>
                             </>
                           )}
                           {calculationResult.breakdown.totalVisits && (
                             <>
-                              <span className="text-gray-600">Total Visits:</span>
-                              <span className="font-medium text-gray-900">{calculationResult.breakdown.totalVisits}</span>
+                              <span className="ds-text-secondary">Total Visits:</span>
+                              <span className="font-medium ds-text-primary">{calculationResult.breakdown.totalVisits}</span>
                             </>
                           )}
                           {calculationResult.breakdown.estimatedHours && (
                             <>
-                              <span className="text-gray-600">Est. Hours:</span>
-                              <span className="font-medium text-gray-900">{calculationResult.breakdown.estimatedHours.toFixed(1)}</span>
+                              <span className="ds-text-secondary">Est. Hours:</span>
+                              <span className="font-medium ds-text-primary">{calculationResult.breakdown.estimatedHours.toFixed(1)}</span>
                             </>
                           )}
                         </div>
@@ -212,7 +212,7 @@ export function ContractValueCalculator({
               )}
 
               {/* Action Hint */}
-              <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 border border-blue-200">
+              <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 border border-blue-400/60">
                 <Sparkles className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-blue-800">
                   <span className="font-medium">Tip:</span> Click "Use Suggested Value" to apply this amount to the contract value field, or enter your own value.

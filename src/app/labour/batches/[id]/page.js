@@ -179,13 +179,13 @@ function LabourBatchDetailPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       submitted: 'bg-blue-100 text-blue-800',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (loading) {
@@ -204,7 +204,7 @@ function LabourBatchDetailPageContent() {
     return (
       <AppLayout>
         <div className="container mx-auto px-4 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6">
             {error || 'Batch not found'}
           </div>
           <Link href="/labour/batches" className="text-blue-600 hover:text-blue-800">
@@ -240,7 +240,7 @@ function LabourBatchDetailPageContent() {
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">
+                <h1 className="text-3xl font-bold ds-text-primary">
                   {batch.batchNumber || 'Batch Details'}
                 </h1>
                 <span
@@ -252,7 +252,7 @@ function LabourBatchDetailPageContent() {
                 </span>
               </div>
               {batch.batchName && (
-                <p className="text-gray-600 text-lg">{batch.batchName}</p>
+                <p className="ds-text-secondary text-lg">{batch.batchName}</p>
               )}
             </div>
             <div className="flex gap-2">
@@ -284,92 +284,92 @@ function LabourBatchDetailPageContent() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <Users className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium text-gray-700">Total Entries</span>
+              <span className="text-sm font-medium ds-text-secondary">Total Entries</span>
             </div>
             <div className="text-2xl font-bold text-blue-600">{batch.totalEntries || entries.length}</div>
           </div>
 
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+          <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="w-5 h-5 text-green-600" />
-              <span className="text-sm font-medium text-gray-700">Total Hours</span>
+              <span className="text-sm font-medium ds-text-secondary">Total Hours</span>
             </div>
             <div className="text-2xl font-bold text-green-600">
               {(batch.totalHours || 0).toFixed(1)}
             </div>
           </div>
 
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+          <div className="bg-purple-50 border border-purple-400/60 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
               <DollarSign className="w-5 h-5 text-purple-600" />
-              <span className="text-sm font-medium text-gray-700">Total Cost</span>
+              <span className="text-sm font-medium ds-text-secondary">Total Cost</span>
             </div>
             <div className="text-2xl font-bold text-purple-600">
               {formatCurrency(batch.totalCost || 0)}
             </div>
           </div>
 
-          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Calendar className="w-5 h-5 text-gray-600" />
-              <span className="text-sm font-medium text-gray-700">Created</span>
+              <Calendar className="w-5 h-5 ds-text-secondary" />
+              <span className="text-sm font-medium ds-text-secondary">Created</span>
             </div>
-            <div className="text-sm font-semibold text-gray-600">
+            <div className="text-sm font-semibold ds-text-secondary">
               {formatDate(batch.createdAt)}
             </div>
           </div>
         </div>
 
         {/* Batch Information */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Batch Information</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Batch Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <p className="text-sm text-gray-600">Project</p>
-              <p className="text-base font-medium text-gray-900 mt-1">
+              <p className="text-sm ds-text-secondary">Project</p>
+              <p className="text-base font-medium ds-text-primary mt-1">
                 {project ? `${project.projectCode} - ${project.projectName}` : 'Loading...'}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Created By</p>
-              <p className="text-base font-medium text-gray-900 mt-1">{batch.createdByName || 'N/A'}</p>
+              <p className="text-sm ds-text-secondary">Created By</p>
+              <p className="text-base font-medium ds-text-primary mt-1">{batch.createdByName || 'N/A'}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Entry Type</p>
-              <p className="text-base font-medium text-gray-900 mt-1">
+              <p className="text-sm ds-text-secondary">Entry Type</p>
+              <p className="text-base font-medium ds-text-primary mt-1">
                 {batch.entryType?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Default Date</p>
-              <p className="text-base font-medium text-gray-900 mt-1">
+              <p className="text-sm ds-text-secondary">Default Date</p>
+              <p className="text-base font-medium ds-text-primary mt-1">
                 {batch.defaultDate ? new Date(batch.defaultDate).toLocaleDateString() : 'N/A'}
               </p>
             </div>
             {batch.approvedAt && (
               <div>
-                <p className="text-sm text-gray-600">Approved At</p>
-                <p className="text-base font-medium text-gray-900 mt-1">{formatDate(batch.approvedAt)}</p>
+                <p className="text-sm ds-text-secondary">Approved At</p>
+                <p className="text-base font-medium ds-text-primary mt-1">{formatDate(batch.approvedAt)}</p>
               </div>
             )}
             {batch.approvedByName && (
               <div>
-                <p className="text-sm text-gray-600">Approved By</p>
-                <p className="text-base font-medium text-gray-900 mt-1">{batch.approvedByName}</p>
+                <p className="text-sm ds-text-secondary">Approved By</p>
+                <p className="text-base font-medium ds-text-primary mt-1">{batch.approvedByName}</p>
               </div>
             )}
             {batch.approvalNotes && (
               <div className="md:col-span-2">
-                <p className="text-sm text-gray-600">Approval Notes</p>
-                <p className="text-base text-gray-900 mt-1">{batch.approvalNotes}</p>
+                <p className="text-sm ds-text-secondary">Approval Notes</p>
+                <p className="text-base ds-text-primary mt-1">{batch.approvalNotes}</p>
               </div>
             )}
             {batch.workItemId && workItem && (
               <div className="md:col-span-2">
-                <p className="text-sm text-gray-600">Work Item</p>
+                <p className="text-sm ds-text-secondary">Work Item</p>
                 <div className="mt-1">
                   <Link
                     href={`/work-items/${workItem._id}`}
@@ -377,7 +377,7 @@ function LabourBatchDetailPageContent() {
                   >
                     {workItem.name} →
                   </Link>
-                  <div className="mt-1 text-sm text-gray-600">
+                  <div className="mt-1 text-sm ds-text-secondary">
                     <span className="capitalize">{workItem.category || 'Other'}</span>
                     {' • '}
                     <span className="capitalize">{workItem.status?.replace('_', ' ') || 'Not Started'}</span>
@@ -406,8 +406,8 @@ function LabourBatchDetailPageContent() {
 
         {/* Phase Summaries */}
         {summaryByPhase.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4 flex items-center gap-2">
               <Building2 className="w-5 h-5" />
               Summary by Phase
             </h2>
@@ -415,14 +415,14 @@ function LabourBatchDetailPageContent() {
               {summaryByPhase.map((phaseSummary) => (
                 <div
                   key={phaseSummary.phaseId}
-                  className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50"
+                  className="border ds-border-subtle rounded-lg p-4 hover:ds-bg-surface-muted"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold ds-text-primary">
                         {phaseSummary.phase?.phaseName || 'Unknown Phase'}
                       </h3>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm ds-text-secondary">
                         {phaseSummary.phase?.phaseCode || ''}
                       </p>
                     </div>
@@ -435,39 +435,39 @@ function LabourBatchDetailPageContent() {
                   </div>
                   <div className="grid grid-cols-3 gap-4 mt-3">
                     <div>
-                      <p className="text-xs text-gray-500">Entries</p>
-                      <p className="text-lg font-semibold text-gray-900">{phaseSummary.entryCount}</p>
+                      <p className="text-xs ds-text-muted">Entries</p>
+                      <p className="text-lg font-semibold ds-text-primary">{phaseSummary.entryCount}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Hours</p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-xs ds-text-muted">Hours</p>
+                      <p className="text-lg font-semibold ds-text-primary">
                         {phaseSummary.totalHours.toFixed(1)}
                       </p>
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500">Cost</p>
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-xs ds-text-muted">Cost</p>
+                      <p className="text-lg font-semibold ds-text-primary">
                         {formatCurrency(phaseSummary.totalCost)}
                       </p>
                     </div>
                   </div>
                   {phaseSummary.phase?.budgetAllocation?.labour && (
-                    <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="mt-3 pt-3 border-t ds-border-subtle">
                       <div className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600">Budget Allocation:</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="ds-text-secondary">Budget Allocation:</span>
+                        <span className="font-medium ds-text-primary">
                           {formatCurrency(phaseSummary.phase.budgetAllocation.labour)}
                         </span>
                       </div>
                       <div className="flex justify-between items-center text-sm mt-1">
-                        <span className="text-gray-600">Current Spending:</span>
-                        <span className="font-medium text-gray-900">
+                        <span className="ds-text-secondary">Current Spending:</span>
+                        <span className="font-medium ds-text-primary">
                           {formatCurrency(phaseSummary.phase.actualSpending?.labour || 0)}
                         </span>
                       </div>
                       {phaseSummary.phase.budgetAllocation.labour > 0 && (
                         <div className="mt-2">
-                          <div className="flex justify-between text-xs text-gray-600 mb-1">
+                          <div className="flex justify-between text-xs ds-text-secondary mb-1">
                             <span>Utilization</span>
                             <span>
                               {(
@@ -478,7 +478,7 @@ function LabourBatchDetailPageContent() {
                               %
                             </span>
                           </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="w-full ds-bg-surface-muted rounded-full h-2">
                             <div
                               className="bg-blue-600 h-2 rounded-full"
                               style={{
@@ -502,9 +502,9 @@ function LabourBatchDetailPageContent() {
         )}
 
         {/* Entries Table */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+            <h2 className="text-lg font-semibold ds-text-primary flex items-center gap-2">
               <FileText className="w-5 h-5" />
               Labour Entries ({entries.length})
             </h2>
@@ -517,43 +517,43 @@ function LabourBatchDetailPageContent() {
           </div>
 
           {entries.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 ds-text-muted">
               <p>No entries found in this batch.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Worker
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Skill
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Date
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Hours
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Rate
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Cost
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {entries.map((entry) => (
-                    <tr key={entry._id} className="hover:bg-gray-50">
+                    <tr key={entry._id} className="hover:ds-bg-surface-muted">
                       <td className="px-4 py-3 whitespace-nowrap">
                         {(entry.workerProfileId || entry.workerId) ? (
                           <Link
@@ -563,21 +563,21 @@ function LabourBatchDetailPageContent() {
                             {entry.workerName} →
                           </Link>
                         ) : (
-                          <div className="text-sm font-medium text-gray-900">{entry.workerName}</div>
+                          <div className="text-sm font-medium ds-text-primary">{entry.workerName}</div>
                         )}
-                        <div className="text-xs text-gray-500">{entry.workerRole}</div>
+                        <div className="text-xs ds-text-muted">{entry.workerRole}</div>
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <span className="text-sm text-gray-900">
+                        <span className="text-sm ds-text-primary">
                           {entry.skillType?.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm ds-text-primary">
                         {new Date(entry.entryDate).toLocaleDateString()}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm ds-text-primary">
                         <div className="flex items-center gap-1">
-                          <Clock className="w-4 h-4 text-gray-400" />
+                          <Clock className="w-4 h-4 ds-text-muted" />
                           {entry.totalHours?.toFixed(1) || 0} hrs
                         </div>
                         {entry.overtimeHours > 0 && (
@@ -586,14 +586,14 @@ function LabourBatchDetailPageContent() {
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm ds-text-primary">
                         {formatCurrency(entry.hourlyRate || 0)}/hr
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
-                        <div className="text-sm font-semibold text-gray-900">
+                        <div className="text-sm font-semibold ds-text-primary">
                           {formatCurrency(entry.totalCost || 0)}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs ds-text-muted">
                           {formatCurrency(entry.regularCost || 0)} reg
                           {entry.overtimeCost > 0 && ` + ${formatCurrency(entry.overtimeCost)} OT`}
                         </div>
@@ -618,15 +618,15 @@ function LabourBatchDetailPageContent() {
                     </tr>
                   ))}
                 </tbody>
-                <tfoot className="bg-gray-50">
+                <tfoot className="ds-bg-surface-muted">
                   <tr>
-                    <td colSpan="3" className="px-4 py-3 text-sm font-semibold text-gray-900">
+                    <td colSpan="3" className="px-4 py-3 text-sm font-semibold ds-text-primary">
                       Totals
                     </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                    <td className="px-4 py-3 text-sm font-semibold ds-text-primary">
                       {(batch.totalHours || 0).toFixed(1)} hrs
                     </td>
-                    <td colSpan="2" className="px-4 py-3 text-sm font-semibold text-gray-900">
+                    <td colSpan="2" className="px-4 py-3 text-sm font-semibold ds-text-primary">
                       {formatCurrency(batch.totalCost || 0)}
                     </td>
                     <td colSpan="2"></td>

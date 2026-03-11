@@ -226,12 +226,12 @@ function ProfessionalActivityDetailPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (loading) {
@@ -248,12 +248,12 @@ function ProfessionalActivityDetailPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg">
             {error || 'Professional activity not found'}
           </div>
           <Link
             href="/professional-activities"
-            className="mt-4 inline-block text-blue-600 hover:text-blue-800"
+            className="mt-4 inline-block ds-text-accent-primary hover:ds-text-accent-hover"
           >
             ← Back to Professional Activities
           </Link>
@@ -289,14 +289,14 @@ function ProfessionalActivityDetailPageContent() {
         <div className="mb-8">
           <Link
             href="/professional-activities"
-            className="text-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block"
           >
             ← Back to Professional Activities
           </Link>
           <div className="flex justify-between items-start">
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
                   {activity.activityCode || 'Professional Activity'}
                 </h1>
                 <span
@@ -307,7 +307,7 @@ function ProfessionalActivityDetailPageContent() {
                   {activity.status?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                 </span>
               </div>
-              <p className="text-gray-600 mt-2">
+              <p className="ds-text-secondary mt-2">
                 {activity.activityType?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'} • {formatDate(activity.activityDate)}
               </p>
             </div>
@@ -339,7 +339,7 @@ function ProfessionalActivityDetailPageContent() {
               {canEdit && (
                 <Link
                   href={`/professional-activities/${activityId}/edit`}
-                  className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition"
+                  className="px-4 py-2 ds-bg-accent-primary hover:ds-bg-accent-hover text-white font-medium rounded-lg transition"
                 >
                   Edit
                 </Link>
@@ -360,28 +360,28 @@ function ProfessionalActivityDetailPageContent() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Activity Information */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="ds-bg-surface rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4">Activity Information</h2>
               <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Activity Type</dt>
-                  <dd className="mt-1 text-lg font-semibold text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Activity Type</dt>
+                  <dd className="mt-1 text-lg font-semibold ds-text-primary">
                     {activity.activityType?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                   </dd>
                 </div>
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Activity Date</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{formatDate(activity.activityDate)}</dd>
+                  <dt className="text-sm font-medium ds-text-muted">Activity Date</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{formatDate(activity.activityDate)}</dd>
                 </div>
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Professional Service</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Professional Service</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {activity.professionalService ? (
                       <Link
                         href={`/professional-services/${normalizeId(activity.professionalService._id)}`}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="ds-text-accent-primary hover:ds-text-accent-hover"
                       >
                         {activity.professionalService.professionalCode || 'N/A'}
                       </Link>
@@ -392,12 +392,12 @@ function ProfessionalActivityDetailPageContent() {
                 </div>
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Project</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Project</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {activity.project ? (
                       <Link
                         href={`/projects/${normalizeId(activity.project._id)}`}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="ds-text-accent-primary hover:ds-text-accent-hover"
                       >
                         {activity.project.projectCode} - {activity.project.projectName}
                       </Link>
@@ -409,8 +409,8 @@ function ProfessionalActivityDetailPageContent() {
 
                 {activity.phase && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Phase</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Phase</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       {activity.phase.phaseName || activity.phase.phaseCode || 'N/A'}
                     </dd>
                   </div>
@@ -418,8 +418,8 @@ function ProfessionalActivityDetailPageContent() {
 
                 {activity.visitPurpose && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Visit Purpose</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Visit Purpose</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       {activity.visitPurpose?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                     </dd>
                   </div>
@@ -427,15 +427,15 @@ function ProfessionalActivityDetailPageContent() {
 
                 {activity.visitDuration && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Visit Duration</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{activity.visitDuration} hours</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Visit Duration</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">{activity.visitDuration} hours</dd>
                   </div>
                 )}
 
                 {activity.inspectionType && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Inspection Type</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Inspection Type</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       {activity.inspectionType?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                     </dd>
                   </div>
@@ -443,8 +443,8 @@ function ProfessionalActivityDetailPageContent() {
 
                 {activity.complianceStatus && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Compliance Status</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Compliance Status</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       {activity.complianceStatus?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                     </dd>
                   </div>
@@ -452,8 +452,8 @@ function ProfessionalActivityDetailPageContent() {
 
                 {activity.feesCharged !== undefined && activity.feesCharged !== null && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Fees Charged</dt>
-                    <dd className="mt-1 text-lg font-semibold text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Fees Charged</dt>
+                    <dd className="mt-1 text-lg font-semibold ds-text-primary">
                       {formatCurrency(activity.feesCharged)}
                     </dd>
                   </div>
@@ -461,8 +461,8 @@ function ProfessionalActivityDetailPageContent() {
 
                 {activity.expensesIncurred !== undefined && activity.expensesIncurred !== null && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Expenses Incurred</dt>
-                    <dd className="mt-1 text-lg font-semibold text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Expenses Incurred</dt>
+                    <dd className="mt-1 text-lg font-semibold ds-text-primary">
                       {formatCurrency(activity.expensesIncurred)}
                     </dd>
                   </div>
@@ -470,22 +470,22 @@ function ProfessionalActivityDetailPageContent() {
 
                 {activity.notes && (
                   <div className="md:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">Notes</dt>
-                    <dd className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">{activity.notes}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Notes</dt>
+                    <dd className="mt-1 text-sm ds-text-primary whitespace-pre-wrap">{activity.notes}</dd>
                   </div>
                 )}
 
                 {activity.observations && (
                   <div className="md:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">Observations</dt>
-                    <dd className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">{activity.observations}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Observations</dt>
+                    <dd className="mt-1 text-sm ds-text-primary whitespace-pre-wrap">{activity.observations}</dd>
                   </div>
                 )}
 
                 {activity.recommendations && (
                   <div className="md:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">Recommendations</dt>
-                    <dd className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">{activity.recommendations}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Recommendations</dt>
+                    <dd className="mt-1 text-sm ds-text-primary whitespace-pre-wrap">{activity.recommendations}</dd>
                   </div>
                 )}
               </dl>
@@ -493,11 +493,11 @@ function ProfessionalActivityDetailPageContent() {
 
             {/* Attendees */}
             {activity.attendees && activity.attendees.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Attendees</h2>
                 <ul className="list-disc list-inside space-y-1">
                   {activity.attendees.map((attendee, index) => (
-                    <li key={index} className="text-sm text-gray-900">{attendee}</li>
+                    <li key={index} className="text-sm ds-text-primary">{attendee}</li>
                   ))}
                 </ul>
               </div>
@@ -505,19 +505,19 @@ function ProfessionalActivityDetailPageContent() {
 
             {/* Issues Found */}
             {activity.issuesFound && activity.issuesFound.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Issues Found</h2>
                 <div className="space-y-3">
                   {activity.issuesFound.map((issue, index) => (
                     <div key={index} className="border-l-4 border-red-500 pl-4">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-medium text-gray-900">{issue.description}</p>
+                          <p className="font-medium ds-text-primary">{issue.description}</p>
                           {issue.location && (
-                            <p className="text-sm text-gray-600 mt-1">Location: {issue.location}</p>
+                            <p className="text-sm ds-text-secondary mt-1">Location: {issue.location}</p>
                           )}
                           {issue.resolutionNotes && (
-                            <p className="text-sm text-gray-700 mt-2">{issue.resolutionNotes}</p>
+                            <p className="text-sm ds-text-secondary mt-2">{issue.resolutionNotes}</p>
                           )}
                         </div>
                         <span
@@ -540,15 +540,15 @@ function ProfessionalActivityDetailPageContent() {
 
             {/* Material Tests */}
             {activity.materialTests && activity.materialTests.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Material Tests</h2>
                 <div className="space-y-3">
                   {activity.materialTests.map((test, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-3">
+                    <div key={index} className="border ds-border-subtle rounded-lg p-3">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-medium text-gray-900">{test.materialName}</p>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="font-medium ds-text-primary">{test.materialName}</p>
+                          <p className="text-sm ds-text-secondary mt-1">
                             Type: {test.testType?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                           </p>
                           {test.testReportUrl && (
@@ -556,7 +556,7 @@ function ProfessionalActivityDetailPageContent() {
                               href={test.testReportUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 text-sm mt-1 inline-block"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover text-sm mt-1 inline-block"
                             >
                               View Report →
                             </a>
@@ -582,17 +582,17 @@ function ProfessionalActivityDetailPageContent() {
 
             {/* Documents */}
             {activity.documents && activity.documents.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Documents</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {activity.documents.map((doc, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-4">
-                      <p className="font-medium text-gray-900">{doc.documentName || 'Untitled Document'}</p>
-                      <p className="text-sm text-gray-600 mt-1">
+                    <div key={index} className="border ds-border-subtle rounded-lg p-4">
+                      <p className="font-medium ds-text-primary">{doc.documentName || 'Untitled Document'}</p>
+                      <p className="text-sm ds-text-secondary mt-1">
                         {doc.documentType?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                       </p>
                       {doc.description && (
-                        <p className="text-sm text-gray-700 mt-2">{doc.description}</p>
+                        <p className="text-sm ds-text-secondary mt-2">{doc.description}</p>
                       )}
                       {doc.documentUrl && (
                         <div className="mt-3">
@@ -611,21 +611,21 @@ function ProfessionalActivityDetailPageContent() {
 
             {/* Approval Information */}
             {activity.approvedBy && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Approval Information</h2>
                 <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Approved By</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{activity.approvedByName || 'N/A'}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Approved By</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">{activity.approvedByName || 'N/A'}</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Approval Date</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{formatDateTime(activity.approvedAt)}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Approval Date</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">{formatDateTime(activity.approvedAt)}</dd>
                   </div>
                   {activity.approvalNotes && (
                     <div className="md:col-span-2">
-                      <dt className="text-sm font-medium text-gray-500">Approval Notes</dt>
-                      <dd className="mt-1 text-sm text-gray-900">{activity.approvalNotes}</dd>
+                      <dt className="text-sm font-medium ds-text-muted">Approval Notes</dt>
+                      <dd className="mt-1 text-sm ds-text-primary">{activity.approvalNotes}</dd>
                     </div>
                   )}
                 </dl>
@@ -634,18 +634,18 @@ function ProfessionalActivityDetailPageContent() {
 
             {/* Linked Fee */}
             {activity.fee && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Linked Fee</h2>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-gray-900">{activity.fee.feeCode || 'N/A'}</p>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="font-medium ds-text-primary">{activity.fee.feeCode || 'N/A'}</p>
+                    <p className="text-sm ds-text-secondary mt-1">
                       {formatCurrency(activity.fee.amount)} • {activity.fee.status}
                     </p>
                   </div>
                   <Link
                     href={`/professional-fees/${activity.fee._id}`}
-                    className="text-blue-600 hover:text-blue-800 font-medium"
+                    className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                   >
                     View Fee →
                   </Link>
@@ -654,7 +654,7 @@ function ProfessionalActivityDetailPageContent() {
             )}
 
             {/* Activity Log */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="ds-bg-surface rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4">Activity Log</h2>
               <AuditTrail entityType="PROFESSIONAL_ACTIVITY" entityId={activityId} />
             </div>
@@ -664,12 +664,12 @@ function ProfessionalActivityDetailPageContent() {
           <div className="space-y-6">
             {/* Approval Actions */}
             {activity.status === 'pending_approval' && (canApprove || canReject) && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-6">
                 <h3 className="text-lg font-semibold mb-4">Actions</h3>
                 <div className="space-y-4">
                   {canApprove && (
                     <div>
-                      <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                      <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                         Approval Notes (Optional)
                       </label>
                       <textarea
@@ -677,13 +677,13 @@ function ProfessionalActivityDetailPageContent() {
                         onChange={(e) => setApprovalNotes(e.target.value)}
                         rows={3}
                         placeholder="Add notes for approval..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                       />
                     </div>
                   )}
                   {canReject && (
                     <div>
-                      <label className="block text-base font-semibold text-gray-700 mb-2 leading-normal">
+                      <label className="block text-base font-semibold ds-text-secondary mb-2 leading-normal">
                         Rejection Reason *
                       </label>
                       <textarea
@@ -691,7 +691,7 @@ function ProfessionalActivityDetailPageContent() {
                         onChange={(e) => setRejectionReason(e.target.value)}
                         rows={3}
                         placeholder="Explain why this activity is being rejected..."
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                        className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                       />
                     </div>
                   )}
@@ -722,31 +722,31 @@ function ProfessionalActivityDetailPageContent() {
             )}
 
             {/* Quick Info */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="ds-bg-surface rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold mb-4">Quick Info</h3>
               <dl className="space-y-3">
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Created By</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{activity.createdByName || 'N/A'}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Created By</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{activity.createdByName || 'N/A'}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Created At</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{formatDateTime(activity.createdAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Created At</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{formatDateTime(activity.createdAt)}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700">Last Updated</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{formatDateTime(activity.updatedAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary">Last Updated</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{formatDateTime(activity.updatedAt)}</dd>
                 </div>
                 {activity.followUpRequired && (
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Follow-up Required</dt>
-                    <dd className="mt-1 text-sm text-gray-900">Yes</dd>
+                    <dt className="text-sm font-semibold ds-text-secondary">Follow-up Required</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">Yes</dd>
                   </div>
                 )}
                 {activity.followUpDate && (
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700">Follow-up Date</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{formatDate(activity.followUpDate)}</dd>
+                    <dt className="text-sm font-semibold ds-text-secondary">Follow-up Date</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">{formatDate(activity.followUpDate)}</dd>
                   </div>
                 )}
               </dl>
@@ -768,13 +768,13 @@ function ProfessionalActivityDetailPageContent() {
         isLoading={isApproving}
       >
         <div className="mt-4">
-          <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">Approval Notes (Optional)</label>
+          <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">Approval Notes (Optional)</label>
           <textarea
             value={approvalNotes}
             onChange={(e) => setApprovalNotes(e.target.value)}
             rows={3}
             disabled={isApproving}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="Add any notes about this approval..."
           />
         </div>
@@ -783,9 +783,9 @@ function ProfessionalActivityDetailPageContent() {
       {/* Rejection Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
+          <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
+            <div className="relative ds-bg-surface rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
               <div className="p-6">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
@@ -795,30 +795,30 @@ function ProfessionalActivityDetailPageContent() {
                   </div>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
+                  <h3 className="text-lg font-semibold leading-6 ds-text-primary mb-2" id="modal-title">
                     Reject Professional Activity
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm ds-text-muted mb-4">
                       Please provide a reason for rejecting this activity:
                     </p>
                     <textarea
                       value={rejectionReason}
                       onChange={(e) => setRejectionReason(e.target.value)}
                       placeholder="Enter rejection reason..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                       rows="4"
                       disabled={isRejecting}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-200">
+              <div className="ds-bg-surface-muted px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-400/60">
                 <button
                   type="button"
                   onClick={() => setShowRejectModal(false)}
                   disabled={isRejecting}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Cancel
                 </button>

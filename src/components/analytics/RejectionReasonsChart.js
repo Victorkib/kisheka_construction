@@ -13,9 +13,9 @@ import { ChartBar, ChartPie } from 'lucide-react';
 const SimpleBarChart = ({ data, height = 300 }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
+      <div className="flex items-center justify-center h-64 ds-text-muted">
         <div className="text-center">
-          <ChartBar className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+          <ChartBar className="w-12 h-12 mx-auto mb-2 ds-text-muted" />
           <p>No data available</p>
         </div>
       </div>
@@ -44,14 +44,14 @@ const SimpleBarChart = ({ data, height = 300 }) => {
           <div key={item.reason} className="flex items-center space-x-3">
             <div className="flex-1">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-sm font-medium text-gray-700 truncate">
+                <span className="text-sm font-medium ds-text-secondary truncate">
                   {item.reason}
                 </span>
-                <span className="text-sm text-gray-600 ml-2">
+                <span className="text-sm ds-text-secondary ml-2">
                   {item.count} ({item.percentage}%)
                 </span>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full ds-bg-surface-muted rounded-full h-2">
                 <div
                   className={`${color} h-2 rounded-full transition-all duration-300`}
                   style={{ width: `${percentage}%` }}
@@ -69,9 +69,9 @@ const SimpleBarChart = ({ data, height = 300 }) => {
 const SimplePieChart = ({ data, size = 200 }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-gray-500">
+      <div className="flex items-center justify-center h-64 ds-text-muted">
         <div className="text-center">
-          <ChartPie className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+          <ChartPie className="w-12 h-12 mx-auto mb-2 ds-text-muted" />
           <p>No data available</p>
         </div>
       </div>
@@ -144,7 +144,7 @@ const SimplePieChart = ({ data, size = 200 }) => {
               className="w-3 h-3 rounded"
               style={{ backgroundColor: colors[index % colors.length] }}
             />
-            <span className="text-gray-600 truncate">{item.reason}</span>
+            <span className="ds-text-secondary truncate">{item.reason}</span>
           </div>
         ))}
       </div>
@@ -159,10 +159,10 @@ const RejectionReasonsChart = ({ reasons }) => {
     return (
       <Card>
         <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Rejection Reasons</h3>
-          <div className="flex items-center justify-center h-64 text-gray-500">
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">Rejection Reasons</h3>
+          <div className="flex items-center justify-center h-64 ds-text-muted">
             <div className="text-center">
-              <ChartBar className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+              <ChartBar className="w-12 h-12 mx-auto mb-2 ds-text-muted" />
               <p>No rejection reasons data available</p>
             </div>
           </div>
@@ -175,14 +175,14 @@ const RejectionReasonsChart = ({ reasons }) => {
     <Card>
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Rejection Reasons</h3>
+          <h3 className="text-lg font-semibold ds-text-primary">Rejection Reasons</h3>
           <div className="flex space-x-2">
             <button
               onClick={() => setViewType('bar')}
               className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 viewType === 'bar'
                   ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
               }`}
             >
               Bar Chart
@@ -192,7 +192,7 @@ const RejectionReasonsChart = ({ reasons }) => {
               className={`px-3 py-1 text-sm rounded-md transition-colors ${
                 viewType === 'pie'
                   ? 'bg-blue-100 text-blue-700'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface-muted'
               }`}
             >
               Pie Chart
@@ -201,7 +201,7 @@ const RejectionReasonsChart = ({ reasons }) => {
         </div>
         
         <div className="mb-4">
-          <div className="flex items-center justify-between text-sm text-gray-600">
+          <div className="flex items-center justify-between text-sm ds-text-secondary">
             <span>Total Reasons: {reasons.length}</span>
             <span>Total Rejections: {reasons.reduce((sum, r) => sum + r.count, 0)}</span>
           </div>
@@ -215,18 +215,18 @@ const RejectionReasonsChart = ({ reasons }) => {
 
         {viewType === 'bar' && (
           <div className="mt-4 space-y-2">
-            <h4 className="text-sm font-medium text-gray-700">Top Reasons:</h4>
+            <h4 className="text-sm font-medium ds-text-secondary">Top Reasons:</h4>
             {reasons.slice(0, 5).map((reason, index) => (
               <div key={reason.reason} className="flex items-center justify-between text-sm">
                 <div className="flex items-center space-x-2">
-                  <span className="text-gray-500">#{index + 1}</span>
-                  <span className="text-gray-700">{reason.reason}</span>
+                  <span className="ds-text-muted">#{index + 1}</span>
+                  <span className="ds-text-secondary">{reason.reason}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Badge variant={reason.percentage > 20 ? 'warning' : 'info'}>
                     {reason.percentage}%
                   </Badge>
-                  <span className="text-gray-600">{reason.count} rejections</span>
+                  <span className="ds-text-secondary">{reason.count} rejections</span>
                 </div>
               </div>
             ))}

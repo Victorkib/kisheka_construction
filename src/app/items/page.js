@@ -476,15 +476,15 @@ function ItemsPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       submitted: 'bg-blue-100 text-blue-800',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
       received: 'bg-purple-100 text-purple-800',
-      archived: 'bg-gray-100 text-gray-600',
+      archived: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const handleSort = (key) => {
@@ -509,8 +509,8 @@ function ItemsPageContent() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6 sm:mb-8">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Materials & Items</h1>
-            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage construction materials</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Materials & Items</h1>
+            <p className="text-sm sm:text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Track and manage construction materials</p>
           </div>
           <NoProjectsEmptyState
             canCreate={canAccess('create_project')}
@@ -524,7 +524,7 @@ function ItemsPageContent() {
   const SortIcon = ({ columnKey }) => {
     if (sortConfig.key !== columnKey) {
       return (
-        <span className="ml-1 text-gray-400">
+        <span className="ml-1 ds-text-muted">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
           </svg>
@@ -532,7 +532,7 @@ function ItemsPageContent() {
       );
     }
     return (
-      <span className="ml-1 text-blue-600">
+      <span className="ml-1 ds-text-accent-primary">
         {sortConfig.direction === 'asc' ? (
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
@@ -557,13 +557,13 @@ function ItemsPageContent() {
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Materials & Items</h1>
-            <p className="text-sm sm:text-base md:text-lg text-gray-700 mt-2 leading-relaxed">Track and manage construction materials</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Materials & Items</h1>
+            <p className="text-sm sm:text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">Track and manage construction materials</p>
           </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             {selectedMaterials.length > 0 && (
               <div className="flex flex-wrap items-center gap-2 sm:mr-4">
-                <span className="text-sm text-gray-600 font-medium">
+                <span className="text-sm ds-text-secondary font-medium">
                   {selectedMaterials.length} selected
                 </span>
                 {canAccess('approve_material') && (
@@ -595,7 +595,7 @@ function ItemsPageContent() {
                 )}
                 <button
                   onClick={() => setSelectedMaterials([])}
-                  className="px-3 sm:px-4 py-2 border border-gray-300 hover:bg-gray-50 active:bg-gray-100 text-gray-700 text-sm font-medium rounded-lg transition-colors touch-manipulation"
+                  className="px-3 sm:px-4 py-2 border ds-border-subtle hover:ds-bg-surface-muted active:ds-bg-surface-muted ds-text-secondary text-sm font-medium rounded-lg transition-colors touch-manipulation"
                 >
                   Clear
                 </button>
@@ -604,7 +604,7 @@ function ItemsPageContent() {
             {canAccess('create_material') && (
               <Link
                 href={`/items/new${filters.projectId ? `?projectId=${filters.projectId}&entryType=retroactive_entry` : '?entryType=retroactive_entry'}`}
-                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
+                className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
               >
                 + Add Material
               </Link>
@@ -625,21 +625,21 @@ function ItemsPageContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
           <div className="space-y-4">
             {/* Search Bar */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Search Materials</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-2">Search Materials</label>
               <div className="relative">
                 <input
                   type="text"
                   placeholder="Search by material name, category, supplier, or description..."
                   value={filters.search}
                   onChange={(e) => handleFilterChange('search', e.target.value)}
-                  className="w-full px-4 py-2 pl-10 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-4 py-2 pl-10 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
                 <svg
-                  className="absolute left-3 top-2.5 h-5 w-5 text-gray-400"
+                  className="absolute left-3 top-2.5 h-5 w-5 ds-text-muted"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -652,92 +652,92 @@ function ItemsPageContent() {
             {/* Filter Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Project</label>
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">Project</label>
                 <select
                   value={filters.projectId}
                   onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="" className="text-gray-900">All Projects</option>
+                  <option value="" className="ds-text-primary">All Projects</option>
                   {accessibleProjects.map((project) => (
-                    <option key={project._id} value={project._id} className="text-gray-900">
+                    <option key={project._id} value={project._id} className="ds-text-primary">
                       {project.projectName || project.projectCode || project._id}
                     </option>
                   ))}
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">Category</label>
                 <input
                   type="text"
                   placeholder="Filter by category..."
                   value={filters.category}
                   onChange={(e) => handleFilterChange('category', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">Status</label>
                 <select
                   value={filters.status}
                   onChange={(e) => handleFilterChange('status', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="" className="text-gray-900">All Status</option>
-                  <option value="draft" className="text-gray-900">Draft</option>
-                  <option value="submitted" className="text-gray-900">Submitted</option>
-                  <option value="pending_approval" className="text-gray-900">Pending Approval</option>
-                  <option value="approved" className="text-gray-900">Approved</option>
-                  <option value="rejected" className="text-gray-900">Rejected</option>
-                  <option value="received" className="text-gray-900">Received</option>
+                  <option value="" className="ds-text-primary">All Status</option>
+                  <option value="draft" className="ds-text-primary">Draft</option>
+                  <option value="submitted" className="ds-text-primary">Submitted</option>
+                  <option value="pending_approval" className="ds-text-primary">Pending Approval</option>
+                  <option value="approved" className="ds-text-primary">Approved</option>
+                  <option value="rejected" className="ds-text-primary">Rejected</option>
+                  <option value="received" className="ds-text-primary">Received</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Entry Type</label>
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">Entry Type</label>
                 <select
                   value={filters.entryType}
                   onChange={(e) => handleFilterChange('entryType', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
-                  <option value="" className="text-gray-900">All Entry Types</option>
-                  <option value="new_procurement" className="text-gray-900">New Procurement</option>
-                  <option value="retroactive_entry" className="text-gray-900">Retroactive Entry</option>
+                  <option value="" className="ds-text-primary">All Entry Types</option>
+                  <option value="new_procurement" className="ds-text-primary">New Procurement</option>
+                  <option value="retroactive_entry" className="ds-text-primary">Retroactive Entry</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Supplier</label>
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">Supplier</label>
                 <input
                   type="text"
                   placeholder="Filter by supplier..."
                   value={filters.supplier}
                   onChange={(e) => handleFilterChange('supplier', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Floor</label>
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">Floor</label>
                 <input
                   type="text"
                   placeholder="Filter by floor..."
                   value={filters.floor}
                   onChange={(e) => handleFilterChange('floor', e.target.value)}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Phase</label>
+                <label className="block text-sm font-semibold ds-text-secondary mb-2">Phase</label>
                 <select
                   value={filters.phaseId}
                   onChange={(e) => handleFilterChange('phaseId', e.target.value)}
                   disabled={loadingPhases}
-                  className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
+                  className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50"
                 >
-                  <option value="" className="text-gray-900">All Phases</option>
+                  <option value="" className="ds-text-primary">All Phases</option>
                   {loadingPhases ? (
                     <option>Loading phases...</option>
                   ) : (
                     phases.map((phase) => (
-                      <option key={phase._id} value={phase._id} className="text-gray-900">
+                      <option key={phase._id} value={phase._id} className="ds-text-primary">
                         {phase.name}
                       </option>
                     ))
@@ -770,7 +770,7 @@ function ItemsPageContent() {
                     });
                     router.push(`/items?${params.toString()}`, { scroll: false });
                   }}
-                  className="w-full px-4 py-2 bg-gray-100 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-200 font-medium transition-colors"
+                  className="w-full px-4 py-2 ds-bg-surface-muted ds-text-secondary border ds-border-subtle rounded-lg hover:ds-bg-surface-muted font-medium transition-colors"
                 >
                   Clear Filters
                 </button>
@@ -781,7 +781,7 @@ function ItemsPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
@@ -790,12 +790,12 @@ function ItemsPageContent() {
         {loading ? (
           <LoadingTable rows={10} columns={8} showHeader={true} />
         ) : materials.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <svg className="mx-auto h-12 w-12 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
             </svg>
-            <h3 className="mt-4 text-lg font-medium text-gray-900">No materials found</h3>
-            <p className="mt-2 text-sm text-gray-500">
+            <h3 className="mt-4 text-lg font-medium ds-text-primary">No materials found</h3>
+            <p className="mt-2 text-sm ds-text-muted">
               {filters.search || filters.category || filters.status || filters.projectId
                 ? 'Try adjusting your filters'
                 : 'Get started by adding your first material'}
@@ -803,7 +803,7 @@ function ItemsPageContent() {
             {canAccess('create_material') && (
               <Link
                 href={`/items/new${filters.projectId ? `?projectId=${filters.projectId}&entryType=retroactive_entry` : '?entryType=retroactive_entry'}`}
-                className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition"
+                className="mt-4 inline-block px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 font-medium transition"
               >
                 + Add Material
               </Link>
@@ -812,21 +812,21 @@ function ItemsPageContent() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden lg:block bg-white rounded-lg shadow overflow-hidden">
+            <div className="hidden lg:block ds-bg-surface rounded-lg shadow overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
                       <th className="px-4 py-3 text-left">
                         <input
                           type="checkbox"
                           checked={selectedMaterials.length === materials.length && materials.length > 0}
                           onChange={toggleSelectAll}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                         />
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('name')}
                       >
                         <div className="flex items-center">
@@ -834,11 +834,11 @@ function ItemsPageContent() {
                           <SortIcon columnKey="name" />
                         </div>
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide">
                         Entry Type
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('category')}
                       >
                         <div className="flex items-center">
@@ -847,7 +847,7 @@ function ItemsPageContent() {
                         </div>
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('quantity')}
                       >
                         <div className="flex items-center">
@@ -856,7 +856,7 @@ function ItemsPageContent() {
                         </div>
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('unitCost')}
                       >
                         <div className="flex items-center">
@@ -865,7 +865,7 @@ function ItemsPageContent() {
                         </div>
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('totalCost')}
                       >
                         <div className="flex items-center">
@@ -873,11 +873,11 @@ function ItemsPageContent() {
                           <SortIcon columnKey="totalCost" />
                         </div>
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide">
                         Supplier
                       </th>
                       <th
-                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide cursor-pointer hover:bg-gray-100 transition-colors"
+                        className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide cursor-pointer hover:ds-bg-surface-muted transition-colors"
                         onClick={() => handleSort('status')}
                       >
                         <div className="flex items-center">
@@ -885,28 +885,28 @@ function ItemsPageContent() {
                           <SortIcon columnKey="status" />
                         </div>
                       </th>
-                      <th className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                      <th className="px-4 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wide">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {materials.map((material) => (
-                      <tr key={material._id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={material._id} className="hover:ds-bg-surface-muted transition-colors">
                         <td className="px-4 py-4 whitespace-nowrap">
                           <input
                             type="checkbox"
                             checked={selectedMaterials.includes(material._id)}
                             onChange={() => toggleSelectMaterial(material._id)}
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                           />
                         </td>
                         <td className="px-4 py-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium ds-text-primary">
                             {material.name || material.materialName}
                           </div>
                           {material.description && (
-                            <div className="text-xs text-gray-500 truncate max-w-xs mt-1">
+                            <div className="text-xs ds-text-muted truncate max-w-xs mt-1">
                               {material.description}
                             </div>
                           )}
@@ -914,7 +914,7 @@ function ItemsPageContent() {
                             {material.purchaseOrderId && (
                               <Link
                                 href={`/purchase-orders/${material.purchaseOrderId}`}
-                                className="text-xs text-blue-600 hover:text-blue-800"
+                                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover"
                               >
                                 📦 PO
                               </Link>
@@ -935,8 +935,8 @@ function ItemsPageContent() {
                               material.entryType === 'new_procurement'
                                 ? 'bg-blue-100 text-blue-800'
                                 : material.entryType === 'retroactive_entry'
-                                ? 'bg-gray-100 text-gray-800'
-                                : 'bg-gray-100 text-gray-600'
+                                ? 'ds-bg-surface-muted ds-text-primary'
+                                : 'ds-bg-surface-muted ds-text-secondary'
                             }`}>
                               {material.entryType === 'new_procurement'
                                 ? 'New Procurement'
@@ -960,30 +960,30 @@ function ItemsPageContent() {
                           </div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">{material.category || 'N/A'}</span>
+                          <span className="text-sm ds-text-primary">{material.category || 'N/A'}</span>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm ds-text-primary">
                             {material.quantity || material.quantityPurchased || 0} {material.unit || ''}
                           </div>
                           {material.quantityRemaining !== undefined && (
-                            <div className="text-xs text-gray-600">
+                            <div className="text-xs ds-text-secondary">
                               Remaining: {material.quantityRemaining} {material.unit || ''}
                             </div>
                           )}
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">
+                          <span className="text-sm ds-text-primary">
                             KES {material.unitCost?.toLocaleString() || '0.00'}
                           </span>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <span className="text-sm font-medium text-gray-900">
+                          <span className="text-sm font-medium ds-text-primary">
                             KES {material.totalCost?.toLocaleString() || '0.00'}
                           </span>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-900">
+                          <span className="text-sm ds-text-primary">
                             {material.supplierName || material.supplier || 'N/A'}
                           </span>
                         </td>
@@ -1000,7 +1000,7 @@ function ItemsPageContent() {
                           <div className="flex flex-col gap-1">
                             <Link
                               href={`/items/${material._id}`}
-                              className="text-blue-600 hover:text-blue-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               View
                             </Link>
@@ -1032,7 +1032,7 @@ function ItemsPageContent() {
             {/* Mobile Card View */}
             <div className="lg:hidden space-y-4">
               {materials.map((material) => (
-                <div key={material._id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                <div key={material._id} className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
@@ -1040,17 +1040,17 @@ function ItemsPageContent() {
                           type="checkbox"
                           checked={selectedMaterials.includes(material._id)}
                           onChange={() => toggleSelectMaterial(material._id)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          className="rounded ds-border-subtle ds-text-accent-primary focus:ring-ds-accent-focus"
                         />
                         <Link
                           href={`/items/${material._id}`}
-                          className="text-base font-semibold text-blue-600 hover:text-blue-900 flex-1"
+                          className="text-base font-semibold ds-text-accent-primary hover:ds-text-accent-hover flex-1"
                         >
                           {material.name || material.materialName}
                         </Link>
                       </div>
                       {material.description && (
-                        <p className="text-sm text-gray-600 mb-2">{material.description}</p>
+                        <p className="text-sm ds-text-secondary mb-2">{material.description}</p>
                       )}
                       <div className="flex gap-2 flex-wrap">
                         <span
@@ -1064,8 +1064,8 @@ function ItemsPageContent() {
                           material.entryType === 'new_procurement'
                             ? 'bg-blue-100 text-blue-800'
                             : material.entryType === 'retroactive_entry'
-                            ? 'bg-gray-100 text-gray-800'
-                            : 'bg-gray-100 text-gray-600'
+                            ? 'ds-bg-surface-muted ds-text-primary'
+                            : 'ds-bg-surface-muted ds-text-secondary'
                         }`}>
                           {material.entryType === 'new_procurement'
                             ? 'New Procurement'
@@ -1077,43 +1077,43 @@ function ItemsPageContent() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 text-sm mb-3 pt-3 border-t border-gray-200">
+                  <div className="grid grid-cols-2 gap-3 text-sm mb-3 pt-3 border-t ds-border-subtle">
                     <div>
-                      <span className="text-gray-500">Category:</span>
-                      <span className="ml-1 text-gray-900 font-medium">{material.category || 'N/A'}</span>
+                      <span className="ds-text-muted">Category:</span>
+                      <span className="ml-1 ds-text-primary font-medium">{material.category || 'N/A'}</span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Supplier:</span>
-                      <span className="ml-1 text-gray-900 font-medium">
+                      <span className="ds-text-muted">Supplier:</span>
+                      <span className="ml-1 ds-text-primary font-medium">
                         {material.supplierName || material.supplier || 'N/A'}
                       </span>
                     </div>
                     <div>
-                      <span className="text-gray-500">Quantity:</span>
-                      <span className="ml-1 text-gray-900 font-medium">
+                      <span className="ds-text-muted">Quantity:</span>
+                      <span className="ml-1 ds-text-primary font-medium">
                         {material.quantity || material.quantityPurchased || 0} {material.unit || ''}
                       </span>
                       {material.quantityRemaining !== undefined && (
-                        <div className="text-xs text-gray-600 mt-0.5">
+                        <div className="text-xs ds-text-secondary mt-0.5">
                           Remaining: {material.quantityRemaining} {material.unit || ''}
                         </div>
                       )}
                     </div>
                     <div>
-                      <span className="text-gray-500">Unit Cost:</span>
-                      <span className="ml-1 text-gray-900 font-medium">
+                      <span className="ds-text-muted">Unit Cost:</span>
+                      <span className="ml-1 ds-text-primary font-medium">
                         KES {material.unitCost?.toLocaleString() || '0.00'}
                       </span>
                     </div>
                     <div className="col-span-2">
-                      <span className="text-gray-500">Total Cost:</span>
-                      <span className="ml-1 text-gray-900 font-semibold">
+                      <span className="ds-text-muted">Total Cost:</span>
+                      <span className="ml-1 ds-text-primary font-semibold">
                         KES {material.totalCost?.toLocaleString() || '0.00'}
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2 pt-3 border-t border-gray-200">
+                  <div className="flex flex-col gap-2 pt-3 border-t ds-border-subtle">
                     <div className="flex gap-2">
                       {material.purchaseOrderId && (
                         <Link
@@ -1163,23 +1163,23 @@ function ItemsPageContent() {
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="mt-6 bg-white rounded-lg shadow p-4 border border-gray-200">
+              <div className="mt-6 ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                   <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <span className="text-sm text-gray-700">Items per page:</span>
+                    <span className="text-sm ds-text-secondary">Items per page:</span>
                     <select
                       value={pagination.limit}
                       onChange={(e) => handleLimitChange(e.target.value)}
-                      className="px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm touch-manipulation"
+                      className="px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm touch-manipulation"
                     >
-                      <option value="10" className="text-gray-900">10</option>
-                      <option value="20" className="text-gray-900">20</option>
-                      <option value="50" className="text-gray-900">50</option>
-                      <option value="100" className="text-gray-900">100</option>
+                      <option value="10" className="ds-text-primary">10</option>
+                      <option value="20" className="ds-text-primary">20</option>
+                      <option value="50" className="ds-text-primary">50</option>
+                      <option value="100" className="ds-text-primary">100</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-700 text-center sm:text-left">
+                    <span className="text-sm ds-text-secondary text-center sm:text-left">
                       Page {pagination.page} of {pagination.pages} ({pagination.total} total)
                     </span>
                   </div>
@@ -1187,7 +1187,7 @@ function ItemsPageContent() {
                     <button
                       onClick={() => handlePageChange(pagination.page - 1)}
                       disabled={pagination.page === 1}
-                      className="flex-1 sm:flex-none px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors touch-manipulation"
+                      className="flex-1 sm:flex-none px-4 py-2 ds-bg-surface ds-text-secondary border ds-border-subtle rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors touch-manipulation"
                     >
                       Previous
                     </button>
@@ -1210,7 +1210,7 @@ function ItemsPageContent() {
                             className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors touch-manipulation ${
                               pagination.page === pageNum
                                 ? 'bg-blue-600 text-white'
-                                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 active:bg-gray-100'
+                                : 'ds-bg-surface ds-text-secondary border ds-border-subtle hover:ds-bg-surface-muted active:ds-bg-surface-muted'
                             }`}
                           >
                             {pageNum}
@@ -1221,7 +1221,7 @@ function ItemsPageContent() {
                     <button
                       onClick={() => handlePageChange(pagination.page + 1)}
                       disabled={pagination.page === pagination.pages}
-                      className="flex-1 sm:flex-none px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors touch-manipulation"
+                      className="flex-1 sm:flex-none px-4 py-2 ds-bg-surface ds-text-secondary border ds-border-subtle rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium transition-colors touch-manipulation"
                     >
                       Next
                     </button>
@@ -1236,9 +1236,9 @@ function ItemsPageContent() {
       {/* Bulk Approve Modal with Notes */}
       {showBulkApproveModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !bulkActionLoading && setShowBulkApproveModal(false)} />
+          <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => !bulkActionLoading && setShowBulkApproveModal(false)} />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
+            <div className="relative ds-bg-surface rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
               <div className="p-6">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
@@ -1248,33 +1248,33 @@ function ItemsPageContent() {
                   </div>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
+                  <h3 className="text-lg font-semibold leading-6 ds-text-primary mb-2" id="modal-title">
                     Approve Materials
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm ds-text-muted mb-4">
                       Approve {selectedMaterials.length} material(s)?
                     </p>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium ds-text-secondary mb-2">
                       Approval Notes (Optional)
                     </label>
                     <textarea
                       value={approvalNotes}
                       onChange={(e) => setApprovalNotes(e.target.value)}
                       placeholder="Add approval notes..."
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted"
                       rows="3"
                       disabled={bulkActionLoading}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-blue-200">
+              <div className="ds-bg-surface-muted px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-blue-400/60">
                 <button
                   type="button"
                   onClick={() => setShowBulkApproveModal(false)}
                   disabled={bulkActionLoading}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Cancel
                 </button>
@@ -1295,9 +1295,9 @@ function ItemsPageContent() {
       {/* Bulk Reject Modal */}
       {showBulkRejectModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !bulkActionLoading && setShowBulkRejectModal(false)} />
+          <div className="fixed inset-0 bg-black/50 transition-opacity" onClick={() => !bulkActionLoading && setShowBulkRejectModal(false)} />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
+            <div className="relative ds-bg-surface rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
               <div className="p-6">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
@@ -1307,33 +1307,33 @@ function ItemsPageContent() {
                   </div>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
+                  <h3 className="text-lg font-semibold leading-6 ds-text-primary mb-2" id="modal-title">
                     Reject Materials
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm ds-text-muted mb-4">
                       Reject {selectedMaterials.length} material(s)?
                     </p>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium ds-text-secondary mb-2">
                       Reason for Rejection (Required)
                     </label>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Enter rejection reason..."
-                      className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder:text-gray-400"
+                      className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 placeholder:ds-text-muted"
                       rows="4"
                       disabled={bulkActionLoading}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-200">
+              <div className="ds-bg-surface-muted px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-400/60">
                 <button
                   type="button"
                   onClick={() => setShowBulkRejectModal(false)}
                   disabled={bulkActionLoading}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Cancel
                 </button>
@@ -1387,7 +1387,7 @@ export default function ItemsPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading materials...</p>
+            <p className="mt-4 ds-text-secondary">Loading materials...</p>
           </div>
         </div>
       </AppLayout>

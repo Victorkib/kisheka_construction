@@ -80,13 +80,13 @@ export function PhaseDependencies({ phase, projectId }) {
 
   const getStatusColor = (status) => {
     const colors = {
-      'not_started': 'bg-gray-100 text-gray-800',
+      'not_started': 'ds-bg-surface-muted ds-text-primary',
       'in_progress': 'bg-blue-100 text-blue-800',
       'completed': 'bg-green-100 text-green-800',
       'on_hold': 'bg-yellow-100 text-yellow-800',
       'cancelled': 'bg-red-100 text-red-800'
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const formatDate = (date) => {
@@ -100,11 +100,11 @@ export function PhaseDependencies({ phase, projectId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Dependencies</h3>
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Dependencies</h3>
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-          <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-3/4 mb-2"></div>
+          <div className="h-4 ds-bg-surface-muted rounded w-1/2"></div>
         </div>
       </div>
     );
@@ -113,9 +113,9 @@ export function PhaseDependencies({ phase, projectId }) {
   const hasDependencies = (prerequisites.length > 0 || dependents.length > 0 || phase?.dependsOn?.length > 0);
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="ds-bg-surface rounded-lg shadow p-6">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Phase Dependencies</h3>
+        <h3 className="text-lg font-semibold ds-text-primary">Phase Dependencies</h3>
         {canStartInfo && !canStartInfo.canStart && (
           <span className="px-3 py-1 text-sm font-medium rounded-full bg-yellow-100 text-yellow-800">
             Cannot Start Yet
@@ -124,13 +124,13 @@ export function PhaseDependencies({ phase, projectId }) {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+        <div className="mb-4 p-3 bg-red-50 border border-red-400/60 rounded text-red-700 text-sm">
           {error}
         </div>
       )}
 
       {!hasDependencies && !error && (
-        <div className="text-gray-500 text-sm">
+        <div className="ds-text-muted text-sm">
           <p>This phase has no dependencies.</p>
           <p className="mt-2">It can be started independently.</p>
         </div>
@@ -141,8 +141,8 @@ export function PhaseDependencies({ phase, projectId }) {
           {/* Prerequisites Section */}
           {prerequisites.length > 0 && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h4 className="text-sm font-semibold ds-text-secondary mb-3 flex items-center">
+                <svg className="w-5 h-5 mr-2 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Prerequisite Phases ({prerequisites.length})
@@ -151,20 +151,20 @@ export function PhaseDependencies({ phase, projectId }) {
                 {prerequisites.map((prereq) => (
                   <div
                     key={prereq.phaseId}
-                    className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors"
+                    className="border ds-border-subtle rounded-lg p-3 hover:ds-bg-surface-muted transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <Link
                           href={`/phases/${prereq.phaseId}`}
-                          className="font-medium text-gray-900 hover:text-blue-600"
+                          className="font-medium ds-text-primary hover:text-blue-600"
                         >
                           {prereq.phaseName}
                         </Link>
                         {prereq.phaseCode && (
-                          <span className="ml-2 text-xs text-gray-500">({prereq.phaseCode})</span>
+                          <span className="ml-2 text-xs ds-text-muted">({prereq.phaseCode})</span>
                         )}
-                        <div className="mt-1 flex items-center gap-3 text-sm text-gray-600">
+                        <div className="mt-1 flex items-center gap-3 text-sm ds-text-secondary">
                           <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(prereq.status)}`}>
                             {prereq.status?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Unknown'}
                           </span>
@@ -173,12 +173,12 @@ export function PhaseDependencies({ phase, projectId }) {
                           )}
                         </div>
                         {prereq.actualEndDate && (
-                          <div className="mt-1 text-xs text-gray-500">
+                          <div className="mt-1 text-xs ds-text-muted">
                             Completed: {formatDate(prereq.actualEndDate)}
                           </div>
                         )}
                         {!prereq.actualEndDate && prereq.plannedEndDate && (
-                          <div className="mt-1 text-xs text-gray-500">
+                          <div className="mt-1 text-xs ds-text-muted">
                             Planned End: {formatDate(prereq.plannedEndDate)}
                           </div>
                         )}
@@ -192,7 +192,7 @@ export function PhaseDependencies({ phase, projectId }) {
 
           {/* Can Start After Date */}
           {phase?.canStartAfter && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
               <div className="flex items-start">
                 <svg className="w-5 h-5 text-blue-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -214,7 +214,7 @@ export function PhaseDependencies({ phase, projectId }) {
 
           {/* Cannot Start Warning */}
           {canStartInfo && !canStartInfo.canStart && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-4">
               <div className="flex items-start">
                 <svg className="w-5 h-5 text-yellow-600 mr-2 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -242,37 +242,37 @@ export function PhaseDependencies({ phase, projectId }) {
           {/* Dependent Phases Section */}
           {dependents.length > 0 && (
             <div>
-              <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <h4 className="text-sm font-semibold ds-text-secondary mb-3 flex items-center">
+                <svg className="w-5 h-5 mr-2 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
                 Dependent Phases ({dependents.length})
               </h4>
-              <p className="text-xs text-gray-500 mb-2">Phases that depend on this phase:</p>
+              <p className="text-xs ds-text-muted mb-2">Phases that depend on this phase:</p>
               <div className="space-y-2">
                 {dependents.map((dependent) => (
                   <div
                     key={dependent.phaseId}
-                    className="border border-gray-200 rounded-lg p-3 hover:bg-gray-50 transition-colors"
+                    className="border ds-border-subtle rounded-lg p-3 hover:ds-bg-surface-muted transition-colors"
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <Link
                           href={`/phases/${dependent.phaseId}`}
-                          className="font-medium text-gray-900 hover:text-blue-600"
+                          className="font-medium ds-text-primary hover:text-blue-600"
                         >
                           {dependent.phaseName}
                         </Link>
                         {dependent.phaseCode && (
-                          <span className="ml-2 text-xs text-gray-500">({dependent.phaseCode})</span>
+                          <span className="ml-2 text-xs ds-text-muted">({dependent.phaseCode})</span>
                         )}
-                        <div className="mt-1 flex items-center gap-3 text-sm text-gray-600">
+                        <div className="mt-1 flex items-center gap-3 text-sm ds-text-secondary">
                           <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${getStatusColor(dependent.status)}`}>
                             {dependent.status?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) || 'Unknown'}
                           </span>
                         </div>
                         {dependent.canStartAfter && (
-                          <div className="mt-1 text-xs text-gray-500">
+                          <div className="mt-1 text-xs ds-text-muted">
                             Can start after: {formatDate(dependent.canStartAfter)}
                           </div>
                         )}

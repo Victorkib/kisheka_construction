@@ -31,10 +31,12 @@ function NewSubcontractorPageContent() {
   
   const projectIdFromUrl = searchParams.get('projectId');
   const phaseIdFromUrl = searchParams.get('phaseId');
+  const floorIdFromUrl = searchParams.get('floorId');
   
   const [formData, setFormData] = useState({
     projectId: projectIdFromUrl || '',
     phaseId: phaseIdFromUrl || '',
+    floorId: floorIdFromUrl || '',
     subcontractorName: '',
     subcontractorType: '',
     contactPerson: '',
@@ -193,11 +195,13 @@ function NewSubcontractorPageContent() {
       }
 
       const response = await fetch('/api/subcontractors', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(formData),
       });
 
@@ -225,18 +229,18 @@ function NewSubcontractorPageContent() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6">
-          <Link href="/subcontractors" className="text-blue-600 hover:text-blue-800 mb-4 inline-block font-medium">
+          <Link href="/subcontractors" className="ds-text-accent-primary hover:ds-text-accent-hover mb-4 inline-block font-medium">
             ← Back to Subcontractors
           </Link>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">New Subcontractor Assignment</h1>
-          <p className="text-gray-600 mt-1">Create a new subcontractor assignment for a phase</p>
+          <h1 className="text-2xl md:text-3xl font-bold ds-text-primary">New Subcontractor Assignment</h1>
+          <p className="ds-text-secondary mt-1">Create a new subcontractor assignment for a phase</p>
         </div>
 
         {/* Information Card */}
-        <div className="bg-gradient-to-br from-purple-50 via-violet-50 to-purple-100 rounded-xl border-2 border-purple-200 p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
+        <div className="ds-bg-accent-subtle rounded-xl border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center shadow-md">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 ds-bg-accent-primary rounded-lg flex items-center justify-center shadow-md">
                 <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
@@ -244,15 +248,15 @@ function NewSubcontractorPageContent() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between gap-2 mb-2">
-                <h3 className="text-base sm:text-lg font-bold text-gray-900">Creating a Subcontractor Assignment</h3>
+                <h3 className="text-base sm:text-lg font-bold ds-text-primary">Creating a Subcontractor Assignment</h3>
                 <button
                   onClick={() => setIsInfoExpanded(!isInfoExpanded)}
-                  className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 bg-white/80 hover:bg-white border border-purple-300 rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                  className="flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 ds-bg-surface/80 hover:ds-bg-surface border ds-border-accent-subtle rounded-lg flex items-center justify-center shadow-sm hover:shadow-md transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:ring-offset-2"
                   aria-label={isInfoExpanded ? 'Collapse information' : 'Expand information'}
                   aria-expanded={isInfoExpanded}
                 >
                   <svg 
-                    className={`w-5 h-5 sm:w-6 sm:h-6 text-purple-600 transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
+                    className={`w-5 h-5 sm:w-6 sm:h-6 ds-text-accent-primary transition-transform duration-300 ${isInfoExpanded ? 'rotate-180' : ''}`} 
                     fill="none" 
                     stroke="currentColor" 
                     viewBox="0 0 24 24"
@@ -264,17 +268,17 @@ function NewSubcontractorPageContent() {
               
               {isInfoExpanded ? (
                 <div className="space-y-3 animate-fadeIn">
-                  <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+                  <p className="text-xs sm:text-sm ds-text-secondary leading-relaxed">
                     Subcontractors are external contractors and service providers hired for specific work. This includes construction labour (masons, electricians, plumbers), professional services (architects, engineers, surveyors), and specialized technicians (HVAC, lift technicians, fire safety).
                   </p>
-                  <div className="bg-white/70 rounded-lg p-3 border border-purple-200">
-                    <p className="text-xs text-gray-600">
-                      <strong className="text-gray-900">Tip:</strong> Specify the subcontractor type clearly, set up payment milestones based on work completion, and track performance ratings. Include contact information for easy communication and coordination.
+                  <div className="ds-bg-surface/70 rounded-lg p-3 border ds-border-accent-subtle">
+                    <p className="text-xs ds-text-secondary">
+                      <strong className="ds-text-primary">Tip:</strong> Specify the subcontractor type clearly, set up payment milestones based on work completion, and track performance ratings. Include contact information for easy communication and coordination.
                     </p>
                   </div>
                 </div>
               ) : (
-                <p className="text-xs sm:text-sm text-gray-500 italic mt-1 animate-fadeIn">
+                <p className="text-xs sm:text-sm ds-text-muted italic mt-1 animate-fadeIn">
                   Click to expand for more information
                 </p>
               )}
@@ -283,18 +287,18 @@ function NewSubcontractorPageContent() {
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+        <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle p-8">
           {error && (
-            <div className="bg-red-50 border-2 border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 font-medium">
+            <div className="bg-red-50 border-2 border-red-400/60 text-red-800 px-4 py-3 rounded-lg mb-6 font-medium">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
             {/* Project & Phase Selection Section */}
-            <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-6 border border-purple-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="ds-bg-accent-subtle rounded-xl p-6 border ds-border-accent-subtle">
+              <h2 className="text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 ds-text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 Project & Phase Selection
@@ -302,15 +306,15 @@ function NewSubcontractorPageContent() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Project Selection */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label className="block text-sm font-semibold ds-text-primary mb-2">
                     Project <span className="text-red-600">*</span>
                   </label>
                   {loadingProjects ? (
-                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                    <div className="w-full px-4 py-2.5 ds-bg-surface-muted border-2 ds-border-subtle rounded-lg ds-text-muted">
                       Loading projects...
                     </div>
                   ) : projects.length === 0 ? (
-                    <div className="w-full px-4 py-2.5 bg-yellow-50 border-2 border-yellow-300 rounded-lg text-yellow-800">
+                    <div className="w-full px-4 py-2.5 bg-yellow-50 border-2 border-yellow-400/60 rounded-lg text-yellow-800">
                       No projects available
                     </div>
                   ) : (
@@ -320,36 +324,36 @@ function NewSubcontractorPageContent() {
                       onChange={handleChange}
                       required
                       disabled={loadingProjects}
-                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                     >
-                      <option value="" className="text-gray-500">Select Project</option>
-                      {projects.map((project) => (
-                        <option key={project._id} value={project._id} className="text-gray-900">
+                      <option value="" className="ds-text-muted">Select Project</option>
+                        {projects.map((project) => (
+                        <option key={project._id} value={project._id} className="ds-text-primary">
                           {project.projectName || project.projectCode || 'Unnamed Project'}
                         </option>
                       ))}
                     </select>
                   )}
                   {projects.length > 0 && !formData.projectId && (
-                    <p className="text-xs text-gray-600 mt-1.5">Please select a project to continue</p>
+                    <p className="text-xs ds-text-muted mt-1.5">Please select a project to continue</p>
                   )}
                 </div>
 
                 {/* Phase Selection */}
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label className="block text-sm font-semibold ds-text-primary mb-2">
                     Phase <span className="text-red-600">*</span>
                   </label>
                   {loadingPhases ? (
-                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                    <div className="w-full px-4 py-2.5 ds-bg-surface-muted border-2 ds-border-subtle rounded-lg ds-text-muted">
                       Loading phases...
                     </div>
                   ) : !formData.projectId ? (
-                    <div className="w-full px-4 py-2.5 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-500">
+                    <div className="w-full px-4 py-2.5 ds-bg-surface-muted border-2 ds-border-subtle rounded-lg ds-text-muted">
                       Select Project First
                     </div>
                   ) : phases.length === 0 ? (
-                    <div className="w-full px-4 py-2.5 bg-yellow-50 border-2 border-yellow-300 rounded-lg text-yellow-800">
+                    <div className="w-full px-4 py-2.5 bg-yellow-50 border-2 border-yellow-400/60 rounded-lg text-yellow-800">
                       No phases available for this project
                     </div>
                   ) : (
@@ -359,27 +363,39 @@ function NewSubcontractorPageContent() {
                       onChange={handleChange}
                       required
                       disabled={loadingPhases || !formData.projectId}
-                      className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                      className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                     >
-                      <option value="" className="text-gray-500">Select Phase</option>
-                      {phases.map((phase) => (
-                        <option key={phase._id} value={phase._id} className="text-gray-900">
+                      <option value="" className="ds-text-muted">Select Phase</option>
+                        {phases.map((phase) => (
+                        <option key={phase._id} value={phase._id} className="ds-text-primary">
                           {phase.phaseName || phase.name} {phase.phaseCode ? `(${phase.phaseCode})` : ''}
                         </option>
                       ))}
                     </select>
                   )}
                   {formData.projectId && phases.length > 0 && !formData.phaseId && (
-                    <p className="text-xs text-gray-600 mt-1.5">Please select a phase</p>
+                    <p className="text-xs ds-text-muted mt-1.5">Please select a phase</p>
                   )}
                 </div>
+                
+                {/* Floor ID (optional, for finishing phases) */}
+                {formData.floorId && (
+                  <div className="md:col-span-2">
+                    <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-3">
+                      <p className="text-xs ds-text-accent-primary">
+                        <strong>Note:</strong> This subcontractor will be linked to a specific floor (Floor ID: {formData.floorId}). 
+                        This is useful for finishing-phase subcontractors that work on specific floors.
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
             {/* Subcontractor Details Section */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="ds-bg-surface-muted rounded-xl p-6 border ds-border-subtle">
+              <h2 className="text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 ds-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 Subcontractor Details
@@ -387,7 +403,7 @@ function NewSubcontractorPageContent() {
               
               {/* Subcontractor Name */}
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                <label className="block text-sm font-semibold ds-text-primary mb-2">
                   Subcontractor Name <span className="text-red-600">*</span>
                 </label>
                 <input
@@ -398,13 +414,13 @@ function NewSubcontractorPageContent() {
                   required
                   minLength={2}
                   placeholder="e.g., ABC Electrical Services"
-                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                  className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted transition-all duration-200 font-medium"
                 />
               </div>
 
               {/* Subcontractor Type */}
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                <label className="block text-sm font-semibold ds-text-primary mb-2">
                   Subcontractor Type <span className="text-red-600">*</span>
                 </label>
                 <select
@@ -412,11 +428,11 @@ function NewSubcontractorPageContent() {
                   value={formData.subcontractorType}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                  className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                 >
-                  <option value="" className="text-gray-500">Select Type</option>
+                  <option value="" className="ds-text-muted">Select Type</option>
                   {SUBCONTRACTOR_TYPES.map((type) => (
-                    <option key={type} value={type} className="text-gray-900">
+                    <option key={type} value={type} className="ds-text-primary">
                       {getSubcontractorTypeLabel(type)}
                     </option>
                   ))}
@@ -426,7 +442,7 @@ function NewSubcontractorPageContent() {
               {/* Contact Information */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label className="block text-sm font-semibold ds-text-primary mb-2">
                     Contact Person
                   </label>
                   <input
@@ -435,12 +451,12 @@ function NewSubcontractorPageContent() {
                     value={formData.contactPerson}
                     onChange={handleChange}
                     placeholder="John Doe"
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                    className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted transition-all duration-200 font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label className="block text-sm font-semibold ds-text-primary mb-2">
                     Phone
                   </label>
                   <input
@@ -449,12 +465,12 @@ function NewSubcontractorPageContent() {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder="+254 700 000 000"
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                    className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted transition-all duration-200 font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label className="block text-sm font-semibold ds-text-primary mb-2">
                     Email
                   </label>
                   <input
@@ -463,16 +479,16 @@ function NewSubcontractorPageContent() {
                     value={formData.email}
                     onChange={handleChange}
                     placeholder="contact@example.com"
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                    className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted transition-all duration-200 font-medium"
                   />
                 </div>
               </div>
             </div>
 
             {/* Contract & Schedule Section */}
-            <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-6 border border-indigo-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="ds-bg-accent-subtle rounded-xl p-6 border ds-border-accent-subtle">
+              <h2 className="text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
                 Contract & Schedule
@@ -481,7 +497,7 @@ function NewSubcontractorPageContent() {
               {/* Contract Details */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label className="block text-sm font-semibold ds-text-primary mb-2">
                     Contract Value (KES) <span className="text-red-600">*</span>
                   </label>
                   <input
@@ -493,12 +509,12 @@ function NewSubcontractorPageContent() {
                     min="0"
                     step="0.01"
                     placeholder="0.00"
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                    className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted transition-all duration-200 font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label className="block text-sm font-semibold ds-text-primary mb-2">
                     Contract Type <span className="text-red-600">*</span>
                   </label>
                   <select
@@ -506,10 +522,10 @@ function NewSubcontractorPageContent() {
                     value={formData.contractType}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                    className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                   >
                     {CONTRACT_TYPES.map((type) => (
-                      <option key={type} value={type} className="text-gray-900">
+                      <option key={type} value={type} className="ds-text-primary">
                         {getContractTypeLabel(type)}
                       </option>
                     ))}
@@ -520,7 +536,7 @@ function NewSubcontractorPageContent() {
               {/* Dates */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label className="block text-sm font-semibold ds-text-primary mb-2">
                     Start Date <span className="text-red-600">*</span>
                   </label>
                   <input
@@ -529,12 +545,12 @@ function NewSubcontractorPageContent() {
                     value={formData.startDate}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
+                    className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
+                  <label className="block text-sm font-semibold ds-text-primary mb-2">
                     End Date (Optional)
                   </label>
                   <input
@@ -543,16 +559,16 @@ function NewSubcontractorPageContent() {
                     value={formData.endDate}
                     onChange={handleChange}
                     min={formData.startDate}
-                    className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
+                    className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
                   />
                 </div>
               </div>
             </div>
 
             {/* Payment Schedule Section */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="ds-bg-surface-muted rounded-xl p-6 border ds-border-subtle">
+              <h2 className="text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 ds-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Payment Schedule (Optional)
@@ -561,10 +577,10 @@ function NewSubcontractorPageContent() {
               {formData.paymentSchedule.length > 0 && (
                 <div className="mb-6 space-y-3">
                   {formData.paymentSchedule.map((payment, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 bg-white rounded-lg border-2 border-gray-200 shadow-sm">
+                    <div key={index} className="flex items-center gap-3 p-3 ds-bg-surface rounded-lg border-2 ds-border-subtle shadow-sm">
                       <div className="flex-1">
-                        <span className="font-bold text-gray-900">{payment.milestone}</span>
-                        <span className="text-gray-700 ml-2 font-medium">
+                        <span className="font-bold ds-text-primary">{payment.milestone}</span>
+                        <span className="ds-text-secondary ml-2 font-medium">
                           - KES {payment.amount.toLocaleString()} due {new Date(payment.dueDate).toLocaleDateString()}
                         </span>
                       </div>
@@ -579,8 +595,8 @@ function NewSubcontractorPageContent() {
                   ))}
                   
                   {contractValue > 0 && (
-                    <div className="text-sm font-semibold text-gray-700 mt-3 p-3 bg-white rounded-lg border border-gray-200">
-                      Total Scheduled: <span className="text-gray-900">KES {totalScheduled.toLocaleString()}</span> / <span className="text-gray-900">KES {contractValue.toLocaleString()}</span>
+                    <div className="text-sm font-semibold ds-text-secondary mt-3 p-3 ds-bg-surface rounded-lg border ds-border-subtle">
+                      Total Scheduled: <span className="ds-text-primary">KES {totalScheduled.toLocaleString()}</span> / <span className="ds-text-primary">KES {contractValue.toLocaleString()}</span>
                       {totalScheduled > contractValue * 1.1 && (
                         <span className="text-red-600 ml-2 font-bold">⚠ Exceeds contract value by more than 10%</span>
                       )}
@@ -595,7 +611,7 @@ function NewSubcontractorPageContent() {
                   placeholder="Milestone name"
                   value={newPayment.milestone}
                   onChange={(e) => handlePaymentChange({ target: { name: 'milestone', value: e.target.value } })}
-                  className="px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                  className="px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted transition-all duration-200 font-medium"
                 />
                 <input
                   type="number"
@@ -604,14 +620,14 @@ function NewSubcontractorPageContent() {
                   onChange={(e) => handlePaymentChange({ target: { name: 'amount', value: e.target.value } })}
                   min="0"
                   step="0.01"
-                  className="px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-400 transition-all duration-200 font-medium"
+                  className="px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted transition-all duration-200 font-medium"
                 />
                 <input
                   type="date"
                   placeholder="Due date"
                   value={newPayment.dueDate}
                   onChange={(e) => handlePaymentChange({ target: { name: 'dueDate', value: e.target.value } })}
-                  className="px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
+                  className="px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium"
                 />
                 <button
                   type="button"
@@ -624,9 +640,9 @@ function NewSubcontractorPageContent() {
             </div>
 
             {/* Additional Information Section */}
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="ds-bg-surface-muted rounded-xl p-6 border ds-border-subtle">
+              <h2 className="text-lg font-bold ds-text-primary mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5 ds-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                 </svg>
                 Additional Information
@@ -634,17 +650,17 @@ function NewSubcontractorPageContent() {
               
               {/* Status */}
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                <label className="block text-sm font-semibold ds-text-primary mb-2">
                   Status
                 </label>
                 <select
                   name="status"
                   value={formData.status}
                   onChange={handleChange}
-                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:bg-white [&>option]:text-gray-900 [&>option]:font-medium"
+                  className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium"
                 >
                   {SUBCONTRACTOR_STATUSES.map((status) => (
-                    <option key={status} value={status} className="text-gray-900">
+                    <option key={status} value={status} className="ds-text-primary">
                       {status.replace(/\b\w/g, l => l.toUpperCase())}
                     </option>
                   ))}
@@ -653,7 +669,7 @@ function NewSubcontractorPageContent() {
 
               {/* Notes */}
               <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-2">
+                <label className="block text-sm font-semibold ds-text-primary mb-2">
                   Notes
                 </label>
                 <textarea
@@ -662,16 +678,16 @@ function NewSubcontractorPageContent() {
                   onChange={handleChange}
                   rows={4}
                   placeholder="Additional notes about this subcontractor assignment..."
-                  className="w-full px-4 py-2.5 bg-white text-gray-900 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:text-gray-400 transition-all duration-200 font-medium resize-none"
+                  className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 placeholder:ds-text-muted transition-all duration-200 font-medium resize-none"
                 />
               </div>
             </div>
 
             {/* Submit Buttons */}
-            <div className="flex justify-end gap-4 pt-6 border-t-2 border-gray-200">
+            <div className="flex justify-end gap-4 pt-6 border-t-2 ds-border-subtle">
               <Link
                 href="/subcontractors"
-                className="px-6 py-2.5 border-2 border-gray-300 rounded-lg text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-all duration-200"
+                className="px-6 py-2.5 border-2 ds-border-subtle rounded-lg ds-text-secondary font-semibold hover:ds-bg-surface-muted hover:ds-border-strong transition-all duration-200"
               >
                 Cancel
               </Link>

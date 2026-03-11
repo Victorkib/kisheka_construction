@@ -20,8 +20,8 @@ function CostSummaryContent() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Labour Cost Summary</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold ds-text-primary mb-2">Labour Cost Summary</h1>
+        <p className="ds-text-secondary">
           Comprehensive labour cost summaries with breakdowns by role, skill type, and direct vs
           subcontractor labour
         </p>
@@ -33,7 +33,7 @@ function CostSummaryContent() {
           periodType={phaseId ? 'phase_total' : 'project_total'}
         />
       ) : (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 text-center">
+        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-8 text-center">
           <p className="text-blue-800">
             Please select a project from the{' '}
             <a href="/labour/reports" className="underline font-medium">

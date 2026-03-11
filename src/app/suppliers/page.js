@@ -160,7 +160,7 @@ function SuppliersPageContent() {
   const getStatusBadge = (status) => {
     const badges = {
       active: 'bg-green-100 text-green-900 font-semibold',
-      inactive: 'bg-gray-100 text-gray-900 font-semibold',
+      inactive: 'ds-bg-surface-muted ds-text-primary font-semibold',
       suspended: 'bg-red-100 text-red-900 font-semibold',
     };
     return badges[status] || badges.inactive;
@@ -172,17 +172,17 @@ function SuppliersPageContent() {
         {/* Header */}
         <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
               Suppliers
             </h1>
-            <p className="text-sm sm:text-base text-gray-700 mt-2 font-medium">
+            <p className="text-sm sm:text-base ds-text-secondary mt-2 font-medium">
               Manage supplier contacts and information
             </p>
           </div>
           {canCreate && (
             <Link
               href="/suppliers/new"
-              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 sm:px-6 py-2.5 rounded-lg transition-colors shadow-md touch-manipulation text-sm sm:text-base text-center"
+              className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-4 sm:px-6 py-2.5 rounded-lg transition-colors shadow-md touch-manipulation text-sm sm:text-base text-center"
             >
               + Add Supplier
             </Link>
@@ -205,10 +205,10 @@ function SuppliersPageContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
+              <label className="block text-sm font-medium ds-text-primary mb-2">
                 Search
               </label>
               <input
@@ -219,11 +219,11 @@ function SuppliersPageContent() {
                   setPage(1);
                 }}
                 placeholder="Search by name, email, or contact person..."
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder:text-gray-500 bg-white"
+                className="w-full px-4 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary placeholder:ds-text-muted ds-bg-surface"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
+              <label className="block text-sm font-medium ds-text-primary mb-2">
                 Status
               </label>
               <select
@@ -232,7 +232,7 @@ function SuppliersPageContent() {
                   setStatusFilter(e.target.value);
                   setPage(1);
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 bg-white"
+                className="w-full px-4 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ds-text-primary ds-bg-surface"
               >
                 <option value="all">All Status</option>
                 <option value="active">Active</option>
@@ -245,26 +245,26 @@ function SuppliersPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border-2 border-red-300 text-red-900 px-4 py-3 rounded mb-6 font-medium">
+          <div className="bg-red-50 border-2 border-red-400/60 text-red-900 px-4 py-3 rounded mb-6 font-medium">
             {error}
           </div>
         )}
 
         {/* Suppliers Table */}
         {loading ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-900 font-medium">
+            <p className="mt-4 ds-text-primary font-medium">
               Loading suppliers...
             </p>
           </div>
         ) : suppliers.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="text-6xl mb-4">🏢</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold ds-text-primary mb-2">
               No suppliers found
             </h3>
-            <p className="text-gray-700 mb-6 font-medium">
+            <p className="ds-text-secondary mb-6 font-medium">
               {canCreate
                 ? 'Get started by adding your first supplier.'
                 : 'No suppliers match your search criteria.'}
@@ -272,7 +272,7 @@ function SuppliersPageContent() {
             {canCreate && (
               <Link
                 href="/suppliers/new"
-                className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg transition-colors inline-block shadow-md touch-manipulation"
+                className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg transition-colors inline-block shadow-md touch-manipulation"
               >
                 + Add Supplier
               </Link>
@@ -281,45 +281,45 @@ function SuppliersPageContent() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+            <div className="hidden md:block ds-bg-surface rounded-lg shadow overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-primary uppercase tracking-wider">
                         Supplier
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-primary uppercase tracking-wider">
                         Contact
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-primary uppercase tracking-wider">
                         Phone
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-primary uppercase tracking-wider">
                         Email
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-primary uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-primary uppercase tracking-wider">
                         Communication
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-900 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-semibold ds-text-primary uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {suppliers.map((supplier) => (
-                      <tr key={supplier._id} className="hover:bg-gray-50">
+                      <tr key={supplier._id} className="hover:ds-bg-surface-muted">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <div>
-                              <div className="text-sm font-semibold text-gray-900">
+                              <div className="text-sm font-semibold ds-text-primary">
                                 {supplier.name}
                               </div>
                               {supplier.contactPerson && (
-                                <div className="text-sm text-gray-700 font-medium">
+                                <div className="text-sm ds-text-secondary font-medium">
                                   {supplier.contactPerson}
                                 </div>
                               )}
@@ -327,26 +327,26 @@ function SuppliersPageContent() {
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900 font-medium">
+                          <div className="text-sm ds-text-primary font-medium">
                             {supplier.contactPerson || 'N/A'}
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900 font-medium">
+                          <div className="text-sm ds-text-primary font-medium">
                             {supplier.phone}
                           </div>
                           {supplier.alternatePhone && (
-                            <div className="text-sm text-gray-700 font-medium">
+                            <div className="text-sm ds-text-secondary font-medium">
                               {supplier.alternatePhone}
                             </div>
                           )}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900 font-medium">
+                          <div className="text-sm ds-text-primary font-medium">
                             {supplier.email}
                           </div>
                           {supplier.alternateEmail && (
-                            <div className="text-sm text-gray-700 font-medium">
+                            <div className="text-sm ds-text-secondary font-medium">
                               {supplier.alternateEmail}
                             </div>
                           )}
@@ -380,7 +380,7 @@ function SuppliersPageContent() {
                         <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                           <Link
                             href={`/suppliers/${supplier._id}`}
-                            className="text-blue-600 hover:text-blue-800 font-semibold mr-4 underline"
+                            className="ds-text-accent-primary hover:ds-text-accent-hover font-semibold mr-4 underline"
                           >
                             View
                           </Link>
@@ -416,17 +416,17 @@ function SuppliersPageContent() {
                     <button
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-medium bg-white transition-colors touch-manipulation"
+                      className="px-4 py-2 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted active:ds-bg-surface-muted ds-text-primary font-medium ds-bg-surface transition-colors touch-manipulation"
                     >
                       Previous
                     </button>
-                    <span className="px-4 py-2 text-gray-900 font-medium">
+                    <span className="px-4 py-2 ds-text-primary font-medium">
                       Page {page} of {totalPages}
                     </span>
                     <button
                       onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                       disabled={page === totalPages}
-                      className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-medium bg-white transition-colors touch-manipulation"
+                      className="px-4 py-2 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted active:ds-bg-surface-muted ds-text-primary font-medium ds-bg-surface transition-colors touch-manipulation"
                     >
                       Next
                     </button>
@@ -440,16 +440,16 @@ function SuppliersPageContent() {
               {suppliers.map((supplier) => (
                 <div
                   key={supplier._id}
-                  className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                  className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle"
                 >
                   {/* Header Row */}
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-base font-semibold text-gray-900 truncate">
+                      <h3 className="text-base font-semibold ds-text-primary truncate">
                         {supplier.name}
                       </h3>
                       {supplier.contactPerson && (
-                        <p className="text-sm text-gray-600 mt-0.5">
+                        <p className="text-sm ds-text-secondary mt-0.5">
                           Contact: {supplier.contactPerson}
                         </p>
                       )}
@@ -462,22 +462,22 @@ function SuppliersPageContent() {
                   </div>
 
                   {/* Contact Details */}
-                  <div className="space-y-2 mb-3 pb-3 border-b border-gray-200">
+                  <div className="space-y-2 mb-3 pb-3 border-b ds-border-subtle">
                     <div className="flex items-start gap-2">
-                      <span className="text-xs text-gray-500 w-16 flex-shrink-0">Phone:</span>
+                      <span className="text-xs ds-text-muted w-16 flex-shrink-0">Phone:</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900 font-medium">{supplier.phone || 'N/A'}</p>
+                        <p className="text-sm ds-text-primary font-medium">{supplier.phone || 'N/A'}</p>
                         {supplier.alternatePhone && (
-                          <p className="text-xs text-gray-600 mt-0.5">{supplier.alternatePhone}</p>
+                          <p className="text-xs ds-text-secondary mt-0.5">{supplier.alternatePhone}</p>
                         )}
                       </div>
                     </div>
                     <div className="flex items-start gap-2">
-                      <span className="text-xs text-gray-500 w-16 flex-shrink-0">Email:</span>
+                      <span className="text-xs ds-text-muted w-16 flex-shrink-0">Email:</span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900 font-medium truncate">{supplier.email || 'N/A'}</p>
+                        <p className="text-sm ds-text-primary font-medium truncate">{supplier.email || 'N/A'}</p>
                         {supplier.alternateEmail && (
-                          <p className="text-xs text-gray-600 mt-0.5 truncate">{supplier.alternateEmail}</p>
+                          <p className="text-xs ds-text-secondary mt-0.5 truncate">{supplier.alternateEmail}</p>
                         )}
                       </div>
                     </div>
@@ -485,8 +485,8 @@ function SuppliersPageContent() {
 
                   {/* Communication Methods */}
                   {(supplier.emailEnabled || supplier.smsEnabled || supplier.pushNotificationsEnabled) && (
-                    <div className="mb-3 pb-3 border-b border-gray-200">
-                      <p className="text-xs text-gray-500 mb-1.5">Communication:</p>
+                    <div className="mb-3 pb-3 border-b ds-border-subtle">
+                      <p className="text-xs ds-text-muted mb-1.5">Communication:</p>
                       <div className="flex flex-wrap gap-2">
                         {supplier.emailEnabled && (
                           <span className="px-2 py-0.5 text-xs text-green-700 font-medium bg-green-50 rounded">
@@ -511,7 +511,7 @@ function SuppliersPageContent() {
                   <div className="flex flex-wrap gap-2 pt-3">
                     <Link
                       href={`/suppliers/${supplier._id}`}
-                      className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                      className="flex-1 px-3 py-2 bg-blue-500/10 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation text-center border border-blue-400/60"
                     >
                       View
                     </Link>
@@ -537,25 +537,25 @@ function SuppliersPageContent() {
 
               {/* Mobile Pagination */}
               {totalPages > 1 && (
-                <div className="bg-white rounded-lg shadow p-4 border border-gray-200">
-                  <div className="text-sm text-gray-700 text-center mb-3">
+                <div className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle">
+                  <div className="text-sm ds-text-secondary text-center mb-3">
                     Page {page} of {totalPages}
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <button
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-medium transition-colors touch-manipulation"
+                      className="flex-1 px-4 py-2.5 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted active:ds-bg-surface-muted ds-text-primary font-medium transition-colors touch-manipulation"
                     >
                       Previous
                     </button>
-                    <span className="px-4 py-2.5 text-sm text-gray-700 font-medium">
+                    <span className="px-4 py-2.5 text-sm ds-text-secondary font-medium">
                       {page} / {totalPages}
                     </span>
                     <button
                       onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                       disabled={page === totalPages}
-                      className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 active:bg-gray-100 text-gray-900 font-medium transition-colors touch-manipulation"
+                      className="flex-1 px-4 py-2.5 border ds-border-subtle rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:ds-bg-surface-muted active:ds-bg-surface-muted ds-text-primary font-medium transition-colors touch-manipulation"
                     >
                       Next
                     </button>
@@ -576,9 +576,9 @@ export default function SuppliersPage() {
       fallback={
         <AppLayout>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="bg-white rounded-lg shadow p-12 text-center">
+            <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="mt-4 text-gray-600">Loading...</p>
+              <p className="mt-4 ds-text-secondary">Loading...</p>
             </div>
           </div>
         </AppLayout>

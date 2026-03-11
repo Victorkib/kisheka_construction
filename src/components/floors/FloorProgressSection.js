@@ -260,10 +260,10 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
 
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-lg p-8">
+      <div className="ds-bg-surface rounded-xl shadow-lg p-8">
         <div className="flex items-center justify-center py-16">
           <LoadingSpinner size="lg" color="blue-600" />
-          <span className="ml-3 text-gray-600 text-lg">Loading progress...</span>
+          <span className="ml-3 ds-text-secondary text-lg">Loading progress...</span>
         </div>
       </div>
     );
@@ -271,7 +271,7 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="ds-bg-surface rounded-xl shadow-lg overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-5">
           <div className="flex items-center justify-between">
@@ -282,7 +282,7 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
             {canEdit && (
               <button
                 onClick={fetchProgress}
-                className="text-white hover:text-blue-100 font-medium text-sm bg-white bg-opacity-20 hover:bg-opacity-30 rounded-lg px-4 py-2 transition-all duration-200"
+                className="text-white hover:text-blue-100 font-medium text-sm ds-bg-surface bg-opacity-20 hover:bg-opacity-30 rounded-lg px-4 py-2 transition-all duration-200"
                 title="Refresh progress data"
               >
                 <svg className="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -296,9 +296,9 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
 
         <div className="p-6 space-y-8">
           {/* Completion Percentage */}
-          <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-100">
+          <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border ds-border-subtle">
             <div className="flex items-center justify-between mb-4">
-              <label className="block text-lg font-bold text-gray-800">
+              <label className="block text-lg font-bold ds-text-primary">
                 Completion Percentage
               </label>
               <div className="flex items-center gap-3">
@@ -323,12 +323,12 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
                   max="100"
                   value={completionPercentage}
                   onChange={(e) => setCompletionPercentage(parseInt(e.target.value))}
-                  className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                  className="w-full h-3 ds-bg-surface-muted rounded-lg appearance-none cursor-pointer accent-blue-600"
                   style={{
                     background: `linear-gradient(to right, #2563eb 0%, #2563eb ${completionPercentage}%, #e5e7eb ${completionPercentage}%, #e5e7eb 100%)`,
                   }}
                 />
-                <div className="flex justify-between text-xs text-gray-500 font-medium">
+                <div className="flex justify-between text-xs ds-text-muted font-medium">
                   <span>0%</span>
                   <span>25%</span>
                   <span>50%</span>
@@ -337,7 +337,7 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
                 </div>
               </div>
             ) : (
-              <div className="w-full bg-gray-200 rounded-full h-6 overflow-hidden shadow-inner">
+              <div className="w-full ds-bg-surface-muted rounded-full h-6 overflow-hidden shadow-inner">
                 <div
                   className={`h-6 rounded-full transition-all duration-500 ease-out ${
                     completionPercentage >= 100
@@ -355,8 +355,8 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
           </div>
 
           {/* Milestone Notes */}
-          <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border border-gray-100">
-            <label className="block text-lg font-bold text-gray-800 mb-3">
+          <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-6 border ds-border-subtle">
+            <label className="block text-lg font-bold ds-text-primary mb-3">
               Milestone Notes
             </label>
             {canEdit ? (
@@ -366,20 +366,20 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
                   onChange={(e) => setMilestoneNotes(e.target.value)}
                   placeholder="Enter milestone notes, achievements, or important updates..."
                   rows={5}
-                  className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 resize-none transition-all duration-200"
+                  className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted resize-none transition-all duration-200"
                 />
-                <p className="mt-2 text-xs text-gray-500">
+                <p className="mt-2 text-xs ds-text-muted">
                   Make your changes and click "Save Changes" to update the progress.
                 </p>
               </>
             ) : (
               milestoneNotes ? (
-                <div className="px-4 py-4 bg-white border-2 border-gray-200 rounded-lg">
-                  <p className="text-gray-900 whitespace-pre-line leading-relaxed">{milestoneNotes}</p>
+                <div className="px-4 py-4 ds-bg-surface border-2 ds-border-subtle rounded-lg">
+                  <p className="ds-text-primary whitespace-pre-line leading-relaxed">{milestoneNotes}</p>
                 </div>
               ) : (
-                <div className="px-4 py-4 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg text-center">
-                  <p className="text-sm text-gray-500 italic">No milestone notes yet</p>
+                <div className="px-4 py-4 ds-bg-surface-muted border-2 border-dashed ds-border-subtle rounded-lg text-center">
+                  <p className="text-sm ds-text-muted italic">No milestone notes yet</p>
                 </div>
               )
             )}
@@ -387,7 +387,7 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
 
           {/* Change Indicator */}
           {canEdit && (completionPercentage !== originalCompletionPercentage || milestoneNotes !== originalMilestoneNotes) && (
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 flex items-center gap-3 animate-pulse">
+            <div className="bg-blue-50 border-2 border-blue-400/60 rounded-xl p-4 flex items-center gap-3 animate-pulse">
               <div className="flex-shrink-0">
                 <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -405,14 +405,14 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
           )}
 
           {/* Photo Upload Section */}
-          <div className="border-t border-gray-200 pt-8">
+          <div className="border-t ds-border-subtle pt-8">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h3 className="text-xl font-bold text-gray-900">
+                <h3 className="text-xl font-bold ds-text-primary">
                   Progress Photos
                 </h3>
                 {photos.length > 0 && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm ds-text-muted mt-1">
                     {photos.length} {photos.length === 1 ? 'photo' : 'photos'} uploaded
                   </p>
                 )}
@@ -435,7 +435,7 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
                   />
 
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold ds-text-secondary mb-2">
                       Photo Description (Optional)
                     </label>
                     <textarea
@@ -443,7 +443,7 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
                       onChange={(e) => setPhotoDescription(e.target.value)}
                       placeholder="Describe what this photo shows..."
                       rows={3}
-                      className="w-full px-4 py-3 bg-white text-gray-900 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 resize-none transition-all duration-200"
+                      className="w-full px-4 py-3 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted resize-none transition-all duration-200"
                     />
                   </div>
 
@@ -472,15 +472,15 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
 
             {/* Photo Gallery */}
             {photos.length === 0 ? (
-              <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-white rounded-xl border-2 border-dashed border-gray-300">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 mb-4">
-                  <svg className="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="text-center py-16 bg-gradient-to-br from-gray-50 to-white rounded-xl border-2 border-dashed ds-border-subtle">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full ds-bg-surface-muted mb-4">
+                  <svg className="w-10 h-10 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
-                <p className="text-gray-600 font-medium text-lg">No photos uploaded yet</p>
+                <p className="ds-text-secondary font-medium text-lg">No photos uploaded yet</p>
                 {canEdit && (
-                  <p className="mt-2 text-sm text-gray-500">Upload a photo to get started</p>
+                  <p className="mt-2 text-sm ds-text-muted">Upload a photo to get started</p>
                 )}
               </div>
             ) : (
@@ -488,10 +488,10 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
                 {photos.map((photo, index) => (
                   <div
                     key={index}
-                    className="group relative bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-400 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                    className="group relative ds-bg-surface border-2 ds-border-subtle rounded-xl overflow-hidden hover:border-blue-400 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
                   >
                     {/* Image */}
-                    <div className="relative aspect-square bg-gray-100 overflow-hidden">
+                    <div className="relative aspect-square ds-bg-surface-muted overflow-hidden">
                       <img
                         src={photo.url}
                         alt={photo.description || `Progress photo ${index + 1}`}
@@ -535,14 +535,14 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
 
                     {/* Photo Info */}
                     {(photo.description || photo.uploadedAt) && (
-                      <div className="p-4 bg-gray-50">
+                      <div className="p-4 ds-bg-surface-muted">
                         {photo.description && (
-                          <p className="text-sm text-gray-700 mb-2 line-clamp-2 font-medium">
+                          <p className="text-sm ds-text-secondary mb-2 line-clamp-2 font-medium">
                             {photo.description}
                           </p>
                         )}
                         {photo.uploadedAt && (
-                          <p className="text-xs text-gray-500 flex items-center gap-1">
+                          <p className="text-xs ds-text-muted flex items-center gap-1">
                             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
@@ -583,13 +583,13 @@ export const FloorProgressSection = forwardRef(function FloorProgressSection({ f
         title="Delete Photo"
         message={
           <>
-            <p className="mb-3 text-gray-700">Are you sure you want to delete this photo?</p>
+            <p className="mb-3 ds-text-secondary">Are you sure you want to delete this photo?</p>
             {photoToDelete?.photo?.description && (
-              <p className="text-sm text-gray-600 mb-2 bg-gray-50 p-3 rounded-lg">
+              <p className="text-sm ds-text-secondary mb-2 ds-bg-surface-muted p-3 rounded-lg">
                 <strong>Description:</strong> {photoToDelete.photo.description}
               </p>
             )}
-            <p className="text-sm text-gray-600">
+            <p className="text-sm ds-text-secondary">
               This action cannot be undone. The photo will be removed from the progress gallery.
             </p>
           </>

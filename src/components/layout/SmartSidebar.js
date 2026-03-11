@@ -17,7 +17,6 @@ import { SidebarDataProvider } from '@/components/layout/SidebarDataProvider';
 import { ContextualQuickActions } from '@/components/navigation/ContextualQuickActions';
 import { CurrentProjectContext } from '@/components/navigation/CurrentProjectContext';
 import { RecentlyViewed } from '@/components/navigation/RecentlyViewed';
-import { PendingActions } from '@/components/navigation/PendingActions';
 import { SuggestedActions } from '@/components/navigation/SuggestedActions';
 import { CommandPalette } from '@/components/navigation/CommandPalette';
 import { FavoriteButton } from '@/components/navigation/FavoritesManager';
@@ -109,7 +108,8 @@ const SmartNavSection = memo(function SmartNavSection({
         });
       });
       if (hasActiveChild) {
-        setIsExpanded(true);
+        // Defer state update to avoid cascading renders
+        setTimeout(() => setIsExpanded(true), 0);
       }
     }
   }, [pathname, section.children, hasChildren, isCollapsed]);
@@ -155,9 +155,9 @@ const SmartNavSection = memo(function SmartNavSection({
         {!isCollapsed && <span className="flex-1 text-left truncate">{section.label}</span>}
         {!isCollapsed && hasChildren && (
           isExpanded ? (
-            <ChevronDown className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <ChevronDown className="w-4 h-4 ds-text-muted flex-shrink-0" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+            <ChevronRight className="w-4 h-4 ds-text-muted flex-shrink-0" />
           )
         )}
         {!isCollapsed && section.badge && <Badge count={section.badge} />}
@@ -218,13 +218,12 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
   const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
   const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
   const [readyToOrderCount, setReadyToOrderCount] = useState(0);
-  const [favorites, setFavorites] = useState([]);
   const [showSettings, setShowSettings] = useState(false);
 
-  // Load favorites
+  // Load favorites - use lazy initialization
+  const [favorites, setFavorites] = useState(() => getFavorites());
+
   useEffect(() => {
-    setFavorites(getFavorites());
-    
     const handleFavoritesUpdate = () => {
       setFavorites(getFavorites());
     };
@@ -233,10 +232,22 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
     return () => window.removeEventListener('favorites-updated', handleFavoritesUpdate);
   }, []);
 
-  // Fetch badge counts
+  // Fetch badge counts (project-specific)
   useEffect(() => {
     if (user && ['owner', 'pm', 'project_manager', 'accountant'].includes(user.role?.toLowerCase())) {
-      fetch('/api/dashboard/summary', {
+      // If no project selected, set count to 0 (multi-project system)
+      if (!currentProject?._id) {
+        setTimeout(() => setPendingApprovalsCount(0), 0);
+        return;
+      }
+
+      const projectId = currentProject._id?.toString() || currentProject._id;
+      if (!projectId) {
+        setTimeout(() => setPendingApprovalsCount(0), 0);
+        return;
+      }
+
+      fetch(`/api/dashboard/summary?projectId=${projectId}`, {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -247,42 +258,57 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
         .then((data) => {
           if (data.success && data.data?.summary?.totalPendingApprovals) {
             setPendingApprovalsCount(data.data.summary.totalPendingApprovals);
+          } else {
+            // If no data, set to 0 (no badge)
+            setPendingApprovalsCount(0);
           }
         })
-        .catch((err) => console.error('Error fetching approvals count:', err));
+        .catch((err) => {
+          console.error('Error fetching approvals count:', err);
+          setPendingApprovalsCount(0); // Set to 0 on error (no badge)
+        });
+    } else {
+      // User doesn't have permission, set to 0
+      setPendingApprovalsCount(0);
     }
-  }, [user]);
+  }, [user, currentProject]); // Add currentProject to dependencies
+
+  const projectId = currentProject?._id?.toString() || currentProject?._id || null;
+  
+  // Get smart navigation - must be called before early return
+  const navigation = useMemo(
+    () => {
+      if (!user) return [];
+      return getSmartNavigationForRole(user.role, projectId, { showSettings });
+    },
+    [user?.role, projectId, showSettings]
+  );
+
+  // Get favorites section - must be called before early return
+  const favoritesSection = useMemo(
+    () => {
+      if (!user) return null;
+      return getFavoritesSection(favorites, user.role, projectId);
+    },
+    [favorites, user?.role, projectId]
+  );
 
   if (loading || !user) {
     return (
       <aside
-        className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen ${
-          isCollapsed ? 'w-16' : 'w-64'
+        className={`ds-bg-sidebar ds-border-sidebar border-r shadow-xl transition-all duration-300 flex flex-col h-screen ${
+          isCollapsed ? 'w-16 lg:w-20' : 'w-64 lg:w-72'
         }`}
       >
         <div className="p-4">
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+          <div className="animate-pulse space-y-3">
+            <div className="h-4 bg-slate-500 rounded w-3/4"></div>
+            <div className="h-4 bg-slate-500 rounded w-1/2"></div>
           </div>
         </div>
       </aside>
     );
   }
-
-  const projectId = currentProject?._id?.toString() || currentProject?._id || null;
-  
-  // Get smart navigation
-  const navigation = useMemo(
-    () => getSmartNavigationForRole(user.role, projectId, { showSettings }),
-    [user.role, projectId, showSettings]
-  );
-
-  // Get favorites section
-  const favoritesSection = useMemo(
-    () => getFavoritesSection(favorites, user.role, projectId),
-    [favorites, user.role, projectId]
-  );
 
   // Add favorites to navigation if exists
   const navigationWithFavorites = useMemo(() => {
@@ -295,9 +321,11 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
     return navigationWithFavorites.map((section) => {
       if (section.label === 'Operations' && section.children) {
         const updatedChildren = section.children.map((child) => {
+          // ONLY add badge when count > 0 (fixes issue where badge shows even with 0 approvals)
           if (child.href === '/dashboard/approvals' && pendingApprovalsCount > 0) {
             return { ...child, badge: pendingApprovalsCount };
           }
+          // When count is 0, return child WITHOUT badge property (no red highlighting)
           return child;
         });
         return { ...section, children: updatedChildren };
@@ -343,26 +371,33 @@ const SmartSidebarContent = memo(function SmartSidebarContent({
 
   return (
     <aside
-      className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen ${
-        isCollapsed ? 'w-16' : 'w-64'
+      className={`ds-bg-sidebar ds-border-sidebar border-r shadow-xl transition-all duration-300 flex flex-col h-screen ${
+        isCollapsed ? 'w-16 lg:w-20' : 'w-64 lg:w-72'
       }`}
     >
       {/* Logo/Brand */}
-      <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-white z-10">
+      <div className="p-4 border-b ds-border-sidebar flex-shrink-0 ds-bg-sidebar-section-secondary z-10">
         <div className="flex items-center justify-between gap-2">
           {!isCollapsed && (
-            <Link href="/dashboard" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors truncate">
+            <Link
+              href="/dashboard"
+              className="text-xl font-bold text-white hover:text-slate-50 transition-colors truncate"
+            >
               Doshaki
             </Link>
           )}
           {isCollapsed && (
-            <Link href="/dashboard" className="text-xl font-bold text-blue-600 hover:text-blue-700 transition-colors" title="Doshaki">
+            <Link
+              href="/dashboard"
+              className="text-xl font-bold text-white hover:text-slate-50 transition-colors"
+              title="Doshaki"
+            >
               K
             </Link>
           )}
           <button
             onClick={onToggleCollapse}
-            className="p-1.5 rounded-md hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors flex-shrink-0"
+            className="p-1.5 rounded-md hover:bg-slate-600 text-slate-200 hover:text-white transition-colors flex-shrink-0"
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -388,7 +423,7 @@ const SmartSidebarContent = memo(function SmartSidebarContent({
       >
         {/* Quick Actions Section */}
         {!isCollapsed && (
-          <div className="px-3 py-2 border-b border-gray-200">
+          <div className="px-3 py-2 border-b ds-border-subtle">
             <button
               onClick={() => {
                 // Trigger command palette
@@ -398,16 +433,13 @@ const SmartSidebarContent = memo(function SmartSidebarContent({
                   ctrlKey: true,
                 }));
               }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors text-gray-700"
+              className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-lg border ds-border-subtle hover:border-blue-400/60 hover:bg-blue-50 transition-colors ds-text-secondary"
             >
               <Search className="w-4 h-4" />
               <span className="flex-1 text-left">Search (⌘K)</span>
             </button>
           </div>
         )}
-
-        {/* Pending Actions */}
-        <PendingActions isCollapsed={isCollapsed} />
 
         {/* Suggested Actions */}
         <SuggestedActions isCollapsed={isCollapsed} />
@@ -434,7 +466,7 @@ const SmartSidebarContent = memo(function SmartSidebarContent({
       </div>
 
       {/* Bottom Sections */}
-      <div className="flex-shrink-0 border-t border-gray-200 bg-white">
+      <div className="flex-shrink-0 border-t ds-border-sidebar ds-bg-sidebar-section-secondary">
         {/* Contextual Quick Actions */}
         <ContextualQuickActions isCollapsed={isCollapsed} />
 
@@ -442,7 +474,7 @@ const SmartSidebarContent = memo(function SmartSidebarContent({
         {!isCollapsed && (
           <button
             onClick={onToggleSettings}
-            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors border-t border-gray-200"
+            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-200 hover:bg-slate-600 transition-colors border-t border-slate-600"
           >
             <Icon name="settings" className="w-4 h-4" />
             <span className="flex-1 text-left">{showSettings ? 'Hide' : 'Show'} Settings</span>
@@ -451,10 +483,10 @@ const SmartSidebarContent = memo(function SmartSidebarContent({
 
         {/* User Info */}
         {!isCollapsed && user && (
-          <div className="p-4 border-t border-gray-200">
+          <div className="p-4 border-t border-slate-600">
             <div className="text-sm">
-              <p className="font-medium text-gray-900 truncate">{user.firstName || user.email}</p>
-              <p className="text-gray-500 capitalize text-xs truncate">{user.role || 'User'}</p>
+              <p className="font-medium text-white truncate">{user.firstName || user.email}</p>
+              <p className="text-slate-200 capitalize text-xs truncate">{user.role || 'User'}</p>
             </div>
           </div>
         )}

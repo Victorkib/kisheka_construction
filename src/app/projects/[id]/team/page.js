@@ -236,16 +236,16 @@ export default function ProjectTeamPage() {
       site_clerk: 'bg-yellow-100 text-yellow-800',
       accountant: 'bg-indigo-100 text-indigo-800',
       investor: 'bg-pink-100 text-pink-800',
-      viewer: 'bg-gray-100 text-gray-800',
+      viewer: 'ds-bg-surface-muted ds-text-primary',
     };
-    return colors[role] || 'bg-gray-100 text-gray-800';
+    return colors[role] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (!projectId) {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+          <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-6 text-center">
             <p className="text-yellow-800">Please select a project to manage its team.</p>
           </div>
         </div>
@@ -269,24 +269,24 @@ export default function ProjectTeamPage() {
         {/* Header */}
         <div className="mb-6 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
               Project Team
             </h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+            <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">
               {currentProject?.projectName} ({currentProject?.projectCode})
             </p>
           </div>
           <div className="flex gap-3">
             <Link
               href={`/projects/${projectId}`}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 font-medium"
+              className="px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary font-medium"
             >
               ← Back to Project
             </Link>
             {canAccess && canAccess('manage_project_team') && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 font-medium"
               >
                 + Add Team Member
               </button>
@@ -295,16 +295,16 @@ export default function ProjectTeamPage() {
         </div>
 
         {/* Team Members List */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
           {teamMembers.length === 0 ? (
             <div className="p-12 text-center">
               <div className="text-6xl mb-4">👥</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No Team Members</h3>
-              <p className="text-gray-600 mb-6">Add team members to collaborate on this project</p>
+              <h3 className="text-xl font-semibold ds-text-primary mb-2">No Team Members</h3>
+              <p className="ds-text-secondary mb-6">Add team members to collaborate on this project</p>
               {canAccess && canAccess('manage_project_team') && (
                 <button
                   onClick={() => setShowAddModal(true)}
-                  className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                  className="inline-block ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
                 >
                   Add First Team Member
                 </button>
@@ -312,41 +312,41 @@ export default function ProjectTeamPage() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                       Member
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                       Project Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                       Global Role
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                       Joined
                     </th>
                     {canAccess && canAccess('manage_project_team') && (
-                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Actions
                       </th>
                     )}
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {teamMembers.map((member) => (
-                    <tr key={member.membershipId} className="hover:bg-gray-50">
+                    <tr key={member.membershipId} className="hover:ds-bg-surface-muted">
                       <td className="px-6 py-4 whitespace-nowrap">
                         {member.user ? (
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium ds-text-primary">
                               {member.user.firstName} {member.user.lastName}
                             </div>
-                            <div className="text-sm text-gray-500">{member.user.email}</div>
+                            <div className="text-sm ds-text-muted">{member.user.email}</div>
                           </div>
                         ) : (
-                          <div className="text-sm text-gray-500">User not found</div>
+                          <div className="text-sm ds-text-muted">User not found</div>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -377,11 +377,11 @@ export default function ProjectTeamPage() {
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm ds-text-secondary">
                           {member.user?.role ? member.user.role.charAt(0).toUpperCase() + member.user.role.slice(1) : 'N/A'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {member.joinedAt
                           ? new Date(member.joinedAt).toLocaleDateString()
                           : 'N/A'}
@@ -418,19 +418,19 @@ export default function ProjectTeamPage() {
             onConfirm={handleAddMember}
             title="Add Team Member"
             confirmText="Add Member"
-            confirmButtonClass="bg-blue-600 hover:bg-blue-700"
+            confirmButtonClass="ds-bg-accent-primary hover:bg-blue-700"
             isLoading={addingMember}
             showCancel={true}
           >
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Select User
                 </label>
                 <select
                   value={newMember.userId}
                   onChange={(e) => setNewMember({ ...newMember, userId: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">Choose a user...</option>
                   {availableUsers.map((user) => (
@@ -440,19 +440,19 @@ export default function ProjectTeamPage() {
                   ))}
                 </select>
                 {availableUsers.length === 0 && (
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm ds-text-muted mt-1">
                     All users are already team members
                   </p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium ds-text-secondary mb-1">
                   Project Role
                 </label>
                 <select
                   value={newMember.role}
                   onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="site_clerk">Site Clerk</option>
                   <option value="supervisor">Supervisor</option>

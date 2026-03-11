@@ -176,8 +176,8 @@ export default function InvestorDashboardPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-96"></div>
+              <div className="h-8 ds-bg-surface-muted rounded w-64 mb-2"></div>
+              <div className="h-4 ds-bg-surface-muted rounded w-96"></div>
             </div>
             <LoadingCard count={3} showHeader={true} lines={4} />
           </div>
@@ -192,8 +192,8 @@ export default function InvestorDashboardPage() {
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">My Investment Dashboard</h1>
-            <p className="mt-2 text-sm text-gray-700">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">My Investment Dashboard</h1>
+            <p className="mt-2 text-sm ds-text-secondary">
               Welcome, {investor.name}. View your investment details and project progress.
             </p>
           </div>
@@ -211,7 +211,7 @@ export default function InvestorDashboardPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-4">
+          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded mb-4">
             <p className="font-medium">{error || 'Investor profile not found.'}</p>
             <p className="text-sm mt-2">
               If you believe this is an error, please contact the administrator to link your user account to an investor record.
@@ -231,31 +231,31 @@ export default function InvestorDashboardPage() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">My Investment Dashboard</h1>
-          <p className="mt-2 text-sm text-gray-700">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">My Investment Dashboard</h1>
+          <p className="mt-2 text-sm ds-text-secondary">
             Welcome, {investor.name}. View your investment details and project progress.
           </p>
         </div>
 
         {/* My Contribution Card */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">My Contribution</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">My Contribution</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <div className="text-sm text-gray-600">Total Invested</div>
+              <div className="text-sm ds-text-secondary">Total Invested</div>
               <div className="text-2xl font-bold text-green-600 mt-1">
                 {formatCurrency(investor.totalInvested || 0)}
               </div>
             </div>
             <div>
-              <div className="text-sm text-gray-600">Investment Type</div>
-              <div className="text-xl font-semibold text-gray-900 mt-1">
+              <div className="text-sm ds-text-secondary">Investment Type</div>
+              <div className="text-xl font-semibold ds-text-primary mt-1">
                 {investor.investmentType}
               </div>
             </div>
             <div>
-              <div className="text-sm text-gray-600">Share of Total</div>
-              <div className="text-xl font-semibold text-gray-900 mt-1">
+              <div className="text-sm ds-text-secondary">Share of Total</div>
+              <div className="text-xl font-semibold ds-text-primary mt-1">
                 {investorShare.toFixed(2)}%
               </div>
             </div>
@@ -264,44 +264,44 @@ export default function InvestorDashboardPage() {
 
         {/* Project Finances Overview */}
         {financesLoading ? (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
             <div className="animate-pulse">
-              <div className="h-6 bg-gray-200 rounded w-48 mb-4"></div>
+              <div className="h-6 ds-bg-surface-muted rounded w-48 mb-4"></div>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i}>
-                    <div className="h-4 bg-gray-200 rounded w-24 mb-2"></div>
-                    <div className="h-6 bg-gray-200 rounded w-32"></div>
+                    <div className="h-4 ds-bg-surface-muted rounded w-24 mb-2"></div>
+                    <div className="h-6 ds-bg-surface-muted rounded w-32"></div>
                   </div>
                 ))}
               </div>
             </div>
           </div>
         ) : finances ? (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Project Finances Overview</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Project Finances Overview</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div>
-                <div className="text-sm text-gray-600">Total Capital Raised</div>
-                <div className="text-xl font-semibold text-gray-900 mt-1">
+                <div className="text-sm ds-text-secondary">Total Capital Raised</div>
+                <div className="text-xl font-semibold ds-text-primary mt-1">
                   {formatCurrency(finances.totalInvested || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-600">Total Capital Used</div>
+                <div className="text-sm ds-text-secondary">Total Capital Used</div>
                 <div className="text-xl font-semibold text-red-600 mt-1">
                   {formatCurrency(finances.totalUsed || 0)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-600">My Capital Used</div>
+                <div className="text-sm ds-text-secondary">My Capital Used</div>
                 <div className="text-xl font-semibold text-orange-600 mt-1">
                   {formatCurrency(investorCapitalUsed)}
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-600">My Remaining Balance</div>
-                <div className="text-xl font-semibold text-blue-600 mt-1">
+                <div className="text-sm ds-text-secondary">My Remaining Balance</div>
+                <div className="text-xl font-semibold ds-text-accent-primary mt-1">
                   {formatCurrency(investorCapitalBalance)}
                 </div>
               </div>
@@ -311,48 +311,48 @@ export default function InvestorDashboardPage() {
 
         {/* Project Breakdown */}
         {projectBreakdown.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">My Project Allocations</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">My Project Allocations</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                       Project
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                       Allocated
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                       Capital Used
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                       Remaining
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                    <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {projectBreakdown.map((project) => (
-                    <tr key={project.projectId} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={project.projectId} className="hover:ds-bg-surface-muted">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                         {project.projectName}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                         {formatCurrency(project.allocatedAmount)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-red-600">
                         {formatCurrency(project.capitalUsed)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-blue-600">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-accent-primary">
                         {formatCurrency(project.capitalBalance)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <Link
                           href={`/projects/${project.projectId}/finances`}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="ds-text-accent-primary hover:text-blue-900"
                         >
                           View Details →
                         </Link>
@@ -366,9 +366,9 @@ export default function InvestorDashboardPage() {
         )}
 
         {/* Financial Statements Section */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold text-gray-900">Financial Statements</h2>
+            <h2 className="text-lg font-semibold ds-text-primary">Financial Statements</h2>
             <button
               onClick={handleOpenStatementGenerator}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
@@ -376,7 +376,7 @@ export default function InvestorDashboardPage() {
               Generate Statement
             </button>
           </div>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm ds-text-secondary">
             Download your investment statement showing all contributions and capital usage in PDF, Excel, or JSON format.
           </p>
         </div>
@@ -384,7 +384,7 @@ export default function InvestorDashboardPage() {
         {/* Statement Generator Modal */}
         {showStatementGenerator && investor && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="ds-bg-surface rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
               <StatementGenerator
                 investorId={investor._id}
                 investorName={investor.name}
@@ -395,14 +395,14 @@ export default function InvestorDashboardPage() {
         )}
 
         {/* Project Progress Section */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Project Progress</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Project Progress</h2>
+          <p className="text-sm ds-text-secondary mb-4">
             View project details and progress updates.
           </p>
           <Link
             href="/projects"
-            className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-block px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover"
           >
             View Projects
           </Link>

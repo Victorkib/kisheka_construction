@@ -89,15 +89,15 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+        <div className="bg-red-500/10 border border-red-400/60/70 text-red-400 px-4 py-3 rounded text-sm">
           <p>{error}</p>
           {isVerificationError && email && (
-            <div className="mt-3 pt-3 border-t border-red-200">
+            <div className="mt-3 pt-3 border-t border-red-400/60">
               <button
                 type="button"
                 onClick={handleResendVerification}
                 disabled={resending || resendSuccess}
-                className="text-sm text-blue-600 hover:text-blue-800 underline disabled:text-gray-400"
+                className="text-sm text-blue-600 hover:text-blue-800 underline disabled:ds-text-muted"
               >
                 {resending
                   ? 'Sending...'
@@ -111,13 +111,13 @@ export function LoginForm() {
       )}
 
       {resendSuccess && !error && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-sm">
+        <div className="bg-emerald-500/10 border border-emerald-300/70 text-emerald-300 px-4 py-3 rounded text-sm">
           ✓ Verification email sent! Please check your inbox.
         </div>
       )}
 
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="email" className="block text-sm font-medium ds-text-secondary mb-1">
           Email
         </label>
         <input
@@ -128,12 +128,12 @@ export function LoginForm() {
           placeholder="you@company.com"
           required
           disabled={loading}
-          className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:bg-gray-100 disabled:text-gray-500"
+          className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted disabled:bg-opacity-70 disabled:ds-text-muted"
         />
       </div>
 
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+        <label htmlFor="password" className="block text-sm font-medium ds-text-secondary mb-1">
           Password
         </label>
         <input
@@ -144,14 +144,14 @@ export function LoginForm() {
           placeholder="••••••••"
           required
           disabled={loading}
-          className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 disabled:bg-gray-100 disabled:text-gray-500"
+          className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted disabled:bg-opacity-70 disabled:ds-text-muted"
         />
       </div>
 
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 rounded-lg transition"
+        className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-slate-500 text-white font-medium py-2 rounded-lg transition"
       >
         {loading ? 'Signing in...' : 'Sign in'}
       </button>

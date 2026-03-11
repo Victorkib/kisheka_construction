@@ -135,11 +135,11 @@ export default function NewCategoryPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
+          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded mb-6 text-sm sm:text-base">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to create categories. Only Owners can create categories.</p>
           </div>
-          <Link href="/categories" className="text-blue-600 hover:text-blue-900 active:text-blue-800 underline text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/categories" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover underline text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Categories
           </Link>
         </div>
@@ -152,16 +152,16 @@ export default function NewCategoryPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/categories" className="text-blue-600 hover:text-blue-900 active:text-blue-800 text-sm sm:text-base mb-4 inline-block transition-colors touch-manipulation">
+          <Link href="/categories" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover text-sm sm:text-base mb-4 inline-block transition-colors touch-manipulation">
             ← Back to Categories
           </Link>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">Create New Category</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-2">Add a new category for a specific area</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Create New Category</h1>
+          <p className="text-sm sm:text-base ds-text-secondary mt-2">Add a new category for a specific area</p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6 flex items-start gap-2 text-sm sm:text-base">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6 flex items-start gap-2 text-sm sm:text-base">
             <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -176,19 +176,19 @@ export default function NewCategoryPage() {
         )}
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-4 sm:p-6 space-y-4 sm:space-y-6">
+        <form onSubmit={handleSubmit} className="ds-bg-surface rounded-lg shadow border ds-border-subtle p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Category Type */}
           <div>
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Category Type</h2>
+            <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Category Type</h2>
             <div>
-              <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Type <span className="text-red-500">*</span>
               </label>
               <select
                 name="type"
                 value={formData.type}
                 onChange={handleChange}
-                className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
+                className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus touch-manipulation"
               >
                 {CATEGORY_TYPE_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -196,7 +196,7 @@ export default function NewCategoryPage() {
                   </option>
                 ))}
               </select>
-              <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-normal">
+              <p className="text-xs sm:text-sm ds-text-secondary mt-1 leading-normal">
                 Keeps categories organized by feature area
               </p>
             </div>
@@ -204,10 +204,10 @@ export default function NewCategoryPage() {
 
           {/* Basic Information */}
           <div>
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+            <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Basic Information</h2>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
                   Category Name <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -217,25 +217,25 @@ export default function NewCategoryPage() {
                   onChange={handleChange}
                   placeholder="e.g., Concrete, Steel, Electrical"
                   required
-                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted touch-manipulation"
                 />
-                <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-normal">Unique name for this category</p>
+                <p className="text-xs sm:text-sm ds-text-secondary mt-1 leading-normal">Unique name for this category</p>
               </div>
 
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Description</label>
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">Description</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
                   placeholder="Category description..."
                   rows={3}
-                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted touch-manipulation"
                 />
               </div>
 
               <div>
-                <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1 leading-normal">Icon (Emoji)</label>
+                <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">Icon (Emoji)</label>
                 <input
                   type="text"
                   name="icon"
@@ -243,16 +243,16 @@ export default function NewCategoryPage() {
                   onChange={handleChange}
                   placeholder="e.g., 🏗️, 📦, ⚡"
                   maxLength={2}
-                  className="w-full px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                  className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted touch-manipulation"
                 />
-                <p className="text-xs sm:text-sm text-gray-600 mt-1 leading-normal">Optional emoji icon for visual identification</p>
+                <p className="text-xs sm:text-sm ds-text-secondary mt-1 leading-normal">Optional emoji icon for visual identification</p>
               </div>
             </div>
           </div>
 
           {/* Subcategories */}
           <div>
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Subcategories (Optional)</h2>
+            <h2 className="text-base sm:text-lg font-semibold ds-text-primary mb-4">Subcategories (Optional)</h2>
             <div className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-2">
                 <input
@@ -266,12 +266,12 @@ export default function NewCategoryPage() {
                     }
                   }}
                   placeholder="Enter subcategory name"
-                  className="flex-1 px-3 py-2.5 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400 touch-manipulation"
+                  className="flex-1 px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-focus placeholder:ds-text-muted touch-manipulation"
                 />
                 <button
                   type="button"
                   onClick={handleAddSubcategory}
-                  className="px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors touch-manipulation min-h-[44px] sm:min-h-0"
+                  className="px-4 py-2.5 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface active:ds-bg-surface transition-colors touch-manipulation min-h-[44px] sm:min-h-0"
                 >
                   Add
                 </button>
@@ -288,7 +288,7 @@ export default function NewCategoryPage() {
                       <button
                         type="button"
                         onClick={() => handleRemoveSubcategory(index)}
-                        className="text-blue-600 hover:text-blue-800 active:text-blue-900 flex-shrink-0 touch-manipulation min-w-[24px] min-h-[24px] flex items-center justify-center"
+                        className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover flex-shrink-0 touch-manipulation min-w-[24px] min-h-[24px] flex items-center justify-center"
                       >
                         ×
                       </button>
@@ -301,13 +301,13 @@ export default function NewCategoryPage() {
 
           {/* Submit Buttons */}
           <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 sm:gap-4 pt-4 border-t">
-            <Link href="/categories" className="w-full sm:w-auto px-6 py-2.5 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 transition-colors text-center touch-manipulation">
+            <Link href="/categories" className="w-full sm:w-auto px-6 py-2.5 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface transition-colors text-center touch-manipulation">
               Cancel
             </Link>
             <button
               type="submit"
               disabled={loading}
-              className="w-full sm:w-auto px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
+              className="w-full sm:w-auto px-6 py-2.5 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
             >
               {loading ? 'Creating...' : 'Create Category'}
             </button>

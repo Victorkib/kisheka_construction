@@ -327,8 +327,8 @@ export function Step2AddWorkers({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Add Workers</h2>
-        <p className="text-sm text-gray-600">
+        <h2 className="text-xl font-semibold ds-text-primary mb-2">Add Workers</h2>
+        <p className="text-sm ds-text-secondary">
           Add workers to this batch. You can add multiple workers at once. Default values from Step 1 will be applied.
         </p>
       </div>
@@ -341,13 +341,13 @@ export function Step2AddWorkers({
           className={`px-4 py-2 rounded-lg border-2 transition-colors ${
             showTemplates
               ? 'border-blue-500 bg-blue-50 text-blue-700'
-              : 'border-gray-300 bg-white text-gray-700 hover:border-blue-300'
+              : 'ds-border-subtle ds-bg-surface ds-text-secondary hover:border-blue-400/60'
           }`}
         >
           {showTemplates ? 'Hide Templates' : 'Use Template'}
         </button>
         {!showTemplates && workers.length === 0 && (
-          <p className="text-sm text-gray-600">
+          <p className="text-sm ds-text-secondary">
             Or start with a template to quickly add common worker patterns
           </p>
         )}
@@ -355,7 +355,7 @@ export function Step2AddWorkers({
 
       {/* Template Selector */}
       {showTemplates && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-4">
           <TemplateSelector
             onTemplateSelected={handleTemplateSelected}
             currentProjectId={wizardData.projectId}
@@ -365,7 +365,7 @@ export function Step2AddWorkers({
       )}
 
       {/* Summary */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-medium text-blue-900">
@@ -388,33 +388,33 @@ export function Step2AddWorkers({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 border border-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-ds-border-subtle border ds-border-subtle">
+          <thead className="ds-bg-surface-muted">
             <tr>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-12">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase w-12">
                 #
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[200px]">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase min-w-[200px]">
                 Worker Name <span className="text-red-500">*</span>
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[120px]">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase min-w-[120px]">
                 Skill Type <span className="text-red-500">*</span>
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[100px]">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase min-w-[100px]">
                 Hours <span className="text-red-500">*</span>
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[120px]">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase min-w-[120px]">
                 Rate (KES) <span className="text-red-500">*</span>
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase min-w-[120px]">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase min-w-[120px]">
                 Cost (KES)
               </th>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-16">
+              <th className="px-3 py-2 text-left text-xs font-medium ds-text-muted uppercase w-16">
                 Action
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
             {workers.map((worker, index) => {
               // Use schema calculation logic to match what will be saved
               const totalHours = parseFloat(worker.totalHours) || 0;
@@ -430,13 +430,13 @@ export function Step2AddWorkers({
               const totalCost = regularCost + overtimeCost;
 
               return (
-                <tr key={index} className="hover:bg-gray-50">
-                  <td className="px-3 py-2 text-sm text-gray-600">{index + 1}</td>
+                <tr key={index} className="hover:ds-bg-surface-muted">
+                  <td className="px-3 py-2 text-sm ds-text-secondary">{index + 1}</td>
                   <td className="px-3 py-2">
                     <div className="space-y-2">
                       {/* Loading Indicator */}
                       {(loadingWorkers || loadingSuggestions) && (
-                        <div className="mb-2 flex items-center gap-2 text-xs text-gray-500">
+                        <div className="mb-2 flex items-center gap-2 text-xs ds-text-muted">
                           <LoadingSpinner size="sm" color="gray-600" />
                           <span>Loading workers...</span>
                         </div>
@@ -479,8 +479,8 @@ export function Step2AddWorkers({
                       />
                       
                       {/* Traditional Dropdown (Alternative) */}
-                      <div className="border-t border-gray-200 pt-2">
-                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                      <div className="border-t ds-border-subtle pt-2">
+                        <label className="block text-xs font-medium ds-text-secondary mb-1">
                           Or select from dropdown:
                         </label>
                         <select
@@ -504,7 +504,7 @@ export function Step2AddWorkers({
                               }
                             }
                           }}
-                          className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                         >
                           <option value="">Select from list...</option>
                           {suggestedWorkers.length > 0 && (
@@ -549,7 +549,7 @@ export function Step2AddWorkers({
                       value={worker.skillType || ''}
                       onChange={(e) => handleWorkerChange(index, 'skillType', e.target.value)}
                       required
-                      className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     >
                       <option value="">Select Skill</option>
                       {VALID_SKILL_TYPES.map((skill) => (
@@ -568,7 +568,7 @@ export function Step2AddWorkers({
                       max="24"
                       step="0.5"
                       required
-                      className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </td>
                   <td className="px-3 py-2">
@@ -579,10 +579,10 @@ export function Step2AddWorkers({
                       min="0"
                       step="0.01"
                       required
-                      className="w-full px-2 py-1 text-sm bg-white text-gray-900 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1 text-sm ds-bg-surface ds-text-primary border ds-border-subtle rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                     />
                   </td>
-                  <td className="px-3 py-2 text-sm font-medium text-gray-900">
+                  <td className="px-3 py-2 text-sm font-medium ds-text-primary">
                     {totalCost.toLocaleString()}
                   </td>
                   <td className="px-3 py-2">
@@ -601,16 +601,16 @@ export function Step2AddWorkers({
               );
             })}
           </tbody>
-          <tfoot className="bg-gray-50">
+          <tfoot className="ds-bg-surface-muted">
             <tr>
-              <td colSpan="3" className="px-3 py-2 text-sm font-semibold text-gray-900 text-right">
+              <td colSpan="3" className="px-3 py-2 text-sm font-semibold ds-text-primary text-right">
                 Totals:
               </td>
-              <td className="px-3 py-2 text-sm font-semibold text-gray-900">
+              <td className="px-3 py-2 text-sm font-semibold ds-text-primary">
                 {totals.totalHours.toFixed(1)} hrs
               </td>
               <td className="px-3 py-2"></td>
-              <td className="px-3 py-2 text-sm font-semibold text-gray-900">
+              <td className="px-3 py-2 text-sm font-semibold ds-text-primary">
                 {totals.totalCost.toLocaleString()} KES
               </td>
               <td className="px-3 py-2"></td>

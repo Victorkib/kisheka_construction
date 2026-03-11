@@ -18,29 +18,29 @@ export function LoadingTable({
   className = '' 
 }) {
   return (
-    <div className={`bg-white rounded-lg shadow overflow-hidden ${className}`}>
+    <div className={`ds-bg-surface rounded-lg shadow overflow-hidden border ds-border-subtle ${className}`}>
       <div className="animate-pulse">
         {showHeader && (
-          <div className="bg-gray-50 px-6 py-3 border-b border-gray-200">
+          <div className="ds-bg-surface-muted px-6 py-3 border-b ds-border-subtle">
             <div className="flex space-x-4">
               {Array.from({ length: columns }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-4 bg-gray-200 rounded"
+                  className="h-4 ds-bg-surface-muted rounded"
                   style={{ width: `${100 / columns}%` }}
                 ></div>
               ))}
             </div>
           </div>
         )}
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y ds-border-subtle">
           {Array.from({ length: rows }).map((_, rowIndex) => (
             <div key={rowIndex} className="px-6 py-4">
               <div className="flex space-x-4">
                 {Array.from({ length: columns }).map((_, colIndex) => (
                   <div
                     key={colIndex}
-                    className="h-4 bg-gray-200 rounded"
+                  className="h-4 ds-bg-surface-muted rounded"
                     style={{ width: `${100 / columns}%` }}
                   ></div>
                 ))}

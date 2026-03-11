@@ -235,7 +235,9 @@ export async function PATCH(request, { params }) {
       floorId,
       categoryId,
       priority,
-      notes
+      notes,
+      executionModel,
+      subcontractorId
     } = body;
 
     const db = await getDatabase();
@@ -363,7 +365,60 @@ export async function PATCH(request, { params }) {
       if (isNaN(estimatedCost) || estimatedCost < 0) {
         return errorResponse('Estimated cost must be >= 0', 400);
       }
-      updateData.estimatedCost = parseFloat(estimatedCost);
+      
+      const parsedEstimatedCost = parseFloat(estimatedCost);
+      
+      // For finishing phases, validate budget when updating estimatedCost
+      if (phase.phaseType === 'finishing' && parsedEstimatedCost > 0) {
+        const workItemFloorId = updateData.floorId || existingWorkItem.floorId;
+        if (workItemFloorId) {
+          const floor = await db.collection('floors').findOne({
+            _id: workItemFloorId,
+            projectId: existingWorkItem.projectId,
+            deletedAt: null,
+          });
+
+          if (floor) {
+            const phase03Budget = floor.budgetAllocation?.byPhase?.['PHASE-03']?.total || 0;
+            
+            // If budget is set, validate
+            if (phase03Budget > 0) {
+              // Calculate current spending for finishing works on this floor
+              const { calculateFloorActualSpending } = await import('@/lib/floor-financial-helpers');
+              const actualSpending = await calculateFloorActualSpending(workItemFloorId.toString(), true);
+              const phase03Spending = actualSpending.byPhase?.[existingWorkItem.phaseId.toString()]?.total || 0;
+              
+              // Get committed costs (estimated costs of existing work items, excluding this one)
+              const existingFinishingWorkItems = await db.collection('work_items').find({
+                projectId: existingWorkItem.projectId,
+                phaseId: existingWorkItem.phaseId,
+                floorId: workItemFloorId,
+                _id: { $ne: new ObjectId(id) }, // Exclude current work item
+                deletedAt: null,
+              }).toArray();
+              
+              const committedEstimated = existingFinishingWorkItems.reduce(
+                (sum, item) => sum + (Number(item.estimatedCost) || 0),
+                0
+              );
+              
+              const totalAfterUpdate = phase03Spending + committedEstimated + parsedEstimatedCost;
+              
+              // Only block if budget is exceeded (allow 5% tolerance for rounding)
+              if (totalAfterUpdate > phase03Budget * 1.05) {
+                return errorResponse(
+                  `Updated estimated cost (${parsedEstimatedCost}) would exceed PHASE-03 budget for this floor. ` +
+                  `Budget: ${phase03Budget}, Current: ${phase03Spending + committedEstimated}, ` +
+                  `After update: ${totalAfterUpdate}`,
+                  400
+                );
+              }
+            }
+          }
+        }
+      }
+      
+      updateData.estimatedCost = parsedEstimatedCost;
     }
 
     if (actualCost !== undefined) {
@@ -411,7 +466,16 @@ export async function PATCH(request, { params }) {
     }
 
     if (floorId !== undefined) {
-      updateData.floorId = floorId && ObjectId.isValid(floorId) ? new ObjectId(floorId) : null;
+      // For finishing phases, floorId is required
+      if (phase.phaseType === 'finishing') {
+        if (!floorId || !ObjectId.isValid(floorId)) {
+          return errorResponse('For finishing phases, a valid floorId is required', 400);
+        }
+        updateData.floorId = new ObjectId(floorId);
+      } else {
+        // For non-finishing phases, floorId is optional
+        updateData.floorId = floorId && ObjectId.isValid(floorId) ? new ObjectId(floorId) : null;
+      }
     }
 
     if (categoryId !== undefined) {
@@ -429,6 +493,77 @@ export async function PATCH(request, { params }) {
 
     if (notes !== undefined) {
       updateData.notes = notes?.trim() || '';
+    }
+
+    if (executionModel !== undefined) {
+      const validModels = ['direct_labour', 'contract_based'];
+      if (executionModel !== null && executionModel !== '' && !validModels.includes(executionModel)) {
+        return errorResponse(`Invalid execution model. Must be one of: ${validModels.join(', ')}`, 400);
+      }
+      updateData.executionModel = executionModel && executionModel !== '' ? executionModel : null;
+      
+      // If changing to contract_based, ensure subcontractorId is set
+      // If changing to direct_labour, clear subcontractorId
+      if (updateData.executionModel === 'contract_based') {
+        // If no subcontractorId provided, keep existing one or require it
+        if (subcontractorId === undefined && !existingWorkItem.subcontractorId) {
+          return errorResponse('Subcontractor ID is required when execution model is contract_based', 400);
+        }
+        
+        // For finishing phases, validate subcontractor floorId matches work item floorId
+        if (phase.phaseType === 'finishing') {
+          const workItemFloorId = updateData.floorId || existingWorkItem.floorId;
+          if (workItemFloorId) {
+            const finalSubcontractorId = subcontractorId !== undefined ? subcontractorId : existingWorkItem.subcontractorId;
+            if (finalSubcontractorId) {
+              const subcontractor = await db.collection('subcontractors').findOne({
+                _id: new ObjectId(finalSubcontractorId),
+                deletedAt: null
+              });
+              if (subcontractor && subcontractor.floorId && subcontractor.floorId.toString() !== workItemFloorId.toString()) {
+                return errorResponse('Subcontractor is assigned to a different floor. Please select a subcontractor assigned to this floor.', 400);
+              }
+            }
+          }
+        }
+      } else if (updateData.executionModel === 'direct_labour') {
+        // Clear subcontractorId when switching to direct_labour
+        updateData.subcontractorId = null;
+      }
+    }
+
+    if (subcontractorId !== undefined) {
+      if (subcontractorId === null || subcontractorId === '') {
+        updateData.subcontractorId = null;
+      } else if (!ObjectId.isValid(subcontractorId)) {
+        return errorResponse('If provided, subcontractorId must be a valid ObjectId', 400);
+      } else {
+        // Verify subcontractor exists and belongs to same project/phase
+        const subcontractor = await db.collection('subcontractors').findOne({
+          _id: new ObjectId(subcontractorId),
+          projectId: existingWorkItem.projectId,
+          phaseId: existingWorkItem.phaseId,
+          deletedAt: null
+        });
+        if (!subcontractor) {
+          return errorResponse('Subcontractor not found or does not belong to this project/phase', 404);
+        }
+        
+        // For finishing phases, verify subcontractor is linked to the same floor if floorId is set
+        const workItemFloorId = updateData.floorId || existingWorkItem.floorId;
+        if (phase.phaseType === 'finishing' && workItemFloorId && subcontractor.floorId) {
+          if (subcontractor.floorId.toString() !== workItemFloorId.toString()) {
+            return errorResponse('Subcontractor is assigned to a different floor. Please select a subcontractor assigned to this floor.', 400);
+          }
+        }
+        
+        updateData.subcontractorId = new ObjectId(subcontractorId);
+        
+        // If executionModel is not contract_based, auto-set it to contract_based when subcontractor is assigned
+        if (existingWorkItem.executionModel !== 'contract_based' && updateData.executionModel !== 'contract_based') {
+          updateData.executionModel = 'contract_based';
+        }
+      }
     }
 
     // Update work item

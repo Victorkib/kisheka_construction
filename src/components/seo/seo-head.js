@@ -85,7 +85,7 @@ export function SeoBreadcrumb({ items }) {
               {item.name}
             </a>
             {index < items.length - 1 && (
-              <span className="text-gray-400">/</span>
+              <span className="ds-text-muted">/</span>
             )}
           </li>
         ))}
@@ -99,17 +99,17 @@ export function SeoBreadcrumb({ items }) {
  */
 export function SeofaqItem({ question, answer, isOpen, onToggle }) {
   return (
-    <div className="border-b border-gray-200">
+    <div className="border-b ds-border-subtle">
       <button
         onClick={onToggle}
-        className="w-full text-left py-4 font-semibold text-gray-900 hover:text-blue-600 flex justify-between items-center"
+        className="w-full text-left py-4 font-semibold ds-text-primary hover:text-blue-600 flex justify-between items-center"
         aria-expanded={isOpen}
       >
         <span>{question}</span>
         <span>{isOpen ? '−' : '+'}</span>
       </button>
       {isOpen && (
-        <div className="pb-4 text-gray-700">
+        <div className="pb-4 ds-text-secondary">
           <p>{answer}</p>
         </div>
       )}

@@ -125,9 +125,9 @@ function PhaseTemplatesPageContent() {
       'residential': 'bg-blue-100 text-blue-800',
       'commercial': 'bg-green-100 text-green-800',
       'infrastructure': 'bg-purple-100 text-purple-800',
-      'custom': 'bg-gray-100 text-gray-800'
+      'custom': 'ds-bg-surface-muted ds-text-primary'
     };
-    return colors[type] || 'bg-gray-100 text-gray-800';
+    return colors[type] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (!permissionChecked) {
@@ -154,11 +154,11 @@ function PhaseTemplatesPageContent() {
     <AppLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Phase Templates</h1>
+          <h1 className="text-2xl font-bold ds-text-primary">Phase Templates</h1>
           {user && ['owner', 'pm', 'project_manager'].includes(user.role?.toLowerCase()) && (
             <Link
               href="/phase-templates/new"
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white ds-bg-accent-primary hover:ds-bg-accent-hover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-ds-accent-focus"
             >
               + Create Template
             </Link>
@@ -180,17 +180,17 @@ function PhaseTemplatesPageContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="templateType-filter" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="templateType-filter" className="block text-sm font-semibold ds-text-secondary mb-2">
                 Template Type
               </label>
               <select
                 id="templateType-filter"
                 value={filters.templateType}
                 onChange={(e) => handleFilterChange('templateType', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500"
               >
                 <option value="">All Types</option>
                 {TEMPLATE_TYPES.map((type) => (
@@ -201,7 +201,7 @@ function PhaseTemplatesPageContent() {
               </select>
             </div>
             <div>
-              <label htmlFor="search-filter" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="search-filter" className="block text-sm font-semibold ds-text-secondary mb-2">
                 Search
               </label>
               <input
@@ -210,7 +210,7 @@ function PhaseTemplatesPageContent() {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search templates..."
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-blue-500"
               />
             </div>
             <div className="flex items-end">
@@ -219,7 +219,7 @@ function PhaseTemplatesPageContent() {
                   setFilters({ templateType: '', search: '' });
                   router.push('/phase-templates', { scroll: false });
                 }}
-                className="w-full px-4 py-2 border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium rounded-lg transition"
+                className="w-full px-4 py-2 border ds-border-subtle hover:ds-bg-surface-muted ds-text-secondary font-medium rounded-lg transition"
               >
                 Clear Filters
               </button>
@@ -228,7 +228,7 @@ function PhaseTemplatesPageContent() {
         </div>
 
         {error ? (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         ) : templates.length === 0 ? (
@@ -241,11 +241,11 @@ function PhaseTemplatesPageContent() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {templates.map((template) => (
-              <div key={template._id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
+              <div key={template._id} className="ds-bg-surface rounded-lg shadow hover:shadow-lg transition-shadow">
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      <h3 className="text-lg font-semibold ds-text-primary mb-2">
                         {template.templateName}
                       </h3>
                       <span className={`px-2 py-1 text-xs font-semibold rounded-full ${getTemplateTypeColor(template.templateType)}`}>
@@ -256,7 +256,7 @@ function PhaseTemplatesPageContent() {
                       <div className="flex gap-2">
                         <Link
                           href={`/phase-templates/${template._id}`}
-                          className="text-blue-600 hover:text-blue-800 text-sm"
+                          className="ds-text-accent-primary hover:ds-text-accent-hover text-sm"
                         >
                           View
                         </Link>
@@ -271,22 +271,22 @@ function PhaseTemplatesPageContent() {
                   </div>
 
                   {template.description && (
-                    <p className="text-sm text-gray-600 mb-4">{template.description}</p>
+                    <p className="text-sm ds-text-secondary mb-4">{template.description}</p>
                   )}
 
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Phases:</span>
-                      <span className="font-semibold text-gray-900">{template.phases?.length || 0}</span>
+                      <span className="ds-text-secondary">Phases:</span>
+                      <span className="font-semibold ds-text-primary">{template.phases?.length || 0}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Times Used:</span>
-                      <span className="font-semibold text-gray-900">{template.usageCount || 0}</span>
+                      <span className="ds-text-secondary">Times Used:</span>
+                      <span className="font-semibold ds-text-primary">{template.usageCount || 0}</span>
                     </div>
                     {template.lastUsedAt && (
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Last Used:</span>
-                        <span className="font-semibold text-gray-900">
+                        <span className="ds-text-secondary">Last Used:</span>
+                        <span className="font-semibold ds-text-primary">
                           {new Date(template.lastUsedAt).toLocaleDateString()}
                         </span>
                       </div>

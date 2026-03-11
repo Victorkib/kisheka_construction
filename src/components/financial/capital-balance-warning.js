@@ -128,7 +128,7 @@ export function CapitalBalanceWarning({ projectId, amountToApprove }) {
             <p className={textColor}>
               <strong>Total Invested:</strong> {formatCurrency(totalInvested)}
             </p>
-            <p className="text-gray-600 mt-2">
+            <p className="ds-text-secondary mt-2">
               <em>Note: Spending limit is based on available capital, not budget.</em>
             </p>
           </div>

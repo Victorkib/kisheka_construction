@@ -46,7 +46,7 @@ export function RegistrationSuccess({ email, isInvitation = false }) {
 
   return (
     <div className="space-y-6">
-      <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 text-center">
+      <div className="bg-green-50 border-2 border-green-400/60 rounded-lg p-6 text-center">
         <div className="mb-4">
           <svg
             className="mx-auto h-16 w-16 text-green-600"
@@ -78,7 +78,7 @@ export function RegistrationSuccess({ email, isInvitation = false }) {
             <p className="text-lg font-semibold text-green-800 bg-green-100 px-4 py-2 rounded inline-block">
               {email}
             </p>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4 text-left">
+            <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 mt-4 text-left">
               <p className="text-blue-800 font-semibold mb-2">📧 Next Steps:</p>
               <ol className="list-decimal list-inside space-y-2 text-blue-700 text-sm">
                 <li>Check your email inbox (and spam folder)</li>
@@ -93,13 +93,13 @@ export function RegistrationSuccess({ email, isInvitation = false }) {
       {!isInvitation && (
         <div className="space-y-3">
           <div className="text-center">
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm ds-text-secondary mb-3">
               Didn't receive the email?
             </p>
             <button
               onClick={handleResendVerification}
               disabled={resending || resendSuccess}
-              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-lg transition"
+              className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-500 text-white font-medium py-2 px-4 rounded-lg transition"
             >
               {resending
                 ? 'Sending...'
@@ -110,28 +110,28 @@ export function RegistrationSuccess({ email, isInvitation = false }) {
           </div>
 
           {resendSuccess && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-sm text-center">
+            <div className="bg-green-50 border border-green-400/60 text-green-700 px-4 py-3 rounded text-sm text-center">
               ✓ Verification email sent! Please check your inbox.
             </div>
           )}
 
           {resendError && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm text-center">
+            <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm text-center">
               {resendError}
             </div>
           )}
         </div>
       )}
 
-      <div className="pt-4 border-t border-gray-200">
+      <div className="pt-4 border-t ds-border-subtle">
         <div className="space-y-3">
           <Link
             href="/auth/login"
-            className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-medium py-2 px-4 rounded-lg transition text-center"
+            className="block w-full ds-bg-surface-muted hover:ds-bg-surface-muted ds-text-primary font-medium py-2 px-4 rounded-lg transition text-center"
           >
             Go to Login Page
           </Link>
-          <p className="text-center text-xs text-gray-500">
+          <p className="text-center text-xs ds-text-muted">
             Already verified?{' '}
             <Link href="/auth/login" className="text-blue-600 hover:underline">
               Sign in now

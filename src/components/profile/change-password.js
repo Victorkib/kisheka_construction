@@ -97,11 +97,13 @@ export function ChangePassword() {
 
     try {
       const response = await fetch('/api/profile/password', {
-          cache: 'no-store',
-          headers: {
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
+        method: 'POST',
+        cache: 'no-store',
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
         body: JSON.stringify(formData),
       });
 
@@ -128,19 +130,19 @@ export function ChangePassword() {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 mb-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-4">
+    <div className="ds-bg-surface rounded-lg shadow p-6 mb-6 border ds-border-subtle">
+      <h2 className="text-xl font-semibold ds-text-primary mb-4">
         Change Password
       </h2>
 
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm">
+        <div className="mb-4 bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm">
           {error}
         </div>
       )}
 
       {success && (
-        <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded text-sm">
+        <div className="mb-4 bg-green-50 border border-green-400/60 text-green-700 px-4 py-3 rounded text-sm">
           Password changed successfully!
         </div>
       )}
@@ -150,7 +152,7 @@ export function ChangePassword() {
         <div>
           <label
             htmlFor="currentPassword"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium ds-text-secondary mb-1"
           >
             Current Password
           </label>
@@ -163,12 +165,12 @@ export function ChangePassword() {
               onChange={handleChange}
               disabled={loading}
               required
-              className="w-full px-3 py-2 pr-10 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+              className="w-full px-3 py-2 pr-10 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted"
             />
             <button
               type="button"
               onClick={() => togglePasswordVisibility('current')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 ds-text-muted hover:ds-text-secondary"
             >
               {showPassword.current ? (
                 <svg
@@ -213,7 +215,7 @@ export function ChangePassword() {
         <div>
           <label
             htmlFor="newPassword"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium ds-text-secondary mb-1"
           >
             New Password
           </label>
@@ -227,12 +229,12 @@ export function ChangePassword() {
               disabled={loading}
               required
               minLength={8}
-              className="w-full px-3 py-2 pr-10 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+              className="w-full px-3 py-2 pr-10 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted"
             />
             <button
               type="button"
               onClick={() => togglePasswordVisibility('new')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 ds-text-muted hover:ds-text-secondary"
             >
               {showPassword.new ? (
                 <svg
@@ -274,7 +276,7 @@ export function ChangePassword() {
           {formData.newPassword && (
             <div className="mt-2">
               <div className="flex items-center gap-2 mb-1">
-                <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 ds-bg-surface-muted rounded-full overflow-hidden">
                   <div
                     className={`h-full ${passwordStrength.color} transition-all duration-300`}
                     style={{
@@ -294,7 +296,7 @@ export function ChangePassword() {
                   {passwordStrength.label}
                 </span>
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs ds-text-muted">
                 Must be at least 8 characters long
               </p>
             </div>
@@ -305,7 +307,7 @@ export function ChangePassword() {
         <div>
           <label
             htmlFor="confirmPassword"
-            className="block text-sm font-medium text-gray-700 mb-1"
+            className="block text-sm font-medium ds-text-secondary mb-1"
           >
             Confirm New Password
           </label>
@@ -319,12 +321,12 @@ export function ChangePassword() {
               disabled={loading}
               required
               minLength={8}
-              className="w-full px-3 py-2 pr-10 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-500"
+              className="w-full px-3 py-2 pr-10 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:ds-bg-surface-muted disabled:ds-text-muted"
             />
             <button
               type="button"
               onClick={() => togglePasswordVisibility('confirm')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 -translate-y-1/2 ds-text-muted hover:ds-text-secondary"
             >
               {showPassword.confirm ? (
                 <svg
@@ -372,11 +374,11 @@ export function ChangePassword() {
         </div>
 
         {/* Submit Button */}
-        <div className="pt-4 border-t border-gray-200">
+        <div className="pt-4 border-t ds-border-subtle">
           <button
             type="submit"
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium disabled:bg-slate-500 disabled:cursor-not-allowed"
           >
             {loading ? 'Changing Password...' : 'Change Password'}
           </button>

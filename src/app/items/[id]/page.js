@@ -12,7 +12,12 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ImagePreview } from '@/components/uploads/image-preview';
-import { LoadingButton, LoadingCard, LoadingOverlay } from '@/components/loading';
+import {
+  LoadingButton,
+  LoadingCard,
+  LoadingOverlay,
+  LoadingSpinner,
+} from '@/components/loading';
 import { usePermissions } from '@/hooks/use-permissions';
 import { AuditTrail } from '@/components/audit-trail';
 import { checkMaterialDiscrepanciesClient } from '@/lib/discrepancy-calculations-client';
@@ -531,15 +536,15 @@ export default function ItemDetailPage() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'ds-bg-surface-muted ds-text-primary',
       submitted: 'bg-blue-100 text-blue-800',
       pending_approval: 'bg-yellow-100 text-yellow-800',
       approved: 'bg-green-100 text-green-800',
       rejected: 'bg-red-100 text-red-800',
       received: 'bg-purple-100 text-purple-800',
-      archived: 'bg-gray-100 text-gray-600',
+      archived: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const canApprove = user && canAccess('approve_material');
@@ -557,13 +562,13 @@ export default function ItemDetailPage() {
   
   const getSeverityColor = (severity) => {
     const colors = {
-      CRITICAL: 'bg-red-100 text-red-800 border-red-300',
+      CRITICAL: 'bg-red-100 text-red-800 border-red-400/60',
       HIGH: 'bg-orange-100 text-orange-800 border-orange-300',
-      MEDIUM: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-      LOW: 'bg-blue-100 text-blue-800 border-blue-300',
-      NONE: 'bg-gray-100 text-gray-600 border-gray-300',
+      MEDIUM: 'bg-yellow-100 text-yellow-800 border-yellow-400/60',
+      LOW: 'bg-blue-100 text-blue-800 border-blue-400/60',
+      NONE: 'ds-bg-surface-muted ds-text-secondary ds-border-subtle',
     };
-    return colors[severity] || 'bg-gray-100 text-gray-800 border-gray-300';
+    return colors[severity] || 'ds-bg-surface-muted ds-text-primary ds-border-subtle';
   };
 
   const formatCurrency = (amount) => {
@@ -592,8 +597,8 @@ export default function ItemDetailPage() {
         />
           <div className="space-y-6">
             <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-48"></div>
+              <div className="h-8 ds-bg-surface-muted rounded w-64 mb-2"></div>
+              <div className="h-4 ds-bg-surface-muted rounded w-48"></div>
             </div>
             <LoadingCard count={2} showHeader={true} lines={6} />
           </div>
@@ -606,10 +611,10 @@ export default function ItemDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Link href="/items" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/items" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Materials
           </Link>
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm sm:text-base">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm sm:text-base">
             {error || 'Material not found'}
           </div>
         </div>
@@ -637,13 +642,13 @@ export default function ItemDetailPage() {
         />
         {/* Header */}
         <div className="mb-6 sm:mb-8">
-          <Link href="/items" className="text-blue-600 hover:text-blue-800 active:text-blue-900 mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
+          <Link href="/items" className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover mb-4 inline-block text-sm sm:text-base transition-colors touch-manipulation">
             ← Back to Materials
           </Link>
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">
                   {material.name || material.materialName}
                 </h1>
                 {material.deletedAt && <ArchiveBadge />}
@@ -661,8 +666,8 @@ export default function ItemDetailPage() {
                     material.entryType === 'new_procurement'
                       ? 'bg-blue-100 text-blue-800'
                       : material.entryType === 'retroactive_entry'
-                      ? 'bg-gray-100 text-gray-800'
-                      : 'bg-gray-100 text-gray-600'
+                      ? 'ds-bg-surface-muted ds-text-primary'
+                      : 'ds-bg-surface-muted ds-text-secondary'
                   }`}>
                     {material.entryType === 'new_procurement'
                       ? 'New Procurement'
@@ -672,14 +677,14 @@ export default function ItemDetailPage() {
                   </span>
                 )}
                 {material.category && (
-                  <span className="text-xs sm:text-sm text-gray-600">Category: {material.category}</span>
+                  <span className="text-xs sm:text-sm ds-text-secondary">Category: {material.category}</span>
                 )}
                 {/* Show links to purchase order or material request */}
                 <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                   {material.purchaseOrderId && (
                     <Link
                       href={`/purchase-orders/${material.purchaseOrderId}`}
-                      className="text-xs sm:text-sm text-blue-600 hover:text-blue-800 active:text-blue-900 font-medium transition-colors touch-manipulation"
+                      className="text-xs sm:text-sm ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-hover font-medium transition-colors touch-manipulation"
                     >
                       📦 View Purchase Order
                     </Link>
@@ -699,7 +704,7 @@ export default function ItemDetailPage() {
               {canEdit && (
                 <Link
                   href={`/items/${materialId}/edit`}
-                  className="flex-1 sm:flex-none px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium text-center touch-manipulation"
+                  className="flex-1 sm:flex-none px-4 py-2.5 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium text-center touch-manipulation"
                 >
                   Edit
                 </Link>
@@ -748,7 +753,7 @@ export default function ItemDetailPage() {
                 <>
                   <button
                     onClick={handleArchiveClick}
-                    className="flex-1 sm:flex-none px-4 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 active:bg-gray-800 transition-colors text-sm font-medium touch-manipulation"
+                    className="flex-1 sm:flex-none px-4 py-2.5 bg-slate-600 text-white rounded-lg hover:bg-slate-700 active:bg-slate-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Archive
                   </button>
@@ -783,11 +788,11 @@ export default function ItemDetailPage() {
         </div>
 
         {/* Material Lifecycle Status */}
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
           <h2 className="text-lg sm:text-xl md:text-2xl font-semibold mb-4 leading-tight">Material Lifecycle</h2>
           <div className="flex items-center justify-between overflow-x-auto pb-4">
             {[
-              { status: 'draft', label: 'Draft', color: 'bg-gray-200', textColor: 'text-gray-700' },
+              { status: 'draft', label: 'Draft', color: 'ds-bg-surface-muted', textColor: 'ds-text-secondary' },
               { status: 'submitted', label: 'Submitted', color: 'bg-blue-200', textColor: 'text-blue-700' },
               { status: 'pending_approval', label: 'Pending Approval', color: 'bg-yellow-200', textColor: 'text-yellow-700' },
               { status: 'approved', label: 'Approved', color: 'bg-green-200', textColor: 'text-green-700' },
@@ -810,19 +815,19 @@ export default function ItemDetailPage() {
                           ? `${stage.color} ${stage.textColor} ring-4 ring-blue-300 scale-110`
                           : isCompleted
                           ? `${stage.color} ${stage.textColor}`
-                          : 'bg-gray-100 text-gray-400'
+                          : 'ds-bg-surface-muted ds-text-muted'
                       }`}
                     >
                       {isCompleted ? '✓' : index + 1}
                     </div>
-                    <span className={`text-sm mt-2 text-center leading-normal ${isActive ? 'font-semibold text-gray-700' : 'text-gray-600'}`}>
+                    <span className={`text-sm mt-2 text-center leading-normal ${isActive ? 'font-semibold ds-text-secondary' : 'ds-text-secondary'}`}>
                       {stage.label}
                     </span>
                   </div>
                   {index < array.length - 1 && (
                     <div
                       className={`flex-1 h-1 mx-2 transition-all ${
-                        isCompleted ? 'bg-green-400' : 'bg-gray-200'
+                        isCompleted ? 'bg-green-400' : 'ds-bg-surface-muted'
                       }`}
                     />
                   )}
@@ -831,7 +836,7 @@ export default function ItemDetailPage() {
             })}
           </div>
           {material.status === 'rejected' && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded">
+            <div className="mt-4 p-3 bg-red-50 border border-red-400/60 rounded">
               <p className="text-sm text-red-800">
                 <strong>Status:</strong> REJECTED
               </p>
@@ -846,27 +851,27 @@ export default function ItemDetailPage() {
             </div>
           )}
           {material.status !== 'rejected' && (
-            <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded">
+            <div className="mt-4 p-3 bg-blue-50 border border-blue-400/60 rounded">
               <p className="text-sm text-blue-800">
                 <strong>Current Status:</strong> {material.status?.replace('_', ' ').toUpperCase() || 'DRAFT'}
               </p>
               {material.status === 'draft' && (
-                <p className="text-sm text-blue-600 mt-1 leading-normal">
+                <p className="text-sm ds-text-accent-primary mt-1 leading-normal">
                   Next step: Submit for approval
                 </p>
               )}
               {material.status === 'pending_approval' && (
-                <p className="text-sm text-blue-600 mt-1 leading-normal">
+                <p className="text-sm ds-text-accent-primary mt-1 leading-normal">
                   Next step: Awaiting PM/OWNER approval
                 </p>
               )}
               {material.status === 'approved' && (
-                <p className="text-sm text-blue-600 mt-1 leading-normal">
+                <p className="text-sm ds-text-accent-primary mt-1 leading-normal">
                   Next step: Mark as delivered when materials arrive
                 </p>
               )}
               {material.status === 'received' && (
-                <p className="text-sm text-blue-600 mt-1 leading-normal">
+                <p className="text-sm ds-text-accent-primary mt-1 leading-normal">
                   Next step: Track usage as materials are used
                 </p>
               )}
@@ -877,12 +882,12 @@ export default function ItemDetailPage() {
         {/* Discrepancy Summary Card - Hidden for Clerk */}
         {material && material.quantityDelivered > 0 && discrepancy && 
           userRole !== 'clerk' && userRole !== 'site_clerk' && (
-          <div className={`bg-white rounded-lg shadow mb-6 border-2 ${hasDiscrepancyIssues ? getSeverityColor(discrepancy.severity) : 'border-gray-200'}`}>
+          <div className={`ds-bg-surface rounded-lg shadow mb-6 border-2 ${hasDiscrepancyIssues ? getSeverityColor(discrepancy.severity) : 'ds-border-subtle'}`}>
             <div className="p-4 sm:p-6">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 mb-4">
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Discrepancy Analysis</h2>
-                  <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  <h2 className="text-lg sm:text-xl font-semibold ds-text-primary">Discrepancy Analysis</h2>
+                  <p className="text-xs sm:text-sm ds-text-secondary mt-1">
                     Material variance, loss, and wastage tracking
                   </p>
                 </div>
@@ -895,7 +900,7 @@ export default function ItemDetailPage() {
                   {material.projectId && (
                     <Link
                       href={`/dashboard/analytics/wastage?projectId=${material.projectId}`}
-                      className="px-3 sm:px-4 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-xs sm:text-sm font-medium transition-colors touch-manipulation"
+                      className="px-3 sm:px-4 py-1.5 sm:py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 text-xs sm:text-sm font-medium transition-colors touch-manipulation"
                     >
                       View Full Analytics →
                     </Link>
@@ -908,7 +913,7 @@ export default function ItemDetailPage() {
                   {/* Alert Indicators */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     {discrepancy.alerts.variance && (
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="text-lg">⚠️</span>
                           <span className="font-semibold text-yellow-900">Variance Alert</span>
@@ -936,7 +941,7 @@ export default function ItemDetailPage() {
                       </div>
                     )}
                     {discrepancy.alerts.wastage && (
-                      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
                         <div className="flex items-center gap-2 mb-2">
                           <span className="text-lg">⚠️</span>
                           <span className="font-semibold text-red-900">Wastage Alert</span>
@@ -952,20 +957,20 @@ export default function ItemDetailPage() {
                   </div>
 
                   {/* Total Impact */}
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-4">
                     <div className="flex justify-between items-center">
-                      <span className="font-semibold text-gray-900">Total Discrepancy Cost:</span>
+                      <span className="font-semibold ds-text-primary">Total Discrepancy Cost:</span>
                       <span className="text-2xl font-bold text-red-600">
                         {formatCurrency(discrepancy.metrics.totalDiscrepancyCost)}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-600 mt-2">
+                    <p className="text-xs ds-text-secondary mt-2">
                       Combined financial impact of variance and loss
                     </p>
                   </div>
                 </div>
               ) : (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">✅</span>
                     <div>
@@ -979,40 +984,40 @@ export default function ItemDetailPage() {
               )}
 
               {/* Detailed Metrics */}
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <h3 className="text-sm sm:text-base font-semibold text-gray-700 mb-3 leading-normal">Detailed Metrics</h3>
+              <div className="mt-4 pt-4 border-t ds-border-subtle">
+                <h3 className="text-sm sm:text-base font-semibold ds-text-secondary mb-3 leading-normal">Detailed Metrics</h3>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700 leading-normal">Variance</dt>
-                    <dd className="mt-1 text-sm font-semibold text-gray-900">
+                    <dt className="text-sm font-semibold ds-text-secondary leading-normal">Variance</dt>
+                    <dd className="mt-1 text-sm font-semibold ds-text-primary">
                       {discrepancy.metrics.variance.toFixed(2)} units
                     </dd>
-                    <dd className="text-sm text-gray-600 leading-normal">
+                    <dd className="text-sm ds-text-secondary leading-normal">
                       {discrepancy.metrics.variancePercentage.toFixed(2)}%
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700 leading-normal">Loss</dt>
-                    <dd className="mt-1 text-sm font-semibold text-gray-900">
+                    <dt className="text-sm font-semibold ds-text-secondary leading-normal">Loss</dt>
+                    <dd className="mt-1 text-sm font-semibold ds-text-primary">
                       {discrepancy.metrics.loss.toFixed(2)} units
                     </dd>
-                    <dd className="text-sm text-gray-600 leading-normal">
+                    <dd className="text-sm ds-text-secondary leading-normal">
                       {discrepancy.metrics.lossPercentage.toFixed(2)}%
                     </dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700 leading-normal">Wastage</dt>
-                    <dd className="mt-1 text-sm font-semibold text-gray-900">
+                    <dt className="text-sm font-semibold ds-text-secondary leading-normal">Wastage</dt>
+                    <dd className="mt-1 text-sm font-semibold ds-text-primary">
                       {discrepancy.metrics.wastage.toFixed(2)}%
                     </dd>
-                    <dd className="text-sm text-gray-600 leading-normal">of purchased</dd>
+                    <dd className="text-sm ds-text-secondary leading-normal">of purchased</dd>
                   </div>
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700 leading-normal">Total Cost</dt>
+                    <dt className="text-sm font-semibold ds-text-secondary leading-normal">Total Cost</dt>
                     <dd className="mt-1 text-sm font-semibold text-red-600">
                       {formatCurrency(discrepancy.metrics.totalDiscrepancyCost)}
                     </dd>
-                    <dd className="text-sm text-gray-600 leading-normal">impact</dd>
+                    <dd className="text-sm ds-text-secondary leading-normal">impact</dd>
                   </div>
                 </div>
               </div>
@@ -1021,8 +1026,8 @@ export default function ItemDetailPage() {
         )}
 
         {/* Tabs */}
-        <div className="bg-white rounded-lg shadow mb-6">
-          <div className="border-b border-gray-200 overflow-x-auto">
+        <div className="ds-bg-surface rounded-lg shadow mb-6">
+          <div className="border-b ds-border-subtle overflow-x-auto">
             <nav className="flex -mb-px min-w-max sm:min-w-0">
               {['overview', 'discrepancy', 'approval', 'activity']
               .filter(tab => {
@@ -1038,8 +1043,8 @@ export default function ItemDetailPage() {
                   onClick={() => setActiveTab(tab)}
                   className={`px-3 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-medium border-b-2 whitespace-nowrap touch-manipulation ${
                     activeTab === tab
-                      ? 'border-blue-600 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 active:text-gray-900'
+                      ? 'border-ds-accent-primary ds-text-accent-primary'
+                      : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle active:ds-text-primary'
                   }`}
                 >
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -1053,7 +1058,7 @@ export default function ItemDetailPage() {
             {activeTab === 'overview' && (
               <div className="space-y-6">
                 {/* Quantity Tracking Card */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-6">
                   <h3 className="text-lg md:text-xl font-semibold mb-4 text-blue-900 leading-tight">Quantity Tracking</h3>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
@@ -1068,7 +1073,7 @@ export default function ItemDetailPage() {
                         {material.quantityDelivered || 0} {material.unit || ''}
                       </dd>
                       {material.dateDelivered && (
-                        <dd className="text-xs text-blue-600 mt-1">
+                        <dd className="text-xs ds-text-accent-primary mt-1">
                           {new Date(material.dateDelivered).toLocaleDateString()}
                         </dd>
                       )}
@@ -1079,7 +1084,7 @@ export default function ItemDetailPage() {
                         {material.quantityUsed || 0} {material.unit || ''}
                       </dd>
                       {material.dateUsed && (
-                        <dd className="text-xs text-blue-600 mt-1">
+                        <dd className="text-xs ds-text-accent-primary mt-1">
                           {new Date(material.dateUsed).toLocaleDateString()}
                         </dd>
                       )}
@@ -1099,7 +1104,7 @@ export default function ItemDetailPage() {
                   
                   {/* Wastage Metrics Breakdown */}
                   {(material.quantityDelivered > 0 || material.quantityUsed > 0) && (
-                    <div className="mt-4 pt-4 border-t border-blue-200">
+                    <div className="mt-4 pt-4 border-t border-blue-400/60">
                       <h4 className="text-sm font-semibold text-blue-900 mb-3">Wastage Analysis</h4>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                         {(() => {
@@ -1113,7 +1118,7 @@ export default function ItemDetailPage() {
                           
                           return (
                             <>
-                              <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                              <div className="bg-yellow-50 border border-yellow-400/60 rounded p-3">
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="text-xs font-semibold text-yellow-800">Variance</span>
                                   <span 
@@ -1147,7 +1152,7 @@ export default function ItemDetailPage() {
                                   {lossPercentage}% of delivered
                                 </div>
                               </div>
-                              <div className="bg-red-50 border border-red-200 rounded p-3">
+                              <div className="bg-red-50 border border-red-400/60 rounded p-3">
                                 <div className="flex items-center gap-2 mb-1">
                                   <span className="text-xs font-semibold text-red-800">Total Wastage</span>
                                   <span 
@@ -1178,7 +1183,7 @@ export default function ItemDetailPage() {
                       <h3 className="text-lg md:text-xl font-semibold leading-tight">Material Details</h3>
                       {/* Workflow Information Section */}
                       {(material.entryType === 'retroactive_entry' || material.purchaseOrderId || material.materialRequestId || material.retroactiveNotes || material.costStatus || material.documentationStatus) && (
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm ds-text-secondary">
                           {material.entryType === 'retroactive_entry' && '📝 Retroactive Entry'}
                         </div>
                       )}
@@ -1186,19 +1191,19 @@ export default function ItemDetailPage() {
 
                     {/* Workflow Information Card */}
                     {(material.entryType === 'retroactive_entry' || material.purchaseOrderId || material.materialRequestId) && (
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                      <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4 mb-6">
                         <h4 className="text-base font-semibold text-blue-900 mb-3">Workflow Information</h4>
                         <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {material.entryType && (
                             <div>
-                              <dt className="text-sm font-semibold text-gray-700">Entry Type</dt>
+                              <dt className="text-sm font-semibold ds-text-secondary">Entry Type</dt>
                               <dd className="mt-1">
                                 <span className={`inline-flex px-2 py-1 text-sm font-semibold rounded-full ${
                                   material.entryType === 'new_procurement'
                                     ? 'bg-blue-100 text-blue-800'
                                     : material.entryType === 'retroactive_entry'
-                                    ? 'bg-gray-100 text-gray-800'
-                                    : 'bg-gray-100 text-gray-600'
+                                    ? 'ds-bg-surface-muted ds-text-primary'
+                                    : 'ds-bg-surface-muted ds-text-secondary'
                                 }`}>
                                   {material.entryType === 'new_procurement'
                                     ? 'New Procurement'
@@ -1211,11 +1216,11 @@ export default function ItemDetailPage() {
                           )}
                           {material.purchaseOrderId && (
                             <div>
-                              <dt className="text-sm font-semibold text-gray-700">Purchase Order</dt>
+                              <dt className="text-sm font-semibold ds-text-secondary">Purchase Order</dt>
                               <dd className="mt-1">
                                 <Link
                                   href={`/purchase-orders/${material.purchaseOrderId}`}
-                                  className="text-blue-600 hover:text-blue-800 font-medium"
+                                  className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                                 >
                                   View Purchase Order →
                                 </Link>
@@ -1224,7 +1229,7 @@ export default function ItemDetailPage() {
                           )}
                           {material.materialRequestId && (
                             <div>
-                              <dt className="text-sm font-semibold text-gray-700">Material Request</dt>
+                              <dt className="text-sm font-semibold ds-text-secondary">Material Request</dt>
                               <dd className="mt-1">
                                 <Link
                                   href={`/material-requests/${material.materialRequestId}`}
@@ -1237,7 +1242,7 @@ export default function ItemDetailPage() {
                           )}
                           {material.entryType === 'retroactive_entry' && material.costStatus && (
                             <div>
-                              <dt className="text-sm font-semibold text-gray-700">Cost Status</dt>
+                              <dt className="text-sm font-semibold ds-text-secondary">Cost Status</dt>
                               <dd className="mt-1">
                                 <span className={`inline-flex px-2 py-1 text-sm font-semibold rounded-full ${
                                   material.costStatus === 'actual'
@@ -1253,7 +1258,7 @@ export default function ItemDetailPage() {
                           )}
                           {material.entryType === 'retroactive_entry' && material.documentationStatus && (
                             <div>
-                              <dt className="text-sm font-semibold text-gray-700">Documentation Status</dt>
+                              <dt className="text-sm font-semibold ds-text-secondary">Documentation Status</dt>
                               <dd className="mt-1">
                                 <span className={`inline-flex px-2 py-1 text-sm font-semibold rounded-full ${
                                   material.documentationStatus === 'complete'
@@ -1269,8 +1274,8 @@ export default function ItemDetailPage() {
                           )}
                           {material.entryType === 'retroactive_entry' && material.originalPurchaseDate && (
                             <div>
-                              <dt className="text-sm font-semibold text-gray-700">Original Purchase Date</dt>
-                              <dd className="mt-1 text-sm text-gray-900">
+                              <dt className="text-sm font-semibold ds-text-secondary">Original Purchase Date</dt>
+                              <dd className="mt-1 text-sm ds-text-primary">
                                 {new Date(material.originalPurchaseDate).toLocaleDateString('en-KE', {
                                   year: 'numeric',
                                   month: 'long',
@@ -1281,9 +1286,9 @@ export default function ItemDetailPage() {
                           )}
                         </dl>
                         {material.entryType === 'retroactive_entry' && material.retroactiveNotes && (
-                          <div className="mt-4 pt-4 border-t border-blue-200">
-                            <dt className="text-sm font-semibold text-gray-700 mb-2">Retroactive Notes</dt>
-                            <dd className="text-sm text-gray-900 bg-white p-3 rounded border border-blue-100">
+                          <div className="mt-4 pt-4 border-t border-blue-400/60">
+                            <dt className="text-sm font-semibold ds-text-secondary mb-2">Retroactive Notes</dt>
+                            <dd className="text-sm ds-text-primary ds-bg-surface p-3 rounded border border-blue-100">
                               {material.retroactiveNotes}
                             </dd>
                           </div>
@@ -1294,23 +1299,23 @@ export default function ItemDetailPage() {
                     <h3 className="text-lg md:text-xl font-semibold mb-4 leading-tight">Material Details</h3>
                     <dl className="space-y-3">
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Description</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
+                        <dt className="text-sm font-medium ds-text-muted">Description</dt>
+                        <dd className="mt-1 text-sm ds-text-primary">
                           {material.description || 'No description'}
                         </dd>
                       </div>
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Quantity Purchased</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
+                        <dt className="text-sm font-medium ds-text-muted">Quantity Purchased</dt>
+                        <dd className="mt-1 text-sm ds-text-primary">
                           {material.quantityPurchased || material.quantity || 0} {material.unit || ''}
                         </dd>
                       </div>
                       <div>
-                        <dt className="text-sm font-medium text-gray-500">Category</dt>
-                        <dd className="mt-1 text-sm text-gray-900">
+                        <dt className="text-sm font-medium ds-text-muted">Category</dt>
+                        <dd className="mt-1 text-sm ds-text-primary">
                           {material.categoryDetails?.name || material.category || 'N/A'}
                           {material.categoryDetails && (
-                            <span className="text-sm text-gray-600 ml-2 leading-normal">
+                            <span className="text-sm ds-text-secondary ml-2 leading-normal">
                               ({material.categoryDetails.description || 'No description'})
                             </span>
                           )}
@@ -1318,11 +1323,11 @@ export default function ItemDetailPage() {
                       </div>
                       {material.projectDetails && (
                         <div>
-                          <dt className="text-sm font-medium text-gray-500">Project</dt>
-                          <dd className="mt-1 text-sm text-gray-900">
+                          <dt className="text-sm font-medium ds-text-muted">Project</dt>
+                          <dd className="mt-1 text-sm ds-text-primary">
                             <Link
                               href={`/projects/${material.projectId}`}
-                              className="text-blue-600 hover:text-blue-800"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               {material.projectDetails.projectName || material.projectDetails.projectCode || 'View Project'}
                             </Link>
@@ -1331,11 +1336,11 @@ export default function ItemDetailPage() {
                       )}
                       {material.floorDetails && (
                         <div>
-                          <dt className="text-sm font-medium text-gray-500">Floor</dt>
-                          <dd className="mt-1 text-sm text-gray-900">
+                          <dt className="text-sm font-medium ds-text-muted">Floor</dt>
+                          <dd className="mt-1 text-sm ds-text-primary">
                             <Link
                               href={`/floors/${material.floor}`}
-                              className="text-blue-600 hover:text-blue-800"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               {(() => {
                                 const floor = material.floorDetails;
@@ -1352,26 +1357,26 @@ export default function ItemDetailPage() {
                         </div>
                       )}
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Unit Cost</dt>
-                      <dd className="mt-1 text-sm text-gray-900">
+                      <dt className="text-sm font-medium ds-text-muted">Unit Cost</dt>
+                      <dd className="mt-1 text-sm ds-text-primary">
                         KES {material.unitCost?.toLocaleString() || '0.00'}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Total Cost</dt>
-                      <dd className="mt-1 text-lg font-bold text-gray-900">
+                      <dt className="text-sm font-medium ds-text-muted">Total Cost</dt>
+                      <dd className="mt-1 text-lg font-bold ds-text-primary">
                         KES {material.totalCost?.toLocaleString() || '0.00'}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Supplier</dt>
-                      <dd className="mt-1 text-sm text-gray-900">
+                      <dt className="text-sm font-medium ds-text-muted">Supplier</dt>
+                      <dd className="mt-1 text-sm ds-text-primary">
                         {material.supplierName || material.supplier || 'N/A'}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">Payment Method</dt>
-                      <dd className="mt-1 text-sm text-gray-900">
+                      <dt className="text-sm font-medium ds-text-muted">Payment Method</dt>
+                      <dd className="mt-1 text-sm ds-text-primary">
                         {material.paymentMethod || 'N/A'}
                       </dd>
                     </div>
@@ -1382,7 +1387,7 @@ export default function ItemDetailPage() {
                 {canAccess('edit_material') && material.status === 'approved' && (
                   <div className="col-span-2 space-y-4">
                     {/* Delivery Update Form */}
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
                       <h4 className="text-md font-semibold mb-3 text-green-900">Update Delivery</h4>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -1396,7 +1401,7 @@ export default function ItemDetailPage() {
                             value={quantityUpdateForm.quantityDelivered}
                             onChange={(e) => setQuantityUpdateForm(prev => ({ ...prev, quantityDelivered: e.target.value }))}
                             placeholder={material.quantityDelivered?.toString() || '0'}
-                            className="w-full px-3 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="w-full px-3 py-2 border border-green-400/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                           />
                           <p className="text-xs text-green-600 mt-1">
                             Max: {material.quantityPurchased || material.quantity || 0} {material.unit || ''}
@@ -1410,7 +1415,7 @@ export default function ItemDetailPage() {
                             type="date"
                             value={quantityUpdateForm.dateDelivered}
                             onChange={(e) => setQuantityUpdateForm(prev => ({ ...prev, dateDelivered: e.target.value }))}
-                            className="w-full px-3 py-2 border border-green-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                            className="w-full px-3 py-2 border border-green-400/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                           />
                         </div>
                       </div>
@@ -1472,72 +1477,72 @@ export default function ItemDetailPage() {
                 {material.finishingDetails && Object.keys(material.finishingDetails).length > 0 && (
                   <div className="mt-6">
                     <h3 className="text-lg md:text-xl font-semibold mb-4 leading-tight">Finishing Details</h3>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
                       <dl className="space-y-3">
                         {material.finishingDetails.brand && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Brand</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{material.finishingDetails.brand}</dd>
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Brand</dt>
+                            <dd className="mt-1 text-sm ds-text-primary">{material.finishingDetails.brand}</dd>
                           </div>
                         )}
                         {material.finishingDetails.colour && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Colour</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{material.finishingDetails.colour}</dd>
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Colour</dt>
+                            <dd className="mt-1 text-sm ds-text-primary">{material.finishingDetails.colour}</dd>
                           </div>
                         )}
                         {material.finishingDetails.technicianName && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Technician Name</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{material.finishingDetails.technicianName}</dd>
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Technician Name</dt>
+                            <dd className="mt-1 text-sm ds-text-primary">{material.finishingDetails.technicianName}</dd>
                           </div>
                         )}
                         {material.finishingDetails.installationTeam && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Installation Team</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{material.finishingDetails.installationTeam}</dd>
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Installation Team</dt>
+                            <dd className="mt-1 text-sm ds-text-primary">{material.finishingDetails.installationTeam}</dd>
                           </div>
                         )}
                         {material.finishingDetails.materialType && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Material Type</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{material.finishingDetails.materialType}</dd>
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Material Type</dt>
+                            <dd className="mt-1 text-sm ds-text-primary">{material.finishingDetails.materialType}</dd>
                           </div>
                         )}
                         {material.finishingDetails.teamLeader && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Team Leader</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{material.finishingDetails.teamLeader}</dd>
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Team Leader</dt>
+                            <dd className="mt-1 text-sm ds-text-primary">{material.finishingDetails.teamLeader}</dd>
                           </div>
                         )}
                         {material.finishingDetails.tileType && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Tile Type</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{material.finishingDetails.tileType}</dd>
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Tile Type</dt>
+                            <dd className="mt-1 text-sm ds-text-primary">{material.finishingDetails.tileType}</dd>
                           </div>
                         )}
                         {material.finishingDetails.squareMeters && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Square Meters Covered</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{material.finishingDetails.squareMeters} m²</dd>
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Square Meters Covered</dt>
+                            <dd className="mt-1 text-sm ds-text-primary">{material.finishingDetails.squareMeters} m²</dd>
                           </div>
                         )}
                         {material.finishingDetails.contractNumber && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Contract Number</dt>
-                            <dd className="mt-1 text-sm text-gray-900">{material.finishingDetails.contractNumber}</dd>
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Contract Number</dt>
+                            <dd className="mt-1 text-sm ds-text-primary">{material.finishingDetails.contractNumber}</dd>
                           </div>
                         )}
                         {material.finishingDetails.paymentSchedule && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Payment Schedule</dt>
-                            <dd className="mt-1 text-sm text-gray-900 whitespace-pre-line">{material.finishingDetails.paymentSchedule}</dd>
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Payment Schedule</dt>
+                            <dd className="mt-1 text-sm ds-text-primary whitespace-pre-line">{material.finishingDetails.paymentSchedule}</dd>
                           </div>
                         )}
                         {material.finishingDetails.installationDate && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 leading-normal">Installation Date</dt>
-                            <dd className="mt-1 text-sm text-gray-900">
+                            <dt className="text-base font-semibold ds-text-secondary leading-normal">Installation Date</dt>
+                            <dd className="mt-1 text-sm ds-text-primary">
                               {new Date(material.finishingDetails.installationDate).toLocaleDateString()}
                             </dd>
                           </div>
@@ -1546,7 +1551,7 @@ export default function ItemDetailPage() {
                          Array.isArray(material.finishingDetails.warrantyDocuments) && 
                          material.finishingDetails.warrantyDocuments.length > 0 && (
                           <div>
-                            <dt className="text-base font-semibold text-gray-700 mb-2 leading-normal">Warranty Documents</dt>
+                            <dt className="text-base font-semibold ds-text-secondary mb-2 leading-normal">Warranty Documents</dt>
                             <dd className="mt-1 space-y-2">
                               {material.finishingDetails.warrantyDocuments.map((url, index) => (
                                 <ImagePreview
@@ -1574,7 +1579,7 @@ export default function ItemDetailPage() {
                         showDelete={false}
                       />
                     ) : (
-                      <p className="text-sm text-gray-500">No receipt uploaded</p>
+                      <p className="text-sm ds-text-muted">No receipt uploaded</p>
                     )}
                     {material.invoiceFileUrl && (
                       <ImagePreview
@@ -1591,14 +1596,14 @@ export default function ItemDetailPage() {
                       />
                     )}
                     {!material.receiptUrl && !material.receiptFileUrl && !material.invoiceFileUrl && !material.deliveryNoteFileUrl && (
-                      <p className="text-sm text-gray-500 italic">No documents uploaded for this material</p>
+                      <p className="text-sm ds-text-muted italic">No documents uploaded for this material</p>
                     )}
                   </div>
 
                   {material.notes && (
                     <div className="mt-6">
-                      <h4 className="text-sm font-medium text-gray-500 mb-2">Notes</h4>
-                      <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded">
+                      <h4 className="text-sm font-medium ds-text-muted mb-2">Notes</h4>
+                      <p className="text-sm ds-text-primary ds-bg-surface-muted p-3 rounded">
                         {material.notes}
                       </p>
                     </div>
@@ -1620,12 +1625,12 @@ export default function ItemDetailPage() {
                             <p className="font-medium">
                               {approval.action === 'APPROVED' ? '✅ Approved' : '❌ Rejected'}
                             </p>
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm ds-text-secondary">
                               {approval.reason || approval.approvalNotes || 'No notes'}
                             </p>
                           </div>
                           <div className="text-right">
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm ds-text-muted">
                               {new Date(approval.timestamp).toLocaleDateString()}
                             </p>
                           </div>
@@ -1634,7 +1639,7 @@ export default function ItemDetailPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500">No approval history yet</p>
+                  <p className="ds-text-muted">No approval history yet</p>
                 )}
               </div>
             )}
@@ -1645,29 +1650,29 @@ export default function ItemDetailPage() {
                 {loadingDiscrepancy ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">Loading discrepancy data...</p>
+                    <p className="mt-2 ds-text-secondary">Loading discrepancy data...</p>
                   </div>
                 ) : discrepancyRecord ? (
                   <>
                     {/* Current Discrepancy Status */}
-                    <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <div className="ds-bg-surface border ds-border-subtle rounded-lg p-6">
                       <h3 className="text-lg font-semibold mb-4">Current Discrepancy Status</h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                          <label className="text-sm font-medium text-gray-500">Status</label>
+                          <label className="text-sm font-medium ds-text-muted">Status</label>
                           <div className="mt-1">
                             <span className={`px-3 py-1 rounded-full text-sm font-semibold ${
                               discrepancyRecord.status === 'open' ? 'bg-red-100 text-red-800' :
                               discrepancyRecord.status === 'investigating' ? 'bg-yellow-100 text-yellow-800' :
                               discrepancyRecord.status === 'resolved' ? 'bg-green-100 text-green-800' :
-                              'bg-gray-100 text-gray-800'
+                              'ds-bg-surface-muted ds-text-primary'
                             }`}>
                               {discrepancyRecord.status.replace('_', ' ').toUpperCase()}
                             </span>
                           </div>
                         </div>
                         <div>
-                          <label className="text-sm font-medium text-gray-500">Severity</label>
+                          <label className="text-sm font-medium ds-text-muted">Severity</label>
                           <div className="mt-1">
                             <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getSeverityColor(discrepancyRecord.severity)}`}>
                               {discrepancyRecord.severity}
@@ -1676,14 +1681,14 @@ export default function ItemDetailPage() {
                         </div>
                         {discrepancyRecord.resolutionNotes && (
                           <div className="md:col-span-2">
-                            <label className="text-sm font-medium text-gray-500">Resolution Notes</label>
-                            <p className="mt-1 text-sm text-gray-900">{discrepancyRecord.resolutionNotes}</p>
+                            <label className="text-sm font-medium ds-text-muted">Resolution Notes</label>
+                            <p className="mt-1 text-sm ds-text-primary">{discrepancyRecord.resolutionNotes}</p>
                           </div>
                         )}
                         {discrepancyRecord.resolvedAt && (
                           <div>
-                            <label className="text-sm font-medium text-gray-500">Resolved At</label>
-                            <p className="mt-1 text-sm text-gray-900">
+                            <label className="text-sm font-medium ds-text-muted">Resolved At</label>
+                            <p className="mt-1 text-sm ds-text-primary">
                               {new Date(discrepancyRecord.resolvedAt).toLocaleString()}
                             </p>
                           </div>
@@ -1693,14 +1698,14 @@ export default function ItemDetailPage() {
 
                     {/* Threshold Comparison */}
                     {projectThresholds && discrepancy && (
-                      <div className="bg-white border border-gray-200 rounded-lg p-6">
+                      <div className="ds-bg-surface border ds-border-subtle rounded-lg p-6">
                         <h3 className="text-lg font-semibold mb-4">Threshold Comparison</h3>
                         <div className="space-y-3">
                           {discrepancy.alerts.variance && (
                             <div className="flex justify-between items-center p-3 bg-yellow-50 rounded">
                               <div>
-                                <p className="font-medium text-gray-900">Variance Threshold</p>
-                                <p className="text-sm text-gray-600">
+                                <p className="font-medium ds-text-primary">Variance Threshold</p>
+                                <p className="text-sm ds-text-secondary">
                                   Current: {discrepancy.metrics.variancePercentage.toFixed(2)}% | 
                                   Threshold: {projectThresholds.variancePercentage}%
                                 </p>
@@ -1711,8 +1716,8 @@ export default function ItemDetailPage() {
                           {discrepancy.alerts.loss && (
                             <div className="flex justify-between items-center p-3 bg-orange-50 rounded">
                               <div>
-                                <p className="font-medium text-gray-900">Loss Threshold</p>
-                                <p className="text-sm text-gray-600">
+                                <p className="font-medium ds-text-primary">Loss Threshold</p>
+                                <p className="text-sm ds-text-secondary">
                                   Current: {discrepancy.metrics.lossPercentage.toFixed(2)}% | 
                                   Threshold: {projectThresholds.lossPercentage}%
                                 </p>
@@ -1723,8 +1728,8 @@ export default function ItemDetailPage() {
                           {discrepancy.alerts.wastage && (
                             <div className="flex justify-between items-center p-3 bg-red-50 rounded">
                               <div>
-                                <p className="font-medium text-gray-900">Wastage Threshold</p>
-                                <p className="text-sm text-gray-600">
+                                <p className="font-medium ds-text-primary">Wastage Threshold</p>
+                                <p className="text-sm ds-text-secondary">
                                   Current: {discrepancy.metrics.wastage.toFixed(2)}% | 
                                   Threshold: {projectThresholds.wastagePercentage}%
                                 </p>
@@ -1738,21 +1743,21 @@ export default function ItemDetailPage() {
 
                     {/* Resolution History */}
                     {discrepancyRecord.resolutionHistory && discrepancyRecord.resolutionHistory.length > 0 && (
-                      <div className="bg-white border border-gray-200 rounded-lg p-6">
+                      <div className="ds-bg-surface border ds-border-subtle rounded-lg p-6">
                         <h3 className="text-lg font-semibold mb-4">Resolution History</h3>
                         <div className="space-y-4">
                           {discrepancyRecord.resolutionHistory.map((entry, index) => (
                             <div key={index} className="border-l-4 border-blue-500 pl-4 py-2">
                               <div className="flex justify-between items-start">
                                 <div>
-                                  <p className="font-medium text-gray-900">
+                                  <p className="font-medium ds-text-primary">
                                     Status: <span className="text-blue-600">{entry.status.replace('_', ' ').toUpperCase()}</span>
                                   </p>
                                   {entry.resolutionNotes && (
-                                    <p className="text-sm text-gray-600 mt-1">{entry.resolutionNotes}</p>
+                                    <p className="text-sm ds-text-secondary mt-1">{entry.resolutionNotes}</p>
                                   )}
                                 </div>
-                                <p className="text-sm text-gray-600 leading-normal">
+                                <p className="text-sm ds-text-secondary leading-normal">
                                   {new Date(entry.updatedAt).toLocaleString()}
                                 </p>
                               </div>
@@ -1763,7 +1768,7 @@ export default function ItemDetailPage() {
                     )}
                   </>
                 ) : (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+                  <div className="bg-green-50 border border-green-400/60 rounded-lg p-6 text-center">
                     <p className="text-green-800 font-medium">No Active Discrepancy</p>
                     <p className="text-sm text-green-600 mt-1">
                       This material has no active discrepancy records. All quantities are within acceptable thresholds.
@@ -1801,7 +1806,7 @@ export default function ItemDetailPage() {
         <div className="mt-4 space-y-4">
           {/* Capital Validation Indicator */}
           {validatingCapital && (
-            <div className="bg-blue-50 border border-blue-200 text-blue-800 px-3 py-2 rounded-lg text-sm">
+            <div className="bg-blue-50 border border-blue-400/60 text-blue-800 px-3 py-2 rounded-lg text-sm">
               <div className="flex items-center gap-2">
                 <LoadingSpinner size="sm" color="blue-600" />
                 <span>Validating capital availability...</span>
@@ -1810,7 +1815,7 @@ export default function ItemDetailPage() {
           )}
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium ds-text-secondary mb-1">
               Approval Notes (Optional)
             </label>
             <textarea
@@ -1819,7 +1824,7 @@ export default function ItemDetailPage() {
               placeholder="Add approval notes..."
               rows={3}
               disabled={isApproving}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             />
           </div>
         </div>
@@ -1828,9 +1833,9 @@ export default function ItemDetailPage() {
       {/* Rejection Modal with Reason Input */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
+          <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
+            <div className="relative ds-bg-surface rounded-lg shadow-xl max-w-md w-full transform transition-all" onClick={(e) => e.stopPropagation()}>
               <div className="p-6">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 mb-4">
@@ -1840,30 +1845,30 @@ export default function ItemDetailPage() {
                   </div>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
+                  <h3 className="text-lg font-semibold leading-6 ds-text-primary mb-2" id="modal-title">
                     Reject Material
                   </h3>
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm ds-text-muted mb-4">
                       Please provide a reason for rejecting this material:
                     </p>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Enter rejection reason..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+                      className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
                       rows="4"
                       disabled={isRejecting}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-200">
+              <div className="ds-bg-surface-muted px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-400/60">
                 <button
                   type="button"
                   onClick={() => setShowRejectModal(false)}
                   disabled={isRejecting}
-                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Cancel
                 </button>
@@ -1920,7 +1925,7 @@ export default function ItemDetailPage() {
               {!material.deletedAt && (
                 <>
                   <p className="mb-2 font-medium">Permanent deletion will:</p>
-                  <ul className="list-disc list-inside mb-3 space-y-1 text-gray-600">
+                  <ul className="list-disc list-inside mb-3 space-y-1 ds-text-secondary">
                     <li>Permanently remove the material from the system</li>
                     {material.status && ['approved', 'received'].includes(material.status) && material.totalCost > 0 && (
                       <li>Recalculate project finances</li>
@@ -1968,7 +1973,7 @@ export default function ItemDetailPage() {
           <div className="space-y-4">
             <p>Confirm that you have received and verified the materials on site.</p>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Actual Quantity Received (Optional)
               </label>
               <input
@@ -1978,14 +1983,14 @@ export default function ItemDetailPage() {
                 value={verifyReceiptData.actualQuantityReceived}
                 onChange={(e) => setVerifyReceiptData(prev => ({ ...prev, actualQuantityReceived: e.target.value }))}
                 placeholder={material?.quantityDelivered?.toString() || material?.quantityPurchased?.toString() || 'Enter quantity'}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs ds-text-muted mt-1">
                 Leave empty to use delivered quantity ({material?.quantityDelivered || material?.quantityPurchased || 0} {material?.unit || ''})
               </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Notes (Optional)
               </label>
               <textarea
@@ -1993,7 +1998,7 @@ export default function ItemDetailPage() {
                 onChange={(e) => setVerifyReceiptData(prev => ({ ...prev, notes: e.target.value }))}
                 placeholder="Add any notes about the receipt verification..."
                 rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
               />
             </div>
           </div>

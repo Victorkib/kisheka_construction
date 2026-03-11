@@ -5,6 +5,8 @@
 
 'use client';
 
+import { notifyError } from './error-notification-manager';
+
 /**
  * Initialize global error handlers
  */
@@ -32,6 +34,12 @@ export function initGlobalErrorHandlers() {
 
   // Handle unhandled promise rejections
   window.addEventListener('unhandledrejection', (event) => {
+    // Ignore aborted requests - these are normal (component unmount, navigation, etc.)
+    if (isAbortError(event.reason)) {
+      // Silently ignore aborted promise rejections
+      return;
+    }
+    
     console.error('Unhandled promise rejection:', event.reason);
     
     const errorData = {
@@ -53,13 +61,41 @@ export function initGlobalErrorHandlers() {
 function storeErrorForReporting(errorData) {
   try {
     sessionStorage.setItem('lastError', JSON.stringify(errorData));
+    
+    // Use centralized notification manager (with deduplication and rate limiting)
+    notifyError(errorData);
   } catch (e) {
     console.error('Failed to store error data:', e);
   }
 }
 
 /**
+ * Check if error is an aborted request (not a real error)
+ */
+function isAbortError(error) {
+  if (!error) return false;
+  
+  // Check error name
+  if (error.name === 'AbortError') return true;
+  
+  // Check error message
+  const message = error.message || String(error);
+  if (typeof message === 'string') {
+    const lowerMessage = message.toLowerCase();
+    if (lowerMessage.includes('abort') || 
+        lowerMessage.includes('signal is aborted') ||
+        lowerMessage.includes('the operation was aborted')) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
+/**
  * Intercept fetch errors
+ * Only shows notifications for server errors (500+) that aren't handled by components
+ * Ignores aborted requests (normal behavior when components unmount or navigation occurs)
  */
 export function interceptFetchErrors() {
   if (typeof window === 'undefined') return;
@@ -70,7 +106,8 @@ export function interceptFetchErrors() {
     try {
       const response = await originalFetch.apply(this, args);
       
-      // Check for API errors
+      // Only handle server errors (500+) - client errors (400-499) are handled by components
+      // This prevents duplicate notifications
       if (!response.ok && response.status >= 500) {
         const errorData = {
           message: `API Error: ${response.status} ${response.statusText}`,
@@ -88,6 +125,13 @@ export function interceptFetchErrors() {
       
       return response;
     } catch (error) {
+      // Ignore aborted requests - these are normal (component unmount, navigation, etc.)
+      if (isAbortError(error)) {
+        // Silently rethrow - don't show notification for aborted requests
+        throw error;
+      }
+      
+      // Network errors (not HTTP errors) - these are worth notifying
       const errorData = {
         message: `Fetch Error: ${error.message}`,
         stack: error.stack || '',

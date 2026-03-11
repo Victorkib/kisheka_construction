@@ -105,35 +105,35 @@ export default function ErrorReportPage() {
   if (submitted) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center px-4 py-12">
-          <div className="max-w-2xl w-full bg-white rounded-xl shadow-xl p-8 border border-green-200">
+        <div className="min-h-screen ds-bg-app flex items-center justify-center px-4 py-12">
+          <div className="max-w-2xl w-full ds-bg-surface rounded-xl shadow-xl p-8 border border-green-400/60">
             <div className="text-center">
               <div className="text-6xl mb-4">✅</div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Thank You!</h1>
-              <p className="text-lg text-gray-600 mb-6">
+              <h1 className="text-3xl font-bold ds-text-primary mb-2">Thank You!</h1>
+              <p className="text-lg ds-text-secondary mb-6">
                 Your error report has been sent successfully. Our team will review it and work on a fix.
               </p>
               {isAutoReport && (
-                <p className="text-sm text-gray-500 mb-6">
+                <p className="text-sm ds-text-muted mb-6">
                   Redirecting to dashboard in a few seconds...
                 </p>
               )}
               <div className="flex flex-wrap gap-3 justify-center">
                 <Link
                   href="/dashboard"
-                  className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 ds-bg-accent-primary text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Go to Dashboard
                 </Link>
                 <Link
                   href="/projects"
-                  className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                  className="px-6 py-3 ds-bg-surface-muted ds-text-secondary font-semibold rounded-lg hover:ds-bg-surface-muted transition-colors"
                 >
                   View Projects
                 </Link>
                 <button
                   onClick={() => router.back()}
-                  className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                  className="px-6 py-3 ds-bg-surface-muted ds-text-secondary font-semibold rounded-lg hover:ds-bg-surface-muted transition-colors"
                 >
                   Go Back
                 </button>
@@ -148,9 +148,9 @@ export default function ErrorReportPage() {
   return (
     <AppLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-red-600 to-orange-600 text-white px-6 py-8">
+          <div className="ds-bg-danger text-white px-6 py-8">
             <div className="flex items-center gap-4">
               <div className="text-5xl">⚠️</div>
               <div>
@@ -188,7 +188,7 @@ export default function ErrorReportPage() {
           <form onSubmit={handleSubmit} className="px-6 py-8 space-y-6">
             {/* User Description */}
             <div>
-              <label htmlFor="userDescription" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="userDescription" className="block text-sm font-medium ds-text-secondary mb-2">
                 What were you trying to do? <span className="text-red-500">*</span>
               </label>
               <textarea
@@ -199,16 +199,16 @@ export default function ErrorReportPage() {
                 onChange={handleChange}
                 required
                 placeholder="Describe what you were doing when the error occurred..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400 text-gray-900"
+                className="w-full px-4 py-3 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:ds-text-muted ds-text-primary"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs ds-text-muted">
                 This helps us understand the context of the error.
               </p>
             </div>
 
             {/* Steps to Reproduce */}
             <div>
-              <label htmlFor="stepsToReproduce" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="stepsToReproduce" className="block text-sm font-medium ds-text-secondary mb-2">
                 Steps to Reproduce (Optional)
               </label>
               <textarea
@@ -218,16 +218,16 @@ export default function ErrorReportPage() {
                 value={formData.stepsToReproduce}
                 onChange={handleChange}
                 placeholder="1. Go to...&#10;2. Click on...&#10;3. Error occurs..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400 text-gray-900"
+                className="w-full px-4 py-3 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:ds-text-muted ds-text-primary"
               />
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs ds-text-muted">
                 Help us reproduce the error by listing the steps you took.
               </p>
             </div>
 
             {/* Additional Info */}
             <div>
-              <label htmlFor="additionalInfo" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="additionalInfo" className="block text-sm font-medium ds-text-secondary mb-2">
                 Additional Information (Optional)
               </label>
               <textarea
@@ -237,16 +237,16 @@ export default function ErrorReportPage() {
                 value={formData.additionalInfo}
                 onChange={handleChange}
                 placeholder="Any other details that might be helpful..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-400 text-gray-900"
+                className="w-full px-4 py-3 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:ds-text-muted ds-text-primary"
               />
             </div>
 
             {/* Auto-collected Info Display */}
-            <details className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <summary className="text-sm font-medium text-gray-700 cursor-pointer">
+            <details className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-4">
+              <summary className="text-sm font-medium ds-text-secondary cursor-pointer">
                 Auto-collected Information (Click to view)
               </summary>
-              <div className="mt-4 space-y-2 text-xs text-gray-600">
+              <div className="mt-4 space-y-2 text-xs ds-text-secondary">
                 <div>
                   <span className="font-medium">URL:</span> {context.url || 'Not available'}
                 </div>
@@ -281,7 +281,7 @@ export default function ErrorReportPage() {
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+                className="px-6 py-3 ds-bg-surface-muted ds-text-secondary font-semibold rounded-lg hover:ds-bg-surface-muted transition-colors"
               >
                 Cancel
               </button>
@@ -289,30 +289,30 @@ export default function ErrorReportPage() {
           </form>
 
           {/* Navigation Links */}
-          <div className="bg-gray-50 border-t border-gray-200 px-6 py-4">
-            <p className="text-sm text-gray-600 mb-3">Quick Navigation:</p>
+          <div className="ds-bg-surface-muted border-t ds-border-subtle px-6 py-4">
+            <p className="text-sm ds-text-secondary mb-3">Quick Navigation:</p>
             <div className="flex flex-wrap gap-2">
               <Link
                 href="/dashboard"
-                className="px-4 py-2 text-sm bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm ds-bg-surface ds-text-secondary rounded-lg border ds-border-subtle hover:ds-bg-surface-muted transition-colors"
               >
                 Dashboard
               </Link>
               <Link
                 href="/projects"
-                className="px-4 py-2 text-sm bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm ds-bg-surface ds-text-secondary rounded-lg border ds-border-subtle hover:ds-bg-surface-muted transition-colors"
               >
                 Projects
               </Link>
               <Link
                 href="/"
-                className="px-4 py-2 text-sm bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm ds-bg-surface ds-text-secondary rounded-lg border ds-border-subtle hover:ds-bg-surface-muted transition-colors"
               >
                 Home
               </Link>
               <button
                 onClick={() => router.back()}
-                className="px-4 py-2 text-sm bg-white text-gray-700 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                className="px-4 py-2 text-sm ds-bg-surface ds-text-secondary rounded-lg border ds-border-subtle hover:ds-bg-surface-muted transition-colors"
               >
                 Go Back
               </button>

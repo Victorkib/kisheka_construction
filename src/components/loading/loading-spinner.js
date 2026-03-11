@@ -38,7 +38,7 @@ export function LoadingSpinner({
     'red-600': 'border-red-600',
     'yellow-600': 'border-yellow-600',
     'purple-600': 'border-purple-600',
-    'gray-600': 'border-gray-600',
+    'gray-600': 'border-slate-600',
   };
 
   const borderColorClass = colorClasses[color] || 'border-blue-600';
@@ -56,7 +56,7 @@ export function LoadingSpinner({
         <span className="sr-only">Loading...</span>
       </div>
       {text && (
-        <p className={`mt-2 text-sm text-gray-600 ${size === 'sm' ? 'text-xs' : ''}`}>
+        <p className={`mt-2 text-sm ds-text-secondary ${size === 'sm' ? 'text-xs' : ''}`}>
           {text}
         </p>
       )}

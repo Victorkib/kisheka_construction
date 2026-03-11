@@ -116,13 +116,13 @@ function ProjectsPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      planning: 'bg-blue-100 text-blue-800',
-      active: 'bg-green-100 text-green-800',
-      paused: 'bg-yellow-100 text-yellow-800',
-      completed: 'bg-purple-100 text-purple-800',
-      archived: 'bg-gray-100 text-gray-600',
+      planning: 'bg-blue-500/10 text-blue-200 border border-blue-400/60',
+      active: 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60',
+      paused: 'bg-amber-500/10 text-amber-200 border border-amber-400/60',
+      completed: 'bg-purple-500/10 text-purple-200 border border-purple-400/60',
+      archived: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const formatCurrency = (amount) => {
@@ -139,17 +139,17 @@ function ProjectsPageContent() {
         {/* Header */}
         <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">
               Projects
             </h1>
-            <p className="text-base md:text-lg text-gray-700 mt-2 leading-relaxed">
+            <p className="text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">
               Manage construction projects
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/projects/archive"
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 border ds-border-subtle rounded-lg text-sm font-medium ds-text-secondary hover:ds-bg-surface-muted transition"
             >
               <span className="text-base">🗂️</span>
               Archived Projects
@@ -157,7 +157,7 @@ function ProjectsPageContent() {
             {canCreate && (
               <Link
                 href="/projects/new"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
               >
                 + Create Project
               </Link>
@@ -183,33 +183,33 @@ function ProjectsPageContent() {
         {/* Summary Stats - Moved to top for quick reference */}
         {!loading && projects.length > 0 && (
           <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-blue-500">
-              <p className="text-sm font-medium text-gray-600">
+            <div className="ds-bg-surface rounded-lg shadow p-4 border-l-4 border-blue-500">
+              <p className="text-sm font-medium ds-text-secondary">
                 Total Projects
               </p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+              <p className="text-2xl font-bold ds-text-primary mt-1">
                 {projects.length}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-green-500">
-              <p className="text-sm font-medium text-gray-600">
+            <div className="ds-bg-surface rounded-lg shadow p-4 border-l-4 border-green-500">
+              <p className="text-sm font-medium ds-text-secondary">
                 Active Projects
               </p>
-              <p className="text-2xl font-bold text-green-600 mt-1">
+              <p className="text-2xl font-bold text-emerald-400 mt-1">
                 {projects.filter((p) => p.status === 'active').length}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-purple-500">
-              <p className="text-sm font-medium text-gray-600">Total Budget</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
+            <div className="ds-bg-surface rounded-lg shadow p-4 border-l-4 border-purple-500">
+              <p className="text-sm font-medium ds-text-secondary">Total Budget</p>
+              <p className="text-2xl font-bold ds-text-primary mt-1">
                 {formatCurrency(
                   projects.reduce((sum, p) => sum + (p.budget?.total || 0), 0),
                 )}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-4 border-l-4 border-yellow-500">
-              <p className="text-sm font-medium text-gray-600">In Planning</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">
+            <div className="ds-bg-surface rounded-lg shadow p-4 border-l-4 border-yellow-500">
+              <p className="text-sm font-medium ds-text-secondary">In Planning</p>
+              <p className="text-2xl font-bold ds-text-accent-primary mt-1">
                 {projects.filter((p) => p.status === 'planning').length}
               </p>
             </div>
@@ -217,10 +217,10 @@ function ProjectsPageContent() {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Search
               </label>
               <input
@@ -228,17 +228,17 @@ function ProjectsPageContent() {
                 placeholder="Search by name, code, or location..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               />
             </div>
             <div>
-              <label className="block text-base font-semibold text-gray-700 mb-1 leading-normal">
+              <label className="block text-base font-semibold ds-text-secondary mb-1 leading-normal">
                 Status
               </label>
               <select
                 value={filters.status}
                 onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:ds-text-muted"
               >
                 <option value="">All Statuses</option>
                 <option value="planning">Planning</option>
@@ -253,7 +253,7 @@ function ProjectsPageContent() {
                 onClick={() => {
                   router.push('/projects');
                 }}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="w-full px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted"
               >
                 Clear Filters
               </button>
@@ -263,7 +263,7 @@ function ProjectsPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             {error}
           </div>
         )}
@@ -272,12 +272,12 @@ function ProjectsPageContent() {
         {loading ? (
           <LoadingTable rows={8} columns={8} showHeader={true} />
         ) : projects.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
             <div className="text-6xl mb-4">🏗️</div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            <h3 className="text-xl font-semibold ds-text-primary mb-2">
               No projects found
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="ds-text-secondary mb-6">
               {filters.search || filters.status
                 ? 'Try adjusting your filters'
                 : 'Get started by creating your first project'}
@@ -285,13 +285,13 @@ function ProjectsPageContent() {
             {canCreate && (
               <Link
                 href="/projects/new"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
+                className="inline-block ds-bg-accent-primary hover:bg-blue-700 text-white font-medium px-6 py-2 rounded-lg transition"
               >
                 Create First Project
               </Link>
             )}
             {!canCreate && (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm ds-text-muted">
                 Contact a Project Manager or Owner to create a project
               </p>
             )}
@@ -299,32 +299,32 @@ function ProjectsPageContent() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+            <div className="hidden md:block ds-bg-surface rounded-lg shadow overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                  <thead className="ds-bg-surface-muted">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Project
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Status
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Budget
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Financing
                       </th>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Location
                       </th>
-                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-right text-xs font-semibold ds-text-secondary uppercase tracking-wider">
                         Actions
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                     {projects.map((project) => {
                       const totalInvested =
                         project.statistics?.totalInvested || 0;
@@ -337,34 +337,34 @@ function ProjectsPageContent() {
                           ? (totalUsed / totalInvested) * 100
                           : 0;
 
-                      let capitalStatusColor = 'bg-green-100 text-green-800';
-                      let capitalStatusText = 'Capital OK';
+                    let capitalStatusColor = 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60';
+                    let capitalStatusText = 'Capital OK';
 
-                      if (totalInvested === 0) {
-                        capitalStatusColor = 'bg-red-100 text-red-800';
-                        capitalStatusText = 'No Capital';
-                      } else if (availableCapital < 0) {
-                        capitalStatusColor = 'bg-red-100 text-red-800';
-                        capitalStatusText = 'Negative';
-                      } else if (usagePercentage > 80) {
-                        capitalStatusColor = 'bg-yellow-100 text-yellow-800';
-                        capitalStatusText = 'Low Capital';
-                      }
+                    if (totalInvested === 0) {
+                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusText = 'No Capital';
+                    } else if (availableCapital < 0) {
+                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusText = 'Negative';
+                    } else if (usagePercentage > 80) {
+                      capitalStatusColor = 'bg-amber-500/10 text-amber-200 border border-amber-400/60';
+                      capitalStatusText = 'Low Capital';
+                    }
 
                       return (
                         <tr
                           key={project._id}
-                          className="hover:bg-gray-50 transition-colors"
+                          className="hover:ds-bg-surface-muted transition-colors"
                         >
                           <td className="px-6 py-4">
                             <div>
                               <Link
                                 href={`/projects/${project._id}`}
-                                className="text-sm font-semibold text-gray-900 hover:text-blue-600"
+                                className="text-sm font-semibold ds-text-primary hover:ds-text-accent-primary"
                               >
                                 {project.projectName}
                               </Link>
-                              <p className="text-xs text-gray-500 mt-0.5">
+                              <p className="text-xs ds-text-muted mt-0.5">
                                 {project.projectCode}
                               </p>
                             </div>
@@ -379,7 +379,7 @@ function ProjectsPageContent() {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="text-sm font-medium text-gray-900">
+                            <span className="text-sm font-medium ds-text-primary">
                               {formatCurrency(project.budget?.total || 0)}
                             </span>
                           </td>
@@ -387,7 +387,7 @@ function ProjectsPageContent() {
                             {project.statistics?.totalInvested !== undefined ? (
                               <div className="space-y-1">
                                 <div className="flex items-center gap-2">
-                                  <span className="text-sm font-medium text-gray-900">
+                                  <span className="text-sm font-medium ds-text-primary">
                                     {formatCurrency(
                                       project.statistics.totalInvested,
                                     )}
@@ -399,7 +399,7 @@ function ProjectsPageContent() {
                                     {capitalStatusText}
                                   </span>
                                 </div>
-                                <div className="text-xs text-gray-600">
+                                <div className="text-xs ds-text-secondary">
                                   Balance:{' '}
                                   {formatCurrency(
                                     project.statistics.capitalBalance || 0,
@@ -407,7 +407,7 @@ function ProjectsPageContent() {
                                 </div>
                                 {project.statistics.budgetVsCapitalWarning && (
                                   <div
-                                    className="text-xs text-yellow-600 flex items-center gap-1"
+                                    className="text-xs text-amber-400 flex items-center gap-1"
                                     title={
                                       project.statistics.budgetVsCapitalWarning
                                     }
@@ -418,20 +418,20 @@ function ProjectsPageContent() {
                                 )}
                               </div>
                             ) : (
-                              <span className="text-sm text-gray-400">
+                              <span className="text-sm ds-text-muted">
                                 No financing
                               </span>
                             )}
                           </td>
                           <td className="px-6 py-4">
-                            <span className="text-sm text-gray-900">
+                            <span className="text-sm ds-text-primary">
                               {project.location || 'N/A'}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <Link
                               href={`/projects/${project._id}`}
-                              className="text-blue-600 hover:text-blue-900 font-medium"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover font-medium"
                             >
                               View →
                             </Link>
@@ -454,34 +454,34 @@ function ProjectsPageContent() {
                 const usagePercentage =
                   totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
 
-                let capitalStatusColor = 'bg-green-100 text-green-800';
-                let capitalStatusText = 'Capital OK';
+                    let capitalStatusColor = 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60';
+                    let capitalStatusText = 'Capital OK';
 
-                if (totalInvested === 0) {
-                  capitalStatusColor = 'bg-red-100 text-red-800';
-                  capitalStatusText = 'No Capital';
-                } else if (availableCapital < 0) {
-                  capitalStatusColor = 'bg-red-100 text-red-800';
-                  capitalStatusText = 'Negative';
-                } else if (usagePercentage > 80) {
-                  capitalStatusColor = 'bg-yellow-100 text-yellow-800';
-                  capitalStatusText = 'Low Capital';
-                }
+                    if (totalInvested === 0) {
+                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusText = 'No Capital';
+                    } else if (availableCapital < 0) {
+                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusText = 'Negative';
+                    } else if (usagePercentage > 80) {
+                      capitalStatusColor = 'bg-amber-500/10 text-amber-200 border border-amber-400/60';
+                      capitalStatusText = 'Low Capital';
+                    }
 
                 return (
                   <div
                     key={project._id}
-                    className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                    className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle"
                   >
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex-1">
                         <Link
                           href={`/projects/${project._id}`}
-                          className="text-base font-semibold text-gray-900 hover:text-blue-600 block"
+                          className="text-base font-semibold ds-text-primary hover:ds-text-accent-primary block"
                         >
                           {project.projectName}
                         </Link>
-                        <p className="text-sm text-gray-500 mt-0.5">
+                        <p className="text-sm ds-text-muted mt-0.5">
                           {project.projectCode}
                         </p>
                       </div>
@@ -496,23 +496,23 @@ function ProjectsPageContent() {
 
                     <div className="grid grid-cols-2 gap-3 mb-3">
                       <div>
-                        <p className="text-xs text-gray-500">Budget</p>
-                        <p className="text-sm font-medium text-gray-900 mt-0.5">
+                        <p className="text-xs ds-text-muted">Budget</p>
+                        <p className="text-sm font-medium ds-text-primary mt-0.5">
                           {formatCurrency(project.budget?.total || 0)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Location</p>
-                        <p className="text-sm font-medium text-gray-900 mt-0.5">
+                        <p className="text-xs ds-text-muted">Location</p>
+                        <p className="text-sm font-medium ds-text-primary mt-0.5">
                           {project.location || 'N/A'}
                         </p>
                       </div>
                     </div>
 
                     {project.statistics?.totalInvested !== undefined && (
-                      <div className="border-t border-gray-200 pt-3 mt-3">
+                      <div className="border-t ds-border-subtle pt-3 mt-3">
                         <div className="flex items-center justify-between mb-2">
-                          <p className="text-xs text-gray-500">Financing</p>
+                          <p className="text-xs ds-text-muted">Financing</p>
                           <span
                             className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full ${capitalStatusColor}`}
                             title={`Capital: ${formatCurrency(totalInvested)}, Available: ${formatCurrency(availableCapital)}`}
@@ -522,18 +522,18 @@ function ProjectsPageContent() {
                         </div>
                         <div className="space-y-1">
                           <div className="flex justify-between">
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs ds-text-secondary">
                               Capital Raised
                             </span>
-                            <span className="text-sm font-medium text-gray-900">
+                            <span className="text-sm font-medium ds-text-primary">
                               {formatCurrency(project.statistics.totalInvested)}
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs ds-text-secondary">
                               Balance
                             </span>
-                            <span className="text-sm font-medium text-gray-900">
+                            <span className="text-sm font-medium ds-text-primary">
                               {formatCurrency(
                                 project.statistics.capitalBalance || 0,
                               )}
@@ -552,10 +552,10 @@ function ProjectsPageContent() {
                       </div>
                     )}
 
-                    <div className="mt-3 pt-3 border-t border-gray-200">
+                    <div className="mt-3 pt-3 border-t ds-border-subtle">
                       <Link
                         href={`/projects/${project._id}`}
-                        className="block text-center text-sm font-medium text-blue-600 hover:text-blue-900 py-2"
+                        className="block text-center text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover py-2"
                       >
                         View Details →
                       </Link>

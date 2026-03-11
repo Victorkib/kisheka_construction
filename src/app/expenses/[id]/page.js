@@ -292,9 +292,9 @@ export default function ExpenseDetailPage() {
       APPROVED: 'bg-green-100 text-green-800',
       REJECTED: 'bg-red-100 text-red-800',
       PAID: 'bg-blue-100 text-blue-800',
-      ARCHIVED: 'bg-gray-100 text-gray-600',
+      ARCHIVED: 'ds-bg-surface-muted ds-text-secondary',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   if (loading) {
@@ -303,8 +303,8 @@ export default function ExpenseDetailPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="space-y-6">
             <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-48"></div>
+              <div className="h-8 ds-bg-surface-muted rounded w-64 mb-2"></div>
+              <div className="h-4 ds-bg-surface-muted rounded w-48"></div>
             </div>
             <LoadingCard count={2} showHeader={true} lines={6} />
           </div>
@@ -317,7 +317,7 @@ export default function ExpenseDetailPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded text-sm sm:text-base">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm sm:text-base">
             {error || 'Expense not found'}
           </div>
           <Link
@@ -350,10 +350,10 @@ export default function ExpenseDetailPage() {
           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight break-words">Expense Details</h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight break-words">Expense Details</h1>
                 {(expense.deletedAt || expense.status === 'ARCHIVED') && <ArchiveBadge />}
               </div>
-              <p className="text-sm sm:text-base text-gray-600 mt-2">Expense Code: {expense.expenseCode || 'N/A'}</p>
+              <p className="text-sm sm:text-base ds-text-secondary mt-2">Expense Code: {expense.expenseCode || 'N/A'}</p>
             </div>
             <span
               className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-full ${getStatusBadgeColor(
@@ -369,19 +369,19 @@ export default function ExpenseDetailPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             {/* Expense Information */}
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
               <h2 className="text-lg sm:text-xl font-semibold mb-4">Expense Information</h2>
               <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Amount</dt>
-                  <dd className="mt-1 text-lg font-semibold text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Amount</dt>
+                  <dd className="mt-1 text-lg font-semibold ds-text-primary">
                     {formatCurrency(expense.amount, expense.currency)}
                   </dd>
                 </div>
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Category</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Category</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     <div className="flex items-center gap-2">
                       {expense.category?.replace('_', ' ').replace(/\b\w/g, (l) => l.toUpperCase()) || 'N/A'}
                       {expense.isIndirectCost && (
@@ -395,12 +395,12 @@ export default function ExpenseDetailPage() {
                 
                 {expense.isIndirectCost && expense.indirectCostCategory && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Indirect Cost Category</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Indirect Cost Category</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       <span className="px-2 py-1 text-xs font-semibold rounded bg-purple-100 text-purple-800">
                         {expense.indirectCostCategory.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                       </span>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs ds-text-muted mt-1">
                         This expense is charged to the project-level indirect costs budget, not the phase budget.
                       </p>
                     </dd>
@@ -408,45 +408,45 @@ export default function ExpenseDetailPage() {
                 )}
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Description</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{expense.description || 'N/A'}</dd>
+                  <dt className="text-sm font-medium ds-text-muted">Description</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{expense.description || 'N/A'}</dd>
                 </div>
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Vendor</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{expense.vendor || 'N/A'}</dd>
+                  <dt className="text-sm font-medium ds-text-muted">Vendor</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{expense.vendor || 'N/A'}</dd>
                 </div>
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Date</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{formatDate(expense.date)}</dd>
+                  <dt className="text-sm font-medium ds-text-muted">Date</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{formatDate(expense.date)}</dd>
                 </div>
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Payment Method</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Payment Method</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {expense.paymentMethod?.replace('_', ' ') || 'N/A'}
                   </dd>
                 </div>
 
                 {expense.referenceNumber && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Reference Number</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{expense.referenceNumber}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Reference Number</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">{expense.referenceNumber}</dd>
                   </div>
                 )}
 
                 <div>
-                  <dt className="text-sm font-medium text-gray-500">Submitted By</dt>
-                  <dd className="mt-1 text-sm text-gray-900">
+                  <dt className="text-sm font-medium ds-text-muted">Submitted By</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">
                     {expense.submittedBy?.name || expense.submittedBy?.email || 'N/A'}
                   </dd>
                 </div>
 
                 {expense.approvedBy && (
                   <div>
-                    <dt className="text-sm font-medium text-gray-500">Approved By</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-medium ds-text-muted">Approved By</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       {expense.approvalChain?.[expense.approvalChain.length - 1]?.approverName || 'N/A'}
                     </dd>
                   </div>
@@ -454,8 +454,8 @@ export default function ExpenseDetailPage() {
 
                 {expense.notes && (
                   <div className="md:col-span-2">
-                    <dt className="text-sm font-medium text-gray-500">Notes</dt>
-                    <dd className="mt-1 text-sm text-gray-900 whitespace-pre-wrap">{expense.notes}</dd>
+                    <dt className="text-sm font-medium ds-text-muted">Notes</dt>
+                    <dd className="mt-1 text-sm ds-text-primary whitespace-pre-wrap">{expense.notes}</dd>
                   </div>
                 )}
               </dl>
@@ -463,7 +463,7 @@ export default function ExpenseDetailPage() {
 
             {/* Receipt */}
             {expense.receiptFileUrl && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
                 <h2 className="text-lg sm:text-xl font-semibold mb-4">Receipt</h2>
                 <ImagePreview
                   url={expense.receiptFileUrl}
@@ -475,21 +475,21 @@ export default function ExpenseDetailPage() {
 
             {/* Approval History */}
             {expense.approvalHistory && expense.approvalHistory.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
                 <h2 className="text-lg sm:text-xl font-semibold mb-4">Approval History</h2>
                 <div className="space-y-4">
                   {expense.approvalHistory.map((approval, index) => (
                     <div key={index} className="border-l-4 border-blue-500 pl-4">
                       <div className="flex justify-between items-start">
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium ds-text-primary">
                             {approval.action === 'APPROVED' ? '✅ Approved' : '❌ Rejected'}
                           </p>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm ds-text-secondary mt-1">
                             {formatDate(approval.timestamp)}
                           </p>
                           {approval.reason && (
-                            <p className="text-sm text-gray-700 mt-2">{approval.reason}</p>
+                            <p className="text-sm ds-text-secondary mt-2">{approval.reason}</p>
                           )}
                         </div>
                       </div>
@@ -507,8 +507,8 @@ export default function ExpenseDetailPage() {
           <div className="space-y-4 sm:space-y-6">
             {/* Approval Actions */}
             {expense.status === 'PENDING' && canAccess('approve_expense') && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-900">Actions</h3>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold mb-4 ds-text-primary">Actions</h3>
                 {/* Capital Balance Warning */}
                 {expense.projectId && (
                   <div className="mb-4">
@@ -520,7 +520,7 @@ export default function ExpenseDetailPage() {
                 )}
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm sm:text-base font-semibold text-gray-900 mb-2 leading-normal">
+                    <label className="block text-sm sm:text-base font-semibold ds-text-primary mb-2 leading-normal">
                       Approval Notes (Optional)
                     </label>
                     <textarea
@@ -528,7 +528,7 @@ export default function ExpenseDetailPage() {
                       onChange={(e) => setApprovalNotes(e.target.value)}
                       rows={3}
                       placeholder="Add notes for approval/rejection..."
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-400 text-gray-900 text-sm sm:text-base touch-manipulation"
+                      className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:ds-text-muted ds-text-primary text-sm sm:text-base touch-manipulation"
                     />
                   </div>
                   <div className="flex flex-col sm:flex-row gap-2">
@@ -555,12 +555,12 @@ export default function ExpenseDetailPage() {
 
             {/* Archive/Delete Actions */}
             {canAccess('delete_expense') && !expense.deletedAt && expense.status !== 'ARCHIVED' && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Actions</h3>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold ds-text-primary mb-2">Actions</h3>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <button
                     onClick={handleArchiveClick}
-                    className="flex-1 px-4 py-2.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 active:bg-gray-800 transition-colors text-sm font-medium touch-manipulation"
+                    className="flex-1 px-4 py-2.5 bg-slate-600 text-white rounded-lg hover:bg-slate-700 active:bg-slate-800 transition-colors text-sm font-medium touch-manipulation"
                   >
                     Archive
                   </button>
@@ -574,8 +574,8 @@ export default function ExpenseDetailPage() {
               </div>
             )}
             {canAccess('delete_expense') && (expense.deletedAt || expense.status === 'ARCHIVED') && (
-              <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">Actions</h3>
+              <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+                <h3 className="text-base sm:text-lg font-semibold ds-text-primary mb-2">Actions</h3>
                 <div className="flex flex-col sm:flex-row gap-2">
                   <button
                     onClick={handleRestoreClick}
@@ -596,21 +596,21 @@ export default function ExpenseDetailPage() {
             )}
 
             {/* Quick Info */}
-            <div className="bg-white rounded-lg shadow p-4 sm:p-6">
-              <h3 className="text-base sm:text-lg font-semibold mb-4 text-gray-900">Quick Info</h3>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 ds-text-primary">Quick Info</h3>
               <dl className="space-y-3">
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700 leading-normal">Created</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{formatDate(expense.createdAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary leading-normal">Created</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{formatDate(expense.createdAt)}</dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-semibold text-gray-700 leading-normal">Last Updated</dt>
-                  <dd className="mt-1 text-sm text-gray-900">{formatDate(expense.updatedAt)}</dd>
+                  <dt className="text-sm font-semibold ds-text-secondary leading-normal">Last Updated</dt>
+                  <dd className="mt-1 text-sm ds-text-primary">{formatDate(expense.updatedAt)}</dd>
                 </div>
                 {expense.approvalChain && expense.approvalChain.length > 0 && (
                   <div>
-                    <dt className="text-sm font-semibold text-gray-700 leading-normal">Approvals</dt>
-                    <dd className="mt-1 text-sm text-gray-900">
+                    <dt className="text-sm font-semibold ds-text-secondary leading-normal">Approvals</dt>
+                    <dd className="mt-1 text-sm ds-text-primary">
                       {expense.approvalChain.length} approval(s)
                     </dd>
                   </div>
@@ -637,9 +637,9 @@ export default function ExpenseDetailPage() {
       {/* Rejection Modal with Reason Input */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
+          <div className="fixed inset-0 bg-black bg-opacity-50 transition-opacity" onClick={() => !isRejecting && setShowRejectModal(false)} />
           <div className="flex min-h-full items-center justify-center p-4">
-            <div className="relative bg-white rounded-lg shadow-xl max-w-full sm:max-w-md w-full transform transition-all mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="relative ds-bg-surface rounded-lg shadow-xl max-w-full sm:max-w-md w-full transform transition-all mx-4" onClick={(e) => e.stopPropagation()}>
               <div className="p-4 sm:p-6">
                 <div className="flex items-start">
                   <div className="flex-shrink-0 mx-auto flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-yellow-100 mb-4">
@@ -649,30 +649,30 @@ export default function ExpenseDetailPage() {
                   </div>
                 </div>
                 <div className="mt-3 text-center sm:mt-0 sm:text-left">
-                  <h3 className="text-base sm:text-lg font-semibold leading-6 text-gray-900 mb-2" id="modal-title">
+                  <h3 className="text-base sm:text-lg font-semibold leading-6 ds-text-primary mb-2" id="modal-title">
                     Reject Expense
                   </h3>
                   <div className="mt-2">
-                    <p className="text-xs sm:text-sm text-gray-500 mb-4">
+                    <p className="text-xs sm:text-sm ds-text-muted mb-4">
                       Please provide a reason for rejecting this expense:
                     </p>
                     <textarea
                       value={rejectReason}
                       onChange={(e) => setRejectReason(e.target.value)}
                       placeholder="Enter rejection reason..."
-                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm sm:text-base touch-manipulation"
+                      className="w-full px-3 py-2.5 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-sm sm:text-base touch-manipulation"
                       rows="4"
                       disabled={isRejecting}
                     />
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-50 px-4 sm:px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-200">
+              <div className="ds-bg-surface-muted px-4 sm:px-6 py-4 flex flex-col-reverse sm:flex-row sm:justify-end gap-3 border-t border-yellow-400/60">
                 <button
                   type="button"
                   onClick={() => setShowRejectModal(false)}
                   disabled={isRejecting}
-                  className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
+                  className="w-full sm:w-auto px-4 py-2.5 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface-muted focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors touch-manipulation"
                 >
                   Cancel
                 </button>
@@ -716,7 +716,7 @@ export default function ExpenseDetailPage() {
               {!expense.deletedAt && expense.status !== 'ARCHIVED' && (
                 <>
                   <p className="mb-2 font-medium">Permanent deletion will:</p>
-                  <ul className="list-disc list-inside mb-3 space-y-1 text-gray-600">
+                  <ul className="list-disc list-inside mb-3 space-y-1 ds-text-secondary">
                     <li>Permanently remove the expense from the system</li>
                     {expense.status && ['APPROVED', 'PAID'].includes(expense.status) && expense.amount > 0 && (
                       <li>Recalculate project finances</li>

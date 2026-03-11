@@ -69,8 +69,8 @@ export function QuickActions({ pendingApprovals = 0 }) {
   ];
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
-      <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6">Quick Actions</h2>
+    <div className="ds-bg-surface rounded-lg shadow-lg p-4 sm:p-6 mb-6 sm:mb-8 border ds-border-subtle">
+      <h2 className="text-xl sm:text-2xl font-bold ds-text-primary mb-4 sm:mb-6">Quick Actions</h2>
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         {actions.map((action, idx) => (
           <Link

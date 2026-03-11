@@ -91,12 +91,12 @@ export function CostManagementSummary({ projectId }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6 border-2 border-gray-200">
+      <div className="ds-bg-surface rounded-lg shadow p-6 border-2 ds-border-subtle">
         <div className="animate-pulse">
-          <div className="h-6 bg-gray-200 rounded w-1/3 mb-4"></div>
+          <div className="h-6 ds-bg-surface-muted rounded w-1/3 mb-4"></div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+              <div key={i} className="h-24 ds-bg-surface-muted rounded"></div>
             ))}
           </div>
         </div>
@@ -140,9 +140,9 @@ export function CostManagementSummary({ projectId }) {
   const contingencyUsage = contingencyBudget > 0 ? (contingencyUsed / contingencyBudget) * 100 : 0;
 
   const getStatusColor = (usage) => {
-    if (usage >= 100) return 'bg-red-100 text-red-800 border-red-200';
-    if (usage >= 80) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    return 'bg-green-100 text-green-800 border-green-200';
+    if (usage >= 100) return 'bg-red-100 text-red-800 border-red-400/60';
+    if (usage >= 80) return 'bg-yellow-100 text-yellow-800 border-yellow-400/60';
+    return 'bg-green-100 text-green-800 border-green-400/60';
   };
 
   const getStatusText = (usage) => {
@@ -152,9 +152,9 @@ export function CostManagementSummary({ projectId }) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 border-2 border-gray-200">
+    <div className="ds-bg-surface rounded-lg shadow p-6 border-2 ds-border-subtle">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900">Cost Management</h2>
+        <h2 className="text-xl font-bold ds-text-primary">Cost Management</h2>
         <Link
           href={`/projects/${projectId}/costs`}
           className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition"
@@ -167,7 +167,7 @@ export function CostManagementSummary({ projectId }) {
         {/* DCC Card */}
         <Link
           href={`/projects/${projectId}/costs?tab=dcc`}
-          className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+          className="p-4 border-2 ds-border-subtle rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-2xl">🏗️</span>
@@ -175,10 +175,10 @@ export function CostManagementSummary({ projectId }) {
               {getStatusText(dccUsage)}
             </span>
           </div>
-          <h3 className="font-semibold text-gray-900 mb-1">Direct Construction Costs</h3>
-          <p className="text-sm text-gray-600 mb-2">Budget: {formatCurrency(dccBudget)}</p>
-          <p className="text-sm text-gray-600 mb-2">Spent: {formatCurrency(dccSpent)}</p>
-          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <h3 className="font-semibold ds-text-primary mb-1">Direct Construction Costs</h3>
+          <p className="text-sm ds-text-secondary mb-2">Budget: {formatCurrency(dccBudget)}</p>
+          <p className="text-sm ds-text-secondary mb-2">Spent: {formatCurrency(dccSpent)}</p>
+          <div className="w-full ds-bg-surface-muted rounded-full h-2 mt-2">
             <div
               className={`h-2 rounded-full ${
                 dccUsage >= 100 ? 'bg-red-600' : dccUsage >= 80 ? 'bg-yellow-600' : 'bg-green-600'
@@ -186,13 +186,13 @@ export function CostManagementSummary({ projectId }) {
               style={{ width: `${Math.min(100, dccUsage)}%` }}
             ></div>
           </div>
-          <p className="text-xs text-gray-500 mt-1">{dccUsage.toFixed(1)}% used</p>
+          <p className="text-xs ds-text-muted mt-1">{dccUsage.toFixed(1)}% used</p>
         </Link>
 
         {/* Preconstruction Card */}
         <Link
           href={`/projects/${projectId}/costs?tab=preconstruction`}
-          className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+          className="p-4 border-2 ds-border-subtle rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-2xl">📋</span>
@@ -200,10 +200,10 @@ export function CostManagementSummary({ projectId }) {
               {getStatusText(preconstructionUsage)}
             </span>
           </div>
-          <h3 className="font-semibold text-gray-900 mb-1">Preconstruction</h3>
-          <p className="text-sm text-gray-600 mb-2">Budget: {formatCurrency(preconstructionBudget)}</p>
-          <p className="text-sm text-gray-600 mb-2">Spent: {formatCurrency(preconstructionSpent)}</p>
-          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <h3 className="font-semibold ds-text-primary mb-1">Preconstruction</h3>
+          <p className="text-sm ds-text-secondary mb-2">Budget: {formatCurrency(preconstructionBudget)}</p>
+          <p className="text-sm ds-text-secondary mb-2">Spent: {formatCurrency(preconstructionSpent)}</p>
+          <div className="w-full ds-bg-surface-muted rounded-full h-2 mt-2">
             <div
               className={`h-2 rounded-full ${
                 preconstructionUsage >= 100
@@ -215,13 +215,13 @@ export function CostManagementSummary({ projectId }) {
               style={{ width: `${Math.min(100, preconstructionUsage)}%` }}
             ></div>
           </div>
-          <p className="text-xs text-gray-500 mt-1">{preconstructionUsage.toFixed(1)}% used</p>
+          <p className="text-xs ds-text-muted mt-1">{preconstructionUsage.toFixed(1)}% used</p>
         </Link>
 
         {/* Indirect Costs Card */}
         <Link
           href={`/projects/${projectId}/costs?tab=indirect`}
-          className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+          className="p-4 border-2 ds-border-subtle rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-2xl">⚙️</span>
@@ -229,10 +229,10 @@ export function CostManagementSummary({ projectId }) {
               {getStatusText(indirectUsage)}
             </span>
           </div>
-          <h3 className="font-semibold text-gray-900 mb-1">Indirect Costs</h3>
-          <p className="text-sm text-gray-600 mb-2">Budget: {formatCurrency(indirectBudget)}</p>
-          <p className="text-sm text-gray-600 mb-2">Spent: {formatCurrency(indirectSpent)}</p>
-          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <h3 className="font-semibold ds-text-primary mb-1">Indirect Costs</h3>
+          <p className="text-sm ds-text-secondary mb-2">Budget: {formatCurrency(indirectBudget)}</p>
+          <p className="text-sm ds-text-secondary mb-2">Spent: {formatCurrency(indirectSpent)}</p>
+          <div className="w-full ds-bg-surface-muted rounded-full h-2 mt-2">
             <div
               className={`h-2 rounded-full ${
                 indirectUsage >= 100
@@ -244,13 +244,13 @@ export function CostManagementSummary({ projectId }) {
               style={{ width: `${Math.min(100, indirectUsage)}%` }}
             ></div>
           </div>
-          <p className="text-xs text-gray-500 mt-1">{indirectUsage.toFixed(1)}% used</p>
+          <p className="text-xs ds-text-muted mt-1">{indirectUsage.toFixed(1)}% used</p>
         </Link>
 
         {/* Contingency Card */}
         <Link
           href={`/projects/${projectId}/costs?tab=contingency`}
-          className="p-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
+          className="p-4 border-2 ds-border-subtle rounded-lg hover:border-blue-500 hover:bg-blue-50 transition"
         >
           <div className="flex items-center justify-between mb-2">
             <span className="text-2xl">🛡️</span>
@@ -258,10 +258,10 @@ export function CostManagementSummary({ projectId }) {
               {getStatusText(contingencyUsage)}
             </span>
           </div>
-          <h3 className="font-semibold text-gray-900 mb-1">Contingency Reserve</h3>
-          <p className="text-sm text-gray-600 mb-2">Budget: {formatCurrency(contingencyBudget)}</p>
-          <p className="text-sm text-gray-600 mb-2">Used: {formatCurrency(contingencyUsed)}</p>
-          <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+          <h3 className="font-semibold ds-text-primary mb-1">Contingency Reserve</h3>
+          <p className="text-sm ds-text-secondary mb-2">Budget: {formatCurrency(contingencyBudget)}</p>
+          <p className="text-sm ds-text-secondary mb-2">Used: {formatCurrency(contingencyUsed)}</p>
+          <div className="w-full ds-bg-surface-muted rounded-full h-2 mt-2">
             <div
               className={`h-2 rounded-full ${
                 contingencyUsage >= 100
@@ -273,12 +273,12 @@ export function CostManagementSummary({ projectId }) {
               style={{ width: `${Math.min(100, contingencyUsage)}%` }}
             ></div>
           </div>
-          <p className="text-xs text-gray-500 mt-1">{contingencyUsage.toFixed(1)}% used</p>
+          <p className="text-xs ds-text-muted mt-1">{contingencyUsage.toFixed(1)}% used</p>
         </Link>
       </div>
 
       {/* Quick Links */}
-      <div className="mt-6 pt-6 border-t border-gray-200">
+      <div className="mt-6 pt-6 border-t ds-border-subtle">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Link
             href={`/projects/${projectId}/costs?tab=analytics`}

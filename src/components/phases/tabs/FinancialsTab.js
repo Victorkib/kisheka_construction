@@ -31,26 +31,26 @@ export function FinancialsTab({ phase, formatCurrency }) {
     <div className="space-y-6">
       {/* Financial Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Budget Allocated</p>
-          <p className="text-2xl font-bold text-gray-900">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Budget Allocated</p>
+          <p className="text-2xl font-bold ds-text-primary">
             {formatCurrency(financialSummary.budgetTotal)}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Actual Spending</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Actual Spending</p>
           <p className="text-2xl font-bold text-blue-600">
             {formatCurrency(financialSummary.actualTotal)}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Committed Costs</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Committed Costs</p>
           <p className="text-2xl font-bold text-orange-600">
             {formatCurrency(financialSummary.committedTotal)}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-6">
-          <p className="text-sm text-gray-600 mb-2">Remaining Budget</p>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <p className="text-sm ds-text-secondary mb-2">Remaining Budget</p>
           <p className={`text-2xl font-bold ${
             financialSummary.remaining < 0 ? 'text-red-600' : 'text-green-600'
           }`}>
@@ -60,20 +60,20 @@ export function FinancialsTab({ phase, formatCurrency }) {
       </div>
 
       {/* Budget vs Actual Comparison */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget vs Actual</h3>
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Budget vs Actual</h3>
         <div className="space-y-4">
           <div>
-            <div className="flex justify-between text-sm text-gray-600 mb-2">
+            <div className="flex justify-between text-sm ds-text-secondary mb-2">
               <span>Budget Utilization</span>
               <span>{phaseStatus.isOptional ? 'Not Set' : formatPercentage(phaseStatus.utilization, 'N/A')}</span>
             </div>
             {phaseStatus.isOptional ? (
-              <div className="w-full bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <div className="w-full bg-blue-50 border border-blue-400/60 rounded-lg p-3">
                 <p className="text-sm text-blue-800">{phaseStatus.message}</p>
               </div>
             ) : (
-              <div className="w-full bg-gray-200 rounded-full h-4">
+              <div className="w-full ds-bg-surface-muted rounded-full h-4">
                 <div
                   className={`h-4 rounded-full transition-all ${
                     phaseStatus.status === 'over_budget'
@@ -91,11 +91,11 @@ export function FinancialsTab({ phase, formatCurrency }) {
           </div>
           <div className="grid grid-cols-2 gap-4 pt-4 border-t">
             <div>
-              <p className="text-sm text-gray-600">Variance</p>
+              <p className="text-sm ds-text-secondary">Variance</p>
               {phaseStatus.isOptional ? (
                 <>
-                  <p className="text-lg font-semibold mt-1 text-gray-500">N/A</p>
-                  <p className="text-xs text-gray-500">Budget not set</p>
+                  <p className="text-lg font-semibold mt-1 ds-text-muted">N/A</p>
+                  <p className="text-xs ds-text-muted">Budget not set</p>
                 </>
               ) : (
                 <>
@@ -104,7 +104,7 @@ export function FinancialsTab({ phase, formatCurrency }) {
                   }`}>
                     {formatCurrency(phaseStatus.variance !== null ? phaseStatus.variance : 0)}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs ds-text-muted">
                     {phaseStatus.variance !== null && phaseStatus.variance < 0 ? '+' : ''}
                     {formatPercentage(phaseStatus.variance !== null ? (phaseStatus.variance / phaseStatus.budget) * 100 : null, 'N/A')}
                   </p>
@@ -112,8 +112,8 @@ export function FinancialsTab({ phase, formatCurrency }) {
               )}
             </div>
             <div>
-              <p className="text-sm text-gray-600">Estimated Costs</p>
-              <p className="text-lg font-semibold text-gray-900 mt-1">
+              <p className="text-sm ds-text-secondary">Estimated Costs</p>
+              <p className="text-lg font-semibold ds-text-primary mt-1">
                 {formatCurrency(financialSummary.estimatedTotal)}
               </p>
             </div>
@@ -122,18 +122,18 @@ export function FinancialsTab({ phase, formatCurrency }) {
       </div>
 
       {/* Budget Breakdown */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Budget Breakdown</h3>
+      <div className="ds-bg-surface rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Budget Breakdown</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="border border-gray-200 rounded-lg p-4">
-            <p className="text-sm font-medium text-gray-700 mb-2">Materials</p>
-            <p className="text-lg font-semibold text-gray-900">
+          <div className="border ds-border-subtle rounded-lg p-4">
+            <p className="text-sm font-medium ds-text-secondary mb-2">Materials</p>
+            <p className="text-lg font-semibold ds-text-primary">
               {formatCurrency(phase.budgetAllocation?.materials || 0)}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs ds-text-muted mt-1">
               Spent: {formatCurrency(phase.actualSpending?.materials || 0)}
             </p>
-            <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+            <div className="mt-2 w-full ds-bg-surface-muted rounded-full h-1.5">
               <div
                 className="bg-blue-600 h-1.5 rounded-full"
                 style={{
@@ -148,15 +148,15 @@ export function FinancialsTab({ phase, formatCurrency }) {
               />
             </div>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <p className="text-sm font-medium text-gray-700 mb-2">Labour</p>
-            <p className="text-lg font-semibold text-gray-900">
+          <div className="border ds-border-subtle rounded-lg p-4">
+            <p className="text-sm font-medium ds-text-secondary mb-2">Labour</p>
+            <p className="text-lg font-semibold ds-text-primary">
               {formatCurrency(phase.budgetAllocation?.labour || 0)}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs ds-text-muted mt-1">
               Spent: {formatCurrency(phase.actualSpending?.labour || 0)}
             </p>
-            <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+            <div className="mt-2 w-full ds-bg-surface-muted rounded-full h-1.5">
               <div
                 className="bg-green-600 h-1.5 rounded-full"
                 style={{
@@ -171,15 +171,15 @@ export function FinancialsTab({ phase, formatCurrency }) {
               />
             </div>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <p className="text-sm font-medium text-gray-700 mb-2">Equipment</p>
-            <p className="text-lg font-semibold text-gray-900">
+          <div className="border ds-border-subtle rounded-lg p-4">
+            <p className="text-sm font-medium ds-text-secondary mb-2">Equipment</p>
+            <p className="text-lg font-semibold ds-text-primary">
               {formatCurrency(phase.budgetAllocation?.equipment || 0)}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs ds-text-muted mt-1">
               Spent: {formatCurrency(phase.actualSpending?.equipment || 0)}
             </p>
-            <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+            <div className="mt-2 w-full ds-bg-surface-muted rounded-full h-1.5">
               <div
                 className="bg-purple-600 h-1.5 rounded-full"
                 style={{
@@ -190,15 +190,15 @@ export function FinancialsTab({ phase, formatCurrency }) {
               />
             </div>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <p className="text-sm font-medium text-gray-700 mb-2">Subcontractors</p>
-            <p className="text-lg font-semibold text-gray-900">
+          <div className="border ds-border-subtle rounded-lg p-4">
+            <p className="text-sm font-medium ds-text-secondary mb-2">Subcontractors</p>
+            <p className="text-lg font-semibold ds-text-primary">
               {formatCurrency(phase.budgetAllocation?.subcontractors || 0)}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs ds-text-muted mt-1">
               Spent: {formatCurrency(phase.actualSpending?.subcontractors || 0)}
             </p>
-            <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
+            <div className="mt-2 w-full ds-bg-surface-muted rounded-full h-1.5">
               <div
                 className="bg-orange-600 h-1.5 rounded-full"
                 style={{
@@ -209,12 +209,12 @@ export function FinancialsTab({ phase, formatCurrency }) {
               />
             </div>
           </div>
-          <div className="border border-gray-200 rounded-lg p-4">
-            <p className="text-sm font-medium text-gray-700 mb-2">Professional Services</p>
-            <p className="text-lg font-semibold text-gray-900">
+          <div className="border ds-border-subtle rounded-lg p-4">
+            <p className="text-sm font-medium ds-text-secondary mb-2">Professional Services</p>
+            <p className="text-lg font-semibold ds-text-primary">
               {formatCurrency(phase.professionalServices?.totalFees || 0)}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs ds-text-muted mt-1">
               Activities: {phase.professionalServices?.activitiesCount || 0}
             </p>
           </div>
@@ -226,8 +226,8 @@ export function FinancialsTab({ phase, formatCurrency }) {
       {!phaseStatus.isOptional && phaseStatus.utilization !== null && phaseStatus.utilization > 80 && (
         <div className={`rounded-lg p-4 border-2 ${
           phaseStatus.status === 'over_budget'
-            ? 'bg-red-50 border-red-300'
-            : 'bg-yellow-50 border-yellow-300'
+            ? 'bg-red-50 border-red-400/60'
+            : 'bg-yellow-50 border-yellow-400/60'
         }`}>
           <div className="flex items-start">
             <svg className={`w-5 h-5 mr-2 mt-0.5 ${
@@ -252,11 +252,11 @@ export function FinancialsTab({ phase, formatCurrency }) {
       )}
 
       {/* Link to Detailed Financial View */}
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-4">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-900">Detailed Financial Analysis</p>
-            <p className="text-xs text-gray-600 mt-1">View comprehensive financial reports and charts</p>
+            <p className="text-sm font-medium ds-text-primary">Detailed Financial Analysis</p>
+            <p className="text-xs ds-text-secondary mt-1">View comprehensive financial reports and charts</p>
           </div>
           <Link
             href={`/phases/${phase._id}/financial`}

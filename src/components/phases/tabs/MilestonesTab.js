@@ -167,7 +167,7 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <p className="text-gray-500">Loading milestones...</p>
+        <p className="ds-text-muted">Loading milestones...</p>
       </div>
     );
   }
@@ -176,44 +176,44 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
     <div className="space-y-6">
       {/* Statistics */}
       {stats && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-600">Total Milestones</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">{stats.total}</p>
+              <p className="text-sm ds-text-secondary">Total Milestones</p>
+              <p className="text-2xl font-bold ds-text-primary mt-1">{stats.total}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Completed</p>
+              <p className="text-sm ds-text-secondary">Completed</p>
               <p className="text-2xl font-bold text-green-600 mt-1">{stats.completed}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Pending</p>
+              <p className="text-sm ds-text-secondary">Pending</p>
               <p className="text-2xl font-bold text-blue-600 mt-1">{stats.pending}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Overdue</p>
+              <p className="text-sm ds-text-secondary">Overdue</p>
               <p className="text-2xl font-bold text-red-600 mt-1">{stats.overdue}</p>
             </div>
           </div>
           {stats.total > 0 && (
             <div className="mt-4">
-              <p className="text-sm text-gray-600">Completion Rate</p>
-              <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+              <p className="text-sm ds-text-secondary">Completion Rate</p>
+              <div className="mt-2 w-full ds-bg-surface-muted rounded-full h-2">
                 <div
                   className="bg-green-600 h-2 rounded-full"
                   style={{ width: `${stats.completionPercentage}%` }}
                 />
               </div>
-              <p className="text-sm text-gray-600 mt-1">{stats.completionPercentage}%</p>
+              <p className="text-sm ds-text-secondary mt-1">{stats.completionPercentage}%</p>
             </div>
           )}
         </div>
       )}
 
       {/* Milestones Header */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
+          <h3 className="text-lg font-semibold ds-text-primary">
             Milestones ({milestones.length})
           </h3>
           {canEdit && (
@@ -239,7 +239,7 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
 
         {milestones.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-gray-500 mb-4">No milestones defined for this phase</p>
+            <p className="ds-text-muted mb-4">No milestones defined for this phase</p>
             {canEdit && (
               <button
                 onClick={() => {
@@ -278,11 +278,11 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
 
       {/* Timeline View */}
       {milestones.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Milestone Timeline</h3>
+        <div className="ds-bg-surface rounded-lg shadow p-6">
+          <h3 className="text-lg font-semibold ds-text-primary mb-4">Milestone Timeline</h3>
           <div className="relative">
             {/* Timeline Line */}
-            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+            <div className="absolute left-4 top-0 bottom-0 w-0.5 ds-bg-surface-muted"></div>
             
             {/* Milestones */}
             <div className="space-y-6">
@@ -294,14 +294,14 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
                     <div className={`
                       absolute left-2 top-1 w-4 h-4 rounded-full border-2 border-white
                       ${status === 'completed' ? 'bg-green-500' : 
-                        status === 'overdue' ? 'bg-red-500' : 'bg-gray-400'}
+                        status === 'overdue' ? 'bg-red-500' : 'ds-bg-surface-muted'}
                     `}></div>
                     
                     {/* Milestone Content */}
                     <div>
-                      <h4 className="font-semibold text-gray-900">{milestone.name || `Milestone ${index + 1}`}</h4>
+                      <h4 className="font-semibold ds-text-primary">{milestone.name || `Milestone ${index + 1}`}</h4>
                       {milestone.targetDate && (
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm ds-text-secondary mt-1">
                           {formatDate(milestone.targetDate)}
                         </p>
                       )}
@@ -317,10 +317,10 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
       {/* Add/Edit Milestone Modal */}
       {showAddModal && canEdit && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+          <div className="ds-bg-surface rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold ds-text-primary">
                   {editingMilestone ? 'Edit Milestone' : 'Add Milestone'}
                 </h3>
                 <button
@@ -336,7 +336,7 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
                       newCriterion: ''
                     });
                   }}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="ds-text-muted hover:ds-text-secondary"
                 >
                   ✕
                 </button>
@@ -344,7 +344,7 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
 
               <form onSubmit={handleSaveMilestone} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     Milestone Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -352,24 +352,24 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     Description
                   </label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     Target Date <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -377,18 +377,18 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
                     value={formData.targetDate}
                     onChange={(e) => setFormData({ ...formData, targetDate: e.target.value })}
                     required
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium ds-text-secondary mb-2">
                     Completion Criteria
                   </label>
                   <div className="space-y-2">
                     {formData.completionCriteria.map((criterion, index) => (
                       <div key={index} className="flex items-center gap-2">
-                        <span className="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                        <span className="flex-1 px-3 py-2 ds-bg-surface-muted border ds-border-subtle rounded-lg text-sm">
                           {criterion}
                         </span>
                         <button
@@ -412,12 +412,12 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
                           }
                         }}
                         placeholder="Add completion criterion..."
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="flex-1 px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                       <button
                         type="button"
                         onClick={addCriterion}
-                        className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                        className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition-colors"
                       >
                         Add
                       </button>
@@ -431,9 +431,9 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
                       type="checkbox"
                       checked={formData.signOffRequired}
                       onChange={(e) => setFormData({ ...formData, signOffRequired: e.target.checked })}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded ds-border-subtle text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm font-medium text-gray-700">Require Sign-Off</span>
+                    <span className="text-sm font-medium ds-text-secondary">Require Sign-Off</span>
                   </label>
                 </div>
 
@@ -452,7 +452,7 @@ export function MilestonesTab({ phase, canEdit, formatDate }) {
                         newCriterion: ''
                       });
                     }}
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
                   >
                     Cancel
                   </button>

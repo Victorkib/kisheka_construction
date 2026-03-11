@@ -54,7 +54,7 @@ export function ModalLoadingOverlay({
 
   return (
     <div
-      className="absolute inset-0 z-50 flex items-center justify-center bg-gradient-to-br bg-white/85 backdrop-blur-md transition-opacity duration-300"
+      className="absolute inset-0 z-50 flex items-center justify-center bg-gradient-to-br ds-bg-surface/85 backdrop-blur-md transition-opacity duration-300"
       role="status"
       aria-label="Loading"
       aria-live="polite"
@@ -74,11 +74,11 @@ export function ModalLoadingOverlay({
           {/* Message */}
           {message && (
             <div className="text-center">
-              <p className="text-base font-semibold text-gray-900 mb-1">
+              <p className="text-base font-semibold ds-text-primary mb-1">
                 {message}
               </p>
               {progress !== null && (
-                <p className="text-xs text-gray-600 mt-1">
+                <p className="text-xs ds-text-secondary mt-1">
                   {Math.round(progress)}% complete
                 </p>
               )}
@@ -88,7 +88,7 @@ export function ModalLoadingOverlay({
           {/* Progress Bar */}
           {progress !== null && (
             <div className="w-full mt-2">
-              <div className="w-full bg-white/60 backdrop-blur-sm rounded-full h-2.5 overflow-hidden border border-white/30">
+              <div className="w-full ds-bg-surface/60 backdrop-blur-sm rounded-full h-2.5 overflow-hidden border border-white/30">
                 <div
                   className={`h-full bg-gradient-to-r ${
                     variant === 'blue' ? 'from-blue-500 to-blue-600' :

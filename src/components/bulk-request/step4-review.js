@@ -83,8 +83,8 @@ export function Step4Review({ wizardData, user, onValidationChange }) {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-2 text-sm text-gray-600">Loading review...</p>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 ds-border-accent-primary mx-auto"></div>
+        <p className="mt-2 text-sm ds-text-secondary">Loading review...</p>
       </div>
     );
   }
@@ -92,77 +92,77 @@ export function Step4Review({ wizardData, user, onValidationChange }) {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Review & Submit</h2>
-        <p className="text-sm text-gray-600 mb-6">
+        <h2 className="text-xl font-semibold ds-text-primary mb-4">Review & Submit</h2>
+        <p className="text-sm ds-text-secondary mb-6">
           Review all details before submitting. {willAutoApprove && 'As OWNER, this request will be auto-approved.'}
         </p>
       </div>
 
       {/* Project & Settings Summary */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Project & Settings</h3>
+      <div className="ds-bg-surface rounded-lg border ds-border-subtle p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Project & Settings</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <p className="text-sm text-gray-600">Project</p>
-            <p className="font-medium text-gray-900">
+            <p className="text-sm ds-text-secondary">Project</p>
+            <p className="font-medium ds-text-primary">
               {project ? `${project.projectCode} - ${project.projectName}` : 'Loading...'}
             </p>
           </div>
           {wizardData.batchName && (
             <div>
-              <p className="text-sm text-gray-600">Batch Name</p>
-              <p className="font-medium text-gray-900">{wizardData.batchName}</p>
+              <p className="text-sm ds-text-secondary">Batch Name</p>
+              <p className="font-medium ds-text-primary">{wizardData.batchName}</p>
             </div>
           )}
           <div>
-            <p className="text-sm text-gray-600">Default Urgency</p>
-            <p className="font-medium text-gray-900 capitalize">{wizardData.defaultUrgency || 'medium'}</p>
+            <p className="text-sm ds-text-secondary">Default Urgency</p>
+            <p className="font-medium ds-text-primary capitalize">{wizardData.defaultUrgency || 'medium'}</p>
           </div>
           {wizardData.defaultReason && (
             <div>
-              <p className="text-sm text-gray-600">Default Reason</p>
-              <p className="font-medium text-gray-900">{wizardData.defaultReason}</p>
+              <p className="text-sm ds-text-secondary">Default Reason</p>
+              <p className="font-medium ds-text-primary">{wizardData.defaultReason}</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Materials Summary */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Materials Summary</h3>
+      <div className="ds-bg-surface rounded-lg border ds-border-subtle p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Materials Summary</h3>
         <div className="space-y-2 max-h-96 overflow-y-auto">
           {materials.map((material, index) => {
             const cost = material.estimatedCost || (material.estimatedUnitCost && material.quantityNeeded ? material.estimatedUnitCost * material.quantityNeeded : 0);
             return (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
+              <div key={index} className="border ds-border-subtle rounded-lg p-4">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900">{material.name}</p>
+                    <p className="font-semibold ds-text-primary">{material.name}</p>
                     <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                       <div>
-                        <span className="text-gray-600">Quantity: </span>
-                        <span className="font-medium text-gray-900">{material.quantityNeeded} {material.unit}</span>
+                        <span className="ds-text-secondary">Quantity: </span>
+                        <span className="font-medium ds-text-primary">{material.quantityNeeded} {material.unit}</span>
                       </div>
                       {material.category && (
                         <div>
-                          <span className="text-gray-600">Category: </span>
-                          <span className="font-medium text-gray-900">{material.category}</span>
+                          <span className="ds-text-secondary">Category: </span>
+                          <span className="font-medium ds-text-primary">{material.category}</span>
                         </div>
                       )}
                       <div>
-                        <span className="text-gray-600">Urgency: </span>
-                        <span className="font-medium text-gray-900 capitalize">{material.urgency || wizardData.defaultUrgency || 'medium'}</span>
+                        <span className="ds-text-secondary">Urgency: </span>
+                        <span className="font-medium ds-text-primary capitalize">{material.urgency || wizardData.defaultUrgency || 'medium'}</span>
                       </div>
                       {material.estimatedUnitCost && (
                         <div>
-                          <span className="text-gray-600">Unit Cost: </span>
-                          <span className="font-medium text-gray-900">{formatCurrency(material.estimatedUnitCost)}</span>
+                          <span className="ds-text-secondary">Unit Cost: </span>
+                          <span className="font-medium ds-text-primary">{formatCurrency(material.estimatedUnitCost)}</span>
                         </div>
                       )}
                     </div>
                   </div>
                   <div className="ml-4 text-right">
-                    <p className="text-lg font-bold text-gray-900">{formatCurrency(cost)}</p>
+                    <p className="text-lg font-bold ds-text-primary">{formatCurrency(cost)}</p>
                   </div>
                 </div>
               </div>
@@ -172,20 +172,20 @@ export function Step4Review({ wizardData, user, onValidationChange }) {
       </div>
 
       {/* Totals */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-4">Summary</h3>
+      <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-6">
+        <h3 className="text-lg font-semibold ds-text-primary mb-4">Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
-            <p className="text-sm text-blue-700">Total Materials</p>
-            <p className="text-3xl font-bold text-blue-900">{totals.totalMaterials}</p>
+            <p className="text-sm ds-text-secondary">Total Materials</p>
+            <p className="text-3xl font-bold ds-text-primary">{totals.totalMaterials}</p>
           </div>
           <div>
-            <p className="text-sm text-blue-700">Total Estimated Cost</p>
-            <p className="text-3xl font-bold text-blue-900">{formatCurrency(totals.totalCost)}</p>
+            <p className="text-sm ds-text-secondary">Total Estimated Cost</p>
+            <p className="text-3xl font-bold ds-text-primary">{formatCurrency(totals.totalCost)}</p>
           </div>
           <div>
-            <p className="text-sm text-blue-700">Average Cost per Material</p>
-            <p className="text-3xl font-bold text-blue-900">
+            <p className="text-sm ds-text-secondary">Average Cost per Material</p>
+            <p className="text-3xl font-bold ds-text-primary">
               {formatCurrency(totals.totalMaterials > 0 ? totals.totalCost / totals.totalMaterials : 0)}
             </p>
           </div>
@@ -194,14 +194,14 @@ export function Step4Review({ wizardData, user, onValidationChange }) {
 
       {/* Auto-approval Notice */}
       {willAutoApprove && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="ds-bg-success/10 border ds-border-success/40 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-green-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 ds-text-success mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <p className="font-semibold text-green-900">Auto-Approval Enabled</p>
-              <p className="text-sm text-green-700 mt-1">
+              <p className="font-semibold ds-text-success">Auto-Approval Enabled</p>
+              <p className="text-sm ds-text-success mt-1">
                 As OWNER, this bulk request will be automatically approved and ready for supplier assignment.
               </p>
             </div>

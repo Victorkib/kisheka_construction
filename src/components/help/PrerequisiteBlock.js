@@ -23,7 +23,7 @@ export function PrerequisiteBlock({
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <Card className="border-2 border-red-200 bg-gradient-to-br from-red-50 to-orange-50 shadow-lg">
+      <Card className="border-2 border-red-400/60 bg-gradient-to-br from-red-50 to-orange-50 shadow-lg">
         <div className="p-8">
           {/* Header with Icon */}
           <div className="flex items-start gap-4 mb-6">
@@ -54,8 +54,8 @@ export function PrerequisiteBlock({
 
           {/* Missing Prerequisites List */}
           {incompletePrerequisites.length > 0 && (
-            <div className="mb-6 bg-white rounded-lg p-5 border border-red-200 shadow-sm">
-              <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4 flex items-center gap-2">
+            <div className="mb-6 ds-bg-surface rounded-lg p-5 border border-red-400/60 shadow-sm">
+              <h3 className="text-sm font-semibold ds-text-primary uppercase tracking-wide mb-4 flex items-center gap-2">
                 <svg
                   className="w-4 h-4 text-red-600"
                   fill="none"
@@ -162,10 +162,10 @@ export function PrerequisiteBlock({
 
           {/* Retry Button */}
           {onRetry && (
-            <div className="pt-4 border-t border-red-200">
+            <div className="pt-4 border-t border-red-400/60">
               <button
                 onClick={onRetry}
-                className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 bg-white border border-red-300 rounded-lg hover:bg-red-50 transition-colors"
+                className="inline-flex items-center px-4 py-2 text-sm font-medium text-red-700 ds-bg-surface border border-red-400/60 rounded-lg hover:bg-red-50 transition-colors"
               >
                 <svg
                   className="w-4 h-4 mr-2"
@@ -186,7 +186,7 @@ export function PrerequisiteBlock({
           )}
 
           {/* Help Text */}
-          <div className="mt-6 pt-6 border-t border-red-200">
+          <div className="mt-6 pt-6 border-t border-red-400/60">
             <p className="text-xs text-red-700/80">
               <strong>Tip:</strong> Complete the missing prerequisites above to
               proceed. All required data must be set up before you can create

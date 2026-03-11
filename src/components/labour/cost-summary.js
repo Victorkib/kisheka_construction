@@ -87,7 +87,7 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex items-center justify-center py-8">
           <LoadingSpinner size="md" text="Loading cost summary..." />
         </div>
@@ -97,7 +97,7 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
         <p className="text-sm text-red-800">Error loading cost summary: {error}</p>
       </div>
     );
@@ -105,8 +105,8 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
 
   if (!data || !data.summary) {
     return (
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
-        <p className="text-gray-600">No cost summary data available</p>
+      <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-8 text-center">
+        <p className="ds-text-secondary">No cost summary data available</p>
       </div>
     );
   }
@@ -118,7 +118,7 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
     <div className="space-y-6">
       {/* Header with Recalculate Button */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">Labour Cost Summary</h3>
+        <h3 className="text-lg font-semibold ds-text-primary">Labour Cost Summary</h3>
         <button
           onClick={handleRecalculate}
           disabled={recalculating}
@@ -134,10 +134,10 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
         <div
           className={`rounded-lg p-4 border ${
             budgetInfo.utilization > 100
-              ? 'bg-red-50 border-red-200'
+              ? 'bg-red-50 border-red-400/60'
               : budgetInfo.utilization > 80
-              ? 'bg-yellow-50 border-yellow-200'
-              : 'bg-green-50 border-green-200'
+              ? 'bg-yellow-50 border-yellow-400/60'
+              : 'bg-green-50 border-green-400/60'
           }`}
         >
           <div className="flex items-start gap-3">
@@ -149,15 +149,15 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
               <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
             )}
             <div className="flex-1">
-              <p className="text-sm font-medium text-gray-900 mb-1">Budget Utilization</p>
+              <p className="text-sm font-medium ds-text-primary mb-1">Budget Utilization</p>
               <div className="flex items-center gap-4 text-sm">
-                <span className="text-gray-600">
+                <span className="ds-text-secondary">
                   Used: <span className="font-semibold">{budgetInfo.used.toLocaleString()} KES</span>
                 </span>
-                <span className="text-gray-600">
+                <span className="ds-text-secondary">
                   Allocated: <span className="font-semibold">{budgetInfo.allocated.toLocaleString()} KES</span>
                 </span>
-                <span className="text-gray-600">
+                <span className="ds-text-secondary">
                   Remaining: <span className="font-semibold">{budgetInfo.remaining.toLocaleString()} KES</span>
                 </span>
                 <span
@@ -179,35 +179,35 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-5 h-5 text-blue-600" />
-            <span className="text-sm font-medium text-gray-700">Total Hours</span>
+            <span className="text-sm font-medium ds-text-secondary">Total Hours</span>
           </div>
           <div className="text-2xl font-bold text-blue-600">
             {costs.total?.hours?.toFixed(1) || '0.0'}
           </div>
-          <div className="text-xs text-gray-600 mt-1">{summary.totalEntries || 0} entries</div>
+          <div className="text-xs ds-text-secondary mt-1">{summary.totalEntries || 0} entries</div>
         </div>
 
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+        <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign className="w-5 h-5 text-green-600" />
-            <span className="text-sm font-medium text-gray-700">Total Cost</span>
+            <span className="text-sm font-medium ds-text-secondary">Total Cost</span>
           </div>
           <div className="text-2xl font-bold text-green-600">
             {costs.total?.cost?.toLocaleString() || '0'} KES
           </div>
-          <div className="text-xs text-gray-600 mt-1">All labour types</div>
+          <div className="text-xs ds-text-secondary mt-1">All labour types</div>
         </div>
 
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+        <div className="bg-purple-50 border border-purple-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-5 h-5 text-purple-600" />
-            <span className="text-sm font-medium text-gray-700">Unique Workers</span>
+            <span className="text-sm font-medium ds-text-secondary">Unique Workers</span>
           </div>
           <div className="text-2xl font-bold text-purple-600">{summary.uniqueWorkers || 0}</div>
-          <div className="text-xs text-gray-600 mt-1">
+          <div className="text-xs ds-text-secondary mt-1">
             Avg: {summary.averageWorkersPerDay?.toFixed(1) || '0.0'}/day
           </div>
         </div>
@@ -215,7 +215,7 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
         <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-5 h-5 text-orange-600" />
-            <span className="text-sm font-medium text-gray-700">Avg Rate</span>
+            <span className="text-sm font-medium ds-text-secondary">Avg Rate</span>
           </div>
           <div className="text-2xl font-bold text-orange-600">
             {costs.total?.hours > 0
@@ -223,37 +223,37 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
               : '0'}{' '}
             KES/hr
           </div>
-          <div className="text-xs text-gray-600 mt-1">Per hour</div>
+          <div className="text-xs ds-text-secondary mt-1">Per hour</div>
         </div>
       </div>
 
       {/* Breakdown by Role */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h4 className="text-md font-semibold text-gray-900">Breakdown by Role</h4>
+      <div className="ds-bg-surface rounded-lg shadow">
+        <div className="px-4 py-3 border-b ds-border-subtle">
+          <h4 className="text-md font-semibold ds-text-primary">Breakdown by Role</h4>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-ds-border-subtle">
+            <thead className="ds-bg-surface-muted">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                   Role
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                   Hours
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                   Cost
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                   Entries
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                   % of Total
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
               {[
                 { key: 'skilled', label: 'Skilled' },
                 { key: 'unskilled', label: 'Unskilled' },
@@ -265,27 +265,27 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
                   costs.total?.cost > 0 ? (roleData.cost / costs.total.cost) * 100 : 0;
 
                 return (
-                  <tr key={role.key} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{role.label}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{roleData.hours.toFixed(1)}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
+                  <tr key={role.key} className="hover:ds-bg-surface-muted">
+                    <td className="px-4 py-3 text-sm font-medium ds-text-primary">{role.label}</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">{roleData.hours.toFixed(1)}</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
                       {roleData.cost.toLocaleString()} KES
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{roleData.entries || 0}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{percentage.toFixed(1)}%</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">{roleData.entries || 0}</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">{percentage.toFixed(1)}%</td>
                   </tr>
                 );
               })}
-              <tr className="bg-gray-50 font-semibold">
-                <td className="px-4 py-3 text-sm text-gray-900">Total</td>
-                <td className="px-4 py-3 text-sm text-gray-900">
+              <tr className="ds-bg-surface-muted font-semibold">
+                <td className="px-4 py-3 text-sm ds-text-primary">Total</td>
+                <td className="px-4 py-3 text-sm ds-text-primary">
                   {costs.total?.hours?.toFixed(1) || '0.0'}
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-900">
+                <td className="px-4 py-3 text-sm ds-text-primary">
                   {costs.total?.cost?.toLocaleString() || '0'} KES
                 </td>
-                <td className="px-4 py-3 text-sm text-gray-900">{summary.totalEntries || 0}</td>
-                <td className="px-4 py-3 text-sm text-gray-900">100.0%</td>
+                <td className="px-4 py-3 text-sm ds-text-primary">{summary.totalEntries || 0}</td>
+                <td className="px-4 py-3 text-sm ds-text-primary">100.0%</td>
               </tr>
             </tbody>
           </table>
@@ -294,45 +294,45 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
 
       {/* Direct vs Subcontractor vs Indirect Breakdown */}
       {summary.direct && summary.subcontractor && (
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <h4 className="text-md font-semibold text-gray-900">Labour Breakdown by Type</h4>
+        <div className="ds-bg-surface rounded-lg shadow">
+          <div className="px-4 py-3 border-b ds-border-subtle">
+            <h4 className="text-md font-semibold ds-text-primary">Labour Breakdown by Type</h4>
           </div>
           <div className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Direct Labour (Phase Budget)</p>
+              <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
+                <p className="text-sm font-medium ds-text-secondary mb-2">Direct Labour (Phase Budget)</p>
                 <div className="space-y-1">
                   <p className="text-lg font-bold text-blue-600">
                     {summary.direct.cost.toLocaleString()} KES
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs ds-text-secondary">
                     {summary.direct.hours.toFixed(1)} hours • {summary.direct.entries} entries
                   </p>
                   {costs.total?.cost > 0 && (
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs ds-text-secondary">
                       {((summary.direct.cost / costs.total.cost) * 100).toFixed(1)}% of total
                     </p>
                   )}
                 </div>
               </div>
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <p className="text-sm font-medium text-gray-700 mb-2">Subcontractor Labour</p>
+              <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
+                <p className="text-sm font-medium ds-text-secondary mb-2">Subcontractor Labour</p>
                 <div className="space-y-1">
                   <p className="text-lg font-bold text-green-600">
                     {summary.subcontractor.cost.toLocaleString()} KES
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p className="text-xs ds-text-secondary">
                     {summary.subcontractor.hours.toFixed(1)} hours • {summary.subcontractor.entries}{' '}
                     entries
                   </p>
                   {costs.total?.cost > 0 && (
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs ds-text-secondary">
                       {((summary.subcontractor.cost / costs.total.cost) * 100).toFixed(1)}% of total
                     </p>
                   )}
                   {summary.subcontractor.subcontractorCount > 0 && (
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs ds-text-secondary">
                       {summary.subcontractor.subcontractorCount} subcontractor
                       {summary.subcontractor.subcontractorCount !== 1 ? 's' : ''}
                     </p>
@@ -341,16 +341,16 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
               </div>
               {summary.indirect && summary.indirect.cost > 0 && (
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                  <p className="text-sm font-medium text-gray-700 mb-2">Indirect Labour (Project Budget)</p>
+                  <p className="text-sm font-medium ds-text-secondary mb-2">Indirect Labour (Project Budget)</p>
                   <div className="space-y-1">
                     <p className="text-lg font-bold text-amber-600">
                       {summary.indirect.cost.toLocaleString()} KES
                     </p>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs ds-text-secondary">
                       {summary.indirect.hours.toFixed(1)} hours • {summary.indirect.entries} entries
                     </p>
                     {costs.total?.cost > 0 && (
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs ds-text-secondary">
                         {((summary.indirect.cost / costs.total.cost) * 100).toFixed(1)}% of total
                       </p>
                     )}
@@ -364,41 +364,41 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
 
       {/* Breakdown by Skill Type */}
       {summary.bySkillType && Object.keys(summary.bySkillType).length > 0 && (
-        <div className="bg-white rounded-lg shadow">
-          <div className="px-4 py-3 border-b border-gray-200">
-            <h4 className="text-md font-semibold text-gray-900">Breakdown by Skill Type</h4>
+        <div className="ds-bg-surface rounded-lg shadow">
+          <div className="px-4 py-3 border-b ds-border-subtle">
+            <h4 className="text-md font-semibold ds-text-primary">Breakdown by Skill Type</h4>
           </div>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Skill Type
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Hours
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Cost
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                  <th className="px-4 py-3 text-left text-xs font-medium ds-text-muted uppercase">
                     Entries
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {Object.entries(summary.bySkillType)
                   .sort((a, b) => b[1].cost - a[1].cost)
                   .map(([skillType, data]) => (
-                    <tr key={skillType} className="hover:bg-gray-50">
-                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                    <tr key={skillType} className="hover:ds-bg-surface-muted">
+                      <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                         {skillType.replace(/_/g, ' ')}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{data.hours.toFixed(1)}</td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-4 py-3 text-sm ds-text-secondary">{data.hours.toFixed(1)}</td>
+                      <td className="px-4 py-3 text-sm ds-text-secondary">
                         {data.cost.toLocaleString()} KES
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">{data.entries || 0}</td>
+                      <td className="px-4 py-3 text-sm ds-text-secondary">{data.entries || 0}</td>
                     </tr>
                   ))}
               </tbody>
@@ -409,7 +409,7 @@ export function LabourCostSummary({ projectId, phaseId = null, periodType = 'pro
 
       {/* Last Updated */}
       {summary.calculatedAt && (
-        <div className="text-xs text-gray-500 text-center">
+        <div className="text-xs ds-text-muted text-center">
           Last calculated: {new Date(summary.calculatedAt).toLocaleString()}
         </div>
       )}

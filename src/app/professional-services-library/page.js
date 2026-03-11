@@ -217,8 +217,8 @@ function ProfessionalServicesLibraryPageContent() {
 
   const getTypeBadgeColor = (type) => {
     return type === 'architect' 
-      ? 'bg-blue-100 text-blue-800' 
-      : 'bg-green-100 text-green-800';
+      ? 'ds-bg-accent-subtle ds-text-accent-primary'
+      : 'ds-bg-success/10 ds-text-success';
   };
 
   const getTypeLabel = (type) => {
@@ -236,17 +236,17 @@ function ProfessionalServicesLibraryPageContent() {
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight">
+            <h1 className="text-2xl md:text-3xl font-bold ds-text-primary leading-tight">
               Library
             </h1>
-            <p className="text-gray-600 mt-2">
+            <p className="ds-text-secondary mt-2">
               Manage architects and engineers for quick assignment to projects
             </p>
           </div>
           {canAccess('manage_professional_services_library') && (
             <Link
               href="/professional-services-library/new"
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition-colors"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -268,17 +268,17 @@ function ProfessionalServicesLibraryPageContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Type Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Type
               </label>
               <select
                 value={filters.type}
                 onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
               >
                 <option value="">All Types</option>
                 <option value="architect">Architects</option>
@@ -288,13 +288,13 @@ function ProfessionalServicesLibraryPageContent() {
 
             {/* Common Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Common
               </label>
               <select
                 value={filters.isCommon}
                 onChange={(e) => handleFilterChange('isCommon', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
               >
                 <option value="">All</option>
                 <option value="true">Common Only</option>
@@ -304,13 +304,13 @@ function ProfessionalServicesLibraryPageContent() {
 
             {/* Active Filter */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Status
               </label>
               <select
                 value={filters.isActive}
                 onChange={(e) => handleFilterChange('isActive', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
               >
                 <option value="true">Active</option>
                 <option value="false">Inactive</option>
@@ -320,7 +320,7 @@ function ProfessionalServicesLibraryPageContent() {
 
             {/* Search */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium ds-text-secondary mb-1">
                 Search
               </label>
               <input
@@ -328,7 +328,7 @@ function ProfessionalServicesLibraryPageContent() {
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 placeholder="Search by name..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary"
               />
             </div>
           </div>
@@ -336,7 +336,7 @@ function ProfessionalServicesLibraryPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-lg mb-6">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
           </div>
@@ -346,12 +346,12 @@ function ProfessionalServicesLibraryPageContent() {
         {loading ? (
           <LoadingTable rows={5} columns={6} />
         ) : professionals.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="ds-bg-surface rounded-lg shadow p-12 text-center">
+            <svg className="mx-auto h-12 w-12 ds-text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No professionals found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <h3 className="mt-2 text-sm font-medium ds-text-primary">No professionals found</h3>
+            <p className="mt-1 text-sm ds-text-muted">
               {canAccess('manage_professional_services_library') 
                 ? 'Get started by adding a new professional to the library.'
                 : 'No professionals have been added to the library yet.'}
@@ -360,7 +360,7 @@ function ProfessionalServicesLibraryPageContent() {
               <div className="mt-6">
                 <Link
                   href="/professional-services-library/new"
-                  className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="inline-flex items-center px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover"
                 >
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -371,42 +371,42 @@ function ProfessionalServicesLibraryPageContent() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="ds-bg-surface rounded-lg shadow overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Name
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Type
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Contact
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Usage
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {professionals.map((professional) => (
-                    <tr key={professional._id} className="hover:bg-gray-50">
+                    <tr key={professional._id} className="hover:ds-bg-surface-muted">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium ds-text-primary">
                               {professional.name}
                             </div>
                             {professional.companyName && (
-                              <div className="text-sm text-gray-500">
+                              <div className="text-sm ds-text-muted">
                                 {professional.companyName}
                               </div>
                             )}
@@ -418,19 +418,19 @@ function ProfessionalServicesLibraryPageContent() {
                           {getTypeLabel(professional.type)}
                         </span>
                         {professional.specialization && (
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs ds-text-muted mt-1">
                             {professional.specialization}
                           </div>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         <div>{professional.email || 'N/A'}</div>
                         <div>{professional.phone || 'N/A'}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         <div>Used {professional.usageCount || 0} times</div>
                         {professional.lastUsedAt && (
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs ds-text-muted">
                             Last: {new Date(professional.lastUsedAt).toLocaleDateString()}
                           </div>
                         )}
@@ -438,16 +438,16 @@ function ProfessionalServicesLibraryPageContent() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           {professional.isCommon && (
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full ds-bg-accent-subtle ds-text-accent-primary">
                               Common
                             </span>
                           )}
                           {professional.isActive ? (
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full ds-bg-success/10 ds-text-success">
                               Active
                             </span>
                           ) : (
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full ds-bg-surface-muted ds-text-primary">
                               Inactive
                             </span>
                           )}
@@ -455,10 +455,19 @@ function ProfessionalServicesLibraryPageContent() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <div className="flex items-center justify-end gap-2">
+                          {canAccess('assign_professional_service') && (
+                            <Link
+                              href={`/professional-services/new?libraryId=${professional._id}`}
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
+                              title="Assign this professional to a project"
+                            >
+                              Assign
+                            </Link>
+                          )}
                           {canAccess('edit_professional_service') && (
                             <Link
                               href={`/professional-services-library/${professional._id}/edit`}
-                              className="text-blue-600 hover:text-blue-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               Edit
                             </Link>
@@ -466,7 +475,7 @@ function ProfessionalServicesLibraryPageContent() {
                           {canAccess('edit_professional_service') && (
                             <button
                               onClick={() => handleToggleCommon(professional._id, professional.isCommon)}
-                              className="text-purple-600 hover:text-purple-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                               title={professional.isCommon ? 'Remove from common' : 'Mark as common'}
                             >
                               {professional.isCommon ? '★' : '☆'}
@@ -475,7 +484,7 @@ function ProfessionalServicesLibraryPageContent() {
                           {canAccess('edit_professional_service') && (
                             <button
                               onClick={() => handleToggleActive(professional._id, professional.isActive)}
-                              className={professional.isActive ? 'text-gray-600 hover:text-gray-900' : 'text-green-600 hover:text-green-900'}
+                              className={professional.isActive ? 'ds-text-secondary hover:ds-text-primary' : 'ds-text-success hover:ds-text-success'}
                               title={professional.isActive ? 'Deactivate' : 'Activate'}
                             >
                               {professional.isActive ? '●' : '○'}
@@ -484,7 +493,7 @@ function ProfessionalServicesLibraryPageContent() {
                           {canAccess('delete_professional_service') && (
                             <button
                               onClick={() => handleDelete(professional._id, professional.name)}
-                              className="text-red-600 hover:text-red-900"
+                              className="ds-text-danger hover:ds-text-danger"
                             >
                               Delete
                             </button>
@@ -499,26 +508,26 @@ function ProfessionalServicesLibraryPageContent() {
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="ds-bg-surface px-4 py-3 flex items-center justify-between border-t ds-border-subtle sm:px-6">
                 <div className="flex-1 flex justify-between sm:hidden">
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                     disabled={pagination.page === 1}
-                    className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="relative inline-flex items-center px-4 py-2 border ds-border-subtle text-sm font-medium rounded-md ds-text-secondary ds-bg-surface hover:ds-bg-surface-muted disabled:opacity-50"
                   >
                     Previous
                   </button>
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                     disabled={pagination.page === pagination.pages}
-                    className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                    className="ml-3 relative inline-flex items-center px-4 py-2 border ds-border-subtle text-sm font-medium rounded-md ds-text-secondary ds-bg-surface hover:ds-bg-surface-muted disabled:opacity-50"
                   >
                     Next
                   </button>
                 </div>
                 <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-sm text-gray-700">
+                    <p className="text-sm ds-text-secondary">
                       Showing <span className="font-medium">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
                       <span className="font-medium">
                         {Math.min(pagination.page * pagination.limit, pagination.total)}
@@ -531,7 +540,7 @@ function ProfessionalServicesLibraryPageContent() {
                       <button
                         onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                         disabled={pagination.page === 1}
-                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-l-md border ds-border-subtle ds-bg-surface text-sm font-medium ds-text-muted hover:ds-bg-surface-muted disabled:opacity-50"
                       >
                         Previous
                       </button>
@@ -548,22 +557,22 @@ function ProfessionalServicesLibraryPageContent() {
                               onClick={() => setPagination(prev => ({ ...prev, page }))}
                               className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
                                 page === pagination.page
-                                  ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                  ? 'z-10 ds-bg-accent-subtle ds-border-accent-primary ds-text-accent-primary'
+                                  : 'ds-bg-surface ds-border-subtle ds-text-muted hover:ds-bg-surface-muted'
                               }`}
                             >
                               {page}
                             </button>
                           );
                         } else if (page === pagination.page - 2 || page === pagination.page + 2) {
-                          return <span key={page} className="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">...</span>;
+                          return <span key={page} className="relative inline-flex items-center px-4 py-2 border ds-border-subtle ds-bg-surface text-sm font-medium ds-text-secondary">...</span>;
                         }
                         return null;
                       })}
                       <button
                         onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                         disabled={pagination.page === pagination.pages}
-                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                        className="relative inline-flex items-center px-2 py-2 rounded-r-md border ds-border-subtle ds-bg-surface text-sm font-medium ds-text-muted hover:ds-bg-surface-muted disabled:opacity-50"
                       >
                         Next
                       </button>

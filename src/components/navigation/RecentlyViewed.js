@@ -141,10 +141,10 @@ export function RecentlyViewed({ isCollapsed = false }) {
             <Link
               key={`${item.type}-${item.id}-${index}`}
               href={typeInfo.getHref(item.id)}
-              className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg hover:bg-gray-100 transition-colors group"
+              className="flex items-center gap-2 px-2 py-1.5 text-sm rounded-lg hover:bg-slate-600/60 transition-colors group"
             >
               <span className="text-base flex-shrink-0">{typeInfo.icon}</span>
-              <span className="flex-1 truncate text-gray-700 group-hover:text-blue-600 transition-colors">
+              <span className="flex-1 truncate text-white group-hover:text-blue-200 transition-colors">
                 {item.label}
               </span>
             </Link>
@@ -157,7 +157,7 @@ export function RecentlyViewed({ isCollapsed = false }) {
             localStorage.removeItem(STORAGE_KEY);
             setItems([]);
           }}
-          className="mt-3 w-full text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 px-2 py-1.5 rounded-md transition-colors font-medium"
+          className="mt-3 w-full text-xs text-slate-200 hover:text-white hover:bg-slate-600/60 px-2 py-1.5 rounded-md transition-colors font-medium"
           aria-label="Clear recently viewed history"
         >
           Clear history

@@ -193,13 +193,13 @@ function PhasesPageContent() {
 
   const getStatusColor = (status) => {
     const colors = {
-      'not_started': 'bg-gray-100 text-gray-800',
+      'not_started': 'ds-bg-surface-muted ds-text-primary',
       'in_progress': 'bg-blue-100 text-blue-800',
       'completed': 'bg-green-100 text-green-800',
       'on_hold': 'bg-yellow-100 text-yellow-800',
       'cancelled': 'bg-red-100 text-red-800'
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getPhaseTypeLabel = (type) => {
@@ -226,18 +226,18 @@ function PhasesPageContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex-1 min-w-0">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Construction Phases</h1>
-            <p className="text-sm sm:text-base text-gray-600 mt-1">Manage and track construction phases</p>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary">Construction Phases</h1>
+            <p className="text-sm sm:text-base ds-text-secondary mt-1">Manage and track construction phases</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-1 sm:gap-2 bg-gray-100 rounded-lg p-1">
+            <div className="flex items-center gap-1 sm:gap-2 ds-bg-surface-muted rounded-lg p-1">
               <button
                 onClick={() => setViewMode('table')}
                 className={`px-3 py-2 sm:py-1.5 text-sm font-medium rounded transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                   viewMode === 'table'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900'
+                    ? 'ds-bg-surface ds-text-primary shadow-sm'
+                    : 'ds-text-secondary hover:ds-text-primary active:ds-text-primary'
                 }`}
               >
                 <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,8 +249,8 @@ function PhasesPageContent() {
                 onClick={() => setViewMode('timeline')}
                 className={`px-3 py-2 sm:py-1.5 text-sm font-medium rounded transition-colors touch-manipulation min-h-[44px] sm:min-h-0 ${
                   viewMode === 'timeline'
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900 active:text-gray-900'
+                    ? 'ds-bg-surface ds-text-primary shadow-sm'
+                    : 'ds-text-secondary hover:ds-text-primary active:ds-text-primary'
                 }`}
               >
                 <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -262,7 +262,7 @@ function PhasesPageContent() {
             {canCreate && (
               <Link
                 href={`/phases/new${selectedProjectId ? `?projectId=${selectedProjectId}` : ''}`}
-                className="bg-blue-600 text-white px-4 sm:px-6 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation text-sm sm:text-base text-center font-medium"
+                className="ds-bg-accent-primary text-white px-4 sm:px-6 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation text-sm sm:text-base text-center font-medium"
               >
                 + New Phase
               </Link>
@@ -286,11 +286,11 @@ function PhasesPageContent() {
         />
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-4 sm:p-6 mb-6">
-          <h3 className="text-sm sm:text-base font-medium text-gray-700 mb-4">Filters & Sorting</h3>
+        <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 mb-6">
+          <h3 className="text-sm sm:text-base font-medium ds-text-secondary mb-4">Filters & Sorting</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium ds-text-secondary mb-1">
                 Project
               </label>
               <select
@@ -311,7 +311,7 @@ function PhasesPageContent() {
                     });
                   }
                 }}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Projects</option>
                 {accessibleProjects.map((project) => (
@@ -322,7 +322,7 @@ function PhasesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium ds-text-secondary mb-1">
                 Status
               </label>
               <select
@@ -337,7 +337,7 @@ function PhasesPageContent() {
                   if (sortOrder) params.append('sortOrder', sortOrder);
                   router.push(`/phases?${params.toString()}`);
                 }}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Statuses</option>
                 <option value="not_started">Not Started</option>
@@ -348,7 +348,7 @@ function PhasesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium ds-text-secondary mb-1">
                 Phase Type
               </label>
               <select
@@ -363,7 +363,7 @@ function PhasesPageContent() {
                   if (sortOrder) params.append('sortOrder', sortOrder);
                   router.push(`/phases?${params.toString()}`);
                 }}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Types</option>
                 <option value="construction">Construction</option>
@@ -372,7 +372,7 @@ function PhasesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium ds-text-secondary mb-1">
                 Sort By
               </label>
               <select
@@ -387,7 +387,7 @@ function PhasesPageContent() {
                   if (sortOrder) params.append('sortOrder', sortOrder);
                   router.push(`/phases?${params.toString()}`);
                 }}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="sequence">Sequence</option>
                 <option value="name">Name</option>
@@ -397,7 +397,7 @@ function PhasesPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-600 mb-1">
+              <label className="block text-xs font-medium ds-text-secondary mb-1">
                 Order
               </label>
               <select
@@ -412,7 +412,7 @@ function PhasesPageContent() {
                   params.append('sortOrder', e.target.value);
                   router.push(`/phases?${params.toString()}`);
                 }}
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 text-sm border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="asc">Ascending</option>
                 <option value="desc">Descending</option>
@@ -423,7 +423,7 @@ function PhasesPageContent() {
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -432,8 +432,8 @@ function PhasesPageContent() {
         {loading ? (
           <LoadingTable />
         ) : phases.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center">
-            <p className="text-gray-500 text-lg">
+          <div className="ds-bg-surface rounded-lg shadow p-8 text-center">
+            <p className="ds-text-muted text-lg">
               {selectedProjectId 
                 ? 'No phases found for this project. Create one to get started.'
                 : 'No phases found. Select a project or create a new phase.'}
@@ -441,7 +441,7 @@ function PhasesPageContent() {
             {canCreate && (
               <Link
                 href={`/phases/new${selectedProjectId ? `?projectId=${selectedProjectId}` : ''}`}
-                className="mt-4 inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation font-medium"
+                className="mt-4 inline-block ds-bg-accent-primary text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation font-medium"
               >
                 Create First Phase
               </Link>
@@ -452,38 +452,38 @@ function PhasesPageContent() {
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+            <div className="hidden md:block ds-bg-surface rounded-lg shadow overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+                <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Phase
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Project
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Budget
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Spent
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Remaining
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Progress
                     </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {phases.map((phase) => {
                     const financialSummary = phase.financialSummary || {
                       budgetTotal: phase.budgetAllocation?.total || 0,
@@ -494,22 +494,22 @@ function PhasesPageContent() {
                     const project = projectMap[phase.projectId] || {};
                     
                     return (
-                      <tr key={phase._id} className="hover:bg-gray-50">
+                      <tr key={phase._id} className="hover:ds-bg-surface-muted">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div>
-                            <div className="text-sm font-medium text-gray-900">
+                            <div className="text-sm font-medium ds-text-primary">
                               {phase.phaseName}
                             </div>
-                            <div className="text-sm text-gray-500">
+                            <div className="text-sm ds-text-muted">
                               {phase.phaseCode} • {getPhaseTypeLabel(phase.phaseType)}
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="text-sm text-gray-900">
+                          <div className="text-sm ds-text-primary">
                             {project.projectName || 'Unknown'}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm ds-text-muted">
                             {project.projectCode || ''}
                           </div>
                         </td>
@@ -543,18 +543,18 @@ function PhasesPageContent() {
                             )}
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {formatCurrency(financialSummary.budgetTotal)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {formatCurrency(financialSummary.actualTotal)}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                           {formatCurrency(financialSummary.remaining)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
-                            <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                            <div className="w-full ds-bg-surface-muted rounded-full h-2 mr-2">
                               <div
                                 className={`h-2 rounded-full ${
                                   financialSummary.utilizationPercentage > 100 
@@ -568,7 +568,7 @@ function PhasesPageContent() {
                                 }}
                               />
                             </div>
-                            <span className="text-xs text-gray-600">
+                            <span className="text-xs ds-text-secondary">
                               {financialSummary.utilizationPercentage.toFixed(1)}%
                             </span>
                           </div>
@@ -584,7 +584,7 @@ function PhasesPageContent() {
                             </Link>
                             <Link
                               href={`/phases/${phase._id}`}
-                              className="text-blue-600 hover:text-blue-900"
+                              className="ds-text-accent-primary hover:ds-text-accent-hover"
                             >
                               View
                             </Link>
@@ -620,18 +620,18 @@ function PhasesPageContent() {
                 return (
                   <div
                     key={phase._id}
-                    className="bg-white rounded-lg shadow p-4 border border-gray-200"
+                    className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle"
                   >
                     {/* Header Row */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-base font-semibold text-gray-900 truncate">
+                        <h3 className="text-base font-semibold ds-text-primary truncate">
                           {phase.phaseName}
                         </h3>
-                        <p className="text-sm text-gray-600 mt-0.5">
+                        <p className="text-sm ds-text-secondary mt-0.5">
                           {phase.phaseCode} • {getPhaseTypeLabel(phase.phaseType)}
                         </p>
-                        <p className="text-xs text-gray-500 mt-0.5 truncate">
+                        <p className="text-xs ds-text-muted mt-0.5 truncate">
                           {project.projectName || 'Unknown'}
                         </p>
                       </div>
@@ -654,29 +654,29 @@ function PhasesPageContent() {
                     </div>
 
                     {/* Financial Summary */}
-                    <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b border-gray-200">
+                    <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b ds-border-subtle">
                       <div>
-                        <p className="text-xs text-gray-500 mb-0.5">Budget</p>
-                        <p className="text-sm font-semibold text-gray-900">
+                        <p className="text-xs ds-text-muted mb-0.5">Budget</p>
+                        <p className="text-sm font-semibold ds-text-primary">
                           {formatCurrency(financialSummary.budgetTotal)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-0.5">Spent</p>
-                        <p className="text-sm font-semibold text-gray-900">
+                        <p className="text-xs ds-text-muted mb-0.5">Spent</p>
+                        <p className="text-sm font-semibold ds-text-primary">
                           {formatCurrency(financialSummary.actualTotal)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-0.5">Remaining</p>
-                        <p className="text-sm font-semibold text-gray-900">
+                        <p className="text-xs ds-text-muted mb-0.5">Remaining</p>
+                        <p className="text-sm font-semibold ds-text-primary">
                           {formatCurrency(financialSummary.remaining)}
                         </p>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500 mb-0.5">Progress</p>
+                        <p className="text-xs ds-text-muted mb-0.5">Progress</p>
                         <div className="flex items-center gap-2">
-                          <div className="flex-1 max-w-20 bg-gray-200 rounded-full h-2">
+                          <div className="flex-1 max-w-20 ds-bg-surface-muted rounded-full h-2">
                             <div
                               className={`h-2 rounded-full ${
                                 financialSummary.utilizationPercentage > 100 
@@ -690,7 +690,7 @@ function PhasesPageContent() {
                               }}
                             />
                           </div>
-                          <span className="text-xs text-gray-600 font-medium">
+                          <span className="text-xs ds-text-secondary font-medium">
                             {financialSummary.utilizationPercentage.toFixed(1)}%
                           </span>
                         </div>
@@ -707,7 +707,7 @@ function PhasesPageContent() {
                       </Link>
                       <Link
                         href={`/phases/${phase._id}`}
-                        className="flex-1 px-3 py-2 bg-blue-50 text-blue-600 text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                        className="flex-1 px-3 py-2 bg-blue-500/10 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-500/20 active:bg-blue-500/30 transition-colors touch-manipulation text-center border border-blue-400/60"
                       >
                         View
                       </Link>

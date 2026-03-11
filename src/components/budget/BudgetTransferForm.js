@@ -192,12 +192,12 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="ds-bg-surface rounded-lg shadow-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-gray-900">Request Budget Transfer</h3>
+          <h3 className="text-xl font-semibold ds-text-primary">Request Budget Transfer</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600 transition"
+            className="ds-text-muted hover:ds-text-secondary transition"
             disabled={loading}
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,7 +207,7 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-4 text-sm">
             {error}
           </div>
         )}
@@ -215,7 +215,7 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 From Category <span className="text-red-500">*</span>
               </label>
               <select
@@ -226,7 +226,7 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
                 }}
                 required
                 disabled={loading}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
               >
                 <option value="">Select source category</option>
                 {categories.map((cat) => (
@@ -238,7 +238,7 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 To Category <span className="text-red-500">*</span>
               </label>
               <select
@@ -246,7 +246,7 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
                 onChange={(e) => setFormData({ ...formData, toCategory: e.target.value })}
                 required
                 disabled={loading}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
               >
                 <option value="">Select target category</option>
                 {categories
@@ -258,7 +258,7 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
                   ))}
               </select>
               {formData.fromCategory && (
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs ds-text-muted mt-1">
                   Note: Cannot transfer to contingency reserve
                 </p>
               )}
@@ -266,7 +266,7 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Amount (KES) <span className="text-red-500">*</span>
             </label>
             <input
@@ -278,8 +278,8 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
               step="0.01"
               required
               disabled={loading}
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
-                budgetInfo?.exceeded ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 ${
+                budgetInfo?.exceeded ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
             {budgetInfo && (
@@ -296,7 +296,7 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Reason <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -306,11 +306,11 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
               placeholder="Explain why this budget transfer is needed..."
               required
               disabled={loading}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             />
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+          <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-3 text-sm text-blue-800">
             <p className="font-semibold mb-1">⚠️ Important Notes:</p>
             <ul className="list-disc list-inside space-y-1 text-xs">
               <li>Budget transfers require owner approval</li>
@@ -325,7 +325,7 @@ export function BudgetTransferForm({ projectId, onClose, onSuccess, initialData 
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
+              className="flex-1 px-4 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted transition disabled:opacity-50"
             >
               Cancel
             </button>

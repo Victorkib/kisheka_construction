@@ -166,10 +166,10 @@ export function ContextualQuickActions({ isCollapsed = false }) {
 
   const getColorClasses = (color) => {
     const colors = {
-      blue: 'bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700',
-      green: 'bg-green-50 hover:bg-green-100 border-green-200 text-green-700',
-      gray: 'bg-gray-50 hover:bg-gray-100 border-gray-200 text-gray-700',
-      orange: 'bg-orange-50 hover:bg-orange-100 border-orange-200 text-orange-700',
+      blue: 'bg-blue-500/20 border-blue-400/50 text-blue-50 hover:bg-blue-500/30',
+      green: 'bg-emerald-500/20 border-emerald-400/50 text-emerald-50 hover:bg-emerald-500/30',
+      gray: 'bg-slate-600/40 border-slate-500/50 text-white hover:bg-slate-600/60',
+      orange: 'bg-orange-500/20 border-orange-400/50 text-orange-50 hover:bg-orange-500/30',
     };
     return colors[color] || colors.gray;
   };

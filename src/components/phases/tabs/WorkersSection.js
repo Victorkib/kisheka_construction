@@ -181,9 +181,9 @@ export function WorkersSection({ phase, formatCurrency }) {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Workers</h3>
+          <h3 className="text-lg font-semibold ds-text-primary">Workers</h3>
         </div>
         <div className="flex items-center justify-center py-8">
           <LoadingSpinner size="md" text="Loading workers..." />
@@ -194,11 +194,11 @@ export function WorkersSection({ phase, formatCurrency }) {
 
   if (error) {
     return (
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Workers</h3>
+          <h3 className="text-lg font-semibold ds-text-primary">Workers</h3>
         </div>
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
           <p className="text-sm text-red-800">Error loading workers: {error}</p>
         </div>
       </div>
@@ -206,9 +206,9 @@ export function WorkersSection({ phase, formatCurrency }) {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="ds-bg-surface rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">Workers</h3>
+        <h3 className="text-lg font-semibold ds-text-primary">Workers</h3>
         <Link
           href={`/labour/entries/new?projectId=${phase.projectId}&phaseId=${phase._id}`}
           className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -219,8 +219,8 @@ export function WorkersSection({ phase, formatCurrency }) {
 
       {stats && stats.total === 0 ? (
         <div className="text-center py-8">
-          <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500 mb-4">No workers have logged labour for this phase yet</p>
+          <Users className="w-12 h-12 ds-text-muted mx-auto mb-4" />
+          <p className="ds-text-muted mb-4">No workers have logged labour for this phase yet</p>
           <Link
             href={`/labour/entries/new?projectId=${phase.projectId}&phaseId=${phase._id}`}
             className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -232,35 +232,35 @@ export function WorkersSection({ phase, formatCurrency }) {
         <>
           {/* Statistics */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="border border-gray-200 rounded-lg p-4">
+            <div className="border ds-border-subtle rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Users className="w-5 h-5 text-blue-600" />
-                <p className="text-sm text-gray-600">Total Workers</p>
+                <p className="text-sm ds-text-secondary">Total Workers</p>
               </div>
-              <p className="text-2xl font-bold text-gray-900">{stats?.total || 0}</p>
+              <p className="text-2xl font-bold ds-text-primary">{stats?.total || 0}</p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-4">
+            <div className="border ds-border-subtle rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <Clock className="w-5 h-5 text-green-600" />
-                <p className="text-sm text-gray-600">Total Hours</p>
+                <p className="text-sm ds-text-secondary">Total Hours</p>
               </div>
               <p className="text-2xl font-bold text-green-600">
                 {stats?.totalHours?.toFixed(1) || 0}
               </p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-4">
+            <div className="border ds-border-subtle rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <DollarSign className="w-5 h-5 text-purple-600" />
-                <p className="text-sm text-gray-600">Total Cost</p>
+                <p className="text-sm ds-text-secondary">Total Cost</p>
               </div>
               <p className="text-2xl font-bold text-purple-600">
                 {formatCurrency(stats?.totalCost || 0)}
               </p>
             </div>
-            <div className="border border-gray-200 rounded-lg p-4">
+            <div className="border ds-border-subtle rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <TrendingUp className="w-5 h-5 text-orange-600" />
-                <p className="text-sm text-gray-600">Avg Hours/Worker</p>
+                <p className="text-sm ds-text-secondary">Avg Hours/Worker</p>
               </div>
               <p className="text-2xl font-bold text-orange-600">
                 {stats?.averageHoursPerWorker?.toFixed(1) || 0}
@@ -276,7 +276,7 @@ export function WorkersSection({ phase, formatCurrency }) {
               return (
               <div
                 key={worker.workerId || worker.workerName || actualIndex}
-                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                className="border ds-border-subtle rounded-lg p-4 hover:ds-bg-surface-muted transition-colors"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -284,12 +284,12 @@ export function WorkersSection({ phase, formatCurrency }) {
                       {worker.workerId ? (
                         <Link
                           href={`/labour/workers/${worker.workerId}`}
-                          className="font-semibold text-gray-900 hover:text-blue-600"
+                          className="font-semibold ds-text-primary hover:text-blue-600"
                         >
                           {worker.workerName}
                         </Link>
                       ) : (
-                        <span className="font-semibold text-gray-900">{worker.workerName}</span>
+                        <span className="font-semibold ds-text-primary">{worker.workerName}</span>
                       )}
                       {worker.skillType && (
                         <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
@@ -297,7 +297,7 @@ export function WorkersSection({ phase, formatCurrency }) {
                         </span>
                       )}
                     </div>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-600">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm ds-text-secondary">
                       <div>
                         <span className="font-medium">Hours:</span> {worker.totalHours.toFixed(1)}
                       </div>
@@ -328,9 +328,9 @@ export function WorkersSection({ phase, formatCurrency }) {
 
           {/* Pagination Controls */}
           {pagination.totalPages > 1 && (
-            <div className="mt-6 pt-4 border-t border-gray-200">
+            <div className="mt-6 pt-4 border-t ds-border-subtle">
               <div className="flex items-center justify-between">
-                <div className="text-sm text-gray-600">
+                <div className="text-sm ds-text-secondary">
                   Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
                   {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
                   {pagination.total} workers
@@ -339,7 +339,7 @@ export function WorkersSection({ phase, formatCurrency }) {
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                     disabled={pagination.page === 1}
-                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     aria-label="Previous page"
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -367,7 +367,7 @@ export function WorkersSection({ phase, formatCurrency }) {
                           className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                             pagination.page === pageNum
                               ? 'bg-blue-600 text-white'
-                              : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                              : 'ds-bg-surface ds-text-secondary border ds-border-subtle hover:ds-bg-surface-muted'
                           }`}
                           aria-label={`Go to page ${pageNum}`}
                           aria-current={pagination.page === pageNum ? 'page' : undefined}
@@ -381,7 +381,7 @@ export function WorkersSection({ phase, formatCurrency }) {
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: Math.min(pagination.totalPages, prev.page + 1) }))}
                     disabled={pagination.page >= pagination.totalPages}
-                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="flex items-center gap-1 px-3 py-2 text-sm font-medium ds-text-secondary ds-bg-surface border ds-border-subtle rounded-lg hover:ds-bg-surface-muted disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     aria-label="Next page"
                   >
                     Next
@@ -403,10 +403,10 @@ export function WorkersSection({ phase, formatCurrency }) {
           </div>
 
           {/* Link to Workers Registry */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
+          <div className="mt-4 pt-4 border-t ds-border-subtle">
             <Link
               href="/labour/workers"
-              className="text-sm text-gray-600 hover:text-gray-900"
+              className="text-sm ds-text-secondary hover:ds-text-primary"
             >
               Manage Workers →
             </Link>

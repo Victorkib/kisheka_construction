@@ -317,7 +317,9 @@ export async function POST(request) {
       floorId,
       categoryId,
       priority,
-      notes
+      notes,
+      executionModel,
+      subcontractorId,
     } = body;
 
     // Validation
@@ -355,6 +357,69 @@ export async function POST(request) {
       category,
     });
 
+    // Enforce floor linkage for finishing phases (PHASE_TYPES.FINISHING)
+    // Note: keep backward compatible for non-finishing phases
+    if (phase.phaseType === 'finishing') {
+      if (!floorId || !ObjectId.isValid(floorId)) {
+        return errorResponse('For finishing phases, a valid floorId is required for each work item', 400);
+      }
+
+      // Validate budget for finishing work items (optional budget - allow if not set)
+      if (estimatedCost && estimatedCost > 0) {
+        const floor = await db.collection('floors').findOne({
+          _id: new ObjectId(floorId),
+          projectId: new ObjectId(projectId),
+          deletedAt: null,
+        });
+
+        if (floor) {
+          const phase03Budget = floor.budgetAllocation?.byPhase?.['PHASE-03']?.total || 0;
+          
+          // If budget is set, validate
+          if (phase03Budget > 0) {
+            // Calculate current spending for finishing works on this floor
+            const { calculateFloorActualSpending } = await import('@/lib/floor-financial-helpers');
+            const actualSpending = await calculateFloorActualSpending(floorId, true);
+            const phase03Spending = actualSpending.byPhase?.[phaseId]?.total || 0;
+            
+            // Get committed costs (estimated costs of existing work items)
+            const existingFinishingWorkItems = await db.collection('work_items').find({
+              projectId: new ObjectId(projectId),
+              phaseId: new ObjectId(phaseId),
+              floorId: new ObjectId(floorId),
+              deletedAt: null,
+            }).toArray();
+            
+            const committedEstimated = existingFinishingWorkItems.reduce(
+              (sum, item) => sum + (Number(item.estimatedCost) || 0),
+              0
+            );
+            
+            const totalAfterNew = phase03Spending + committedEstimated + estimatedCost;
+            
+            // Only block if budget is exceeded (allow 5% tolerance for rounding)
+            if (totalAfterNew > phase03Budget * 1.05) {
+              return errorResponse(
+                `Estimated cost (${estimatedCost}) would exceed PHASE-03 budget for this floor. ` +
+                `Budget: ${phase03Budget}, Current: ${phase03Spending + committedEstimated}, ` +
+                `After adding: ${totalAfterNew}`,
+                400
+              );
+            }
+            
+            // Warn if approaching budget limit (90% threshold)
+            if (totalAfterNew > phase03Budget * 0.9 && totalAfterNew <= phase03Budget * 1.05) {
+              console.warn(
+                `Finishing work item budget warning: ${totalAfterNew} / ${phase03Budget} ` +
+                `(${((totalAfterNew / phase03Budget) * 100).toFixed(1)}%) for floor ${floorId}`
+              );
+            }
+          }
+          // If budget is not set (phase03Budget === 0), allow operation (spending will still be tracked)
+        }
+      }
+    }
+
     // Prepare work item data for validation
     const workItemData = {
       projectId,
@@ -377,9 +442,32 @@ export async function POST(request) {
         ? resolvedCategoryId.toString()
         : (categoryId && ObjectId.isValid(categoryId) ? categoryId : null),
       priority,
-      notes
+      notes,
+      executionModel,
+      subcontractorId,
     };
 
+    // Validate executionModel and subcontractorId consistency
+    if (executionModel === 'contract_based' && subcontractorId) {
+      // Verify subcontractor exists and belongs to the same project/phase
+      const subcontractor = await db.collection('subcontractors').findOne({
+        _id: new ObjectId(subcontractorId),
+        projectId: new ObjectId(projectId),
+        phaseId: new ObjectId(phaseId),
+        deletedAt: null
+      });
+      if (!subcontractor) {
+        return errorResponse('Subcontractor not found or does not belong to this project/phase', 404);
+      }
+      
+      // For finishing phases, verify subcontractor is linked to the same floor if floorId is provided
+      if (phase.phaseType === 'finishing' && floorId && subcontractor.floorId) {
+        if (subcontractor.floorId.toString() !== floorId.toString()) {
+          return errorResponse('Subcontractor is assigned to a different floor. Please select a subcontractor assigned to this floor.', 400);
+        }
+      }
+    }
+    
     // Validate using schema
     const validation = validateWorkItem(workItemData);
     if (!validation.isValid) {
@@ -415,7 +503,9 @@ export async function POST(request) {
           ? resolvedCategoryId.toString()
           : (categoryId && ObjectId.isValid(categoryId) ? categoryId : null),
         priority,
-        notes
+        notes,
+        executionModel,
+        subcontractorId,
       },
       projectId,
       phaseId,

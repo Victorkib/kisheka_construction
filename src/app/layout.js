@@ -8,6 +8,7 @@ import { ProjectContextProvider } from '@/contexts/ProjectContext';
 import { OAuthSync } from '@/components/auth/oauth-sync';
 import ErrorBoundary from '@/components/error-boundary/ErrorBoundary';
 import { GlobalErrorHandler } from '@/components/error-boundary/GlobalErrorHandler';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -120,7 +121,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light">
       <head>
         {/* Preconnect to improve performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -190,22 +191,22 @@ export default function RootLayout({ children }) {
         <meta name="apple-mobile-web-app-title" content="Doshaki" />
 
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ErrorBoundary>
-          <ToastProvider>
-            <Suspense fallback={<div>Loading...</div>}>
-              <GlobalErrorHandler />
-              <ProjectContextProvider>
-                <OAuthSync />
-                <ServiceWorkerRegister />
-                <NotificationPermissionRequest />
-                {children}
-              </ProjectContextProvider>
-            </Suspense>
-          </ToastProvider>
-        </ErrorBoundary>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ThemeProvider>
+          <ErrorBoundary>
+            <ToastProvider>
+              <Suspense fallback={<div>Loading...</div>}>
+                <GlobalErrorHandler />
+                <ProjectContextProvider>
+                  <OAuthSync />
+                  <ServiceWorkerRegister />
+                  <NotificationPermissionRequest />
+                  {children}
+                </ProjectContextProvider>
+              </Suspense>
+            </ToastProvider>
+          </ErrorBoundary>
+        </ThemeProvider>
       </body>
     </html>
   );

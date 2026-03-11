@@ -25,8 +25,8 @@ const formatDate = (date) => {
 export function AssignmentHistory({ assignmentHistory = [] }) {
   if (!assignmentHistory || assignmentHistory.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        <Clock className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+      <div className="text-center py-8 ds-text-muted">
+        <Clock className="w-12 h-12 mx-auto mb-3 ds-text-muted" />
         <p className="font-medium">No assignment history</p>
         <p className="text-sm mt-1">Assignment changes will appear here</p>
       </div>
@@ -42,20 +42,20 @@ export function AssignmentHistory({ assignmentHistory = [] }) {
       case 'unassigned':
         return <UserMinus className="w-4 h-4 text-red-600" />;
       default:
-        return <User className="w-4 h-4 text-gray-600" />;
+        return <User className="w-4 h-4 ds-text-secondary" />;
     }
   };
 
   const getActionColor = (action) => {
     switch (action) {
       case 'assigned':
-        return 'bg-green-50 border-green-200';
+        return 'bg-green-50 border-green-400/60';
       case 'reassigned':
-        return 'bg-blue-50 border-blue-200';
+        return 'bg-blue-50 border-blue-400/60';
       case 'unassigned':
-        return 'bg-red-50 border-red-200';
+        return 'bg-red-50 border-red-400/60';
       default:
-        return 'bg-gray-50 border-gray-200';
+        return 'ds-bg-surface-muted ds-border-subtle';
     }
   };
 
@@ -77,15 +77,15 @@ export function AssignmentHistory({ assignmentHistory = [] }) {
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-gray-900 capitalize">
+                    <span className="font-semibold ds-text-primary capitalize">
                       {entry.action?.replace('_', ' ')}
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs ds-text-muted">
                       {formatDate(entry.assignedAt)}
                     </span>
                   </div>
                   {entry.assignedByName && (
-                    <span className="text-xs text-gray-600">
+                    <span className="text-xs ds-text-secondary">
                       by {entry.assignedByName}
                     </span>
                   )}
@@ -93,12 +93,12 @@ export function AssignmentHistory({ assignmentHistory = [] }) {
 
                 {previousWorkers.length > 0 && (
                   <div className="mb-2">
-                    <p className="text-xs font-medium text-gray-700 mb-1">Previous Workers:</p>
+                    <p className="text-xs font-medium ds-text-secondary mb-1">Previous Workers:</p>
                     <div className="flex flex-wrap gap-1">
                       {previousWorkers.map((worker, idx) => (
                         <span
                           key={idx}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-gray-300 rounded text-xs text-gray-700"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 ds-bg-surface border ds-border-subtle rounded text-xs ds-text-secondary"
                         >
                           <User className="w-3 h-3" />
                           {typeof worker === 'string' ? worker : worker.workerName || 'Unknown'}
@@ -110,12 +110,12 @@ export function AssignmentHistory({ assignmentHistory = [] }) {
 
                 {assignedWorkers.length > 0 && (
                   <div>
-                    <p className="text-xs font-medium text-gray-700 mb-1">Assigned Workers:</p>
+                    <p className="text-xs font-medium ds-text-secondary mb-1">Assigned Workers:</p>
                     <div className="flex flex-wrap gap-1">
                       {assignedWorkers.map((worker, idx) => (
                         <span
                           key={idx}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-white border border-gray-300 rounded text-xs text-gray-700"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 ds-bg-surface border ds-border-subtle rounded text-xs ds-text-secondary"
                         >
                           <User className="w-3 h-3" />
                           {typeof worker === 'string' ? worker : worker.workerName || 'Unknown'}
@@ -126,7 +126,7 @@ export function AssignmentHistory({ assignmentHistory = [] }) {
                 )}
 
                 {previousWorkers.length === 0 && assignedWorkers.length === 0 && (
-                  <p className="text-xs text-gray-600 italic">
+                  <p className="text-xs ds-text-secondary italic">
                     No worker details available
                   </p>
                 )}

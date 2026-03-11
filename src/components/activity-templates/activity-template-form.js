@@ -199,10 +199,10 @@ export function ActivityTemplateForm({
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Basic Information */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Basic Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Template Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -211,8 +211,8 @@ export function ActivityTemplateForm({
               onChange={(e) => handleChange('name', e.target.value)}
               placeholder="e.g., Weekly Site Visit"
               required
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.name ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.name ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
             {validationErrors.name && (
@@ -221,7 +221,7 @@ export function ActivityTemplateForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Professional Type <span className="text-red-500">*</span>
             </label>
             <select
@@ -229,9 +229,9 @@ export function ActivityTemplateForm({
               onChange={(e) => handleChange('type', e.target.value)}
               required
               disabled={!!initialData}
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.type ? 'border-red-300' : 'border-gray-300'
-              } ${initialData ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.type ? 'border-red-400/60' : 'ds-border-subtle'
+              } ${initialData ? 'ds-bg-surface-muted cursor-not-allowed' : ''}`}
             >
               <option value="">Select Professional Type</option>
               <option value={TEMPLATE_PROFESSIONAL_TYPES.ARCHITECT}>Architect Activity</option>
@@ -243,7 +243,7 @@ export function ActivityTemplateForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Activity Type <span className="text-red-500">*</span>
             </label>
             <select
@@ -251,9 +251,9 @@ export function ActivityTemplateForm({
               onChange={(e) => handleChange('activityType', e.target.value)}
               required
               disabled={!formData.type}
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.activityType ? 'border-red-300' : 'border-gray-300'
-              } ${!formData.type ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.activityType ? 'border-red-400/60' : 'ds-border-subtle'
+              } ${!formData.type ? 'ds-bg-surface-muted cursor-not-allowed' : ''}`}
             >
               <option value="">Select Activity Type</option>
               {availableActivityTypes.map((type) => (
@@ -268,7 +268,7 @@ export function ActivityTemplateForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Description
             </label>
             <textarea
@@ -276,7 +276,7 @@ export function ActivityTemplateForm({
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder="Template description..."
               rows={2}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -284,16 +284,16 @@ export function ActivityTemplateForm({
 
       {/* Template Settings */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Template Settings</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Template Settings</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Template Category
             </label>
             <select
               value={formData.templateCategory}
               onChange={(e) => handleChange('templateCategory', e.target.value)}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Category (Optional)</option>
               {Object.values(TEMPLATE_CATEGORY_TYPES).map((category) => (
@@ -305,13 +305,13 @@ export function ActivityTemplateForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Project Phase
             </label>
             <select
               value={formData.projectPhase}
               onChange={(e) => handleChange('projectPhase', e.target.value)}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Select Phase (Optional)</option>
               {PROJECT_PHASES.map((phase) => (
@@ -323,13 +323,13 @@ export function ActivityTemplateForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Status
             </label>
             <select
               value={formData.status}
               onChange={(e) => handleChange('status', e.target.value)}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               {Object.values(TEMPLATE_STATUS).map((status) => (
                 <option key={status} value={status}>
@@ -345,9 +345,9 @@ export function ActivityTemplateForm({
               id="isPublic"
               checked={formData.isPublic}
               onChange={(e) => handleChange('isPublic', e.target.checked)}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
             />
-            <label htmlFor="isPublic" className="text-sm font-medium text-gray-700 cursor-pointer">
+            <label htmlFor="isPublic" className="text-sm font-medium ds-text-secondary cursor-pointer">
               Make this template public (others can use it)
             </label>
           </div>
@@ -355,7 +355,7 @@ export function ActivityTemplateForm({
 
         {/* Tags */}
         <div className="mt-4">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Tags
           </label>
           <div className="flex gap-2 mb-2">
@@ -370,12 +370,12 @@ export function ActivityTemplateForm({
                 }
               }}
               placeholder="Add tag and press Enter"
-              className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="button"
               onClick={handleAddTag}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
             >
               Add
             </button>
@@ -404,19 +404,19 @@ export function ActivityTemplateForm({
 
       {/* Default Activity Data */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Default Activity Data</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Default Activity Data</h2>
         
         {/* Site Visit Fields */}
         {formData.activityType === 'site_visit' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Visit Purpose
               </label>
               <select
                 value={formData.defaultData.visitPurpose || ''}
                 onChange={(e) => handleDefaultDataChange('visitPurpose', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Purpose (Optional)</option>
                 {VISIT_PURPOSES.map((purpose) => (
@@ -427,7 +427,7 @@ export function ActivityTemplateForm({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Visit Duration (Hours)
               </label>
               <input
@@ -437,7 +437,7 @@ export function ActivityTemplateForm({
                 placeholder="0.0"
                 min="0"
                 step="0.5"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
@@ -447,13 +447,13 @@ export function ActivityTemplateForm({
         {formData.activityType === 'inspection' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Inspection Type
               </label>
               <select
                 value={formData.defaultData.inspectionType || ''}
                 onChange={(e) => handleDefaultDataChange('inspectionType', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Type (Optional)</option>
                 {INSPECTION_TYPES.map((type) => (
@@ -464,13 +464,13 @@ export function ActivityTemplateForm({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Compliance Status
               </label>
               <select
                 value={formData.defaultData.complianceStatus || ''}
                 onChange={(e) => handleDefaultDataChange('complianceStatus', e.target.value)}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Status (Optional)</option>
                 {COMPLIANCE_STATUSES.map((status) => (
@@ -486,7 +486,7 @@ export function ActivityTemplateForm({
         {/* Design Revision Fields */}
         {formData.activityType === 'design_revision' && (
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Revision Reason
             </label>
             <input
@@ -494,7 +494,7 @@ export function ActivityTemplateForm({
               value={formData.defaultData.revisionReason || ''}
               onChange={(e) => handleDefaultDataChange('revisionReason', e.target.value)}
               placeholder="Default revision reason"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         )}
@@ -502,7 +502,7 @@ export function ActivityTemplateForm({
         {/* Areas Inspected (for inspections) */}
         {(formData.activityType === 'inspection' || formData.activityType === 'quality_check') && (
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Default Areas Inspected
             </label>
             <div className="flex gap-2 mb-2">
@@ -517,12 +517,12 @@ export function ActivityTemplateForm({
                   }
                 }}
                 placeholder="Add area and press Enter"
-                className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="button"
                 onClick={handleAddArea}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
               >
                 Add
               </button>
@@ -552,7 +552,7 @@ export function ActivityTemplateForm({
         {/* Affected Areas (for design revisions) */}
         {formData.activityType === 'design_revision' && (
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Default Affected Areas
             </label>
             <div className="flex gap-2 mb-2">
@@ -567,12 +567,12 @@ export function ActivityTemplateForm({
                   }
                 }}
                 placeholder="Add affected area and press Enter"
-                className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="button"
                 onClick={handleAddAffectedArea}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
               >
                 Add
               </button>
@@ -602,7 +602,7 @@ export function ActivityTemplateForm({
         {/* Attendees (for site visits) */}
         {formData.activityType === 'site_visit' && (
           <div className="mb-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Default Attendees
             </label>
             <div className="flex gap-2 mb-2">
@@ -617,12 +617,12 @@ export function ActivityTemplateForm({
                   }
                 }}
                 placeholder="Add attendee name and press Enter"
-                className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="button"
                 onClick={handleAddAttendee}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
               >
                 Add
               </button>
@@ -652,7 +652,7 @@ export function ActivityTemplateForm({
         {/* Default Notes and Observations */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Default Notes
             </label>
             <textarea
@@ -660,11 +660,11 @@ export function ActivityTemplateForm({
               onChange={(e) => handleDefaultDataChange('notes', e.target.value)}
               placeholder="Default notes..."
               rows={3}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Default Observations
             </label>
             <textarea
@@ -672,12 +672,12 @@ export function ActivityTemplateForm({
               onChange={(e) => handleDefaultDataChange('observations', e.target.value)}
               placeholder="Default observations..."
               rows={3}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
         <div className="mt-4">
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Default Recommendations
           </label>
           <textarea
@@ -685,17 +685,17 @@ export function ActivityTemplateForm({
             onChange={(e) => handleDefaultDataChange('recommendations', e.target.value)}
             placeholder="Default recommendations..."
             rows={2}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
       </div>
 
       {/* Financial Defaults */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Defaults (Optional)</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Financial Defaults (Optional)</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Default Fee Amount (KES)
             </label>
             <input
@@ -705,11 +705,11 @@ export function ActivityTemplateForm({
               placeholder="0.00"
               min="0"
               step="0.01"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Default Expense Amount (KES)
             </label>
             <input
@@ -719,7 +719,7 @@ export function ActivityTemplateForm({
               placeholder="0.00"
               min="0"
               step="0.01"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -727,18 +727,18 @@ export function ActivityTemplateForm({
 
       {/* Expiration */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Expiration (Optional)</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Expiration (Optional)</h2>
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-1">
+          <label className="block text-sm font-semibold ds-text-secondary mb-1">
             Expiration Date
           </label>
           <input
             type="date"
             value={formData.expiresAt}
             onChange={(e) => handleChange('expiresAt', e.target.value)}
-            className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs ds-text-muted">
             Optional: Set expiration date for cost-sensitive templates
           </p>
         </div>
@@ -746,17 +746,17 @@ export function ActivityTemplateForm({
 
       {/* Usage Stats (if editing) */}
       {showUsageStats && initialData && (
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">Usage Statistics</h3>
+        <div className="ds-bg-surface-muted rounded-lg p-4">
+          <h3 className="text-sm font-semibold ds-text-primary mb-2">Usage Statistics</h3>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-gray-600">Times Used:</span>
-              <span className="ml-2 font-medium text-gray-900">{initialData.usageCount || 0}</span>
+              <span className="ds-text-secondary">Times Used:</span>
+              <span className="ml-2 font-medium ds-text-primary">{initialData.usageCount || 0}</span>
             </div>
             {initialData.lastUsedAt && (
               <div>
-                <span className="text-gray-600">Last Used:</span>
-                <span className="ml-2 font-medium text-gray-900">
+                <span className="ds-text-secondary">Last Used:</span>
+                <span className="ml-2 font-medium ds-text-primary">
                   {new Date(initialData.lastUsedAt).toLocaleDateString()}
                 </span>
               </div>
@@ -770,7 +770,7 @@ export function ActivityTemplateForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+          className="px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary"
         >
           Cancel
         </button>

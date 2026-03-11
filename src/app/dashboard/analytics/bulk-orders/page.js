@@ -113,8 +113,8 @@ function BulkOrderAnalyticsPageContent() {
       <AppLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-            <p className="text-gray-600">You don't have permission to view analytics.</p>
+            <h1 className="text-2xl font-bold ds-text-primary mb-2">Access Denied</h1>
+            <p className="ds-text-secondary">You don't have permission to view analytics.</p>
           </div>
         </div>
       </AppLayout>
@@ -135,7 +135,7 @@ function BulkOrderAnalyticsPageContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+          <div className="bg-red-50 border border-red-400/60 text-red-800 px-4 py-3 rounded-lg">
             {error || 'Failed to load analytics'}
           </div>
         </div>
@@ -148,19 +148,19 @@ function BulkOrderAnalyticsPageContent() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Bulk Order Analytics</h1>
-          <p className="text-gray-600 mt-2">Analytics and insights for bulk material orders</p>
+          <h1 className="text-3xl font-bold ds-text-primary">Bulk Order Analytics</h1>
+          <p className="ds-text-secondary mt-2">Analytics and insights for bulk material orders</p>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Project</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Project</label>
               <select
                 value={filters.projectId}
                 onChange={(e) => setFilters((prev) => ({ ...prev, projectId: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">All Projects</option>
                 {projects.map((project) => (
@@ -171,29 +171,29 @@ function BulkOrderAnalyticsPageContent() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Start Date</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Start Date</label>
               <input
                 type="date"
                 value={filters.startDate}
                 onChange={(e) => setFilters((prev) => ({ ...prev, startDate: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">End Date</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">End Date</label>
               <input
                 type="date"
                 value={filters.endDate}
                 onChange={(e) => setFilters((prev) => ({ ...prev, endDate: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Group By</label>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">Group By</label>
               <select
                 value={filters.groupBy}
                 onChange={(e) => setFilters((prev) => ({ ...prev, groupBy: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="day">Day</option>
                 <option value="week">Week</option>
@@ -205,50 +205,50 @@ function BulkOrderAnalyticsPageContent() {
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Batches</p>
-            <p className="text-3xl font-bold text-gray-900">{analytics.summary.totalBatches}</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-1">Total Batches</p>
+            <p className="text-3xl font-bold ds-text-primary">{analytics.summary.totalBatches}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Materials</p>
-            <p className="text-3xl font-bold text-gray-900">{analytics.summary.totalMaterials}</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-1">Total Materials</p>
+            <p className="text-3xl font-bold ds-text-primary">{analytics.summary.totalMaterials}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Cost</p>
-            <p className="text-3xl font-bold text-gray-900">{formatCurrency(analytics.summary.totalCost)}</p>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-1">Total Cost</p>
+            <p className="text-3xl font-bold ds-text-primary">{formatCurrency(analytics.summary.totalCost)}</p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Avg Materials/Batch</p>
-            <p className="text-3xl font-bold text-gray-900">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-1">Avg Materials/Batch</p>
+            <p className="text-3xl font-bold ds-text-primary">
               {analytics.summary.averageMaterialsPerBatch.toFixed(1)}
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-sm text-gray-600 mb-1">Avg Cost/Batch</p>
-            <p className="text-3xl font-bold text-gray-900">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="text-sm ds-text-secondary mb-1">Avg Cost/Batch</p>
+            <p className="text-3xl font-bold ds-text-primary">
               {formatCurrency(analytics.summary.averageCostPerBatch)}
             </p>
           </div>
         </div>
 
         {/* Comparison */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Bulk vs Individual Orders</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Bulk vs Individual Orders</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Bulk Orders</p>
+              <p className="text-sm ds-text-secondary mb-1">Bulk Orders</p>
               <p className="text-2xl font-bold text-blue-900">
                 {analytics.comparison.bulkVsIndividual.bulkOrders}
               </p>
             </div>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Individual Orders</p>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="text-center p-4 ds-bg-surface-muted rounded-lg">
+              <p className="text-sm ds-text-secondary mb-1">Individual Orders</p>
+              <p className="text-2xl font-bold ds-text-primary">
                 {analytics.comparison.bulkVsIndividual.individualOrders}
               </p>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Bulk Percentage</p>
+              <p className="text-sm ds-text-secondary mb-1">Bulk Percentage</p>
               <p className="text-2xl font-bold text-green-900">
                 {analytics.comparison.bulkVsIndividual.bulkPercentage}%
               </p>
@@ -257,37 +257,37 @@ function BulkOrderAnalyticsPageContent() {
         </div>
 
         {/* Trends Table */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Trends Over Time</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Trends Over Time</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Period
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Batches
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Materials
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Total Cost
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {analytics.trends.map((trend, index) => (
                   <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                       {trend.period}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{trend.batchCount}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">{trend.batchCount}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                       {trend.materialCount}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                       {formatCurrency(trend.totalCost)}
                     </td>
                   </tr>
@@ -298,37 +298,37 @@ function BulkOrderAnalyticsPageContent() {
         </div>
 
         {/* Top Materials */}
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Top Materials in Bulk Orders</h2>
+        <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Top Materials in Bulk Orders</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Material
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Request Count
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Total Quantity
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Total Cost
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {analytics.topMaterials.map((material, index) => (
                   <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                       {material.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{material.count}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">{material.count}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                       {material.totalQuantity.toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                       {formatCurrency(material.totalCost)}
                     </td>
                   </tr>
@@ -340,45 +340,45 @@ function BulkOrderAnalyticsPageContent() {
 
         {/* Supplier Performance */}
         {analytics.supplierPerformance && analytics.supplierPerformance.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Supplier Performance on Bulk Orders</h2>
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold ds-text-primary mb-4">Supplier Performance on Bulk Orders</h2>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-ds-border-subtle">
+                <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Supplier
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Orders
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Materials
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Total Cost
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                       Acceptance Rate
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                   {analytics.supplierPerformance.map((supplier, index) => (
                     <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium ds-text-primary">
                         {supplier.supplierName}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {supplier.orderCount}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {supplier.materialCount}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {formatCurrency(supplier.totalCost)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                         {supplier.acceptanceRate}%
                       </td>
                     </tr>

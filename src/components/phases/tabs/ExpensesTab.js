@@ -99,9 +99,9 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
       'PENDING': 'bg-yellow-100 text-yellow-800',
       'REJECTED': 'bg-red-100 text-red-800',
       'PAID': 'bg-blue-100 text-blue-800',
-      'ARCHIVED': 'bg-gray-100 text-gray-800'
+      'ARCHIVED': 'ds-bg-surface-muted ds-text-primary'
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const expenseCategories = [
@@ -122,54 +122,54 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
     <div className="space-y-6">
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-sm text-gray-600">Total Expenses</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{stats.total}</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-sm ds-text-secondary">Total Expenses</p>
+          <p className="text-2xl font-bold ds-text-primary mt-1">{stats.total}</p>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-sm text-gray-600">Total Amount</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-sm ds-text-secondary">Total Amount</p>
           <p className="text-2xl font-bold text-blue-600 mt-1">
             {formatCurrency(stats.totalCost)}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-sm text-gray-600">By Status</p>
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-sm ds-text-secondary">By Status</p>
           <div className="mt-1 space-y-1">
             {Object.entries(stats.byStatus).slice(0, 2).map(([status, count]) => (
               <div key={status} className="text-sm">
-                <span className="text-gray-600">{status}:</span>{' '}
-                <span className="font-semibold text-gray-900">{count}</span>
+                <span className="ds-text-secondary">{status}:</span>{' '}
+                <span className="font-semibold ds-text-primary">{count}</span>
               </div>
             ))}
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4">
-          <p className="text-sm text-gray-600">Categories</p>
-          <p className="text-lg font-semibold text-gray-900 mt-1">
+        <div className="ds-bg-surface rounded-lg shadow p-4">
+          <p className="text-sm ds-text-secondary">Categories</p>
+          <p className="text-lg font-semibold ds-text-primary mt-1">
             {Object.keys(stats.byCategory).length}
           </p>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="ds-bg-surface rounded-lg shadow p-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+            <label className="block text-sm font-medium ds-text-secondary mb-1">Search</label>
             <input
               type="text"
               placeholder="Search expenses..."
               value={filters.search}
               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <label className="block text-sm font-medium ds-text-secondary mb-1">Status</label>
             <select
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Statuses</option>
               <option value="APPROVED">Approved</option>
@@ -179,11 +179,11 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <label className="block text-sm font-medium ds-text-secondary mb-1">Category</label>
             <select
               value={filters.category}
               onChange={(e) => setFilters({ ...filters, category: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">All Categories</option>
               {expenseCategories.map((cat) => (
@@ -196,7 +196,7 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
           <div className="flex items-end">
             <button
               onClick={() => setFilters({ status: '', category: '', search: '' })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+              className="w-full px-4 py-2 border ds-border-subtle rounded-lg ds-text-secondary hover:ds-bg-surface-muted transition-colors"
             >
               Clear Filters
             </button>
@@ -205,9 +205,9 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
       </div>
 
       {/* Expenses List */}
-      <div className="bg-white rounded-lg shadow">
-        <div className="p-6 border-b border-gray-200 flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-gray-900">
+      <div className="ds-bg-surface rounded-lg shadow">
+        <div className="p-6 border-b ds-border-subtle flex justify-between items-center">
+          <h3 className="text-lg font-semibold ds-text-primary">
             Expenses ({filteredExpenses.length})
           </h3>
           <Link
@@ -220,11 +220,11 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
 
         {loading ? (
           <div className="p-12 text-center">
-            <p className="text-gray-500">Loading expenses...</p>
+            <p className="ds-text-muted">Loading expenses...</p>
           </div>
         ) : filteredExpenses.length === 0 ? (
           <div className="p-12 text-center">
-            <p className="text-gray-500 mb-4">No expenses found</p>
+            <p className="ds-text-muted mb-4">No expenses found</p>
             <Link
               href={`/expenses/new?projectId=${phase.projectId}&phaseId=${phase._id}`}
               className="inline-block px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
@@ -234,35 +234,35 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Description
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Vendor
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {filteredExpenses.map((expense) => (
-                  <tr key={expense._id} className="hover:bg-gray-50">
+                  <tr key={expense._id} className="hover:ds-bg-surface-muted">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Link
                         href={`/expenses/${expense._id}`}
@@ -271,19 +271,19 @@ export function ExpensesTab({ phase, formatCurrency, formatDate }) {
                         {expense.description || 'No description'}
                       </Link>
                       {expense.expenseCode && (
-                        <p className="text-xs text-gray-500 mt-1">{expense.expenseCode}</p>
+                        <p className="text-xs ds-text-muted mt-1">{expense.expenseCode}</p>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                       {expense.category ? expense.category.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'Uncategorized'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                       {expense.vendor || 'N/A'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold ds-text-primary">
                       {formatCurrency(expense.amount || 0)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-muted">
                       {expense.date ? formatDate(expense.date) : 'N/A'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

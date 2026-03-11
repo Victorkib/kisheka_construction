@@ -9,6 +9,7 @@
  * @property {string} batchNumber - Auto-generated: BATCH-YYYYMMDD-001 (unique)
  * @property {string} batchName - Optional user-defined name
  * @property {ObjectId} projectId - Project ID (required)
+ * @property {ObjectId} [defaultPhaseId] - Default phase ID (optional but recommended)
  * @property {ObjectId} [defaultFloorId] - Default floor ID (optional)
  * @property {ObjectId} [defaultCategoryId] - Default category ID (optional)
  * @property {string} defaultUrgency - Default urgency: 'low', 'medium', 'high', 'critical'
@@ -34,6 +35,7 @@ export const MATERIAL_REQUEST_BATCH_SCHEMA = {
   batchNumber: String, // Auto-generated: BATCH-YYYYMMDD-001
   batchName: String, // Optional
   projectId: 'ObjectId', // Required
+  defaultPhaseId: 'ObjectId', // Optional
   defaultFloorId: 'ObjectId', // Optional
   defaultCategoryId: 'ObjectId', // Optional
   defaultUrgency: String, // 'low', 'medium', 'high', 'critical'

@@ -344,7 +344,7 @@ export function QuickActivityForm({
     <form onSubmit={(e) => handleSubmit(e)} className="space-y-6">
       {/* Error Message */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2">
+        <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded-lg flex items-start gap-2">
           <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -357,10 +357,10 @@ export function QuickActivityForm({
 
       {/* Basic Information */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Basic Information</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Professional Service <span className="text-red-500">*</span>
             </label>
             <select
@@ -369,9 +369,9 @@ export function QuickActivityForm({
               onChange={handleChange}
               required
               disabled={isEdit}
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.professionalServiceId ? 'border-red-300' : 'border-gray-300'
-              } ${isEdit ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.professionalServiceId ? 'border-red-400/60' : 'ds-border-subtle'
+              } ${isEdit ? 'ds-bg-surface-muted cursor-not-allowed' : ''}`}
             >
               <option value="">Select Professional Service</option>
               {professionalServices
@@ -388,17 +388,17 @@ export function QuickActivityForm({
             {selectedProfessional && (
               <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                 <div className="text-sm">
-                  <div className="font-medium text-gray-900">
+                  <div className="font-medium ds-text-primary">
                     {selectedProfessional.library?.name || 'N/A'} ({selectedProfessional.type === 'architect' ? 'Architect' : 'Engineer'})
                   </div>
-                  <div className="text-gray-600">Project: {selectedProfessional.project?.projectName || 'N/A'}</div>
+                  <div className="ds-text-secondary">Project: {selectedProfessional.project?.projectName || 'N/A'}</div>
                 </div>
               </div>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Activity Type <span className="text-red-500">*</span>
             </label>
             <select
@@ -406,8 +406,8 @@ export function QuickActivityForm({
               value={formData.activityType}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.activityType ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.activityType ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             >
               <option value="">Select Activity Type</option>
@@ -423,7 +423,7 @@ export function QuickActivityForm({
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Activity Date <span className="text-red-500">*</span>
             </label>
             <input
@@ -432,8 +432,8 @@ export function QuickActivityForm({
               value={formData.activityDate}
               onChange={handleChange}
               required
-              className={`w-full px-3 py-2 bg-white text-gray-900 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-                validationErrors.activityDate ? 'border-red-300' : 'border-gray-300'
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.activityDate ? 'border-red-400/60' : 'ds-border-subtle'
               }`}
             />
             {validationErrors.activityDate && (
@@ -445,14 +445,14 @@ export function QuickActivityForm({
             <>
               {availablePhases.length > 0 && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Phase (Optional)
                   </label>
                   <select
                     name="phaseId"
                     value={formData.phaseId}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Phase (Optional)</option>
                     {availablePhases.map((phase) => (
@@ -465,14 +465,14 @@ export function QuickActivityForm({
               )}
               {availableFloors.length > 0 && (
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Floor (Optional)
                   </label>
                   <select
                     name="floorId"
                     value={formData.floorId}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Select Floor (Optional)</option>
                     {availableFloors.map((floor) => (
@@ -491,17 +491,17 @@ export function QuickActivityForm({
       {/* Activity-Specific Fields */}
       {formData.activityType === 'site_visit' && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Site Visit Details</h2>
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Site Visit Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Visit Purpose
               </label>
               <select
                 name="visitPurpose"
                 value={formData.visitPurpose}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Purpose (Optional)</option>
                 {VISIT_PURPOSES.map((purpose) => (
@@ -512,7 +512,7 @@ export function QuickActivityForm({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Duration (Hours)
               </label>
               <input
@@ -523,12 +523,12 @@ export function QuickActivityForm({
                 placeholder="0.0"
                 min="0"
                 step="0.5"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Attendees
             </label>
             <div className="flex gap-2 mb-2">
@@ -543,12 +543,12 @@ export function QuickActivityForm({
                   }
                 }}
                 placeholder="Add attendee name and press Enter"
-                className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="button"
                 onClick={handleAddAttendee}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
               >
                 Add
               </button>
@@ -578,10 +578,10 @@ export function QuickActivityForm({
 
       {formData.activityType === 'design_revision' && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Design Revision Details</h2>
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Design Revision Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Revision Number
               </label>
               <input
@@ -590,11 +590,11 @@ export function QuickActivityForm({
                 value={formData.revisionNumber}
                 onChange={handleChange}
                 placeholder="e.g., Rev. 2.1"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Revision Reason
               </label>
               <input
@@ -603,12 +603,12 @@ export function QuickActivityForm({
                 value={formData.revisionReason}
                 onChange={handleChange}
                 placeholder="Reason for revision"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Affected Areas
             </label>
             <div className="flex gap-2 mb-2">
@@ -623,12 +623,12 @@ export function QuickActivityForm({
                   }
                 }}
                 placeholder="Add affected area and press Enter"
-                className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="button"
                 onClick={handleAddAffectedArea}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
               >
                 Add
               </button>
@@ -658,17 +658,17 @@ export function QuickActivityForm({
 
       {formData.activityType === 'inspection' && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Inspection Details</h2>
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Inspection Details</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Inspection Type
               </label>
               <select
                 name="inspectionType"
                 value={formData.inspectionType}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Type (Optional)</option>
                 {INSPECTION_TYPES.map((type) => (
@@ -679,7 +679,7 @@ export function QuickActivityForm({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Duration (Hours)
               </label>
               <input
@@ -690,12 +690,12 @@ export function QuickActivityForm({
                 placeholder="0.0"
                 min="0"
                 step="0.5"
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           </div>
           <div className="mt-4">
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Areas Inspected
             </label>
             <div className="flex gap-2 mb-2">
@@ -710,12 +710,12 @@ export function QuickActivityForm({
                   }
                 }}
                 placeholder="Add area and press Enter"
-                className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <button
                 type="button"
                 onClick={handleAddAreaInspected}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+                className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
               >
                 Add
               </button>
@@ -742,14 +742,14 @@ export function QuickActivityForm({
           </div>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Compliance Status
               </label>
               <select
                 name="complianceStatus"
                 value={formData.complianceStatus}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">Select Status (Optional)</option>
                 {COMPLIANCE_STATUSES.map((status) => (
@@ -766,9 +766,9 @@ export function QuickActivityForm({
                   name="codeCompliance"
                   checked={formData.codeCompliance}
                   onChange={handleChange}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
                 />
-                <span className="text-sm font-medium text-gray-700">Code Compliant</span>
+                <span className="text-sm font-medium ds-text-secondary">Code Compliant</span>
               </label>
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
@@ -776,9 +776,9 @@ export function QuickActivityForm({
                   name="designCompliance"
                   checked={formData.designCompliance}
                   onChange={handleChange}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
                 />
-                <span className="text-sm font-medium text-gray-700">Design Compliant</span>
+                <span className="text-sm font-medium ds-text-secondary">Design Compliant</span>
               </label>
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
@@ -786,9 +786,9 @@ export function QuickActivityForm({
                   name="qualityStandards"
                   checked={formData.qualityStandards}
                   onChange={handleChange}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
                 />
-                <span className="text-sm font-medium text-gray-700">Meets Quality Standards</span>
+                <span className="text-sm font-medium ds-text-secondary">Meets Quality Standards</span>
               </label>
             </div>
           </div>
@@ -798,14 +798,14 @@ export function QuickActivityForm({
       {/* Issues Found (for engineers) */}
       {selectedProfessional?.type === 'engineer' && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Issues Found</h2>
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Issues Found</h2>
           {formData.issuesFound.length > 0 && (
             <div className="mb-4 space-y-2">
               {formData.issuesFound.map((issue, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                   <div className="flex-1">
-                    <div className="font-medium text-gray-900">{issue.description}</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="font-medium ds-text-primary">{issue.description}</div>
+                    <div className="text-sm ds-text-secondary">
                       Severity: {issue.severity} {issue.location && `| Location: ${issue.location}`}
                     </div>
                   </div>
@@ -825,15 +825,15 @@ export function QuickActivityForm({
             <button
               type="button"
               onClick={() => setShowIssueForm(true)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
             >
               + Add Issue
             </button>
           ) : (
-            <div className="p-4 bg-gray-50 rounded-lg space-y-4">
+            <div className="p-4 ds-bg-surface-muted rounded-lg space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Issue Description <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -841,17 +841,17 @@ export function QuickActivityForm({
                     value={newIssue.description}
                     onChange={(e) => setNewIssue(prev => ({ ...prev, description: e.target.value }))}
                     placeholder="Describe the issue"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Severity
                   </label>
                   <select
                     value={newIssue.severity}
                     onChange={(e) => setNewIssue(prev => ({ ...prev, severity: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {ISSUE_SEVERITIES.map((severity) => (
                       <option key={severity} value={severity}>
@@ -861,7 +861,7 @@ export function QuickActivityForm({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Location (Optional)
                   </label>
                   <input
@@ -869,7 +869,7 @@ export function QuickActivityForm({
                     value={newIssue.location}
                     onChange={(e) => setNewIssue(prev => ({ ...prev, location: e.target.value }))}
                     placeholder="Location of issue"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -891,7 +891,7 @@ export function QuickActivityForm({
                       location: '',
                     });
                   }}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                  className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
                 >
                   Cancel
                 </button>
@@ -904,14 +904,14 @@ export function QuickActivityForm({
       {/* Material Tests (for engineers) */}
       {selectedProfessional?.type === 'engineer' && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Material Tests</h2>
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Material Tests</h2>
           {formData.materialTests.length > 0 && (
             <div className="mb-4 space-y-2">
               {formData.materialTests.map((test, index) => (
                 <div key={index} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                   <div className="flex-1">
-                    <div className="font-medium text-gray-900">{test.materialName}</div>
-                    <div className="text-sm text-gray-600">
+                    <div className="font-medium ds-text-primary">{test.materialName}</div>
+                    <div className="text-sm ds-text-secondary">
                       {test.testType} - Result: {test.testResult}
                     </div>
                   </div>
@@ -931,15 +931,15 @@ export function QuickActivityForm({
             <button
               type="button"
               onClick={() => setShowMaterialTestForm(true)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
+              className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
             >
               + Add Material Test
             </button>
           ) : (
-            <div className="p-4 bg-gray-50 rounded-lg space-y-4">
+            <div className="p-4 ds-bg-surface-muted rounded-lg space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Material Name <span className="text-red-500">*</span>
                   </label>
                   <input
@@ -947,17 +947,17 @@ export function QuickActivityForm({
                     value={newMaterialTest.materialName}
                     onChange={(e) => setNewMaterialTest(prev => ({ ...prev, materialName: e.target.value }))}
                     placeholder="Material name"
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Test Type
                   </label>
                   <select
                     value={newMaterialTest.testType}
                     onChange={(e) => setNewMaterialTest(prev => ({ ...prev, testType: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {TEST_TYPES.map((type) => (
                       <option key={type} value={type}>
@@ -967,13 +967,13 @@ export function QuickActivityForm({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Test Result
                   </label>
                   <select
                     value={newMaterialTest.testResult}
                     onChange={(e) => setNewMaterialTest(prev => ({ ...prev, testResult: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     {TEST_RESULTS.map((result) => (
                       <option key={result} value={result}>
@@ -983,14 +983,14 @@ export function QuickActivityForm({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold ds-text-secondary mb-1">
                     Test Date
                   </label>
                   <input
                     type="date"
                     value={newMaterialTest.testDate}
                     onChange={(e) => setNewMaterialTest(prev => ({ ...prev, testDate: e.target.value }))}
-                    className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
@@ -1013,7 +1013,7 @@ export function QuickActivityForm({
                       testDate: new Date().toISOString().split('T')[0],
                     });
                   }}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+                  className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted"
                 >
                   Cancel
                 </button>
@@ -1041,10 +1041,10 @@ export function QuickActivityForm({
 
       {/* Financial Information */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Financial Information (Optional)</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Financial Information (Optional)</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Fees Charged (KES)
             </label>
             <div className="flex gap-2">
@@ -1056,7 +1056,7 @@ export function QuickActivityForm({
                 placeholder="0.00"
                 min="0"
                 step="0.01"
-                className="flex-1 px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               {suggestedFee && (
                 <button
@@ -1074,13 +1074,13 @@ export function QuickActivityForm({
               )}
             </div>
             {suggestedFee && !formData.feesCharged && (
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs ds-text-muted">
                 Suggested: {suggestedFee.toLocaleString('en-KE', { style: 'currency', currency: 'KES', minimumFractionDigits: 0 })}
               </p>
             )}
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Expenses Incurred (KES)
             </label>
             <input
@@ -1091,7 +1091,7 @@ export function QuickActivityForm({
               placeholder="0.00"
               min="0"
               step="0.01"
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -1099,10 +1099,10 @@ export function QuickActivityForm({
 
       {/* Notes and Observations */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Notes and Observations</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Notes and Observations</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Observations
             </label>
             <textarea
@@ -1111,11 +1111,11 @@ export function QuickActivityForm({
               onChange={handleChange}
               placeholder="Site observations..."
               rows={3}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Recommendations
             </label>
             <textarea
@@ -1124,11 +1124,11 @@ export function QuickActivityForm({
               onChange={handleChange}
               placeholder="Recommendations..."
               rows={3}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Notes
             </label>
             <textarea
@@ -1137,7 +1137,7 @@ export function QuickActivityForm({
               onChange={handleChange}
               placeholder="Additional notes..."
               rows={2}
-              className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
@@ -1145,7 +1145,7 @@ export function QuickActivityForm({
 
       {/* Follow-up */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Follow-up</h2>
+        <h2 className="text-lg font-semibold ds-text-primary mb-4">Follow-up</h2>
         <div className="space-y-4">
           <label className="flex items-center space-x-2 cursor-pointer">
             <input
@@ -1153,13 +1153,13 @@ export function QuickActivityForm({
               name="followUpRequired"
               checked={formData.followUpRequired}
               onChange={handleChange}
-              className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
             />
-            <span className="text-sm font-medium text-gray-700">Follow-up Required</span>
+            <span className="text-sm font-medium ds-text-secondary">Follow-up Required</span>
           </label>
           {formData.followUpRequired && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Follow-up Date
               </label>
               <input
@@ -1167,7 +1167,7 @@ export function QuickActivityForm({
                 name="followUpDate"
                 value={formData.followUpDate}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           )}
@@ -1177,17 +1177,17 @@ export function QuickActivityForm({
       {/* Status and Approval */}
       {isEdit && (
         <div>
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Status</h2>
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Status</h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
                 Status
               </label>
               <select
                 name="status"
                 value={formData.status}
                 onChange={handleChange}
-                className="w-full px-3 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="draft">Draft</option>
                 <option value="pending_approval">Pending Approval</option>
@@ -1201,9 +1201,9 @@ export function QuickActivityForm({
                 name="requiresApproval"
                 checked={formData.requiresApproval}
                 onChange={handleChange}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 text-blue-600 ds-border-subtle rounded focus:ring-blue-500"
               />
-              <span className="text-sm font-medium text-gray-700">Requires Approval</span>
+              <span className="text-sm font-medium ds-text-secondary">Requires Approval</span>
             </label>
           </div>
         </div>
@@ -1214,7 +1214,7 @@ export function QuickActivityForm({
         <button
           type="button"
           onClick={onCancel}
-          className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700"
+          className="px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary"
         >
           Cancel
         </button>
@@ -1232,7 +1232,7 @@ export function QuickActivityForm({
               type="button"
               disabled={loading}
               onClick={(e) => handleSubmit(e, 'draft')}
-              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted ds-text-secondary disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Save Draft
             </button>

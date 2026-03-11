@@ -122,7 +122,7 @@ export function HelpTooltip({ children, content, position = 'top', size = 'md' }
       {isVisible && (
         <div
           ref={tooltipRef}
-          className={`fixed z-50 bg-gray-800 text-white rounded-lg shadow-lg ${sizeClasses[size]} ${positionClasses[position]}`}
+          className={`fixed z-50 bg-slate-800 text-white rounded-lg shadow-lg ${sizeClasses[size]} ${positionClasses[position]}`}
           style={{
             top: `${tooltipPosition.top}px`,
             left: `${tooltipPosition.left}px`,
@@ -146,7 +146,7 @@ export function HelpIcon({ content, position = 'top', size = 'md' }) {
   return (
     <HelpTooltip content={content} position={position} size={size}>
       <svg
-        className="w-4 h-4 text-gray-400 hover:text-gray-600 transition"
+        className="w-4 h-4 ds-text-muted hover:ds-text-secondary transition"
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -168,7 +168,7 @@ export function HelpIcon({ content, position = 'top', size = 'md' }) {
  */
 export function FieldHelp({ children, className = '' }) {
   return (
-    <p className={`text-sm text-gray-500 mt-1 ${className}`}>
+    <p className={`text-sm ds-text-muted mt-1 ${className}`}>
       {children}
     </p>
   );
@@ -180,7 +180,7 @@ export function FieldHelp({ children, className = '' }) {
  */
 export function InlineHelp({ children, className = '' }) {
   return (
-    <span className={`text-sm text-gray-500 font-normal ${className}`}>
+    <span className={`text-sm ds-text-muted font-normal ${className}`}>
       {children}
     </span>
   );

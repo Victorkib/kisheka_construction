@@ -222,7 +222,7 @@ function FloorBudgetAllocationContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading floor budget allocation...</p>
+            <p className="mt-4 ds-text-secondary">Loading floor budget allocation...</p>
           </div>
         </div>
       </AppLayout>
@@ -233,7 +233,7 @@ function FloorBudgetAllocationContent() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-6">
+          <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded mb-6">
             <p className="font-semibold">Error</p>
             <p>{error}</p>
             <button
@@ -242,18 +242,6 @@ function FloorBudgetAllocationContent() {
             >
               Go Back
             </button>
-          </div>
-        </div>
-      </AppLayout>
-    );
-  }
-
-  if (!phase) {
-    return (
-      <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600">Phase not found.</p>
           </div>
         </div>
       </AppLayout>
@@ -295,10 +283,22 @@ function FloorBudgetAllocationContent() {
       setFloorBudgets(budgets);
     };
 
-    if (allocations.length > 0) {
+    if (allocations.length > 0 && phase) {
       fetchFloorBudgets();
     }
-  }, [allocations]);
+  }, [allocations, phase]);
+
+  if (!phase) {
+    return (
+      <AppLayout>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="ds-bg-surface rounded-lg shadow p-6">
+            <p className="ds-text-secondary">Phase not found.</p>
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   const phaseBudget = phase.budgetAllocation?.total || 0;
   const totalAllocated = allocations.reduce((sum, alloc) => sum + (alloc.total || 0), 0);
@@ -313,23 +313,23 @@ function FloorBudgetAllocationContent() {
           <nav className="flex" aria-label="Breadcrumb">
             <ol className="flex items-center space-x-4">
               <li>
-                <Link href="/projects" className="text-gray-400 hover:text-gray-500">
+                <Link href="/projects" className="ds-text-muted hover:ds-text-muted">
                   Projects
                 </Link>
               </li>
               <li>
-                <span className="text-gray-500">/</span>
+                <span className="ds-text-muted">/</span>
               </li>
               <li>
-                <Link href={`/phases/${phaseId}`} className="text-gray-400 hover:text-gray-500">
+                <Link href={`/phases/${phaseId}`} className="ds-text-muted hover:ds-text-muted">
                   {phase.phaseName || phase.phaseCode}
                 </Link>
               </li>
               <li>
-                <span className="text-gray-500">/</span>
+                <span className="ds-text-muted">/</span>
               </li>
               <li>
-                <span className="text-gray-900 font-medium">Floor Budget Allocation</span>
+                <span className="ds-text-primary font-medium">Floor Budget Allocation</span>
               </li>
             </ol>
           </nav>
@@ -339,15 +339,15 @@ function FloorBudgetAllocationContent() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Floor Budget Allocation</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-3xl font-bold ds-text-primary">Floor Budget Allocation</h1>
+              <p className="mt-2 ds-text-secondary">
                 {phase.phaseName || phase.phaseCode} - Allocate budget to floors
               </p>
             </div>
             <div className="flex gap-3">
               <Link
                 href={`/phases/${phaseId}`}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+                className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition text-sm font-medium"
               >
                 Back to Phase
               </Link>
@@ -356,40 +356,40 @@ function FloorBudgetAllocationContent() {
         </div>
 
         {/* Phase Summary */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Phase Budget Summary</h2>
+        <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-6 mb-8">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Phase Budget Summary</h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Phase Budget</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(phaseBudget)}</p>
+              <p className="text-sm ds-text-secondary mb-1">Phase Budget</p>
+              <p className="text-2xl font-bold ds-text-primary">{formatCurrency(phaseBudget)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Allocated</p>
+              <p className="text-sm ds-text-secondary mb-1">Total Allocated</p>
               <p className={`text-2xl font-bold ${isOverAllocated ? 'text-red-600' : 'text-green-600'}`}>
                 {formatCurrency(totalAllocated)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600 mb-1">Remaining</p>
-              <p className={`text-2xl font-bold ${remainingUnallocated < 0 ? 'text-red-600' : 'text-gray-900'}`}>
+              <p className="text-sm ds-text-secondary mb-1">Remaining</p>
+              <p className={`text-2xl font-bold ${remainingUnallocated < 0 ? 'text-red-600' : 'ds-text-primary'}`}>
                 {formatCurrency(remainingUnallocated)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-600 mb-1">Floors</p>
-              <p className="text-2xl font-bold text-gray-900">{floors.length}</p>
+              <p className="text-sm ds-text-secondary mb-1">Floors</p>
+              <p className="text-2xl font-bold ds-text-primary">{floors.length}</p>
             </div>
           </div>
           {isOverAllocated && (
-            <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded text-red-700 text-sm">
+            <div className="mt-4 p-3 bg-red-50 border border-red-400/60 rounded text-red-700 text-sm">
               <strong>Warning:</strong> Total allocations exceed phase budget by {formatCurrency(Math.abs(remainingUnallocated))}
             </div>
           )}
         </div>
 
         {/* Distribution Strategy */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Distribution Strategy</h2>
+        <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-6 mb-8">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Distribution Strategy</h2>
           <div className="flex gap-4">
             <label className="flex items-center">
               <input
@@ -426,7 +426,7 @@ function FloorBudgetAllocationContent() {
             <div className="mt-4">
               <button
                 onClick={handleApplySuggestions}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+                className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition text-sm font-medium"
               >
                 Apply Suggestions
               </button>
@@ -435,33 +435,33 @@ function FloorBudgetAllocationContent() {
         </div>
 
         {/* Floor Budget Grid */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Floor Budget Allocation</h2>
+        <div className="ds-bg-surface rounded-lg shadow-sm border ds-border-subtle p-6 mb-8">
+          <h2 className="text-lg font-semibold ds-text-primary mb-4">Floor Budget Allocation</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-ds-border-subtle">
+              <thead className="ds-bg-surface-muted">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Floor
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Suggested Budget
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Allocated Budget
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Actual Spent
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Remaining
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium ds-text-muted uppercase tracking-wider">
                     Variance
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="ds-bg-surface divide-y divide-ds-border-subtle">
                 {allocations.map((alloc) => {
                   const suggestion = suggestions.find((s) => s.floorId === alloc.floorId);
                   const floorBudget = floorBudgets[alloc.floorId] || { actualSpending: 0, remaining: alloc.total || 0 };
@@ -471,12 +471,12 @@ function FloorBudgetAllocationContent() {
                   return (
                     <tr key={alloc.floorId} className={isOverBudget ? 'bg-red-50' : ''}>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium ds-text-primary">
                           {alloc.floorName}
                         </div>
-                        <div className="text-sm text-gray-500">Floor {alloc.floorNumber}</div>
+                        <div className="text-sm ds-text-muted">Floor {alloc.floorNumber}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                         {suggestion ? formatCurrency(suggestion.suggestedBudget) : '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -484,12 +484,12 @@ function FloorBudgetAllocationContent() {
                           type="number"
                           value={alloc.total || 0}
                           onChange={(e) => handleAllocationChange(alloc.floorId, 'total', e.target.value)}
-                          className="w-32 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          className="w-32 px-2 py-1 text-sm border ds-border-subtle rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                           min="0"
                           step="1000"
                         />
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm ds-text-primary">
                         {formatCurrency(floorBudget.actualSpending || 0)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -526,14 +526,14 @@ function FloorBudgetAllocationContent() {
         <div className="flex justify-end gap-3">
           <Link
             href={`/phases/${phaseId}`}
-            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-sm font-medium"
+            className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted transition text-sm font-medium"
           >
             Cancel
           </Link>
           <button
             onClick={handleSave}
             disabled={isSaving || isOverAllocated}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
+            className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition text-sm font-medium"
           >
             {isSaving ? 'Saving...' : 'Save Allocations'}
           </button>
@@ -550,7 +550,7 @@ export default function FloorBudgetAllocationPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading...</p>
+            <p className="mt-4 ds-text-secondary">Loading...</p>
           </div>
         </div>
       </AppLayout>
