@@ -165,7 +165,7 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
   const overallProgress = prerequisites.readiness.completionPercentage;
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-400/60 rounded-lg p-6 mb-6 shadow-lg">
+    <div className="ds-bg-surface rounded-lg border ds-border-accent-subtle p-6 mb-6 shadow-lg">
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
@@ -180,7 +180,7 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
           <div className="mt-4">
             <div className="flex justify-between items-center mb-1">
               <span className="text-sm font-medium ds-text-secondary">Overall Setup Progress</span>
-              <span className="text-sm font-semibold text-blue-600">{overallProgress}%</span>
+              <span className="text-sm font-semibold ds-text-accent-primary">{overallProgress}%</span>
             </div>
             <div className="w-full ds-bg-surface-muted rounded-full h-2">
               <div
@@ -204,14 +204,14 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
 
       {/* Current Step */}
       {currentStepData && (
-        <div className="ds-bg-surface rounded-lg p-5 mb-4 border border-blue-100">
+        <div className="ds-bg-surface rounded-lg p-5 mb-4 border ds-border-subtle">
           <div className="flex items-start gap-4">
             <div className={`text-4xl flex-shrink-0`}>
               {currentStepData.icon}
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs font-semibold text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                <span className="text-xs font-semibold ds-text-accent-primary ds-bg-accent-subtle px-2 py-1 rounded">
                   Step {currentStep + 1} of {steps.length}
                 </span>
                 <h3 className="text-lg font-bold ds-text-primary">{currentStepData.title}</h3>
@@ -280,34 +280,38 @@ export function PostCreationWizard({ projectId, projectData, onComplete, onDismi
       )}
 
       {/* All Steps Overview */}
-      <div className="ds-bg-surface rounded-lg p-4 border border-blue-100">
+      <div className="ds-bg-surface rounded-lg p-4 border ds-border-subtle">
         <h4 className="text-sm font-semibold ds-text-secondary mb-3">Setup Checklist</h4>
         <div className="space-y-2">
           {steps.map((step, index) => (
             <div
               key={step.id}
               className={`flex items-center gap-3 p-2 rounded ${
-                index === currentStep ? 'bg-blue-50 border border-blue-400/60' : ''
+                index === currentStep ? 'ds-bg-accent-subtle ds-border-accent-subtle border' : ''
               }`}
             >
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
-                index < currentStep
-                  ? 'bg-green-100 text-green-700'
-                  : index === currentStep
-                  ? 'bg-blue-100 text-blue-700'
-                  : 'ds-bg-surface-muted ds-text-muted'
-              }`}>
+              <div
+                className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
+                  index < currentStep
+                    ? 'ds-bg-success/10 ds-text-success'
+                    : index === currentStep
+                    ? 'ds-bg-accent-subtle ds-text-accent-primary'
+                    : 'ds-bg-surface-muted ds-text-muted'
+                }`}
+              >
                 {index < currentStep ? '✓' : index + 1}
               </div>
               <div className="flex-1">
-                <p className={`text-sm font-medium ${
-                  index === currentStep ? 'text-blue-900' : 'ds-text-secondary'
-                }`}>
+                <p
+                  className={`text-sm font-medium ${
+                    index === currentStep ? 'ds-text-primary' : 'ds-text-secondary'
+                  }`}
+                >
                   {step.title}
                 </p>
               </div>
               {index < currentStep && (
-                <span className="text-xs text-green-600 font-semibold">Done</span>
+                <span className="text-xs ds-text-success font-semibold">Done</span>
               )}
             </div>
           ))}

@@ -148,8 +148,8 @@ export function ProjectSetupChecklist({ projectId }) {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
-        <p className="text-sm text-red-800">{error}</p>
+      <div className="ds-bg-danger/10 border ds-border-danger/40 rounded-lg p-4">
+        <p className="text-sm ds-text-danger">{error}</p>
       </div>
     );
   }
@@ -183,14 +183,14 @@ export function ProjectSetupChecklist({ projectId }) {
   };
 
   const getStatusColor = (status, completed) => {
-    if (completed) return 'bg-green-50 border-green-400/60';
-    if (status === 'low' || status === 'depleted') return 'bg-yellow-50 border-yellow-400/60';
+    if (completed) return 'ds-bg-success/10 ds-border-success/40';
+    if (status === 'low' || status === 'depleted') return 'ds-bg-warning/10 ds-border-warning/40';
     return 'ds-bg-surface-muted ds-border-subtle';
   };
 
   const getStatusTextColor = (status, completed) => {
-    if (completed) return 'text-green-800';
-    if (status === 'low' || status === 'depleted') return 'text-yellow-800';
+    if (completed) return 'ds-text-success';
+    if (status === 'low' || status === 'depleted') return 'ds-text-warning';
     return 'ds-text-primary';
   };
 
@@ -229,11 +229,13 @@ export function ProjectSetupChecklist({ projectId }) {
 
       {/* Readiness Status */}
       <div className="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className={`p-4 rounded-lg border-2 ${
-          readiness.readyForMaterials 
-            ? 'bg-green-50 border-green-400/60' 
-            : 'bg-yellow-50 border-yellow-400/60'
-        }`}>
+        <div
+          className={`p-4 rounded-lg border-2 ${
+            readiness.readyForMaterials
+              ? 'ds-bg-success/10 ds-border-success/40'
+              : 'ds-bg-warning/10 ds-border-warning/40'
+          }`}
+        >
           <div className="flex items-center gap-2 mb-2">
             {readiness.readyForMaterials ? (
               <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -244,9 +246,11 @@ export function ProjectSetupChecklist({ projectId }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             )}
-            <span className={`font-semibold ${
-              readiness.readyForMaterials ? 'text-green-900' : 'text-yellow-900'
-            }`}>
+            <span
+              className={`font-semibold ${
+                readiness.readyForMaterials ? 'ds-text-success' : 'ds-text-warning'
+              }`}
+            >
               Ready for Material Requests
             </span>
           </div>
@@ -257,11 +261,13 @@ export function ProjectSetupChecklist({ projectId }) {
           </p>
         </div>
 
-        <div className={`p-4 rounded-lg border-2 ${
-          readiness.readyForPurchaseOrders 
-            ? 'bg-green-50 border-green-400/60' 
-            : 'bg-yellow-50 border-yellow-400/60'
-        }`}>
+        <div
+          className={`p-4 rounded-lg border-2 ${
+            readiness.readyForPurchaseOrders
+              ? 'ds-bg-success/10 ds-border-success/40'
+              : 'ds-bg-warning/10 ds-border-warning/40'
+          }`}
+        >
           <div className="flex items-center gap-2 mb-2">
             {readiness.readyForPurchaseOrders ? (
               <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -272,9 +278,11 @@ export function ProjectSetupChecklist({ projectId }) {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             )}
-            <span className={`font-semibold ${
-              readiness.readyForPurchaseOrders ? 'text-green-900' : 'text-yellow-900'
-            }`}>
+            <span
+              className={`font-semibold ${
+                readiness.readyForPurchaseOrders ? 'ds-text-success' : 'ds-text-warning'
+              }`}
+            >
               Ready for Purchase Orders
             </span>
           </div>
@@ -318,7 +326,7 @@ export function ProjectSetupChecklist({ projectId }) {
                     {item.message}
                   </p>
                   {item.warning && (
-                    <div className="mt-2 p-2 bg-yellow-100 border border-yellow-400/60 rounded text-sm text-yellow-800">
+                    <div className="mt-2 p-2 ds-bg-warning/10 border ds-border-warning/40 rounded text-sm ds-text-warning">
                       ⚠️ {item.warning}
                     </div>
                   )}
@@ -354,14 +362,14 @@ export function ProjectSetupChecklist({ projectId }) {
                   <button
                     type="button"
                     onClick={openFloorInitModal}
-                    className="ml-4 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition whitespace-nowrap"
+                    className="ml-4 px-3 py-1.5 text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover hover:ds-bg-surface-muted rounded-lg transition whitespace-nowrap"
                   >
                     {item.actionLabel || 'Create Floors'}
                   </button>
                 ) : (
                   <Link
                     href={item.actionUrl}
-                    className="ml-4 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded-lg transition whitespace-nowrap"
+                    className="ml-4 px-3 py-1.5 text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover hover:ds-bg-surface-muted rounded-lg transition whitespace-nowrap"
                   >
                     {item.actionLabel}
                   </Link>
@@ -374,13 +382,13 @@ export function ProjectSetupChecklist({ projectId }) {
 
       {/* Quick Actions */}
       {!readiness.readyForMaterials && (
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-400/60 rounded-lg">
-          <p className="text-sm font-semibold text-blue-900 mb-2">Quick Actions</p>
+        <div className="mt-6 p-4 ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg">
+          <p className="text-sm font-semibold ds-text-primary mb-2">Quick Actions</p>
           <div className="flex flex-wrap gap-2">
             {!prerequisites.budget.completed && (
               <Link
                 href={prerequisites.budget.actionUrl}
-                className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-3 py-1.5 text-sm font-medium ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
               >
                 Set Budget
               </Link>
@@ -388,7 +396,7 @@ export function ProjectSetupChecklist({ projectId }) {
             {!prerequisites.capital.completed && (
               <Link
                 href={prerequisites.capital.actionUrl}
-                className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-3 py-1.5 text-sm font-medium ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
               >
                 Allocate Capital
               </Link>
@@ -397,7 +405,7 @@ export function ProjectSetupChecklist({ projectId }) {
               <button
                 type="button"
                 onClick={openFloorInitModal}
-                className="px-3 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-3 py-1.5 text-sm font-medium ds-bg-accent-primary text-white rounded-lg hover:ds-bg-accent-hover transition"
               >
                 Create Floors
               </button>
@@ -433,7 +441,7 @@ export function ProjectSetupChecklist({ projectId }) {
 
         <div className="px-8 py-6 space-y-6">
           {floorInitError && (
-            <div className="bg-red-50/80 border border-red-400/60/70 text-red-700 px-4 py-3 rounded-xl">
+            <div className="ds-bg-danger/10 border ds-border-danger/40 ds-text-danger px-4 py-3 rounded-xl">
               {floorInitError}
             </div>
           )}
