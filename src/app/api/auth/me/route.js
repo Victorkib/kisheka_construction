@@ -41,20 +41,20 @@ export async function GET(request) {
     // OAuth callback might have just completed and profile might not be ready yet
     const isOAuthUser = !!user.app_metadata?.provider;
     let userProfile = null;
-    let retryCount = 0;
-    const maxRetries = isOAuthUser ? 3 : 1; // More retries for OAuth users
+    let profileRetryCount = 0;
+    const profileMaxRetries = isOAuthUser ? 3 : 1; // More retries for OAuth users
     
-    while (!userProfile && retryCount < maxRetries) {
+    while (!userProfile && profileRetryCount < profileMaxRetries) {
       userProfile = await getUserProfile(user.id);
       
-      if (!userProfile && retryCount < maxRetries - 1) {
+      if (!userProfile && profileRetryCount < profileMaxRetries - 1) {
         // Wait before retry: 200ms, 500ms, 1s
-        const delay = [200, 500, 1000][retryCount] || 1000;
+        const delay = [200, 500, 1000][profileRetryCount] || 1000;
         await new Promise(resolve => setTimeout(resolve, delay));
-        retryCount++;
-        console.log(`[Auth Me] Profile not found, retrying... (attempt ${retryCount}/${maxRetries})`);
+        profileRetryCount++;
+        console.log(`[Auth Me] Profile not found, retrying... (attempt ${profileRetryCount}/${profileMaxRetries})`);
       } else {
-        retryCount++;
+        profileRetryCount++;
       }
     }
 

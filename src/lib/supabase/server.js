@@ -37,22 +37,29 @@ export async function createClient() {
             cookiesToSet.forEach(({ name, value, options }) => {
               // CRITICAL FIX: Set explicit cookie options for OAuth/PKCE flow
               // These options ensure cookies work correctly in production
+              // CRITICAL: Preserve original options but ensure critical settings are correct
               const cookieOptions = {
                 ...options,
                 // SameSite must be 'lax' or 'none' for OAuth redirects
-                // 'lax' works for same-site redirects, 'none' needed for cross-site (with Secure)
+                // 'lax' works for same-site redirects (recommended for OAuth)
+                // Use 'none' only if cross-site redirects are needed (requires Secure)
                 sameSite: options?.sameSite || 'lax',
                 // Secure should be true in production (HTTPS required)
-                secure: process.env.NODE_ENV === 'production' ? true : (options?.secure ?? false),
-                // HttpOnly for session cookies (but code verifier may need to be accessible)
-                httpOnly: options?.httpOnly ?? true,
+                // But preserve original secure setting if explicitly set
+                secure: options?.secure !== undefined 
+                  ? options.secure 
+                  : (process.env.NODE_ENV === 'production' ? true : false),
+                // HttpOnly for session cookies (security)
+                // But code verifier cookies may need to be accessible to JS
+                httpOnly: options?.httpOnly !== undefined ? options.httpOnly : true,
                 // Path should be root to ensure cookies are available everywhere
                 path: options?.path || '/',
                 // Domain should match the application domain
                 // Don't set domain in development (localhost), set in production if needed
-                ...(process.env.NODE_ENV === 'production' && options?.domain 
-                  ? { domain: options.domain } 
-                  : {}),
+                // CRITICAL: Only set domain if explicitly provided, don't override
+                ...(options?.domain ? { domain: options.domain } : {}),
+                // MaxAge for session persistence
+                maxAge: options?.maxAge || 60 * 60 * 24 * 365, // 1 year default
               };
               cookieStore.set(name, value, cookieOptions);
             });

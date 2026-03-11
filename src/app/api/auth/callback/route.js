@@ -32,7 +32,7 @@ export async function GET(request) {
 
   // If there's a code, exchange it (for email verification links and OAuth)
   if (code) {
-    // CRITICAL FIX: Properly handle cookies for PKCE flow
+    // CRITICAL: Properly handle cookies for PKCE flow
     // The code verifier is stored in cookies by the browser client during OAuth initiation
     // We must read ALL cookies from the request to ensure code verifier is available
     const cookieStore = await cookies();
@@ -42,9 +42,17 @@ export async function GET(request) {
     if (process.env.NODE_ENV === 'development') {
       const allCookies = cookieStore.getAll();
       console.log('[Auth Callback] Available cookies:', allCookies.map(c => c.name));
+      // CRITICAL: Check if code verifier cookie is present
+      const codeVerifierCookie = allCookies.find(c => c.name.includes('code-verifier') || c.name.includes('code_verifier'));
+      if (!codeVerifierCookie) {
+        console.error('[Auth Callback] WARNING: Code verifier cookie not found! Available cookies:', allCookies.map(c => c.name));
+      } else {
+        console.log('[Auth Callback] Code verifier cookie found:', codeVerifierCookie.name);
+      }
     }
     
     // Create Supabase client with explicit cookie handling
+    // CRITICAL: Use request.cookies to read cookies sent from browser (including code verifier)
     // This ensures we can read the code verifier cookie set by the browser client
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -52,7 +60,17 @@ export async function GET(request) {
       {
         cookies: {
           getAll() {
-            return cookieStore.getAll();
+            // CRITICAL: Read from request cookies first (includes code verifier from browser)
+            // Then merge with cookieStore (server-set cookies)
+            const requestCookies = request.cookies.getAll();
+            const serverCookies = cookieStore.getAll();
+            
+            // Combine and deduplicate (request cookies take precedence)
+            const cookieMap = new Map();
+            serverCookies.forEach(c => cookieMap.set(c.name, c));
+            requestCookies.forEach(c => cookieMap.set(c.name, c));
+            
+            return Array.from(cookieMap.values());
           },
           setAll(cookiesToSetArray) {
             // Track all cookies being set during exchangeCodeForSession
@@ -192,14 +210,16 @@ export async function GET(request) {
         // CRITICAL FIX: Copy ALL cookies to redirect response
         // Session cookies and code verifier cookies must be included in the redirect
         // This ensures the session persists after redirect
+        // CRITICAL: Preserve original cookie options from Supabase - don't override unnecessarily
         cookiesToSet.forEach(({ name, value, options }) => {
           try {
-            // Set cookie with proper options for production
+            // CRITICAL: Preserve Supabase's original cookie options
+            // Only set defaults if options are missing, don't override what Supabase sets
             const cookieOptions = {
               ...options,
               // Ensure SameSite is set correctly for OAuth redirects
               sameSite: options?.sameSite || 'lax',
-              // Secure should be true in production (HTTPS)
+              // Secure should match environment
               secure: process.env.NODE_ENV === 'production' ? true : (options?.secure ?? false),
               // HttpOnly for session cookies
               httpOnly: options?.httpOnly ?? true,
