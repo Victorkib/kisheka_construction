@@ -517,9 +517,7 @@ Thank you for your delivery. You may proceed with invoice/payment follow-up as a
       <p style="font-size: 12px; color: #6b7280;">Automated message from Doshaki Construction.</p>
     </body>
     </html>
-  `;
-
-  return sendEmail({
+  `;  return sendEmail({
     to: supplier.email,
     toName: supplier.contactPerson || supplier.name || supplier.email,
     subject,

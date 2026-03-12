@@ -24,6 +24,8 @@ export default function DashboardPage() {
   const hasRedirected = useRef(false);
 
   useEffect(() => {
+    let isMounted = true;
+
     // CRITICAL FIX: Check if we're already on a role-specific dashboard
     // This prevents redirect loops when user clicks dashboard link while already on dashboard
     const currentPath = pathname || window.location.pathname;
@@ -40,6 +42,8 @@ export default function DashboardPage() {
     }
 
     async function redirectToRoleDashboard(retryCount = 0) {
+      if (!isMounted) return;
+
       try {
         // CRITICAL FIX: Double-check we're still on /dashboard before redirecting
         const currentPath = window.location.pathname;
@@ -51,6 +55,8 @@ export default function DashboardPage() {
         const response = await fetchNoCache('/api/auth/me');
         const data = await response.json();
 
+        if (!isMounted) return;
+
         // CRITICAL FIX: Handle different error scenarios
         // 401 = Session not available (might be race condition after OAuth)
         // 404 = Profile not found (MongoDB sync race condition)
@@ -61,7 +67,10 @@ export default function DashboardPage() {
             // Wait before retry: 500ms, 1s, 2s
             const delay = [500, 1000, 2000][retryCount] || 2000;
             await new Promise(resolve => setTimeout(resolve, delay));
-            return redirectToRoleDashboard(retryCount + 1);
+            if (isMounted) {
+              return redirectToRoleDashboard(retryCount + 1);
+            }
+            return;
           }
           
           // For 404 errors (profile not found), retry - MongoDB sync might still be in progress
@@ -70,68 +79,89 @@ export default function DashboardPage() {
             // Wait before retry: 500ms, 1s, 2s, 3s, 4s
             const delay = [500, 1000, 2000, 3000, 4000][retryCount] || 4000;
             await new Promise(resolve => setTimeout(resolve, delay));
-            return redirectToRoleDashboard(retryCount + 1);
+            if (isMounted) {
+              return redirectToRoleDashboard(retryCount + 1);
+            }
+            return;
           }
           
           // After all retries, redirect to login
-          console.error('Authentication failed after retries:', data.error);
-          router.push('/auth/login');
+          if (isMounted) {
+            console.error('Authentication failed after retries:', data.error);
+            router.push('/auth/login');
+          }
           return;
         }
+
+        if (!isMounted) return;
 
         const user = data.data;
         const role = user.role?.toLowerCase();
 
         // CRITICAL FIX: Mark as redirected before actually redirecting
-        hasRedirected.current = true;
+        if (isMounted) {
+          hasRedirected.current = true;
 
-        // Route to role-specific dashboard
-        switch (role) {
-          case 'owner':
-            router.replace('/dashboard/owner');
-            break;
-          case 'investor':
-            router.replace('/dashboard/investor');
-            break;
-          case 'pm':
-          case 'project_manager':
-            router.replace('/dashboard/pm');
-            break;
-          case 'clerk':
-          case 'site_clerk':
-            router.replace('/dashboard/clerk');
-            break;
-          case 'accountant':
-            router.replace('/dashboard/accountant');
-            break;
-          case 'supervisor':
-            router.replace('/dashboard/supervisor');
-            break;
-          case 'supplier':
-            router.replace('/dashboard/supplier');
-            break;
-          default:
-            // Fallback to a generic dashboard or owner dashboard
-            router.replace('/dashboard/owner');
+          // Route to role-specific dashboard
+          switch (role) {
+            case 'owner':
+              router.replace('/dashboard/owner');
+              break;
+            case 'investor':
+              router.replace('/dashboard/investor');
+              break;
+            case 'pm':
+            case 'project_manager':
+              router.replace('/dashboard/pm');
+              break;
+            case 'clerk':
+            case 'site_clerk':
+              router.replace('/dashboard/clerk');
+              break;
+            case 'accountant':
+              router.replace('/dashboard/accountant');
+              break;
+            case 'supervisor':
+              router.replace('/dashboard/supervisor');
+              break;
+            case 'supplier':
+              router.replace('/dashboard/supplier');
+              break;
+            default:
+              // Fallback to a generic dashboard or owner dashboard
+              router.replace('/dashboard/owner');
+          }
         }
       } catch (error) {
+        if (!isMounted) return;
+        
         console.error('Error fetching user:', error);
         // Only redirect to login if we've exhausted retries
         if (retryCount >= 3) {
-          setError('Failed to load dashboard. Redirecting to login...');
-          setTimeout(() => {
-            router.push('/auth/login');
-          }, 2000);
+          if (isMounted) {
+            setError('Failed to load dashboard. Redirecting to login...');
+            setTimeout(() => {
+              if (isMounted) {
+                router.push('/auth/login');
+              }
+            }, 2000);
+          }
         } else {
           // Retry on network errors
           const delay = [500, 1000, 2000][retryCount] || 2000;
           await new Promise(resolve => setTimeout(resolve, delay));
-          return redirectToRoleDashboard(retryCount + 1);
+          if (isMounted) {
+            return redirectToRoleDashboard(retryCount + 1);
+          }
         }
       }
     }
 
     redirectToRoleDashboard();
+
+    return () => {
+      isMounted = false;
+    };
   }, [router, pathname]);
 
   if (error) {

@@ -174,16 +174,22 @@ export function SmartMobileNav({ isOpen, onClose }) {
 
   // Fetch badge counts (project-specific)
   useEffect(() => {
+    let isMounted = true;
+
     if (user && ['owner', 'pm', 'project_manager', 'accountant'].includes(user.role?.toLowerCase())) {
       // If no project selected, set count to 0 (multi-project system)
       if (!currentProject?._id) {
-        setPendingApprovalsCount(0);
+        if (isMounted) {
+          setPendingApprovalsCount(0);
+        }
         return;
       }
 
       const projectId = currentProject._id?.toString() || currentProject._id;
       if (!projectId) {
-        setPendingApprovalsCount(0);
+        if (isMounted) {
+          setPendingApprovalsCount(0);
+        }
         return;
       }
 
@@ -196,6 +202,8 @@ export function SmartMobileNav({ isOpen, onClose }) {
       })
         .then((res) => res.json())
         .then((data) => {
+          if (!isMounted) return;
+          
           if (data.success && data.data?.summary?.totalPendingApprovals) {
             setPendingApprovalsCount(data.data.summary.totalPendingApprovals);
           } else {
@@ -204,13 +212,20 @@ export function SmartMobileNav({ isOpen, onClose }) {
           }
         })
         .catch((err) => {
+          if (!isMounted) return;
           console.error('Error fetching approvals count:', err);
           setPendingApprovalsCount(0); // Set to 0 on error (no badge)
         });
     } else {
       // User doesn't have permission, set to 0
-      setPendingApprovalsCount(0);
+      if (isMounted) {
+        setPendingApprovalsCount(0);
+      }
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [user, currentProject]); // Add currentProject to dependencies
 
   // Get navigation

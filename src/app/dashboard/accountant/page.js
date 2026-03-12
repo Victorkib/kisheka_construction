@@ -35,12 +35,18 @@ export default function AccountantDashboard() {
   }, [contextLoading, isEmpty, hasRefreshed, refreshAccessibleProjects]);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function fetchData() {
+      if (!isMounted) return;
+
       // Always fetch user data first, even if empty state
       try {
         setUserError(null);
         const userResponse = await fetchNoCache('/api/auth/me');
         const userData = await userResponse.json();
+
+        if (!isMounted) return;
 
         if (!userData.success) {
           setUserError('Failed to load user data. Please try again.');
@@ -48,29 +54,42 @@ export default function AccountantDashboard() {
           return;
         }
 
-        setUser(userData.data);
+        if (isMounted) {
+          setUser(userData.data);
+        }
 
         // Don't fetch other data if empty state
         if (isEmpty) {
-          setLoading(false);
+          if (isMounted) {
+            setLoading(false);
+          }
           return;
         }
 
         const summaryResponse = await fetchNoCache('/api/dashboard/summary');
         const summaryData = await summaryResponse.json();
 
-        if (summaryData.success) {
+        if (!isMounted) return;
+
+        if (summaryData.success && isMounted) {
           setSummary(summaryData.data.summary);
         }
       } catch (error) {
+        if (!isMounted) return;
         console.error('Error fetching data:', error);
         setUserError('Network error. Please check your connection and try again.');
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [router, isEmpty]);
 
   // CRITICAL FIX: Wait for ProjectContext to finish loading before showing empty state

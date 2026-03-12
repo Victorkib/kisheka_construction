@@ -42,6 +42,8 @@ export function usePermissions() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    let isMounted = true;
+
     const fetchUser = async () => {
       // Check if we have a valid cache
       const now = Date.now();
@@ -50,8 +52,10 @@ export function usePermissions() {
         cacheTimestamp &&
         now - cacheTimestamp < CACHE_DURATION
       ) {
-        setUser(cachedUser);
-        setLoading(false);
+        if (isMounted) {
+          setUser(cachedUser);
+          setLoading(false);
+        }
         return;
       }
 
@@ -59,8 +63,10 @@ export function usePermissions() {
       if (fetchPromise) {
         try {
           const cachedData = await fetchPromise;
-          setUser(cachedData);
-          setLoading(false);
+          if (isMounted) {
+            setUser(cachedData);
+            setLoading(false);
+          }
           return;
         } catch (err) {
           // If the promise failed, continue with a new fetch
@@ -68,8 +74,10 @@ export function usePermissions() {
       }
 
       try {
-        setLoading(true);
-        setError(null);
+        if (isMounted) {
+          setLoading(true);
+          setError(null);
+        }
 
         // Create a new fetch promise
         fetchPromise = fetch('/api/auth/me')
@@ -88,22 +96,31 @@ export function usePermissions() {
           });
 
         const userData = await fetchPromise;
-        setUser(userData);
+        if (isMounted) {
+          setUser(userData);
+        }
       } catch (err) {
+        if (!isMounted) return;
         console.error('Error fetching user:', err);
         setError(err.message);
         // Clear cache on error
         cachedUser = null;
         cacheTimestamp = null;
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchUser();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const refetch = async () => {
+  const refetch = useCallback(async () => {
     // Clear cache and refetch with no-cache
     clearUserCache();
 
@@ -130,7 +147,7 @@ export function usePermissions() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   /**
    * Check if user has one of the required roles

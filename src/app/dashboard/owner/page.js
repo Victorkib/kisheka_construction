@@ -42,7 +42,11 @@ export default function OwnerDashboard() {
   }, [contextLoading, isEmpty, hasRefreshed, refreshAccessibleProjects]);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function fetchData() {
+      if (!isMounted) return;
+
       try {
         setUserError(null);
         
@@ -50,32 +54,45 @@ export default function OwnerDashboard() {
         const userResponse = await fetchNoCache('/api/auth/me');
         const userData = await userResponse.json();
 
+        if (!isMounted) return;
+
         if (!userData.success) {
           setUserError('Failed to load user data. Please try again.');
           setLoading(false);
           return;
         }
 
-        setUser(userData.data);
+        if (isMounted) {
+          setUser(userData.data);
+        }
 
         // Fetch portfolio-wide data (no project filter for owner)
         const portfolioResponse = await fetchNoCache('/api/dashboard/owner/portfolio');
         const portfolioResult = await portfolioResponse.json();
 
-        if (portfolioResult.success) {
+        if (!isMounted) return;
+
+        if (portfolioResult.success && isMounted) {
           setPortfolioData(portfolioResult.data);
-        } else {
+        } else if (isMounted) {
           setUserError(portfolioResult.error || 'Failed to load portfolio data');
         }
       } catch (error) {
+        if (!isMounted) return;
         console.error('Error fetching data:', error);
         setUserError('Network error. Please check your connection and try again.');
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
 
   // CRITICAL FIX: Wait for ProjectContext to finish loading before showing empty state

@@ -178,6 +178,8 @@ export function Header({ onMenuClick }) {
 
   /* Fetch pending approvals (project-specific) */
   useEffect(() => {
+    let isMounted = true;
+
     if (
       user &&
       ['owner', 'pm', 'project_manager', 'accountant'].includes(
@@ -186,19 +188,25 @@ export function Header({ onMenuClick }) {
     ) {
       // If no project selected, set count to 0 (multi-project system)
       if (!currentProject?._id) {
-        setPendingApprovalsCount(0);
+        if (isMounted) {
+          setPendingApprovalsCount(0);
+        }
         return;
       }
 
       const projectId = currentProject._id?.toString() || currentProject._id;
       if (!projectId) {
-        setPendingApprovalsCount(0);
+        if (isMounted) {
+          setPendingApprovalsCount(0);
+        }
         return;
       }
 
       fetch(`/api/dashboard/summary?projectId=${projectId}`)
         .then((res) => res.json())
         .then((data) => {
+          if (!isMounted) return;
+          
           if (data?.success && data?.data?.summary?.totalPendingApprovals) {
             setPendingApprovalsCount(data.data.summary.totalPendingApprovals);
           } else {
@@ -207,13 +215,20 @@ export function Header({ onMenuClick }) {
           }
         })
         .catch((err) => {
+          if (!isMounted) return;
           console.error('Error fetching approvals count:', err);
           setPendingApprovalsCount(0); // Set to 0 on error (no badge)
         });
     } else {
       // User doesn't have permission, set to 0
-      setPendingApprovalsCount(0);
+      if (isMounted) {
+        setPendingApprovalsCount(0);
+      }
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [user, currentProject]); // Add currentProject to dependencies
 
   /* Logout */
@@ -347,13 +362,15 @@ export function Header({ onMenuClick }) {
           <>
             {/* Desktop User Info & Actions */}
             <div className="hidden md:flex items-center gap-2 lg:gap-3">
-              <UserAvatar user={user} />
+              <UserAvatar user={user} onClick={() => router.push('/profile')} className="cursor-pointer" aria-label="View profile" />
               <div className="hidden lg:flex flex-col">
-                <span className="font-medium ds-text-primary text-sm leading-tight">
+                {/* <span className="font-medium ds-text-primary text-sm leading-tight">
                   {user.name}
-                </span>
+                </span> */}
                 <span className="text-xs ds-text-muted capitalize leading-tight">
+                  <Link href="/profile" className="text-xs ds-text-muted capitalize leading-tight">
                   {user.role || 'User'}
+                </Link>
                 </span>
               </div>
               <Link
@@ -365,7 +382,7 @@ export function Header({ onMenuClick }) {
               </Link>
               <button
                 onClick={handleLogout}
-                className="rounded-md bg-gradient-to-r from-red-400 to-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow transition-all hover:opacity-90 active:opacity-80 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2"
+                className="rounded-md bg-gradient-to-r from-red-400 to-red-600 px-3 py-1.5 text-sm font-semibold text-white shadow transition-all hover:opacity-90 active:opacity-80 focus:outline-none focus:ring-2 focus:ring-red-300 focus:ring-offset-2 cursor-pointer"
                 aria-label="Logout from account"
               >
                 Logout

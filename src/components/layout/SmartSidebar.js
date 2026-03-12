@@ -234,16 +234,22 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
 
   // Fetch badge counts (project-specific)
   useEffect(() => {
+    let isMounted = true;
+
     if (user && ['owner', 'pm', 'project_manager', 'accountant'].includes(user.role?.toLowerCase())) {
       // If no project selected, set count to 0 (multi-project system)
       if (!currentProject?._id) {
-        setTimeout(() => setPendingApprovalsCount(0), 0);
+        if (isMounted) {
+          setPendingApprovalsCount(0);
+        }
         return;
       }
 
       const projectId = currentProject._id?.toString() || currentProject._id;
       if (!projectId) {
-        setTimeout(() => setPendingApprovalsCount(0), 0);
+        if (isMounted) {
+          setPendingApprovalsCount(0);
+        }
         return;
       }
 
@@ -256,6 +262,8 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
       })
         .then((res) => res.json())
         .then((data) => {
+          if (!isMounted) return;
+          
           if (data.success && data.data?.summary?.totalPendingApprovals) {
             setPendingApprovalsCount(data.data.summary.totalPendingApprovals);
           } else {
@@ -264,13 +272,20 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
           }
         })
         .catch((err) => {
+          if (!isMounted) return;
           console.error('Error fetching approvals count:', err);
           setPendingApprovalsCount(0); // Set to 0 on error (no badge)
         });
     } else {
       // User doesn't have permission, set to 0
-      setPendingApprovalsCount(0);
+      if (isMounted) {
+        setPendingApprovalsCount(0);
+      }
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [user, currentProject]); // Add currentProject to dependencies
 
   const projectId = currentProject?._id?.toString() || currentProject?._id || null;
@@ -293,30 +308,13 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
     [favorites, user?.role, projectId]
   );
 
-  if (loading || !user) {
-    return (
-      <aside
-        className={`ds-bg-sidebar ds-border-sidebar border-r shadow-xl transition-all duration-300 flex flex-col h-screen ${
-          isCollapsed ? 'w-16 lg:w-20' : 'w-64 lg:w-72'
-        }`}
-      >
-        <div className="p-4">
-          <div className="animate-pulse space-y-3">
-            <div className="h-4 bg-slate-500 rounded w-3/4"></div>
-            <div className="h-4 bg-slate-500 rounded w-1/2"></div>
-          </div>
-        </div>
-      </aside>
-    );
-  }
-
-  // Add favorites to navigation if exists
+  // Add favorites to navigation if exists - must be called before early return
   const navigationWithFavorites = useMemo(() => {
     if (!favoritesSection) return navigation;
     return [favoritesSection, ...navigation];
   }, [navigation, favoritesSection]);
 
-  // Add badges
+  // Add badges - must be called before early return
   const navigationWithBadges = useMemo(() => {
     return navigationWithFavorites.map((section) => {
       if (section.label === 'Operations' && section.children) {
@@ -333,6 +331,23 @@ export const SmartSidebar = memo(function SmartSidebar({ isCollapsed = false, on
       return section;
     });
   }, [navigationWithFavorites, pendingApprovalsCount]);
+
+  if (loading || !user) {
+    return (
+      <aside
+        className={`ds-bg-sidebar ds-border-sidebar border-r shadow-xl transition-all duration-300 flex flex-col h-screen ${
+          isCollapsed ? 'w-16 lg:w-20' : 'w-64 lg:w-72'
+        }`}
+      >
+        <div className="p-4">
+          <div className="animate-pulse space-y-3">
+            <div className="h-4 bg-slate-500 rounded w-3/4"></div>
+            <div className="h-4 bg-slate-500 rounded w-1/2"></div>
+          </div>
+        </div>
+      </aside>
+    );
+  }
 
   return (
     <>

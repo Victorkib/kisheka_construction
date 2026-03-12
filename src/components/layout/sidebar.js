@@ -269,16 +269,22 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
 
   // Fetch pending approvals count for badge (project-specific)
   useEffect(() => {
+    let isMounted = true;
+
     if (user && ['owner', 'pm', 'project_manager', 'accountant'].includes(user.role?.toLowerCase())) {
       // If no project selected, set count to 0 (multi-project system)
       if (!currentProject?._id) {
-        setPendingApprovalsCount(0);
+        if (isMounted) {
+          setPendingApprovalsCount(0);
+        }
         return;
       }
 
       const projectId = currentProject._id?.toString() || currentProject._id;
       if (!projectId) {
-        setPendingApprovalsCount(0);
+        if (isMounted) {
+          setPendingApprovalsCount(0);
+        }
         return;
       }
 
@@ -291,6 +297,8 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
       })
         .then((res) => res.json())
         .then((data) => {
+          if (!isMounted) return;
+          
           if (data.success && data.data?.summary?.totalPendingApprovals) {
             setPendingApprovalsCount(data.data.summary.totalPendingApprovals);
           } else {
@@ -299,17 +307,26 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
           }
         })
         .catch((err) => {
+          if (!isMounted) return;
           console.error('Error fetching approvals count:', err);
           setPendingApprovalsCount(0); // Set to 0 on error (no badge)
         });
     } else {
       // User doesn't have permission, set to 0
-      setPendingApprovalsCount(0);
+      if (isMounted) {
+        setPendingApprovalsCount(0);
+      }
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [user, currentProject]); // Add currentProject to dependencies
 
   // Fetch pending purchase orders count for supplier badge
   useEffect(() => {
+    let isMounted = true;
+
     if (user && user.role?.toLowerCase() === 'supplier') {
       fetch('/api/purchase-orders?limit=0', {
         cache: 'no-store',
@@ -320,6 +337,8 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
       })
         .then((res) => res.json())
         .then((data) => {
+          if (!isMounted) return;
+          
           if (data.success && data.data?.orders) {
             const pendingCount = data.data.orders.filter(
               (order) => order.status === 'order_sent' || order.status === 'order_modified'
@@ -327,12 +346,21 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
             setPendingOrdersCount(pendingCount);
           }
         })
-        .catch((err) => console.error('Error fetching pending orders count:', err));
+        .catch((err) => {
+          if (!isMounted) return;
+          console.error('Error fetching pending orders count:', err);
+        });
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   // Fetch ready to order count (approved requests without purchase orders) for PM/OWNER badge
   useEffect(() => {
+    let isMounted = true;
+
     if (user && ['owner', 'pm', 'project_manager'].includes(user.role?.toLowerCase())) {
       fetch('/api/material-requests?status=ready_to_order&limit=0', {
         cache: 'no-store',
@@ -343,14 +371,23 @@ export const Sidebar = memo(function Sidebar({ isCollapsed = false, onToggleColl
       })
         .then((res) => res.json())
         .then((data) => {
+          if (!isMounted) return;
+          
           if (data.success && data.data?.pagination?.total !== undefined) {
             setReadyToOrderCount(data.data.pagination.total);
           } else if (data.success && data.data?.requests) {
             setReadyToOrderCount(data.data.requests.length);
           }
         })
-        .catch((err) => console.error('Error fetching ready to order count:', err));
+        .catch((err) => {
+          if (!isMounted) return;
+          console.error('Error fetching ready to order count:', err);
+        });
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   if (loading || !user) {

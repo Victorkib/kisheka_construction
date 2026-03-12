@@ -140,6 +140,8 @@ export function MobileNav({ isOpen, onClose }) {
 
   // Fetch pending approvals count
   useEffect(() => {
+    let isMounted = true;
+
     if (
       user &&
       ['owner', 'pm', 'project_manager', 'accountant'].includes(
@@ -149,12 +151,21 @@ export function MobileNav({ isOpen, onClose }) {
       fetch('/api/dashboard/summary')
         .then((res) => res.json())
         .then((data) => {
+          if (!isMounted) return;
+          
           if (data.success && data.data?.summary?.totalPendingApprovals) {
             setPendingApprovalsCount(data.data.summary.totalPendingApprovals);
           }
         })
-        .catch((err) => console.error('Error fetching approvals count:', err));
+        .catch((err) => {
+          if (!isMounted) return;
+          console.error('Error fetching approvals count:', err);
+        });
     }
+
+    return () => {
+      isMounted = false;
+    };
   }, [user]);
 
   // Close drawer when route changes

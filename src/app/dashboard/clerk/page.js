@@ -34,11 +34,17 @@ function ClerkDashboardContent() {
   }, [contextLoading, isEmpty, hasRefreshed, refreshAccessibleProjects]);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function fetchData() {
+      if (!isMounted) return;
+
       try {
         setUserError(null);
         const response = await fetchNoCache('/api/auth/me');
         const data = await response.json();
+
+        if (!isMounted) return;
 
         if (!data.success) {
           setUserError('Failed to load user data. Please try again.');
@@ -46,16 +52,25 @@ function ClerkDashboardContent() {
           return;
         }
 
-        setUser(data.data);
+        if (isMounted) {
+          setUser(data.data);
+        }
       } catch (error) {
+        if (!isMounted) return;
         console.error('Error fetching data:', error);
         setUserError('Network error. Please check your connection and try again.');
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [router]);
 
   if (loading) {

@@ -73,7 +73,7 @@ export default function LandingPageContent() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-6">
             <Link
               href="/auth/login"
-              className="w-full sm:w-auto px-8 py-4 ds-bg-accent-primary hover:bg-blue-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              className="w-full sm:w-auto px-8 py-4 ds-bg-accent-primary ds-bg-surface hover:bg-blue-700 text-white font-semibold rounded-lg border-2 ds-border-strong shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
               aria-label="Sign in to Doshaki Construction"
             >
               Sign In
