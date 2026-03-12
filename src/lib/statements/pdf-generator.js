@@ -113,6 +113,34 @@ export function generatePDFStatement(statementData) {
     yPosition += 10;
   }
 
+  // Scope Information (All vs Selected Projects)
+  if (statementData.scope && statementData.scope.mode === 'selected_projects') {
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Project Scope', margin, yPosition);
+    yPosition += 8;
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const projects = Array.isArray(statementData.scope.projects) ? statementData.scope.projects : [];
+    if (projects.length === 0) {
+      doc.text('Selected projects (details unavailable).', margin, yPosition);
+      yPosition += 7;
+    } else {
+      doc.text('Included Projects:', margin, yPosition);
+      yPosition += 7;
+      projects.slice(0, 8).forEach((p) => {
+        doc.text(`- ${p.projectName}${p.projectCode ? ` (${p.projectCode})` : ''}`, margin + 5, yPosition);
+        yPosition += 6;
+      });
+      if (projects.length > 8) {
+        doc.text(`...and ${projects.length - 8} more`, margin + 5, yPosition);
+        yPosition += 6;
+      }
+    }
+    yPosition += 8;
+  }
+
   // Summary Section
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');

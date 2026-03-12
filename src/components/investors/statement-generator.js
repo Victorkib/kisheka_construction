@@ -12,7 +12,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { LoadingButton, LoadingOverlay } from '@/components/loading';
 
 export function StatementGenerator({ investorId, investorName, onClose }) {
@@ -22,6 +22,10 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
   const [error, setError] = useState(null);
   const [previewData, setPreviewData] = useState(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [scopeMode, setScopeMode] = useState('all'); // 'all' | 'selected'
+  const [availableProjects, setAvailableProjects] = useState([]);
+  const [selectedProjectIds, setSelectedProjectIds] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
 
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-KE', {
@@ -40,6 +44,46 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
     });
   };
 
+  useEffect(() => {
+    const fetchInvestorProjects = async () => {
+      if (!investorId) return;
+      try {
+        setLoadingProjects(true);
+        const response = await fetch(`/api/investors/${investorId}/allocations`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+          },
+        });
+        const data = await response.json();
+        if (data.success) {
+          const projects = Array.isArray(data.data?.allocations) ? data.data.allocations : [];
+          setAvailableProjects(projects);
+        } else {
+          setAvailableProjects([]);
+        }
+      } catch (err) {
+        console.error('Fetch statement projects error:', err);
+        setAvailableProjects([]);
+      } finally {
+        setLoadingProjects(false);
+      }
+    };
+    fetchInvestorProjects();
+  }, [investorId]);
+
+  const scopedProjectIds = useMemo(() => {
+    if (scopeMode !== 'selected') return [];
+    return selectedProjectIds.filter(Boolean);
+  }, [scopeMode, selectedProjectIds]);
+
+  const addScopeQueryParams = (queryParams) => {
+    if (scopeMode === 'selected' && scopedProjectIds.length > 0) {
+      queryParams.set('projectIds', scopedProjectIds.join(','));
+    }
+  };
+
   const handleGeneratePreview = async () => {
     setGenerating(true);
     setError(null);
@@ -52,6 +96,7 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
         ...(startDate && { startDate }),
         ...(endDate && { endDate }),
       });
+      addScopeQueryParams(queryParams);
 
       const response = await fetch(`/api/investors/${investorId}/statements?${queryParams}`, {
         cache: 'no-store',
@@ -86,6 +131,7 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
         ...(startDate && { startDate }),
         ...(endDate && { endDate }),
       });
+      addScopeQueryParams(queryParams);
 
       const response = await fetch(`/api/investors/${investorId}/statements?${queryParams}`, {
         cache: 'no-store',
@@ -102,7 +148,7 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
 
       // Get filename from Content-Disposition header or generate one
       const contentDisposition = response.headers.get('Content-Disposition');
-      let filename = `Investor_Statement_${investorName || investorId}_${new Date().toISOString().split('T')[0]}`;
+      let filename = `Investor_Statement_${investorName || investorId}${scopeMode === 'selected' && scopedProjectIds.length > 0 ? '_Scoped' : ''}_${new Date().toISOString().split('T')[0]}`;
       
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename="(.+)"/);
@@ -185,6 +231,114 @@ export function StatementGenerator({ investorId, investorName, onClose }) {
             min={startDate || undefined}
           />
         </div>
+      </div>
+
+      {/* Project Scope Selection */}
+      <div className="ds-bg-surface-muted rounded-lg p-4 border ds-border-subtle">
+        <h3 className="text-base font-semibold ds-text-primary mb-3">Project Scope</h3>
+        <div className="flex flex-col md:flex-row gap-3">
+          <label className="flex items-start gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="scopeMode"
+              value="all"
+              checked={scopeMode === 'all'}
+              onChange={() => {
+                setScopeMode('all');
+                setSelectedProjectIds([]);
+              }}
+              className="mt-1"
+            />
+            <div>
+              <div className="text-sm font-semibold ds-text-primary">All Projects</div>
+              <div className="text-xs ds-text-secondary">
+                Includes all allocations and usage across every project.
+              </div>
+            </div>
+          </label>
+          <label className="flex items-start gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="scopeMode"
+              value="selected"
+              checked={scopeMode === 'selected'}
+              onChange={() => setScopeMode('selected')}
+              className="mt-1"
+            />
+            <div>
+              <div className="text-sm font-semibold ds-text-primary">Selected Project(s)</div>
+              <div className="text-xs ds-text-secondary">
+                Generate a statement for one or multiple projects this investor is allocated to.
+              </div>
+            </div>
+          </label>
+        </div>
+
+        {scopeMode === 'selected' && (
+          <div className="mt-4">
+            {loadingProjects ? (
+              <div className="text-sm ds-text-secondary">Loading projects…</div>
+            ) : availableProjects.length === 0 ? (
+              <div className="text-sm ds-text-secondary">
+                No allocated projects found for this investor. Allocate capital to projects first, then generate a scoped statement.
+              </div>
+            ) : (
+              <>
+                <div className="flex flex-wrap items-center gap-2 mb-3">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedProjectIds(availableProjects.map((p) => p.projectId))}
+                    className="px-3 py-1.5 text-xs font-medium rounded-md border ds-border-subtle ds-bg-surface hover:ds-bg-surface-muted"
+                  >
+                    Select all
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedProjectIds([])}
+                    className="px-3 py-1.5 text-xs font-medium rounded-md border ds-border-subtle ds-bg-surface hover:ds-bg-surface-muted"
+                  >
+                    Clear
+                  </button>
+                  <div className="text-xs ds-text-muted">
+                    Selected: {selectedProjectIds.length}
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {availableProjects.map((p) => {
+                    const id = p.projectId;
+                    const checked = selectedProjectIds.includes(id);
+                    return (
+                      <label key={id} className="flex items-start gap-2 p-2 rounded border ds-border-subtle ds-bg-surface cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={(e) => {
+                            const next = e.target.checked
+                              ? [...new Set([...selectedProjectIds, id])]
+                              : selectedProjectIds.filter((x) => x !== id);
+                            setSelectedProjectIds(next);
+                          }}
+                          className="mt-1"
+                        />
+                        <div className="min-w-0">
+                          <div className="text-sm font-semibold ds-text-primary truncate">
+                            {p.projectName || 'Project'}
+                          </div>
+                          <div className="text-xs ds-text-secondary truncate">
+                            {p.projectCode ? `${p.projectCode} • ` : ''}Allocated: {formatCurrency(p.amount || 0)}
+                          </div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+                <p className="text-xs ds-text-muted mt-2">
+                  Tip: For a single-project statement, select only one project.
+                </p>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Error Message */}

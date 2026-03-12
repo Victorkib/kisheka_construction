@@ -15,6 +15,7 @@ import { hasPermission, ROLES } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
+import { recalculateProjectFinances } from '@/lib/financial-helpers';
 
 /**
  * GET /api/investors/[id]/contributions
@@ -107,7 +108,7 @@ export async function GET(request, { params }) {
  * POST /api/investors/[id]/contributions
  * Adds a new contribution to an investor
  * Auth: OWNER only
- * Body: { amount, date, type, notes?, receiptUrl? }
+ * Body: { amount, date, type, notes?, receiptUrl?, projectId?, allocatedAmount? }
  */
 export async function POST(request, { params }) {
   try {
@@ -136,7 +137,7 @@ export async function POST(request, { params }) {
     }
 
     const body = await request.json();
-    const { amount, date, type, notes, receiptUrl } = body;
+    const { amount, date, type, notes, receiptUrl, projectId, allocatedAmount } = body;
 
     // Validation
     if (!amount || parseFloat(amount) <= 0) {
@@ -171,6 +172,93 @@ export async function POST(request, { params }) {
     const contributions = [...(investor.contributions || []), newContribution];
     const totalInvested = contributions.reduce((sum, c) => sum + (c.amount || 0), 0);
 
+    // Optional: allocate this contribution to a project in the same step
+    // We treat it as an increase to that project's allocation by the allocated amount
+    // (defaults to full contribution amount if not specified).
+    let allocationApplied = null;
+    let allocationWarning = null;
+    const allocationProjectId = projectId ? String(projectId) : '';
+    const contributionAmount = parseFloat(amount);
+    const requestedAllocatedAmount =
+      allocatedAmount === undefined || allocatedAmount === null || allocatedAmount === ''
+        ? contributionAmount
+        : parseFloat(allocatedAmount);
+
+    if (
+      allocatedAmount !== undefined &&
+      allocatedAmount !== null &&
+      allocatedAmount !== '' &&
+      (Number.isNaN(requestedAllocatedAmount) || requestedAllocatedAmount < 0)
+    ) {
+      return errorResponse('allocatedAmount must be a valid non-negative number', 400);
+    }
+
+    if (!Number.isNaN(requestedAllocatedAmount) && requestedAllocatedAmount > contributionAmount) {
+      return errorResponse('allocatedAmount cannot exceed the contribution amount', 400);
+    }
+
+    const shouldAllocate =
+      allocationProjectId &&
+      ObjectId.isValid(allocationProjectId) &&
+      contributionAmount > 0 &&
+      requestedAllocatedAmount > 0;
+
+    let nextProjectAllocations = Array.isArray(investor.projectAllocations)
+      ? [...investor.projectAllocations]
+      : [];
+
+    if (shouldAllocate) {
+      // Ensure project exists
+      const project = await db.collection('projects').findOne({
+        _id: new ObjectId(allocationProjectId),
+        deletedAt: { $in: [null, undefined] },
+      });
+
+      if (!project) {
+        allocationWarning = 'Selected project not found. Contribution was added but not allocated.';
+      } else {
+        const delta = requestedAllocatedAmount;
+        const existingIndex = nextProjectAllocations.findIndex((alloc) => {
+          if (!alloc?.projectId) return false;
+          const allocId =
+            alloc.projectId instanceof ObjectId
+              ? alloc.projectId.toString()
+              : ObjectId.isValid(alloc.projectId)
+                ? new ObjectId(alloc.projectId).toString()
+                : String(alloc.projectId);
+          return allocId === new ObjectId(allocationProjectId).toString();
+        });
+
+        if (existingIndex >= 0) {
+          const existing = nextProjectAllocations[existingIndex];
+          nextProjectAllocations[existingIndex] = {
+            ...existing,
+            amount: (parseFloat(existing.amount) || 0) + delta,
+            allocatedAt: new Date(),
+            allocatedBy: userProfile._id,
+          };
+        } else {
+          nextProjectAllocations.push({
+            projectId: new ObjectId(allocationProjectId),
+            amount: delta,
+            percentage: null,
+            loanPercentage: null,
+            notes: 'Auto-allocation from contribution entry',
+            allocatedAt: new Date(),
+            allocatedBy: userProfile._id,
+          });
+        }
+
+        allocationApplied = {
+          projectId: allocationProjectId,
+          amountAllocated: delta,
+          contributionAmount,
+          projectName: project.projectName,
+          projectCode: project.projectCode,
+        };
+      }
+    }
+
     const result = await db
       .collection('investors')
       .updateOne(
@@ -179,6 +267,7 @@ export async function POST(request, { params }) {
           $set: {
             contributions,
             totalInvested,
+            ...(shouldAllocate && !allocationWarning ? { projectAllocations: nextProjectAllocations } : {}),
             updatedAt: new Date(),
           },
         }
@@ -198,8 +287,21 @@ export async function POST(request, { params }) {
         investorName: investor.name,
         contributionAmount: parseFloat(amount),
         contributionType: type,
+        ...(allocationApplied ? { allocationApplied } : {}),
       },
     });
+
+    // Recalculate project finances if allocation was applied (non-blocking)
+    if (allocationApplied?.projectId) {
+      try {
+        await recalculateProjectFinances(allocationApplied.projectId);
+      } catch (financeError) {
+        console.error('Finance recalculation error after contribution allocation:', financeError);
+        allocationWarning =
+          allocationWarning ||
+          'Contribution was allocated, but project finance recalculation failed. Please refresh the Project Finances page.';
+      }
+    }
 
     // Fetch updated investor
     const updatedInvestor = await db
@@ -210,8 +312,12 @@ export async function POST(request, { params }) {
       {
         contribution: newContribution,
         investor: updatedInvestor,
+        allocationApplied,
+        ...(allocationWarning ? { warning: allocationWarning } : {}),
       },
-      'Contribution added successfully',
+      allocationApplied
+        ? 'Contribution added and allocated successfully'
+        : 'Contribution added successfully',
       201
     );
   } catch (error) {

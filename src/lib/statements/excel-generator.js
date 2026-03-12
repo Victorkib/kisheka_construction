@@ -104,6 +104,28 @@ export async function generateExcelStatement(statementData) {
     worksheet.addRow([]);
   }
 
+  // Scope Information (All vs Selected Projects)
+  if (statementData.scope && statementData.scope.mode === 'selected_projects') {
+    const scopeTitle = worksheet.addRow(['Project Scope']);
+    scopeTitle.font = { size: 12, bold: true };
+    scopeTitle.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FFF0F0F0' },
+    };
+
+    const projects = Array.isArray(statementData.scope.projects) ? statementData.scope.projects : [];
+    if (projects.length === 0) {
+      worksheet.addRow(['Included Projects:', 'Selected projects (details unavailable)']);
+    } else {
+      worksheet.addRow(['Included Projects:', `${projects.length}`]);
+      projects.forEach((p) => {
+        worksheet.addRow(['', `${p.projectName}${p.projectCode ? ` (${p.projectCode})` : ''}`]);
+      });
+    }
+    worksheet.addRow([]);
+  }
+
   // Investment Summary Section
   const summaryTitle = worksheet.addRow(['Investment Summary']);
   summaryTitle.font = { size: 14, bold: true };

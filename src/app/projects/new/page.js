@@ -947,7 +947,7 @@ export default function NewProjectPage() {
           </ul>
           <div className="bg-slate-800/50 rounded-lg p-3 mt-3 border border-slate-700">
             <p className="text-xs text-slate-300">
-              <strong className="text-blue-300">💡 Note:</strong> These are <strong>estimates</strong> based on industry standards. You can adjust individual phase budgets after project creation by navigating to each phase's budget management page from the project details or phases list.
+              <strong className="text-blue-300">💡 Note:</strong> These are <strong>estimates</strong> based on industry standards. You can adjust individual phase budgets after project creation by navigating to each phase budget management page from the project details or phases list.
             </p>
           </div>
         </div>
@@ -1133,7 +1133,7 @@ export default function NewProjectPage() {
                     </svg>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold ds-text-primary">Project Configuration</h2>
+                    <h2 className="text-xl font-bold ds-text-primary capitalize">Project Configuration</h2>
                     <p className="text-sm ds-text-secondary">Auto-setup options and preferences</p>
                   </div>
                 </div>
@@ -1187,6 +1187,59 @@ export default function NewProjectPage() {
                         <p className="text-xs ds-text-muted mt-2">
                           Number of floors to create (0-50). Ground floor is included. Default: 10 floors (Ground + 9 floors).
                         </p>
+
+                        {/* Basement configuration */}
+                        <div className="mt-5 border-t ds-border-subtle pt-4">
+                          <div className="flex items-start gap-4">
+                            <div className="flex items-center h-5">
+                              <input
+                                type="checkbox"
+                                id="includeBasements"
+                                name="includeBasements"
+                                checked={!!formData.includeBasements}
+                                onChange={(e) => {
+                                  // If turning off, reset count to 0 to avoid sending stale values
+                                  const checked = e.target.checked;
+                                  setFormData((prev) => ({
+                                    ...prev,
+                                    includeBasements: checked,
+                                    basementCount: checked ? (parseInt(prev.basementCount) || 1) : 0,
+                                  }));
+                                }}
+                                className="w-5 h-5 text-indigo-600 ds-border-subtle rounded focus:ring-indigo-500 cursor-pointer"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <label htmlFor="includeBasements" className="block text-sm font-semibold ds-text-primary mb-1 cursor-pointer">
+                                Create Basements
+                              </label>
+                              <p className="text-xs ds-text-secondary">
+                                Basements are created as negative floor numbers (e.g., Basement 1 = -1). Useful for underground levels and phase-based spending.
+                              </p>
+                            </div>
+                          </div>
+
+                          {formData.includeBasements && (
+                            <div className="mt-3">
+                              <label className="block text-sm font-medium ds-text-secondary mb-2">
+                                Number of Basements
+                              </label>
+                              <input
+                                type="number"
+                                name="basementCount"
+                                value={formData.basementCount}
+                                onChange={handleChange}
+                                placeholder="1"
+                                min="0"
+                                max="10"
+                                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 placeholder:ds-text-muted transition-all"
+                              />
+                              <p className="text-xs ds-text-muted mt-2">
+                                Number of basements to create (0-10). Basement floors will be created before the ground floor.
+                              </p>
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>

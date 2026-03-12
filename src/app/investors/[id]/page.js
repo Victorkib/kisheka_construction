@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -36,6 +36,8 @@ export default function InvestorDetailPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fetchingContributions, setFetchingContributions] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
   const [reconciling, setReconciling] = useState(false);
   const [showStatementGenerator, setShowStatementGenerator] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -49,19 +51,35 @@ export default function InvestorDetailPage() {
     type: 'EQUITY',
     notes: '',
     receiptUrl: '',
+    projectId: '',
+    allocatedAmount: '',
   });
 
-  useEffect(() => {
-    if (investorId) {
-      fetchInvestor();
-      fetchContributions();
-    } else {
-      setError('Invalid investor ID');
-      setLoading(false);
+  const fetchProjects = useCallback(async () => {
+    try {
+      setLoadingProjects(true);
+      const response = await fetch('/api/projects', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      const data = await response.json();
+      if (data.success) {
+        setProjects(Array.isArray(data.data) ? data.data : []);
+      } else {
+        setProjects([]);
+      }
+    } catch (err) {
+      console.error('Fetch projects error:', err);
+      setProjects([]);
+    } finally {
+      setLoadingProjects(false);
     }
-  }, [investorId]);
+  }, []);
 
-  const fetchInvestor = async () => {
+  const fetchInvestor = useCallback(async () => {
     if (!investorId) {
       setError('Invalid investor ID');
       setLoading(false);
@@ -92,9 +110,9 @@ export default function InvestorDetailPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [investorId]);
 
-  const fetchContributions = async () => {
+  const fetchContributions = useCallback(async () => {
     if (!investorId) return;
 
     try {
@@ -116,7 +134,18 @@ export default function InvestorDetailPage() {
     } finally {
       setFetchingContributions(false);
     }
-  };
+  }, [investorId]);
+
+  useEffect(() => {
+    if (investorId) {
+      fetchInvestor();
+      fetchContributions();
+      fetchProjects();
+    } else {
+      setError('Invalid investor ID');
+      setLoading(false);
+    }
+  }, [investorId, fetchInvestor, fetchContributions, fetchProjects]);
 
   const handleAddContribution = async (e) => {
     e.preventDefault();
@@ -154,9 +183,18 @@ export default function InvestorDetailPage() {
         type: 'EQUITY',
         notes: '',
         receiptUrl: '',
+        projectId: '',
+        allocatedAmount: '',
       });
       setShowAddForm(false);
-      toast.showSuccess('Contribution added successfully!');
+      if (data.data?.allocationApplied?.projectName) {
+        toast.showSuccess(`Contribution added and allocated to "${data.data.allocationApplied.projectName}".`);
+      } else {
+        toast.showSuccess('Contribution added successfully!');
+      }
+      if (data.data?.warning) {
+        toast.showWarning(data.data.warning, { duration: 12000 });
+      }
     } catch (err) {
       toast.showError(err.message || 'Failed to add contribution');
       console.error('Add contribution error:', err);
@@ -630,6 +668,55 @@ export default function InvestorDetailPage() {
                     <option value="MIXED">Mixed</option>
                   </select>
                 </div>
+                <div>
+                  <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
+                    Allocate to Project <span className="ds-text-muted font-normal">(Optional)</span>
+                  </label>
+                  <select
+                    value={newContribution.projectId || ''}
+                    onChange={(e) =>
+                      setNewContribution({
+                        ...newContribution,
+                        projectId: e.target.value,
+                        // Reset partial allocation when switching projects / turning off
+                        allocatedAmount: '',
+                      })
+                    }
+                    disabled={loadingProjects}
+                    className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation disabled:opacity-60"
+                  >
+                    <option value="">Don’t allocate yet</option>
+                    {projects.map((p) => (
+                      <option key={p._id} value={p._id}>
+                        {p.projectName} {p.projectCode ? `(${p.projectCode})` : ''}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs ds-text-muted mt-2">
+                    If selected, you can allocate the full contribution or only part of it. You can still adjust allocations later.
+                  </p>
+                </div>
+                {newContribution.projectId && (
+                  <div>
+                    <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">
+                      Allocate Amount <span className="ds-text-muted font-normal">(Optional)</span>
+                    </label>
+                    <input
+                      type="number"
+                      value={newContribution.allocatedAmount}
+                      onChange={(e) =>
+                        setNewContribution({ ...newContribution, allocatedAmount: e.target.value })
+                      }
+                      min="0"
+                      step="0.01"
+                      placeholder={newContribution.amount ? String(newContribution.amount) : 'Full amount'}
+                      className="w-full px-3 py-2.5 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 touch-manipulation"
+                    />
+                    <p className="text-xs ds-text-muted mt-2">
+                      Leave blank to allocate the full contribution. If set, it must be ≤ the contribution amount.
+                    </p>
+                  </div>
+                )}
                 <div className="sm:col-span-2">
                   <label className="block text-sm sm:text-base font-semibold ds-text-secondary mb-1 leading-normal">Notes</label>
                   <input
@@ -764,13 +851,13 @@ export default function InvestorDetailPage() {
               <p className="mb-3">
                 {investor.status === 'ARCHIVED' ? (
                   <>
-                    Are you sure you want to permanently delete <strong>"{investor.name}"</strong>?
+                    Are you sure you want to permanently delete <strong>&quot;{investor.name}&quot;</strong>?
                     <br />
                     <span className="text-red-600 font-medium">This action cannot be undone.</span>
                   </>
                 ) : (
                   <>
-                    What would you like to do with <strong>"{investor.name}"</strong>?
+                    What would you like to do with <strong>&quot;{investor.name}&quot;</strong>?
                   </>
                 )}
               </p>

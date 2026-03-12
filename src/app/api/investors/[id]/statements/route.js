@@ -4,6 +4,8 @@
  * 
  * GET /api/investors/[id]/statements
  * Query params: startDate, endDate, format (json|pdf|excel)
+ * Optional query params:
+ * - projectIds: comma-separated project IDs to scope the statement to (e.g. projectIds=...,...)
  */
 
 import { NextResponse } from 'next/server';
@@ -51,6 +53,7 @@ export async function GET(request, { params }) {
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
     const format = searchParams.get('format') || 'json';
+    const projectIdsParam = searchParams.get('projectIds'); // comma-separated list
 
     const db = await getDatabase();
 
@@ -108,14 +111,38 @@ export async function GET(request, { params }) {
 
     // Get investor's project allocations
     const investorAllocations = investor.projectAllocations || [];
+    const requestedProjectIds = (projectIdsParam || '')
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const selectedProjectIds = requestedProjectIds.filter((pid) => ObjectId.isValid(pid));
+    const isScopedToProjects = selectedProjectIds.length > 0;
+    const selectedProjectIdSet = new Set(selectedProjectIds.map((pid) => new ObjectId(pid).toString()));
+    const statementScope = {
+      mode: isScopedToProjects ? 'selected_projects' : 'all_projects',
+      projectIds: isScopedToProjects ? selectedProjectIds : null,
+      projects: [],
+    };
     
     let investorCapitalUsed = 0;
     let investorTotalAllocated = 0;
     const projectBreakdown = [];
 
     if (investorAllocations.length > 0) {
+      const allocationsToProcess = isScopedToProjects
+        ? investorAllocations.filter((allocation) => {
+            if (!allocation?.projectId) return false;
+            const allocPid = ObjectId.isValid(allocation.projectId)
+              ? new ObjectId(allocation.projectId).toString()
+              : allocation.projectId instanceof ObjectId
+                ? allocation.projectId.toString()
+                : null;
+            return allocPid ? selectedProjectIdSet.has(allocPid) : false;
+          })
+        : investorAllocations;
+
       // Calculate based on project-specific allocations - REAL-TIME from actual spending
-      for (const allocation of investorAllocations) {
+      for (const allocation of allocationsToProcess) {
         if (allocation.projectId && ObjectId.isValid(allocation.projectId)) {
           const projectId = new ObjectId(allocation.projectId);
           const allocatedAmount = allocation.amount || 0;
@@ -224,15 +251,23 @@ export async function GET(request, { params }) {
             projectTotalInvested, // Real-time calculated
             lastUpdated: new Date(), // Mark as real-time
           });
+
+          if (project) {
+            statementScope.projects.push({
+              projectId: projectId.toString(),
+              projectName: project.projectName,
+              projectCode: project.projectCode || null,
+            });
+          }
         }
       }
     } else {
       // Fallback: Use proportional calculation across all projects (backward compatibility)
       // Calculate REAL-TIME from actual spending
-      const allProjects = await db
-        .collection('projects')
-        .find({})
-        .toArray();
+      const projectQuery = isScopedToProjects
+        ? { _id: { $in: selectedProjectIds.map((pid) => new ObjectId(pid)) } }
+        : {};
+      const allProjects = await db.collection('projects').find(projectQuery).toArray();
 
       let totalInvested = 0;
       let totalUsed = 0;
@@ -290,12 +325,28 @@ export async function GET(request, { params }) {
           (expensesTotal[0]?.total || 0) +
           (materialsTotal[0]?.total || 0) +
           (initialExpensesTotal[0]?.total || 0);
+
+        if (isScopedToProjects) {
+          statementScope.projects.push({
+            projectId: projectId.toString(),
+            projectName: project.projectName,
+            projectCode: project.projectCode || null,
+          });
+        }
       }
 
       const investorShare = totalInvested > 0 ? (investor.totalInvested / totalInvested) : 0;
       investorCapitalUsed = totalUsed * investorShare;
       investorTotalAllocated = investor.totalInvested;
     }
+
+    // In scoped mode, show totals for only the selected project allocations
+    // (this matches user intent: "amounts used in X/Y projects")
+    const totalCommittedInScope = projectBreakdown.reduce((sum, proj) => sum + (proj.capitalCommitted || 0), 0);
+    const totalAllocatedInScope = isScopedToProjects
+      ? investorTotalAllocated
+      : (investorTotalAllocated || investor.totalInvested);
+    const totalInvestedForStatement = isScopedToProjects ? totalAllocatedInScope : investor.totalInvested;
 
     // Build statement
     const statement = {
@@ -307,6 +358,7 @@ export async function GET(request, { params }) {
         investmentType: investor.investmentType,
         status: investor.status,
       },
+      scope: statementScope,
       period: {
         startDate: startDate || null,
         endDate: endDate || null,
@@ -318,16 +370,17 @@ export async function GET(request, { params }) {
         count: contributions.length,
       },
       capitalUsage: {
-        totalInvested: investor.totalInvested,
-        totalAllocated: investorTotalAllocated || investor.totalInvested,
-        unallocated: Math.max(0, investor.totalInvested - (investorTotalAllocated || investor.totalInvested)),
+        totalInvested: totalInvestedForStatement,
+        totalInvestedOverall: investor.totalInvested,
+        totalAllocated: totalAllocatedInScope,
+        unallocated: isScopedToProjects ? 0 : Math.max(0, investor.totalInvested - (investorTotalAllocated || investor.totalInvested)),
         capitalUsed: investorCapitalUsed,
         // NEW: Calculate total committed across all projects
-        capitalCommitted: projectBreakdown.reduce((sum, proj) => sum + (proj.capitalCommitted || 0), 0),
-        capitalBalance: (investorTotalAllocated || investor.totalInvested) - investorCapitalUsed - projectBreakdown.reduce((sum, proj) => sum + (proj.capitalCommitted || 0), 0), // Updated to include committed
-        available: (investorTotalAllocated || investor.totalInvested) - investorCapitalUsed - projectBreakdown.reduce((sum, proj) => sum + (proj.capitalCommitted || 0), 0), // Available = Allocated - Used - Committed
-        usagePercentage: (investorTotalAllocated || investor.totalInvested) > 0 
-          ? ((investorCapitalUsed / (investorTotalAllocated || investor.totalInvested)) * 100).toFixed(2)
+        capitalCommitted: totalCommittedInScope,
+        capitalBalance: totalAllocatedInScope - investorCapitalUsed - totalCommittedInScope, // Allocated - Used - Committed
+        available: totalAllocatedInScope - investorCapitalUsed - totalCommittedInScope,
+        usagePercentage: totalAllocatedInScope > 0 
+          ? ((investorCapitalUsed / totalAllocatedInScope) * 100).toFixed(2)
           : 0,
         projectBreakdown: projectBreakdown.length > 0 ? projectBreakdown : undefined,
       },
@@ -342,7 +395,8 @@ export async function GET(request, { params }) {
         const pdfBuffer = generatePDFStatement(statement);
         const investorName = investor.name.replace(/[^a-zA-Z0-9]/g, '_');
         const dateStr = new Date().toISOString().split('T')[0];
-        const filename = `Investor_Statement_${investorName}_${dateStr}.pdf`;
+        const scopeSuffix = statementScope.mode === 'selected_projects' ? '_Scoped' : '';
+        const filename = `Investor_Statement_${investorName}${scopeSuffix}_${dateStr}.pdf`;
 
         return new NextResponse(pdfBuffer, {
           status: 200,
@@ -361,7 +415,8 @@ export async function GET(request, { params }) {
         const excelBuffer = await generateExcelStatement(statement);
         const investorName = investor.name.replace(/[^a-zA-Z0-9]/g, '_');
         const dateStr = new Date().toISOString().split('T')[0];
-        const filename = `Investor_Statement_${investorName}_${dateStr}.xlsx`;
+        const scopeSuffix = statementScope.mode === 'selected_projects' ? '_Scoped' : '';
+        const filename = `Investor_Statement_${investorName}${scopeSuffix}_${dateStr}.xlsx`;
 
         return new NextResponse(excelBuffer, {
           status: 200,
