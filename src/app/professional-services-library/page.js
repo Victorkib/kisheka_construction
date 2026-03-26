@@ -16,6 +16,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { getProfessionalTypeLabel } from '@/lib/professional-services-helpers';
 
 function ProfessionalServicesLibraryPageContent() {
   const router = useRouter();
@@ -216,13 +217,13 @@ function ProfessionalServicesLibraryPageContent() {
   };
 
   const getTypeBadgeColor = (type) => {
-    return type === 'architect' 
-      ? 'ds-bg-accent-subtle ds-text-accent-primary'
-      : 'ds-bg-success/10 ds-text-success';
+    if (type === 'architect') return 'ds-bg-accent-subtle ds-text-accent-primary';
+    if (type === 'engineer') return 'ds-bg-success/10 ds-text-success';
+    return 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getTypeLabel = (type) => {
-    return type === 'architect' ? 'Architect' : 'Engineer';
+    return getProfessionalTypeLabel(type);
   };
 
   return (
@@ -240,7 +241,7 @@ function ProfessionalServicesLibraryPageContent() {
               Library
             </h1>
             <p className="ds-text-secondary mt-2">
-              Manage architects and engineers for quick assignment to projects
+              Manage professional services for quick assignment to projects
             </p>
           </div>
           {canAccess('manage_professional_services_library') && (
@@ -283,6 +284,14 @@ function ProfessionalServicesLibraryPageContent() {
                 <option value="">All Types</option>
                 <option value="architect">Architects</option>
                 <option value="engineer">Engineers</option>
+                <option value="quantity_surveyor">Quantity Surveyors</option>
+                <option value="land_surveyor">Land Surveyors</option>
+                <option value="interior_designer">Interior Designers</option>
+                <option value="project_manager">Project Managers</option>
+                <option value="nema_consultant">NEMA Consultants</option>
+                <option value="geotechnical_engineer">Geotechnical Engineers</option>
+                <option value="mep_engineer">MEP Engineers</option>
+                <option value="fire_safety_consultant">Fire Safety Consultants</option>
               </select>
             </div>
 

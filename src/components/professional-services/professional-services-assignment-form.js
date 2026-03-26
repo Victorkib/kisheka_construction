@@ -12,6 +12,7 @@ import {
   VISIT_FREQUENCIES,
   PAYMENT_STATUSES,
 } from '@/lib/constants/professional-services-constants';
+import { getProfessionalTypeLabel } from '@/lib/professional-services-helpers';
 import { CloudinaryUploadWidget } from '@/components/uploads/cloudinary-upload-widget';
 import { ContractValueCalculator } from './ContractValueCalculator';
 
@@ -40,6 +41,7 @@ export function ProfessionalServicesAssignmentForm({
     contractValue: '',
     paymentSchedule: '',
     visitFrequency: '',
+    floorsCount: '',
     contractStartDate: new Date().toISOString().split('T')[0],
     contractEndDate: '',
     contractDocumentUrl: '',
@@ -63,6 +65,7 @@ export function ProfessionalServicesAssignmentForm({
   // Load initial data if editing
   useEffect(() => {
     if (initialData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData({
         libraryId: initialData.libraryId?.toString() || initialData.library?._id?.toString() || '',
         projectId: initialData.projectId?.toString() || initialData.project?._id?.toString() || '',
@@ -73,6 +76,7 @@ export function ProfessionalServicesAssignmentForm({
         contractValue: initialData.contractValue?.toString() || '',
         paymentSchedule: initialData.paymentSchedule || '',
         visitFrequency: initialData.visitFrequency || '',
+        floorsCount: initialData.floorsCount?.toString?.() || '',
         contractStartDate: initialData.contractStartDate ? new Date(initialData.contractStartDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         contractEndDate: initialData.contractEndDate ? new Date(initialData.contractEndDate).toISOString().split('T')[0] : '',
         contractDocumentUrl: initialData.contractDocumentUrl || '',
@@ -98,6 +102,7 @@ export function ProfessionalServicesAssignmentForm({
     if (formData.libraryId) {
       const prof = professionals.find(p => p._id?.toString() === formData.libraryId);
       if (prof) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedProfessional(prof);
         // Pre-fill defaults from library
         if (!isEdit) {
@@ -119,6 +124,7 @@ export function ProfessionalServicesAssignmentForm({
     if (isEdit || !presetLibraryId || formData.libraryId) return;
     const exists = professionals.some((p) => p._id?.toString() === presetLibraryId);
     if (exists) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setFormData((prev) => ({ ...prev, libraryId: presetLibraryId }));
     }
   }, [presetLibraryId, professionals, isEdit, formData.libraryId]);
@@ -229,9 +235,11 @@ export function ProfessionalServicesAssignmentForm({
 
   const getContractTypes = () => {
     if (!selectedProfessional) return CONTRACT_TYPES.ALL;
-    return selectedProfessional.type === 'architect' 
-      ? CONTRACT_TYPES.ARCHITECT 
-      : CONTRACT_TYPES.ENGINEER;
+    return selectedProfessional.type === 'architect'
+      ? CONTRACT_TYPES.ARCHITECT
+      : selectedProfessional.type === 'engineer'
+        ? CONTRACT_TYPES.ENGINEER
+        : CONTRACT_TYPES.ALL;
   };
 
   const formatCurrency = (amount) => {
@@ -280,7 +288,7 @@ export function ProfessionalServicesAssignmentForm({
                 .filter((p) => p.isActive && !p.deletedAt)
                 .map((professional) => (
                   <option key={professional._id} value={professional._id}>
-                    {professional.name} ({professional.type === 'architect' ? 'Architect' : 'Engineer'})
+                    {professional.name} ({getProfessionalTypeLabel(professional.type)})
                   </option>
                 ))}
             </select>
@@ -392,6 +400,7 @@ export function ProfessionalServicesAssignmentForm({
               contractStartDate={formData.contractStartDate}
               contractEndDate={formData.contractEndDate || null}
               visitFrequency={formData.visitFrequency || null}
+              floorsCount={formData.floorsCount || null}
               currentContractValue={formData.contractValue}
               onSuggestedValueChange={(value) => {
                 setSuggestedContractValue(value);
@@ -512,6 +521,27 @@ export function ProfessionalServicesAssignmentForm({
                   </option>
                 ))}
               </select>
+            </div>
+          )}
+
+          {formData.paymentSchedule === 'per_floor' && (
+            <div>
+              <label className="block text-sm font-semibold ds-text-secondary mb-1">
+                Floors Count (for estimation)
+              </label>
+              <input
+                type="number"
+                name="floorsCount"
+                value={formData.floorsCount}
+                onChange={handleChange}
+                placeholder="e.g. 10"
+                min="1"
+                step="1"
+                className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
+              />
+              <p className="mt-1 text-xs ds-text-muted">
+                Used only to suggest a contract value for per-floor contracts. You can leave it blank and enter contract value manually.
+              </p>
             </div>
           )}
         </div>

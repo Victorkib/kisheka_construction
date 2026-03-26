@@ -23,6 +23,7 @@ export function ContractValueCalculator({
   contractStartDate,
   contractEndDate,
   visitFrequency,
+  floorsCount,
   currentContractValue,
   onSuggestedValueChange,
   className = '',
@@ -63,6 +64,7 @@ export function ContractValueCalculator({
             contractStartDate,
             contractEndDate: contractEndDate || null,
             visitFrequency: visitFrequency || null,
+            floorsCount: floorsCount || null,
           }),
         });
 
@@ -89,7 +91,7 @@ export function ContractValueCalculator({
     // Debounce calculation
     const timeoutId = setTimeout(calculateValue, 500);
     return () => clearTimeout(timeoutId);
-  }, [professional, paymentSchedule, contractType, contractStartDate, contractEndDate, visitFrequency, onSuggestedValueChange]);
+  }, [professional, paymentSchedule, contractType, contractStartDate, contractEndDate, visitFrequency, floorsCount, onSuggestedValueChange]);
 
   // Don't show if manual entry schedule
   if (['lump_sum', 'milestone', 'percentage'].includes(paymentSchedule)) {
@@ -215,7 +217,7 @@ export function ContractValueCalculator({
               <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50 border border-blue-400/60">
                 <Sparkles className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
                 <p className="text-xs text-blue-800">
-                  <span className="font-medium">Tip:</span> Click "Use Suggested Value" to apply this amount to the contract value field, or enter your own value.
+                  <span className="font-medium">Tip:</span> Click &quot;Use Suggested Value&quot; to apply this amount to the contract value field, or enter your own value.
                 </p>
               </div>
 

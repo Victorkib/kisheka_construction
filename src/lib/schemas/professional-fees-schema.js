@@ -13,6 +13,7 @@ import {
   CURRENCIES as CURRENCIES_CONST,
   APPROVAL_CHAIN_STATUSES as APPROVAL_CHAIN_STATUSES_CONST,
 } from '@/lib/constants/professional-fees-constants';
+import { getProfessionalTypeCodePrefix } from '@/lib/professional-services-helpers';
 
 /**
  * Professional Fees Schema
@@ -164,15 +165,28 @@ export function validateProfessionalFee(data, professionalService = null) {
     errors.push('Amount is required and must be greater than 0');
   }
 
+  // If the linked professional service uses per-floor billing, require a floorId
+  if (professionalService && professionalService.paymentSchedule === 'per_floor') {
+    if (!data.floorId || !ObjectId.isValid(data.floorId)) {
+      errors.push('Floor is required for fees on per-floor professional services');
+    }
+  }
+
   // Validate fee type matches professional type (if professional service provided)
+  // Backwards compatible: architect/engineer keep strict lists; new types fall back to ALL
   if (professionalService) {
-    const professionalType = professionalService.type; // 'architect' or 'engineer'
-    const validTypes = professionalType === 'architect' 
-      ? FEE_TYPES.ARCHITECT 
-      : FEE_TYPES.ENGINEER;
-    
+    const professionalType = professionalService.type;
+    const validTypes =
+      professionalType === 'architect'
+        ? FEE_TYPES.ARCHITECT
+        : professionalType === 'engineer'
+          ? FEE_TYPES.ENGINEER
+          : FEE_TYPES.ALL;
+
     if (!validTypes.includes(data.feeType)) {
-      errors.push(`Fee type '${data.feeType}' is not valid for ${professionalType}. Valid types: ${validTypes.join(', ')}`);
+      errors.push(
+        `Fee type '${data.feeType}' is not valid for ${professionalType}. Valid types: ${validTypes.join(', ')}`
+      );
     }
   }
 
@@ -228,7 +242,7 @@ export function validateProfessionalFee(data, professionalService = null) {
  * @returns {string} Fee code (e.g., "FEE-ARCH-001" or "FEE-ENG-001")
  */
 export function generateFeeCode(type, sequence) {
-  const prefix = type === 'architect' ? 'ARCH' : 'ENG';
+  const prefix = getProfessionalTypeCodePrefix(type);
   const sequenceStr = String(sequence).padStart(6, '0');
   return `FEE-${prefix}-${sequenceStr}`;
 }

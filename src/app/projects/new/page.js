@@ -13,7 +13,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { useToast } from '@/components/toast';
-import { EnhancedBudgetInput } from '@/components/budget/EnhancedBudgetInput';
+import { SmartBudgetInput } from '@/components/budget/SmartBudgetInput';
 import { useProjectContext } from '@/contexts/ProjectContext';
 
 export default function NewProjectPage() {
@@ -42,31 +42,32 @@ export default function NewProjectPage() {
       preConstructionCosts: 0,
       indirectCosts: 0,
       contingencyReserve: 0,
-      directCosts: {
+      // Keep detailed breakdowns for backward compatibility
+      _detailedBreakdown: {
         materials: { total: 0, structural: 0, finishing: 0, mep: 0, specialty: 0 },
         labour: { total: 0, skilled: 0, unskilled: 0, supervisory: 0, specialized: 0 },
         equipment: { total: 0, rental: 0, purchase: 0, maintenance: 0 },
-        subcontractors: { total: 0, specializedTrades: 0, professionalServices: 0 }
-      },
-      preConstruction: {
-        total: 0,
-        landAcquisition: 0,
-        legalRegulatory: 0,
-        permitsApprovals: 0,
-        sitePreparation: 0
-      },
-      indirect: {
-        total: 0,
-        siteOverhead: 0,
-        transportation: 0,
-        utilities: 0,
-        safetyCompliance: 0
-      },
-      contingency: {
-        total: 0,
-        designContingency: 0,
-        constructionContingency: 0,
-        ownersReserve: 0
+        subcontractors: { total: 0, specializedTrades: 0, professionalServices: 0 },
+        preConstruction: {
+          total: 0,
+          landAcquisition: 0,
+          legalRegulatory: 0,
+          permitsApprovals: 0,
+          sitePreparation: 0,
+        },
+        indirect: {
+          total: 0,
+          siteOverhead: 0,
+          transportation: 0,
+          utilities: 0,
+          safetyCompliance: 0,
+        },
+        contingency: {
+          total: 0,
+          designContingency: 0,
+          constructionContingency: 0,
+          ownersReserve: 0,
+        },
       }
     },
     siteManager: '',
@@ -159,6 +160,27 @@ export default function NewProjectPage() {
         [name]: value,
       }));
     }
+  };
+
+  // Detect project type based on project name/description for smart budget suggestions
+  const detectProjectType = () => {
+    const { projectName, description } = formData;
+    const text = `${projectName} ${description}`.toLowerCase();
+    
+    if (text.includes('commercial') || text.includes('office') || text.includes('shop') || text.includes('mall') || text.includes('business')) {
+      return 'commercial';
+    }
+    if (text.includes('infrastructure') || text.includes('road') || text.includes('bridge') || text.includes('highway') || text.includes('public')) {
+      return 'infrastructure';
+    }
+    return 'residential'; // Default
+  };
+
+  const detectedProjectType = detectProjectType();
+
+  const handleProjectTypeChange = (newType) => {
+    // You could store this in formData or use it for other logic
+    console.log('Project type changed to:', newType);
   };
 
   const handleBudgetChange = (budgetData) => {
@@ -376,7 +398,7 @@ export default function NewProjectPage() {
     return (
       <AppLayout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-yellow-50 border border-yellow-400/60 text-yellow-700 px-4 py-3 rounded mb-6">
+          <div className="ds-bg-warning/10 ds-border-warning/40 ds-text-warning px-4 py-3 rounded mb-6">
             <p className="font-semibold">Access Denied</p>
             <p>You do not have permission to create projects. Only Project Managers and Owners can create projects.</p>
           </div>
@@ -458,19 +480,19 @@ export default function NewProjectPage() {
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-md p-4 flex items-start gap-3">
+            <div className="mb-6 ds-bg-danger/10 ds-border-danger/40 ds-text-danger rounded-lg shadow-md p-4 flex items-start gap-3">
               <div className="flex-shrink-0">
-                <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 ds-text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-red-800 text-base">Error</p>
-                <p className="text-red-700 mt-1">{error}</p>
+                <p className="font-semibold ds-text-danger text-base">Error</p>
+                <p className="ds-text-danger mt-1">{error}</p>
               </div>
               <button
                 onClick={() => setError(null)}
-                className="flex-shrink-0 text-red-500 hover:text-red-700 transition-colors"
+                className="flex-shrink-0 ds-text-danger hover:ds-text-danger/80 transition-colors"
                 aria-label="Dismiss error"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -816,10 +838,10 @@ export default function NewProjectPage() {
                 </div>
 
                 {budgetMode === 'later' ? (
-                  <div className="mt-2 rounded-lg border border-blue-100 bg-blue-50 p-4">
+                  <div className="mt-2 rounded-lg border ds-border-accent-subtle ds-bg-accent-subtle p-4">
                     <div className="flex items-start gap-3">
                       <svg
-                        className="h-5 w-5 flex-shrink-0 text-blue-500 mt-0.5"
+                        className="h-5 w-5 flex-shrink-0 ds-text-accent-primary mt-0.5"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -832,20 +854,20 @@ export default function NewProjectPage() {
                         />
                       </svg>
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-blue-900">
+                        <p className="text-sm font-semibold ds-text-primary">
                           No budget for now – you can still create and operate the project
                         </p>
-                        <p className="mt-1 text-sm text-blue-800">
+                        <p className="mt-1 text-sm ds-text-secondary">
                           The project will start with a zero budget. All material requests, labour, and expenses will still be tracked normally.
                           When you are ready, you can:
                         </p>
-                        <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-blue-900">
+                        <ul className="mt-2 list-disc space-y-1 pl-5 text-xs ds-text-secondary">
                           <li>Set the overall project budget from the <strong>Project Finances</strong> page.</li>
                           <li>Allocate Direct Construction Costs (DCC) to phases from the <strong>Phases</strong> pages.</li>
                           <li>Capture pre-construction costs as <strong>Initial Expenses</strong> for better separation.</li>
                         </ul>
                         {formData.autoInitializePhases && (
-                          <p className="mt-2 text-xs text-blue-900">
+                          <p className="mt-2 text-xs ds-text-secondary">
                             Phases will be created with zero budgets. You can allocate DCC to each phase later; all spending will be visible even before budgets are set.
                           </p>
                         )}
@@ -854,26 +876,43 @@ export default function NewProjectPage() {
                   </div>
                 ) : (
                   <>
-                    <EnhancedBudgetInput
+                    {/* Project Type Detection Indicator */}
+                    <div className="mb-4 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                          <span className="text-sm font-medium text-blue-700">
+                            Project Type Detected: <span className="font-bold text-blue-900 capitalize">{detectedProjectType}</span>
+                          </span>
+                        </div>
+                        <div className="text-xs text-blue-600">
+                          Budget suggestions optimized for {detectedProjectType} projects
+                        </div>
+                      </div>
+                    </div>
+
+                    <SmartBudgetInput
                       value={formData.budget}
                       onChange={handleBudgetChange}
-                      showAdvanced={true}
+                      projectType={detectedProjectType} // Use detected project type
+                      onProjectTypeChange={handleProjectTypeChange}
+                      showAdvanced={false} // Start simplified for better UX
                     />
                     {/* Budget validation warning and phase preview */}
                     {(() => {
                       const budgetTotal = parseFloat(formData.budget?.total || 0);
                       if (budgetTotal === 0 || isNaN(budgetTotal)) {
                         return (
-                          <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-3 mt-3">
+                          <div className="ds-bg-warning/10 ds-border-warning/40 rounded-lg p-3 mt-3">
                             <div className="flex items-start gap-2">
-                              <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <svg className="w-5 h-5 ds-text-warning flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                               </svg>
                               <div>
-                                <p className="text-sm font-medium text-yellow-800">
+                                <p className="text-sm font-medium ds-text-warning">
                                   Zero Budget Warning
                                 </p>
-                                <p className="text-sm text-yellow-700 mt-1">
+                                <p className="text-sm ds-text-warning mt-1">
                                   Project budget is zero. You can still use the system – all operations will be allowed and spending will be tracked. 
                                   Set a budget later to enable budget validation and better financial control.
                                   {formData.autoInitializePhases && ' Phases will be initialized with zero budget allocations (can be allocated later).'}
@@ -903,10 +942,10 @@ export default function NewProjectPage() {
                         
                         // Phase allocations based on DCC only (pre-construction tracked separately via initial_expenses)
                         const phaseAllocations = {
-                          basement: dccBudget * 0.15,            // 15% of DCC
-                          superstructure: dccBudget * 0.65,      // 65% of DCC
-                          finishing: dccBudget * 0.15,           // 15% of DCC
-                          finalSystems: dccBudget * 0.05         // 5% of DCC
+                          basement: dccBudget * 0.15, // 15% of DCC
+                          superstructure: dccBudget * 0.65, // 65% of DCC
+                          finishing: dccBudget * 0.15, // 15% of DCC
+                          finalSystems: dccBudget * 0.05, // 5% of DCC
                           // Total: 100% of DCC (not total budget)
                         };
                         const totalPhaseBudgets = Object.values(phaseAllocations).reduce((sum, val) => sum + val, 0);
@@ -915,14 +954,14 @@ export default function NewProjectPage() {
     {/* Header */}
     <div className="flex items-start justify-between mb-4">
       <div className="flex items-center gap-3">
-        <div className="bg-blue-600 rounded-lg p-2">
+        <div className="ds-bg-accent-primary rounded-lg p-2">
           <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
         </div>
         <div>
-          <h3 className="text-base font-bold text-blue-400">Phase Budget Preview (Auto-Initialized)</h3>
-          <p className="text-xs text-slate-400 mt-1">Standard construction phases with industry-based allocations</p>
+          <h3 className="text-base font-bold ds-text-accent-primary">Phase Budget Preview (Auto-Initialized)</h3>
+          <p className="text-xs ds-text-secondary mt-1">Standard construction phases with industry-based allocations</p>
         </div>
       </div>
     </div>
@@ -1267,7 +1306,7 @@ export default function NewProjectPage() {
                       </div>
                       <div className="flex-1">
                         <label htmlFor="autoInitializePhases" className="block text-sm font-semibold ds-text-primary mb-1 cursor-pointer">
-                          Auto-initialize Default Phases <span className="text-indigo-600">(Recommended)</span>
+                          Auto-initialize Default Phases <span className="ds-text-accent-primary">(Recommended)</span>
                         </label>
                         <p className="text-xs ds-text-secondary mb-3">
                           Automatically create 4 default construction phases (Basement, Superstructure, Finishing, Final Systems) with automatic budget allocation from Direct Construction Costs (DCC). Pre-construction costs are tracked separately via initial expenses. This enables phase-based budget tracking and financial management.
@@ -1276,16 +1315,16 @@ export default function NewProjectPage() {
                     const budgetTotal = parseFloat(formData.budget?.total || 0);
                     if (budgetTotal === 0 || isNaN(budgetTotal)) {
                       return (
-                        <div className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-3 mt-2">
+                        <div className="ds-bg-warning/10 ds-border-warning/40 rounded-lg p-3 mt-2">
                           <div className="flex items-start gap-2">
-                            <svg className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-5 h-5 ds-text-warning flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                             </svg>
                             <div>
-                              <p className="text-sm font-medium text-yellow-800">
+                              <p className="text-sm font-medium ds-text-warning">
                                 Phases Will Be Initialized Without Budget Allocation
                               </p>
-                              <p className="text-sm text-yellow-700 mt-1">
+                              <p className="text-sm ds-text-warning mt-1">
                                 Phases will be created with zero budget allocations. You can allocate budget to phases later. All spending will still be tracked regardless of budget.
                               </p>
                             </div>

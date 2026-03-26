@@ -28,6 +28,7 @@ function FloorBudgetAllocationContent() {
   const [suggestions, setSuggestions] = useState([]);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [floorBudgets, setFloorBudgets] = useState({}); // Moved to top with other state
 
   useEffect(() => {
     if (phaseId) {
@@ -248,7 +249,7 @@ function FloorBudgetAllocationContent() {
     );
   }
 
-  const [floorBudgets, setFloorBudgets] = useState({});
+  // Removed duplicate useState - floorBudgets is now at top with other state
 
   useEffect(() => {
     // Fetch actual spending for each floor
@@ -288,19 +289,7 @@ function FloorBudgetAllocationContent() {
     }
   }, [allocations, phase]);
 
-  if (!phase) {
-    return (
-      <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="ds-bg-surface rounded-lg shadow p-6">
-            <p className="ds-text-secondary">Phase not found.</p>
-          </div>
-        </div>
-      </AppLayout>
-    );
-  }
-
-  const phaseBudget = phase.budgetAllocation?.total || 0;
+  const phaseBudget = phase?.budgetAllocation?.total || 0;
   const totalAllocated = allocations.reduce((sum, alloc) => sum + (alloc.total || 0), 0);
   const remainingUnallocated = phaseBudget - totalAllocated;
   const isOverAllocated = totalAllocated > phaseBudget;

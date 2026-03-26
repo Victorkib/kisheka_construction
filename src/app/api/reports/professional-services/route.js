@@ -13,7 +13,7 @@ import { getUserProfile } from '@/lib/auth-helpers';
 import { hasPermission } from '@/lib/role-helpers';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
-import { calculateProjectProfessionalServicesStats, getProjectProfessionalServicesBreakdown } from '@/lib/professional-services-helpers';
+import { calculateProjectProfessionalServicesStats, getProjectProfessionalServicesBreakdown } from '@/lib/professional-services-stats';
 
 /**
  * GET /api/reports/professional-services
@@ -152,6 +152,35 @@ export async function GET(request) {
       })
       .reduce((sum, fee) => sum + (fee.amount || 0), 0);
 
+    // Per-floor analytics
+    const perFloorAssignments = assignments.filter(a => a.paymentSchedule === 'per_floor');
+    const perFloorAssignmentIds = perFloorAssignments.map(a => a._id.toString());
+
+    const perFloorFees = activeFees.filter(fee =>
+      perFloorAssignmentIds.includes(fee.professionalServiceId?.toString())
+    );
+
+    const feesByFloor = {};
+    perFloorFees.forEach((fee) => {
+      const key = fee.floorId ? fee.floorId.toString() : 'unassigned';
+      if (!feesByFloor[key]) {
+        feesByFloor[key] = {
+          floorId: fee.floorId ? fee.floorId.toString() : null,
+          total: 0,
+          count: 0,
+        };
+      }
+      feesByFloor[key].total += fee.amount || 0;
+      feesByFloor[key].count += 1;
+    });
+
+    const perFloorCoverage = {
+      totalPerFloorAssignments: perFloorAssignments.length,
+      withAnyFee: new Set(
+        perFloorFees.map((fee) => fee.professionalServiceId?.toString()).filter(Boolean)
+      ).size,
+    };
+
     // Activity breakdown by month
     const activitiesByMonth = {};
     filteredActivities.forEach(activity => {
@@ -223,32 +252,41 @@ export async function GET(request) {
       })
     );
 
-    return successResponse({
-      summary: {
-        totalAssignments,
-        architectsCount,
-        engineersCount,
-        totalActivities,
-        siteVisits,
-        inspections,
-        designRevisions,
-        qualityChecks,
-        totalFees,
-        paidFees,
-        pendingFees,
-        architectFees,
-        engineerFees,
+    return successResponse(
+      {
+        summary: {
+          totalAssignments,
+          architectsCount,
+          engineersCount,
+          totalActivities,
+          siteVisits,
+          inspections,
+          designRevisions,
+          qualityChecks,
+          totalFees,
+          paidFees,
+          pendingFees,
+          architectFees,
+          engineerFees,
+        },
+        activitiesByMonth: Object.values(activitiesByMonth).sort((a, b) =>
+          a.month.localeCompare(b.month)
+        ),
+        feesByMonth: Object.values(feesByMonth).sort((a, b) => a.month.localeCompare(b.month)),
+        breakdown,
+        perFloor: {
+          feesByFloor: Object.values(feesByFloor),
+          coverage: perFloorCoverage,
+        },
+        filters: {
+          projectId: projectId || null,
+          startDate: startDate || null,
+          endDate: endDate || null,
+          type,
+        },
       },
-      activitiesByMonth: Object.values(activitiesByMonth).sort((a, b) => a.month.localeCompare(b.month)),
-      feesByMonth: Object.values(feesByMonth).sort((a, b) => a.month.localeCompare(b.month)),
-      breakdown,
-      filters: {
-        projectId: projectId || null,
-        startDate: startDate || null,
-        endDate: endDate || null,
-        type,
-      },
-    }, 'Professional services report generated successfully');
+      'Professional services report generated successfully'
+    );
   } catch (error) {
     console.error('Professional services report error:', error);
     return errorResponse('Failed to generate professional services report', 500);

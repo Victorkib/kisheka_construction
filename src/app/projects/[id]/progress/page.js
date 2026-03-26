@@ -13,6 +13,8 @@ import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { ProgressPhotoUpload } from '@/components/progress/photo-upload';
 import { MilestoneTracker } from '@/components/progress/milestone-tracker';
+import { EvidenceComposer } from '@/components/progress/evidence-composer';
+import { EvidenceFeed } from '@/components/progress/evidence-feed';
 import { LoadingButton, LoadingCard } from '@/components/loading';
 import { ImagePreview } from '@/components/uploads/image-preview';
 import { useToast } from '@/components/toast';
@@ -109,7 +111,10 @@ function ProjectProgressPageContent() {
           'Pragma': 'no-cache',
         },
         body: JSON.stringify({
-          notes: dailyUpdateText.trim(),
+          type: 'dailyUpdate',
+          dailyUpdate: {
+            notes: dailyUpdateText.trim(),
+          },
         }),
       });
 
@@ -186,6 +191,12 @@ function ProjectProgressPageContent() {
               {project.projectName} ({project.projectCode})
             </p>
           )}
+          <p className="text-sm ds-text-muted mt-3 max-w-2xl">
+            <span className="font-semibold">Photos</span> are project-level images,&nbsp;
+            <span className="font-semibold">Milestones</span> track key checkpoints,&nbsp;
+            <span className="font-semibold">Daily Updates</span> are your text logbook, and&nbsp;
+            <span className="font-semibold">Evidence</span> is the unified stream of notes and photos used across project, phases, and floors.
+          </p>
         </div>
 
         {/* Tabs */}
@@ -220,6 +231,16 @@ function ProjectProgressPageContent() {
               }`}
             >
               Daily Updates ({progress.dailyUpdates?.length || 0})
+            </button>
+            <button
+              onClick={() => setActiveTab('evidence')}
+              className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                activeTab === 'evidence'
+                  ? 'border-ds-accent-primary ds-text-accent-primary'
+                  : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+              }`}
+            >
+              Evidence
             </button>
           </nav>
         </div>
@@ -337,6 +358,14 @@ function ProjectProgressPageContent() {
                   </div>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Evidence Tab */}
+          {activeTab === 'evidence' && (
+            <div className="space-y-6">
+              <EvidenceComposer projectId={projectId} />
+              <EvidenceFeed projectId={projectId} />
             </div>
           )}
         </div>

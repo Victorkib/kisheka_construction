@@ -17,6 +17,16 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
   const [index, setIndex] = useState(currentIndex || 0);
   const [isZoomed, setIsZoomed] = useState(false);
 
+  const handlePrevious = useCallback(() => {
+    setIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+    setIsZoomed(false);
+  }, [images.length]);
+
+  const handleNext = useCallback(() => {
+    setIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+    setIsZoomed(false);
+  }, [images.length]);
+
   useEffect(() => {
     setIndex(currentIndex || 0);
   }, [currentIndex, isOpen]);
@@ -42,16 +52,6 @@ export function ImageLightbox({ images, currentIndex, isOpen, onClose, onDelete 
       document.body.style.overflow = 'unset';
     };
   }, [isOpen, onClose, handlePrevious, handleNext]);
-
-  const handlePrevious = useCallback(() => {
-    setIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
-    setIsZoomed(false);
-  }, [images.length]);
-
-  const handleNext = useCallback(() => {
-    setIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
-    setIsZoomed(false);
-  }, [images.length]);
 
   const handleImageClick = () => {
     setIsZoomed(!isZoomed);

@@ -61,8 +61,8 @@ export function AppLayout({ children, forceSmartNav = null }) {
         <Header onMenuClick={() => setMobileNavOpen(true)} />
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain">
-          <div className="min-h-full">
+        <main className="flex-1 overflow-y-auto overscroll-contain w-full">
+          <div className="w-full min-h-full">
             {children || (
               <div className="flex items-center justify-center min-h-[400px] p-4">
                 <LoadingSpinner size="lg" text="Loading..." />

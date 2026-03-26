@@ -16,6 +16,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
+import { getProfessionalTypeLabel } from '@/lib/professional-services-helpers';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { useProfessionalPrerequisites } from '@/hooks/use-professional-prerequisites';
 
@@ -223,13 +224,13 @@ function ProfessionalServicesPageContent() {
   };
 
   const getTypeBadgeColor = (type) => {
-    return type === 'architect' 
-      ? 'ds-bg-accent-subtle ds-text-accent-primary'
-      : 'ds-bg-success/10 ds-text-success';
+    if (type === 'architect') return 'ds-bg-accent-subtle ds-text-accent-primary';
+    if (type === 'engineer') return 'ds-bg-success/10 ds-text-success';
+    return 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getTypeLabel = (type) => {
-    return type === 'architect' ? 'Architect' : 'Engineer';
+    return getProfessionalTypeLabel(type);
   };
 
   const getStatusBadgeColor = (status) => {

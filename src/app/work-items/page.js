@@ -17,6 +17,8 @@ import { normalizeProjectId } from '@/lib/utils/project-id-helpers';
 import { NoProjectsEmptyState, NoDataEmptyState } from '@/components/empty-states';
 import PrerequisiteGuide from '@/components/help/PrerequisiteGuide';
 import { useToast } from '@/components/toast';
+import { WorkItemsTimeline } from '@/components/work-items/work-items-timeline';
+import { TableDensityControl, ResponsiveTableWrapper, getDensityClasses } from '@/lib/table-utils';
 
 function WorkItemsPageContent() {
   const router = useRouter();
@@ -32,13 +34,19 @@ function WorkItemsPageContent() {
   const [user, setUser] = useState(null);
   const [canEdit, setCanEdit] = useState(false);
   const [isInfoExpanded, setIsInfoExpanded] = useState(false);
+  const [showTimeline, setShowTimeline] = useState(false);
+  const [tableDensity, setTableDensity] = useState('normal');
   const [filters, setFilters] = useState({
     projectId: searchParams.get('projectId') || currentProjectId || '',
     phaseId: searchParams.get('phaseId') || '',
     status: searchParams.get('status') || '',
     category: searchParams.get('category') || '',
     search: searchParams.get('search') || '',
-    unassigned: searchParams.get('unassigned') === 'true' || false
+    unassigned: searchParams.get('unassigned') === 'true' || false,
+    scope: searchParams.get('scope') || '',
+    floorId: searchParams.get('floorId') || '',
+    dateFrom: searchParams.get('dateFrom') || '',
+    dateTo: searchParams.get('dateTo') || ''
   });
 
   // Define fetchWorkItems BEFORE useEffect that uses it
@@ -58,6 +66,10 @@ function WorkItemsPageContent() {
       if (filters.category) queryParams.set('category', filters.category);
       if (filters.search) queryParams.set('search', filters.search);
       if (filters.unassigned) queryParams.set('unassigned', 'true');
+      if (filters.scope) queryParams.set('scope', filters.scope);
+      if (filters.floorId) queryParams.set('floorId', filters.floorId);
+      if (filters.dateFrom) queryParams.set('dateFrom', filters.dateFrom);
+      if (filters.dateTo) queryParams.set('dateTo', filters.dateTo);
 
       const response = await fetch(`/api/work-items?${queryParams.toString()}`, {
         cache: 'no-store',
@@ -170,13 +182,15 @@ function WorkItemsPageContent() {
   const handleFilterChange = (key, value) => {
     setFilters(prev => {
       const updatedFilters = key === 'projectId'
-        ? { ...prev, projectId: value, phaseId: '' }
+        ? { ...prev, projectId: value, phaseId: '', floorId: '' }
+        : key === 'phaseId'
+        ? { ...prev, phaseId: value, floorId: '' }
         : { ...prev, [key]: value };
-      
+
       // Update URL params
       const params = new URLSearchParams();
       Object.entries(updatedFilters).forEach(([k, v]) => {
-        if (v && v !== false) {
+        if (v && v !== false && v !== '') {
           if (k === 'unassigned' && v === true) {
             params.set(k, 'true');
           } else if (k !== 'unassigned') {
@@ -185,7 +199,7 @@ function WorkItemsPageContent() {
         }
       });
       router.push(`/work-items?${params.toString()}`, { scroll: false });
-      
+
       return updatedFilters;
     });
 
@@ -198,22 +212,22 @@ function WorkItemsPageContent() {
 
   const getStatusColor = (status) => {
     const colors = {
-      'not_started': 'ds-bg-surface-muted ds-text-primary',
-      'in_progress': 'bg-blue-100 text-blue-800',
-      'completed': 'bg-green-100 text-green-800',
-      'blocked': 'bg-red-100 text-red-800',
-      'on_hold': 'bg-yellow-100 text-yellow-800'
+      not_started: 'ds-bg-surface-muted ds-text-primary',
+      in_progress: 'ds-bg-accent-subtle ds-text-accent-primary',
+      completed: 'ds-bg-success/10 ds-text-success',
+      blocked: 'ds-bg-danger/10 ds-text-danger',
+      on_hold: 'ds-bg-warning/10 ds-text-warning',
     };
     return colors[status] || 'ds-bg-surface-muted ds-text-primary';
   };
 
   const getPriorityColor = (priority) => {
     const colors = {
-      1: 'bg-red-100 text-red-800',
-      2: 'bg-orange-100 text-orange-800',
-      3: 'bg-yellow-100 text-yellow-800',
-      4: 'bg-blue-100 text-blue-800',
-      5: 'ds-bg-surface-muted ds-text-primary'
+      1: 'ds-bg-danger/10 ds-text-danger',
+      2: 'ds-bg-warning/10 ds-text-warning',
+      3: 'ds-bg-warning/10 ds-text-warning',
+      4: 'ds-bg-accent-subtle ds-text-accent-primary',
+      5: 'ds-bg-surface-muted ds-text-primary',
     };
     return colors[priority] || 'ds-bg-surface-muted ds-text-primary';
   };
@@ -230,7 +244,7 @@ function WorkItemsPageContent() {
   if (isEmpty) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full px-2 sm:px-4 lg:px-6 py-8">
           <NoProjectsEmptyState />
         </div>
       </AppLayout>
@@ -240,7 +254,7 @@ function WorkItemsPageContent() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="w-full px-2 sm:px-4 lg:px-6 py-8">
           <LoadingTable />
         </div>
       </AppLayout>
@@ -254,23 +268,38 @@ function WorkItemsPageContent() {
 
   return (
     <AppLayout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="w-full px-2 sm:px-4 lg:px-6 py-8">
         <div className="mb-6 sm:mb-8 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center">
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary">Work Items</h1>
             <p className="text-sm sm:text-base ds-text-secondary mt-1">Manage and track work items across phases</p>
           </div>
-          {canEdit && (
-            <Link
-              href={`/work-items/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}${filters.phaseId ? `&phaseId=${filters.phaseId}` : ''}`}
-              className="ds-bg-accent-primary text-white px-4 sm:px-6 py-2.5 rounded-lg hover:ds-bg-accent-hover active:ds-bg-accent-active font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base"
+          <div className="flex gap-2">
+            {canEdit && (
+              <Link
+                href={`/work-items/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}${filters.phaseId ? `&phaseId=${filters.phaseId}` : ''}`}
+                className="ds-bg-accent-primary text-white px-4 sm:px-6 py-2.5 rounded-lg hover:ds-bg-accent-hover active:ds-bg-accent-active font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                New Work Item
+              </Link>
+            )}
+            <button
+              onClick={() => setShowTimeline(!showTimeline)}
+              className={`px-4 sm:px-6 py-2.5 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base ${
+                showTimeline
+                  ? 'ds-bg-accent-primary text-white hover:ds-bg-accent-hover'
+                  : 'ds-bg-surface ds-text-primary border-2 ds-border-subtle hover:ds-bg-surface-muted'
+              }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              New Work Item
-            </Link>
-          )}
+              {showTimeline ? 'Hide Timeline' : 'View Timeline'}
+            </button>
+          </div>
         </div>
 
         <PrerequisiteGuide
@@ -290,13 +319,23 @@ function WorkItemsPageContent() {
           tip="Use the filters below to narrow by phase or status once your project is set."
         />
 
+        {/* Timeline View */}
+        {showTimeline && (
+          <div className="mb-6">
+            <WorkItemsTimeline
+              projectId={filters.projectId || currentProjectId}
+              phaseId={filters.phaseId || null}
+            />
+          </div>
+        )}
+
         {/* Information Card */}
         <div className="ds-bg-accent-subtle rounded-xl border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6 shadow-lg transition-all duration-300">
           <div className="flex items-start gap-3 sm:gap-4">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 sm:w-12 sm:h-12 ds-bg-accent-primary rounded-lg flex items-center justify-center shadow-md">
                 <svg className="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
             </div>
@@ -321,7 +360,6 @@ function WorkItemsPageContent() {
                   </svg>
                 </button>
               </div>
-              
               {isInfoExpanded ? (
                 <div className="space-y-4 animate-fadeIn">
                   <p className="text-sm sm:text-base ds-text-secondary leading-relaxed">
@@ -331,7 +369,7 @@ function WorkItemsPageContent() {
                     <div className="ds-bg-surface/60 rounded-lg p-4 border ds-border-accent-subtle">
                       <h4 className="font-semibold ds-text-primary mb-2 flex items-center gap-2 text-sm sm:text-base">
                         <svg className="w-5 h-5 ds-text-accent-primary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                         Who uses this?
                       </h4>
@@ -378,7 +416,7 @@ function WorkItemsPageContent() {
 
         {/* Filters */}
         <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle p-4 sm:p-6 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <div>
               <label htmlFor="project-filter" className="block text-sm font-semibold ds-text-primary mb-2">
                 Project
@@ -422,6 +460,24 @@ function WorkItemsPageContent() {
             </div>
 
             <div>
+              <label htmlFor="scope-filter" className="block text-sm font-semibold ds-text-primary mb-2">
+                Scope
+              </label>
+              <select
+                id="scope-filter"
+                value={filters.scope}
+                onChange={(e) => handleFilterChange('scope', e.target.value)}
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium [&>option]:ds-bg-surface [&>option]:ds-text-primary [&>option]:font-medium touch-manipulation"
+              >
+                <option value="" className="ds-text-muted">All Scopes</option>
+                <option value="project" className="ds-text-primary">🌍 Project</option>
+                <option value="phase" className="ds-text-primary">📋 Phase</option>
+                <option value="floor" className="ds-text-primary">🏢 Floor</option>
+                <option value="multi_phase" className="ds-text-primary">🔗 Multi-Phase</option>
+              </select>
+            </div>
+
+            <div>
               <label htmlFor="status-filter" className="block text-sm font-semibold ds-text-primary mb-2">
                 Status
               </label>
@@ -459,7 +515,33 @@ function WorkItemsPageContent() {
               </select>
             </div>
 
-            <div className="flex items-end sm:col-span-2 lg:col-span-1">
+            <div>
+              <label htmlFor="dateFrom-filter" className="block text-sm font-semibold ds-text-primary mb-2">
+                Start Date From
+              </label>
+              <input
+                type="date"
+                id="dateFrom-filter"
+                value={filters.dateFrom}
+                onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium touch-manipulation"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="dateTo-filter" className="block text-sm font-semibold ds-text-primary mb-2">
+                Start Date To
+              </label>
+              <input
+                type="date"
+                id="dateTo-filter"
+                value={filters.dateTo}
+                onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+                className="w-full px-4 py-2.5 ds-bg-surface ds-text-primary border-2 ds-border-subtle rounded-lg focus:outline-none focus:ring-2 focus:ring-ds-accent-focus focus:border-ds-accent-primary transition-all duration-200 font-medium touch-manipulation"
+              />
+            </div>
+
+            <div className="flex items-end">
               <label className="flex items-center gap-2 cursor-pointer touch-manipulation min-h-[44px]">
                 <input
                   type="checkbox"
@@ -473,7 +555,7 @@ function WorkItemsPageContent() {
               </label>
             </div>
 
-            <div>
+            <div className="sm:col-span-2 lg:col-span-1">
               <label htmlFor="search-filter" className="block text-sm font-semibold ds-text-primary mb-2">
                 Search
               </label>
@@ -487,15 +569,15 @@ function WorkItemsPageContent() {
               />
             </div>
 
-            <div className="flex items-end sm:col-span-2 lg:col-span-1">
+            <div className="sm:col-span-2 lg:col-span-1">
               <button
                 onClick={() => {
-                  setFilters({ projectId: '', phaseId: '', status: '', category: '', search: '', unassigned: false });
+                  setFilters({ projectId: '', phaseId: '', status: '', category: '', search: '', unassigned: false, scope: '', floorId: '', dateFrom: '', dateTo: '' });
                   router.push('/work-items', { scroll: false });
                 }}
                 className="w-full px-4 py-2.5 border-2 ds-border-subtle hover:ds-bg-surface-muted active:ds-bg-surface-muted hover:border-ds-border-strong ds-text-primary font-semibold rounded-lg transition-all duration-200 touch-manipulation"
               >
-                Clear
+                Clear All
               </button>
             </div>
           </div>
@@ -506,7 +588,7 @@ function WorkItemsPageContent() {
             {error}
           </div>
         ) : !Array.isArray(workItems) || workItems.length === 0 ? (
-          <NoDataEmptyState 
+          <NoDataEmptyState
             message="No work items found. Create your first work item to get started."
             actionLabel="Create Work Item"
             actionHref={`/work-items/new${filters.projectId ? `?projectId=${filters.projectId}` : ''}`}
@@ -514,37 +596,45 @@ function WorkItemsPageContent() {
           />
         ) : (
           <>
-            {/* Desktop Table View */}
-            <div className="hidden md:block ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-hidden">
-              <div className="overflow-x-auto">
+            {/* Table Controls */}
+            <div className="hidden md:flex justify-end mb-4 gap-2">
+              <TableDensityControl 
+                density={tableDensity} 
+                onDensityChange={setTableDensity} 
+              />
+            </div>
+
+            {/* Desktop Table View - Optimized */}
+            <div className="hidden md:block ds-bg-surface rounded-xl shadow-lg border ds-border-subtle overflow-x-auto">
+              <ResponsiveTableWrapper>
                 <table className="min-w-full divide-y divide-ds-border-subtle">
                 <thead className="ds-bg-surface-muted">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
+                    <th className={`${getDensityClasses(tableDensity).headerPadding} text-left text-xs font-bold ds-text-primary uppercase tracking-wider whitespace-nowrap`}>
                       Work Item
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
-                      Phase
+                    <th className={`${getDensityClasses(tableDensity).headerPadding} text-left text-xs font-bold ds-text-primary uppercase tracking-wider whitespace-nowrap`}>
+                      Scope
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
+                    <th className={`${getDensityClasses(tableDensity).headerPadding} text-left text-xs font-bold ds-text-primary uppercase tracking-wider whitespace-nowrap`}>
+                      Phase / Floor
+                    </th>
+                    <th className={`${getDensityClasses(tableDensity).headerPadding} text-left text-xs font-bold ds-text-primary uppercase tracking-wider whitespace-nowrap`}>
                       Assigned To
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
+                    <th className={`${getDensityClasses(tableDensity).headerPadding} text-left text-xs font-bold ds-text-primary uppercase tracking-wider whitespace-nowrap`}>
                       Status
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
+                    <th className={`${getDensityClasses(tableDensity).headerPadding} text-left text-xs font-bold ds-text-primary uppercase tracking-wider whitespace-nowrap`}>
                       Priority
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
+                    <th className={`${getDensityClasses(tableDensity).headerPadding} text-left text-xs font-bold ds-text-primary uppercase tracking-wider whitespace-nowrap`}>
                       Progress
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
+                    <th className={`${getDensityClasses(tableDensity).headerPadding} text-left text-xs font-bold ds-text-primary uppercase tracking-wider whitespace-nowrap`}>
                       Hours
                     </th>
-                    <th className="px-6 py-4 text-left text-xs font-bold ds-text-primary uppercase tracking-wider">
-                      Labour
-                    </th>
-                    <th className="px-6 py-4 text-right text-xs font-bold ds-text-primary uppercase tracking-wider">
+                    <th className={`${getDensityClasses(tableDensity).headerPadding} text-right text-xs font-bold ds-text-primary uppercase tracking-wider whitespace-nowrap`}>
                       Actions
                     </th>
                   </tr>
@@ -555,9 +645,33 @@ function WorkItemsPageContent() {
                       const completionPercentage = item.estimatedHours > 0
                         ? Math.round((item.actualHours / item.estimatedHours) * 100)
                         : 0;
-                      
+
+                      // Check if overdue
+                      const isOverdue = item.plannedEndDate && 
+                        new Date(item.plannedEndDate) < new Date() && 
+                        item.status !== 'completed';
+
+                      // Scope badge config
+                      const scopeConfig = {
+                        project: { label: 'Project', color: 'bg-purple-100 text-purple-800', icon: '🌍' },
+                        phase: { label: 'Phase', color: 'bg-blue-100 text-blue-800', icon: '📋' },
+                        floor: { label: 'Floor', color: 'bg-green-100 text-green-800', icon: '🏢' },
+                        multi_phase: { label: 'Multi', color: 'bg-orange-100 text-orange-800', icon: '🔗' }
+                      };
+                      const scope = scopeConfig[item.scope || 'phase'];
+
+                      // Floor label helper
+                      const getFloorLabel = () => {
+                        if (!item.floor?.floorNumber) return null;
+                        const n = item.floor.floorNumber;
+                        if (n === 0) return 'Ground';
+                        if (n < 0) return `B${Math.abs(n)}`;
+                        return `F${n}`;
+                      };
+
                       return (
-                        <tr key={item._id} className="hover:bg-blue-50 transition-colors duration-150">
+                        <tr key={item._id} className={`hover:ds-bg-surface-muted transition-colors duration-150 ${isOverdue ? 'bg-red-50/30' : ''}`}>
+                          {/* Work Item Name */}
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div>
                               <Link
@@ -571,26 +685,44 @@ function WorkItemsPageContent() {
                                   {item.category.replace(/\b\w/g, l => l.toUpperCase())}
                                 </p>
                               )}
+                              {isOverdue && (
+                                <span className="inline-flex items-center gap-1 mt-1 text-xs font-bold text-red-600">
+                                  <span>⚠️</span> Overdue
+                                </span>
+                              )}
                             </div>
                           </td>
+
+                          {/* Scope Badge */}
                           <td className="px-6 py-4 whitespace-nowrap">
-                            {item.phaseName ? (
-                              <Link
-                                href={`/phases/${item.phaseId}`}
-                                className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover transition-colors"
-                              >
-                                {item.phaseName}
-                              </Link>
-                            ) : item.phaseId ? (
-                              <Link
-                                href={`/phases/${item.phaseId}`}
-                                className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover transition-colors"
-                              >
-                                View Phase
-                              </Link>
-                            ) : (
-                              <span className="text-sm font-medium ds-text-muted">No Phase</span>
-                            )}
+                            <span className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-full ${scope.color}`}>
+                              <span>{scope.icon}</span>
+                              <span>{scope.label}</span>
+                            </span>
+                          </td>
+
+                          {/* Phase / Floor */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="space-y-1">
+                              {item.phaseName ? (
+                                <Link
+                                  href={`/phases/${item.phaseId}`}
+                                  className="text-sm font-medium ds-text-accent-primary hover:ds-text-accent-hover block"
+                                >
+                                  {item.phaseCode ? `${item.phaseCode}: ` : ''}{item.phaseName}
+                                </Link>
+                              ) : (
+                                <span className="text-sm font-medium ds-text-muted">No Phase</span>
+                              )}
+                              {item.floor && (
+                                <Link
+                                  href={`/floors/${item.floor._id}`}
+                                  className="text-xs font-medium ds-text-accent-primary hover:ds-text-accent-hover block"
+                                >
+                                  📍 {getFloorLabel() || item.floor.name || 'Floor'}
+                                </Link>
+                              )}
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             {item.assignedWorkers && item.assignedWorkers.length > 0 ? (
@@ -638,7 +770,7 @@ function WorkItemsPageContent() {
                               </span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className={`${getDensityClasses(tableDensity).cellPadding} whitespace-nowrap`}>
                             <div className="text-sm font-medium ds-text-primary">
                               <span className="ds-text-accent-primary font-semibold">{item.actualHours || 0}</span>
                               <span className="ds-text-muted mx-1">/</span>
@@ -651,54 +783,13 @@ function WorkItemsPageContent() {
                               </div>
                             )}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex flex-col gap-1">
-                              <Link
-                                href={`/labour/entries?workItemId=${item._id}`}
-                                className="text-xs ds-text-accent-primary hover:ds-text-accent-hover font-medium"
-                              >
-                                View Entries →
-                              </Link>
-                              {canEdit && (
-                                <div className="flex flex-col gap-1 mt-1">
-                                  <span className="text-[10px] font-semibold uppercase tracking-wide ds-text-muted">
-                                    Log labour
-                                  </span>
-                                  <div className="flex gap-2">
-                                    {item.assignedWorkers && item.assignedWorkers.length > 1 ? (
-                                      <Link
-                                        href={`/labour/batches/new?workItemId=${item._id}&workerIds=${item.assignedWorkers
-                                          .map((worker) => worker._id?.toString() || worker.userId?.toString())
-                                          .filter(Boolean)
-                                          .join(',')}`}
-                                        className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded hover:bg-purple-200 font-medium"
-                                        title="Bulk Entry (Prefilled)"
-                                      >
-                                        Bulk
-                                      </Link>
-                                    ) : (
-                                      <Link
-                                        href={`/labour/entries/new?workItemId=${item._id}&workerId=${item.assignedWorkers?.[0]?._id?.toString() || item.assignedWorkers?.[0]?.userId?.toString() || ''}`}
-                                        className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded hover:bg-green-200 font-medium"
-                                        title="Quick Entry"
-                                      >
-                                        Quick
-                                      </Link>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <div className="flex items-center justify-end gap-2">
-                              <Link
-                                href={`/work-items/${item._id}`}
-                                className="ds-text-accent-primary hover:ds-text-accent-hover font-semibold transition-colors"
-                              >
-                                View →
-                              </Link>
-                            </div>
+                          <td className={`${getDensityClasses(tableDensity).cellPadding} whitespace-nowrap text-right text-sm font-medium`}>
+                            <Link
+                              href={`/work-items/${item._id}`}
+                              className="ds-text-accent-primary hover:ds-text-accent-hover font-semibold transition-colors"
+                            >
+                              View →
+                            </Link>
                           </td>
                         </tr>
                       );
@@ -712,7 +803,7 @@ function WorkItemsPageContent() {
                   )}
                 </tbody>
               </table>
-            </div>
+              </ResponsiveTableWrapper>
             </div>
 
             {/* Mobile Card View */}
@@ -722,11 +813,34 @@ function WorkItemsPageContent() {
                   const completionPercentage = item.estimatedHours > 0
                     ? Math.round((item.actualHours / item.estimatedHours) * 100)
                     : 0;
-                  
+
+                  // Check if overdue
+                  const isOverdue = item.plannedEndDate && 
+                    new Date(item.plannedEndDate) < new Date() && 
+                    item.status !== 'completed';
+
+                  // Scope badge config
+                  const scopeConfig = {
+                    project: { label: 'Project', color: 'bg-purple-100 text-purple-800', icon: '🌍' },
+                    phase: { label: 'Phase', color: 'bg-blue-100 text-blue-800', icon: '📋' },
+                    floor: { label: 'Floor', color: 'bg-green-100 text-green-800', icon: '🏢' },
+                    multi_phase: { label: 'Multi', color: 'bg-orange-100 text-orange-800', icon: '🔗' }
+                  };
+                  const scope = scopeConfig[item.scope || 'phase'];
+
+                  // Floor label helper
+                  const getFloorLabel = () => {
+                    if (!item.floor?.floorNumber) return null;
+                    const n = item.floor.floorNumber;
+                    if (n === 0) return 'Ground';
+                    if (n < 0) return `B${Math.abs(n)}`;
+                    return `F${n}`;
+                  };
+
                   return (
                     <div
                       key={item._id}
-                      className="ds-bg-surface rounded-lg shadow p-4 border ds-border-subtle"
+                      className={`ds-bg-surface rounded-lg shadow p-4 border ${isOverdue ? 'border-red-400/60 bg-red-50/20' : 'ds-border-subtle'}`}
                     >
                       {/* Header Row */}
                       <div className="flex items-start justify-between mb-3">
@@ -742,18 +856,20 @@ function WorkItemsPageContent() {
                               {item.category.replace(/\b\w/g, l => l.toUpperCase())}
                             </p>
                           )}
+                          {isOverdue && (
+                            <span className="inline-flex items-center gap-1 mt-1 text-xs font-bold text-red-600">
+                              <span>⚠️</span> Overdue
+                            </span>
+                          )}
                         </div>
                         <div className="flex flex-col gap-1 items-end ml-2">
-                          <span className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ${getStatusColor(item.status)}`}>
-                            {item.status?.replace('_', ' ').toUpperCase() || 'UNKNOWN'}
-                          </span>
-                          <span className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ${getPriorityColor(item.priority || 3)}`}>
-                            P{item.priority || 3}
+                          <span className={`px-2 py-1 text-xs font-semibold rounded-full flex-shrink-0 ${scope.color}`}>
+                            {scope.icon} {scope.label}
                           </span>
                         </div>
                       </div>
 
-                      {/* Phase & Assigned To */}
+                      {/* Phase & Floor */}
                       <div className="mb-3 pb-3 border-b ds-border-subtle">
                         <div className="flex items-start gap-2 mb-2">
                           <span className="text-xs ds-text-muted w-20 flex-shrink-0">Phase:</span>
@@ -762,12 +878,23 @@ function WorkItemsPageContent() {
                               href={`/phases/${item.phaseId}`}
                               className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium flex-1"
                             >
-                              {item.phaseName}
+                              {item.phaseCode ? `${item.phaseCode}: ` : ''}{item.phaseName}
                             </Link>
                           ) : (
                             <span className="text-sm ds-text-muted">No Phase</span>
                           )}
                         </div>
+                        {item.floor && (
+                          <div className="flex items-start gap-2">
+                            <span className="text-xs ds-text-muted w-20 flex-shrink-0">Floor:</span>
+                            <Link
+                              href={`/floors/${item.floor._id}`}
+                              className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium"
+                            >
+                              📍 {getFloorLabel() || item.floor.name || 'Floor'}
+                            </Link>
+                          </div>
+                        )}
                         <div className="flex items-start gap-2">
                           <span className="text-xs ds-text-muted w-20 flex-shrink-0">Assigned:</span>
                           {item.assignedWorkers && item.assignedWorkers.length > 0 ? (
@@ -833,14 +960,14 @@ function WorkItemsPageContent() {
                       <div className="flex flex-wrap gap-2 pt-3">
                         <Link
                           href={`/work-items/${item._id}`}
-                          className="flex-1 px-3 py-2 bg-blue-50 ds-text-accent-primary text-sm font-semibold rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors touch-manipulation text-center"
+                          className="flex-1 px-3 py-2 ds-bg-surface-muted ds-text-accent-primary text-sm font-semibold rounded-lg hover:ds-bg-surface transition-colors touch-manipulation text-center"
                         >
                           View →
                         </Link>
                         {item.assignedWorkers && item.assignedWorkers.length > 0 && (
                           <Link
                             href={`/labour/entries?workItemId=${item._id}`}
-                            className="flex-1 px-3 py-2 bg-purple-50 text-purple-600 text-sm font-semibold rounded-lg hover:bg-purple-100 active:bg-purple-200 transition-colors touch-manipulation text-center"
+                            className="flex-1 px-3 py-2 ds-bg-accent-subtle ds-text-accent-primary text-sm font-semibold rounded-lg hover:ds-bg-accent-hover transition-colors touch-manipulation text-center"
                           >
                             Entries
                           </Link>
@@ -852,8 +979,8 @@ function WorkItemsPageContent() {
                                   .map((worker) => worker._id?.toString() || worker.userId?.toString())
                                   .filter(Boolean)
                                   .join(',')}`
-                              : `/labour/entries/new?workItemId=${item._id}&workerId=${item.assignedWorkers[0]?._id?.toString() || item.assignedWorkers[0]?.userId?.toString() || ''}`}
-                            className="flex-1 px-3 py-2 bg-green-50 text-green-600 text-sm font-semibold rounded-lg hover:bg-green-100 active:bg-green-200 transition-colors touch-manipulation text-center"
+                              : `/labour/entries/new?workItemId=${item._id}&workerId=${item.assignedWorkers[0]?._id?.toString() || item.assignedWorkers[0]?.userId?.toString() || ''}&projectId=${item.projectId || ''}&phaseId=${item.phaseId || ''}`}
+                            className="flex-1 px-3 py-2 ds-bg-success/10 ds-text-success text-sm font-semibold rounded-lg hover:ds-bg-success/20 transition-colors touch-manipulation text-center"
                           >
                             {item.assignedWorkers.length > 1 ? 'Bulk Log' : 'Quick Log'}
                           </Link>

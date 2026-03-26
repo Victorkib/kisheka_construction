@@ -399,7 +399,7 @@ export function getSmartNavigationForRole(userRole, projectId = null, options = 
   const addProjectContext = (href) => {
     if (!projectId || !href) return href;
     const projectScopedRoutes = [
-      '/items', '/phases', '/expenses', '/initial-expenses',
+      '/items', '/phases', '/floors', '/expenses', '/initial-expenses',
       '/material-requests', '/purchase-orders', '/professional-services',
       '/professional-activities', '/professional-fees', '/dashboard/budget',
       '/dashboard/analytics', '/work-items', '/equipment', '/subcontractors',
@@ -477,7 +477,7 @@ export function getFavoritesSection(favorites, userRole, projectId = null) {
   const addProjectContext = (href) => {
     if (!projectId || !href) return href;
     const projectScopedRoutes = [
-      '/items', '/phases', '/expenses', '/initial-expenses',
+      '/items', '/phases', '/floors', '/expenses', '/initial-expenses',
       '/material-requests', '/purchase-orders', '/professional-services',
       '/professional-activities', '/professional-fees', '/dashboard/budget',
       '/dashboard/analytics', '/work-items', '/equipment', '/subcontractors',

@@ -64,12 +64,14 @@ export async function POST(request) {
     const result = calculateContractValueEstimate({
       hourlyRate: library.defaultHourlyRate || null,
       perVisitRate: library.defaultPerVisitRate || null,
+      perFloorRate: library.defaultPerFloorRate || null,
       monthlyRetainer: library.defaultMonthlyRetainer || null,
       paymentSchedule: body.paymentSchedule,
       contractType: body.contractType,
       contractStartDate: body.contractStartDate,
       contractEndDate: body.contractEndDate || null,
       visitFrequency: body.visitFrequency || null,
+      floorsCount: body.floorsCount || null,
     });
 
     if (result.error) {

@@ -6,6 +6,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getProfessionalTypeLabel } from '@/lib/professional-services-helpers';
 
 export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange }) {
   const [projects, setProjects] = useState([]);
@@ -20,6 +21,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
   // Fetch projects on mount
   useEffect(() => {
     fetchProjects();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Fetch professional services when project changes
@@ -33,6 +35,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
       setPhases([]);
       setFloors([]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wizardData.projectId]);
 
   // Validate and notify parent
@@ -236,7 +239,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
                 <option value="">Select Professional Service</option>
                 {professionalServices.map((service) => (
                   <option key={service._id} value={service._id}>
-                    {service.library?.name || 'N/A'} ({service.type === 'architect' ? 'Architect' : 'Engineer'})
+                    {service.library?.name || 'N/A'} ({getProfessionalTypeLabel(service.type)})
                   </option>
                 ))}
               </select>
@@ -244,7 +247,7 @@ export function Step1ProjectSettings({ wizardData, onUpdate, onValidationChange 
                 <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                   <div className="text-sm">
                     <div className="font-medium ds-text-primary">
-                      {selectedService.library?.name || 'N/A'} ({selectedService.type === 'architect' ? 'Architect' : 'Engineer'})
+                      {selectedService.library?.name || 'N/A'} ({getProfessionalTypeLabel(selectedService.type)})
                     </div>
                     <div className="ds-text-secondary mt-1">
                       Contract: {selectedService.contractType || 'N/A'} | Status: {selectedService.status || 'N/A'}

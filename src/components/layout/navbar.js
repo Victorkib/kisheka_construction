@@ -7,13 +7,11 @@
 'use client';
 
 import { useState } from 'react';
-import { useEffect } from 'react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
 import { Sidebar } from './sidebar';
 import { MobileNav } from './mobile-nav';
 import { Header } from './header';
 import { clearUserCache } from '@/hooks/use-permissions';
+import Link from 'next/link';
 
 /**
  * Navbar Component - Integrated Navigation System
@@ -27,7 +25,7 @@ export function Navbar({ children }) {
   // If children are provided, wrap them with the layout
   if (children) {
     return (
-      <div className="min-h-screen ds-bg-surface-muted flex">
+      <div className="min-h-screen bg-gray-50 flex">
         {/* Desktop Sidebar */}
         <div className="hidden lg:block">
           <Sidebar
@@ -92,7 +90,11 @@ export function LegacyNavbar() {
   const [user, setUser] = useState(null);
   const [showMenu, setShowMenu] = useState(false);
 
-  async function fetchUser() {
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const fetchUser = async () => {
     try {
       const response = await fetch('/api/auth/me');
       const data = await response.json();
@@ -102,11 +104,7 @@ export function LegacyNavbar() {
     } catch (err) {
       console.error('Error fetching user:', err);
     }
-  }
-
-  useEffect(() => {
-    fetchUser();
-  }, []);
+  };
 
   const handleLogout = async () => {
     try {
@@ -126,17 +124,6 @@ export function LegacyNavbar() {
       try {
         sessionStorage.clear();
         localStorage.removeItem('currentProjectId');
-        // CRITICAL: Clear Supabase/PKCE state to avoid account-switch OAuth failures
-        for (const key of Object.keys(localStorage)) {
-          if (key.startsWith('sb-') || key.toLowerCase().includes('supabase')) {
-            localStorage.removeItem(key);
-          }
-        }
-        for (const key of Object.keys(sessionStorage)) {
-          if (key.startsWith('sb-') || key.toLowerCase().includes('supabase')) {
-            sessionStorage.removeItem(key);
-          }
-        }
       } catch (e) {
         // Storage might not be available
       }
@@ -157,7 +144,7 @@ export function LegacyNavbar() {
     pathname === path || pathname.startsWith(path + '/');
 
   return (
-    <nav className="ds-bg-surface shadow-sm border-b ds-border-subtle">
+    <nav className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -174,8 +161,8 @@ export function LegacyNavbar() {
                 href="/dashboard"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                   isActive('/dashboard') && !pathname.includes('/dashboard/')
-                    ? 'border-blue-500 ds-text-primary'
-                    : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                    ? 'border-blue-500 text-gray-900'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
                 Dashboard
@@ -185,8 +172,8 @@ export function LegacyNavbar() {
                   href="/supplier/delivery-notes"
                   className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                     isActive('/supplier/delivery-notes')
-                      ? 'border-blue-500 ds-text-primary'
-                      : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                      ? 'border-blue-500 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                   }`}
                 >
                   Delivery Notes
@@ -198,8 +185,8 @@ export function LegacyNavbar() {
                     href="/projects"
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive('/projects')
-                        ? 'border-blue-500 ds-text-primary'
-                        : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     Projects
@@ -212,8 +199,8 @@ export function LegacyNavbar() {
                         href="/financing"
                         className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                           isActive('/financing')
-                            ? 'border-blue-500 ds-text-primary'
-                            : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                            ? 'border-blue-500 text-gray-900'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                         }`}
                       >
                         Financing
@@ -224,8 +211,8 @@ export function LegacyNavbar() {
                       href="/investors"
                       className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                         isActive('/investors')
-                          ? 'border-blue-500 ds-text-primary'
-                          : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                          ? 'border-blue-500 text-gray-900'
+                          : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                       }`}
                     >
                       Investors
@@ -235,8 +222,8 @@ export function LegacyNavbar() {
                     href="/initial-expenses"
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive('/initial-expenses')
-                        ? 'border-blue-500 ds-text-primary'
-                        : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     Initial Expenses
@@ -245,8 +232,8 @@ export function LegacyNavbar() {
                     href="/items"
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive('/items')
-                        ? 'border-blue-500 ds-text-primary'
-                        : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     Materials
@@ -255,8 +242,8 @@ export function LegacyNavbar() {
                     href="/dashboard/approvals"
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive('/dashboard/approvals')
-                        ? 'border-blue-500 ds-text-primary'
-                        : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     Approvals
@@ -265,8 +252,8 @@ export function LegacyNavbar() {
                     href="/dashboard/stock"
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive('/dashboard/stock')
-                        ? 'border-blue-500 ds-text-primary'
-                        : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     Stock
@@ -275,8 +262,8 @@ export function LegacyNavbar() {
                     href="/expenses"
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive('/expenses')
-                        ? 'border-blue-500 ds-text-primary'
-                        : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     Expenses
@@ -285,8 +272,8 @@ export function LegacyNavbar() {
                     href="/categories"
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive('/categories')
-                        ? 'border-blue-500 ds-text-primary'
-                        : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     Categories
@@ -295,8 +282,8 @@ export function LegacyNavbar() {
                     href="/floors"
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive('/floors')
-                        ? 'border-blue-500 ds-text-primary'
-                        : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     Floors
@@ -305,8 +292,8 @@ export function LegacyNavbar() {
                     href="/dashboard/analytics/wastage"
                     className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                       isActive('/dashboard/analytics')
-                        ? 'border-blue-500 ds-text-primary'
-                        : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                        ? 'border-blue-500 text-gray-900'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                     }`}
                   >
                     Analytics
@@ -323,8 +310,8 @@ export function LegacyNavbar() {
                         href="/dashboard/budget"
                         className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
                           isActive('/dashboard/budget')
-                            ? 'border-blue-500 ds-text-primary'
-                            : 'border-transparent ds-text-muted hover:ds-text-secondary hover:ds-border-subtle'
+                            ? 'border-blue-500 text-gray-900'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                         }`}
                       >
                         Budget
@@ -338,16 +325,16 @@ export function LegacyNavbar() {
             <div className="ml-3 relative">
               <div className="flex items-center gap-4">
                 {user && (
-                  <div className="text-sm ds-text-secondary">
+                  <div className="text-sm text-gray-700">
                     <span className="font-medium">
                       {user.firstName || user.email}
                     </span>
-                    <span className="ds-text-muted ml-2">({user.role})</span>
+                    <span className="text-gray-500 ml-2">({user.role})</span>
                   </div>
                 )}
                 <button
                   onClick={handleLogout}
-                  className="ds-text-muted hover:ds-text-secondary px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Logout
                 </button>
@@ -357,7 +344,7 @@ export function LegacyNavbar() {
           <div className="sm:hidden flex items-center">
             <button
               onClick={() => setShowMenu(!showMenu)}
-              className="inline-flex items-center justify-center p-2 rounded-md ds-text-muted hover:ds-text-muted hover:ds-bg-surface-muted"
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
             >
               <svg
                 className="h-6 w-6"
@@ -395,7 +382,7 @@ export function LegacyNavbar() {
               className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                 isActive('/dashboard') && !pathname.includes('/dashboard/')
                   ? 'bg-blue-50 border-blue-500 text-blue-700'
-                  : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                  : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
               }`}
               onClick={() => setShowMenu(false)}
             >
@@ -407,7 +394,7 @@ export function LegacyNavbar() {
                 className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                   isActive('/supplier/delivery-notes')
                     ? 'bg-blue-50 border-blue-500 text-blue-700'
-                    : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                    : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                 }`}
                 onClick={() => setShowMenu(false)}
               >
@@ -421,7 +408,7 @@ export function LegacyNavbar() {
                   className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                     isActive('/projects')
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   onClick={() => setShowMenu(false)}
                 >
@@ -436,7 +423,7 @@ export function LegacyNavbar() {
                       className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                         isActive('/financing')
                           ? 'bg-blue-50 border-blue-500 text-blue-700'
-                          : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                          : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                       }`}
                       onClick={() => setShowMenu(false)}
                     >
@@ -449,7 +436,7 @@ export function LegacyNavbar() {
                     className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                       isActive('/investors')
                         ? 'bg-blue-50 border-blue-500 text-blue-700'
-                        : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                        : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                     }`}
                     onClick={() => setShowMenu(false)}
                   >
@@ -461,7 +448,7 @@ export function LegacyNavbar() {
                   className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                     isActive('/initial-expenses')
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   onClick={() => setShowMenu(false)}
                 >
@@ -472,7 +459,7 @@ export function LegacyNavbar() {
                   className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                     isActive('/items')
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   onClick={() => setShowMenu(false)}
                 >
@@ -483,7 +470,7 @@ export function LegacyNavbar() {
                   className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                     isActive('/dashboard/approvals')
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   onClick={() => setShowMenu(false)}
                 >
@@ -494,7 +481,7 @@ export function LegacyNavbar() {
                   className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                     isActive('/dashboard/stock')
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   onClick={() => setShowMenu(false)}
                 >
@@ -505,7 +492,7 @@ export function LegacyNavbar() {
                   className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                     isActive('/expenses')
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   onClick={() => setShowMenu(false)}
                 >
@@ -516,7 +503,7 @@ export function LegacyNavbar() {
                   className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                     isActive('/categories')
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   onClick={() => setShowMenu(false)}
                 >
@@ -527,7 +514,7 @@ export function LegacyNavbar() {
                   className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                     isActive('/floors')
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   onClick={() => setShowMenu(false)}
                 >
@@ -538,7 +525,7 @@ export function LegacyNavbar() {
                   className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                     isActive('/dashboard/analytics')
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
-                      : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                   }`}
                   onClick={() => setShowMenu(false)}
                 >
@@ -557,7 +544,7 @@ export function LegacyNavbar() {
                       className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
                         isActive('/dashboard/budget')
                           ? 'bg-blue-50 border-blue-500 text-blue-700'
-                          : 'border-transparent ds-text-muted hover:ds-bg-surface-muted hover:ds-border-subtle'
+                          : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300'
                       }`}
                       onClick={() => setShowMenu(false)}
                     >
@@ -566,9 +553,9 @@ export function LegacyNavbar() {
                   )}
               </>
             )}
-            <div className="border-t ds-border-subtle pt-4 pb-3">
+            <div className="border-t border-gray-200 pt-4 pb-3">
               {user && (
-                <div className="px-4 text-sm ds-text-muted mb-2">
+                <div className="px-4 text-sm text-gray-500 mb-2">
                   {user.firstName || user.email} ({user.role})
                 </div>
               )}
@@ -577,7 +564,7 @@ export function LegacyNavbar() {
                   setShowMenu(false);
                   handleLogout();
                 }}
-                className="block w-full text-left pl-3 pr-4 py-2 text-base font-medium ds-text-muted hover:ds-bg-surface-muted"
+                className="block w-full text-left pl-3 pr-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-50"
               >
                 Logout
               </button>

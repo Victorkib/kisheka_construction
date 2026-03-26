@@ -25,6 +25,7 @@ import { ReportsTab } from '@/components/phases/tabs/ReportsTab';
 import { QualityTab } from '@/components/phases/tabs/QualityTab';
 import { WorkItemsTab } from '@/components/phases/tabs/WorkItemsTab';
 import { FloorsTab } from '@/components/phases/tabs/FloorsTab';
+import { FinishingTab } from '@/components/phases/tabs/FinishingTab';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 
 export default function PhaseDetailPage() {
@@ -447,6 +448,10 @@ export default function PhaseDetailPage() {
     { id: 'materials', label: 'Materials', icon: '📦', badge: materials.length },
     { id: 'expenses', label: 'Expenses', icon: '💳', badge: expenses.length },
     { id: 'floors', label: 'Floors', icon: '🏢' },
+    // Finishing tab only for finishing phases
+    ...(phase.phaseType === 'finishing'
+      ? [{ id: 'finishing', label: 'Finishing', icon: '🎨' }]
+      : []),
     { id: 'work-items', label: 'Work Items', icon: '✅' },
     { id: 'resources', label: 'Resources', icon: '👥' },
     { id: 'milestones', label: 'Milestones', icon: '🎯', badge: phase.milestones?.length || 0 },
@@ -482,6 +487,8 @@ export default function PhaseDetailPage() {
         return <FloorsTab phase={phase} formatCurrency={formatCurrency} />;
       case 'work-items':
         return <WorkItemsTab phase={phase} canEdit={canEdit} formatCurrency={formatCurrency} formatDate={formatDate} />;
+      case 'finishing':
+        return <FinishingTab phase={phase} project={project} formatCurrency={formatCurrency} />;
       case 'resources':
         return <ResourcesTab phase={phase} formatCurrency={formatCurrency} />;
       case 'milestones':

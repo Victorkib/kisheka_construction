@@ -99,23 +99,27 @@ export function estimateHoursForContract(contractType, startDate, endDate, visit
  * @param {Object} params - Calculation parameters
  * @param {number|null} params.hourlyRate - Hourly rate
  * @param {number|null} params.perVisitRate - Per-visit rate
+ * @param {number|null} params.perFloorRate - Per-floor rate
  * @param {number|null} params.monthlyRetainer - Monthly retainer
  * @param {string} params.paymentSchedule - Payment schedule
  * @param {string} params.contractType - Contract type
  * @param {Date|string} params.contractStartDate - Contract start date
  * @param {Date|string} params.contractEndDate - Contract end date (optional)
  * @param {string|null} params.visitFrequency - Visit frequency (for engineers)
+ * @param {number|null} params.floorsCount - Optional floors count (for per-floor schedule estimate)
  * @returns {Object} Calculation result with suggested value and breakdown
  */
 export function calculateContractValueEstimate({
   hourlyRate,
   perVisitRate,
+  perFloorRate,
   monthlyRetainer,
   paymentSchedule,
   contractType,
   contractStartDate,
   contractEndDate,
   visitFrequency,
+  floorsCount,
 }) {
   if (!contractStartDate) {
     return {
@@ -189,6 +193,33 @@ export function calculateContractValueEstimate({
             error: 'Visit frequency is required for per-visit payment schedule',
           };
         }
+      }
+      break;
+
+    case 'per_floor':
+      if (perFloorRate && perFloorRate > 0) {
+        const floors = Number(floorsCount);
+        if (!floors || Number.isNaN(floors) || floors <= 0) {
+          return {
+            suggestedValue: null,
+            calculation: null,
+            breakdown: null,
+            error: 'Floors count is required for per-floor payment schedule',
+          };
+        }
+
+        suggestedValue = perFloorRate * floors;
+        calculation = {
+          method: 'per_floor',
+          rate: perFloorRate,
+          floors,
+          formula: `${perFloorRate.toLocaleString()} × ${floors} floors = ${suggestedValue.toLocaleString()}`,
+        };
+        breakdown = {
+          perFloorRate,
+          floors,
+          total: suggestedValue,
+        };
       }
       break;
       
@@ -376,14 +407,17 @@ export function getSuggestedFeeAmount(feeType, assignment) {
   
   const hourlyRate = assignment.hourlyRate || assignment.ratesSnapshot?.hourlyRate;
   const perVisitRate = assignment.perVisitRate || assignment.ratesSnapshot?.perVisitRate;
+  const perFloorRate = assignment.perFloorRate || assignment.ratesSnapshot?.perFloorRate;
   const monthlyRetainer = assignment.monthlyRetainer || assignment.ratesSnapshot?.monthlyRetainer;
   
   let suggestedAmount = null;
   let calculation = null;
   
   // Map fee types to rate suggestions
+  const isPerFloor = assignment.paymentSchedule === 'per_floor';
+
   const feeTypeMap = {
-    site_visit: perVisitRate || hourlyRate,
+    site_visit: (isPerFloor ? perFloorRate : perVisitRate) || hourlyRate,
     inspection_fee: hourlyRate || perVisitRate,
     design_fee: hourlyRate ? hourlyRate * 2 : null, // Default 2 hours
     revision_fee: hourlyRate ? hourlyRate * 2 : null, // Default 2 hours
@@ -395,7 +429,13 @@ export function getSuggestedFeeAmount(feeType, assignment) {
   suggestedAmount = feeTypeMap[feeType];
   
   if (suggestedAmount) {
-    if (feeType === 'site_visit' && perVisitRate) {
+    if (feeType === 'site_visit' && isPerFloor && perFloorRate) {
+      calculation = {
+        method: 'per_floor_rate',
+        rate: perFloorRate,
+        formula: `Per-floor rate: ${perFloorRate.toLocaleString()} KES`,
+      };
+    } else if (feeType === 'site_visit' && perVisitRate) {
       calculation = {
         method: 'per_visit_rate',
         rate: perVisitRate,

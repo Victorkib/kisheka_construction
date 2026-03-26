@@ -358,30 +358,41 @@ function FloorsPageContent() {
           <div className="flex-1 min-w-0">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold ds-text-primary leading-tight">Floors</h1>
             <p className="text-sm sm:text-base md:text-lg ds-text-secondary mt-2 leading-relaxed">
-              {selectedProjectId 
+              {selectedProjectId
                 ? `Floors for ${getProjectName(selectedProjectId)}`
                 : 'Manage building floors and their status'}
             </p>
           </div>
-          {canCreate && (
-            <div className="flex flex-col sm:flex-row gap-2">
-              {selectedProjectId && (
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Link
+              href={`/floors/dashboard?projectId=${selectedProjectId}`}
+              className="ds-bg-surface hover:ds-bg-surface-muted ds-text-accent-primary border ds-border-subtle font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base text-center"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Dashboard
+            </Link>
+            {canCreate && (
+              <>
+                {selectedProjectId && (
+                  <Link
+                    href={`/floors/new?projectId=${selectedProjectId}&basement=true`}
+                    className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base"
+                    title="Add a basement floor"
+                  >
+                    <span>🏢</span> Add Basement
+                  </Link>
+                )}
                 <Link
-                  href={`/floors/new?projectId=${selectedProjectId}&basement=true`}
-                  className="bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors flex items-center justify-center gap-2 touch-manipulation text-sm sm:text-base"
-                  title="Add a basement floor"
+                  href={selectedProjectId ? `/floors/new?projectId=${selectedProjectId}` : '/floors/new'}
+                  className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
                 >
-                  <span>🏢</span> Add Basement
+                  + Create Floor
                 </Link>
-              )}
-              <Link
-                href={selectedProjectId ? `/floors/new?projectId=${selectedProjectId}` : '/floors/new'}
-                className="ds-bg-accent-primary hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 sm:px-6 py-2.5 rounded-lg transition-colors touch-manipulation text-sm sm:text-base text-center"
-              >
-                + Create Floor
-              </Link>
-            </div>
-          )}
+              </>
+            )}
+          </div>
         </div>
 
         {/* Project Filter */}
@@ -508,7 +519,13 @@ function FloorsPageContent() {
                         Status
                       </th>
                       <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
+                        Progress
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Budget
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
+                        Capital
                       </th>
                       <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Actual Cost
@@ -557,9 +574,47 @@ function FloorsPageContent() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 ds-bg-surface-muted rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all ${
+                                  floor.completionPercentage >= 100
+                                    ? 'ds-bg-success'
+                                    : floor.completionPercentage >= 50
+                                    ? 'ds-bg-accent-primary'
+                                    : floor.completionPercentage > 0
+                                    ? 'ds-bg-warning'
+                                    : 'ds-bg-surface-muted'
+                                }`}
+                                style={{ width: `${floor.completionPercentage || 0}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium ds-text-secondary w-10">
+                              {floor.completionPercentage || 0}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm ds-text-primary">
                             {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
                           </span>
+                          {floor.alertType === 'over_budget' && (
+                            <div className="text-xs text-red-600 font-medium mt-0.5">⚠ Over</div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <span className="text-sm ds-text-primary">
+                              {formatCurrency(floor.capitalTotal || 0)}
+                            </span>
+                            {floor.capitalTotal > 0 && (
+                              <div className={`text-xs font-medium mt-0.5 ${
+                                floor.alertType === 'low_capital' ? 'text-red-600' : 'ds-text-muted'
+                              }`}>
+                                Rem: {formatCurrency(floor.capitalRemaining || 0)}
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm ds-text-primary">
@@ -626,12 +681,52 @@ function FloorsPageContent() {
                           <p className="text-sm font-semibold ds-text-primary">
                             {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
                           </p>
+                          {floor.alertType === 'over_budget' && (
+                            <span className="text-xs text-red-600 font-medium">⚠ Over</span>
+                          )}
                         </div>
                         <div>
                           <p className="text-xs ds-text-muted mb-0.5">Actual Cost</p>
                           <p className="text-sm font-semibold ds-text-primary">
                             {formatCurrency(floor.actualCost || 0)}
                           </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b ds-border-subtle">
+                        <div>
+                          <p className="text-xs ds-text-muted mb-0.5">Progress</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 ds-bg-surface-muted rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all ${
+                                  floor.completionPercentage >= 100
+                                    ? 'ds-bg-success'
+                                    : floor.completionPercentage >= 50
+                                    ? 'ds-bg-accent-primary'
+                                    : floor.completionPercentage > 0
+                                    ? 'ds-bg-warning'
+                                    : 'ds-bg-surface-muted'
+                                }`}
+                                style={{ width: `${floor.completionPercentage || 0}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium ds-text-secondary">
+                              {floor.completionPercentage || 0}%
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-xs ds-text-muted mb-0.5">Capital</p>
+                          <p className="text-sm font-semibold ds-text-primary">
+                            {formatCurrency(floor.capitalTotal || 0)}
+                          </p>
+                          {floor.capitalTotal > 0 && (
+                            <span className={`text-xs ${
+                              floor.alertType === 'low_capital' ? 'text-red-600' : 'ds-text-muted'
+                            }`}>
+                              Rem: {formatCurrency(floor.capitalRemaining || 0)}
+                            </span>
+                          )}
                         </div>
                       </div>
                       {floor.projectId && (
@@ -696,7 +791,13 @@ function FloorsPageContent() {
                         Status
                       </th>
                       <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
+                        Progress
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Budget
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
+                        Capital
                       </th>
                       <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Actual Cost
@@ -745,9 +846,47 @@ function FloorsPageContent() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 ds-bg-surface-muted rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all ${
+                                  floor.completionPercentage >= 100
+                                    ? 'ds-bg-success'
+                                    : floor.completionPercentage >= 50
+                                    ? 'ds-bg-accent-primary'
+                                    : floor.completionPercentage > 0
+                                    ? 'ds-bg-warning'
+                                    : 'ds-bg-surface-muted'
+                                }`}
+                                style={{ width: `${floor.completionPercentage || 0}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium ds-text-secondary w-10">
+                              {floor.completionPercentage || 0}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm ds-text-primary">
                             {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
                           </span>
+                          {floor.alertType === 'over_budget' && (
+                            <div className="text-xs text-red-600 font-medium mt-0.5">⚠ Over</div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <span className="text-sm ds-text-primary">
+                              {formatCurrency(floor.capitalTotal || 0)}
+                            </span>
+                            {floor.capitalTotal > 0 && (
+                              <div className={`text-xs font-medium mt-0.5 ${
+                                floor.alertType === 'low_capital' ? 'text-red-600' : 'ds-text-muted'
+                              }`}>
+                                Rem: {formatCurrency(floor.capitalRemaining || 0)}
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm ds-text-primary">
@@ -814,12 +953,52 @@ function FloorsPageContent() {
                           <p className="text-sm font-semibold ds-text-primary">
                             {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
                           </p>
+                          {floor.alertType === 'over_budget' && (
+                            <span className="text-xs text-red-600 font-medium">⚠ Over</span>
+                          )}
                         </div>
                         <div>
                           <p className="text-xs ds-text-muted mb-0.5">Actual Cost</p>
                           <p className="text-sm font-semibold ds-text-primary">
                             {formatCurrency(floor.actualCost || 0)}
                           </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b ds-border-subtle">
+                        <div>
+                          <p className="text-xs ds-text-muted mb-0.5">Progress</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 ds-bg-surface-muted rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all ${
+                                  floor.completionPercentage >= 100
+                                    ? 'ds-bg-success'
+                                    : floor.completionPercentage >= 50
+                                    ? 'ds-bg-accent-primary'
+                                    : floor.completionPercentage > 0
+                                    ? 'ds-bg-warning'
+                                    : 'ds-bg-surface-muted'
+                                }`}
+                                style={{ width: `${floor.completionPercentage || 0}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium ds-text-secondary">
+                              {floor.completionPercentage || 0}%
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-xs ds-text-muted mb-0.5">Capital</p>
+                          <p className="text-sm font-semibold ds-text-primary">
+                            {formatCurrency(floor.capitalTotal || 0)}
+                          </p>
+                          {floor.capitalTotal > 0 && (
+                            <span className={`text-xs ${
+                              floor.alertType === 'low_capital' ? 'text-red-600' : 'ds-text-muted'
+                            }`}>
+                              Rem: {formatCurrency(floor.capitalRemaining || 0)}
+                            </span>
+                          )}
                         </div>
                       </div>
                       {floor.projectId && (
@@ -884,7 +1063,13 @@ function FloorsPageContent() {
                         Status
                       </th>
                       <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
+                        Progress
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Budget
+                      </th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
+                        Capital
                       </th>
                       <th className="px-6 py-3 text-left text-sm font-semibold ds-text-secondary uppercase tracking-wide leading-normal">
                         Actual Cost
@@ -933,9 +1118,47 @@ function FloorsPageContent() {
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-2">
+                            <div className="w-24 ds-bg-surface-muted rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all ${
+                                  floor.completionPercentage >= 100
+                                    ? 'ds-bg-success'
+                                    : floor.completionPercentage >= 50
+                                    ? 'ds-bg-accent-primary'
+                                    : floor.completionPercentage > 0
+                                    ? 'ds-bg-warning'
+                                    : 'ds-bg-surface-muted'
+                                }`}
+                                style={{ width: `${floor.completionPercentage || 0}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium ds-text-secondary w-10">
+                              {floor.completionPercentage || 0}%
+                            </span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm ds-text-primary">
                             {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
                           </span>
+                          {floor.alertType === 'over_budget' && (
+                            <div className="text-xs text-red-600 font-medium mt-0.5">⚠ Over</div>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div>
+                            <span className="text-sm ds-text-primary">
+                              {formatCurrency(floor.capitalTotal || 0)}
+                            </span>
+                            {floor.capitalTotal > 0 && (
+                              <div className={`text-xs font-medium mt-0.5 ${
+                                floor.alertType === 'low_capital' ? 'text-red-600' : 'ds-text-muted'
+                              }`}>
+                                Rem: {formatCurrency(floor.capitalRemaining || 0)}
+                              </div>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className="text-sm ds-text-primary">
@@ -1002,12 +1225,52 @@ function FloorsPageContent() {
                           <p className="text-sm font-semibold ds-text-primary">
                             {formatCurrency(floor.budgetAllocation?.total || floor.totalBudget || 0)}
                           </p>
+                          {floor.alertType === 'over_budget' && (
+                            <span className="text-xs text-red-600 font-medium">⚠ Over</span>
+                          )}
                         </div>
                         <div>
                           <p className="text-xs ds-text-muted mb-0.5">Actual Cost</p>
                           <p className="text-sm font-semibold ds-text-primary">
                             {formatCurrency(floor.actualCost || 0)}
                           </p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 mb-3 pb-3 border-b ds-border-subtle">
+                        <div>
+                          <p className="text-xs ds-text-muted mb-0.5">Progress</p>
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 ds-bg-surface-muted rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all ${
+                                  floor.completionPercentage >= 100
+                                    ? 'ds-bg-success'
+                                    : floor.completionPercentage >= 50
+                                    ? 'ds-bg-accent-primary'
+                                    : floor.completionPercentage > 0
+                                    ? 'ds-bg-warning'
+                                    : 'ds-bg-surface-muted'
+                                }`}
+                                style={{ width: `${floor.completionPercentage || 0}%` }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium ds-text-secondary">
+                              {floor.completionPercentage || 0}%
+                            </span>
+                          </div>
+                        </div>
+                        <div>
+                          <p className="text-xs ds-text-muted mb-0.5">Capital</p>
+                          <p className="text-sm font-semibold ds-text-primary">
+                            {formatCurrency(floor.capitalTotal || 0)}
+                          </p>
+                          {floor.capitalTotal > 0 && (
+                            <span className={`text-xs ${
+                              floor.alertType === 'low_capital' ? 'text-red-600' : 'ds-text-muted'
+                            }`}>
+                              Rem: {formatCurrency(floor.capitalRemaining || 0)}
+                            </span>
+                          )}
                         </div>
                       </div>
                       {floor.projectId && (
@@ -1052,7 +1315,7 @@ function FloorsPageContent() {
 
         {/* Summary Stats */}
         {floors.length > 0 && (
-          <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          <div className="mt-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
             <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
               <p className="text-xs sm:text-sm ds-text-secondary">Total Floors</p>
               <p className="text-xl sm:text-2xl font-bold ds-text-primary">{floors.length}</p>
@@ -1069,11 +1332,82 @@ function FloorsPageContent() {
                 {floors.filter((f) => f.status === 'COMPLETED').length}
               </p>
             </div>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <p className="text-xs sm:text-sm ds-text-secondary">Avg Progress</p>
+              <p className="text-xl sm:text-2xl font-bold ds-text-primary">
+                {floors.length > 0 
+                  ? Math.round(floors.reduce((sum, f) => sum + (f.completionPercentage || 0), 0) / floors.length)
+                  : 0}%
+              </p>
+            </div>
+            <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6">
+              <p className="text-xs sm:text-sm ds-text-secondary">Total Capital</p>
+              <p className="text-lg sm:text-xl font-bold text-purple-700 truncate">
+                {formatCurrency(floors.reduce((sum, f) => sum + (f.capitalTotal || 0), 0))}
+              </p>
+            </div>
             <div className="ds-bg-surface rounded-lg shadow p-4 sm:p-6 col-span-2 md:col-span-1">
               <p className="text-xs sm:text-sm ds-text-secondary">Total Budget</p>
-              <p className="text-xl sm:text-2xl font-bold ds-text-primary truncate">
+              <p className="text-lg sm:text-xl font-bold ds-text-primary truncate">
                 {formatCurrency(floors.reduce((sum, f) => sum + (f.budgetAllocation?.total || f.totalBudget || 0), 0))}
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Alerts Section */}
+        {floors.some(f => f.alertType) && (
+          <div className="mt-6 space-y-2">
+            <h3 className="text-sm font-semibold ds-text-secondary">Floor Alerts</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {floors.filter(f => f.alertType === 'over_budget').map(floor => (
+                <div key={floor._id} className="bg-red-50 border border-red-400/60 rounded-lg p-3 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-red-800">
+                      {getFloorDisplayName(floor.floorNumber, floor.name)}
+                    </p>
+                    <p className="text-xs text-red-600">Budget exceeded</p>
+                  </div>
+                  <Link
+                    href={`/floors/${floor._id}`}
+                    className="text-xs text-red-700 font-medium hover:text-red-900"
+                  >
+                    View →
+                  </Link>
+                </div>
+              ))}
+              {floors.filter(f => f.alertType === 'low_capital').map(floor => (
+                <div key={floor._id} className="bg-yellow-50 border border-yellow-400/60 rounded-lg p-3 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-yellow-800">
+                      {getFloorDisplayName(floor.floorNumber, floor.name)}
+                    </p>
+                    <p className="text-xs text-yellow-600">Low capital remaining</p>
+                  </div>
+                  <Link
+                    href={`/floors/${floor._id}`}
+                    className="text-xs text-yellow-700 font-medium hover:text-yellow-900"
+                  >
+                    View →
+                  </Link>
+                </div>
+              ))}
+              {floors.filter(f => f.alertType === 'no_progress').map(floor => (
+                <div key={floor._id} className="bg-blue-50 border border-blue-400/60 rounded-lg p-3 flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-blue-800">
+                      {getFloorDisplayName(floor.floorNumber, floor.name)}
+                    </p>
+                    <p className="text-xs text-blue-600">No progress recorded</p>
+                  </div>
+                  <Link
+                    href={`/floors/${floor._id}#progress`}
+                    className="text-xs text-blue-700 font-medium hover:text-blue-900"
+                  >
+                    Update →
+                  </Link>
+                </div>
+              ))}
             </div>
           </div>
         )}

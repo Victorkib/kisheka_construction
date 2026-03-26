@@ -188,8 +188,23 @@ export async function POST(request, { params }) {
       { returnDocument: 'after' }
     );
 
+    // Fallback in case driver/version does not return .value as expected
+    let updatedProject = result?.value;
+    if (!updatedProject) {
+      updatedProject = await db.collection('projects').findOne({
+        _id: new ObjectId(id),
+      });
+    }
+
+    const updatedProgress =
+      updatedProject?.progress || {
+        photos: [],
+        milestones: [],
+        dailyUpdates: [],
+      };
+
     return successResponse(
-      result.value.progress,
+      updatedProgress,
       type === 'photo' ? 'Photo added successfully' : 'Daily update added successfully'
     );
   } catch (error) {

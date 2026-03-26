@@ -7,7 +7,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
@@ -17,6 +17,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { ConfirmationModal } from '@/components/modals';
 import { useToast } from '@/components/toast';
 import { ImagePreview } from '@/components/uploads/image-preview';
+import { getProfessionalTypeLabel } from '@/lib/professional-services-helpers';
 
 const normalizeId = (value) => {
   if (!value) return '';
@@ -42,22 +43,7 @@ function ProfessionalServiceDetailPageContent() {
   const [fees, setFees] = useState([]);
   const [loadingRelated, setLoadingRelated] = useState(false);
 
-  useEffect(() => {
-    if (assignmentId) {
-      fetchAssignment();
-    } else {
-      setError('Invalid assignment ID');
-      setLoading(false);
-    }
-  }, [assignmentId]);
-
-  useEffect(() => {
-    if (assignment?._id) {
-      fetchRelatedData();
-    }
-  }, [assignment?._id]);
-
-  const fetchAssignment = async () => {
+  const fetchAssignment = useCallback(async () => {
     if (!assignmentId) {
       setError('Invalid assignment ID');
       setLoading(false);
@@ -88,37 +74,61 @@ function ProfessionalServiceDetailPageContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [assignmentId]);
 
-  const fetchRelatedData = async () => {
+  const fetchRelatedData = useCallback(async () => {
     if (!assignment?._id) return;
-
     try {
       setLoadingRelated(true);
+      const [activitiesRes, feesRes] = await Promise.all([
+        fetch(`/api/professional-activities?professionalServiceId=${assignmentId}&limit=100`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            Pragma: 'no-cache',
+          },
+        }),
+        fetch(`/api/professional-fees?professionalServiceId=${assignmentId}&limit=100`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            Pragma: 'no-cache',
+          },
+        }),
+      ]);
 
-      // Fetch activities
-      const activitiesResponse = await fetch(
-        `/api/professional-activities?professionalServiceId=${assignment._id}&limit=10&sortBy=activityDate&sortOrder=desc`
-      );
-      const activitiesData = await activitiesResponse.json();
-      if (activitiesData.success) {
-        setActivities(activitiesData.data.activities || []);
+      const activitiesData = await activitiesRes.json().catch(() => ({}));
+      const feesData = await feesRes.json().catch(() => ({}));
+
+      if (activitiesData?.success) {
+        setActivities(activitiesData.data?.activities || []);
       }
-
-      // Fetch fees
-      const feesResponse = await fetch(
-        `/api/professional-fees?professionalServiceId=${assignment._id}&limit=10&sortBy=createdAt&sortOrder=desc`
-      );
-      const feesData = await feesResponse.json();
-      if (feesData.success) {
-        setFees(feesData.data.fees || []);
+      if (feesData?.success) {
+        setFees(feesData.data?.fees || []);
       }
     } catch (err) {
       console.error('Fetch related data error:', err);
     } finally {
       setLoadingRelated(false);
     }
-  };
+  }, [assignment?._id, assignmentId]);
+
+  useEffect(() => {
+    if (assignmentId) {
+      fetchAssignment();
+    } else {
+      setError('Invalid assignment ID');
+      setLoading(false);
+    }
+  }, [assignmentId, fetchAssignment]);
+
+  useEffect(() => {
+    if (assignment?._id) {
+      fetchRelatedData();
+    }
+  }, [assignment?._id, fetchRelatedData]);
+
+  // NOTE: fetchRelatedData is defined above with useCallback for correct hook deps.
 
   const handleTerminateClick = () => {
     setShowTerminateModal(true);
@@ -235,7 +245,7 @@ function ProfessionalServiceDetailPageContent() {
                 </span>
               </div>
               <p className="ds-text-secondary mt-2">
-                {assignment.professionalCode || 'N/A'} • {assignment.type === 'architect' ? 'Architect' : 'Engineer'}
+                {assignment.professionalCode || 'N/A'} • {getProfessionalTypeLabel(assignment.type)}
               </p>
             </div>
             <div className="flex gap-2">
@@ -276,7 +286,7 @@ function ProfessionalServiceDetailPageContent() {
                 <div>
                   <dt className="text-sm font-medium ds-text-muted">Type</dt>
                   <dd className="mt-1 text-sm ds-text-primary">
-                    {assignment.type === 'architect' ? 'Architect' : 'Engineer'}
+                    {getProfessionalTypeLabel(assignment.type)}
                   </dd>
                 </div>
 

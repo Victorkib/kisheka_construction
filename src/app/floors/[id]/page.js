@@ -15,12 +15,15 @@ import { useToast } from '@/components/toast';
 import { ConfirmationModal } from '@/components/modals';
 import { Breadcrumbs } from '@/components/navigation/Breadcrumbs';
 import { FloorTabNavigation } from '@/components/floors/FloorTabNavigation';
+import { ExecutionSubTabs } from '@/components/floors/ExecutionSubTabs';
 import { FloorOverviewTab } from '@/components/floors/tabs/OverviewTab';
 import { FloorCostsTab } from '@/components/floors/tabs/CostsTab';
 import { FloorActivityTab } from '@/components/floors/tabs/ActivityTab';
 import { FloorBudgetTab } from '@/components/floors/tabs/BudgetTab';
 import { FloorPhaseBreakdownTab } from '@/components/floors/tabs/PhaseBreakdownTab';
 import { FloorProgressSection } from '@/components/floors/FloorProgressSection';
+import { EvidenceComposer } from '@/components/progress/evidence-composer';
+import { EvidenceFeed } from '@/components/progress/evidence-feed';
 import { FinishingWorksTab } from '@/components/floors/tabs/FinishingWorksTab';
 
 export default function FloorDetailPage() {
@@ -54,11 +57,9 @@ export default function FloorDetailPage() {
   const [ledgerItems, setLedgerItems] = useState([]);
   const [phaseBreakdown, setPhaseBreakdown] = useState([]);
   const [activeTab, setActiveTab] = useState('overview');
+  const [activeExecutionSubTab, setActiveExecutionSubTab] = useState('phase-work');
   
-  // Progress changes tracking
-  const [progressChanges, setProgressChanges] = useState(null);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
-  const progressSectionRef = useRef(null);
+  // Progress saving is handled inside the Progress tab components (no global save coupling)
 
   const [formData, setFormData] = useState({
     status: 'NOT_STARTED',
@@ -473,33 +474,6 @@ export default function FloorDetailPage() {
         setFloor(data.data);
         setEditMode(false);
       }
-
-      // Save progress changes if any
-      if (progressChanges) {
-        const progressResponse = await fetch(`/api/floors/${floorId}/progress`, {
-          method: 'PATCH',
-          cache: 'no-store',
-          headers: {
-            'Content-Type': 'application/json',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-            'Pragma': 'no-cache',
-          },
-          body: JSON.stringify(progressChanges),
-        });
-
-        const progressData = await progressResponse.json();
-
-        if (!progressData.success) {
-          throw new Error(progressData.error || 'Failed to update progress');
-        }
-      }
-
-      // Clear progress changes and reset progress section originals
-      if (progressSectionRef.current) {
-        progressSectionRef.current.resetOriginals();
-      }
-      setProgressChanges(null);
-      setHasUnsavedChanges(false);
       
       toast.showSuccess('Changes saved successfully');
       // Refresh to get updated data
@@ -513,13 +487,9 @@ export default function FloorDetailPage() {
     }
   };
 
-  const handleProgressChange = (changes) => {
-    setProgressChanges(changes);
-    setHasUnsavedChanges(true);
-    // Auto-enable edit mode if not already enabled
-    if (!editMode) {
-      setEditMode(true);
-    }
+  const handleProgressChange = () => {
+    // Progress updates are saved inside the Progress tab components.
+    // Keeping this for backward compatibility with older child components.
   };
 
   const handleDelete = async () => {
@@ -621,90 +591,206 @@ export default function FloorDetailPage() {
     ? ((formData.actualCost / formData.totalBudget) * 100).toFixed(1)
     : 0;
 
-  // Prepare tabs
+  // Consolidated tabs: 4 tabs instead of 7
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: '📋' },
-    { id: 'phases', label: 'Phase Breakdown', icon: '🏗️' },
-    { id: 'budget', label: 'Budget by Phase', icon: '💵' },
-    { id: 'finishing', label: 'Finishing Works', icon: '🎨' },
-    { id: 'costs', label: 'Costs', icon: '💰', badge: floorSummary.materials.count + floorSummary.labour.count },
-    { id: 'activity', label: 'Activity', icon: '📊', badge: ledgerItems.length },
-    { id: 'progress', label: 'Progress', icon: '📈' },
+    { id: 'summary', label: 'Summary', icon: '📋', badge: floorSummary.materials.count + floorSummary.labour.count },
+    { id: 'financials', label: 'Financials', icon: '💰', badge: ledgerItems.length },
+    { id: 'execution', label: 'Execution', icon: '🏗️' },
+    { id: 'tracking', label: 'Tracking', icon: '📊' },
   ];
 
-  // Render tab content
+  // Render tab content for consolidated tabs
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'overview':
+      case 'summary':
         return (
-          <FloorOverviewTab
-            floor={floor}
-            project={project}
-            canEdit={canEdit}
-            onStatusChange={(status) => {
-              setFormData(prev => ({ ...prev, status }));
-              handleSave();
-            }}
-            formatDate={formatDate}
-            formatCurrency={formatCurrency}
-            getStatusColor={getStatusBadgeColor}
-            floorSummary={floorSummary}
-          />
+          <div className="space-y-6">
+            {/* Summary Tab: Combines Overview + Key Stats */}
+            <FloorOverviewTab
+              floor={floor}
+              project={project}
+              canEdit={canEdit}
+              onStatusChange={(status) => {
+                setFormData(prev => ({ ...prev, status }));
+                handleSave();
+              }}
+              formatDate={formatDate}
+              formatCurrency={formatCurrency}
+              getStatusColor={getStatusBadgeColor}
+              floorSummary={floorSummary}
+            />
+            {/* Quick Costs Summary */}
+            <FloorCostsTab
+              floor={floor}
+              floorSummary={floorSummary}
+              formatCurrency={formatCurrency}
+            />
+          </div>
         );
-      case 'phases':
+      case 'financials':
         return (
-          <FloorPhaseBreakdownTab
-            floor={floor}
-            project={project}
-            formatCurrency={formatCurrency}
-            formatDate={formatDate}
-            canEdit={canEdit}
-          />
+          <div className="space-y-6">
+            {/* Financials Tab: Combines Budget + Costs + Capital */}
+            <FloorBudgetTab
+              floor={floor}
+              project={project}
+              formatCurrency={formatCurrency}
+              canEdit={canEdit}
+            />
+            {/* Capital Allocation Summary */}
+            {(() => {
+              const capitalAllocation = floor.capitalAllocation || { total: 0, used: 0, committed: 0, remaining: 0 };
+              const capitalTotal = capitalAllocation.total || 0;
+              const budgetTotal = floor.budgetAllocation?.total || floor.totalBudget || 0;
+              const capitalCoverage = budgetTotal > 0 ? (capitalTotal / budgetTotal) * 100 : 0;
+              
+              return (
+                <div className="ds-bg-accent-subtle border ds-border-accent-subtle rounded-lg p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold ds-text-primary">Capital Allocation</h3>
+                    {canEdit && (
+                      <Link
+                        href={`/floors/${floorId}/budget`}
+                        className="text-sm ds-text-accent-primary hover:ds-text-accent-hover font-medium underline"
+                      >
+                        Manage Capital →
+                      </Link>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div>
+                      <p className="text-sm ds-text-secondary">Total Capital</p>
+                      <p className="text-xl font-bold text-purple-700">{formatCurrency(capitalTotal)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm ds-text-secondary">Used</p>
+                      <p className="text-xl font-bold ds-text-accent-primary">{formatCurrency(capitalAllocation.used || 0)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm ds-text-secondary">Committed</p>
+                      <p className="text-xl font-bold text-yellow-600">{formatCurrency(capitalAllocation.committed || 0)}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm ds-text-secondary">Remaining</p>
+                      <p className={`text-xl font-bold ${
+                        capitalAllocation.remaining < 0 ? 'ds-text-danger' : 'ds-text-success'
+                      }`}>{formatCurrency(capitalAllocation.remaining || 0)}</p>
+                    </div>
+                  </div>
+                  {budgetTotal > 0 && (
+                    <div className="mt-4 pt-4 border-t ds-border-accent-subtle">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium ds-text-secondary">Capital Coverage</span>
+                        <span className="text-sm ds-text-secondary">{formatCurrency(capitalTotal)} / {formatCurrency(budgetTotal)}</span>
+                      </div>
+                      <div className="w-full ds-bg-surface-muted rounded-full h-3">
+                        <div
+                          className={`h-3 rounded-full ${
+                            capitalCoverage >= 100
+                              ? 'ds-bg-success'
+                              : capitalCoverage >= 80
+                              ? 'ds-bg-warning'
+                              : 'ds-bg-danger'
+                          }`}
+                          style={{ width: `${Math.min(capitalCoverage, 100)}%` }}
+                        />
+                      </div>
+                      <p className="text-xs ds-text-secondary mt-2">
+                        Capital covers {capitalCoverage.toFixed(1)}% of budget.
+                        {capitalCoverage < 80 && ' Consider allocating more capital.'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+          </div>
         );
-      case 'budget':
+      case 'execution':
         return (
-          <FloorBudgetTab
-            floor={floor}
-            project={project}
-            formatCurrency={formatCurrency}
-            canEdit={canEdit}
-          />
+          <div className="space-y-4">
+            {/* Execution Sub-Tabs */}
+            <ExecutionSubTabs
+              activeSubTab={activeExecutionSubTab}
+              onSubTabChange={setActiveExecutionSubTab}
+            />
+            
+            {/* Sub-Tab Content */}
+            {activeExecutionSubTab === 'phase-work' && (
+              <FloorPhaseBreakdownTab
+                floor={floor}
+                project={project}
+                formatCurrency={formatCurrency}
+                formatDate={formatDate}
+                canEdit={canEdit}
+              />
+            )}
+            
+            {activeExecutionSubTab === 'finishing' && (
+              <FinishingWorksTab
+                floor={floor}
+                formatCurrency={formatCurrency}
+              />
+            )}
+            
+            {activeExecutionSubTab === 'progress' && (
+              <>
+                <FloorProgressSection
+                  floorId={floorId}
+                  canEdit={canEdit}
+                  projectId={floor?.projectId}
+                  onProgressChange={handleProgressChange}
+                />
+                {floor?.projectId && (
+                  <>
+                    <EvidenceComposer
+                      projectId={floor.projectId.toString()}
+                      floorId={floorId}
+                    />
+                    <EvidenceFeed
+                      projectId={floor.projectId.toString()}
+                      floorId={floorId}
+                    />
+                  </>
+                )}
+              </>
+            )}
+            
+            {activeExecutionSubTab === 'evidence' && (
+              <div className="space-y-4">
+                {floor?.projectId ? (
+                  <>
+                    <EvidenceComposer
+                      projectId={floor.projectId.toString()}
+                      floorId={floorId}
+                    />
+                    <EvidenceFeed
+                      projectId={floor.projectId.toString()}
+                      floorId={floorId}
+                    />
+                  </>
+                ) : (
+                  <div className="ds-bg-surface rounded-lg shadow p-8 text-center">
+                    <p className="ds-text-secondary">No project associated with this floor</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         );
-      case 'costs':
+      case 'tracking':
         return (
-          <FloorCostsTab
-            floor={floor}
-            floorSummary={floorSummary}
-            formatCurrency={formatCurrency}
-          />
-        );
-      case 'finishing':
-        return (
-          <FinishingWorksTab
-            floor={floor}
-            formatCurrency={formatCurrency}
-          />
-        );
-      case 'activity':
-        return (
-          <FloorActivityTab
-            floor={floor}
-            ledgerItems={ledgerItems}
-            phaseBreakdown={phaseBreakdown}
-            formatDate={formatDate}
-            formatCurrency={formatCurrency}
-            floorSummary={floorSummary}
-          />
-        );
-      case 'progress':
-        return (
-          <FloorProgressSection 
-            ref={progressSectionRef}
-            floorId={floorId} 
-            canEdit={canEdit} 
-            projectId={floor?.projectId}
-            onProgressChange={handleProgressChange}
-          />
+          <div className="space-y-6">
+            {/* Tracking Tab: Activity Ledger + Timeline */}
+            <FloorActivityTab
+              floor={floor}
+              ledgerItems={ledgerItems}
+              phaseBreakdown={phaseBreakdown}
+              formatDate={formatDate}
+              formatCurrency={formatCurrency}
+              floorSummary={floorSummary}
+            />
+          </div>
         );
       default:
         return null;
@@ -755,13 +841,11 @@ export default function FloorDetailPage() {
             </div>
             {canEdit && (
               <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
-                {editMode || hasUnsavedChanges ? (
+                {editMode ? (
                   <>
                     <button
                       onClick={() => {
                         setEditMode(false);
-                        setProgressChanges(null);
-                        setHasUnsavedChanges(false);
                         fetchFloor(); // Reset form
                       }}
                       className="flex-1 sm:flex-none px-4 py-2.5 border ds-border-subtle rounded-lg hover:ds-bg-surface-muted active:ds-bg-surface-muted transition-colors text-sm font-medium touch-manipulation"
@@ -841,39 +925,7 @@ export default function FloorDetailPage() {
           {renderTabContent()}
         </div>
 
-        {/* Floating Save Button - Shows when there are unsaved progress changes */}
-        {hasUnsavedChanges && !saving && (
-          <>
-            <style jsx>{`
-              @keyframes slide-up {
-                from {
-                  transform: translateY(100px);
-                  opacity: 0;
-                }
-                to {
-                  transform: translateY(0);
-                  opacity: 1;
-                }
-              }
-              .animate-slide-up {
-                animation: slide-up 0.3s ease-out;
-              }
-            `}</style>
-            <div className="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 z-50 animate-slide-up">
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="ds-bg-accent-primary hover:ds-bg-accent-hover active:ds-bg-accent-active text-white font-semibold px-4 sm:px-6 py-3 sm:py-4 rounded-xl shadow-2xl hover:shadow-3xl transition-all duration-200 transform hover:-translate-y-1 active:translate-y-0 flex items-center gap-2 sm:gap-3 min-w-[140px] sm:min-w-[180px] justify-center text-sm sm:text-base touch-manipulation"
-              >
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="hidden sm:inline">Save Changes</span>
-                <span className="sm:hidden">Save</span>
-              </button>
-            </div>
-          </>
-        )}
+        {/* Progress tab saves within its components; no floating global save for progress */}
 
         {/* Edit Mode Form (shown when editMode is true) */}
         {editMode && (

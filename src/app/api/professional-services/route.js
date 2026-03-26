@@ -19,7 +19,7 @@ import {
   validateProfessionalServices,
   generateProfessionalCode,
 } from '@/lib/schemas/professional-services-schema';
-import { PROFESSIONAL_SERVICE_STATUSES } from '@/lib/constants/professional-services-constants';
+import { PROFESSIONAL_SERVICE_STATUSES, PROFESSIONAL_TYPES } from '@/lib/constants/professional-services-constants';
 
 // Force dynamic rendering to prevent caching stale data
 export const dynamic = 'force-dynamic';
@@ -42,7 +42,7 @@ export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get('projectId');
     const libraryId = searchParams.get('libraryId');
-    const type = searchParams.get('type'); // 'architect' or 'engineer'
+    const type = searchParams.get('type');
     const status = searchParams.get('status');
     const search = searchParams.get('search');
     const page = parseInt(searchParams.get('page') || '1', 10);
@@ -63,7 +63,7 @@ export async function GET(request) {
       query.libraryId = new ObjectId(libraryId);
     }
 
-    if (type && ['architect', 'engineer'].includes(type)) {
+    if (type && PROFESSIONAL_TYPES.includes(type)) {
       query.type = type;
     }
 
@@ -289,6 +289,7 @@ export async function POST(request) {
     const ratesSnapshot = {
       hourlyRate: libraryEntry.defaultHourlyRate || null,
       perVisitRate: libraryEntry.defaultPerVisitRate || null,
+      perFloorRate: libraryEntry.defaultPerFloorRate || null,
       monthlyRetainer: libraryEntry.defaultMonthlyRetainer || null,
       snapshotDate: new Date(),
       libraryId: new ObjectId(body.libraryId),
@@ -314,6 +315,7 @@ export async function POST(request) {
       // Denormalize rates for quick access and historical accuracy
       hourlyRate: ratesSnapshot.hourlyRate,
       perVisitRate: ratesSnapshot.perVisitRate,
+      perFloorRate: ratesSnapshot.perFloorRate,
       monthlyRetainer: ratesSnapshot.monthlyRetainer,
       ratesSnapshot,
       totalFees: 0,

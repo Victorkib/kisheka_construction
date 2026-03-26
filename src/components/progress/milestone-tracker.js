@@ -159,18 +159,22 @@ export function MilestoneTracker({ projectId, milestones = [], onMilestoneUpdate
     setError(null);
 
     try {
-      // Find the milestone to get its name for fallback
+      // Find the milestone to get its name for logging/fallback
       const milestone = milestonesList.find(
         (m) => (m._id?.toString() || m._id || m.tempId) === milestoneId
       );
 
-      const response = await fetch(`/api/projects/${projectId}/progress?milestoneId=${milestoneId}`, {
-        method: 'DELETE',
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-        },
+      const response = await fetch(`/api/projects/${projectId}/progress`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'delete',
+          milestone: {
+            _id: milestoneId,
+            // include name as a fallback identifier for API-side matching/logging
+            name: milestone?.name,
+          },
+        }),
       });
 
       const data = await response.json();

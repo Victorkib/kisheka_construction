@@ -662,7 +662,7 @@ export async function getProjectPhases(projectId, includeFinancials = true) {
       ]).toArray();
       
       // Calculate professional services spending for this phase
-      const { calculatePhaseProfessionalServicesSpending } = await import('@/lib/professional-services-helpers');
+      const { calculatePhaseProfessionalServicesSpending } = await import('@/lib/professional-services-stats');
       const professionalServicesSpending = await calculatePhaseProfessionalServicesSpending(phase._id.toString());
       
       // Calculate labour spending from approved/paid labour entries
@@ -830,12 +830,21 @@ export async function calculatePhaseCommittedCost(phaseId) {
   }).toArray();
   
   let committedCost = 0;
-  
+
   // Get professional services committed cost for this phase
-  const { calculatePhaseProfessionalServicesCommittedCost } = await import('@/lib/professional-services-helpers');
-  const professionalServicesCommitted = await calculatePhaseProfessionalServicesCommittedCost(phaseId);
+  // Professional services fees that are approved but not yet paid
+  const professionalServicesFees = await db.collection('professional_fees').find({
+    phaseId: new ObjectId(phaseId),
+    status: { $in: ['approved', 'ready_for_payment'] },
+    deletedAt: null
+  }).toArray();
+
+  const professionalServicesCommitted = professionalServicesFees.reduce((total, fee) => {
+    return total + (fee.totalCost || 0);
+  }, 0);
+
   committedCost += professionalServicesCommitted;
-  
+
   // Phase 4: Add equipment committed costs
   const equipmentCommitted = await calculatePhaseEquipmentCommittedCost(phaseId);
   committedCost += equipmentCommitted;
@@ -1019,7 +1028,7 @@ export async function recalculatePhaseSpending(phaseId) {
   ]).toArray();
   
   // Calculate professional services spending for this phase
-  const { calculatePhaseProfessionalServicesSpending } = await import('@/lib/professional-services-helpers');
+  const { calculatePhaseProfessionalServicesSpending } = await import('@/lib/professional-services-stats');
   const professionalServicesSpending = await calculatePhaseProfessionalServicesSpending(phaseId.toString());
   
   // Calculate committed cost

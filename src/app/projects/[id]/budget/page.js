@@ -11,7 +11,10 @@ import { useState, useEffect, Suspense } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
-import { EnhancedBudgetInput } from '@/components/budget/EnhancedBudgetInput';
+import { SmartBudgetInput } from '@/components/budget/SmartBudgetInput';
+import { BudgetWizard } from '@/components/budget/BudgetWizard';
+import { BudgetManagementDrawer } from '@/components/budget/BudgetManagementDrawer';
+import { FinancialScenarioBanners } from '@/components/budget/FinancialScenarioBanners';
 import { BudgetAdjustmentForm } from '@/components/budget/BudgetAdjustmentForm';
 import { BudgetTransferForm } from '@/components/budget/BudgetTransferForm';
 import { PreBudgetSpendingSummary } from '@/components/budget/PreBudgetSpendingSummary';
@@ -44,19 +47,14 @@ function BudgetManagementContent() {
   const [phases, setPhases] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showEditBudget, setShowEditBudget] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false); // Budget management drawer
   const [showAdjustmentForm, setShowAdjustmentForm] = useState(false);
   const [showTransferForm, setShowTransferForm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [budgetData, setBudgetData] = useState(null);
-  const [reallocatePhases, setReallocatePhases] = useState(false); // Phase 2: Flag to rescale phase budgets when DCC changes
-  const [autoAllocatePhases, setAutoAllocatePhases] = useState(true); // Phase 1: Flag to auto-allocate budgets to existing phases (default: true)
-  const [originalBudgetData, setOriginalBudgetData] = useState(null);
-  const [showAllocationPreview, setShowAllocationPreview] = useState(false);
-  const [budgetValidationWarnings, setBudgetValidationWarnings] = useState([]);
-  const [preBudgetSummary, setPreBudgetSummary] = useState(null);
   const [allocatingFloors, setAllocatingFloors] = useState(false);
-  const [floorAllocationStrategy, setFloorAllocationStrategy] = useState('weighted'); // 'even' | 'weighted'
+  const [budgetData, setBudgetData] = useState(null);
+  const [preBudgetSummary, setPreBudgetSummary] = useState(null);
+  const [budgetValidationWarnings, setBudgetValidationWarnings] = useState([]);
 
   useEffect(() => {
     if (projectId) {
@@ -83,7 +81,6 @@ function BudgetManagementContent() {
       }
       setProject(projectResult.data);
       setBudgetData(projectResult.data.budget);
-      setOriginalBudgetData(projectResult.data.budget);
 
       // Fetch financial overview
       const overviewResponse = await fetch(`/api/projects/${projectId}/financial-overview`, {
@@ -141,100 +138,31 @@ function BudgetManagementContent() {
     }
   };
 
-  const handleBudgetChange = (newBudget) => {
-    setBudgetData(newBudget);
-    setBudgetValidationWarnings([]);
-    
-    // Real-time validation against spending
-    if (preBudgetSummary && newBudget) {
-      const warnings = [];
-      const dcc = newBudget.directConstructionCosts || 0;
-      const preConstruction = newBudget.preConstructionCosts || 0;
-      const indirect = newBudget.indirectCosts || 0;
-      const contingency = newBudget.contingencyReserve || 0;
-      
-      // DCC validation
-      if (dcc > 0 && dcc < preBudgetSummary.totalSpending.dcc) {
-        warnings.push({
-          category: 'DCC',
-          message: `DCC budget (${dcc.toLocaleString()}) is less than DCC spending (${preBudgetSummary.totalSpending.dcc.toLocaleString()})`,
-          recommended: preBudgetSummary.recommendations.dcc
-        });
-      } else if (dcc > 0 && dcc < preBudgetSummary.recommendations.dcc * 0.95) {
-        warnings.push({
-          category: 'DCC',
-          message: `DCC budget is close to spending. Recommended: ${preBudgetSummary.recommendations.dcc.toLocaleString()}`,
-          recommended: preBudgetSummary.recommendations.dcc
-        });
-      }
-      
-      // Pre-construction validation
-      if (preConstruction > 0 && preConstruction < preBudgetSummary.totalSpending.preConstruction) {
-        warnings.push({
-          category: 'Pre-Construction',
-          message: `Pre-construction budget (${preConstruction.toLocaleString()}) is less than spending (${preBudgetSummary.totalSpending.preConstruction.toLocaleString()})`,
-          recommended: preBudgetSummary.recommendations.preConstruction
-        });
-      }
-      
-      // Indirect validation
-      if (indirect > 0 && indirect < preBudgetSummary.totalSpending.indirect) {
-        warnings.push({
-          category: 'Indirect',
-          message: `Indirect costs budget (${indirect.toLocaleString()}) is less than spending (${preBudgetSummary.totalSpending.indirect.toLocaleString()})`,
-          recommended: preBudgetSummary.recommendations.indirect
-        });
-      }
-      
-      setBudgetValidationWarnings(warnings);
-    }
-  };
-
-  const handleUseRecommendedBudget = (recommendations) => {
-    if (recommendations) {
-      const recommendedBudget = {
-        directConstructionCosts: recommendations.dcc || 0,
-        preConstructionCosts: recommendations.preConstruction || 0,
-        indirectCosts: recommendations.indirect || 0,
-        contingencyReserve: recommendations.contingency || 0,
-        total: recommendations.total || 0
-      };
-      setBudgetData(recommendedBudget);
-      setBudgetValidationWarnings([]);
-      toast.showSuccess('Recommended budget applied');
-    }
-  };
-
-  const handleSaveBudget = async () => {
-    if (!budgetData) {
-      toast.showError('No budget data to save');
-      return;
-    }
-
-    // Check if this is zero-to-non-zero transition and show preview
-    const currentBudget = project?.budget || {};
-    const currentBudgetTotal = currentBudget.total || currentBudget.directConstructionCosts || 0;
-    const newBudgetTotal = budgetData.total || budgetData.directConstructionCosts || 0;
-    const isZeroToNonZero = currentBudgetTotal <= 0 && newBudgetTotal > 0;
-    
-    if (isZeroToNonZero && autoAllocatePhases && !showAllocationPreview) {
-      // Show preview before saving
-      setShowAllocationPreview(true);
-      return;
-    }
-
-    // Proceed with save
-    await performSaveBudget();
-  };
-
-  const performSaveBudget = async () => {
-    if (!budgetData) {
-      toast.showError('No budget data to save');
-      return;
-    }
-
+  const handleDrawerSave = async (budgetData) => {
     setIsSaving(true);
     try {
+      // Extract allocation preferences if present (from wizard)
+      const allocationPrefs = budgetData.allocationPrefs || {};
+      const dccBreakdown = budgetData.dccBreakdown || {};
+      
+      // Clean payload for API - include allocation preferences
+      const apiPayload = {
+        budget: {
+          total: budgetData.total,
+          directConstructionCosts: budgetData.directConstructionCosts,
+          preConstructionCosts: budgetData.preConstructionCosts,
+          indirectCosts: budgetData.indirectCosts,
+          contingencyReserve: budgetData.contingencyReserve,
+          _detailedBreakdown: budgetData._detailedBreakdown
+        },
+        // Support allocation preferences from wizard
+        reallocatePhases: allocationPrefs.autoAllocateToPhases || false,
+        autoAllocatePhases: allocationPrefs.autoAllocateToPhases || false,
+        // Floor allocation preferences
+        floorAllocationStrategy: allocationPrefs.floorAllocationStrategy || 'weighted',
+        autoAllocateFloors: allocationPrefs.autoAllocateToFloors || false
+      };
+
       const response = await fetch(`/api/projects/${projectId}`, {
         method: 'PATCH',
         cache: 'no-store',
@@ -243,11 +171,7 @@ function BudgetManagementContent() {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
           'Pragma': 'no-cache',
         },
-        body: JSON.stringify({
-          budget: budgetData,
-          reallocatePhases: reallocatePhases || false, // Phase 2: Include reallocation flag
-          autoAllocatePhases: autoAllocatePhases !== false, // Phase 1: Auto-allocate to existing phases (default: true)
-        }),
+        body: JSON.stringify(apiPayload),
       });
 
       const result = await response.json();
@@ -255,57 +179,14 @@ function BudgetManagementContent() {
         throw new Error(result.error || 'Failed to update budget');
       }
 
-      // Show success message with phase allocation/rescale info if applicable
-      let successMessage = 'Budget updated successfully!';
-      let hasWarnings = false;
+      setBudgetData(budgetData);
+      toast.showSuccess('Budget updated successfully!');
+      setShowDrawer(false);
       
-      if (result.data?._phaseAllocation && result.data._phaseAllocation.allocated > 0) {
-        successMessage += ` Budgets auto-allocated to ${result.data._phaseAllocation.allocated} phase(s).`;
-        
-        // Show warnings if any
-        if (result.data._phaseAllocation.warnings && result.data._phaseAllocation.warnings.length > 0) {
-          hasWarnings = true;
-          const warningCount = result.data._phaseAllocation.warnings.length;
-          successMessage += ` ${warningCount} warning(s) generated.`;
-          
-          // Show detailed warnings in console for debugging
-          console.warn('Phase allocation warnings:', result.data._phaseAllocation.warnings);
-          
-          // Show first warning as toast for visibility
-          const firstWarning = result.data._phaseAllocation.warnings[0];
-          if (firstWarning.message) {
-            toast.showWarning(firstWarning.message);
-          }
-        }
-      }
-      
-      if (result.data?._phaseRescale && result.data._phaseRescale.rescaled > 0) {
-        successMessage += ` Phase budgets rescaled: ${result.data._phaseRescale.rescaled} phases updated.`;
-        if (result.data._phaseRescale.floorRescale && result.data._phaseRescale.floorRescale.rescaled > 0) {
-          successMessage += ` Floor budgets rescaled: ${result.data._phaseRescale.floorRescale.rescaled} floors updated.`;
-        }
-      }
-      
-      // Show validation warnings if any
-      if (result.data?._budgetValidationWarnings && result.data._budgetValidationWarnings.length > 0) {
-        result.data._budgetValidationWarnings.forEach(warning => {
-          toast.showWarning(warning);
-        });
-      }
-      
-      if (hasWarnings) {
-        toast.showWarning(successMessage);
-      } else {
-        toast.showSuccess(successMessage);
-      }
-      setShowEditBudget(false);
-      setShowAllocationPreview(false);
-      setReallocatePhases(false);
-      setAutoAllocatePhases(true); // Reset to default
-      await fetchData(); // Refresh data
-    } catch (err) {
-      toast.showError(err.message || 'Failed to update budget');
-      console.error('Update budget error:', err);
+      // Refresh data to show updated budget
+      await fetchData();
+    } catch (error) {
+      toast.showError(error.message || 'Failed to update budget');
     } finally {
       setIsSaving(false);
     }
@@ -328,8 +209,8 @@ function BudgetManagementContent() {
           'Pragma': 'no-cache',
         },
         body: JSON.stringify({
-          strategy: floorAllocationStrategy,
-          onlyZeroBudgets: true
+          strategy: 'weighted', // Use weighted distribution by default
+          onlyZeroBudgets: true // Only allocate to floors with zero budgets
         }),
       });
 
@@ -361,12 +242,53 @@ function BudgetManagementContent() {
     }
   };
 
+  const handleUseRecommendedBudget = (recommendations) => {
+    if (recommendations) {
+      const recommendedBudget = {
+        total: recommendations.total || 0,
+        directConstructionCosts: recommendations.dcc || 0,
+        preConstructionCosts: recommendations.preConstruction || 0,
+        indirectCosts: recommendations.indirect || 0,
+        contingencyReserve: recommendations.contingency || 0,
+        // Keep detailed breakdowns for backward compatibility
+        _detailedBreakdown: budgetData?._detailedBreakdown || {
+          materials: { total: 0, structural: 0, finishing: 0, mep: 0, specialty: 0 },
+          labour: { total: 0, skilled: 0, unskilled: 0, supervisory: 0, specialized: 0 },
+          equipment: { total: 0, rental: 0, purchase: 0, maintenance: 0 },
+          subcontractors: { total: 0, specializedTrades: 0, professionalServices: 0 },
+          preConstruction: {
+            total: 0,
+            landAcquisition: 0,
+            legalRegulatory: 0,
+            permitsApprovals: 0,
+            sitePreparation: 0,
+          },
+          indirect: {
+            total: 0,
+            siteOverhead: 0,
+            transportation: 0,
+            utilities: 0,
+            safetyCompliance: 0,
+          },
+          contingency: {
+            total: 0,
+            designContingency: 0,
+            constructionContingency: 0,
+            ownersReserve: 0,
+          },
+        }
+      };
+      setBudgetData(recommendedBudget);
+      toast.showSuccess('Recommended budget applied');
+    }
+  };
+
+  // Helper functions for data formatting
   const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-KE', {
       style: 'currency',
       currency: 'KES',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
     }).format(amount || 0);
   };
 
@@ -653,6 +575,14 @@ function BudgetManagementContent() {
           </div>
         </div>
 
+        {/* Scenario-Based Guidance Banner */}
+        <FinancialScenarioBanners
+          projectId={projectId}
+          budget={budgetData}
+          capital={financialOverview?.capital}
+          spending={financialOverview?.actual}
+        />
+
         {/* Budget Breakdown Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Pie Chart */}
@@ -717,148 +647,38 @@ function BudgetManagementContent() {
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => {
-                if (!showEditBudget) {
-                  setOriginalBudgetData(project.budget);
-                  setReallocatePhases(false);
-                }
-                setShowEditBudget(!showEditBudget);
+                setShowDrawer(true);
               }}
-              className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 transition text-sm font-medium"
+              className="px-4 py-2 ds-bg-accent-primary bg-blue-600 text-white rounded-lg hover:ds-bg-accent-hover transition text-sm font-medium"
+              title="Smart budget management with Quick Edit & Wizard modes"
             >
-              {showEditBudget ? 'Cancel Edit' : 'Edit Budget'}
+              🗄️ Manage Budget
             </button>
+            
             <button
               onClick={() => setShowAdjustmentForm(!showAdjustmentForm)}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm font-medium"
+              title="Create budget adjustments for changes"
             >
               {showAdjustmentForm ? 'Cancel Adjustment' : 'Create Adjustment'}
             </button>
+            
             <button
               onClick={() => setShowTransferForm(!showTransferForm)}
               className="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition text-sm font-medium"
+              title="Transfer budget between categories"
             >
               {showTransferForm ? 'Cancel Transfer' : 'Transfer Budget'}
             </button>
+            
             <Link
               href={`/investors?projectId=${projectId}`}
               className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition text-sm font-medium"
+              title="Manage capital and investor relations"
             >
               Manage Capital
             </Link>
           </div>
-
-          {/* Allocation Preview */}
-          {showAllocationPreview && (
-            <div className="mt-6 border-t ds-border-subtle pt-6">
-              <AllocationPreview
-                projectId={projectId}
-                proposedBudget={budgetData}
-                phases={phases}
-                onConfirm={async () => {
-                  setShowAllocationPreview(false);
-                  await performSaveBudget();
-                }}
-                onCancel={() => {
-                  setShowAllocationPreview(false);
-                }}
-              />
-            </div>
-          )}
-
-          {/* Edit Budget Form */}
-          {showEditBudget && !showAllocationPreview && (
-            <div className="mt-6 border-t ds-border-subtle pt-6">
-              <h3 className="text-md font-semibold ds-text-primary mb-4">Edit Budget</h3>
-              <EnhancedBudgetInput
-                value={budgetData}
-                onChange={handleBudgetChange}
-                showAdvanced={true}
-              />
-              {/* Phase 1: Option to auto-allocate budgets to existing phases (zero-to-non-zero transition) */}
-              {originalBudgetData && budgetData && (() => {
-                const oldDcc = originalBudgetData.directConstructionCosts || 0;
-                const newDcc = budgetData.directConstructionCosts || 0;
-                const isZeroToNonZero = oldDcc <= 0 && newDcc > 0;
-                
-                // Check if phases have zero budgets
-                const phasesWithZeroBudgets = phases.filter(phase => {
-                  const phaseBudget = phase.budgetAllocation?.total || 0;
-                  return phaseBudget === 0;
-                });
-                
-                return isZeroToNonZero && phasesWithZeroBudgets.length > 0 ? (
-                  <div className="mt-4 p-4 bg-green-50 border border-green-400/60 rounded-lg">
-                    <label className="flex items-start cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={autoAllocatePhases}
-                        onChange={(e) => setAutoAllocatePhases(e.target.checked)}
-                        className="mt-1 mr-3 h-4 w-4 text-green-600 focus:ring-green-500 ds-border-subtle rounded"
-                      />
-                      <div className="flex-1">
-                        <span className="text-sm font-medium ds-text-primary">
-                          Automatically allocate budgets to {phasesWithZeroBudgets.length} phase(s) with zero budgets
-                        </span>
-                        <p className="text-xs ds-text-secondary mt-1">
-                          When enabled, budgets will be automatically allocated to existing phases based on standard percentages:
-                          Basement (15%), Superstructure (65%), Finishing (15%), Final Systems (5%). 
-                          You can opt-out by unchecking this box.
-                        </p>
-                      </div>
-                    </label>
-                  </div>
-                ) : null;
-              })()}
-              {/* Phase 2: Option to rescale phase budgets when DCC changes */}
-              {originalBudgetData && budgetData && (() => {
-                const oldDcc = originalBudgetData.directConstructionCosts || 0;
-                const newDcc = budgetData.directConstructionCosts || 0;
-                const dccChanged = oldDcc !== newDcc && oldDcc > 0 && newDcc > 0;
-                return dccChanged ? (
-                  <div className="mt-4 p-4 bg-blue-50 border border-blue-400/60 rounded-lg">
-                    <label className="flex items-start cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={reallocatePhases}
-                        onChange={(e) => setReallocatePhases(e.target.checked)}
-                        className="mt-1 mr-3 h-4 w-4 ds-text-accent-primary focus:ring-ds-accent-focus ds-border-subtle rounded"
-                      />
-                      <div className="flex-1">
-                        <span className="text-sm font-medium ds-text-primary">
-                          Also reallocate phase budgets proportionally to match new DCC
-                        </span>
-                        <p className="text-xs ds-text-secondary mt-1">
-                          When enabled, all phase budgets will be scaled proportionally based on the change in Direct Construction Costs (DCC). 
-                          This ensures phase budgets remain proportional to the new project budget.
-                        </p>
-                      </div>
-                    </label>
-                  </div>
-                ) : null;
-              })()}
-              <div className="mt-4 flex gap-3">
-                <button
-                  onClick={handleSaveBudget}
-                  disabled={isSaving}
-                  className="px-4 py-2 ds-bg-accent-primary text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                >
-                  {isSaving ? 'Saving...' : 'Save Budget'}
-                </button>
-                <button
-                  onClick={() => {
-                    setShowEditBudget(false);
-                    setBudgetData(project.budget);
-                    setOriginalBudgetData(project.budget);
-                    setReallocatePhases(false);
-                    setAutoAllocatePhases(true); // Reset to default
-                  }}
-                  className="px-4 py-2 ds-bg-surface-muted ds-text-secondary rounded-lg hover:ds-bg-surface-muted text-sm font-medium"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
 
           {/* Budget Adjustment Form */}
           {showAdjustmentForm && (
@@ -1135,6 +955,16 @@ function BudgetManagementContent() {
             </table>
           </div>
         </div>
+
+        {/* Budget Management Drawer */}
+        <BudgetManagementDrawer
+          projectId={projectId}
+          isOpen={showDrawer}
+          onClose={() => setShowDrawer(false)}
+          existingBudget={budgetData}
+          preBudgetSummary={preBudgetSummary}
+          onSave={handleDrawerSave}
+        />
       </div>
     </AppLayout>
   );

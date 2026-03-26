@@ -20,6 +20,7 @@ import { FINISHING_EXECUTION_MODELS } from '@/lib/constants/finishing-work-const
 import { WorkItemLabourTracking } from '@/components/work-items/labour-tracking';
 import { MultiWorkerSelector } from '@/components/work-items/multi-worker-selector';
 import { AssignmentHistory } from '@/components/work-items/assignment-history';
+import { DollarSign, Clock } from 'lucide-react';
 
 export default function WorkItemDetailPage() {
   const router = useRouter();
@@ -61,6 +62,8 @@ export default function WorkItemDetailPage() {
     executionModel: '',
     subcontractorId: ''
   });
+  const [budgetContext, setBudgetContext] = useState(null);
+  const [loadingBudget, setLoadingBudget] = useState(false);
 
   useEffect(() => {
     fetchWorkItem();
@@ -109,6 +112,12 @@ export default function WorkItemDetailPage() {
       }
 
       setWorkItem(data.data);
+
+      // Fetch budget context if phase exists
+      if (data.data.phaseId) {
+        fetchBudgetContext(data.data.phaseId, data.data.floorId, data.data.estimatedCost);
+      }
+      
       
       // Populate form data
       // Handle assignedTo - support both array and single ObjectId (backward compatibility)
@@ -209,6 +218,31 @@ export default function WorkItemDetailPage() {
     }
   };
 
+  const getFloorLabel = () => {
+    if (!workItem?.floor?.floorNumber) return null;
+    const n = workItem.floor.floorNumber;
+    if (n === 0) return 'Ground Floor';
+    if (n < 0) return `Basement ${Math.abs(n)}`;
+    return `Floor ${n}`;
+  };
+
+  const getScopeBadge = () => {
+    const scope = workItem?.scope || 'phase';
+    const config = {
+      project: { label: 'Project', color: 'bg-purple-100 text-purple-800 border-purple-400/60', icon: '🌍' },
+      phase: { label: 'Phase', color: 'bg-blue-100 text-blue-800 border-blue-400/60', icon: '📋' },
+      floor: { label: 'Floor', color: 'bg-green-100 text-green-800 border-green-400/60', icon: '🏢' },
+      multi_phase: { label: 'Multi-Phase', color: 'bg-orange-100 text-orange-800 border-orange-400/60', icon: '🔗' }
+    };
+    const { label, color, icon } = config[scope] || config.phase;
+    return (
+      <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-full border ${color}`}>
+        <span>{icon}</span>
+        <span>{label}</span>
+      </span>
+    );
+  };
+
   const fetchCategories = async () => {
     try {
       setLoadingCategories(true);
@@ -230,6 +264,66 @@ export default function WorkItemDetailPage() {
       setCategories([]);
     } finally {
       setLoadingCategories(false);
+    }
+  };
+
+  const fetchBudgetContext = async (phaseId, floorId, workItemCost) => {
+    setLoadingBudget(true);
+    try {
+      // Fetch phase details with budget
+      const phaseResponse = await fetch(`/api/phases/${phaseId}`, {
+        cache: 'no-store',
+      });
+      const phaseData = await phaseResponse.json();
+      
+      if (!phaseData.success) return;
+
+      const phase = phaseData.data;
+      const phaseBudget = phase.budgetAllocation?.total || 0;
+
+      let budgetInfo = {
+        phase: {
+          name: phase.phaseName,
+          code: phase.phaseCode,
+          total: phaseBudget,
+          spent: phase.actualSpending?.total || 0,
+          remaining: phaseBudget - (phase.actualSpending?.total || 0)
+        }
+      };
+
+      // If floor exists, also fetch floor budget
+      if (floorId) {
+        const floorResponse = await fetch(`/api/floors/${floorId}`, {
+          cache: 'no-store',
+        });
+        const floorData = await floorResponse.json();
+        
+        if (floorData.success) {
+          const floor = floorData.data;
+          const floorBudget = floor.budgetAllocation?.total || 0;
+          budgetInfo.floor = {
+            name: floor.name,
+            floorNumber: floor.floorNumber,
+            total: floorBudget,
+            spent: floor.actualSpending?.total || 0,
+            remaining: floorBudget - (floor.actualSpending?.total || 0)
+          };
+        }
+      }
+
+      // Calculate work item percentage
+      if (workItemCost && workItemCost > 0) {
+        budgetInfo.workItemPercentage = {
+          ofPhase: phaseBudget > 0 ? ((workItemCost / phaseBudget) * 100).toFixed(2) : 0,
+          ofFloor: budgetInfo.floor?.total > 0 ? ((workItemCost / budgetInfo.floor.total) * 100).toFixed(2) : 0
+        };
+      }
+
+      setBudgetContext(budgetInfo);
+    } catch (err) {
+      console.error('Error fetching budget context:', err);
+    } finally {
+      setLoadingBudget(false);
     }
   };
 
@@ -390,23 +484,45 @@ export default function WorkItemDetailPage() {
               <p className="text-sm sm:text-base ds-text-secondary mt-1">
                 {workItem.category?.replace(/\b\w/g, l => l.toUpperCase()) || 'Work Item'}
               </p>
-              {project && phase && (
-                <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-                  <Link 
-                    href={`/projects/${project._id}`}
-                    className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active transition-colors touch-manipulation"
-                  >
-                    Project: {project.projectName}
-                  </Link>
-                  <span className="ds-text-muted">•</span>
-                  <Link 
-                    href={`/phases/${phase._id}`}
-                    className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active transition-colors touch-manipulation"
-                  >
-                    Phase: {phase.phaseName}
-                  </Link>
-                </div>
-              )}
+              <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+                {/* Scope Badge */}
+                {getScopeBadge()}
+                
+                {/* Project/Phase/Floor Links */}
+                {(project || phase || workItem?.floor) && (
+                  <>
+                    <span className="ds-text-muted">•</span>
+                    {project && (
+                      <Link
+                        href={`/projects/${project._id}`}
+                        className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active transition-colors touch-manipulation"
+                      >
+                        {project.projectName}
+                      </Link>
+                    )}
+                    {project && (phase || workItem?.floor) && (
+                      <span className="ds-text-muted">•</span>
+                    )}
+                    {phase && (
+                      <Link
+                        href={`/phases/${phase._id}${phase.phaseType === 'finishing' ? '?tab=finishing' : ''}`}
+                        className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active transition-colors touch-manipulation"
+                      >
+                        {phase.phaseCode ? `${phase.phaseCode}: ` : ''}{phase.phaseName}
+                      </Link>
+                    )}
+                    {phase && workItem?.floor && <span className="ds-text-muted">•</span>}
+                    {workItem?.floor && (
+                      <Link
+                        href={`/floors/${workItem.floor._id}?tab=finishing`}
+                        className="ds-text-accent-primary hover:ds-text-accent-hover active:ds-text-accent-active transition-colors touch-manipulation"
+                      >
+                        📍 {getFloorLabel() || workItem.floor.name || 'Floor'}
+                      </Link>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
             <div className="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
               {canEdit && (
@@ -545,6 +661,322 @@ export default function WorkItemDetailPage() {
           </div>
         )}
 
+        {/* Finishing Works Details - Enhanced Floor & Execution Info */}
+        {(workItem.floor || workItem.executionModel || workItem.subcontractor) && (
+          <div className="ds-bg-accent-subtle rounded-xl shadow-lg border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              Location & Execution Details
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {/* Floor - For ALL phases, not just finishing */}
+              {workItem.floor && (
+                <div className="ds-bg-surface rounded-lg p-4 border ds-border-subtle">
+                  <p className="text-xs font-semibold ds-text-secondary uppercase tracking-wide mb-1">
+                    📍 Floor
+                  </p>
+                  <Link
+                    href={`/floors/${workItem.floor._id}?tab=finishing`}
+                    className="text-base font-bold ds-text-accent-primary hover:ds-text-accent-hover transition-colors"
+                  >
+                    {getFloorLabel() || workItem.floor.name || 'View Floor'}
+                  </Link>
+                  {workItem.floor.floorType && (
+                    <p className="text-xs ds-text-secondary mt-1 capitalize">{workItem.floor.floorType}</p>
+                  )}
+                </div>
+              )}
+
+              {/* Execution Model */}
+              {workItem.executionModel && (
+                <div className="ds-bg-surface rounded-lg p-4 border ds-border-subtle">
+                  <p className="text-xs font-semibold ds-text-secondary uppercase tracking-wide mb-1">
+                    ⚙️ Execution Model
+                  </p>
+                  <p className="text-base font-bold ds-text-primary capitalize">
+                    {workItem.executionModel.replace(/_/g, ' ')}
+                  </p>
+                </div>
+              )}
+
+              {/* Subcontractor */}
+              {workItem.subcontractor && (
+                <div className="ds-bg-surface rounded-lg p-4 border ds-border-subtle">
+                  <p className="text-xs font-semibold ds-text-secondary uppercase tracking-wide mb-1">
+                    👷 Subcontractor
+                  </p>
+                  <Link
+                    href={`/subcontractors/${workItem.subcontractor._id}`}
+                    className="text-base font-bold ds-text-accent-primary hover:ds-text-accent-hover transition-colors"
+                  >
+                    {workItem.subcontractor.companyName || workItem.subcontractor.contactName}
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Budget & Progress Tracking */}
+        <div className="ds-bg-accent-subtle rounded-xl shadow-lg border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6">
+          <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Budget & Progress Tracking
+          </h2>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Cost Tracking */}
+            <div className="ds-bg-surface rounded-lg p-4 sm:p-6 border ds-border-subtle">
+              <h3 className="text-base font-bold ds-text-primary mb-4 flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-green-600" />
+                Cost Tracking
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Estimated Cost */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-semibold ds-text-secondary">Estimated Cost</p>
+                    <p className="text-sm font-bold ds-text-primary">{formatCurrency(workItem.estimatedCost || 0)}</p>
+                  </div>
+                  <div className="w-full ds-bg-surface-muted rounded-full h-2">
+                    <div className="ds-bg-accent-primary h-2 rounded-full" style={{ width: '100%' }} />
+                  </div>
+                </div>
+
+                {/* Actual Cost */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-semibold ds-text-secondary">Actual Cost</p>
+                    <p className={`text-sm font-bold ${workItem.actualCost > workItem.estimatedCost ? 'text-red-600' : 'ds-text-primary'}`}>
+                      {formatCurrency(workItem.actualCost || 0)}
+                    </p>
+                  </div>
+                  <div className="w-full ds-bg-surface-muted rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full ${workItem.actualCost > workItem.estimatedCost ? 'bg-red-600' : 'ds-bg-accent-primary'}`}
+                      style={{ width: `${workItem.estimatedCost > 0 ? Math.min(100, (workItem.actualCost / workItem.estimatedCost) * 100) : 0}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Cost Variance */}
+                {workItem.estimatedCost > 0 && (
+                  <div className={`rounded-lg p-3 ${workItem.actualCost > workItem.estimatedCost ? 'bg-red-50 border border-red-400/60' : 'bg-green-50 border border-green-400/60'}`}>
+                    <div className="flex items-center justify-between">
+                      <p className={`text-sm font-medium ${workItem.actualCost > workItem.estimatedCost ? 'text-red-800' : 'text-green-800'}`}>
+                        {workItem.actualCost > workItem.estimatedCost ? '⚠️ Over Budget' : '✓ On Budget'}
+                      </p>
+                      <p className={`text-sm font-bold ${workItem.actualCost > workItem.estimatedCost ? 'text-red-800' : 'text-green-800'}`}>
+                        {workItem.actualCost > workItem.estimatedCost ? '+' : ''}{formatCurrency((workItem.actualCost || 0) - workItem.estimatedCost)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Hours Tracking */}
+            <div className="ds-bg-surface rounded-lg p-4 sm:p-6 border ds-border-subtle">
+              <h3 className="text-base font-bold ds-text-primary mb-4 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-blue-600" />
+                Hours Tracking
+              </h3>
+              
+              <div className="space-y-4">
+                {/* Estimated Hours */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-semibold ds-text-secondary">Estimated Hours</p>
+                    <p className="text-sm font-bold ds-text-primary">{workItem.estimatedHours || 0} hrs</p>
+                  </div>
+                  <div className="w-full ds-bg-surface-muted rounded-full h-2">
+                    <div className="ds-bg-blue-600 h-2 rounded-full" style={{ width: '100%' }} />
+                  </div>
+                </div>
+
+                {/* Actual Hours */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-semibold ds-text-secondary">Actual Hours</p>
+                    <p className={`text-sm font-bold ${workItem.actualHours > workItem.estimatedHours ? 'text-red-600' : 'ds-text-primary'}`}>
+                      {workItem.actualHours || 0} hrs
+                    </p>
+                  </div>
+                  <div className="w-full ds-bg-surface-muted rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full ${workItem.actualHours > workItem.estimatedHours ? 'bg-red-600' : 'bg-blue-600'}`}
+                      style={{ width: `${workItem.estimatedHours > 0 ? Math.min(100, (workItem.actualHours / workItem.estimatedHours) * 100) : 0}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Hours Utilization */}
+                {workItem.estimatedHours > 0 && (
+                  <div className={`rounded-lg p-3 ${workItem.actualHours > workItem.estimatedHours ? 'bg-red-50 border border-red-400/60' : 'bg-blue-50 border border-blue-400/60'}`}>
+                    <div className="flex items-center justify-between">
+                      <p className={`text-sm font-medium ${workItem.actualHours > workItem.estimatedHours ? 'text-red-800' : 'text-blue-800'}`}>
+                        {workItem.actualHours > workItem.estimatedHours ? '⚠️ Over Estimate' : '✓ On Track'}
+                      </p>
+                      <p className={`text-sm font-bold ${workItem.actualHours > workItem.estimatedHours ? 'text-red-800' : 'text-blue-800'}`}>
+                        {((workItem.actualHours || 0) / workItem.estimatedHours * 100).toFixed(1)}%
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Budget Context Cards - Enhanced */}
+        {budgetContext && !loadingBudget && (
+          <div className="ds-bg-accent-subtle rounded-xl shadow-lg border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Budget Context
+            </h2>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Phase Budget */}
+              {budgetContext.phase && (
+                <div className="ds-bg-surface rounded-lg p-4 sm:p-6 border ds-border-subtle">
+                  <h3 className="text-base font-bold ds-text-primary mb-4 flex items-center gap-2">
+                    <span className="text-xl">📋</span>
+                    {budgetContext.phase.code ? `${budgetContext.phase.code}: ` : ''}{budgetContext.phase.name}
+                  </h3>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium ds-text-secondary">Total Budget</span>
+                      <span className="text-lg font-bold ds-text-primary">{formatCurrency(budgetContext.phase.total)}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium ds-text-secondary">Spent to Date</span>
+                      <span className="text-lg font-bold ds-text-accent-primary">{formatCurrency(budgetContext.phase.spent)}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium ds-text-secondary">Remaining</span>
+                      <span className={`text-lg font-bold ${budgetContext.phase.remaining < 0 ? 'text-red-600' : 'ds-text-success'}`}>
+                        {formatCurrency(budgetContext.phase.remaining)}
+                      </span>
+                    </div>
+
+                    {workItem.estimatedCost > 0 && budgetContext.phase.total > 0 && (
+                      <div className="mt-4 pt-4 border-t ds-border-subtle">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium ds-text-secondary">This Work Item</span>
+                          <span className="text-lg font-bold ds-text-primary">{formatCurrency(workItem.estimatedCost)}</span>
+                        </div>
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="text-xs ds-text-secondary">% of Phase Budget</span>
+                          <span className="text-sm font-bold ds-text-accent-primary">{budgetContext.workItemPercentage?.ofPhase}%</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Budget Progress Bar */}
+                    {budgetContext.phase.total > 0 && (
+                      <div className="mt-4">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="ds-text-secondary">Budget Utilization</span>
+                          <span className="ds-text-primary">{((budgetContext.phase.spent / budgetContext.phase.total) * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="w-full ds-bg-surface-muted rounded-full h-3">
+                          <div
+                            className={`h-3 rounded-full transition-all duration-300 ${budgetContext.phase.spent > budgetContext.phase.total ? 'bg-red-600' : 'ds-bg-accent-primary'}`}
+                            style={{ width: `${Math.min(100, (budgetContext.phase.spent / budgetContext.phase.total) * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Floor Budget (if applicable) */}
+              {budgetContext.floor && (
+                <div className="ds-bg-surface rounded-lg p-4 sm:p-6 border ds-border-subtle">
+                  <h3 className="text-base font-bold ds-text-primary mb-4 flex items-center gap-2">
+                    <span className="text-xl">🏢</span>
+                    {budgetContext.floor.name}
+                  </h3>
+
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium ds-text-secondary">Total Budget</span>
+                      <span className="text-lg font-bold ds-text-primary">{formatCurrency(budgetContext.floor.total)}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium ds-text-secondary">Spent to Date</span>
+                      <span className="text-lg font-bold ds-text-accent-primary">{formatCurrency(budgetContext.floor.spent)}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium ds-text-secondary">Remaining</span>
+                      <span className={`text-lg font-bold ${budgetContext.floor.remaining < 0 ? 'text-red-600' : 'ds-text-success'}`}>
+                        {formatCurrency(budgetContext.floor.remaining)}
+                      </span>
+                    </div>
+
+                    {workItem.estimatedCost > 0 && budgetContext.floor.total > 0 && (
+                      <div className="mt-4 pt-4 border-t ds-border-subtle">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm font-medium ds-text-secondary">This Work Item</span>
+                          <span className="text-lg font-bold ds-text-primary">{formatCurrency(workItem.estimatedCost)}</span>
+                        </div>
+                        <div className="flex justify-between items-center mt-2">
+                          <span className="text-xs ds-text-secondary">% of Floor Budget</span>
+                          <span className="text-sm font-bold ds-text-accent-primary">{budgetContext.workItemPercentage?.ofFloor}%</span>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Budget Progress Bar */}
+                    {budgetContext.floor.total > 0 && (
+                      <div className="mt-4">
+                        <div className="flex justify-between text-xs mb-1">
+                          <span className="ds-text-secondary">Budget Utilization</span>
+                          <span className="ds-text-primary">{((budgetContext.floor.spent / budgetContext.floor.total) * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="w-full ds-bg-surface-muted rounded-full h-3">
+                          <div
+                            className={`h-3 rounded-full transition-all duration-300 ${budgetContext.floor.spent > budgetContext.floor.total ? 'bg-red-600' : 'ds-bg-accent-primary'}`}
+                            style={{ width: `${Math.min(100, (budgetContext.floor.spent / budgetContext.floor.total) * 100)}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {budgetContext.phase && budgetContext.floor && (
+              <p className="text-xs ds-text-muted mt-4 text-center">
+                💡 This work item spans both phase and floor budgets. Ensure both have sufficient allocation.
+              </p>
+            )}
+          </div>
+        )}
+
+        {loadingBudget && (
+          <div className="ds-bg-accent-subtle rounded-xl shadow-lg border-2 ds-border-accent-subtle p-4 sm:p-6 mb-6">
+            <div className="flex items-center justify-center py-8">
+              <div className="text-sm font-medium ds-text-secondary">Loading budget context...</div>
+            </div>
+          </div>
+        )}
+
         {/* Dependencies */}
         {workItem.dependencies && workItem.dependencies.length > 0 && (
           <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle p-4 sm:p-6 mb-6">
@@ -626,7 +1058,7 @@ export default function WorkItemDetailPage() {
                       </span>
                     </div>
                     <Link
-                      href={`/labour/entries/new?workItemId=${workItem._id}&workerId=${workItem.assignedWorkers[0]?._id?.toString() || workItem.assignedWorkers[0]?.userId?.toString() || ''}`}
+                      href={`/labour/entries/new?workItemId=${workItem._id}&workerId=${workItem.assignedWorkers[0]?._id?.toString() || workItem.assignedWorkers[0]?.userId?.toString() || ''}&projectId=${phase?.projectId || ''}&phaseId=${phase?._id || ''}`}
                       className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-green-600 text-white rounded-lg hover:bg-green-700 active:bg-green-800 transition-colors text-sm font-medium touch-manipulation"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -652,6 +1084,114 @@ export default function WorkItemDetailPage() {
             </h2>
             <div className="ds-bg-surface-muted rounded-lg p-4 border ds-border-subtle">
               <p className="text-sm sm:text-base ds-text-primary whitespace-pre-wrap font-medium leading-relaxed break-words">{workItem.notes}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Audit Trail */}
+        <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle p-4 sm:p-6 mb-6">
+          <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4 flex items-center gap-2">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6 ds-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Audit Trail
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="ds-bg-surface-muted rounded-lg p-4 border ds-border-subtle">
+              <p className="text-xs font-semibold ds-text-secondary uppercase tracking-wide mb-1">Created By</p>
+              <p className="text-base font-bold ds-text-primary">{workItem.createdBy?.name || 'Unknown'}</p>
+            </div>
+            <div className="ds-bg-surface-muted rounded-lg p-4 border ds-border-subtle">
+              <p className="text-xs font-semibold ds-text-secondary uppercase tracking-wide mb-1">Created On</p>
+              <p className="text-base font-bold ds-text-primary">{formatDate(workItem.createdAt)}</p>
+            </div>
+            <div className="ds-bg-surface-muted rounded-lg p-4 border ds-border-subtle">
+              <p className="text-xs font-semibold ds-text-secondary uppercase tracking-wide mb-1">Last Updated</p>
+              <p className="text-base font-bold ds-text-primary">{formatDate(workItem.updatedAt)}</p>
+            </div>
+            <div className="ds-bg-surface-muted rounded-lg p-4 border ds-border-subtle">
+              <p className="text-xs font-semibold ds-text-secondary uppercase tracking-wide mb-1">Scope</p>
+              <p className="text-base font-bold ds-text-primary capitalize">{workItem.scope || 'phase'}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Dependencies - Enhanced */}
+        {workItem.dependencies && workItem.dependencies.length > 0 && (
+          <div className="ds-bg-surface rounded-xl shadow-lg border ds-border-subtle p-4 sm:p-6 mb-6">
+            <h2 className="text-lg sm:text-xl font-bold ds-text-primary mb-4 flex items-center gap-2">
+              <svg className="w-5 h-5 sm:w-6 sm:h-6 ds-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+              Dependencies ({workItem.dependencies.length})
+            </h2>
+            
+            <div className="space-y-4">
+              {/* Forward Dependencies */}
+              <div>
+                <p className="text-sm font-semibold ds-text-secondary mb-3">This work item depends on:</p>
+                {workItem.dependencyDetails && workItem.dependencyDetails.length > 0 ? (
+                  <div className="space-y-2">
+                    {workItem.dependencyDetails.map((dep) => {
+                      const statusColors = {
+                        not_started: 'bg-gray-100 text-gray-700',
+                        in_progress: 'bg-blue-100 text-blue-700',
+                        completed: 'bg-green-100 text-green-700',
+                        blocked: 'bg-red-100 text-red-700'
+                      };
+                      return (
+                        <Link
+                          key={dep._id}
+                          href={`/work-items/${dep._id}`}
+                          className="flex items-center justify-between p-3 ds-bg-surface-muted border ds-border-subtle rounded-lg hover:shadow-md transition-all"
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <span className={`flex-shrink-0 w-2 h-2 rounded-full ${dep.status === 'completed' ? 'bg-green-500' : dep.status === 'blocked' ? 'bg-red-500' : 'bg-blue-500'}`} />
+                            <span className="font-medium ds-text-primary truncate">{dep.name}</span>
+                          </div>
+                          <span className={`flex-shrink-0 px-2 py-1 text-xs font-bold rounded-full ${statusColors[dep.status] || statusColors.not_started}`}>
+                            {dep.status?.replace('_', ' ') || 'Unknown'}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm ds-text-muted italic">Dependency details unavailable</p>
+                )}
+              </div>
+
+              {/* Reverse Dependencies */}
+              {workItem.reverseDependencies && workItem.reverseDependencies.length > 0 && (
+                <div className="pt-4 border-t ds-border-subtle">
+                  <p className="text-sm font-semibold ds-text-secondary mb-3">Dependent on this work item:</p>
+                  <div className="space-y-2">
+                    {workItem.reverseDependencies.map((dep) => {
+                      const statusColors = {
+                        not_started: 'bg-gray-100 text-gray-700',
+                        in_progress: 'bg-blue-100 text-blue-700',
+                        completed: 'bg-green-100 text-green-700',
+                        blocked: 'bg-red-100 text-red-700'
+                      };
+                      return (
+                        <Link
+                          key={dep._id}
+                          href={`/work-items/${dep._id}`}
+                          className="flex items-center justify-between p-3 ds-bg-surface-muted border ds-border-subtle rounded-lg hover:shadow-md transition-all"
+                        >
+                          <div className="flex items-center gap-3 flex-1 min-w-0">
+                            <span className={`flex-shrink-0 w-2 h-2 rounded-full ${dep.status === 'completed' ? 'bg-green-500' : dep.status === 'blocked' ? 'bg-red-500' : 'bg-blue-500'}`} />
+                            <span className="font-medium ds-text-primary truncate">{dep.name}</span>
+                          </div>
+                          <span className={`flex-shrink-0 px-2 py-1 text-xs font-bold rounded-full ${statusColors[dep.status] || statusColors.not_started}`}>
+                            {dep.status?.replace('_', ' ') || 'Unknown'}
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}

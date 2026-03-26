@@ -6,6 +6,8 @@
 
 'use client';
 
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import { useState, useEffect } from 'react';
 import {
   ACTIVITY_TYPES,
@@ -17,6 +19,7 @@ import {
   TEST_RESULTS,
 } from '@/lib/constants/professional-activities-constants';
 import { FeeCalculator } from './FeeCalculator';
+import { getProfessionalTypeLabel } from '@/lib/professional-services-helpers';
 
 export function QuickActivityForm({
   initialData = null,
@@ -164,9 +167,11 @@ export function QuickActivityForm({
   // Get available activity types based on selected professional
   const getAvailableActivityTypes = () => {
     if (!selectedProfessional) return ACTIVITY_TYPES.ALL;
-    return selectedProfessional.type === 'architect' 
-      ? ACTIVITY_TYPES.ARCHITECT 
-      : ACTIVITY_TYPES.ENGINEER;
+    return selectedProfessional.type === 'architect'
+      ? ACTIVITY_TYPES.ARCHITECT
+      : selectedProfessional.type === 'engineer'
+        ? ACTIVITY_TYPES.ENGINEER
+        : ACTIVITY_TYPES.ALL;
   };
 
   const handleChange = (e) => {
@@ -389,7 +394,7 @@ export function QuickActivityForm({
               <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                 <div className="text-sm">
                   <div className="font-medium ds-text-primary">
-                    {selectedProfessional.library?.name || 'N/A'} ({selectedProfessional.type === 'architect' ? 'Architect' : 'Engineer'})
+                    {selectedProfessional.library?.name || 'N/A'} ({getProfessionalTypeLabel(selectedProfessional.type)})
                   </div>
                   <div className="ds-text-secondary">Project: {selectedProfessional.project?.projectName || 'N/A'}</div>
                 </div>

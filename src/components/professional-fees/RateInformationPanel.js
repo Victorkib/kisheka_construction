@@ -15,6 +15,7 @@ import {
   Info,
   Sparkles,
   CheckCircle,
+  Layers,
 } from 'lucide-react';
 import { getSuggestedFeeAmount, validateFeeAmount } from '@/lib/professional-rates-helpers';
 
@@ -28,6 +29,7 @@ export function RateInformationPanel({
   const [rates, setRates] = useState({
     hourlyRate: null,
     perVisitRate: null,
+    perFloorRate: null,
     monthlyRetainer: null,
     source: null,
   });
@@ -38,7 +40,8 @@ export function RateInformationPanel({
   // Get rates from assignment
   useEffect(() => {
     if (!professionalService) {
-      setRates({ hourlyRate: null, perVisitRate: null, monthlyRetainer: null, source: null });
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRates({ hourlyRate: null, perVisitRate: null, perFloorRate: null, monthlyRetainer: null, source: null });
       return;
     }
 
@@ -46,6 +49,7 @@ export function RateInformationPanel({
     setRates({
       hourlyRate: professionalService.hourlyRate || professionalService.ratesSnapshot?.hourlyRate || null,
       perVisitRate: professionalService.perVisitRate || professionalService.ratesSnapshot?.perVisitRate || null,
+      perFloorRate: professionalService.perFloorRate || professionalService.ratesSnapshot?.perFloorRate || null,
       monthlyRetainer: professionalService.monthlyRetainer || professionalService.ratesSnapshot?.monthlyRetainer || null,
       source: 'assignment',
     });
@@ -54,6 +58,7 @@ export function RateInformationPanel({
   // Calculate suggested amount when fee type or rates change
   useEffect(() => {
     if (!professionalService || !feeType) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSuggestedAmount(null);
       setCalculation(null);
       return;
@@ -77,6 +82,7 @@ export function RateInformationPanel({
   // Validate current amount against contract value
   useEffect(() => {
     if (!professionalService || !currentAmount) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setValidation(null);
       return;
     }
@@ -91,7 +97,7 @@ export function RateInformationPanel({
     setValidation(result);
   }, [professionalService, currentAmount]);
 
-  const hasRates = rates.hourlyRate || rates.perVisitRate || rates.monthlyRetainer;
+  const hasRates = rates.hourlyRate || rates.perVisitRate || rates.perFloorRate || rates.monthlyRetainer;
 
   if (!professionalService) {
     return null;
@@ -112,7 +118,7 @@ export function RateInformationPanel({
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Hourly Rate */}
             {rates.hourlyRate && (
               <div className="ds-bg-surface/70 rounded-lg p-3 border border-indigo-100">
@@ -151,6 +157,25 @@ export function RateInformationPanel({
               </div>
             )}
 
+            {/* Per-Floor Rate */}
+            {rates.perFloorRate && (
+              <div className="ds-bg-surface/70 rounded-lg p-3 border border-indigo-100">
+                <div className="flex items-center gap-2 mb-2">
+                  <Layers className="h-4 w-4 text-indigo-600" />
+                  <span className="text-xs font-medium ds-text-secondary uppercase tracking-wide">Per-Floor Rate</span>
+                </div>
+                <p className="text-lg font-bold ds-text-primary">
+                  {rates.perFloorRate.toLocaleString('en-KE', { 
+                    style: 'currency', 
+                    currency: 'KES',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  })}
+                </p>
+                <p className="text-xs ds-text-muted mt-1">per floor</p>
+              </div>
+            )}
+
             {/* Monthly Retainer */}
             {rates.monthlyRetainer && (
               <div className="ds-bg-surface/70 rounded-lg p-3 border border-indigo-100">
@@ -178,7 +203,7 @@ export function RateInformationPanel({
             <div className="flex-1">
               <h3 className="text-sm font-semibold text-amber-900 mb-1">No Rates Configured</h3>
               <p className="text-sm text-amber-800">
-                This assignment doesn't have rates set. Fee suggestions won't be available, but you can still enter a manual amount.
+                This assignment doesn&apos;t have rates set. Fee suggestions won&apos;t be available, but you can still enter a manual amount.
               </p>
             </div>
           </div>
@@ -220,7 +245,7 @@ export function RateInformationPanel({
           <div className="mt-3 flex items-start gap-2 p-3 rounded-lg bg-blue-50 border border-blue-400/60">
             <Info className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
             <p className="text-xs text-blue-800">
-              <span className="font-medium">Tip:</span> This is a suggested amount based on the professional's rates. You can use this amount or enter your own.
+                  <span className="font-medium">Tip:</span> This is a suggested amount based on the professional&apos;s rates. You can use this amount or enter your own.
             </p>
           </div>
         </div>

@@ -17,6 +17,7 @@ import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
 import { createEquipment, validateEquipment, EQUIPMENT_TYPES, EQUIPMENT_STATUSES } from '@/lib/schemas/equipment-schema';
 import { recalculatePhaseSpending } from '@/lib/phase-helpers';
+import { validateEquipmentBudgetAndCapital } from '@/lib/equipment-helpers';
 
 // Force dynamic rendering to prevent caching stale data
 export const dynamic = 'force-dynamic';
@@ -48,6 +49,7 @@ export async function GET(request) {
     const status = searchParams.get('status');
     const equipmentType = searchParams.get('equipmentType');
     const acquisitionType = searchParams.get('acquisitionType');
+    const search = searchParams.get('search');
 
     if (projectId && ObjectId.isValid(projectId)) {
       query.projectId = new ObjectId(projectId);
@@ -73,14 +75,30 @@ export async function GET(request) {
       query.acquisitionType = acquisitionType;
     }
 
+    // Search functionality
+    if (search && search.trim().length > 0) {
+      const searchRegex = new RegExp(search, 'i');
+      query.$or = [
+        { equipmentName: searchRegex },
+        { serialNumber: searchRegex },
+        { assetTag: searchRegex }
+      ];
+    }
+
     // Pagination
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '20');
     const skip = (page - 1) * limit;
 
+    // Sorting
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') === 'asc' ? 1 : -1;
+    const validSortFields = ['createdAt', 'updatedAt', 'equipmentName', 'dailyRate', 'totalCost', 'startDate'];
+    const sortField = validSortFields.includes(sortBy) ? sortBy : 'createdAt';
+
     const equipment = await db.collection('equipment')
       .find(query)
-      .sort({ createdAt: -1 })
+      .sort({ [sortField]: sortOrder })
       .skip(skip)
       .limit(limit)
       .toArray();
@@ -156,6 +174,7 @@ export async function POST(request) {
     const {
       projectId,
       phaseId,
+      phaseIds,
       floorId,
       equipmentName,
       equipmentType,
@@ -167,7 +186,17 @@ export async function POST(request) {
       dailyRate,
       estimatedHours,
       status,
-      notes
+      notes,
+      costSplit,
+      // New fields
+      serialNumber,
+      assetTag,
+      images,
+      documents,
+      specifications,
+      operatorRequired,
+      operatorType,
+      operatorNotes
     } = body;
 
     // Validation
@@ -182,39 +211,78 @@ export async function POST(request) {
     // Determine equipment scope
     const scope = equipmentScope || 'phase_specific';
 
-    // Phase ID is required only for phase-specific equipment
-    // Site-wide equipment doesn't need a phase
+    // Validate based on scope
+    const db = await getDatabase();
+    
     if (scope === 'phase_specific') {
       if (!phaseId) {
         return errorResponse('Phase ID is required for phase-specific equipment', 400);
       }
-
       if (!ObjectId.isValid(phaseId)) {
         return errorResponse('Invalid phase ID', 400);
       }
-    }
-
-    const db = await getDatabase();
-
-    // Verify phase exists and belongs to project (only for phase-specific)
-    if (scope === 'phase_specific' && phaseId) {
+      // Verify phase exists
       const phase = await db.collection('phases').findOne({
         _id: new ObjectId(phaseId),
         projectId: new ObjectId(projectId),
         deletedAt: null
       });
-
       if (!phase) {
         return errorResponse('Phase not found or does not belong to this project', 400);
       }
-
-      // Phase-Floor Applicability Validation (if floorId is provided and phase-specific)
-      if (floorId && ObjectId.isValid(floorId)) {
-        const { validatePhaseFloorApplicability } = await import('@/lib/phase-floor-validation-helpers');
-        const applicability = await validatePhaseFloorApplicability(phaseId, floorId, projectId);
-        if (!applicability.isValid) {
-          return errorResponse(applicability.error || 'Floor is not applicable to the selected phase', 400);
+    } else if (scope === 'floor_specific') {
+      if (!phaseId) {
+        return errorResponse('Phase ID is required for floor-specific equipment', 400);
+      }
+      if (!floorId) {
+        return errorResponse('Floor ID is required for floor-specific equipment', 400);
+      }
+      if (!ObjectId.isValid(phaseId) || !ObjectId.isValid(floorId)) {
+        return errorResponse('Invalid phase ID or floor ID', 400);
+      }
+      // Verify phase and floor exist
+      const phase = await db.collection('phases').findOne({
+        _id: new ObjectId(phaseId),
+        projectId: new ObjectId(projectId),
+        deletedAt: null
+      });
+      if (!phase) {
+        return errorResponse('Phase not found or does not belong to this project', 400);
+      }
+    } else if (scope === 'multi_phase') {
+      if (!phaseIds || !Array.isArray(phaseIds) || phaseIds.length === 0) {
+        return errorResponse('phaseIds array is required for multi-phase equipment', 400);
+      }
+      // Verify all phases exist and belong to project
+      for (const pid of phaseIds) {
+        if (!ObjectId.isValid(pid)) {
+          return errorResponse(`Invalid phase ID: ${pid}`, 400);
         }
+        const phase = await db.collection('phases').findOne({
+          _id: new ObjectId(pid),
+          projectId: new ObjectId(projectId),
+          deletedAt: null
+        });
+        if (!phase) {
+          return errorResponse(`Phase ${pid.toString().slice(-4)} not found or does not belong to this project`, 400);
+        }
+      }
+      // Validate costSplit if provided
+      if (costSplit && costSplit.type === 'percentage' && costSplit.percentages) {
+        const total = Object.values(costSplit.percentages).reduce((sum, val) => sum + val, 0);
+        if (Math.abs(total - 100) > 0.1) {
+          return errorResponse(`costSplit.percentages must sum to 100 (current: ${total})`, 400);
+        }
+      }
+    }
+    // site_wide doesn't require phaseId
+
+    // Phase-Floor Applicability Validation (if floorId is provided)
+    if (floorId && ObjectId.isValid(floorId) && phaseId) {
+      const { validatePhaseFloorApplicability } = await import('@/lib/phase-floor-validation-helpers');
+      const applicability = await validatePhaseFloorApplicability(phaseId, floorId, projectId);
+      if (!applicability.isValid) {
+        return errorResponse(applicability.error || 'Floor is not applicable to the selected phase', 400);
       }
     }
 
@@ -233,13 +301,23 @@ export async function POST(request) {
     // Prepare equipment data for validation
     const equipmentData = {
       projectId,
-      phaseId: scope === 'site_wide' ? null : phaseId,
+      phaseId: scope === 'site_wide' || scope === 'multi_phase' ? null : phaseId,
+      phaseIds: scope === 'multi_phase' ? phaseIds : [],
       floorId: floorId || null,
       equipmentName,
       equipmentType,
       acquisitionType,
       equipmentScope: scope,
+      costSplit: costSplit || null,
       supplierId,
+      serialNumber,
+      assetTag,
+      images: Array.isArray(images) ? images : [],
+      documents: Array.isArray(documents) ? documents : [],
+      specifications: specifications || null,
+      operatorRequired: operatorRequired !== undefined ? operatorRequired : null,
+      operatorType: operatorType || null,
+      operatorNotes: operatorNotes?.trim() || null,
       startDate,
       endDate,
       dailyRate,
@@ -261,7 +339,17 @@ export async function POST(request) {
         acquisitionType,
         equipmentScope: scope,
         floorId: floorId || null,
+        phaseIds: scope === 'multi_phase' ? phaseIds : [],
+        costSplit: costSplit || null,
         supplierId,
+        serialNumber,
+        assetTag,
+        images: Array.isArray(images) ? images : [],
+        documents: Array.isArray(documents) ? documents : [],
+        specifications: specifications || null,
+        operatorRequired,
+        operatorType,
+        operatorNotes,
         startDate,
         endDate,
         dailyRate,
@@ -270,9 +358,48 @@ export async function POST(request) {
         notes
       },
       projectId,
-      scope === 'site_wide' ? null : phaseId,
+      scope === 'site_wide' || scope === 'multi_phase' ? null : phaseId,
       userProfile._id
     );
+
+    // ========== BUDGET & CAPITAL VALIDATION ==========
+    const budgetCapitalValidation = await validateEquipmentBudgetAndCapital({
+      projectId,
+      equipmentScope: scope,
+      phaseId: scope === 'site_wide' ? null : phaseId,
+      floorId: floorId || null,
+      totalCost: equipment.totalCost,
+      costSplit: equipmentData.costSplit,
+      phaseIds: equipmentData.phaseIds
+    });
+
+    // Handle validation results based on scenario
+    if (!budgetCapitalValidation.isValid) {
+      // Has errors - block the operation
+      const errorMessages = budgetCapitalValidation.errors.map(e => e.message).join('; ');
+      return errorResponse(`Equipment validation failed: ${errorMessages}`, 400);
+    }
+
+    // Prepare response with warnings if any
+    let warnings = [];
+    let infoMessage = 'Equipment created successfully';
+
+    if (budgetCapitalValidation.warnings.length > 0) {
+      warnings = budgetCapitalValidation.warnings.map(w => ({
+        type: w.type,
+        message: w.message,
+        severity: w.severity
+      }));
+
+      // Set appropriate info message based on scenario
+      if (budgetCapitalValidation.budgetNotSet && budgetCapitalValidation.capitalNotSet) {
+        infoMessage = 'Equipment created: No budget or capital set. Spending will be tracked.';
+      } else if (budgetCapitalValidation.budgetNotSet) {
+        infoMessage = 'Equipment created: No budget set. Capital validated successfully.';
+      } else if (budgetCapitalValidation.capitalNotSet) {
+        infoMessage = 'Equipment created: No capital set. Budget validated successfully. Add capital to enable capital tracking.';
+      }
+    }
 
     // Insert equipment
     const result = await db.collection('equipment').insertOne(equipment);
@@ -302,10 +429,25 @@ export async function POST(request) {
       entityType: 'EQUIPMENT',
       entityId: result.insertedId.toString(),
       projectId: projectId,
-      changes: { created: insertedEquipment },
+      changes: { 
+        created: insertedEquipment,
+        validation: {
+          budgetNotSet: budgetCapitalValidation.budgetNotSet,
+          capitalNotSet: budgetCapitalValidation.capitalNotSet,
+          warnings: budgetCapitalValidation.warnings
+        }
+      },
     });
 
-    return successResponse(insertedEquipment, 'Equipment created successfully', 201);
+    return successResponse({
+      equipment: insertedEquipment,
+      warnings,
+      validation: {
+        budgetNotSet: budgetCapitalValidation.budgetNotSet,
+        capitalNotSet: budgetCapitalValidation.capitalNotSet,
+        details: budgetCapitalValidation.validationDetails
+      }
+    }, infoMessage, 201);
   } catch (error) {
     console.error('Create equipment error:', error);
     return errorResponse('Failed to create equipment', 500);

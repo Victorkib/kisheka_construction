@@ -355,7 +355,7 @@ export async function GET(request) {
     let professionalServicesStats = null;
     if (projectId && ObjectId.isValid(projectId)) {
       try {
-        const { calculateProjectProfessionalServicesStats } = await import('@/lib/professional-services-helpers');
+        const { calculateProjectProfessionalServicesStats } = await import('@/lib/professional-services-stats');
         professionalServicesStats = await calculateProjectProfessionalServicesStats(projectId);
       } catch (err) {
         console.error('Error calculating professional services stats:', err);

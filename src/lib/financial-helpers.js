@@ -607,7 +607,7 @@ export async function calculateCommittedCost(projectId) {
   const poCommitted = poResult[0]?.total || 0;
   
   // Get committed cost from professional services (remaining contract commitments)
-  const { calculateProfessionalServicesCommittedCost } = await import('@/lib/professional-services-helpers');
+  const { calculateProfessionalServicesCommittedCost } = await import('@/lib/professional-services-stats');
   const professionalServicesCommitted = await calculateProfessionalServicesCommittedCost(projectId);
   
   return poCommitted + professionalServicesCommitted;

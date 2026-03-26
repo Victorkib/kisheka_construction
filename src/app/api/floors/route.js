@@ -53,7 +53,7 @@ export async function GET(request) {
       .sort({ floorNumber: 1 })
       .toArray();
 
-    // Add usage counts for each floor (materials, requests, POs)
+    // Add usage counts, progress, and capital data for each floor
     const floorsWithUsage = await Promise.all(
       floors.map(async (floor) => {
         const [materialsCount, requestsCount, purchaseOrdersCount] = await Promise.all([
@@ -70,12 +70,44 @@ export async function GET(request) {
             deletedAt: null,
           }),
         ]);
+        
+        // Get progress data
+        const progressData = floor.progress || { completionPercentage: 0 };
+        const completionPercentage = progressData.completionPercentage || 0;
+        
+        // Get capital allocation data
+        const capitalAllocation = floor.capitalAllocation || { total: 0, remaining: 0 };
+        const capitalTotal = capitalAllocation.total || 0;
+        const capitalRemaining = capitalAllocation.remaining !== undefined 
+          ? capitalAllocation.remaining 
+          : capitalTotal;
+        
+        // Calculate budget utilization
+        const budgetTotal = floor.budgetAllocation?.total || floor.totalBudget || 0;
+        const actualCost = floor.actualCost || 0;
+        const budgetUtilization = budgetTotal > 0 ? (actualCost / budgetTotal) * 100 : 0;
+        
+        // Determine floor status alerts
+        let alertType = null;
+        if (budgetTotal > 0 && actualCost > budgetTotal) {
+          alertType = 'over_budget';
+        } else if (capitalTotal > 0 && capitalRemaining < capitalTotal * 0.15) {
+          alertType = 'low_capital';
+        } else if (completionPercentage === 0 && actualCost > 0) {
+          alertType = 'no_progress';
+        }
+        
         return {
           ...floor,
           usageCount: materialsCount,
           materialsCount,
           requestsCount,
           purchaseOrdersCount,
+          completionPercentage,
+          capitalTotal,
+          capitalRemaining,
+          budgetUtilization: Math.round(budgetUtilization),
+          alertType,
         };
       })
     );

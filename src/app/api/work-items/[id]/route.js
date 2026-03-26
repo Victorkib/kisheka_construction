@@ -69,7 +69,7 @@ export async function GET(request, { params }) {
     }
 
     const { id } = await params;
-    
+
     if (!ObjectId.isValid(id)) {
       return errorResponse('Invalid work item ID', 400);
     }
@@ -82,6 +82,33 @@ export async function GET(request, { params }) {
 
     if (!workItem) {
       return errorResponse('Work item not found', 404);
+    }
+
+    // Populate phase details
+    let phase = null;
+    let project = null;
+    let floor = null;
+    
+    if (workItem.phaseId && ObjectId.isValid(workItem.phaseId)) {
+      phase = await db.collection('phases').findOne({
+        _id: new ObjectId(workItem.phaseId),
+        deletedAt: null
+      });
+      
+      if (phase && phase.projectId && ObjectId.isValid(phase.projectId)) {
+        project = await db.collection('projects').findOne({
+          _id: new ObjectId(phase.projectId),
+          deletedAt: null
+        });
+      }
+    }
+    
+    // Populate floor details
+    if (workItem.floorId && ObjectId.isValid(workItem.floorId)) {
+      floor = await db.collection('floors').findOne({
+        _id: new ObjectId(workItem.floorId),
+        deletedAt: null
+      });
     }
 
     // Populate assigned workers
@@ -127,16 +154,32 @@ export async function GET(request, { params }) {
       .map(entry => entry.assignedBy)
       .filter(Boolean))];
 
-    // Fetch user profiles for assignedBy
+    // Also add createdBy to fetch
+    if (workItem.createdBy && ObjectId.isValid(workItem.createdBy)) {
+      assignedByUserIds.push(workItem.createdBy.toString());
+    }
+
+    // Fetch user profiles for assignedBy and createdBy
     const userProfiles = assignedByUserIds.length > 0
       ? await db.collection('user_profiles').find({
-          _id: { $in: assignedByUserIds.map(id => new ObjectId(id)) }
+          $or: [
+            { _id: { $in: assignedByUserIds.map(id => new ObjectId(id)) } },
+            { userId: { $in: assignedByUserIds.map(id => new ObjectId(id)) } }
+          ]
         }).toArray()
       : [];
 
     const userMap = {};
     userProfiles.forEach(user => {
-      userMap[user._id.toString()] = user.name || user.email || 'Unknown User';
+      const id = user._id.toString();
+      const userId = user.userId?.toString();
+      userMap[id] = {
+        name: user.name || user.email || 'Unknown User',
+        email: user.email
+      };
+      if (userId) {
+        userMap[userId] = userMap[id];
+      }
     });
 
     // Populate assignment history with worker names and user names
@@ -153,12 +196,12 @@ export async function GET(request, { params }) {
         }
         return id;
       });
-      
+
       // Get assignedBy user name
-      const assignedByName = entry.assignedBy 
-        ? (userMap[entry.assignedBy.toString()] || 'Unknown User')
+      const assignedByName = entry.assignedBy
+        ? (userMap[entry.assignedBy.toString()]?.name || 'Unknown User')
         : 'Unknown User';
-      
+
       return {
         ...entry,
         previousWorkersDetails: previousWorkers,
@@ -167,11 +210,91 @@ export async function GET(request, { params }) {
       };
     });
 
+    // Get creator name
+    const createdByName = workItem.createdBy
+      ? (userMap[workItem.createdBy.toString()]?.name || 'Unknown User')
+      : 'Unknown User';
+
+    // Populate subcontractor if exists
+    let subcontractor = null;
+    if (workItem.subcontractorId && ObjectId.isValid(workItem.subcontractorId)) {
+      subcontractor = await db.collection('subcontractors').findOne({
+        _id: new ObjectId(workItem.subcontractorId),
+        deletedAt: null
+      });
+    }
+
+    // Build dependency list with details
+    let dependencyDetails = [];
+    if (workItem.dependencies && workItem.dependencies.length > 0) {
+      dependencyDetails = await db.collection('work_items').find({
+        _id: { $in: workItem.dependencies.map(id => new ObjectId(id)) },
+        deletedAt: null
+      }).toArray();
+    }
+
+    // Get reverse dependencies (what depends on this work item)
+    const reverseDependencies = await db.collection('work_items').find({
+      dependencies: workItem._id,
+      deletedAt: null
+    }).toArray();
+
     const populatedWorkItem = {
       ...workItem,
+      // Scope information
+      scope: workItem.scope || 'phase',
+      // Phase details
+      phase: phase ? {
+        _id: phase._id,
+        phaseName: phase.phaseName || phase.name,
+        phaseCode: phase.phaseCode,
+        phaseType: phase.phaseType
+      } : null,
+      // Project details
+      project: project ? {
+        _id: project._id,
+        projectName: project.projectName,
+        projectCode: project.projectCode
+      } : null,
+      // Floor details
+      floor: floor ? {
+        _id: floor._id,
+        name: floor.name,
+        floorNumber: floor.floorNumber,
+        floorType: floor.floorType
+      } : null,
+      // Assigned workers
       assignedWorkers: assignedWorkerIds.map(id => workerMap[id]).filter(Boolean),
       assignedWorkersCount: assignedWorkerIds.length,
-      assignmentHistory: populatedHistory
+      // Assignment history
+      assignmentHistory: populatedHistory,
+      // Audit trail
+      createdBy: {
+        id: workItem.createdBy?.toString(),
+        name: createdByName
+      },
+      createdAt: workItem.createdAt,
+      updatedAt: workItem.updatedAt,
+      // Subcontractor
+      subcontractor: subcontractor ? {
+        _id: subcontractor._id,
+        companyName: subcontractor.companyName,
+        contactName: subcontractor.contactName
+      } : null,
+      // Dependencies
+      dependencies: workItem.dependencies || [],
+      dependencyDetails: dependencyDetails.map(dep => ({
+        _id: dep._id,
+        name: dep.name,
+        status: dep.status,
+        phaseId: dep.phaseId
+      })),
+      // Reverse dependencies
+      reverseDependencies: reverseDependencies.map(dep => ({
+        _id: dep._id,
+        name: dep.name,
+        status: dep.status
+      }))
     };
 
     return successResponse(populatedWorkItem, 'Work item retrieved successfully');
@@ -241,7 +364,7 @@ export async function PATCH(request, { params }) {
     } = body;
 
     const db = await getDatabase();
-
+  
     // Get existing work item
     const existingWorkItem = await db.collection('work_items').findOne({
       _id: new ObjectId(id),
@@ -250,6 +373,16 @@ export async function PATCH(request, { params }) {
 
     if (!existingWorkItem) {
       return errorResponse('Work item not found', 404);
+    }
+
+    // Load phase for finishing-phase specific validations (budget, floor linkage, subcontractors)
+    let phase = null;
+    if (existingWorkItem.phaseId && ObjectId.isValid(existingWorkItem.phaseId)) {
+      phase = await db.collection('phases').findOne({
+        _id: new ObjectId(existingWorkItem.phaseId),
+        projectId: existingWorkItem.projectId,
+        deletedAt: null,
+      });
     }
 
     // Build update object
@@ -365,11 +498,11 @@ export async function PATCH(request, { params }) {
       if (isNaN(estimatedCost) || estimatedCost < 0) {
         return errorResponse('Estimated cost must be >= 0', 400);
       }
-      
+
       const parsedEstimatedCost = parseFloat(estimatedCost);
-      
+
       // For finishing phases, validate budget when updating estimatedCost
-      if (phase.phaseType === 'finishing' && parsedEstimatedCost > 0) {
+      if (phase?.phaseType === 'finishing' && parsedEstimatedCost > 0) {
         const workItemFloorId = updateData.floorId || existingWorkItem.floorId;
         if (workItemFloorId) {
           const floor = await db.collection('floors').findOne({
@@ -380,14 +513,15 @@ export async function PATCH(request, { params }) {
 
           if (floor) {
             const phase03Budget = floor.budgetAllocation?.byPhase?.['PHASE-03']?.total || 0;
-            
+
             // If budget is set, validate
             if (phase03Budget > 0) {
               // Calculate current spending for finishing works on this floor
               const { calculateFloorActualSpending } = await import('@/lib/floor-financial-helpers');
               const actualSpending = await calculateFloorActualSpending(workItemFloorId.toString(), true);
-              const phase03Spending = actualSpending.byPhase?.[existingWorkItem.phaseId.toString()]?.total || 0;
-              
+              // Use phaseCode (e.g., 'PHASE-03') to access byPhase data, not phaseId
+              const phase03Spending = actualSpending.byPhase?.[phase?.phaseCode]?.total || 0;
+
               // Get committed costs (estimated costs of existing work items, excluding this one)
               const existingFinishingWorkItems = await db.collection('work_items').find({
                 projectId: existingWorkItem.projectId,
@@ -396,14 +530,14 @@ export async function PATCH(request, { params }) {
                 _id: { $ne: new ObjectId(id) }, // Exclude current work item
                 deletedAt: null,
               }).toArray();
-              
+
               const committedEstimated = existingFinishingWorkItems.reduce(
                 (sum, item) => sum + (Number(item.estimatedCost) || 0),
                 0
               );
-              
+
               const totalAfterUpdate = phase03Spending + committedEstimated + parsedEstimatedCost;
-              
+
               // Only block if budget is exceeded (allow 5% tolerance for rounding)
               if (totalAfterUpdate > phase03Budget * 1.05) {
                 return errorResponse(
@@ -417,7 +551,7 @@ export async function PATCH(request, { params }) {
           }
         }
       }
-      
+
       updateData.estimatedCost = parsedEstimatedCost;
     }
 
@@ -467,7 +601,7 @@ export async function PATCH(request, { params }) {
 
     if (floorId !== undefined) {
       // For finishing phases, floorId is required
-      if (phase.phaseType === 'finishing') {
+      if (phase?.phaseType === 'finishing') {
         if (!floorId || !ObjectId.isValid(floorId)) {
           return errorResponse('For finishing phases, a valid floorId is required', 400);
         }
@@ -511,7 +645,7 @@ export async function PATCH(request, { params }) {
         }
         
         // For finishing phases, validate subcontractor floorId matches work item floorId
-        if (phase.phaseType === 'finishing') {
+        if (phase?.phaseType === 'finishing') {
           const workItemFloorId = updateData.floorId || existingWorkItem.floorId;
           if (workItemFloorId) {
             const finalSubcontractorId = subcontractorId !== undefined ? subcontractorId : existingWorkItem.subcontractorId;
@@ -551,7 +685,7 @@ export async function PATCH(request, { params }) {
         
         // For finishing phases, verify subcontractor is linked to the same floor if floorId is set
         const workItemFloorId = updateData.floorId || existingWorkItem.floorId;
-        if (phase.phaseType === 'finishing' && workItemFloorId && subcontractor.floorId) {
+        if (phase?.phaseType === 'finishing' && workItemFloorId && subcontractor.floorId) {
           if (subcontractor.floorId.toString() !== workItemFloorId.toString()) {
             return errorResponse('Subcontractor is assigned to a different floor. Please select a subcontractor assigned to this floor.', 400);
           }
@@ -674,21 +808,23 @@ export async function DELETE(request, { params }) {
       return errorResponse('Work item not found', 404);
     }
 
-    // Recalculate phase completion
-    try {
-      const completionPercentage = await calculatePhaseCompletionFromWorkItems(existingWorkItem.phaseId.toString());
-      await db.collection('phases').updateOne(
-        { _id: new ObjectId(existingWorkItem.phaseId) },
-        {
-          $set: {
-            completionPercentage: completionPercentage,
-            updatedAt: new Date()
+    // Recalculate phase completion (only if work item has a phaseId)
+    if (existingWorkItem.phaseId && ObjectId.isValid(existingWorkItem.phaseId)) {
+      try {
+        const completionPercentage = await calculatePhaseCompletionFromWorkItems(existingWorkItem.phaseId.toString());
+        await db.collection('phases').updateOne(
+          { _id: new ObjectId(existingWorkItem.phaseId) },
+          {
+            $set: {
+              completionPercentage: completionPercentage,
+              updatedAt: new Date()
+            }
           }
-        }
-      );
-    } catch (phaseError) {
-      console.error('Error recalculating phase completion after work item deletion:', phaseError);
-      // Don't fail the request, just log the error
+        );
+      } catch (phaseError) {
+        console.error('Error recalculating phase completion after work item deletion:', phaseError);
+        // Don't fail the request, just log the error
+      }
     }
 
     // Create audit log

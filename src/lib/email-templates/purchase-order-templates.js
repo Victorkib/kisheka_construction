@@ -449,21 +449,15 @@ Hello ${recipientUser.firstName || recipientUser.email},
 
 ${supplierName} has ${actionLabel.toLowerCase()} purchase order ${poNumber}.
 Action: ${actionLabel}
-${details.length > 0 ? details.map(d => `- ${d}`).join('\n') : 'No extra details were provided.'}
-
-View PO: ${poUrl}
-  `.trim();
-
-  return sendEmail({
+${details.length > 0 ? details.map(d => `- ${d}`).join('\n') : 'No extra details were provided.'}View PO: ${poUrl}
+  `.trim();  return sendEmail({
     to: recipientUser.email,
     toName: `${recipientUser.firstName || ''} ${recipientUser.lastName || ''}`.trim() || recipientUser.email,
     subject,
     text,
     html
   });
-}
-
-/**
+}/**
  * Send supplier email when owner/PM confirms delivery.
  * @param {Object} options
  * @param {Object} options.supplier - Supplier profile
@@ -491,9 +485,7 @@ export async function sendSupplierDeliveryConfirmedEmail({
   const itemSummary = deliverySummary.itemSummary || purchaseOrder.materialName || `${purchaseOrder.quantityOrdered || ''} ${purchaseOrder.unit || ''}`.trim();
   const subject = `Delivery Confirmed: ${poNumber}`;
   const text = `
-Delivery ConfirmedHello ${supplier.contactPerson || supplier.name || 'Supplier'},
-
-Delivery has been confirmed for purchase order ${poNumber}.
+Delivery ConfirmedHello ${supplier.contactPerson || supplier.name || 'Supplier'},Delivery has been confirmed for purchase order ${poNumber}.
 
 Received: ${itemSummary}
 Date Confirmed: ${dateText}

@@ -33,6 +33,7 @@ import {
  * @property {string} [defaultVisitFrequency] - Default visit frequency (for engineers)
  * @property {number} [defaultHourlyRate] - Default hourly rate
  * @property {number} [defaultPerVisitRate] - Default per-visit rate
+ * @property {number} [defaultPerFloorRate] - Default per-floor rate
  * @property {number} [defaultMonthlyRetainer] - Default monthly retainer
  * @property {number} usageCount - How many times assigned to projects (default: 0)
  * @property {Date} [lastUsedAt] - Last time assigned
@@ -66,6 +67,7 @@ export const PROFESSIONAL_SERVICES_LIBRARY_SCHEMA = {
   defaultVisitFrequency: String, // Optional, for engineers
   defaultHourlyRate: Number, // Optional, >= 0
   defaultPerVisitRate: Number, // Optional, >= 0
+  defaultPerFloorRate: Number, // Optional, >= 0
   defaultMonthlyRetainer: Number, // Optional, >= 0
   usageCount: Number, // Default: 0, auto-incremented
   lastUsedAt: Date, // Updated when assigned
@@ -151,6 +153,11 @@ export const PROFESSIONAL_SERVICES_LIBRARY_VALIDATION = {
     min: 0,
   },
   defaultPerVisitRate: {
+    required: false,
+    type: 'number',
+    min: 0,
+  },
+  defaultPerFloorRate: {
     required: false,
     type: 'number',
     min: 0,

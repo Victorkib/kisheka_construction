@@ -18,8 +18,11 @@ import {
  * Work Item Schema
  * @typedef {Object} WorkItemSchema
  * @property {ObjectId} _id - Work item ID
- * @property {ObjectId} phaseId - Phase ID (required, indexed)
- * @property {ObjectId} projectId - Project ID (required, indexed)
+ * @property {string} scope - 'project' | 'phase' | 'floor' | 'multi_phase' (default: 'phase')
+ * @property {ObjectId} [projectId] - Project ID (required for project scope)
+ * @property {ObjectId} [phaseId] - Phase ID (required for phase scope)
+ * @property {Array<ObjectId>} [phaseIds] - Phase IDs (required for multi_phase scope)
+ * @property {ObjectId} [floorId] - Floor ID (required for floor scope)
  * @property {string} name - Work item name (required)
  * @property {string} [description] - Work item description
  * @property {string} category - Work category (required)
@@ -35,7 +38,6 @@ import {
  * @property {Date} [plannedEndDate] - Planned end date
  * @property {Date} [actualEndDate] - Actual end date
  * @property {Array<ObjectId>} dependencies - Other work items this depends on
- * @property {ObjectId} [floorId] - Floor ID (optional, required for finishing phases)
  * @property {ObjectId} [subcontractorId] - Linked subcontractor (optional, for contract-based finishing works)
  * @property {ObjectId} [categoryId] - Category ID (optional)
  * @property {number} priority - Priority level (1-5, 1 = highest)
@@ -54,8 +56,11 @@ export { WORK_ITEM_STATUSES, WORK_ITEM_PRIORITIES, WORK_ITEM_CATEGORIES };
  * Work Item Schema Object
  */
 export const WORK_ITEM_SCHEMA = {
-  phaseId: 'ObjectId', // Required
-  projectId: 'ObjectId', // Required
+  scope: String, // Optional: 'project' | 'phase' | 'floor' | 'multi_phase' (default: 'phase')
+  projectId: 'ObjectId', // Required for project scope
+  phaseId: 'ObjectId', // Required for phase scope
+  phaseIds: ['ObjectId'], // Required for multi_phase scope
+  floorId: 'ObjectId', // Required for floor scope
   name: String, // Required, min 2 chars
   description: String,
   category: String, // Required
@@ -71,7 +76,6 @@ export const WORK_ITEM_SCHEMA = {
   plannedEndDate: Date,
   actualEndDate: Date,
   dependencies: ['ObjectId'], // Array of work item IDs
-  floorId: 'ObjectId', // Optional
   subcontractorId: 'ObjectId', // Optional
   categoryId: 'ObjectId', // Optional
   priority: Number, // 1-5, default: 3
@@ -92,6 +96,7 @@ export const WORK_ITEM_SCHEMA = {
  */
 export function createWorkItem(input, projectId, phaseId, createdBy) {
   const {
+    scope,
     name,
     description,
     category,
@@ -106,6 +111,7 @@ export function createWorkItem(input, projectId, phaseId, createdBy) {
     actualEndDate,
     dependencies,
     floorId,
+    phaseIds,
     categoryId,
     priority,
     notes,
@@ -136,9 +142,28 @@ export function createWorkItem(input, projectId, phaseId, createdBy) {
     action: 'assigned'
   }] : [];
 
+  // Determine scope-based field values
+  const workItemScope = scope || 'phase';
+
+  // For backward compatibility, default to phase scope
+  const finalProjectId = typeof projectId === 'string' ? new ObjectId(projectId) : projectId;
+  // phaseId is needed for both phase and floor scopes
+  const finalPhaseId = ((workItemScope === 'phase' || workItemScope === 'floor') && phaseId)
+    ? (typeof phaseId === 'string' ? new ObjectId(phaseId) : phaseId)
+    : null;
+  const finalPhaseIds = (workItemScope === 'multi_phase' && Array.isArray(phaseIds))
+    ? phaseIds.filter(id => id && ObjectId.isValid(id)).map(id => typeof id === 'string' ? new ObjectId(id) : id)
+    : [];
+  const finalFloorId = (workItemScope === 'floor' && floorId && ObjectId.isValid(floorId))
+    ? new ObjectId(floorId)
+    : null;
+
   return {
-    projectId: typeof projectId === 'string' ? new ObjectId(projectId) : projectId,
-    phaseId: typeof phaseId === 'string' ? new ObjectId(phaseId) : phaseId,
+    scope: workItemScope,
+    projectId: finalProjectId,
+    phaseId: finalPhaseId,
+    phaseIds: finalPhaseIds,
+    floorId: finalFloorId,
     name: name?.trim() || '',
     description: description?.trim() || '',
     category: category || 'other',
@@ -153,10 +178,9 @@ export function createWorkItem(input, projectId, phaseId, createdBy) {
     startDate: startDate ? new Date(startDate) : null,
     plannedEndDate: plannedEndDate ? new Date(plannedEndDate) : null,
     actualEndDate: actualEndDate ? new Date(actualEndDate) : null,
-    dependencies: Array.isArray(dependencies) 
+    dependencies: Array.isArray(dependencies)
       ? dependencies.filter(id => ObjectId.isValid(id)).map(id => new ObjectId(id))
       : [],
-    floorId: floorId && ObjectId.isValid(floorId) ? new ObjectId(floorId) : null,
     categoryId: categoryId && ObjectId.isValid(categoryId) ? new ObjectId(categoryId) : null,
     subcontractorId: subcontractorId && ObjectId.isValid(subcontractorId) ? new ObjectId(subcontractorId) : null,
     priority: priority && WORK_ITEM_PRIORITIES.includes(parseInt(priority)) ? parseInt(priority) : 3,
@@ -175,47 +199,77 @@ export function createWorkItem(input, projectId, phaseId, createdBy) {
  */
 export function validateWorkItem(data) {
   const errors = [];
-  
-  if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
-    errors.push('Valid phaseId is required');
+  const scope = data.scope || 'phase';
+
+  // Scope-based validation
+  if (scope === 'project') {
+    if (!data.projectId || !ObjectId.isValid(data.projectId)) {
+      errors.push('Valid projectId is required for project-level work items');
+    }
+  } else if (scope === 'phase') {
+    if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
+      errors.push('Valid phaseId is required for phase-level work items');
+    }
+    if (!data.projectId || !ObjectId.isValid(data.projectId)) {
+      errors.push('Valid projectId is required');
+    }
+  } else if (scope === 'floor') {
+    if (!data.floorId || !ObjectId.isValid(data.floorId)) {
+      errors.push('Valid floorId is required for floor-level work items');
+    }
+    if (!data.phaseId || !ObjectId.isValid(data.phaseId)) {
+      errors.push('Valid phaseId is required for floor-level work items');
+    }
+    if (!data.projectId || !ObjectId.isValid(data.projectId)) {
+      errors.push('Valid projectId is required');
+    }
+  } else if (scope === 'multi_phase') {
+    if (!data.phaseIds || !Array.isArray(data.phaseIds) || data.phaseIds.length === 0) {
+      errors.push('phaseIds array is required for multi-phase work items');
+    } else {
+      for (const pid of data.phaseIds) {
+        if (!pid || !ObjectId.isValid(pid)) {
+          errors.push(`Invalid phaseId in phaseIds array: ${pid}`);
+        }
+      }
+    }
+    if (!data.projectId || !ObjectId.isValid(data.projectId)) {
+      errors.push('Valid projectId is required');
+    }
   }
-  
-  if (!data.projectId || !ObjectId.isValid(data.projectId)) {
-    errors.push('Valid projectId is required');
-  }
-  
+
   if (!data.name || data.name.trim().length < 2) {
     errors.push('Work item name is required and must be at least 2 characters');
   }
-  
+
   if (!data.category || data.category.trim().length === 0) {
     errors.push('Category is required');
   }
-  
+
   if (!data.status || !WORK_ITEM_STATUSES.includes(data.status)) {
     errors.push(`Status is required and must be one of: ${WORK_ITEM_STATUSES.join(', ')}`);
   }
-  
+
   if (data.estimatedHours !== undefined && (isNaN(data.estimatedHours) || data.estimatedHours < 0)) {
     errors.push('Estimated hours must be >= 0');
   }
-  
+
   if (data.actualHours !== undefined && (isNaN(data.actualHours) || data.actualHours < 0)) {
     errors.push('Actual hours must be >= 0');
   }
-  
+
   if (data.estimatedCost !== undefined && (isNaN(data.estimatedCost) || data.estimatedCost < 0)) {
     errors.push('Estimated cost must be >= 0');
   }
-  
+
   if (data.actualCost !== undefined && (isNaN(data.actualCost) || data.actualCost < 0)) {
     errors.push('Actual cost must be >= 0');
   }
-  
+
   if (data.priority !== undefined && !WORK_ITEM_PRIORITIES.includes(parseInt(data.priority))) {
     errors.push('Priority must be between 1 and 5');
   }
-  
+
   // Validate dependencies
   if (data.dependencies && Array.isArray(data.dependencies)) {
     for (const depId of data.dependencies) {
@@ -224,7 +278,7 @@ export function validateWorkItem(data) {
       }
     }
   }
-  
+
   // Validate dates
   if (data.startDate && data.plannedEndDate) {
     const start = new Date(data.startDate);
@@ -233,7 +287,7 @@ export function validateWorkItem(data) {
       errors.push('Planned end date must be after start date');
     }
   }
-  
+
   // Validate executionModel and subcontractorId consistency
   if (data.executionModel === 'contract_based' && data.subcontractorId) {
     // Contract-based work items should have a valid subcontractorId
@@ -241,13 +295,13 @@ export function validateWorkItem(data) {
       errors.push('For contract-based work items, subcontractorId must be a valid ObjectId');
     }
   }
-  
+
   // Warn (but don't block) if contract_based without subcontractorId
   // This is handled at API level for better UX
-  
+
   // If direct_labour, subcontractorId should ideally be null (but not strictly enforced)
   // This allows flexibility for work items that might transition between models
-  
+
   return { isValid: errors.length === 0, errors };
 }
 

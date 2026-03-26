@@ -14,6 +14,7 @@ import {
   PAYMENT_STATUSES as PAYMENT_STATUSES_CONST,
   PROFESSIONAL_TYPES as PROFESSIONAL_TYPES_CONST_IMPORT,
 } from '@/lib/constants/professional-services-constants';
+import { getProfessionalTypeCodePrefix } from '@/lib/professional-services-helpers';
 
 // Re-export PROFESSIONAL_TYPES for backward compatibility (no circular dependency)
 export const PROFESSIONAL_TYPES = PROFESSIONAL_TYPES_CONST_IMPORT;
@@ -39,6 +40,7 @@ export const PROFESSIONAL_TYPES = PROFESSIONAL_TYPES_CONST_IMPORT;
  * @property {Array} [milestonePayments] - Milestone-based payments array
  * @property {number} [hourlyRate] - Denormalized hourly rate from library (snapshot at assignment time)
  * @property {number} [perVisitRate] - Denormalized per-visit rate from library (snapshot at assignment time)
+ * @property {number} [perFloorRate] - Denormalized per-floor rate from library (snapshot at assignment time)
  * @property {number} [monthlyRetainer] - Denormalized monthly retainer from library (snapshot at assignment time)
  * @property {Object} [ratesSnapshot] - Complete rates snapshot for historical accuracy
  * @property {number} totalFees - Total fees paid/committed (default: 0)
@@ -90,10 +92,12 @@ export const PROFESSIONAL_SERVICES_SCHEMA = {
   ],
   hourlyRate: Number, // Optional, denormalized from library
   perVisitRate: Number, // Optional, denormalized from library
+  perFloorRate: Number, // Optional, denormalized from library
   monthlyRetainer: Number, // Optional, denormalized from library
   ratesSnapshot: {
     hourlyRate: Number,
     perVisitRate: Number,
+    perFloorRate: Number,
     monthlyRetainer: Number,
     snapshotDate: Date,
     libraryId: 'ObjectId', // Reference to library version
@@ -282,7 +286,7 @@ export function validateProfessionalServices(data, libraryData = null) {
  * @returns {string} Professional code (e.g., "ARCH-PROJ001-001")
  */
 export function generateProfessionalCode(projectCode, type, sequence) {
-  const prefix = type === 'architect' ? 'ARCH' : 'ENG';
+  const prefix = getProfessionalTypeCodePrefix(type);
   const projectCodeShort = projectCode.substring(0, 8).toUpperCase();
   const sequenceStr = String(sequence).padStart(3, '0');
   return `${prefix}-${projectCodeShort}-${sequenceStr}`;

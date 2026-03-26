@@ -7,12 +7,12 @@
 
 import { useState, useEffect } from 'react';
 import {
-  PROFESSIONAL_TYPES,
   ENGINEER_SPECIALIZATIONS,
   CONTRACT_TYPES,
   PAYMENT_SCHEDULES,
   VISIT_FREQUENCIES,
 } from '@/lib/constants/professional-services-constants';
+import { getProfessionalTypeLabel } from '@/lib/professional-services-helpers';
 
 export function ProfessionalServicesLibraryForm({
   initialData = null,
@@ -42,6 +42,7 @@ export function ProfessionalServicesLibraryForm({
     defaultVisitFrequency: '',
     defaultHourlyRate: '',
     defaultPerVisitRate: '',
+    defaultPerFloorRate: '',
     defaultMonthlyRetainer: '',
     isCommon: false,
     isActive: true,
@@ -50,6 +51,34 @@ export function ProfessionalServicesLibraryForm({
 
   const [tagInput, setTagInput] = useState('');
   const [validationErrors, setValidationErrors] = useState({});
+  const [roles, setRoles] = useState([]);
+  const [rolesLoading, setRolesLoading] = useState(false);
+  const [rolesError, setRolesError] = useState(null);
+
+  // Load roles for dynamic professional type options
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        setRolesLoading(true);
+        setRolesError(null);
+        const response = await fetch('/api/professional-roles', {
+          cache: 'no-store',
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || 'Failed to load professional roles');
+        }
+        setRoles(data.data.roles || []);
+      } catch (err) {
+        console.error('Error loading professional roles:', err);
+        setRolesError(err.message || 'Failed to load roles');
+      } finally {
+        setRolesLoading(false);
+      }
+    };
+
+    fetchRoles();
+  }, []);
 
   // Load initial data if editing
   useEffect(() => {
@@ -72,6 +101,7 @@ export function ProfessionalServicesLibraryForm({
         defaultVisitFrequency: initialData.defaultVisitFrequency || '',
         defaultHourlyRate: initialData.defaultHourlyRate?.toString() || '',
         defaultPerVisitRate: initialData.defaultPerVisitRate?.toString() || '',
+        defaultPerFloorRate: initialData.defaultPerFloorRate?.toString() || '',
         defaultMonthlyRetainer: initialData.defaultMonthlyRetainer?.toString() || '',
         isCommon: initialData.isCommon || false,
         isActive: initialData.isActive !== undefined ? initialData.isActive : true,
@@ -142,6 +172,7 @@ export function ProfessionalServicesLibraryForm({
       ...formData,
       defaultHourlyRate: formData.defaultHourlyRate ? parseFloat(formData.defaultHourlyRate) : null,
       defaultPerVisitRate: formData.defaultPerVisitRate ? parseFloat(formData.defaultPerVisitRate) : null,
+      defaultPerFloorRate: formData.defaultPerFloorRate ? parseFloat(formData.defaultPerFloorRate) : null,
       defaultMonthlyRetainer: formData.defaultMonthlyRetainer ? parseFloat(formData.defaultMonthlyRetainer) : null,
     };
 
@@ -150,9 +181,11 @@ export function ProfessionalServicesLibraryForm({
 
   const getContractTypes = () => {
     if (!formData.type) return CONTRACT_TYPES.ALL;
-    return formData.type === 'architect' 
-      ? CONTRACT_TYPES.ARCHITECT 
-      : CONTRACT_TYPES.ENGINEER;
+    return formData.type === 'architect'
+      ? CONTRACT_TYPES.ARCHITECT
+      : formData.type === 'engineer'
+        ? CONTRACT_TYPES.ENGINEER
+        : CONTRACT_TYPES.ALL;
   };
 
   return (
@@ -189,14 +222,24 @@ export function ProfessionalServicesLibraryForm({
               }`}
             >
               <option value="">Select Type</option>
-              {PROFESSIONAL_TYPES.map((type) => (
-                <option key={type} value={type} className="ds-text-primary">
-                  {type === 'architect' ? 'Architect' : 'Engineer'}
-                </option>
-              ))}
+              {roles.length > 0
+                ? roles.map((role) => (
+                    <option key={role.slug} value={role.slug} className="ds-text-primary">
+                      {role.name}
+                    </option>
+                  ))
+                : null}
             </select>
             {validationErrors.type && (
               <p className="mt-1 text-sm text-red-600">{validationErrors.type}</p>
+            )}
+            {rolesLoading && !rolesError && (
+              <p className="mt-1 text-xs ds-text-muted">Loading professional roles…</p>
+            )}
+            {rolesError && (
+              <p className="mt-1 text-xs text-amber-700">
+                {rolesError}. You can still select previously configured types.
+              </p>
             )}
           </div>
 
@@ -458,7 +501,7 @@ export function ProfessionalServicesLibraryForm({
       {/* Default Rates */}
       <div>
         <h2 className="text-lg font-semibold ds-text-primary mb-4">Default Rates (Optional)</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Hourly Rate (KES)
@@ -482,6 +525,21 @@ export function ProfessionalServicesLibraryForm({
               type="number"
               name="defaultPerVisitRate"
               value={formData.defaultPerVisitRate}
+              onChange={handleChange}
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border ds-border-subtle rounded-lg ${inputFocusClass} placeholder:ds-text-muted`}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
+              Per-Floor Rate (KES)
+            </label>
+            <input
+              type="number"
+              name="defaultPerFloorRate"
+              value={formData.defaultPerFloorRate}
               onChange={handleChange}
               placeholder="0.00"
               min="0"

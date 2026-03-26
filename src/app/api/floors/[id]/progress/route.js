@@ -223,14 +223,16 @@ export async function PATCH(request, { params }) {
     }
 
     const updateData = {
-      updatedAt: new Date(),
+      $set: {
+        updatedAt: new Date(),
+      },
     };
     const changes = {};
 
     if (completionPercentage !== undefined) {
       const percentage = Math.max(0, Math.min(100, parseFloat(completionPercentage) || 0));
       updateData.$set = {
-        ...(updateData.$set || {}),
+        ...updateData.$set,
         'progress.completionPercentage': percentage,
       };
       changes.completionPercentage = {
@@ -241,7 +243,7 @@ export async function PATCH(request, { params }) {
 
     if (milestoneNotes !== undefined) {
       updateData.$set = {
-        ...(updateData.$set || {}),
+        ...updateData.$set,
         'progress.milestoneNotes': milestoneNotes.trim(),
       };
       changes.milestoneNotes = {
@@ -272,7 +274,22 @@ export async function PATCH(request, { params }) {
       });
     }
 
-    return successResponse(result.value.progress, 'Floor progress updated successfully');
+    // Fallback in case driver/version does not return .value as expected
+    let updatedFloor = result?.value;
+    if (!updatedFloor) {
+      updatedFloor = await db.collection('floors').findOne({
+        _id: new ObjectId(id),
+      });
+    }
+
+    const updatedProgress =
+      updatedFloor?.progress || {
+        photos: [],
+        completionPercentage: 0,
+        milestoneNotes: '',
+      };
+
+    return successResponse(updatedProgress, 'Floor progress updated successfully');
   } catch (error) {
     console.error('Update floor progress error:', error);
     return errorResponse('Failed to update floor progress', 500);

@@ -7,10 +7,17 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Clock, DollarSign, Users, TrendingUp, AlertCircle, Wrench } from 'lucide-react';
+import {
+  Clock,
+  DollarSign,
+  Users,
+  TrendingUp,
+  AlertCircle,
+  Wrench,
+} from 'lucide-react';
 import { LoadingSpinner } from '@/components/loading';
 
-export function EquipmentOperatorTracking({ equipmentId }) {
+export function EquipmentOperatorTracking({ equipmentId, projectId, phaseId }) {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -29,7 +36,7 @@ export function EquipmentOperatorTracking({ equipmentId }) {
         cache: 'no-store',
         headers: {
           'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
+          Pragma: 'no-cache',
         },
       });
       const result = await response.json();
@@ -60,7 +67,9 @@ export function EquipmentOperatorTracking({ equipmentId }) {
   if (error) {
     return (
       <div className="bg-red-50 border border-red-400/60 rounded-lg p-4">
-        <p className="text-sm text-red-800">Error loading operator data: {error}</p>
+        <p className="text-sm text-red-800">
+          Error loading operator data: {error}
+        </p>
       </div>
     );
   }
@@ -82,14 +91,20 @@ export function EquipmentOperatorTracking({ equipmentId }) {
         <div className="bg-blue-50 border border-blue-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-5 h-5 text-blue-600" />
-            <span className="text-sm font-medium ds-text-secondary">Operator Hours</span>
+            <span className="text-sm font-medium ds-text-secondary">
+              Operator Hours
+            </span>
           </div>
-          <div className="text-2xl font-bold text-blue-600">{actualHours.toFixed(1)}</div>
+          <div className="text-2xl font-bold text-blue-600">
+            {actualHours.toFixed(1)}
+          </div>
           {estimatedHours > 0 && (
             <div className="text-xs ds-text-secondary mt-1">
               of {estimatedHours} estimated
               {utilizationPercentage > 0 && (
-                <span className={`ml-2 ${utilizationPercentage > 100 ? 'text-red-600' : 'text-green-600'}`}>
+                <span
+                  className={`ml-2 ${utilizationPercentage > 100 ? 'text-red-600' : 'text-green-600'}`}
+                >
                   ({utilizationPercentage.toFixed(1)}%)
                 </span>
               )}
@@ -100,20 +115,28 @@ export function EquipmentOperatorTracking({ equipmentId }) {
         <div className="bg-green-50 border border-green-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign className="w-5 h-5 text-green-600" />
-            <span className="text-sm font-medium ds-text-secondary">Operator Cost</span>
+            <span className="text-sm font-medium ds-text-secondary">
+              Operator Cost
+            </span>
           </div>
           <div className="text-2xl font-bold text-green-600">
             {summary.totalCost.toLocaleString()} KES
           </div>
-          <div className="text-xs ds-text-secondary mt-1">{summary.entryCount} entries</div>
+          <div className="text-xs ds-text-secondary mt-1">
+            {summary.entryCount} entries
+          </div>
         </div>
 
         <div className="bg-purple-50 border border-purple-400/60 rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Users className="w-5 h-5 text-purple-600" />
-            <span className="text-sm font-medium ds-text-secondary">Operators</span>
+            <span className="text-sm font-medium ds-text-secondary">
+              Operators
+            </span>
           </div>
-          <div className="text-2xl font-bold text-purple-600">{summary.uniqueOperators}</div>
+          <div className="text-2xl font-bold text-purple-600">
+            {summary.uniqueOperators}
+          </div>
           <div className="text-xs ds-text-secondary mt-1">Unique operators</div>
         </div>
       </div>
@@ -124,9 +147,12 @@ export function EquipmentOperatorTracking({ equipmentId }) {
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
             <div>
-              <p className="text-sm font-medium text-red-900">Over Utilization</p>
+              <p className="text-sm font-medium text-red-900">
+                Over Utilization
+              </p>
               <p className="text-xs text-red-700 mt-1">
-                Equipment has been used {(utilizationPercentage - 100).toFixed(1)}% more than estimated
+                Equipment has been used{' '}
+                {(utilizationPercentage - 100).toFixed(1)}% more than estimated
                 ({actualHours.toFixed(1)} / {estimatedHours} hours)
               </p>
             </div>
@@ -167,18 +193,26 @@ export function EquipmentOperatorTracking({ equipmentId }) {
                     <td className="px-4 py-3 text-sm font-medium ds-text-primary">
                       {operator.operatorName}
                     </td>
-                    <td className="px-4 py-3 text-sm ds-text-secondary">{operator.totalHours.toFixed(1)}</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
+                      {operator.totalHours.toFixed(1)}
+                    </td>
                     <td className="px-4 py-3 text-sm ds-text-secondary">
                       {operator.totalCost.toLocaleString()} KES
                     </td>
-                    <td className="px-4 py-3 text-sm ds-text-secondary">{operator.entryCount}</td>
-                    <td className="px-4 py-3 text-sm ds-text-secondary">{operator.daysWorked}</td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
+                      {operator.entryCount}
+                    </td>
+                    <td className="px-4 py-3 text-sm ds-text-secondary">
+                      {operator.daysWorked}
+                    </td>
                   </tr>
                 ))}
               </tbody>
               <tfoot className="ds-bg-surface-muted">
                 <tr>
-                  <td className="px-4 py-3 text-sm font-semibold ds-text-primary">Totals:</td>
+                  <td className="px-4 py-3 text-sm font-semibold ds-text-primary">
+                    Totals:
+                  </td>
                   <td className="px-4 py-3 text-sm font-semibold ds-text-primary">
                     {summary.totalHours.toFixed(1)} hrs
                   </td>
@@ -200,9 +234,11 @@ export function EquipmentOperatorTracking({ equipmentId }) {
       {(!operators || operators.length === 0) && (
         <div className="ds-bg-surface-muted border ds-border-subtle rounded-lg p-8 text-center">
           <Wrench className="w-12 h-12 ds-text-muted mx-auto mb-4" />
-          <p className="ds-text-secondary mb-2">No operator labour entries found for this equipment</p>
+          <p className="ds-text-secondary mb-2">
+            No operator labour entries found for this equipment
+          </p>
           <Link
-            href={`/labour/entries/new?equipmentId=${equipmentId}`}
+            href={`/labour/entries/new?equipmentId=${equipmentId}&projectId=${projectId || ''}&phaseId=${phaseId || ''}`}
             className="text-blue-600 hover:text-blue-800 text-sm font-medium"
           >
             Add Operator Labour Entry →
@@ -214,7 +250,9 @@ export function EquipmentOperatorTracking({ equipmentId }) {
       {estimatedHours > 0 && (
         <div className="ds-bg-surface rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-semibold ds-text-primary">Utilization</h3>
+            <h3 className="text-lg font-semibold ds-text-primary">
+              Utilization
+            </h3>
             <span className="text-sm font-medium ds-text-secondary">
               {utilizationPercentage.toFixed(1)}%
             </span>
@@ -225,14 +263,16 @@ export function EquipmentOperatorTracking({ equipmentId }) {
                 utilizationPercentage > 100
                   ? 'bg-red-600'
                   : utilizationPercentage > 80
-                  ? 'bg-yellow-500'
-                  : 'bg-green-600'
+                    ? 'bg-yellow-500'
+                    : 'bg-green-600'
               }`}
               style={{ width: `${Math.min(100, utilizationPercentage)}%` }}
             ></div>
           </div>
           <div className="flex items-center justify-between mt-2 text-xs ds-text-secondary">
-            <span>{actualHours.toFixed(1)} / {estimatedHours} hours</span>
+            <span>
+              {actualHours.toFixed(1)} / {estimatedHours} hours
+            </span>
             <span>
               {actualHours > estimatedHours
                 ? `${(actualHours - estimatedHours).toFixed(1)} hours over`
@@ -244,4 +284,3 @@ export function EquipmentOperatorTracking({ equipmentId }) {
     </div>
   );
 }
-

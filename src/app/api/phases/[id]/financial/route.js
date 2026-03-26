@@ -93,7 +93,7 @@ export async function GET(request, { params }) {
     ]).toArray();
 
     // Get professional services spending for this phase
-    const { calculatePhaseProfessionalServicesSpending } = await import('@/lib/professional-services-helpers');
+    const { calculatePhaseProfessionalServicesSpending } = await import('@/lib/professional-services-stats');
     const professionalServicesSpending = await calculatePhaseProfessionalServicesSpending(id);
 
     // Calculate labour spending from approved/paid labour entries

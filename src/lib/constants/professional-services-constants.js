@@ -7,7 +7,19 @@
 /**
  * Valid professional types
  */
-export const PROFESSIONAL_TYPES = ['architect', 'engineer'];
+export const PROFESSIONAL_TYPES = [
+  'architect',
+  'engineer',
+  // Expanded professional categories (backwards compatible)
+  'quantity_surveyor',
+  'land_surveyor',
+  'interior_designer',
+  'project_manager',
+  'nema_consultant',
+  'geotechnical_engineer',
+  'mep_engineer',
+  'fire_safety_consultant',
+];
 
 /**
  * Valid contract types
@@ -26,6 +38,7 @@ export const PAYMENT_SCHEDULES = [
   'monthly',
   'lump_sum',
   'per_visit',
+  'per_floor',
   'retainer',
   'percentage',
 ];

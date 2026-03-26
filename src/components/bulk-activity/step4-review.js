@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import { normalizeUserRole, isRole } from '@/lib/role-constants';
+import { getProfessionalTypeLabel } from '@/lib/professional-services-helpers';
 
 const normalizeId = (value) => {
   if (!value) return '';
@@ -131,7 +132,7 @@ export function Step4Review({ wizardData, user }) {
             <p className="text-sm ds-text-secondary">Professional Service</p>
             <p className="font-medium ds-text-primary">
               {professionalService 
-                ? `${professionalService.library?.name || 'N/A'} (${professionalService.type === 'architect' ? 'Architect' : 'Engineer'})`
+                ? `${professionalService.library?.name || 'N/A'} (${getProfessionalTypeLabel(professionalService.type)})`
                 : 'Loading...'}
             </p>
           </div>

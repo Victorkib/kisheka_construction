@@ -13,6 +13,8 @@ import Link from 'next/link';
 import { AppLayout } from '@/components/layout/app-layout';
 import { LoadingSpinner, LoadingCard } from '@/components/loading';
 import { useToast } from '@/components/toast';
+import { EvidenceComposer } from '@/components/progress/evidence-composer';
+import { EvidenceFeed } from '@/components/progress/evidence-feed';
 
 export default function PhaseDashboardPage() {
   const router = useRouter();
@@ -415,6 +417,28 @@ export default function PhaseDashboardPage() {
             </Link>
           </div>
         </div>
+
+        {/* Evidence Section */}
+        {project?._id && (
+          <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold ds-text-primary">Phase Evidence</h2>
+              <p className="text-sm ds-text-secondary mt-1">
+                Capture notes and photos that specifically relate to this phase across all floors.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <EvidenceComposer
+                projectId={project._id.toString()}
+                phaseId={phase._id?.toString?.() || phase._id}
+              />
+              <EvidenceFeed
+                projectId={project._id.toString()}
+                phaseId={phase._id?.toString?.() || phase._id}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Timeline */}
         <div className="ds-bg-surface rounded-lg shadow p-6 mb-6">

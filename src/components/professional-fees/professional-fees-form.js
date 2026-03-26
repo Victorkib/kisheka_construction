@@ -5,12 +5,15 @@
 
 'use client';
 
+/* eslint-disable react-hooks/set-state-in-effect */
+
 import { useState, useEffect } from 'react';
 import {
   FEE_TYPES,
   PAYMENT_METHODS,
   CURRENCIES,
 } from '@/lib/constants/professional-fees-constants';
+import { getProfessionalTypeLabel } from '@/lib/professional-services-helpers';
 import { CloudinaryUploadWidget } from '@/components/uploads/cloudinary-upload-widget';
 import { RateInformationPanel } from './RateInformationPanel';
 
@@ -18,6 +21,7 @@ export function ProfessionalFeesForm({
   initialData = null,
   prefillData = null,
   professionalServices = [],
+  floors = [],
   projects = [],
   phases = [],
   activities = [],
@@ -52,6 +56,12 @@ export function ProfessionalFeesForm({
   const [validationErrors, setValidationErrors] = useState({});
   const [autoApprove, setAutoApprove] = useState(false);
   const [suggestedAmount, setSuggestedAmount] = useState(null);
+
+  const availableFloors = floors.filter(
+    (floor) =>
+      floor.projectId?.toString() === formData.projectId ||
+      floor.project?._id?.toString() === formData.projectId
+  );
 
   // Load initial data if editing
   useEffect(() => {
@@ -128,7 +138,9 @@ export function ProfessionalFeesForm({
 
   // Filter phases and activities by selected project and professional service
   const availablePhases = phases.filter(
-    (phase) => phase.projectId?.toString() === formData.projectId || phase.project?._id?.toString() === formData.projectId
+    (phase) =>
+      phase.projectId?.toString() === formData.projectId ||
+      phase.project?._id?.toString() === formData.projectId
   );
   const availableActivities = activities.filter(
     (activity) => 
@@ -164,6 +176,10 @@ export function ProfessionalFeesForm({
     if (!formData.projectId) {
       errors.projectId = 'Project is required';
     }
+
+    if (selectedProfessional?.paymentSchedule === 'per_floor' && !formData.floorId) {
+      errors.floorId = 'Floor is required for fees on per-floor professional services';
+    }
     if (!formData.feeType) {
       errors.feeType = 'Fee type is required';
     }
@@ -194,9 +210,11 @@ export function ProfessionalFeesForm({
   // Get available fee types based on selected professional
   const getAvailableFeeTypes = () => {
     if (!selectedProfessional) return FEE_TYPES.ALL;
-    return selectedProfessional.type === 'architect' 
-      ? FEE_TYPES.ARCHITECT 
-      : FEE_TYPES.ENGINEER;
+    return selectedProfessional.type === 'architect'
+      ? FEE_TYPES.ARCHITECT
+      : selectedProfessional.type === 'engineer'
+        ? FEE_TYPES.ENGINEER
+        : FEE_TYPES.ALL;
   };
 
   return (
@@ -217,7 +235,7 @@ export function ProfessionalFeesForm({
       {/* Basic Information */}
       <div>
         <h2 className="text-lg font-semibold ds-text-primary mb-4">Basic Information</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-semibold ds-text-secondary mb-1">
               Professional Service <span className="text-red-500">*</span>
@@ -248,11 +266,40 @@ export function ProfessionalFeesForm({
               <div className="mt-2 p-3 bg-blue-50 rounded-lg">
                 <div className="text-sm">
                   <div className="font-medium ds-text-primary">
-                    {selectedProfessional.library?.name || 'N/A'} ({selectedProfessional.type === 'architect' ? 'Architect' : 'Engineer'})
+                    {selectedProfessional.library?.name || 'N/A'} ({getProfessionalTypeLabel(selectedProfessional.type)})
                   </div>
                   <div className="ds-text-secondary">Project: {selectedProfessional.project?.projectName || 'N/A'}</div>
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* Floor (required for per-floor services, optional otherwise) */}
+          <div>
+            <label className="block text-sm font-semibold ds-text-secondary mb-1">
+              Floor {selectedProfessional?.paymentSchedule === 'per_floor' && <span className="text-red-500">*</span>}
+            </label>
+            <select
+              name="floorId"
+              value={formData.floorId || ''}
+              onChange={handleChange}
+              className={`w-full px-3 py-2 ds-bg-surface ds-text-primary border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                validationErrors.floorId ? 'border-red-400/60' : 'ds-border-subtle'
+              }`}
+            >
+              <option value="">
+                {selectedProfessional?.paymentSchedule === 'per_floor'
+                  ? 'Select Floor'
+                  : 'Select Floor (Optional)'}
+              </option>
+              {availableFloors.map((floor) => (
+                <option key={floor._id} value={floor._id}>
+                  {floor.floorName} ({floor.floorNumber})
+                </option>
+              ))}
+            </select>
+            {validationErrors.floorId && (
+              <p className="mt-1 text-sm text-red-600">{validationErrors.floorId}</p>
             )}
           </div>
 

@@ -2,7 +2,7 @@
  * Labour Entries API Route
  * GET: List all labour entries with filters
  * POST: Create new labour entry
- * 
+ *
  * GET /api/labour/entries
  * POST /api/labour/entries
  */
@@ -15,7 +15,10 @@ import { hasPermission } from '@/lib/role-helpers';
 import { createAuditLog } from '@/lib/audit-log';
 import { ObjectId } from 'mongodb';
 import { successResponse, errorResponse } from '@/lib/api-response';
-import { createLabourEntry, validateLabourEntry } from '@/lib/schemas/labour-entry-schema';
+import {
+  createLabourEntry,
+  validateLabourEntry,
+} from '@/lib/schemas/labour-entry-schema';
 import {
   validatePhaseLabourBudget,
   updatePhaseLabourSpending,
@@ -23,9 +26,11 @@ import {
   recalculatePhaseLabourSpending,
 } from '@/lib/labour-financial-helpers';
 import { withTransaction } from '@/lib/mongodb/transaction-helpers';
-import { recalculatePhaseSpending } from '@/lib/phase-helpers';
 import { updateFloorFinancials } from '@/lib/floor-financial-helpers';
-import { getProjectContext, createProjectFilter } from '@/lib/middleware/project-context';
+import {
+  getProjectContext,
+  createProjectFilter,
+} from '@/lib/middleware/project-context';
 // Force dynamic rendering to prevent caching stale data
 export const dynamic = 'force-dynamic';
 
@@ -33,10 +38,9 @@ import {
   updateWorkItemLabour,
   updateWorkItemStatusFromCompletion,
 } from '@/lib/work-item-labour-helpers';
-import {
-  updateEquipmentOperatorHours,
-} from '@/lib/equipment-operator-helpers';
+import { updateEquipmentOperatorHours } from '@/lib/equipment-operator-helpers';
 import { updateLabourCostSummary } from '@/lib/labour-financial-helpers';
+import { recalculatePhaseSpending } from '@/lib/phase-helpers';
 
 /**
  * GET /api/labour/entries
@@ -47,7 +51,10 @@ import { updateLabourCostSummary } from '@/lib/labour-financial-helpers';
 export async function GET(request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return errorResponse('Unauthorized', 401);
@@ -74,7 +81,10 @@ export async function GET(request) {
 
     // If projectId is provided, validate access
     if (projectContext.projectId && !projectContext.hasAccess) {
-      return errorResponse(projectContext.error || 'Access denied to this project', 403);
+      return errorResponse(
+        projectContext.error || 'Access denied to this project',
+        403,
+      );
     }
 
     const db = await getDatabase();
@@ -88,7 +98,11 @@ export async function GET(request) {
       query.phaseId = new ObjectId(phaseId);
     }
 
-    if (floorId === 'unassigned' || floorId === 'none' || floorId === 'missing') {
+    if (
+      floorId === 'unassigned' ||
+      floorId === 'none' ||
+      floorId === 'missing'
+    ) {
       query.$and = query.$and || [];
       query.$and.push({
         $or: [{ floorId: { $exists: false } }, { floorId: null }],
@@ -112,7 +126,10 @@ export async function GET(request) {
     if (status) {
       // Handle comma-separated status values (e.g., "approved,paid")
       if (status.includes(',')) {
-        const statuses = status.split(',').map(s => s.trim()).filter(Boolean);
+        const statuses = status
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean);
         query.status = { $in: statuses };
       } else {
         query.status = status;
@@ -155,23 +172,47 @@ export async function GET(request) {
       .toArray();
 
     // Populate project, phase, and work item names for entries
-    const projectIds = [...new Set(entries.map((e) => e.projectId?.toString()).filter(Boolean))];
-    const phaseIds = [...new Set(entries.map((e) => e.phaseId?.toString()).filter(Boolean))];
-    const workItemIds = [...new Set(entries.map((e) => e.workItemId?.toString()).filter(Boolean))];
-    
-    const projects = projectIds.length > 0 ? await db.collection('projects').find({
-      _id: { $in: projectIds.map((id) => new ObjectId(id)) },
-    }).toArray() : [];
-    
-    const phases = phaseIds.length > 0 ? await db.collection('phases').find({
-      _id: { $in: phaseIds.map((id) => new ObjectId(id)) },
-    }).toArray() : [];
-    
-    const workItems = workItemIds.length > 0 ? await db.collection('work_items').find({
-      _id: { $in: workItemIds.map((id) => new ObjectId(id)) },
-      deletedAt: null,
-    }).toArray() : [];
-    
+    const projectIds = [
+      ...new Set(entries.map((e) => e.projectId?.toString()).filter(Boolean)),
+    ];
+    const phaseIds = [
+      ...new Set(entries.map((e) => e.phaseId?.toString()).filter(Boolean)),
+    ];
+    const workItemIds = [
+      ...new Set(entries.map((e) => e.workItemId?.toString()).filter(Boolean)),
+    ];
+
+    const projects =
+      projectIds.length > 0
+        ? await db
+            .collection('projects')
+            .find({
+              _id: { $in: projectIds.map((id) => new ObjectId(id)) },
+            })
+            .toArray()
+        : [];
+
+    const phases =
+      phaseIds.length > 0
+        ? await db
+            .collection('phases')
+            .find({
+              _id: { $in: phaseIds.map((id) => new ObjectId(id)) },
+            })
+            .toArray()
+        : [];
+
+    const workItems =
+      workItemIds.length > 0
+        ? await db
+            .collection('work_items')
+            .find({
+              _id: { $in: workItemIds.map((id) => new ObjectId(id)) },
+              deletedAt: null,
+            })
+            .toArray()
+        : [];
+
     const projectMap = {};
     projects.forEach((project) => {
       projectMap[project._id.toString()] = {
@@ -179,7 +220,7 @@ export async function GET(request) {
         projectCode: project.projectCode,
       };
     });
-    
+
     const phaseMap = {};
     phases.forEach((phase) => {
       phaseMap[phase._id.toString()] = {
@@ -187,7 +228,7 @@ export async function GET(request) {
         phaseCode: phase.phaseCode,
       };
     });
-    
+
     const workItemMap = {};
     workItems.forEach((workItem) => {
       workItemMap[workItem._id.toString()] = {
@@ -196,33 +237,44 @@ export async function GET(request) {
         workItemStatus: workItem.status,
       };
     });
-    
+
     // Add project, phase, and work item names to entries
     const entriesWithNames = entries.map((entry) => ({
       ...entry,
-      projectName: entry.projectId ? projectMap[entry.projectId.toString()]?.projectName : null,
-      phaseName: entry.phaseId ? phaseMap[entry.phaseId.toString()]?.phaseName : null,
-      workItemName: entry.workItemId ? workItemMap[entry.workItemId.toString()]?.workItemName : null,
-      workItemCategory: entry.workItemId ? workItemMap[entry.workItemId.toString()]?.workItemCategory : null,
+      projectName: entry.projectId
+        ? projectMap[entry.projectId.toString()]?.projectName
+        : null,
+      phaseName: entry.phaseId
+        ? phaseMap[entry.phaseId.toString()]?.phaseName
+        : null,
+      workItemName: entry.workItemId
+        ? workItemMap[entry.workItemId.toString()]?.workItemName
+        : null,
+      workItemCategory: entry.workItemId
+        ? workItemMap[entry.workItemId.toString()]?.workItemCategory
+        : null,
     }));
 
     // Get total count for pagination
     const total = await db.collection('labour_entries').countDocuments(query);
 
     // Calculate totals
-    const totals = await db.collection('labour_entries').aggregate([
-      {
-        $match: query,
-      },
-      {
-        $group: {
-          _id: null,
-          totalHours: { $sum: '$totalHours' },
-          totalCost: { $sum: '$totalCost' },
-          entryCount: { $sum: 1 },
+    const totals = await db
+      .collection('labour_entries')
+      .aggregate([
+        {
+          $match: query,
         },
-      },
-    ]).toArray();
+        {
+          $group: {
+            _id: null,
+            totalHours: { $sum: '$totalHours' },
+            totalCost: { $sum: '$totalCost' },
+            entryCount: { $sum: 1 },
+          },
+        },
+      ])
+      .toArray();
 
     const summary = totals[0] || { totalHours: 0, totalCost: 0, entryCount: 0 };
 
@@ -241,7 +293,7 @@ export async function GET(request) {
           entryCount: summary.entryCount,
         },
       },
-      'Labour entries retrieved successfully'
+      'Labour entries retrieved successfully',
     );
   } catch (error) {
     console.error('GET /api/labour/entries error:', error);
@@ -253,13 +305,16 @@ export async function GET(request) {
  * POST /api/labour/entries
  * Creates a new labour entry
  * Auth: OWNER only (in single-user mode)
- * 
+ *
  * CRITICAL: All budget updates are atomic and validated
  */
 export async function POST(request) {
   try {
     const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
     if (authError || !user) {
       return errorResponse('Unauthorized', 401);
@@ -273,7 +328,10 @@ export async function POST(request) {
 
     const hasAccess = await hasPermission(user.id, 'create_labour_entry');
     if (!hasAccess) {
-      return errorResponse('Insufficient permissions. You do not have permission to create labour entries.', 403);
+      return errorResponse(
+        'Insufficient permissions. You do not have permission to create labour entries.',
+        403,
+      );
     }
 
     const body = await request.json();
@@ -322,32 +380,54 @@ export async function POST(request) {
     const indirectLabour = isIndirectLabour === true;
     if (!indirectLabour) {
       if (!phaseId || !ObjectId.isValid(phaseId)) {
-        return errorResponse('Valid phaseId is required for direct labour', 400);
-      }
-    }
-
-    if (!indirectLabour) {
-      if (!workItemId || !ObjectId.isValid(workItemId)) {
-        return errorResponse('Valid workItemId is required for direct labour', 400);
-      }
-    }
-
-    if (!workerName || workerName.trim().length < 2) {
-      return errorResponse('workerName is required and must be at least 2 characters', 400);
-    }
-
-    // Validate indirect cost category when isIndirectLabour is true
-    if (indirectLabour && indirectCostCategory) {
-      const validCategories = ['utilities', 'siteOverhead', 'transportation', 'safetyCompliance'];
-      if (!validCategories.includes(indirectCostCategory)) {
         return errorResponse(
-          `Invalid indirectCostCategory. Must be one of: ${validCategories.join(', ')}`,
-          400
+          'Valid phaseId is required for direct labour',
+          400,
         );
       }
     }
 
-    if (hourlyRate === undefined || hourlyRate === null || isNaN(hourlyRate) || hourlyRate < 0) {
+    // WorkItemId is required for direct labour UNLESS it's equipment operator labour
+    // Equipment operators may not be linked to a specific work item
+    const isEquipmentOperator = equipmentId && ObjectId.isValid(equipmentId);
+    if (!indirectLabour && !isEquipmentOperator) {
+      if (!workItemId || !ObjectId.isValid(workItemId)) {
+        return errorResponse(
+          'Valid workItemId is required for direct labour (or provide equipmentId for equipment operator labour)',
+          400,
+        );
+      }
+    }
+
+    if (!workerName || workerName.trim().length < 2) {
+      return errorResponse(
+        'workerName is required and must be at least 2 characters',
+        400,
+      );
+    }
+
+    // Validate indirect cost category when isIndirectLabour is true
+    if (indirectLabour && indirectCostCategory) {
+      const validCategories = [
+        'utilities',
+        'siteOverhead',
+        'transportation',
+        'safetyCompliance',
+      ];
+      if (!validCategories.includes(indirectCostCategory)) {
+        return errorResponse(
+          `Invalid indirectCostCategory. Must be one of: ${validCategories.join(', ')}`,
+          400,
+        );
+      }
+    }
+
+    if (
+      hourlyRate === undefined ||
+      hourlyRate === null ||
+      isNaN(hourlyRate) ||
+      hourlyRate < 0
+    ) {
       return errorResponse('hourlyRate is required and must be >= 0', 400);
     }
 
@@ -356,12 +436,13 @@ export async function POST(request) {
       if (value === undefined || value === null || value === '') {
         return null;
       }
-      const num = typeof value === 'string' ? parseFloat(value.trim()) : Number(value);
+      const num =
+        typeof value === 'string' ? parseFloat(value.trim()) : Number(value);
       if (isNaN(num)) {
         return null;
       }
       // Only return if in valid range (1-5), otherwise null
-      return (num >= 1 && num <= 5) ? num : null;
+      return num >= 1 && num <= 5 ? num : null;
     };
 
     const normalizedQualityRating = normalizeRating(qualityRating);
@@ -407,7 +488,10 @@ export async function POST(request) {
     // Validate entry data (now includes createdBy)
     const validation = validateLabourEntry(labourEntryData);
     if (!validation.isValid) {
-      return errorResponse(`Validation failed: ${validation.errors.join(', ')}`, 400);
+      return errorResponse(
+        `Validation failed: ${validation.errors.join(', ')}`,
+        400,
+      );
     }
 
     // Create entry object
@@ -423,22 +507,25 @@ export async function POST(request) {
     if (indirectLabour) {
       // Validate against indirect costs budget
       try {
-        const { validateIndirectCostsBudget } = await import('@/lib/indirect-costs-helpers');
+        const { validateIndirectCostsBudget } =
+          await import('@/lib/indirect-costs-helpers');
         if (typeof validateIndirectCostsBudget !== 'function') {
-          throw new Error('validateIndirectCostsBudget is not exported from indirect-costs-helpers');
+          throw new Error(
+            'validateIndirectCostsBudget is not exported from indirect-costs-helpers',
+          );
         }
         // For indirect labour, use the selected category (fallback to siteOverhead)
         const indirectCategory = indirectCostCategory || 'siteOverhead';
         budgetValidation = await validateIndirectCostsBudget(
           projectId,
           labourEntry.totalCost,
-          indirectCategory
+          indirectCategory,
         );
       } catch (error) {
         console.error('Indirect costs budget validation error:', error);
         return errorResponse(
           `Indirect costs budget validation failed: ${error.message}`,
-          500
+          500,
         );
       }
 
@@ -447,7 +534,7 @@ export async function POST(request) {
       if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
         return errorResponse(
           `Indirect costs budget validation failed: ${budgetValidation.message}`,
-          400
+          400,
         );
       }
       // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
@@ -457,7 +544,7 @@ export async function POST(request) {
       // OPTIONAL BUDGET: Allow if budget is not set, validate if budget is set
       budgetValidation = await validatePhaseLabourBudget(
         phaseId,
-        labourEntry.totalCost
+        labourEntry.totalCost,
       );
 
       // Only block if budget is set AND exceeded
@@ -465,7 +552,7 @@ export async function POST(request) {
       if (!budgetValidation.isValid && !budgetValidation.budgetNotSet) {
         return errorResponse(
           `Budget validation failed: ${budgetValidation.message}`,
-          400
+          400,
         );
       }
       // If budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
@@ -475,192 +562,240 @@ export async function POST(request) {
       // Only validate if floorId is provided AND floor budget is set
       if (floorId && labourEntry.totalCost > 0 && ObjectId.isValid(floorId)) {
         try {
-          const { validateFloorBudget } = await import('@/lib/floor-financial-helpers');
-          const floorBudgetValidation = await validateFloorBudget(floorId, labourEntry.totalCost, 'labour');
-          
+          const { validateFloorBudget } =
+            await import('@/lib/floor-financial-helpers');
+          const floorBudgetValidation = await validateFloorBudget(
+            floorId,
+            labourEntry.totalCost,
+            'labour',
+          );
+
           // Only block if floor budget is set AND exceeded
           // If floor budget is not set (budgetNotSet = true), allow the operation
-          if (!floorBudgetValidation.isValid && !floorBudgetValidation.budgetNotSet) {
+          if (
+            !floorBudgetValidation.isValid &&
+            !floorBudgetValidation.budgetNotSet
+          ) {
             return errorResponse(
               `Floor labour budget exceeded. ${floorBudgetValidation.message}. ` +
-              `Floor budget: ${floorBudgetValidation.floorBudget.toLocaleString()}, ` +
-              `Available: ${floorBudgetValidation.available.toLocaleString()}, ` +
-              `Required: ${floorBudgetValidation.required.toLocaleString()}`,
-              400
+                `Floor budget: ${floorBudgetValidation.floorBudget.toLocaleString()}, ` +
+                `Available: ${floorBudgetValidation.available.toLocaleString()}, ` +
+                `Required: ${floorBudgetValidation.required.toLocaleString()}`,
+              400,
             );
           }
           // If floor budget is not set, operation is allowed (isValid = true, budgetNotSet = true)
           // Spending will still be tracked regardless
         } catch (floorValidationError) {
           // Don't block if floor validation fails - log and continue
-          console.error('Floor budget validation error (non-blocking):', floorValidationError);
+          console.error(
+            'Floor budget validation error (non-blocking):',
+            floorValidationError,
+          );
         }
       }
     }
 
     const db = await getDatabase();
 
-    console.log('[POST /api/labour/entries] Starting transaction for atomic labour entry creation');
+    console.log(
+      '[POST /api/labour/entries] Starting transaction for atomic labour entry creation',
+    );
 
     // CRITICAL: Wrap all operations in transaction for atomicity
-    const transactionResult = await withTransaction(async ({ db: transactionDb, session }) => {
-      // STEP 0: Create or get worker profile if needed (atomic)
-      let workerProfileCreated = false;
-      let createdWorkerProfile = null;
-      
-      // If workerId is not provided or empty, but workerName is provided, create/get worker profile
-      if ((!workerId || workerId.trim() === '') && workerName && workerName.trim().length >= 2) {
-        try {
-          const { createOrGetWorkerProfileFromEntry } = await import('@/lib/helpers/worker-profile-helpers');
-          const workerProfile = await createOrGetWorkerProfileFromEntry(
-            labourEntryData,
-            userProfile._id,
-            { session, db: transactionDb }
-          );
-          
-          // Update labour entry with worker profile ID
-          labourEntry.workerId = workerProfile.userId || workerProfile._id;
-          labourEntry.workerName = workerProfile.workerName;
-          
-          // Track if we created a new profile (vs found existing)
-          if (workerProfile.createdAt && 
-              new Date(workerProfile.createdAt).getTime() > Date.now() - 5000) {
-            workerProfileCreated = true;
-            createdWorkerProfile = workerProfile;
-            console.log('[POST /api/labour/entries] Worker profile created:', workerProfile._id);
-          } else {
-            console.log('[POST /api/labour/entries] Existing worker profile found:', workerProfile._id);
-          }
-        } catch (error) {
-          console.error('[POST /api/labour/entries] Error creating worker profile:', error);
-          // Don't fail the entry creation if worker profile creation fails
-          // Just log the error and continue
-        }
-      }
+    const transactionResult = await withTransaction(
+      async ({ db: transactionDb, session }) => {
+        // STEP 0: Create or get worker profile if needed (atomic)
+        let workerProfileCreated = false;
+        let createdWorkerProfile = null;
 
-      // STEP 1: Insert labour entry (atomic)
-      const entryResult = await transactionDb.collection('labour_entries').insertOne(
-        labourEntry,
-        { session }
-      );
-
-      const insertedEntry = { ...labourEntry, _id: entryResult.insertedId };
-      console.log('[POST /api/labour/entries] Labour entry inserted:', entryResult.insertedId);
-
-      // STEP 2: Update phase actual spending (atomic) - only for direct labour
-      // Indirect labour doesn't have a phase, so skip phase spending update
-      if (!indirectLabour && phaseId) {
-        await updatePhaseLabourSpending(
-          phaseId,
-          labourEntry.totalCost,
-          'add',
-          session
-        );
-      }
-
-      // STEP 2.5: Update indirect costs spending (atomic) - only for indirect labour
-      // CRITICAL: Indirect labour must update indirect costs budget, not phase budget
-      if (indirectLabour && indirectCostCategory) {
-        try {
-          const { updateIndirectCostsSpending } = await import('@/lib/indirect-costs-helpers');
-          // CRITICAL: Use the actual indirectCostCategory from the entry, not hardcoded
-          // This allows proper tracking by category (utilities, siteOverhead, transportation, safetyCompliance)
-          await updateIndirectCostsSpending(projectId, indirectCostCategory, labourEntry.totalCost, session);
-          console.log(`[POST /api/labour/entries] Indirect costs updated: ${projectId} | ${indirectCostCategory} | ${labourEntry.totalCost}`);
-        } catch (error) {
-          console.error('Error updating indirect costs spending:', error);
-          // Don't fail the entry creation - log and continue
-          // The budget validation already passed, this is just tracking
-        }
-      }
-
-      // STEP 3: Update project budget (atomic) - for both direct and indirect labour
-      await updateProjectLabourSpending(
-        projectId,
-        labourEntry.totalCost,
-        'add',
-        session
-      );
-
-      // STEP 4: Update work item if linked (atomic)
-      if (workItemId && ObjectId.isValid(workItemId)) {
-        await updateWorkItemLabour(
-          workItemId,
-          labourEntry.totalHours || 0,
-          labourEntry.totalCost,
-          'add',
-          session
-        );
-
-        // Update work item status based on completion (async, non-blocking)
-        setImmediate(async () => {
+        // If workerId is not provided or empty, but workerName is provided, create/get worker profile
+        if (
+          (!workerId || workerId.trim() === '') &&
+          workerName &&
+          workerName.trim().length >= 2
+        ) {
           try {
-            await updateWorkItemStatusFromCompletion(workItemId);
+            const { createOrGetWorkerProfileFromEntry } =
+              await import('@/lib/helpers/worker-profile-helpers');
+            const workerProfile = await createOrGetWorkerProfileFromEntry(
+              labourEntryData,
+              userProfile._id,
+              { session, db: transactionDb },
+            );
+
+            // Update labour entry with worker profile ID
+            labourEntry.workerId = workerProfile.userId || workerProfile._id;
+            labourEntry.workerName = workerProfile.workerName;
+
+            // Track if we created a new profile (vs found existing)
+            if (
+              workerProfile.createdAt &&
+              new Date(workerProfile.createdAt).getTime() > Date.now() - 5000
+            ) {
+              workerProfileCreated = true;
+              createdWorkerProfile = workerProfile;
+              console.log(
+                '[POST /api/labour/entries] Worker profile created:',
+                workerProfile._id,
+              );
+            } else {
+              console.log(
+                '[POST /api/labour/entries] Existing worker profile found:',
+                workerProfile._id,
+              );
+            }
           } catch (error) {
-            console.error('Error updating work item status:', error);
-            // Don't throw - status update is non-critical
+            console.error(
+              '[POST /api/labour/entries] Error creating worker profile:',
+              error,
+            );
+            // Don't fail the entry creation if worker profile creation fails
+            // Just log the error and continue
           }
-        });
-      }
+        }
 
-      // STEP 4.5: Update equipment utilization if operator (atomic)
-      if (labourEntry.equipmentId && ObjectId.isValid(labourEntry.equipmentId)) {
-        await updateEquipmentOperatorHours(
-          labourEntry.equipmentId.toString(),
-          labourEntry.totalHours || 0,
-          'add',
-          session
+        // STEP 1: Insert labour entry (atomic)
+        const entryResult = await transactionDb
+          .collection('labour_entries')
+          .insertOne(labourEntry, { session });
+
+        const insertedEntry = { ...labourEntry, _id: entryResult.insertedId };
+        console.log(
+          '[POST /api/labour/entries] Labour entry inserted:',
+          entryResult.insertedId,
         );
-      }
 
-      // STEP 5: Auto-approve for owner (atomic)
-      await transactionDb.collection('labour_entries').updateOne(
-        { _id: entryResult.insertedId },
-        {
-          $set: {
-            status: 'approved',
-            updatedAt: new Date(),
-          },
-        },
-        { session }
-      );
+        // STEP 2: Update phase actual spending (atomic) - only for direct labour
+        // Indirect labour doesn't have a phase, so skip phase spending update
+        if (!indirectLabour && phaseId) {
+          await updatePhaseLabourSpending(
+            phaseId,
+            labourEntry.totalCost,
+            'add',
+            session,
+          );
+        }
 
-      // STEP 6: Create audit log (atomic)
-      await createAuditLog(
-        {
-          userId: userProfile._id.toString(),
-          action: 'CREATED',
-          entityType: 'LABOUR_ENTRY',
-          entityId: entryResult.insertedId.toString(),
-          projectId: projectId,
-          changes: {
-            created: insertedEntry,
-            labourCost: labourEntry.totalCost,
-            budgetImpact: {
-              type: indirectLabour ? 'indirectCosts' : 'phaseLaborBudget',
-              before: budgetValidation.available + labourEntry.totalCost,
-              after: budgetValidation.available,
-              shortfall: budgetValidation.shortfall,
-              message: budgetValidation.message,
+        // STEP 2.5: Update indirect costs spending (atomic) - only for indirect labour
+        // CRITICAL: Indirect labour must update indirect costs budget, not phase budget
+        if (indirectLabour && indirectCostCategory) {
+          try {
+            const { updateIndirectCostsSpending } =
+              await import('@/lib/indirect-costs-helpers');
+            // CRITICAL: Use the actual indirectCostCategory from the entry, not hardcoded
+            // This allows proper tracking by category (utilities, siteOverhead, transportation, safetyCompliance)
+            await updateIndirectCostsSpending(
+              projectId,
+              indirectCostCategory,
+              labourEntry.totalCost,
+              session,
+            );
+            console.log(
+              `[POST /api/labour/entries] Indirect costs updated: ${projectId} | ${indirectCostCategory} | ${labourEntry.totalCost}`,
+            );
+          } catch (error) {
+            console.error('Error updating indirect costs spending:', error);
+            // Don't fail the entry creation - log and continue
+            // The budget validation already passed, this is just tracking
+          }
+        }
+
+        // STEP 3: Update project budget (atomic) - for both direct and indirect labour
+        await updateProjectLabourSpending(
+          projectId,
+          labourEntry.totalCost,
+          'add',
+          session,
+        );
+
+        // STEP 4: Update work item if linked (atomic)
+        if (workItemId && ObjectId.isValid(workItemId)) {
+          await updateWorkItemLabour(
+            workItemId,
+            labourEntry.totalHours || 0,
+            labourEntry.totalCost,
+            'add',
+            session,
+          );
+
+          // Update work item status based on completion (async, non-blocking)
+          setImmediate(async () => {
+            try {
+              await updateWorkItemStatusFromCompletion(workItemId);
+            } catch (error) {
+              console.error('Error updating work item status:', error);
+              // Don't throw - status update is non-critical
+            }
+          });
+        }
+
+        // STEP 4.5: Update equipment utilization if operator (atomic)
+        if (
+          labourEntry.equipmentId &&
+          ObjectId.isValid(labourEntry.equipmentId)
+        ) {
+          await updateEquipmentOperatorHours(
+            labourEntry.equipmentId.toString(),
+            labourEntry.totalHours || 0,
+            'add',
+            session,
+          );
+        }
+
+        // STEP 5: Auto-approve for owner (atomic)
+        await transactionDb.collection('labour_entries').updateOne(
+          { _id: entryResult.insertedId },
+          {
+            $set: {
+              status: 'approved',
+              updatedAt: new Date(),
             },
           },
-        },
-        { session }
-      );
+          { session },
+        );
 
-      return {
-        entryId: entryResult.insertedId,
-        entry: insertedEntry,
-        workerProfileCreated,
-        createdWorkerProfile: createdWorkerProfile ? {
-          _id: createdWorkerProfile._id,
-          workerName: createdWorkerProfile.workerName,
-          employeeId: createdWorkerProfile.employeeId,
-        } : null,
-      };
-    });
+        // STEP 6: Create audit log (atomic)
+        await createAuditLog(
+          {
+            userId: userProfile._id.toString(),
+            action: 'CREATED',
+            entityType: 'LABOUR_ENTRY',
+            entityId: entryResult.insertedId.toString(),
+            projectId: projectId,
+            changes: {
+              created: insertedEntry,
+              labourCost: labourEntry.totalCost,
+              budgetImpact: {
+                type: indirectLabour ? 'indirectCosts' : 'phaseLaborBudget',
+                before: budgetValidation.available + labourEntry.totalCost,
+                after: budgetValidation.available,
+                shortfall: budgetValidation.shortfall,
+                message: budgetValidation.message,
+              },
+            },
+          },
+          { session },
+        );
 
-    console.log('[POST /api/labour/entries] Transaction completed successfully');
+        return {
+          entryId: entryResult.insertedId,
+          entry: insertedEntry,
+          workerProfileCreated,
+          createdWorkerProfile: createdWorkerProfile
+            ? {
+                _id: createdWorkerProfile._id,
+                workerName: createdWorkerProfile.workerName,
+                employeeId: createdWorkerProfile.employeeId,
+              }
+            : null,
+        };
+      },
+    );
+
+    console.log(
+      '[POST /api/labour/entries] Transaction completed successfully',
+    );
 
     // After transaction: Recalculate phase spending (ensures accuracy)
     // Recalculate phase spending only for direct labour (phaseId is not null)
@@ -674,7 +809,10 @@ export async function POST(request) {
       try {
         await updateFloorFinancials(floorId.toString());
       } catch (floorError) {
-        console.error('Error recalculating floor spending after labour entry creation:', floorError);
+        console.error(
+          'Error recalculating floor spending after labour entry creation:',
+          floorError,
+        );
         // Don't fail the request, just log the error
       }
     }
@@ -716,14 +854,10 @@ export async function POST(request) {
         workerProfileCreated: transactionResult.workerProfileCreated,
         createdWorkerProfile: transactionResult.createdWorkerProfile,
       },
-      successMessage
+      successMessage,
     );
   } catch (error) {
     console.error('POST /api/labour/entries error:', error);
-    return errorResponse(
-      error.message || 'Failed to create labour entry',
-      500
-    );
+    return errorResponse(error.message || 'Failed to create labour entry', 500);
   }
 }
-

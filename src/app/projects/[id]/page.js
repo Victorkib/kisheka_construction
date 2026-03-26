@@ -24,7 +24,7 @@ import { ProjectHealthDashboard } from '@/components/project-health/ProjectHealt
 import { useTrackPageView } from '@/hooks/use-track-page-view';
 import { HierarchicalBudgetDisplay } from '@/components/budget/HierarchicalBudgetDisplay';
 import { CostManagementSummary } from '@/components/budget/CostManagementSummary';
-import { EnhancedBudgetInput } from '@/components/budget/EnhancedBudgetInput';
+import { SmartBudgetInput } from '@/components/budget/SmartBudgetInput';
 import { BudgetVisualization } from '@/components/budget/BudgetVisualization';
 import { useProjectContext } from '@/contexts/ProjectContext';
 import { DomainTile } from '@/components/projects/DomainTile';
@@ -2419,9 +2419,10 @@ export default function ProjectDetailPage() {
 
             <div className="pt-6 border-t-2 ds-border-subtle">
               <h3 className="text-lg font-bold ds-text-primary mb-4">Budget Information</h3>
-              <EnhancedBudgetInput
+              <SmartBudgetInput
                 value={formData.budget}
                 onChange={handleBudgetChange}
+                projectType="residential" // Could detect from project data
                 showAdvanced={true}
               />
               {/* Phase 2: Option to rescale phase budgets when DCC changes */}

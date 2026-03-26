@@ -42,17 +42,32 @@ export function ProgressPhotoUpload({
         ? `/api/floors/${floorId}/progress`
         : `/api/projects/${projectId}/progress`;
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      let requestBody;
+
+      if (floorId) {
+        // Floor progress API expects { photo: { url, description } }
+        requestBody = {
+          photo: {
+            url: photoUrl,
+            description: description.trim(),
+          },
+        };
+      } else {
+        // Project progress API expects { type: 'photo', photo: { url, description, floor? } }
+        requestBody = {
           type: 'photo',
           photo: {
             url: photoUrl,
             description: description.trim(),
-            ...(floorId ? {} : { floor: floorId }),
+            // future-proof: allow tagging a floor when used in floor context for projects
           },
-        }),
+        };
+      }
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
       });
 
       const data = await response.json();

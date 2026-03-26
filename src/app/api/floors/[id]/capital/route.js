@@ -20,6 +20,7 @@ import { successResponse, errorResponse } from '@/lib/api-response';
 import { allocateCapitalToFloors } from '@/lib/floor-financial-helpers';
 import { getProjectFinances } from '@/lib/financial-helpers';
 import { calculateFloorActualSpending, calculateFloorCommittedCosts } from '@/lib/floor-financial-helpers';
+import { checkCapitalAuthorization, CAPITAL_OPERATION_TYPES } from '@/lib/capital-authorization';
 
 // Force dynamic rendering to prevent caching stale data
 export const dynamic = 'force-dynamic';
@@ -160,9 +161,64 @@ export async function POST(request, { params }) {
 
     if (total > availableCapital) {
       return errorResponse(
-        `Insufficient capital. Available: ${availableCapital.toLocaleString()} KES, Requested: ${total.toLocaleString()} KES`,
+        `Insufficient capital. Available: ${formatCurrency(availableCapital)}, Requested: ${formatCurrency(total)}`,
         400
       );
+    }
+
+    // Check authorization level
+    const auth = checkCapitalAuthorization(userRole, total);
+
+    // For large amounts requiring approval from non-owners, create a request instead
+    if (auth.requiresApproval) {
+      // Create capital allocation request
+      const capitalRequest = {
+        projectId: new ObjectId(projectId),
+        floorId: new ObjectId(id),
+        requestedBy: userProfile._id,
+        requestedByName: `${userProfile.firstName || ''} ${userProfile.lastName || ''}`.trim() || userProfile.email,
+        requestedByRole: userProfile.role,
+        amount: total,
+        operationType: CAPITAL_OPERATION_TYPES.ALLOCATION,
+        description: `Capital allocation for floor ${floor.name || `Floor ${floor.floorNumber}`}`,
+        metadata: { strategy, byPhase, manualAllocations },
+        status: 'pending',
+        authLevel: auth.authLevel.name,
+        requiresApproval: true,
+        autoApproved: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        projectFinancesSnapshot: {
+          availableCapital,
+          totalInvested: projectFinances?.totalInvested || 0
+        }
+      };
+
+      const result = await db.collection('capital_allocation_requests').insertOne(capitalRequest);
+
+      // Create audit log
+      await createAuditLog({
+        userId: userProfile._id.toString(),
+        action: 'CAPITAL_REQUESTED',
+        entityType: 'CAPITAL_ALLOCATION_REQUEST',
+        entityId: result.insertedId.toString(),
+        projectId,
+        changes: {
+          amount: total,
+          floorId: id,
+          authLevel: auth.authLevel.name
+        },
+        description: `Capital allocation request created: ${formatCurrency(total)} for floor ${floor.name || `Floor ${floor.floorNumber}`}. Requires approval.`
+      });
+
+      return successResponse({
+        requestId: result.insertedId.toString(),
+        status: 'pending',
+        requiresApproval: true,
+        requiresConfirmation: auth.requiresConfirmation,
+        authLevel: auth.authLevel.name,
+        message: auth.message
+      }, 'Capital allocation request submitted for approval');
     }
 
     // Calculate actual spending and committed costs
@@ -499,4 +555,16 @@ export async function PATCH(request, { params }) {
     console.error('Update floor capital allocation error:', error);
     return errorResponse('Failed to update capital allocation', 500);
   }
+}
+
+/**
+ * Format currency helper
+ */
+function formatCurrency(amount) {
+  return new Intl.NumberFormat('en-KE', {
+    style: 'currency',
+    currency: 'KES',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount || 0);
 }

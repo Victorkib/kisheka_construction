@@ -13,6 +13,7 @@ import {
   MapPin, 
   Calendar,
   Info,
+  Layers,
 } from 'lucide-react';
 
 export function RateInformationCard({ 
@@ -23,21 +24,24 @@ export function RateInformationCard({
   const [rates, setRates] = useState({
     hourlyRate: null,
     perVisitRate: null,
+    perFloorRate: null,
     monthlyRetainer: null,
     source: null,
   });
 
   useEffect(() => {
     if (!professional && !assignment) {
-      setRates({ hourlyRate: null, perVisitRate: null, monthlyRetainer: null, source: null });
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setRates({ hourlyRate: null, perVisitRate: null, perFloorRate: null, monthlyRetainer: null, source: null });
       return;
     }
 
     // Prefer assignment rates (denormalized), fallback to library
-    if (assignment && (assignment.hourlyRate || assignment.perVisitRate || assignment.monthlyRetainer)) {
+    if (assignment && (assignment.hourlyRate || assignment.perVisitRate || assignment.perFloorRate || assignment.monthlyRetainer)) {
       setRates({
         hourlyRate: assignment.hourlyRate || assignment.ratesSnapshot?.hourlyRate || null,
         perVisitRate: assignment.perVisitRate || assignment.ratesSnapshot?.perVisitRate || null,
+        perFloorRate: assignment.perFloorRate || assignment.ratesSnapshot?.perFloorRate || null,
         monthlyRetainer: assignment.monthlyRetainer || assignment.ratesSnapshot?.monthlyRetainer || null,
         source: 'assignment',
       });
@@ -45,13 +49,14 @@ export function RateInformationCard({
       setRates({
         hourlyRate: professional.defaultHourlyRate || null,
         perVisitRate: professional.defaultPerVisitRate || null,
+        perFloorRate: professional.defaultPerFloorRate || null,
         monthlyRetainer: professional.defaultMonthlyRetainer || null,
         source: 'library',
       });
     }
   }, [professional, assignment]);
 
-  const hasRates = rates.hourlyRate || rates.perVisitRate || rates.monthlyRetainer;
+  const hasRates = rates.hourlyRate || rates.perVisitRate || rates.perFloorRate || rates.monthlyRetainer;
 
   if (!hasRates) {
     return (
@@ -60,8 +65,8 @@ export function RateInformationCard({
           <Info className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
           <div className="flex-1">
             <h3 className="text-sm font-semibold text-amber-900 mb-1">No Rates Configured</h3>
-            <p className="text-sm text-amber-800">
-              This professional doesn't have default rates set. You can still create the assignment, but contract value calculations won't be available.
+              <p className="text-sm text-amber-800">
+              This professional doesn&apos;t have default rates set. You can still create the assignment, but contract value calculations won&apos;t be available.
             </p>
           </div>
         </div>
@@ -81,7 +86,7 @@ export function RateInformationCard({
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Hourly Rate */}
         {rates.hourlyRate && (
           <div className="ds-bg-surface/70 rounded-lg p-3 border border-blue-100">
@@ -117,6 +122,25 @@ export function RateInformationCard({
               })}
             </p>
             <p className="text-xs ds-text-muted mt-1">per visit</p>
+          </div>
+        )}
+
+        {/* Per-Floor Rate */}
+        {rates.perFloorRate && (
+          <div className="ds-bg-surface/70 rounded-lg p-3 border border-blue-100">
+            <div className="flex items-center gap-2 mb-2">
+              <Layers className="h-4 w-4 text-blue-600" />
+              <span className="text-xs font-medium ds-text-secondary uppercase tracking-wide">Per-Floor Rate</span>
+            </div>
+            <p className="text-lg font-bold ds-text-primary">
+              {rates.perFloorRate.toLocaleString('en-KE', { 
+                style: 'currency', 
+                currency: 'KES',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}
+            </p>
+            <p className="text-xs ds-text-muted mt-1">per floor</p>
           </div>
         )}
 

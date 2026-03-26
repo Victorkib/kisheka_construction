@@ -81,6 +81,9 @@ export async function GET(request) {
     const assignedTo = searchParams.get('assignedTo');
     const category = searchParams.get('category');
     const search = searchParams.get('search');
+    const scope = searchParams.get('scope');
+    const dateFrom = searchParams.get('dateFrom');
+    const dateTo = searchParams.get('dateTo');
 
     if (projectId && ObjectId.isValid(projectId)) {
       query.projectId = new ObjectId(projectId);
@@ -101,6 +104,26 @@ export async function GET(request) {
 
     if (status && WORK_ITEM_STATUSES.includes(status)) {
       query.status = status;
+    }
+
+    // Filter by scope
+    if (scope && ['project', 'phase', 'floor', 'multi_phase'].includes(scope)) {
+      query.scope = scope;
+    }
+
+    // Filter by date range
+    if (dateFrom || dateTo) {
+      query.startDate = {};
+      if (dateFrom) {
+        query.startDate.$gte = new Date(dateFrom);
+      }
+      if (dateTo) {
+        query.startDate.$lte = new Date(dateTo + 'T23:59:59.999Z');
+      }
+      // Clean up empty object
+      if (Object.keys(query.startDate).length === 0) {
+        delete query.startDate;
+      }
     }
 
     // Handle assignedTo filter - support both single worker and array
@@ -164,18 +187,40 @@ export async function GET(request) {
       .limit(limit)
       .toArray();
 
-    // Populate phase names for better display
+    // Populate phase names and floor info for better display
     const phaseIds = [...new Set(workItems.map(item => item.phaseId?.toString()).filter(Boolean))];
-    const phases = phaseIds.length > 0 
+    const phases = phaseIds.length > 0
       ? await db.collection('phases').find({
           _id: { $in: phaseIds.map(id => new ObjectId(id)) },
           deletedAt: null
         }).toArray()
       : [];
-    
+
     const phaseMap = {};
     phases.forEach(phase => {
-      phaseMap[phase._id.toString()] = phase.phaseName || phase.name || 'Unknown';
+      phaseMap[phase._id.toString()] = {
+        phaseName: phase.phaseName || phase.name || 'Unknown',
+        phaseCode: phase.phaseCode,
+        phaseType: phase.phaseType
+      };
+    });
+
+    // Populate floor info
+    const floorIds = [...new Set(workItems.map(item => item.floorId?.toString()).filter(Boolean))];
+    const floors = floorIds.length > 0
+      ? await db.collection('floors').find({
+          _id: { $in: floorIds.map(id => new ObjectId(id)) },
+          deletedAt: null
+        }).toArray()
+      : [];
+
+    const floorMap = {};
+    floors.forEach(floor => {
+      floorMap[floor._id.toString()] = {
+        name: floor.name,
+        floorNumber: floor.floorNumber,
+        floorType: floor.floorType
+      };
     });
 
     // Populate assigned workers
@@ -222,8 +267,8 @@ export async function GET(request) {
       }
     });
 
-    // Add phase names and assigned workers to work items
-    const workItemsWithPhases = workItems.map(item => {
+    // Add phase names, floor info, and scope to work items
+    const workItemsWithDetails = workItems.map(item => {
       const assignedWorkers = [];
       if (item.assignedTo) {
         if (Array.isArray(item.assignedTo)) {
@@ -241,19 +286,30 @@ export async function GET(request) {
           }
         }
       }
-      
+
+      const phaseInfo = item.phaseId ? phaseMap[item.phaseId.toString()] : null;
+      const floorInfo = item.floorId ? floorMap[item.floorId.toString()] : null;
+
       return {
         ...item,
-        phaseName: item.phaseId ? phaseMap[item.phaseId.toString()] : 'Unknown',
+        scope: item.scope || 'phase',
+        phaseName: phaseInfo?.phaseName || 'Unknown',
+        phaseCode: phaseInfo?.phaseCode || null,
+        phaseType: phaseInfo?.phaseType || null,
+        floor: floorInfo,
         assignedWorkers: assignedWorkers,
-        assignedWorkersCount: assignedWorkers.length
+        assignedWorkersCount: assignedWorkers.length,
+        // Audit info
+        createdBy: item.createdBy?.toString() || null,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt
       };
     });
 
     const total = await db.collection('work_items').countDocuments(query);
 
     return successResponse({
-      workItems: workItemsWithPhases,
+      workItems: workItemsWithDetails,
       pagination: {
         page,
         limit,
@@ -299,8 +355,11 @@ export async function POST(request) {
 
     const body = await request.json();
     const {
+      scope,
       projectId,
       phaseId,
+      phaseIds,
+      floorId,
       name,
       description,
       category,
@@ -314,7 +373,6 @@ export async function POST(request) {
       plannedEndDate,
       actualEndDate,
       dependencies,
-      floorId,
       categoryId,
       priority,
       notes,
@@ -331,25 +389,85 @@ export async function POST(request) {
       return errorResponse('Invalid project ID', 400);
     }
 
-    if (!phaseId) {
-      return errorResponse('Phase ID is required', 400);
-    }
-
-    if (!ObjectId.isValid(phaseId)) {
-      return errorResponse('Invalid phase ID', 400);
-    }
-
+    // Scope-based validation
+    const workItemScope = scope || 'phase';
     const db = await getDatabase();
 
-    // Verify phase exists and belongs to project
-    const phase = await db.collection('phases').findOne({
-      _id: new ObjectId(phaseId),
-      projectId: new ObjectId(projectId),
-      deletedAt: null
-    });
+    // Store fetched phase for reuse (avoid duplicate DB queries)
+    let phase = null;
 
-    if (!phase) {
-      return errorResponse('Phase not found or does not belong to this project', 400);
+    if (workItemScope === 'project') {
+      // Project-level: only projectId required
+      if (!ObjectId.isValid(projectId)) {
+        return errorResponse('Valid projectId is required for project-level work items', 400);
+      }
+    } else if (workItemScope === 'phase') {
+      // Phase-level: projectId + phaseId required
+      if (!phaseId) {
+        return errorResponse('Phase ID is required for phase-level work items', 400);
+      }
+      if (!ObjectId.isValid(phaseId)) {
+        return errorResponse('Invalid phase ID', 400);
+      }
+      // Verify phase exists and belongs to project
+      phase = await db.collection('phases').findOne({
+        _id: new ObjectId(phaseId),
+        projectId: new ObjectId(projectId),
+        deletedAt: null
+      });
+      if (!phase) {
+        return errorResponse('Phase not found or does not belong to this project', 400);
+      }
+    } else if (workItemScope === 'floor') {
+      // Floor-level: projectId + phaseId + floorId required
+      if (!phaseId) {
+        return errorResponse('Phase ID is required for floor-level work items', 400);
+      }
+      if (!ObjectId.isValid(phaseId)) {
+        return errorResponse('Invalid phase ID', 400);
+      }
+      if (!floorId) {
+        return errorResponse('Floor ID is required for floor-level work items', 400);
+      }
+      if (!ObjectId.isValid(floorId)) {
+        return errorResponse('Invalid floor ID', 400);
+      }
+      // Verify phase and floor exist
+      phase = await db.collection('phases').findOne({
+        _id: new ObjectId(phaseId),
+        projectId: new ObjectId(projectId),
+        deletedAt: null
+      });
+      if (!phase) {
+        return errorResponse('Phase not found or does not belong to this project', 400);
+      }
+      const floor = await db.collection('floors').findOne({
+        _id: new ObjectId(floorId),
+        projectId: new ObjectId(projectId),
+        deletedAt: null
+      });
+      if (!floor) {
+        return errorResponse('Floor not found or does not belong to this project', 400);
+      }
+    } else if (workItemScope === 'multi_phase') {
+      // Multi-phase: projectId + phaseIds array required
+      if (!phaseIds || !Array.isArray(phaseIds) || phaseIds.length === 0) {
+        return errorResponse('phaseIds array is required for multi-phase work items', 400);
+      }
+      // Verify all phases exist and belong to project
+      for (const pid of phaseIds) {
+        if (!ObjectId.isValid(pid)) {
+          return errorResponse(`Invalid phase ID: ${pid}`, 400);
+        }
+        const phaseCheck = await db.collection('phases').findOne({
+          _id: new ObjectId(pid),
+          projectId: new ObjectId(projectId),
+          deletedAt: null
+        });
+        if (!phaseCheck) {
+          return errorResponse(`Phase ${pid.toString().slice(-4)} not found or does not belong to this project`, 400);
+        }
+      }
     }
 
     const { resolvedCategoryId, resolvedCategory } = await resolveWorkItemCategory(db, {
@@ -359,7 +477,16 @@ export async function POST(request) {
 
     // Enforce floor linkage for finishing phases (PHASE_TYPES.FINISHING)
     // Note: keep backward compatible for non-finishing phases
-    if (phase.phaseType === 'finishing') {
+    // Phase already fetched above for phase/floor scopes, but check for multi_phase or project scope with phaseId
+    if (!phase && phaseId && ObjectId.isValid(phaseId)) {
+      phase = await db.collection('phases').findOne({
+        _id: new ObjectId(phaseId),
+        projectId: new ObjectId(projectId),
+        deletedAt: null
+      });
+    }
+
+    if (phase?.phaseType === 'finishing') {
       if (!floorId || !ObjectId.isValid(floorId)) {
         return errorResponse('For finishing phases, a valid floorId is required for each work item', 400);
       }
@@ -374,14 +501,15 @@ export async function POST(request) {
 
         if (floor) {
           const phase03Budget = floor.budgetAllocation?.byPhase?.['PHASE-03']?.total || 0;
-          
+
           // If budget is set, validate
           if (phase03Budget > 0) {
             // Calculate current spending for finishing works on this floor
             const { calculateFloorActualSpending } = await import('@/lib/floor-financial-helpers');
             const actualSpending = await calculateFloorActualSpending(floorId, true);
-            const phase03Spending = actualSpending.byPhase?.[phaseId]?.total || 0;
-            
+            // Use phaseCode (e.g., 'PHASE-03') to access byPhase data, not phaseId
+            const phase03Spending = actualSpending.byPhase?.[phase.phaseCode]?.total || 0;
+
             // Get committed costs (estimated costs of existing work items)
             const existingFinishingWorkItems = await db.collection('work_items').find({
               projectId: new ObjectId(projectId),
@@ -389,14 +517,14 @@ export async function POST(request) {
               floorId: new ObjectId(floorId),
               deletedAt: null,
             }).toArray();
-            
+
             const committedEstimated = existingFinishingWorkItems.reduce(
               (sum, item) => sum + (Number(item.estimatedCost) || 0),
               0
             );
-            
+
             const totalAfterNew = phase03Spending + committedEstimated + estimatedCost;
-            
+
             // Only block if budget is exceeded (allow 5% tolerance for rounding)
             if (totalAfterNew > phase03Budget * 1.05) {
               return errorResponse(
@@ -406,7 +534,7 @@ export async function POST(request) {
                 400
               );
             }
-            
+
             // Warn if approaching budget limit (90% threshold)
             if (totalAfterNew > phase03Budget * 0.9 && totalAfterNew <= phase03Budget * 1.05) {
               console.warn(
@@ -422,8 +550,12 @@ export async function POST(request) {
 
     // Prepare work item data for validation
     const workItemData = {
+      scope: workItemScope,
       projectId,
-      phaseId,
+      // phaseId is required for phase and floor scopes
+      phaseId: (workItemScope === 'phase' || workItemScope === 'floor') ? phaseId : null,
+      phaseIds: workItemScope === 'multi_phase' ? phaseIds : [],
+      floorId: workItemScope === 'floor' ? floorId : null,
       name,
       description,
       category: resolvedCategory || category,
@@ -437,7 +569,6 @@ export async function POST(request) {
       plannedEndDate,
       actualEndDate,
       dependencies: dependencies || [],
-      floorId,
       categoryId: resolvedCategoryId
         ? resolvedCategoryId.toString()
         : (categoryId && ObjectId.isValid(categoryId) ? categoryId : null),
@@ -453,21 +584,21 @@ export async function POST(request) {
       const subcontractor = await db.collection('subcontractors').findOne({
         _id: new ObjectId(subcontractorId),
         projectId: new ObjectId(projectId),
-        phaseId: new ObjectId(phaseId),
+        ...(workItemScope === 'phase' && { phaseId: new ObjectId(phaseId) }),
         deletedAt: null
       });
       if (!subcontractor) {
         return errorResponse('Subcontractor not found or does not belong to this project/phase', 404);
       }
-      
-      // For finishing phases, verify subcontractor is linked to the same floor if floorId is provided
-      if (phase.phaseType === 'finishing' && floorId && subcontractor.floorId) {
+
+      // For finishing phases with floor scope, verify subcontractor is linked to the same floor
+      if (workItemScope === 'floor' && floorId && subcontractor.floorId) {
         if (subcontractor.floorId.toString() !== floorId.toString()) {
           return errorResponse('Subcontractor is assigned to a different floor. Please select a subcontractor assigned to this floor.', 400);
         }
       }
     }
-    
+
     // Validate using schema
     const validation = validateWorkItem(workItemData);
     if (!validation.isValid) {
@@ -485,6 +616,7 @@ export async function POST(request) {
     // Create work item object
     const workItem = createWorkItem(
       {
+        scope: workItemScope,
         name,
         description,
         category: resolvedCategory || category,
@@ -498,7 +630,8 @@ export async function POST(request) {
         plannedEndDate,
         actualEndDate,
         dependencies: dependencies || [],
-        floorId,
+        floorId: workItemScope === 'floor' ? floorId : null,
+        phaseIds: workItemScope === 'multi_phase' ? phaseIds : [],
         categoryId: resolvedCategoryId
           ? resolvedCategoryId.toString()
           : (categoryId && ObjectId.isValid(categoryId) ? categoryId : null),
@@ -508,7 +641,8 @@ export async function POST(request) {
         subcontractorId,
       },
       projectId,
-      phaseId,
+      // Pass phaseId for both phase and floor scopes
+      (workItemScope === 'phase' || workItemScope === 'floor') ? phaseId : null,
       userProfile._id
     );
 
@@ -517,21 +651,23 @@ export async function POST(request) {
 
     const insertedWorkItem = { ...workItem, _id: result.insertedId };
 
-    // Recalculate phase completion
-    try {
-      const completionPercentage = await calculatePhaseCompletionFromWorkItems(phaseId);
-      await db.collection('phases').updateOne(
-        { _id: new ObjectId(phaseId) },
-        {
-          $set: {
-            completionPercentage: completionPercentage,
-            updatedAt: new Date()
+    // Recalculate phase completion (only for phase-scoped work items)
+    if (phaseId && ObjectId.isValid(phaseId)) {
+      try {
+        const completionPercentage = await calculatePhaseCompletionFromWorkItems(phaseId);
+        await db.collection('phases').updateOne(
+          { _id: new ObjectId(phaseId) },
+          {
+            $set: {
+              completionPercentage: completionPercentage,
+              updatedAt: new Date()
+            }
           }
-        }
-      );
-    } catch (phaseError) {
-      console.error('Error recalculating phase completion after work item creation:', phaseError);
-      // Don't fail the request, just log the error
+        );
+      } catch (phaseError) {
+        console.error('Error recalculating phase completion after work item creation:', phaseError);
+        // Don't fail the request, just log the error
+      }
     }
 
     // Create audit log

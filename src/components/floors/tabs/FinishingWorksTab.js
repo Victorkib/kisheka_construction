@@ -656,7 +656,7 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                     </div>
                   )}
                 </div>
-                <div className="flex flex-col items-start sm:items-end text-xs ds-text-secondary">
+                <div className="flex flex-col items-start sm:items-end text-xs ds-text-secondary gap-1">
                   <div>
                     Est:{' '}
                     <span className="font-semibold">
@@ -670,12 +670,26 @@ export function FinishingWorksTab({ floor, formatCurrency }) {
                     </span>
                   </div>
                   {item.status && (
-                    <div className="mt-1">
+                    <div>
                       <span className="inline-flex items-center px-2 py-0.5 rounded-full ds-bg-surface-muted ds-text-secondary">
                         {item.status.replace('_', ' ')}
                       </span>
                     </div>
                   )}
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    <Link
+                      href={`/work-items/${item._id}`}
+                      className="inline-flex items-center px-2 py-1 rounded text-[11px] ds-bg-surface-muted ds-text-secondary hover:ds-bg-surface"
+                    >
+                      Open
+                    </Link>
+                    <Link
+                      href={`/labour/entries/new?projectId=${floor.projectId}&phaseId=${item.phase?._id || item.phaseId}&floorId=${floor._id}&workItemId=${item._id}`}
+                      className="inline-flex items-center px-2 py-1 rounded text-[11px] ds-bg-accent-primary text-white hover:ds-bg-accent-hover"
+                    >
+                      Log labour
+                    </Link>
+                  </div>
                 </div>
               </div>
             );
