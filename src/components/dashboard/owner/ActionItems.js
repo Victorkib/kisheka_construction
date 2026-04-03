@@ -10,12 +10,12 @@ import Link from 'next/link';
 export function ActionItems({ items, formatCurrency }) {
   if (!items || items.length === 0) {
     return (
-      <div className="bg-emerald-500/10 border-2 border-emerald-400/60 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
+      <div className="ds-bg-success border-2 ds-border-success rounded-lg p-4 sm:p-6 mb-6 sm:mb-8">
         <div className="flex items-center gap-2 sm:gap-3">
           <span className="text-2xl sm:text-3xl">✅</span>
           <div>
-            <h3 className="text-base sm:text-lg font-semibold text-emerald-200">All Clear!</h3>
-            <p className="text-xs sm:text-sm text-emerald-300">No critical action items at this time.</p>
+            <h3 className="text-base sm:text-lg font-semibold ds-text-success">All Clear!</h3>
+            <p className="text-xs sm:text-sm ds-text-success-muted">No critical action items at this time.</p>
           </div>
         </div>
       </div>
@@ -24,9 +24,9 @@ export function ActionItems({ items, formatCurrency }) {
 
   const getPriorityColor = (priority) => {
     const colors = {
-      critical: 'bg-red-500/10 border-red-400/60 text-red-200',
-      high: 'bg-amber-500/10 border-amber-400/60 text-amber-200',
-      medium: 'bg-blue-500/10 border-blue-400/60 text-blue-200',
+      critical: 'ds-bg-danger ds-border-danger ds-text-danger',
+      high: 'ds-bg-warning ds-border-warning ds-text-warning',
+      medium: 'ds-bg-info ds-border-info ds-text-info',
       low: 'ds-bg-surface-muted ds-border-subtle ds-text-primary',
     };
     return colors[priority] || colors.medium;
@@ -86,7 +86,7 @@ export function ActionItems({ items, formatCurrency }) {
                         <p className="text-xs sm:text-sm ds-text-secondary mb-2 sm:mb-3 break-words">{item.description}</p>
                         <Link
                           href={item.link}
-                          className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-xs sm:text-sm font-medium touch-manipulation"
+                          className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 ds-bg-accent-primary ds-text-inverse rounded-lg hover:ds-bg-accent-focus transition-colors text-xs sm:text-sm font-medium touch-manipulation"
                         >
                           {item.action}
                           <span>→</span>

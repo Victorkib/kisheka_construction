@@ -72,7 +72,7 @@ export function NoProjectsEmptyState({ canCreate = false, userName, role }) {
   };
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-400/60 rounded-lg p-8 mb-8 text-center">
+    <div className="ds-bg-info-muted border-2 ds-border-info rounded-lg p-8 mb-8 text-center">
       <div className="max-w-2xl mx-auto">
         <div className="text-6xl mb-4">🏗️</div>
         <h2 className="text-2xl font-bold ds-text-primary mb-2">
@@ -85,7 +85,7 @@ export function NoProjectsEmptyState({ canCreate = false, userName, role }) {
           {canCreate && (
             <Link
               href="/projects/new"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg transition-colors shadow-md hover:shadow-lg"
+              className="inline-block ds-bg-accent-primary hover:ds-bg-accent-focus ds-text-inverse font-semibold px-8 py-3 rounded-lg transition-colors shadow-md hover:shadow-lg"
             >
               Create Your First Project
             </Link>

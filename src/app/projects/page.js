@@ -116,13 +116,13 @@ function ProjectsPageContent() {
 
   const getStatusBadgeColor = (status) => {
     const colors = {
-      planning: 'bg-blue-500/10 text-blue-200 border border-blue-400/60',
-      active: 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60',
-      paused: 'bg-amber-500/10 text-amber-200 border border-amber-400/60',
-      completed: 'bg-purple-500/10 text-purple-200 border border-purple-400/60',
-      archived: 'ds-bg-surface-muted ds-text-secondary',
+      planning: 'ds-status-planning',
+      active: 'ds-status-active',
+      paused: 'ds-status-paused',
+      completed: 'ds-status-completed',
+      archived: 'ds-status-archived',
     };
-    return colors[status] || 'ds-bg-surface-muted ds-text-primary';
+    return colors[status] || 'ds-status-archived';
   };
 
   const formatCurrency = (amount) => {
@@ -337,17 +337,17 @@ function ProjectsPageContent() {
                           ? (totalUsed / totalInvested) * 100
                           : 0;
 
-                    let capitalStatusColor = 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60';
+                    let capitalStatusColor = 'ds-bg-success ds-border-success ds-text-success';
                     let capitalStatusText = 'Capital OK';
 
                     if (totalInvested === 0) {
-                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusColor = 'ds-bg-danger ds-border-danger ds-text-danger';
                       capitalStatusText = 'No Capital';
                     } else if (availableCapital < 0) {
-                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusColor = 'ds-bg-danger ds-border-danger ds-text-danger';
                       capitalStatusText = 'Negative';
                     } else if (usagePercentage > 80) {
-                      capitalStatusColor = 'bg-amber-500/10 text-amber-200 border border-amber-400/60';
+                      capitalStatusColor = 'ds-bg-warning ds-border-warning ds-text-warning';
                       capitalStatusText = 'Low Capital';
                     }
 
@@ -407,7 +407,7 @@ function ProjectsPageContent() {
                                 </div>
                                 {project.statistics.budgetVsCapitalWarning && (
                                   <div
-                                    className="text-xs text-amber-400 flex items-center gap-1"
+                                    className="text-xs ds-text-warning flex items-center gap-1"
                                     title={
                                       project.statistics.budgetVsCapitalWarning
                                     }
@@ -454,17 +454,17 @@ function ProjectsPageContent() {
                 const usagePercentage =
                   totalInvested > 0 ? (totalUsed / totalInvested) * 100 : 0;
 
-                    let capitalStatusColor = 'bg-emerald-500/10 text-emerald-200 border border-emerald-400/60';
+                    let capitalStatusColor = 'ds-bg-success ds-border-success ds-text-success';
                     let capitalStatusText = 'Capital OK';
 
                     if (totalInvested === 0) {
-                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusColor = 'ds-bg-danger ds-border-danger ds-text-danger';
                       capitalStatusText = 'No Capital';
                     } else if (availableCapital < 0) {
-                      capitalStatusColor = 'bg-red-500/10 text-red-200 border border-red-400/60';
+                      capitalStatusColor = 'ds-bg-danger ds-border-danger ds-text-danger';
                       capitalStatusText = 'Negative';
                     } else if (usagePercentage > 80) {
-                      capitalStatusColor = 'bg-amber-500/10 text-amber-200 border border-amber-400/60';
+                      capitalStatusColor = 'ds-bg-warning ds-border-warning ds-text-warning';
                       capitalStatusText = 'Low Capital';
                     }
 
@@ -541,7 +541,7 @@ function ProjectsPageContent() {
                           </div>
                           {project.statistics.budgetVsCapitalWarning && (
                             <div
-                              className="text-xs text-yellow-600 flex items-center gap-1 mt-1"
+                              className="text-xs ds-text-warning flex items-center gap-1 mt-1"
                               title={project.statistics.budgetVsCapitalWarning}
                             >
                               <span>⚠️</span>

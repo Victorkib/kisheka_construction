@@ -89,15 +89,15 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="bg-red-500/10 border border-red-400/60/70 text-red-400 px-4 py-3 rounded text-sm">
+        <div className="ds-bg-danger border ds-border-danger ds-text-danger px-4 py-3 rounded text-sm">
           <p>{error}</p>
           {isVerificationError && email && (
-            <div className="mt-3 pt-3 border-t border-red-400/60">
+            <div className="mt-3 pt-3 border-t ds-border-danger">
               <button
                 type="button"
                 onClick={handleResendVerification}
                 disabled={resending || resendSuccess}
-                className="text-sm text-blue-600 hover:text-blue-800 underline disabled:ds-text-muted"
+                className="text-sm ds-text-info hover:ds-text-info-muted underline disabled:ds-text-muted"
               >
                 {resending
                   ? 'Sending...'
@@ -111,7 +111,7 @@ export function LoginForm() {
       )}
 
       {resendSuccess && !error && (
-        <div className="bg-emerald-500/10 border border-emerald-300/70 text-emerald-300 px-4 py-3 rounded text-sm">
+        <div className="ds-bg-success border ds-border-success ds-text-success px-4 py-3 rounded text-sm">
           ✓ Verification email sent! Please check your inbox.
         </div>
       )}

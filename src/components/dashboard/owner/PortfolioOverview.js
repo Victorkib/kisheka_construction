@@ -24,13 +24,13 @@ export function PortfolioOverview({ projects, formatCurrency }) {
 
   const getStatusColor = (status) => {
     const colors = {
-      active: 'bg-emerald-500/15 text-emerald-100 border border-emerald-400/60',
-      planning: 'bg-blue-500/15 text-blue-100 border border-blue-400/60',
-      paused: 'bg-amber-500/15 text-amber-100 border border-amber-400/60',
-      completed: 'bg-purple-500/15 text-purple-100 border border-purple-400/60',
-      archived: 'bg-slate-500/15 text-slate-100 border border-slate-400/60',
+      active: 'ds-status-active',
+      planning: 'ds-status-planning',
+      paused: 'ds-status-paused',
+      completed: 'ds-status-completed',
+      archived: 'ds-status-archived',
     };
-    return colors[status] || 'bg-slate-500/15 text-slate-100 border border-slate-400/60';
+    return colors[status] || 'ds-status-archived';
   };
 
   const getHealthColor = (status) => {
@@ -45,12 +45,12 @@ export function PortfolioOverview({ projects, formatCurrency }) {
 
   const getCapitalStatusColor = (status) => {
     const colors = {
-      sufficient: 'bg-emerald-500/10 text-emerald-100 border border-emerald-400/60',
-      low: 'bg-amber-500/10 text-amber-100 border border-amber-400/60',
-      negative: 'bg-red-500/10 text-red-100 border border-red-400/60',
-      insufficient: 'bg-red-500/10 text-red-100 border border-red-400/60',
+      sufficient: 'ds-bg-success ds-border-success ds-text-success',
+      low: 'ds-bg-warning ds-border-warning ds-text-warning',
+      negative: 'ds-bg-danger ds-border-danger ds-text-danger',
+      insufficient: 'ds-bg-danger ds-border-danger ds-text-danger',
     };
-    return colors[status] || 'bg-slate-500/10 text-slate-100 border border-slate-400/60';
+    return colors[status] || 'ds-bg-surface-muted ds-text-secondary ds-border-subtle';
   };
 
   return (
@@ -59,7 +59,7 @@ export function PortfolioOverview({ projects, formatCurrency }) {
         <h2 className="text-xl sm:text-2xl font-bold ds-text-primary">All Projects</h2>
         <Link
           href="/projects"
-          className="text-xs sm:text-sm text-blue-500 hover:text-blue-400 active:text-blue-300 font-medium transition-colors touch-manipulation"
+          className="text-xs sm:text-sm ds-text-accent-primary hover:ds-bg-accent-focus/10 active:ds-bg-accent-focus/20 font-medium transition-colors touch-manipulation"
         >
           View All →
         </Link>
@@ -108,10 +108,10 @@ export function PortfolioOverview({ projects, formatCurrency }) {
                   <div
                     className={`h-1.5 rounded-full ${
                       project.budgetUtilization > 100
-                        ? 'bg-red-500'
+                        ? 'ds-progress-danger'
                         : project.budgetUtilization > 80
-                        ? 'bg-yellow-500'
-                        : 'bg-green-500'
+                        ? 'ds-progress-warning'
+                        : 'ds-progress-success'
                     }`}
                     style={{ width: `${Math.min(100, project.budgetUtilization)}%` }}
                   />
@@ -153,10 +153,10 @@ export function PortfolioOverview({ projects, formatCurrency }) {
                       key={idx}
                       className={`px-2 py-0.5 text-xs rounded ${
                         alert.severity === 'critical'
-                          ? 'bg-red-500/15 text-red-100 border border-red-400/60'
+                          ? 'ds-bg-danger ds-text-danger'
                           : alert.severity === 'high'
-                          ? 'bg-amber-500/15 text-amber-100 border border-amber-400/60'
-                          : 'bg-blue-500/15 text-blue-100 border border-blue-400/60'
+                          ? 'ds-bg-warning ds-text-warning'
+                          : 'ds-bg-info ds-text-info'
                       }`}
                     >
                       {alert.type.replace('_', ' ')}
@@ -176,7 +176,7 @@ export function PortfolioOverview({ projects, formatCurrency }) {
               <div className="mt-4 pt-4 border-t ds-border-subtle">
                 <Link
                   href={`/dashboard/approvals?projectId=${project.id}`}
-                  className="text-xs text-amber-300 hover:text-amber-200 font-medium"
+                  className="text-xs ds-text-warning hover:ds-text-warning-muted font-medium"
                   onClick={(e) => e.stopPropagation()}
                 >
                   ⚠️ {project.pendingApprovals} pending approval{project.pendingApprovals !== 1 ? 's' : ''}

@@ -29,6 +29,61 @@
   --ds-accent-primary: #2563eb;
   --ds-accent-sidebar: #38bdf8;
   --ds-accent-focus: #3b82f6;
+
+  /* Status Colors - Success */
+  --ds-text-success: #166534;
+  --ds-text-success-muted: #15803d;
+  --ds-bg-success: #dcfce7;
+  --ds-bg-success-muted: #f0fdf4;
+  --ds-border-success: #86efac;
+
+  /* Status Colors - Warning */
+  --ds-text-warning: #92400e;
+  --ds-text-warning-muted: #b45309;
+  --ds-bg-warning: #fef3c7;
+  --ds-bg-warning-muted: #fffbeb;
+  --ds-border-warning: #fcd34d;
+
+  /* Status Colors - Danger */
+  --ds-text-danger: #991b1b;
+  --ds-text-danger-muted: #b91c1c;
+  --ds-bg-danger: #fee2e2;
+  --ds-bg-danger-muted: #fef2f2;
+  --ds-border-danger: #fca5a5;
+
+  /* Status Colors - Info */
+  --ds-text-info: #075985;
+  --ds-text-info-muted: #0369a1;
+  --ds-bg-info: #dbeafe;
+  --ds-bg-info-muted: #eff6ff;
+  --ds-border-info: #93c5fd;
+
+  /* Progress/Status Indicators */
+  --ds-progress-success: #16a34a;
+  --ds-progress-warning: #d97706;
+  --ds-progress-danger: #dc2626;
+  --ds-progress-info: #2563eb;
+
+  /* Status Badge Colors */
+  --ds-status-planning-bg: #dbeafe;
+  --ds-status-planning-text: #1e40af;
+  --ds-status-planning-border: #93c5fd;
+  
+  --ds-status-active-bg: #dcfce7;
+  --ds-status-active-text: #166534;
+  --ds-status-active-border: #86efac;
+  
+  --ds-status-paused-bg: #fef3c7;
+  --ds-status-paused-text: #92400e;
+  --ds-status-paused-border: #fcd34d;
+  
+  --ds-status-completed-bg: #f3e8ff;
+  --ds-status-completed-text: #6b21a8;
+  --ds-status-completed-border: #d8b4fe;
+  
+  --ds-status-archived-bg: #f1f5f9;
+  --ds-status-archived-text: #475569;
+  --ds-status-archived-border: #cbd5e1;
 }
 
 /* Light theme tokens */
@@ -56,6 +111,61 @@
   --ds-accent-primary: #2563eb;
   --ds-accent-sidebar: #38bdf8;
   --ds-accent-focus: #3b82f6;
+
+  /* Status Colors - Success */
+  --ds-text-success: #166534;
+  --ds-text-success-muted: #15803d;
+  --ds-bg-success: #dcfce7;
+  --ds-bg-success-muted: #f0fdf4;
+  --ds-border-success: #86efac;
+
+  /* Status Colors - Warning */
+  --ds-text-warning: #92400e;
+  --ds-text-warning-muted: #b45309;
+  --ds-bg-warning: #fef3c7;
+  --ds-bg-warning-muted: #fffbeb;
+  --ds-border-warning: #fcd34d;
+
+  /* Status Colors - Danger */
+  --ds-text-danger: #991b1b;
+  --ds-text-danger-muted: #b91c1c;
+  --ds-bg-danger: #fee2e2;
+  --ds-bg-danger-muted: #fef2f2;
+  --ds-border-danger: #fca5a5;
+
+  /* Status Colors - Info */
+  --ds-text-info: #075985;
+  --ds-text-info-muted: #0369a1;
+  --ds-bg-info: #dbeafe;
+  --ds-bg-info-muted: #eff6ff;
+  --ds-border-info: #93c5fd;
+
+  /* Progress/Status Indicators */
+  --ds-progress-success: #16a34a;
+  --ds-progress-warning: #d97706;
+  --ds-progress-danger: #dc2626;
+  --ds-progress-info: #2563eb;
+
+  /* Status Badge Colors */
+  --ds-status-planning-bg: #dbeafe;
+  --ds-status-planning-text: #1e40af;
+  --ds-status-planning-border: #93c5fd;
+  
+  --ds-status-active-bg: #dcfce7;
+  --ds-status-active-text: #166534;
+  --ds-status-active-border: #86efac;
+  
+  --ds-status-paused-bg: #fef3c7;
+  --ds-status-paused-text: #92400e;
+  --ds-status-paused-border: #fcd34d;
+  
+  --ds-status-completed-bg: #f3e8ff;
+  --ds-status-completed-text: #6b21a8;
+  --ds-status-completed-border: #d8b4fe;
+  
+  --ds-status-archived-bg: #f1f5f9;
+  --ds-status-archived-text: #475569;
+  --ds-status-archived-border: #cbd5e1;
 }
 
 /* Dark theme tokens */
@@ -83,6 +193,61 @@
   --ds-accent-primary: #38bdf8;
   --ds-accent-sidebar: #14b8a6;
   --ds-accent-focus: #38bdf8;
+
+  /* Status Colors - Success (lighter for dark bg) */
+  --ds-text-success: #4ade80;
+  --ds-text-success-muted: #22c55e;
+  --ds-bg-success: #052e16;
+  --ds-bg-success-muted: #022c22;
+  --ds-border-success: #166534;
+
+  /* Status Colors - Warning */
+  --ds-text-warning: #fbbf24;
+  --ds-text-warning-muted: #f59e0b;
+  --ds-bg-warning: #451a03;
+  --ds-bg-warning-muted: #431407;
+  --ds-border-warning: #92400e;
+
+  /* Status Colors - Danger */
+  --ds-text-danger: #f87171;
+  --ds-text-danger-muted: #ef4444;
+  --ds-bg-danger: #450a0a;
+  --ds-bg-danger-muted: #7f1d1d;
+  --ds-border-danger: #991b1b;
+
+  /* Status Colors - Info */
+  --ds-text-info: #7dd3fc;
+  --ds-text-info-muted: #38bdf8;
+  --ds-bg-info: #0c4a6e;
+  --ds-bg-info-muted: #082f49;
+  --ds-border-info: #075985;
+
+  /* Progress/Status Indicators */
+  --ds-progress-success: #4ade80;
+  --ds-progress-warning: #fbbf24;
+  --ds-progress-danger: #f87171;
+  --ds-progress-info: #38bdf8;
+
+  /* Status Badge Colors */
+  --ds-status-planning-bg: #0c4a6e;
+  --ds-status-planning-text: #7dd3fc;
+  --ds-status-planning-border: #075985;
+  
+  --ds-status-active-bg: #052e16;
+  --ds-status-active-text: #4ade80;
+  --ds-status-active-border: #166534;
+  
+  --ds-status-paused-bg: #451a03;
+  --ds-status-paused-text: #fbbf24;
+  --ds-status-paused-border: #92400e;
+  
+  --ds-status-completed-bg: #3b0764;
+  --ds-status-completed-text: #c084fc;
+  --ds-status-completed-border: #7e22ce;
+  
+  --ds-status-archived-bg: #0f172a;
+  --ds-status-archived-text: #94a3b8;
+  --ds-status-archived-border: #334155;
 }
 
 @theme inline {
@@ -161,6 +326,70 @@ body {
 
 .ds-border-sidebar {
   border-color: var(--ds-border-sidebar);
+}
+
+/* Status Text Colors */
+.ds-text-success { color: var(--ds-text-success); }
+.ds-text-success-muted { color: var(--ds-text-success-muted); }
+.ds-text-warning { color: var(--ds-text-warning); }
+.ds-text-warning-muted { color: var(--ds-text-warning-muted); }
+.ds-text-danger { color: var(--ds-text-danger); }
+.ds-text-danger-muted { color: var(--ds-text-danger-muted); }
+.ds-text-info { color: var(--ds-text-info); }
+.ds-text-info-muted { color: var(--ds-text-info-muted); }
+
+/* Status Background Colors */
+.ds-bg-success { background-color: var(--ds-bg-success); }
+.ds-bg-success-muted { background-color: var(--ds-bg-success-muted); }
+.ds-bg-warning { background-color: var(--ds-bg-warning); }
+.ds-bg-warning-muted { background-color: var(--ds-bg-warning-muted); }
+.ds-bg-danger { background-color: var(--ds-bg-danger); }
+.ds-bg-danger-muted { background-color: var(--ds-bg-danger-muted); }
+.ds-bg-info { background-color: var(--ds-bg-info); }
+.ds-bg-info-muted { background-color: var(--ds-bg-info-muted); }
+
+/* Status Border Colors */
+.ds-border-success { border-color: var(--ds-border-success); }
+.ds-border-warning { border-color: var(--ds-border-warning); }
+.ds-border-danger { border-color: var(--ds-border-danger); }
+.ds-border-info { border-color: var(--ds-border-info); }
+
+/* Progress Colors */
+.ds-progress-success { background-color: var(--ds-progress-success); }
+.ds-progress-warning { background-color: var(--ds-progress-warning); }
+.ds-progress-danger { background-color: var(--ds-progress-danger); }
+.ds-progress-info { background-color: var(--ds-progress-info); }
+
+/* Accent Primary */
+.ds-text-accent-primary { color: var(--ds-accent-primary); }
+.ds-bg-accent-primary { background-color: var(--ds-accent-primary); }
+.ds-bg-accent-focus { background-color: var(--ds-accent-focus); }
+
+/* Status Badge Colors */
+.ds-status-planning {
+  background-color: var(--ds-status-planning-bg);
+  color: var(--ds-status-planning-text);
+  border-color: var(--ds-status-planning-border);
+}
+.ds-status-active {
+  background-color: var(--ds-status-active-bg);
+  color: var(--ds-status-active-text);
+  border-color: var(--ds-status-active-border);
+}
+.ds-status-paused {
+  background-color: var(--ds-status-paused-bg);
+  color: var(--ds-status-paused-text);
+  border-color: var(--ds-status-paused-border);
+}
+.ds-status-completed {
+  background-color: var(--ds-status-completed-bg);
+  color: var(--ds-status-completed-text);
+  border-color: var(--ds-status-completed-border);
+}
+.ds-status-archived {
+  background-color: var(--ds-status-archived-bg);
+  color: var(--ds-status-archived-text);
+  border-color: var(--ds-status-archived-border);
 }
 
 

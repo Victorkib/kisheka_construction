@@ -27,10 +27,10 @@ export function ExecutiveSummary({ data, formatCurrency }) {
     : 0;
 
   const getHealthColor = (score) => {
-    if (score >= 80) return 'text-emerald-400';
-    if (score >= 60) return 'text-blue-400';
-    if (score >= 40) return 'text-amber-400';
-    return 'text-red-400';
+    if (score >= 80) return 'ds-text-success';
+    if (score >= 60) return 'ds-text-info';
+    if (score >= 40) return 'ds-text-warning';
+    return 'ds-text-danger';
   };
 
   const getHealthStatus = (score) => {
@@ -81,10 +81,10 @@ export function ExecutiveSummary({ data, formatCurrency }) {
               <div
                 className={`h-2 rounded-full transition-all ${
                   capitalUtilization > 90
-                    ? 'bg-red-500'
+                    ? 'ds-progress-danger'
                     : capitalUtilization > 75
-                    ? 'bg-yellow-500'
-                    : 'bg-green-500'
+                    ? 'ds-progress-warning'
+                    : 'ds-progress-success'
                 }`}
                 style={{ width: `${Math.min(100, capitalUtilization)}%` }}
               />
@@ -126,17 +126,17 @@ export function ExecutiveSummary({ data, formatCurrency }) {
             <p className="text-xs sm:text-sm font-medium ds-text-secondary">Available Capital</p>
             <p className={`text-xl sm:text-2xl font-bold mt-1 break-words ${
               availableCapital < 0
-                ? 'text-red-600'
+                ? 'ds-text-danger'
                 : availableCapital < totalCapitalRaised * 0.1
-                ? 'text-yellow-600'
-                : 'text-green-600'
+                ? 'ds-text-warning'
+                : 'ds-text-success'
             }`}>
               {formatCurrency(availableCapital)}
             </p>
           </div>
           <Link
             href="/financing"
-            className="w-full sm:w-auto px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm font-medium text-center touch-manipulation"
+            className="w-full sm:w-auto px-4 py-2.5 ds-bg-accent-primary ds-text-inverse rounded-lg hover:ds-bg-accent-focus transition-colors text-sm font-medium text-center touch-manipulation"
           >
             View Finances →
           </Link>

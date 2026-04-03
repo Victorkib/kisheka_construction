@@ -524,7 +524,7 @@ export default function NewProjectPage() {
                   {/* Project Code */}
                   <div className="md:col-span-1">
                     <label className="block text-sm font-semibold ds-text-secondary mb-2">
-                      Project Code <span className="text-red-500">*</span>
+                      Project Code <span className="ds-text-danger">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -548,7 +548,7 @@ export default function NewProjectPage() {
                   {/* Project Name */}
                   <div className="md:col-span-1">
                     <label className="block text-sm font-semibold ds-text-secondary mb-2">
-                      Project Name <span className="text-red-500">*</span>
+                      Project Name <span className="ds-text-danger">*</span>
                     </label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -572,7 +572,7 @@ export default function NewProjectPage() {
                   <div className="md:col-span-2">
                     <div className="flex justify-between items-center mb-2">
                       <label className="block text-sm font-semibold ds-text-secondary">Description</label>
-                      <span className={`text-xs font-medium ${formData.description.length > 450 ? 'text-orange-500' : 'ds-text-muted'}`}>
+                      <span className={`text-xs font-medium ${formData.description.length > 450 ? 'ds-text-warning' : 'ds-text-muted'}`}>
                         {formData.description.length} / 500 characters
                       </span>
                     </div>

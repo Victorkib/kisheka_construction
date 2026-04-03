@@ -42,7 +42,7 @@ export function FinancialHealth({ data, formatCurrency }) {
         <h2 className="text-xl sm:text-2xl font-bold ds-text-primary">Financial Health</h2>
         <Link
           href="/financing"
-          className="text-xs sm:text-sm ds-text-accent-primary hover:text-blue-400 active:text-blue-300 font-medium transition-colors touch-manipulation"
+          className="text-xs sm:text-sm ds-text-accent-primary hover:ds-bg-accent-focus/10 active:ds-bg-accent-focus/20 font-medium transition-colors touch-manipulation"
         >
           View Details →
         </Link>
@@ -50,29 +50,29 @@ export function FinancialHealth({ data, formatCurrency }) {
 
       {/* Capital Overview */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-4 sm:mb-6">
-        <div className="bg-blue-500/10 rounded-lg p-4 sm:p-6 border border-blue-400/60">
+        <div className="ds-bg-info rounded-lg p-4 sm:p-6 border ds-border-info">
           <p className="text-xs sm:text-sm font-medium ds-text-secondary mb-2">Total Capital Raised</p>
-          <p className="text-2xl sm:text-3xl font-bold text-blue-200 break-words">{formatCurrency(totalRaised)}</p>
+          <p className="text-2xl sm:text-3xl font-bold ds-text-info break-words">{formatCurrency(totalRaised)}</p>
         </div>
-        <div className="bg-emerald-500/10 rounded-lg p-4 sm:p-6 border border-emerald-400/60">
+        <div className="ds-bg-success rounded-lg p-4 sm:p-6 border ds-border-success">
           <p className="text-xs sm:text-sm font-medium ds-text-secondary mb-2">Total Capital Used</p>
-          <p className="text-2xl sm:text-3xl font-bold text-emerald-200 break-words">{formatCurrency(totalUsed)}</p>
+          <p className="text-2xl sm:text-3xl font-bold ds-text-success break-words">{formatCurrency(totalUsed)}</p>
           <p className="text-xs ds-text-muted mt-2">{utilization}% utilized</p>
         </div>
         <div className={`rounded-lg p-4 sm:p-6 border ${
           available < 0
-            ? 'bg-red-500/10 border-red-400/60'
+            ? 'ds-bg-danger ds-border-danger'
             : available < totalRaised * 0.1
-            ? 'bg-amber-500/10 border-amber-400/60'
-            : 'bg-emerald-500/10 border-emerald-400/60'
+            ? 'ds-bg-warning ds-border-warning'
+            : 'ds-bg-success ds-border-success'
         }`}>
           <p className="text-xs sm:text-sm font-medium ds-text-secondary mb-2">Available Capital</p>
           <p className={`text-2xl sm:text-3xl font-bold break-words ${
             available < 0
-              ? 'text-red-200'
+              ? 'ds-text-danger'
               : available < totalRaised * 0.1
-              ? 'text-amber-200'
-              : 'text-emerald-200'
+              ? 'ds-text-warning'
+              : 'ds-text-success'
           }`}>
             {formatCurrency(available)}
           </p>
@@ -86,18 +86,18 @@ export function FinancialHealth({ data, formatCurrency }) {
           <span>{capitalStatus.isOptional ? 'Not Set' : `${utilization}%`}</span>
         </div>
         {capitalStatus.isOptional ? (
-          <div className="w-full bg-blue-500/10 border border-blue-400/60 rounded-lg p-3">
-            <p className="text-sm text-blue-200">{capitalStatus.message}</p>
+          <div className="w-full ds-bg-info border ds-border-info rounded-lg p-3">
+            <p className="text-sm ds-text-info">{capitalStatus.message}</p>
           </div>
         ) : (
           <div className="w-full ds-bg-surface-muted rounded-full h-4">
             <div
               className={`h-4 rounded-full transition-all ${
                 capitalStatus.status === 'overspent'
-                  ? 'bg-red-500'
+                  ? 'ds-progress-danger'
                   : capitalStatus.status === 'low'
-                  ? 'bg-yellow-500'
-                  : 'bg-green-500'
+                  ? 'ds-progress-warning'
+                  : 'ds-progress-success'
               }`}
               style={{ width: `${Math.min(100, capitalStatus.utilization || 0)}%` }}
             />
@@ -107,20 +107,20 @@ export function FinancialHealth({ data, formatCurrency }) {
 
       {/* Budget vs Actual */}
       {budgetStatus.isOptional ? (
-        <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-500/10 rounded-lg border border-blue-400/60">
+        <div className="mb-4 sm:mb-6 p-3 sm:p-4 ds-bg-info rounded-lg border ds-border-info">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
-            <h3 className="text-base sm:text-lg font-semibold text-blue-200">Budget Status</h3>
-            <span className="text-xs sm:text-sm font-medium text-blue-300">Not Set</span>
+            <h3 className="text-base sm:text-lg font-semibold ds-text-info">Budget Status</h3>
+            <span className="text-xs sm:text-sm font-medium ds-text-info-muted">Not Set</span>
           </div>
-          <p className="text-xs sm:text-sm text-blue-200 mb-3 break-words">{budgetStatus.message}</p>
+          <p className="text-xs sm:text-sm ds-text-info mb-3 break-words">{budgetStatus.message}</p>
           <div className="grid grid-cols-2 gap-3 sm:gap-4">
             <div>
-              <p className="text-xs text-blue-300 mb-1">Current Spending</p>
-              <p className="text-base sm:text-lg font-bold text-blue-200 break-words">{formatCurrency(actualSpent)}</p>
+              <p className="text-xs ds-text-info-muted mb-1">Current Spending</p>
+              <p className="text-base sm:text-lg font-bold ds-text-info break-words">{formatCurrency(actualSpent)}</p>
             </div>
             <div>
-              <p className="text-xs text-blue-300 mb-1">Budget</p>
-              <p className="text-base sm:text-lg font-bold text-blue-300">Not Set</p>
+              <p className="text-xs ds-text-info-muted mb-1">Budget</p>
+              <p className="text-base sm:text-lg font-bold ds-text-info-muted">Not Set</p>
             </div>
           </div>
         </div>
@@ -129,9 +129,9 @@ export function FinancialHealth({ data, formatCurrency }) {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
             <h3 className="text-base sm:text-lg font-semibold ds-text-primary">Budget vs Actual</h3>
             <span className={`text-xs sm:text-sm font-bold ${
-              budgetStatus.status === 'over_budget' ? 'text-red-400' : 
-              budgetStatus.status === 'at_risk' ? 'text-amber-400' : 
-              'text-emerald-400'
+              budgetStatus.status === 'over_budget' ? 'ds-text-danger' :
+              budgetStatus.status === 'at_risk' ? 'ds-text-warning' :
+              'ds-text-success'
             }`}>
               {budgetStatus.variance !== null && budgetStatus.variance < 0 ? '+' : ''}
               {budgetStatus.variance !== null ? formatPercentage(budgetStatus.variance, 'N/A') : 'N/A'} variance
@@ -144,17 +144,17 @@ export function FinancialHealth({ data, formatCurrency }) {
             </div>
             <div>
               <p className="text-xs ds-text-secondary mb-1">Actual Spent</p>
-              <p className="text-base sm:text-lg font-bold text-blue-400 break-words">{formatCurrency(actualSpent)}</p>
+              <p className="text-base sm:text-lg font-bold ds-text-accent-primary break-words">{formatCurrency(actualSpent)}</p>
             </div>
           </div>
           <div className="w-full ds-bg-surface-muted rounded-full h-3">
             <div
               className={`h-3 rounded-full transition-all ${
                 budgetStatus.status === 'over_budget'
-                  ? 'bg-red-500'
+                  ? 'ds-progress-danger'
                   : budgetStatus.status === 'at_risk'
-                  ? 'bg-yellow-500'
-                  : 'bg-green-500'
+                  ? 'ds-progress-warning'
+                  : 'ds-progress-success'
               }`}
               style={{ width: `${Math.min(100, budgetStatus.utilization || 0)}%` }}
             />
@@ -175,7 +175,7 @@ export function FinancialHealth({ data, formatCurrency }) {
             </div>
             <div className="w-full ds-bg-surface-muted rounded-full h-2">
               <div
-                className="h-2 rounded-full bg-blue-500"
+                className="h-2 rounded-full ds-progress-info"
                 style={{ width: `${materialsPercent}%` }}
               />
             </div>
@@ -189,7 +189,7 @@ export function FinancialHealth({ data, formatCurrency }) {
             </div>
             <div className="w-full ds-bg-surface-muted rounded-full h-2">
               <div
-                className="h-2 rounded-full bg-green-500"
+                className="h-2 rounded-full ds-progress-success"
                 style={{ width: `${labourPercent}%` }}
               />
             </div>
@@ -203,7 +203,7 @@ export function FinancialHealth({ data, formatCurrency }) {
             </div>
             <div className="w-full ds-bg-surface-muted rounded-full h-2">
               <div
-                className="h-2 rounded-full bg-purple-500"
+                className="h-2 rounded-full ds-progress-warning"
                 style={{ width: `${expensesPercent}%` }}
               />
             </div>

@@ -25,14 +25,14 @@ function LoginContent() {
       </div>
 
       {verified && (
-        <div className="bg-green-50 border border-green-400/60 text-green-700 px-4 py-3 rounded text-sm">
+        <div className="ds-bg-success border ds-border-success ds-text-success px-4 py-3 rounded text-sm">
           <p className="font-semibold">✓ Email verified successfully!</p>
           <p className="mt-1">You can now sign in to your account.</p>
         </div>
       )}
 
       {registered && !verified && (
-        <div className="bg-blue-50 border border-blue-400/60 text-blue-700 px-4 py-3 rounded text-sm">
+        <div className="ds-bg-info border ds-border-info ds-text-info px-4 py-3 rounded text-sm">
           <p className="font-semibold">📧 Check your email</p>
           <p className="mt-1">
             We've sent you a verification email. Please verify your email address before signing in.
@@ -41,7 +41,7 @@ function LoginContent() {
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-400/60 text-red-700 px-4 py-3 rounded text-sm">
+        <div className="ds-bg-danger border ds-border-danger ds-text-danger px-4 py-3 rounded text-sm">
           {decodeURIComponent(error)}
         </div>
       )}
