@@ -23,6 +23,29 @@ export async function GET(request) {
   const type = requestUrl.searchParams.get('type'); // 'signup' for email verification
   const next = requestUrl.searchParams.get('next') || '/dashboard';
 
+  // CRITICAL: Log incoming request for production debugging
+  console.log('[Auth Callback] ========================================');
+  console.log('[Auth Callback] OAuth callback invoked:', {
+    hasCode: !!code,
+    type,
+    next,
+    url: requestUrl.toString(),
+    nodeEnv: process.env.NODE_ENV,
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 30) + '...',
+  });
+
+  // Log incoming cookies for debugging
+  const incomingCookies = request.cookies.getAll();
+  console.log('[Auth Callback] Incoming cookies:', {
+    count: incomingCookies.length,
+    names: incomingCookies.map(c => c.name),
+    hasCodeVerifier: incomingCookies.some(c => 
+      c.name.includes('code-verifier') || 
+      c.name.includes('code_verifier') || 
+      c.name.includes('pkce')
+    ),
+  });
+
   // CRITICAL FIX: Always redirect to dashboard for OAuth flows
   // Don't allow redirecting to landing page (/) or auth pages after OAuth
   // This prevents users from being stuck on landing page after successful OAuth
@@ -75,10 +98,20 @@ export async function GET(request) {
           },
           setAll(cookiesToSetArray) {
             // Track all cookies being set during exchangeCodeForSession
+            console.log('[Auth Callback] setAll called with', cookiesToSetArray.length, 'cookies:', 
+              cookiesToSetArray.map(c => c.name).join(', '));
+            
             cookiesToSetArray.forEach(({ name, value, options }) => {
               cookiesToSet.push({ name, value, options });
               try {
                 cookieStore.set(name, value, options);
+                console.log('[Auth Callback] Cookie set successfully:', name, {
+                  path: options?.path,
+                  sameSite: options?.sameSite,
+                  secure: options?.secure,
+                  httpOnly: options?.httpOnly,
+                  maxAge: options?.maxAge,
+                });
               } catch (error) {
                 console.warn('[Auth Callback] Failed to set cookie:', name, error.message);
               }
@@ -207,17 +240,68 @@ export async function GET(request) {
         // Create redirect response
         // For OAuth flows, always redirect to dashboard (not landing page)
         // Only email verification should redirect to login page
-        const redirectUrl = isEmailVerification 
+        const redirectUrl = isEmailVerification
           ? new URL('/auth/login?verified=true', request.url)
           : new URL(finalNext, request.url);
 
+        // CRITICAL: Log what we're about to do
+        console.log('[Auth Callback] Preparing redirect:', {
+          url: redirectUrl.toString(),
+          isEmailVerification,
+          cookiesToSetCount: cookiesToSet.length,
+          cookieNames: cookiesToSet.map(c => c.name),
+        });
+
         const response = NextResponse.redirect(redirectUrl);
-        
+
         // CRITICAL FIX: Copy ALL cookies to redirect response
         // Session cookies and code verifier cookies must be included in the redirect
         // This ensures the session persists after redirect
         // CRITICAL: Use unified cookie configuration for consistency
         setCookiesOnResponse(response, cookiesToSet);
+
+        // Log cookies on the response for verification
+        console.log('[Auth Callback] Redirect response created with cookies:', {
+          setCookieHeaders: cookiesToSet.length,
+          status: response.status,
+        });
+        
+        // CRITICAL: Manually set Set-Cookie headers on redirect response
+        // This is more reliable than response.cookies.set() for redirects in production
+        // Each cookie must be set as a separate Set-Cookie header
+        if (cookiesToSet.length > 0) {
+          console.log('[Auth Callback] Manually setting Set-Cookie headers on redirect response');
+          cookiesToSet.forEach(({ name, value, options }) => {
+            try {
+              // Build cookie string manually
+              let cookieString = `${name}=${value}; Path=${options?.path || '/'}; Max-Age=${options?.maxAge || 31536000}`;
+              
+              if (options?.sameSite) {
+                cookieString += `; SameSite=${options.sameSite}`;
+              }
+              
+              if (options?.secure) {
+                cookieString += '; Secure';
+              }
+              
+              if (options?.httpOnly) {
+                cookieString += '; HttpOnly';
+              }
+              
+              if (options?.domain) {
+                cookieString += `; Domain=${options.domain}`;
+              }
+              
+              // Append to Set-Cookie header
+              // Multiple Set-Cookie headers must be separate entries
+              response.headers.append('Set-Cookie', cookieString);
+              
+              console.log('[Auth Callback] Set-Cookie header appended:', name);
+            } catch (headerError) {
+              console.error('[Auth Callback] Failed to set Set-Cookie header for', name, headerError.message);
+            }
+          });
+        }
         
         // Ensure no caching of this response
         response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
