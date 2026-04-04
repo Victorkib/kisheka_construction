@@ -27,8 +27,8 @@
     "fix:roles": "node scripts/diagnose-and-fix-roles.mjs --fix"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.5.0",
-    "@supabase/supabase-js": "^2.39.0",
+    "@supabase/ssr": "^0.10.0",
+    "@supabase/supabase-js": "^2.101.1",
     "@tailwindcss/postcss": "^4.1.17",
     "autoprefixer": "^10.4.24",
     "axios": "^1.6.0",

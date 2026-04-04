@@ -8,6 +8,48 @@ import { getDatabase } from './mongodb/connection';
 import { ObjectId } from 'mongodb';
 
 /**
+ * Determines the appropriate role for a user based on system state
+ *
+ * Role Assignment Logic:
+ * 1. If the user's email matches DEFAULT_ADMIN_EMAIL → always 'owner'
+ * 2. If this is the first user in the system (no users exist) → 'owner'
+ * 3. All other users → 'site_clerk'
+ *
+ * This function is the SINGLE SOURCE OF TRUTH for role assignment
+ * across both server-side sync (syncUserToMongoDB) and client-side sync (/api/auth/sync).
+ *
+ * @param {string} email - User's email address
+ * @param {Object} db - MongoDB database instance (optional, will connect if not provided)
+ * @returns {Promise<string>} The determined role for the user
+ */
+export async function determineUserRole(email, db = null) {
+  try {
+    // Rule 1: Check if email matches default admin
+    const defaultAdminEmail = process.env.DEFAULT_ADMIN_EMAIL?.toLowerCase().trim();
+    if (defaultAdminEmail && email?.toLowerCase().trim() === defaultAdminEmail) {
+      console.log('[Role Determination] User matches DEFAULT_ADMIN_EMAIL → owner');
+      return 'owner';
+    }
+
+    // Rule 2: Check if this is the first user in the system
+    const database = db || await getDatabase();
+    const userCount = await database.collection('users').countDocuments();
+
+    if (userCount === 0) {
+      console.log('[Role Determination] First user in system (count=0) → owner');
+      return 'owner';
+    }
+
+    // Rule 3: Default role for all other users
+    console.log('[Role Determination] Existing user in system → site_clerk');
+    return 'site_clerk';
+  } catch (error) {
+    console.error('[Role Determination] Error determining role, defaulting to site_clerk:', error);
+    return 'site_clerk';
+  }
+}
+
+/**
  * Gets the current authenticated user from Supabase session
  * @param {import('next/headers').cookies} cookieStore - Next.js cookies store
  * @returns {Promise<{user: import('@supabase/supabase-js').User | null, error: Error | null}>}
@@ -124,14 +166,14 @@ export async function syncUserToMongoDB(supabaseUser, additionalData = {}) {
         mongoId: existingUser._id?.toString(),
         currentRole: existingUser.role
       });
-      
+
       // For existing users: preserve current role unless explicitly provided in additionalData
       if (additionalData.hasOwnProperty('role') && additionalData.role !== undefined) {
         userData.role = additionalData.role; // Use provided role
       } else {
         userData.role = existingUser.role; // Preserve existing role
       }
-      
+
       // Update existing user
       const updateResult = await db.collection('users').updateOne(
         { supabaseId: supabaseUser.id },
@@ -142,35 +184,39 @@ export async function syncUserToMongoDB(supabaseUser, additionalData = {}) {
           },
         }
       );
-      
+
       console.log('[MongoDB Sync] User updated:', {
         matchedCount: updateResult.matchedCount,
         modifiedCount: updateResult.modifiedCount,
         supabaseId: supabaseUser.id
       });
-      
+
       // Verify the update
       const updatedUser = await db.collection('users').findOne({
         supabaseId: supabaseUser.id,
       });
-      
+
       if (!updatedUser) {
         throw new Error('User not found after update');
       }
-      
+
       console.log('[MongoDB Sync] Update verified:', {
         mongoId: updatedUser._id?.toString(),
         role: updatedUser.role
       });
-      
+
       return { ...updatedUser };
     } else {
       console.log('[MongoDB Sync] Creating new user');
-      
-      // Create new user - set default role only for new users
+
+      // CRITICAL: Use unified role determination for new users
+      // This ensures consistent role assignment across all sync paths
+      const determinedRole = await determineUserRole(supabaseUser.email, db);
+
+      // Create new user with determined role
       const newUser = {
         ...userData,
-        role: additionalData.role || 'site_clerk', // Default role only for new users
+        role: additionalData.role || determinedRole, // Allow override, otherwise use determined role
         createdAt: new Date(),
         isVerified: supabaseUser.email_confirmed_at ? true : false,
         notificationPreferences: {
@@ -189,32 +235,33 @@ export async function syncUserToMongoDB(supabaseUser, additionalData = {}) {
       console.log('[MongoDB Sync] Inserting new user:', {
         supabaseId: newUser.supabaseId,
         email: newUser.email,
-        role: newUser.role
+        role: newUser.role,
+        roleSource: additionalData.role ? 'explicit_override' : 'determined'
       });
 
       const result = await db.collection('users').insertOne(newUser);
-      
+
       console.log('[MongoDB Sync] User inserted:', {
         insertedId: result.insertedId?.toString(),
         acknowledged: result.acknowledged
       });
-      
+
       // Verify the insert
       const insertedUser = await db.collection('users').findOne({
         _id: result.insertedId,
       });
-      
+
       if (!insertedUser) {
         throw new Error('User not found after insert');
       }
-      
+
       console.log('[MongoDB Sync] Insert verified:', {
         mongoId: insertedUser._id?.toString(),
         supabaseId: insertedUser.supabaseId,
         email: insertedUser.email,
         role: insertedUser.role
       });
-      
+
       return { ...insertedUser };
     }
   } catch (error) {

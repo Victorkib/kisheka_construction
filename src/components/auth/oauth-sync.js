@@ -58,23 +58,58 @@ export function OAuthSync() {
             return; // Already synced, no redirect
           }
 
-          // User is authenticated, sync to MongoDB silently
+          // User is authenticated, sync to MongoDB with retry logic
           // NO REDIRECTS - let the user stay where they are
-          const response = await fetch('/api/auth/sync', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              supabaseId: user.id,
-              email: user.email,
-              firstName: user.user_metadata?.first_name || user.user_metadata?.given_name || '',
-              lastName: user.user_metadata?.last_name || user.user_metadata?.family_name || '',
-            }),
-          });
+          const maxSyncRetries = 2;
+          let syncSuccess = false;
 
-          if (!response.ok) {
-            console.error('Failed to sync user:', await response.text());
-            syncInProgressRef.current = false;
-            return;
+          for (let retry = 0; retry <= maxSyncRetries; retry++) {
+            if (retry > 0) {
+              const delayMs = retry * 1000; // 1s, 2s
+              console.log(`[OAuthSync] Retry attempt ${retry}/${maxSyncRetries}, waiting ${delayMs}ms...`);
+              await new Promise(resolve => setTimeout(resolve, delayMs));
+            }
+
+            try {
+              const response = await fetch('/api/auth/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  supabaseId: user.id,
+                  email: user.email,
+                  firstName: user.user_metadata?.first_name || user.user_metadata?.given_name || '',
+                  lastName: user.user_metadata?.last_name || user.user_metadata?.family_name || '',
+                }),
+              });
+
+              if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`[OAuthSync] Sync attempt ${retry + 1} failed (${response.status}):`, errorText);
+                continue; // Try again
+              }
+
+              // Success
+              syncSuccess = true;
+              console.log('[OAuthSync] User synced successfully', {
+                userId: user.id,
+                attempts: retry + 1
+              });
+              break;
+            } catch (fetchError) {
+              console.error(`[OAuthSync] Sync attempt ${retry + 1} error:`, fetchError.message);
+              // Continue to next retry
+            }
+          }
+
+          if (!syncSuccess) {
+            console.error('[OAuthSync] CRITICAL: All sync attempts failed for user:', {
+              userId: user.id,
+              email: user.email,
+              maxRetries: maxSyncRetries
+            });
+            // Mark as attempted anyway to prevent infinite retry loop
+            // User will still have Supabase session, but dashboard API calls may fail
+            // This is better than an infinite retry loop
           }
 
           // Mark as synced in session storage

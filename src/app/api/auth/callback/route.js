@@ -12,6 +12,7 @@ import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { syncUserToMongoDB } from '@/lib/auth-helpers';
+import { setCookiesOnResponse } from '@/lib/cookie-config';
 
 // Force dynamic rendering to prevent caching
 export const dynamic = 'force-dynamic';
@@ -144,20 +145,25 @@ export async function GET(request) {
             });
             
             // Verify the profile was actually created/updated
-            // CRITICAL: Retry verification up to 3 times with delays
+            // CRITICAL: Retry verification up to 5 times with exponential backoff
             // This handles race conditions where MongoDB write hasn't propagated yet
+            // Delays: 200ms, 500ms, 1000ms, 2000ms, 3000ms (total max wait: 6.7s)
+            // This is calibrated for MongoDB Atlas replication lag in production
             const { getUserProfile } = await import('@/lib/auth-helpers');
             let verifyProfile = null;
             let verifyAttempts = 0;
-            const maxVerifyAttempts = 3;
-            
+            const maxVerifyAttempts = 5;
+            const verifyDelays = [200, 500, 1000, 2000, 3000]; // Exponential backoff
+
             while (!verifyProfile && verifyAttempts < maxVerifyAttempts) {
-              await new Promise(resolve => setTimeout(resolve, verifyAttempts * 200)); // 0ms, 200ms, 400ms
+              const delayMs = verifyDelays[verifyAttempts] || 3000;
+              await new Promise(resolve => setTimeout(resolve, delayMs));
+
               verifyProfile = await getUserProfile(data.user.id);
               verifyAttempts++;
-              
+
               if (!verifyProfile && verifyAttempts < maxVerifyAttempts) {
-                console.log(`[Auth Callback] Profile not found, retrying verification (attempt ${verifyAttempts}/${maxVerifyAttempts})...`);
+                console.log(`[Auth Callback] Profile not found, retrying verification (attempt ${verifyAttempts}/${maxVerifyAttempts}, delay was ${delayMs}ms)...`);
               }
             }
             
@@ -210,29 +216,8 @@ export async function GET(request) {
         // CRITICAL FIX: Copy ALL cookies to redirect response
         // Session cookies and code verifier cookies must be included in the redirect
         // This ensures the session persists after redirect
-        // CRITICAL: Preserve original cookie options from Supabase - don't override unnecessarily
-        cookiesToSet.forEach(({ name, value, options }) => {
-          try {
-            // CRITICAL: Preserve Supabase's original cookie options
-            // Only set defaults if options are missing, don't override what Supabase sets
-            const cookieOptions = {
-              ...options,
-              // Ensure SameSite is set correctly for OAuth redirects
-              sameSite: options?.sameSite || 'lax',
-              // Secure should match environment
-              secure: process.env.NODE_ENV === 'production' ? true : (options?.secure ?? false),
-              // HttpOnly for session cookies
-              httpOnly: options?.httpOnly ?? true,
-              // Path should be root to ensure cookies are available everywhere
-              path: options?.path || '/',
-              // MaxAge should be set for session cookies (default 1 year)
-              maxAge: options?.maxAge || 60 * 60 * 24 * 365, // 1 year
-            };
-            response.cookies.set(name, value, cookieOptions);
-          } catch (error) {
-            console.warn('[Auth Callback] Failed to set cookie in response:', name, error.message);
-          }
-        });
+        // CRITICAL: Use unified cookie configuration for consistency
+        setCookiesOnResponse(response, cookiesToSet);
         
         // Ensure no caching of this response
         response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');

@@ -20,9 +20,15 @@ async function isConnectionHealthy(client) {
 }
 
 /**
- * Connect to MongoDB database
+ * Connect to MongoDB database with retry logic
  * Uses singleton pattern to reuse connection across requests
- * Includes health checks and automatic reconnection
+ * Includes health checks, automatic reconnection, and exponential backoff retries
+ *
+ * CRITICAL FOR PRODUCTION (Netlify):
+ * - Serverless cold starts can take 5-15 seconds for MongoDB Atlas
+ * - DNS resolution + TLS handshake + server selection on first request
+ * - These timeouts are calibrated for production serverless environments
+ *
  * @returns {Promise<{client: MongoClient, db: Db}>}
  */
 async function connectToDatabase() {
@@ -52,61 +58,109 @@ async function connectToDatabase() {
   const options = {
     maxPoolSize: 10,
     minPoolSize: 2,
-    socketTimeoutMS: 45000,
-    serverSelectionTimeoutMS: 5000,
+    // CRITICAL: Increased timeouts for production serverless cold starts
+    // Netlify functions can take 10-15s to establish MongoDB Atlas connection
+    connectTimeoutMS: 15000,        // 15 seconds (was default ~30s, explicit for clarity)
+    serverSelectionTimeoutMS: 15000, // 15 seconds (was 5s - too aggressive for production)
+    socketTimeoutMS: 45000,          // 45 seconds (unchanged - for query execution)
     // Enable connection monitoring
     monitorCommands: false,
     // Retry writes for better reliability
     retryWrites: true,
+    // Read preference: prefer primary for consistency
+    // This ensures we read the most recent writes (critical for auth sync verification)
+    readPreference: 'primary',
+    // Read concern: majority ensures we read replicated data
+    readConcern: { level: 'majority' },
   };
 
-  // Create connection promise
-  connectionPromise = (async () => {
+  // CRITICAL: Retry logic with exponential backoff for production reliability
+  // On Netlify, cold starts + network issues can cause transient failures
+  // We retry up to 3 times with delays: 0ms, 2000ms, 4000ms (total max wait: ~21s + connection time)
+  const maxRetries = 3;
+  let lastError = null;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
-      const client = new MongoClient(uri, options);
-      await client.connect();
-      
-      // Get database name from URI or use default
-      const dbName = process.env.MONGODB_DB_NAME || 'kisheka_prod';
-      const db = client.db(dbName);
-      
-      // Verify connection with ping
-      await db.admin().ping();
-      
-      console.log('✅ MongoDB connected successfully');
-      
-      // Cache the connection
-      cachedClient = client;
-      cachedDb = db;
-      
-      // Set up error handlers for automatic reconnection
-      client.on('error', (error) => {
-        console.error('❌ MongoDB client error:', error);
-        // Clear cache on error to force reconnection
-        cachedClient = null;
-        cachedDb = null;
-      });
+      // Wait before retry (exponential backoff: 0ms, 2s, 4s)
+      if (attempt > 0) {
+        const delayMs = attempt * 2000;
+        console.log(`[MongoDB] Retry attempt ${attempt}/${maxRetries}, waiting ${delayMs}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
 
-      client.on('close', () => {
-        console.warn('⚠️ MongoDB connection closed');
-        cachedClient = null;
-        cachedDb = null;
-      });
-      
-      return { client, db };
+      // Create connection promise
+      connectionPromise = (async () => {
+        try {
+          const client = new MongoClient(uri, options);
+          await client.connect();
+
+          // Get database name from URI or use default
+          const dbName = process.env.MONGODB_DB_NAME || 'kisheka_prod';
+          const db = client.db(dbName);
+
+          // Verify connection with ping
+          await db.admin().ping();
+
+          console.log('✅ MongoDB connected successfully', {
+            attempt: attempt + 1,
+            database: dbName
+          });
+
+          // Cache the connection
+          cachedClient = client;
+          cachedDb = db;
+
+          // Set up error handlers for automatic reconnection
+          client.on('error', (error) => {
+            console.error('❌ MongoDB client error:', error);
+            // Clear cache on error to force reconnection
+            cachedClient = null;
+            cachedDb = null;
+          });
+
+          client.on('close', () => {
+            console.warn('⚠️ MongoDB connection closed');
+            cachedClient = null;
+            cachedDb = null;
+          });
+
+          return { client, db };
+        } catch (error) {
+          console.error('❌ MongoDB connection error:', error);
+          // Clear cache on error
+          cachedClient = null;
+          cachedDb = null;
+          throw error;
+        } finally {
+          // Clear connection promise after completion
+          connectionPromise = null;
+        }
+      })();
+
+      // Return the successful connection
+      return await connectionPromise;
     } catch (error) {
-      console.error('❌ MongoDB connection error:', error);
-      // Clear cache on error
-      cachedClient = null;
-      cachedDb = null;
-      throw error;
-    } finally {
-      // Clear connection promise after completion
-      connectionPromise = null;
-    }
-  })();
+      lastError = error;
+      console.error(`[MongoDB] Connection attempt ${attempt + 1}/${maxRetries + 1} failed:`, {
+        message: error.message,
+        code: error.code,
+        name: error.name
+      });
 
-  return connectionPromise;
+      // Clear connection promise so next attempt starts fresh
+      connectionPromise = null;
+
+      // If this was the last attempt, throw the error
+      if (attempt === maxRetries) {
+        console.error('[MongoDB] All connection attempts failed after retries');
+        throw new Error(
+          `MongoDB connection failed after ${maxRetries + 1} attempts: ${lastError.message}. ` +
+          'This is likely a transient network issue. Please try again.'
+        );
+      }
+    }
+  }
 }
 
 /**
